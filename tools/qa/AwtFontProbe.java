@@ -8,10 +8,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Qué fuente da AWT por el nombre de una familia de resources/fonts/ después de darla de alta con
- * registerFont, que es como la buscaba JSVG antes de SvgFonts. Con la JVM arrancada en turco
- * (-Duser.language=tr -Duser.country=TR) devuelve Dialog aunque la familia esté en la lista: cambiar el Locale en
- * caliente no lo reproduce.
+ * Which font AWT gives for the name of a family of resources/fonts/ after registering it with
+ * registerFont, which is how JSVG looked it up before SvgFonts. With the JVM started in Turkish
+ * (-Duser.language=tr -Duser.country=TR) it returns Dialog even if the family is in the list: changing the Locale at
+ * runtime does not reproduce it.
  */
 public class AwtFontProbe {
     public static void main(String[] args) throws Exception {
@@ -23,7 +23,7 @@ public class AwtFontProbe {
             }
         }
         String[] families = env.getAvailableFontFamilyNames();
-        System.out.println("idioma " + Locale.getDefault());
+        System.out.println("language " + Locale.getDefault());
         for (File dir : fonts.listFiles(File::isDirectory)) {
             String family = dir.getName();
             boolean listed = Arrays.stream(families).anyMatch(family::equalsIgnoreCase);
@@ -31,7 +31,7 @@ public class AwtFontProbe {
             attributes.put(TextAttribute.FAMILY, family);
             attributes.put(TextAttribute.SIZE, 12f);
             Font font = new Font(attributes);
-            System.out.printf("%-16s en la lista: %-5s -> %s%n", family, listed, font.getFontName(Locale.ROOT));
+            System.out.printf("%-16s in the list: %-5s -> %s%n", family, listed, font.getFontName(Locale.ROOT));
         }
     }
 }

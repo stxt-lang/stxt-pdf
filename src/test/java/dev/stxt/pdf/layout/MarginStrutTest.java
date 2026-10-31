@@ -15,13 +15,13 @@ class MarginStrutTest {
 
     @Test
     void emptyBoxBetweenBAndC() {
-        // B (inferior 0), D vacía (25 y 15), C (superior 10): se fusionan 4 márgenes → 25.
+        // B (bottom 0), empty D (25 and 15), C (top 10): 4 margins merge → 25.
         assertEquals(25, MarginStrut.collapse(0, 25, 15, 10), 1e-9);
     }
 
     @Test
     void keepsPositiveAndNegativeApart() {
-        // 20 y −5 dan 15; añadir −10 da 20 − 10 = 10, no 15 − 10.
+        // 20 and −5 give 15; adding −10 gives 20 − 10 = 10, not 15 − 10.
         MarginStrut s = MarginStrut.EMPTY.add(20).add(-5);
         assertEquals(15, s.resolve(), 1e-9);
         assertEquals(10, s.add(-10).resolve(), 1e-9);

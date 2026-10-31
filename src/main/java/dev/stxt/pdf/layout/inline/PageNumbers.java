@@ -1,26 +1,27 @@
 package dev.stxt.pdf.layout.inline;
 
 /**
- * Numeración de páginas en el texto: {@code {page}} y {@code {pages}} (reference/common/breaks.md y
- * reference/common/breaks.md). Se resuelve en dos fases:
+ * Page numbering in the text: {@code {page}} and {@code {pages}}
+ * (reference/common/breaks.md#page-numbers-page-and-pages and reference/components/document.md#page-numbering). It is
+ * resolved in two phases:
  *
  * <ol>
- *   <li>Se pagina midiendo cada marcador como un número de prueba de {@value #DIGITS} cifras
- *       (o más ancho, ver abajo); las líneas conservan los marcadores.</li>
- *   <li>Con el total de páginas ya conocido, {@link InlineLayout#number} sustituye los valores
- *       reales en las líneas que los contienen y vuelve a calcular su ancho, su alineación y su
- *       justificación. Los saltos de línea no cambian.</li>
+ *   <li>Pagination measures each marker as a probe number of {@value #DIGITS} digits
+ *       (or wider, see below); the lines keep the markers.</li>
+ *   <li>With the total number of pages known, {@link InlineLayout#number} puts the real values
+ *       in the lines that contain them and recomputes their width, their alignment and their
+ *       justification. The line breaks do not change.</li>
  * </ol>
  *
- * <p>Si algún número impreso es más ancho que el de prueba (más cifras, o romanos), el {@link
- * dev.stxt.pdf.layout.Paginator} vuelve a paginar con un número de prueba que lo cubre, hasta que basta: tantos
- * caracteres como el más largo, con la letra más ancha de su estilo ({@code M} en romanos).</p>
+ * <p>If some printed number is wider than the probe one (more digits, or Roman numerals), the {@link
+ * dev.stxt.pdf.layout.Paginator} paginates again with a probe number that covers it, until it is enough: as many
+ * characters as the longest one, with the widest letter of its style ({@code M} in Roman numerals).</p>
  */
 public final class PageNumbers {
 
     public static final String PAGE = "{page}";
     public static final String PAGES = "{pages}";
-    /** Cifras del número de prueba de la primera paginación: reservan el ancho hasta 99 páginas. */
+    /** Digits of the probe number of the first pagination: they reserve the width for up to 99 pages. */
     public static final int DIGITS = 2;
 
     private PageNumbers() {
@@ -30,25 +31,25 @@ public final class PageNumbers {
         return text != null && (text.contains(PAGE) || text.contains(PAGES));
     }
 
-    /** El texto con los valores de una página, ya escritos con su estilo. */
+    /** The text with the values of a page, already written in their style. */
     public static String apply(String text, String page, String pages) {
         return text.replace(PAGES, pages).replace(PAGE, page);
     }
 
-    /** El número de prueba de la primera paginación. */
+    /** The probe number of the first pagination. */
     public static String firstProbe() {
         return "0".repeat(DIGITS);
     }
 
-    /** El carácter más ancho de dos de los que forman un número de prueba: {@code 0} &lt; {@code m} &lt; {@code M}. */
+    /** The wider of two of the characters that make up a probe number: {@code 0} &lt; {@code m} &lt; {@code M}. */
     public static char wider(char a, char b) {
         String order = "0mM";
         return order.indexOf(a) >= order.indexOf(b) ? a : b;
     }
 
     /**
-     * El número de prueba que cubre a {@code current} y a {@code needed}: el más largo de los dos, con el carácter más
-     * ancho. Solo crece, para que la paginación converja.
+     * The probe number that covers {@code current} and {@code needed}: the longer of the two, with the wider
+     * character. It only grows, so that the pagination converges.
      */
     public static String cover(String current, String needed) {
         if (needed.isEmpty()) {
@@ -58,7 +59,7 @@ public final class PageNumbers {
         return String.valueOf(c).repeat(Math.max(current.length(), needed.length()));
     }
 
-    /** Mide los marcadores como el número de prueba {@code probe} (primera fase). */
+    /** Measures the markers as the probe number {@code probe} (first phase). */
     public static TextMeasurer probing(TextMeasurer measurer, String probe) {
         return (text, font, fontSize) -> measurer.width(
                 contains(text) ? text.replace(PAGES, probe).replace(PAGE, probe) : text, font, fontSize);

@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Reglas reutilizables de {@code Styles}: a quién se aplican, con qué prioridad y cómo se mezclan. */
+/** Reusable rules of {@code Styles}: what they apply to, with what priority and how they merge. */
 class StylesTest {
 
     private static Box root(String... lines) {
@@ -35,7 +35,7 @@ class StylesTest {
         assertEquals(5, padding(outer), 1e-9);
         assertEquals(5, padding(outer.children().get(0)), 1e-9);
         assertEquals(Sides.all(Value.pt(0)), root.children().get(1).style().box().padding());
-        // La línea es la de la regla: los errores la señalan.
+        // The line is that of the rule: errors point to it.
         assertEquals(14, outer.style().line("padding").number());
     }
 
@@ -56,7 +56,7 @@ class StylesTest {
                 "\tStyles:", "\t\tFor element: Text", "\t\t\tTypography:", "\t\t\t\tSize: 12",
                 "\tBlock:", "\t\tTypography:", "\t\t\tSize: 20", "\t\tText: hola", "\t\tBlock:").children().get(0);
         assertEquals(12, block.children().get(0).style().typography().fontSize(), 1e-9);
-        // Lo que la regla no declara se sigue heredando.
+        // What the rule does not declare is still inherited.
         assertEquals(20, block.children().get(1).style().typography().fontSize(), 1e-9);
     }
 
@@ -75,7 +75,7 @@ class StylesTest {
                 "\tBlock:", "\t\tStyle: a", "\t\tId: x",
                 "\tBlock:", "\t\tStyle: a b", "\t\tId: y", "\t\tBox:", "\t\t\tPadding: 5");
         assertEquals(List.of(1.0, 2.0, 3.0, 4.0, 5.0), root.children().stream().map(StylesTest::padding).toList());
-        // La regla del tipo sigue aportando lo que las demás no declaran.
+        // The rule of the type still contributes what the others do not declare.
         root.children().forEach(b -> assertEquals(Sides.all(Value.pt(1)), b.style().box().margin()));
     }
 

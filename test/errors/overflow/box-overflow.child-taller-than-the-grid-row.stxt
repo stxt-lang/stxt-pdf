@@ -1,0 +1,16 @@
+# Case: Child taller than the grid row
+# Code: BOX_OVERFLOW
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Grid:
+			Row sizes: 20
+			Area: 1 1
+				Block:
+					Box:
+						Height: 80

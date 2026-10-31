@@ -6,18 +6,18 @@ import dev.stxt.pdf.tree.PageSetup;
 import java.util.List;
 
 /**
- * Una página del resultado.
+ * A page of the result.
  *
- * @param number  número de página física, desde 1, en todo el documento
- * @param content fragmento raíz con el flujo de esta página: el de la caja de su sección
- * @param fixed   fragmentos de las cajas {@code fixed} que salen en esta página
- * @param pageSetup   el medio de la página: el de su sección (reference/components/document.md)
- * @param section posición de su sección en el documento, desde 0
- * @param printed número impreso de la página (lo que dicen {@code {page}} y los índices), desde 1;
- *                0 si la página no se numera ({@code Page numbering: none})
- * @param style   cómo se escribe su número ({@code Page number format} de su sección)
- * @param blank   es la página en blanco con que acaba su sección para que la siguiente empiece en impar
- *                ({@code Begin on: odd}): sin contenido ni {@code Page overlay}
+ * @param number  physical page number, from 1, across the whole document
+ * @param content root fragment with the flow of this page: that of the box of its section
+ * @param fixed   fragments of the {@code fixed} boxes that appear on this page
+ * @param pageSetup   the medium of the page: that of its section (reference/components/document.md)
+ * @param section position of its section in the document, from 0
+ * @param printed printed number of the page (what {@code {page}} and the tables of contents say), from 1;
+ *                0 if the page is not numbered ({@code Page numbering: none})
+ * @param style   how its number is written ({@code Page number format} of its section)
+ * @param blank   it is the blank page that ends its section so that the next one starts on an odd page
+ *                ({@code Begin on: odd}): without content or {@code Page overlay}
  */
 public record Page(int number, Fragment content, List<Fragment> fixed, PageSetup pageSetup, int section, int printed,
                    NumberFormat style, boolean blank) {
@@ -26,7 +26,7 @@ public record Page(int number, Fragment content, List<Fragment> fixed, PageSetup
         fixed = List.copyOf(fixed);
     }
 
-    /** Si la página lleva número impreso. */
+    /** Whether the page carries a printed number. */
     public boolean numbered() {
         return printed > 0;
     }

@@ -1,0 +1,16 @@
+# Case: A table of contents without Font in the document
+# Code: TEXT_WITHOUT_FONT
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Heading 1:
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+			Text: Uno
+		Table of contents:

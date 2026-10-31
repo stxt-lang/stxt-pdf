@@ -1,0 +1,16 @@
+# Case: Rotate in a Stack: a Block that contains it is rotated instead
+# Code: CHILD_NOT_DECLARED
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Rotate: 10
+			Item:
+				Block:
+					Box:
+						Height: 10

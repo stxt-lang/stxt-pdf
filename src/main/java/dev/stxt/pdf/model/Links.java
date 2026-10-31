@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * El destino de un enlace (reference/common/links.md): una URL de fuera ({@code https://…},
- * {@code http://…} o {@code mailto:…}) o el {@code Id} de una caja del documento ({@code #id}).
- * Cualquier otra cosa se rechaza: el motor no abre nada, solo escribe la anotación del PDF, y un
- * visor no debe encontrarse con {@code javascript:}, {@code file:} ni una ruta relativa.
+ * The target of a link (reference/common/links.md): an external URL ({@code https://...},
+ * {@code http://...} or {@code mailto:...}) or the {@code Id} of a box of the document ({@code #id}).
+ * Anything else is rejected: the engine opens nothing, it only writes the PDF annotation, and a
+ * viewer must not come across {@code javascript:}, {@code file:} or a relative path.
  */
 public final class Links {
 
@@ -19,35 +19,35 @@ public final class Links {
     private Links() {
     }
 
-    /** Si el destino señala una caja del documento ({@code #id}) en lugar de una URL. */
+    /** Whether the target points to a box of the document ({@code #id}) instead of a URL. */
     public static boolean internal(String destination) {
         return destination.startsWith("#");
     }
 
-    /** El {@code Id} al que lleva un destino interno ({@code #intro} → {@code intro}). */
+    /** The {@code Id} an internal target leads to ({@code #intro} → {@code intro}). */
     public static String target(String destination) {
         return destination.substring(1);
     }
 
-    /** El destino interno que lleva a la caja de ese {@code Id} o nombre de índice. */
+    /** The internal target that leads to the box with that {@code Id} or table of contents name. */
     public static String to(String id) {
         return "#" + id;
     }
 
     /**
-     * Por qué un destino no es válido, o vacío si lo es. Un destino interno solo necesita un
-     * nombre sin espacios (que exista se comprueba al construir el árbol); uno externo, un
-     * esquema admitido y lo que ese esquema necesita: un servidor en {@code http} y
-     * {@code https}, un destinatario en {@code mailto}.
+     * Why a target is not valid, or empty if it is. An internal target only needs a
+     * name without spaces (whether it exists is checked when the tree is built); an external one, a
+     * supported scheme and what that scheme needs: a host in {@code http} and
+     * {@code https}, a recipient in {@code mailto}.
      */
     public static Optional<String> problem(String destination) {
         if (destination.isEmpty()) {
-            return Optional.of("el destino está vacío: tiene que ser una URL (https://..., mailto:...) o #id");
+            return Optional.of("the target is empty: it has to be a URL (https://..., mailto:...) or #id");
         }
         if (internal(destination)) {
             String id = target(destination);
             if (id.isEmpty() || id.chars().anyMatch(Character::isWhitespace)) {
-                return Optional.of("'" + destination + "' no es el Id de una caja: se escribe #id, sin espacios");
+                return Optional.of("'" + destination + "' is not the Id of a box: it is written #id, without spaces");
             }
             return Optional.empty();
         }
@@ -55,20 +55,20 @@ public final class Links {
         try {
             uri = new URI(destination);
         } catch (URISyntaxException e) {
-            return Optional.of("'" + destination + "' no es una URL válida (" + e.getReason() + ")");
+            return Optional.of("'" + destination + "' is not a valid URL (" + e.getReason() + ")");
         }
         String scheme = uri.getScheme() == null ? null : uri.getScheme().toLowerCase(Locale.ROOT);
         if (scheme == null || !SCHEMES.contains(scheme)) {
-            return Optional.of("'" + destination + "' no tiene un esquema admitido: solo https://, http://, "
-                    + "mailto: y #id");
+            return Optional.of("'" + destination + "' does not have a supported scheme: only https://, http://, "
+                    + "mailto: and #id");
         }
         if (scheme.equals("mailto")) {
             String to = uri.getSchemeSpecificPart();
             if (to == null || to.isBlank() || to.startsWith("?")) {
-                return Optional.of("'" + destination + "' no tiene destinatario: mailto:nombre@dominio");
+                return Optional.of("'" + destination + "' has no recipient: mailto:name@domain");
             }
         } else if (uri.getHost() == null || uri.getHost().isEmpty()) {
-            return Optional.of("'" + destination + "' no tiene servidor: " + scheme + "://servidor/ruta");
+            return Optional.of("'" + destination + "' has no host: " + scheme + "://host/path");
         }
         return Optional.empty();
     }

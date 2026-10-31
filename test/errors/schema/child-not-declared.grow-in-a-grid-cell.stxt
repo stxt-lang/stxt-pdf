@@ -1,0 +1,16 @@
+# Case: Grow in a grid cell
+# Code: CHILD_NOT_DECLARED
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Grid:
+			Area:
+				Grow: 1
+				Block:
+					Box:
+						Height: 10

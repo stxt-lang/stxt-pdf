@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/** El schema leído como datos, para los tests que lo comparan con el código. */
+/** The schema read as data, for the tests that compare it with the code. */
 final class SchemaNodes {
 
     private SchemaNodes() {
     }
 
-    /** Los hijos que admite cada nodo del schema, por su nombre y en el orden del fichero. */
+    /** The children that each node of the schema allows, by their name and in file order. */
     static Map<String, List<String>> children() {
         Map<String, List<String>> children = new LinkedHashMap<>();
         for (Node n : ((InlineNode) STXT.rawParser().parse(schema()).get(0)).getChildren()) {
@@ -34,7 +34,7 @@ final class SchemaNodes {
         return children;
     }
 
-    /** Nombre canónico, como {@code Node.getCanonicalName()}: {@code Min width} → {@code min-width}. */
+    /** Canonical name, like {@code Node.getCanonicalName()}: {@code Min width} → {@code min-width}. */
     static String canonical(String name) {
         return name.toLowerCase(Locale.ROOT).replace(' ', '-');
     }

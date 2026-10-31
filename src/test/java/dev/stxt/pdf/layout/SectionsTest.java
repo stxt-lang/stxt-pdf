@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Las secciones (reference/components/document.md): páginas de 300 × 200 con márgenes de 20 (área útil de
- * 260 × 160). Con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt.
+ * Sections (reference/components/document.md): pages of 300 × 200 with margins of 20 (page area of
+ * 260 × 160). With {@code FixedMetrics} and {@code Size: 10}, each character measures 5 pt.
  */
 class SectionsTest {
 
@@ -32,7 +32,7 @@ class SectionsTest {
         return layWith(HEADER, lines);
     }
 
-    /** Las líneas del documento: cada parte es una línea ({@code String}) o varias ({@code String[]}). */
+    /** The lines of the document: each part is one line ({@code String}) or several ({@code String[]}). */
     private static LaidOutDocument layWith(String header, Object... parts) {
         String body = java.util.Arrays.stream(parts)
                 .flatMap(p -> p instanceof String[] many ? java.util.Arrays.stream(many) : java.util.stream.Stream.of((String) p))
@@ -40,7 +40,7 @@ class SectionsTest {
         return new Engine().layOutDocument(new DocumentReader().read(header + body));
     }
 
-    /** Una página entera: una caja de 160 pt, el alto del área útil. */
+    /** A whole page: a box of 160 pt, the height of the page area. */
     private static String[] fullPage(String id) {
         return new String[] {"\t\tBlock:", "\t\t\tId: " + id, "\t\t\tBox:", "\t\t\t\tHeight: 160"};
     }
@@ -63,7 +63,7 @@ class SectionsTest {
     }
 
     /**
-     * El fragmento con ese {@code Id} en el flujo o en los {@code Page overlay} de la página; {@code null} si no sale.
+     * The fragment with that {@code Id} in the flow or in the {@code Page overlay} of the page; {@code null} if absent.
      */
     private static Fragment on(Page page, String id) {
         Fragment found = find(page.content(), id);
@@ -77,7 +77,7 @@ class SectionsTest {
         return page.fixed().stream().map(f -> f.box().id()).collect(Collectors.toList());
     }
 
-    /** El texto de la caja con ese {@code Id}, o el de sus descendientes si ella no tiene líneas. */
+    /** The text of the box with that {@code Id}, or that of its descendants if it has no lines. */
     private static String text(Page page, String id) {
         return text(on(page, id));
     }
@@ -96,20 +96,20 @@ class SectionsTest {
                 "\tSection:", "\t\tPage:", "\t\t\tMargin: 10", "\t\tBlock:", "\t\t\tId: c",
                 "\tSection:", "\t\tPage:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
         assertEquals(4, d.pages().size());
-        // Sin Page propio, el del documento.
+        // Without its own Page, the one of the document.
         assertEquals(595, d.pages().get(0).pageSetup().width(), 1e-9);
         assertEquals(842, d.pages().get(0).pageSetup().height(), 1e-9);
-        // Solo Orientation: el papel del documento girado, con sus márgenes.
+        // Only Orientation: the paper of the document rotated, with its margins.
         assertEquals(842, d.pages().get(1).pageSetup().width(), 1e-9);
         assertEquals(595, d.pages().get(1).pageSetup().height(), 1e-9);
         assertEquals(40, d.pages().get(1).pageSetup().margin().left(), 1e-9);
-        // Solo Margin: el tamaño del documento.
+        // Only Margin: the size of the document.
         assertEquals(595, d.pages().get(2).pageSetup().width(), 1e-9);
         assertEquals(10, d.pages().get(2).pageSetup().margin().top(), 1e-9);
-        // Un tamaño propio y un margen propio.
+        // Its own size and its own margin.
         assertEquals(612, d.pages().get(3).pageSetup().width(), 1e-9);
         assertEquals(0, d.pages().get(3).pageSetup().margin().left(), 1e-9);
-        // El área útil de cada página es la de su medio: el ancho de la caja de la sección.
+        // The page area of each page is that of its medium: the width of the box of the section.
         assertEquals(515, d.pages().get(0).content().width(), 1e-9);
         assertEquals(762, d.pages().get(1).content().width(), 1e-9);
         assertEquals(575, d.pages().get(2).content().width(), 1e-9);
@@ -138,10 +138,10 @@ class SectionsTest {
                         "\t\t\t\tHeight: 10", "\t\tBlock:", "\t\t\tId: b"},
                 new String[] {"\tSection:", "\t\tBlock:", "\t\t\tId: c"});
         assertEquals(4, d.pages().size());
-        // Pages: first cuenta dentro de la sección: solo su primera página.
+        // Pages: first counts within the section: only its first page.
         assertEquals(List.of("foot", "head-a"), pageOverlayIds(d.pages().get(0)));
         assertEquals(List.of("foot"), pageOverlayIds(d.pages().get(1)));
-        // Inherit page overlays: false deja la sección sin los del documento.
+        // Inherit page overlays: false leaves the section without those of the document.
         assertEquals(List.of("head-b"), pageOverlayIds(d.pages().get(2)));
         assertEquals(List.of("foot"), pageOverlayIds(d.pages().get(3)));
     }
@@ -170,17 +170,17 @@ class SectionsTest {
         assertEquals(List.of(0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
         assertFalse(d.pages().get(0).numbered());
         assertEquals(List.of(), pageOverlayIds(d.pages().get(0)));
-        // La primera página interior es la 1 de 2, aunque sea la segunda del documento; el anexo
-        // reinicia el contador, así que es la 1 de 1 y no cuenta para el total del cuerpo.
+        // The first inner page is 1 of 2, even though it is the second of the document; the appendix
+        // restarts the counter, so it is 1 of 1 and does not count toward the total of the body.
         assertEquals("Página 1 de 2", text(d.pages().get(1), "num"));
         assertEquals("Página 2 de 2", text(d.pages().get(2), "num"));
         assertEquals("Página 1 de 1", text(d.pages().get(3), "num"));
     }
 
     /**
-     * Un prefacio en romanos y un cuerpo que vuelve a empezar en 5: {@code {page}}, {@code {pages}} y {@code {page of:
-     * id}} se escriben con el {@code Page number format} de la página donde salen o a la que se refieren
-     * (reference/components/document.md).
+     * A preface in Roman numerals and a body that starts again at 5: {@code {page}}, {@code {pages}} and
+     * {@code {page of: id}} are written with the {@code Page number format} of the page where they appear or to which
+     * they refer (reference/components/document.md).
      */
     @Test
     void romanPagesAndARestartThatStartsAtFive() {
@@ -218,14 +218,15 @@ class SectionsTest {
                         "\t\t\tId: ref"}, fullPage("b1")),
                 join(new String[] {"\tSection:", "\t\tId: second"}, new String[] {"\t\tBlock:", "\t\t\tId: target",
                         "\t\t\tBox:", "\t\t\t\tHeight: 10"}));
-        // cover = física 1 (sin número), cuerpo = física 2 (la 1) y 3 (la 2), segunda sección = física 4 (la 3).
+        // cover = physical 1 (no number), body = physical 2 (number 1) and 3 (number 2), second section = physical 4
+        // (number 3).
         assertEquals(4, d.pages().size());
         assertEquals("Mira la página 3 y la 3.", text(d.pages().get(1), "ref"));
     }
 
     @Test
     void pagesCountsOnlyTheNumberedPagesOfTheRun() {
-        // {pages} cuenta las páginas numeradas de la tanda, no las del documento.
+        // {pages} counts the numbered pages of the page sequence, not those of the document.
         LaidOutDocument d = lay(
                 "\tPage overlay:", "\t\tId: n", "\t\tPages: last", "\t\tText: {pages}",
                 join(new String[] {"\tSection:", "\t\tInherit page overlays: false", "\t\tPage numbering: none"}, fullPage("c1"), fullPage("c2")),
@@ -235,9 +236,9 @@ class SectionsTest {
     }
 
     /**
-     * {@code Begin on: odd}: si la sección anterior acaba en impar, acaba con una página en blanco de ella, sin
-     * contenido ni {@code Page overlay}, que cuenta para el número y para {@code {pages}} pero no para el {@code Pages}
-     * de los {@code Page overlay} de su sección (reference/components/document.md).
+     * {@code Begin on: odd}: if the previous section ends on an odd page, it ends with a blank page of its own, without
+     * content or {@code Page overlay}, which counts for the number and for {@code {pages}} but not for the
+     * {@code Pages} of the {@code Page overlay} of its section (reference/components/document.md).
      */
     @Test
     void aSectionThatBeginsOnAnOddPageLeavesABlankPageBefore() {
@@ -253,7 +254,7 @@ class SectionsTest {
         assertEquals(0, blank.section());
         assertEquals(List.of(), blank.content().children());
         assertEquals(List.of(), pageOverlayIds(blank));
-        // Pages: last de la sección es su última página con contenido, no la página en blanco.
+        // Pages: last of the section is its last page with content, not the blank page.
         assertEquals(List.of("num", "last-a"), pageOverlayIds(d.pages().get(0)));
         assertEquals(List.of(1, 2, 3), d.pages().stream().map(Page::printed).toList());
         assertEquals("Página 1 de 3", text(d.pages().get(0), "num"));
@@ -268,7 +269,7 @@ class SectionsTest {
                 join(new String[] {"\tSection:"}, fullPage("a1"), fullPage("a2")),
                 join(new String[] {"\tSection:", "\t\tBegin on: odd"}, fullPage("b")),
                 join(new String[] {"\tSection:", "\t\tBegin on: odd"}, fullPage("c")));
-        // a: 1 y 2; b: 3; la página en blanco, 4; c: 5.
+        // a: 1 and 2; b: 3; the blank page, 4; c: 5.
         assertEquals(5, d.pages().size());
         assertEquals(List.of(false, false, false, true, false), d.pages().stream().map(Page::blank).toList());
         assertEquals(List.of(0, 0, 1, 1, 2), d.pages().stream().map(Page::section).toList());
@@ -276,8 +277,8 @@ class SectionsTest {
     }
 
     /**
-     * La página en blanco es de la sección anterior: tras una portada sin números no tiene número, y la paridad es la
-     * de la página física, no la del número impreso.
+     * The blank page belongs to the previous section: after a cover without numbers it has no number, and the parity is
+     * that of the physical page, not that of the printed number.
      */
     @Test
     void theBlankPageFollowsTheNumberingOfItsSection() {
@@ -290,7 +291,7 @@ class SectionsTest {
                         fullPage("b")));
         assertEquals(List.of(0, 0, 1, 2, 1), d.pages().stream().map(Page::printed).toList());
         assertEquals(List.of(false, true, false, true, false), d.pages().stream().map(Page::blank).toList());
-        // La página en blanco tiene el medio de su sección: la portada, sin márgenes.
+        // The blank page has the medium of its section: the cover, without margins.
         assertEquals(0, d.pages().get(1).pageSetup().margin().top(), 1e-9);
         assertEquals(NumberFormat.LOWER_ROMAN, d.pages().get(3).style());
     }
@@ -301,7 +302,7 @@ class SectionsTest {
                 () -> lay("\tSection:", "\t\tBegin on: odd", "\t\tBlock:"));
         assertEquals(ErrorCode.BEGIN_ON_FIRST_SECTION, e.errorCode());
         assertEquals(14, e.line());
-        // any, el valor por defecto, se puede escribir.
+        // any, the default value, can be written.
         assertEquals(1, lay("\tSection:", "\t\tBegin on: any", "\t\tBlock:").pages().size());
     }
 
@@ -310,7 +311,7 @@ class SectionsTest {
         LaidOutDocument d = layWith(HEADER + "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tSize: 20\n",
                 "\tSection:", "\t\tText: ab", "\t\t\tId: normal",
                 "\tSection:", "\t\tStyle: annex", "\t\tText: ab", "\t\t\tId: big");
-        // Cada carácter mide la mitad del tamaño: 5 pt con Size 10 y 10 pt con Size 20.
+        // Each character measures half the size: 5 pt with Size 10 and 10 pt with Size 20.
         assertEquals(5, on(d.pages().get(0), "normal").lines().get(0).width() / 2, 1e-9);
         assertEquals(10, on(d.pages().get(1), "big").lines().get(0).width() / 2, 1e-9);
     }
@@ -337,7 +338,8 @@ class SectionsTest {
                         + "\t\tFor id: small\n\t\t\tTypography:\n\t\t\t\tSize: 10\n",
                 "\tSection:", "\t\tText: ab", "\t\t\tId: t1",
                 "\tSection:", "\t\tId: small", "\t\tText: ab", "\t\t\tId: t2");
-        // For element: Section da 10 pt por carácter; la regla del Id de la segunda, que gana, vuelve a 5.
+        // For element: Section gives 10 pt per character; the rule of the Id of the second one, which wins, goes back
+        // to 5.
         assertEquals(10, on(d.pages().get(0), "t1").lines().get(0).width() / 2, 1e-9);
         assertEquals(5, on(d.pages().get(1), "t2").lines().get(0).width() / 2, 1e-9);
     }
@@ -348,16 +350,17 @@ class SectionsTest {
                 "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tText: Portada",
                 "\tSection:", "\t\tTable of contents:"));
         assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.errorCode());
-        // Con In table of contents: false, el encabezado sigue siéndolo pero no se lista; el índice necesita otro.
+        // With In table of contents: false, the heading is still one but it is not listed; the table of contents needs
+        // another.
         LaidOutDocument d = lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tHeading 1:", "\t\t\tIn table of contents: false", "\t\t\tText: Portada",
                 "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", "\t\tTable of contents:", "\t\t\tId: toc");
         assertEquals(2, d.pages().size());
     }
 
-    // Casos que faltaban según las pruebas de mutación.
+    // Cases that were missing according to mutation testing.
 
-    /** Una portada sin números no es un error si su contenido no escribe {page}: solo lo es lo que lo escribe. */
+    /** A cover without numbers is not an error if its content does not write {page}: only what writes it is. */
     @Test
     void anUnnumberedPageWithoutPageNumbersIsFine() {
         LaidOutDocument d = lay("\tSection:", "\t\tPage numbering: none", "\t\tText: Portada",
@@ -370,13 +373,13 @@ class SectionsTest {
         InvalidModelException named = assertThrows(InvalidModelException.class, () -> lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tText: Hay {pages}", "\t\t\tId: t"));
         assertEquals(ErrorCode.PAGE_NUMBER_UNAVAILABLE, named.errorCode());
-        assertTrue(named.getMessage().contains("El texto de la caja t tiene {page}"), named.getMessage());
+        assertTrue(named.getMessage().contains("The text of box t has {page}"), named.getMessage());
         InvalidModelException anonymous = assertThrows(InvalidModelException.class, () -> lay(
                 "\tSection:", "\t\tPage numbering: none", "\t\tText: Hay {pages}"));
-        assertTrue(anonymous.getMessage().contains("El texto de la caja (sin Id) tiene"), anonymous.getMessage());
+        assertTrue(anonymous.getMessage().contains("The text of box (without Id) has"), anonymous.getMessage());
     }
 
-    /** {@code {number of}} no necesita página: puede nombrar una caja de una sección sin números. */
+    /** {@code {number of}} does not need a page: it can name a box of a section without numbers. */
     @Test
     void numberReferencesDoNotNeedAPage() {
         LaidOutDocument d = lay("\tSection:", "\t\tPage numbering: none", "\t\tList:", "\t\t\tMarker: decimal",
@@ -385,7 +388,7 @@ class SectionsTest {
         assertEquals(2, d.pages().size());
     }
 
-    /** El error señala la referencia a la caja sin página, no la primera del documento. */
+    /** The error points to the reference to the box without a page, not the first one of the document. */
     @Test
     void theErrorPointsToTheReferenceOfTheUnplaceableBox() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> lay(
@@ -393,7 +396,7 @@ class SectionsTest {
                 "\tSection:", "\t\tText: a", "\t\t\tId: other", "\t\tText: Ver {page of: other}",
                 "\t\tText: Ver {page of: portada}"));
         assertEquals(ErrorCode.REFERENCE_NOT_PLACEABLE, e.errorCode());
-        // Cabecera de 12 líneas: la referencia a la portada es la 9.ª del cuerpo.
+        // Header of 12 lines: the reference to the cover is the 9th of the body.
         assertEquals(21, e.line());
     }
 }

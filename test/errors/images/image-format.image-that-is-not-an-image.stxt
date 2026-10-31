@@ -1,0 +1,11 @@
+# Case: Image that is not an image
+# Code: IMAGE_FORMAT
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/broken.png

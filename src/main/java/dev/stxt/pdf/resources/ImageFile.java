@@ -20,18 +20,18 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Una imagen de la carpeta {@code images/} (reference/components/image.md): su formato, reconocido por
- * el contenido y no por la extensión, y su tamaño en píxeles. Se admiten PNG, JPEG, SVG (el
- * subconjunto de {@link SvgInspector}) y PDF ({@link PdfInspector}).
+ * An image of the {@code images/} folder (reference/components/image.md): its format, recognized by
+ * the content and not by the extension, and its size in pixels. PNG, JPEG, SVG (the
+ * subset of {@link SvgInspector}) and PDF ({@link PdfInspector}) are supported.
  *
- * <p>El tamaño natural en puntos cuenta cada píxel como en CSS, a 96 por pulgada
- * ({@link #POINTS_PER_PIXEL}), sin mirar la resolución que declare el fichero. El de un SVG es
- * el de su {@code width} y {@code height} o, si faltan, el de su {@code viewBox}, también en
- * píxeles CSS. Un PDF ya está en puntos y cada página tiene el suyo.</p>
+ * <p>The natural size in points counts each pixel as in CSS, at 96 per inch
+ * ({@link #POINTS_PER_PIXEL}), regardless of the resolution the file declares. That of an SVG is
+ * that of its {@code width} and {@code height} or, if they are missing, that of its {@code viewBox}, also in
+ * CSS pixels. A PDF is already in points and each page has its own.</p>
  */
 public final class ImageFile {
 
-    /** Puntos que mide un píxel: 72 / 96, como en CSS. */
+    /** Points a pixel measures: 72 / 96, as in CSS. */
     public static final double POINTS_PER_PIXEL = 0.75;
 
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n'};
@@ -64,10 +64,10 @@ public final class ImageFile {
     }
 
     /**
-     * Lee el formato y el tamaño de una imagen; {@code name} es su ruta en el documento, para los
-     * mensajes. Un SVG se comprueba entero, también sus fuentes en {@code resources}; de un PDF se leen sus páginas.
+     * Reads the format and the size of an image; {@code name} is its path in the document, for the
+     * messages. An SVG is checked in full, including its fonts in {@code resources}; the pages of a PDF are read.
      *
-     * @throws ImageFormatException si no es PNG, JPEG, PDF ni un SVG del subconjunto, o no se puede leer
+     * @throws ImageFormatException if it is not PNG, JPEG, PDF or an SVG of the subset, or cannot be read
      */
     static ImageFile read(Path path, String name, Resources resources) {
         byte[] head = new byte[12];
@@ -75,7 +75,7 @@ public final class ImageFile {
         try (InputStream in = Files.newInputStream(path)) {
             n = in.readNBytes(head, 0, head.length);
         } catch (IOException e) {
-            throw new ImageFormatException("No se puede leer la imagen " + name + ": " + e.getMessage(), e);
+            throw new ImageFormatException("Cannot read the image " + name + ": " + e.getMessage(), e);
         }
         Format format = startsWith(head, n, PNG) ? Format.PNG : startsWith(head, n, JPEG) ? Format.JPEG : null;
         if (format == null && looksLikeXml(head, n)) {
@@ -87,8 +87,8 @@ public final class ImageFile {
                     pages.get(0).height() / POINTS_PER_PIXEL, false, 0, 0, List.of(), pages);
         }
         if (format == null) {
-            throw new ImageFormatException("La imagen " + name + " no es PNG, JPEG, SVG ni PDF" + guess(head, n)
-                    + ": hay que convertirla a uno de los cuatro");
+            throw new ImageFormatException("The image " + name + " is not PNG, JPEG, SVG or PDF" + guess(head, n)
+                    + ": it has to be converted to one of the four");
         }
         Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName(format.name());
         ImageReader reader = readers.next();
@@ -97,24 +97,24 @@ public final class ImageFile {
             int width = reader.getWidth(0);
             int height = reader.getHeight(0);
             if (width <= 0 || height <= 0) {
-                throw new ImageFormatException("La imagen " + name + " no tiene píxeles");
+                throw new ImageFormatException("The image " + name + " has no pixels");
             }
             return new ImageFile(path, format, width, height, false, 0, 0, List.of(), List.of());
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
             }
-            throw new ImageFormatException("No se puede leer la imagen " + name + ", que parece " + format
-                    + " pero está dañada: " + e.getMessage(), e);
+            throw new ImageFormatException("Cannot read the image " + name + ", which looks like " + format
+                    + " but is damaged: " + e.getMessage(), e);
         } finally {
             reader.dispose();
         }
     }
 
     /**
-     * Si el fichero es un PDF, mirando solo su cabecera.
+     * Whether the file is a PDF, looking only at its header.
      *
-     * @throws IOException si no se puede leer
+     * @throws IOException if it cannot be read
      */
     static boolean isPdf(Path path) throws IOException {
         byte[] head = new byte[PDF.length];
@@ -125,7 +125,7 @@ public final class ImageFile {
         return startsWith(head, n, PDF);
     }
 
-    /** Si empieza como un XML (con o sin la marca de orden de bytes de UTF-8). */
+    /** Whether it starts like an XML (with or without the UTF-8 byte order mark). */
     private static boolean looksLikeXml(byte[] head, int n) {
         String text = new String(head, 0, n, java.nio.charset.StandardCharsets.ISO_8859_1);
         if (text.startsWith("\u00EF\u00BB\u00BF")) {
@@ -139,14 +139,14 @@ public final class ImageFile {
         try {
             content = Files.readAllBytes(path);
         } catch (IOException e) {
-            throw new ImageFormatException("No se puede leer la imagen " + name + ": " + e.getMessage(), e);
+            throw new ImageFormatException("Cannot read the image " + name + ": " + e.getMessage(), e);
         }
         SvgInspector.Info info = SvgInspector.inspect(content, name);
         for (SvgInspector.TextUse use : info.texts()) {
             checkText(use, name, resources);
         }
-        // Cada texto que se ve ya tiene su fuente; un <text> o <tspan> sin ella (sin familia, o una que no está en
-        // fonts/) solo puede tener espacios, que no se dibujan.
+        // Each visible text already has its font; a <text> or <tspan> without one (without family, or one that is not
+        // in fonts/) can only have spaces, which are not drawn.
         List<FontFile> fonts = new ArrayList<>();
         for (FontFace face : info.fonts()) {
             fonts.add(face == null ? null : resources.fonts().lookup(face));
@@ -155,17 +155,17 @@ public final class ImageFile {
                 info.elements(), info.depth(), Collections.unmodifiableList(fonts), List.of());
     }
 
-    /** Que la fuente de un texto del SVG exista en {@code fonts/} y tenga todos sus caracteres: no hay sustitución. */
+    /** That the font of a text of the SVG exists in {@code fonts/} and has all its characters: no substitution. */
     private static void checkText(SvgInspector.TextUse use, String name, Resources resources) {
-        String where = "El texto \"" + abbreviate(use.text().strip()) + "\" del SVG " + name + " (línea "
+        String where = "The text \"" + abbreviate(use.text().strip()) + "\" of the SVG " + name + " (line "
                 + use.line() + ")";
         if (use.family() == null) {
-            throw new ImageFormatException(where + " no declara font-family: no hay fuente por defecto");
+            throw new ImageFormatException(where + " declares no font-family: there is no default font");
         }
         String family = SvgInspector.firstFamily(use.family());
         if (SvgInspector.isGeneric(family)) {
-            throw new ImageFormatException(where + " usa la familia genérica " + family + ", que habría que sustituir "
-                    + "por otra: tiene que ser una familia de resources/fonts/");
+            throw new ImageFormatException(where + " uses the generic family " + family + ", which would have to be "
+                    + "replaced by another: it has to be a family of resources/fonts/");
         }
         FontFace face = new FontFace(family, use.bold() ? FontWeight.BOLD : FontWeight.NORMAL,
                 use.italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
@@ -177,27 +177,27 @@ public final class ImageFile {
         }
         use.text().codePoints().filter(cp -> !Character.isWhitespace(cp) && !Character.isISOControl(cp))
                 .filter(cp -> !font.has(cp)).findFirst().ifPresent(cp -> {
-                    throw new ImageFormatException(where + " tiene el carácter '" + new String(Character.toChars(cp))
-                            + "' (U+" + String.format(Locale.ROOT, "%04X", cp) + "), que la fuente " + face + " no tiene");
+                    throw new ImageFormatException(where + ": the font " + face + " has no character '"
+                            + new String(Character.toChars(cp)) + "' (U+" + String.format(Locale.ROOT, "%04X", cp) + ")");
                 });
     }
 
     private static String abbreviate(String text) {
-        return text.length() <= 30 ? text : text.substring(0, 29) + "…";
+        return text.length() <= 30 ? text : text.substring(0, 29) + "...";
     }
 
     private static boolean startsWith(byte[] head, int n, byte[] signature) {
         return n >= signature.length && Arrays.equals(head, 0, signature.length, signature, 0, signature.length);
     }
 
-    /** El formato que parece tener un fichero que no es PNG, JPEG, SVG ni PDF, para el mensaje. */
+    /** The format a file that is not PNG, JPEG, SVG or PDF seems to have, for the message. */
     private static String guess(byte[] head, int n) {
         String text = new String(head, 0, n, java.nio.charset.StandardCharsets.ISO_8859_1);
         if (text.startsWith("GIF8")) {
-            return " (es GIF)";
+            return " (it is GIF)";
         }
         if (text.startsWith("RIFF") && text.startsWith("WEBP", 8)) {
-            return " (es WebP)";
+            return " (it is WebP)";
         }
         return "";
     }
@@ -210,63 +210,63 @@ public final class ImageFile {
         return format;
     }
 
-    /** Ancho en píxeles; el de un SVG o un PDF (su primera página), en píxeles CSS (no tiene por qué ser entero). */
+    /** Width in pixels; that of an SVG or a PDF (its first page), in CSS pixels (not necessarily an integer). */
     public double pixelWidth() {
         return pixelWidth;
     }
 
-    /** Alto en píxeles; el de un SVG o un PDF (su primera página), en píxeles CSS (no tiene por qué ser entero). */
+    /** Height in pixels; that of an SVG or a PDF (its first page), in CSS pixels (not necessarily an integer). */
     public double pixelHeight() {
         return pixelHeight;
     }
 
-    /** Píxeles de un PNG o JPEG (ancho × alto, leídos de la cabecera); 0 en un SVG o un PDF, que no tienen. */
+    /** Pixels of a PNG or JPEG (width × height, read from the header); 0 for an SVG or a PDF, which have none. */
     public long pixels() {
         return isVector() ? 0 : (long) pixelWidth * (long) pixelHeight;
     }
 
-    /** Elementos que dibuja un SVG, contando cada repetición de un {@code <use>} (saturado); 0 si no es un SVG. */
+    /** Elements an SVG draws, counting each repetition of a {@code <use>} (saturated); 0 if it is not an SVG. */
     public long svgElements() {
         return svgElements;
     }
 
-    /** Niveles de anidado de un SVG, con su {@code <svg>} raíz; 0 si no es un SVG. */
+    /** Nesting levels of an SVG, with its root {@code <svg>}; 0 if it is not an SVG. */
     public int svgDepth() {
         return svgDepth;
     }
 
-    /** Si es un SVG con texto, que se dibuja con las fuentes de {@code fonts/}. */
+    /** Whether it is an SVG with text, which is drawn with the fonts of {@code fonts/}. */
     public boolean hasText() {
         return text;
     }
 
     /**
-     * La fuente de {@code fonts/} de cada {@code <text>} y {@code <tspan>} del SVG, en orden del documento: la que se
-     * comprobó y la que lo dibuja. Es la de su sitio en el fichero, con la herencia de sus antepasados (no la del
-     * {@code <use>} que lo repita). {@code null} en uno que no tiene fuente, que solo puede contener espacios.
-     * Vacía si no es un SVG.
+     * The font of {@code fonts/} of each {@code <text>} and {@code <tspan>} of the SVG, in document order: the one that
+     * was checked and the one that draws it. It is that of its place in the file, with the inheritance of its ancestors
+     * (not that of the {@code <use>} that repeats it). {@code null} for one that has no font, which can only contain
+     * spaces. Empty if it is not an SVG.
      */
     public List<FontFile> textFonts() {
         return textFonts;
     }
 
-    /** Si es un dibujo vectorial (un SVG o un PDF), que se pinta sin perder nitidez a ningún tamaño. */
+    /** Whether it is a vector drawing (an SVG or a PDF), which is painted without losing sharpness at any size. */
     public boolean isVector() {
         return format == Format.SVG || format == Format.PDF;
     }
 
-    /** Las páginas de un PDF; 1 en el resto, que son una sola imagen. */
+    /** The pages of a PDF; 1 for the rest, which are a single image. */
     public int pages() {
         return format == Format.PDF ? pages.size() : 1;
     }
 
     /**
-     * Por qué esa página de un PDF no se dibujaría igual que en su PDF según la comprobación {@code check}, para el
-     * mensaje: con {@link Check#PDF_IMAGE_FONTS}, una fuente sin incrustar o sin {@code ToUnicode}; con
-     * {@link Check#PDF_IMAGE_ANNOTATIONS}, una anotación que se ve. {@code null} si no hay problema, con otra
-     * comprobación y en el resto de formatos.
+     * Why that page of a PDF would not be drawn as in its PDF according to the check {@code check}, for the
+     * message: with {@link Check#PDF_IMAGE_FONTS}, a font not embedded or without {@code ToUnicode}; with
+     * {@link Check#PDF_IMAGE_ANNOTATIONS}, a visible annotation. {@code null} if there is no problem, with another
+     * check and for the other formats.
      *
-     * @param page desde 1, hasta {@link #pages()}
+     * @param page from 1 to {@link #pages()}
      */
     public String problem(int page, Check check) {
         if (format != Format.PDF) {
@@ -280,27 +280,27 @@ public final class ImageFile {
         };
     }
 
-    /** Ancho natural en puntos; el de un PDF, el de su primera página. */
+    /** Natural width in points; for a PDF, that of its first page. */
     public double width() {
         return width(1);
     }
 
-    /** Alto natural en puntos; el de un PDF, el de su primera página. */
+    /** Natural height in points; for a PDF, that of its first page. */
     public double height() {
         return height(1);
     }
 
     /**
-     * Ancho natural en puntos de esa página: el de un PDF, el de su recorte ya girado; el del resto, que tienen una
-     * sola página, el de la imagen.
+     * Natural width in points of that page: for a PDF, that of its crop box, already rotated; for the rest, which have
+     * a single page, that of the image.
      *
-     * @param page desde 1, hasta {@link #pages()}
+     * @param page from 1 to {@link #pages()}
      */
     public double width(int page) {
         return format == Format.PDF ? pages.get(page - 1).width() : pixelWidth * POINTS_PER_PIXEL;
     }
 
-    /** Alto natural en puntos de esa página, como {@link #width(int)}. */
+    /** Natural height in points of that page, like {@link #width(int)}. */
     public double height(int page) {
         return format == Format.PDF ? pages.get(page - 1).height() : pixelHeight * POINTS_PER_PIXEL;
     }

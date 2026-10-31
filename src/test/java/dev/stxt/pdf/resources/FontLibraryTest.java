@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Sobre las fuentes del repositorio ({@code resources/fonts}) y copias suyas en carpetas temporales. */
+/** On the fonts of the repository ({@code resources/fonts}) and copies of them in temporary folders. */
 class FontLibraryTest {
 
     private static final Path PLEX = Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans");
@@ -33,7 +33,7 @@ class FontLibraryTest {
         return new FontFace("IBM Plex Sans", weight, style);
     }
 
-    /** Recursos temporales con algunas variantes de Plex, en {@code fonts/<carpeta>/}. */
+    /** Temporary resources with some variants of Plex, in {@code fonts/<folder>/}. */
     private Resources copy(String folder, String... variants) throws IOException {
         Path fonts = Files.createDirectories(dir.resolve("resources/fonts").resolve(folder));
         for (String v : variants) {
@@ -72,20 +72,20 @@ class FontLibraryTest {
 
     @Test
     void decorationMetricsFromPostAndOs2() {
-        // post: underlinePosition −95 y underlineThickness 60; OS/2: yStrikeoutPosition 309 y yStrikeoutSize 60.
+        // post: underlinePosition −95 and underlineThickness 60; OS/2: yStrikeoutPosition 309 and yStrikeoutSize 60.
         FontFile f = new Resources().fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL));
         assertEquals(-0.095, f.decoration().underlinePosition(), 1e-9);
         assertEquals(0.06, f.decoration().underlineThickness(), 1e-9);
         assertEquals(0.309, f.decoration().strikeoutPosition(), 1e-9);
         assertEquals(0.06, f.decoration().strikeoutThickness(), 1e-9);
-        // La negrita tiene la raya más gruesa.
+        // The bold has a thicker line.
         assertEquals(0.1, new Resources().fonts().find(plex(FontWeight.BOLD, FontStyle.NORMAL)).decoration()
                 .underlineThickness(), 1e-9);
     }
 
     /**
-     * El fichero se lee una vez, al indexar la carpeta: el contenido y la huella son los de entonces aunque el
-     * fichero cambie o desaparezca.
+     * The file is read once, when the folder is indexed: the content and the hash are those of that moment even if the
+     * file changes or disappears.
      */
     @Test
     void theContentIsTheOneIndexed() throws Exception {
@@ -103,7 +103,7 @@ class FontLibraryTest {
         Resources r = copy("plex", "Regular", "Bold");
         ResourceException e = assertThrows(ResourceException.class,
                 () -> r.fonts().find(plex(FontWeight.BOLD, FontStyle.ITALIC)));
-        assertEquals("La fuente IBM Plex Sans no tiene la variante bold italic. Variantes en "
+        assertEquals("The font IBM Plex Sans has no variant bold italic. Variants in "
                 + r.fontsFolder() + ": bold, normal", e.getMessage());
     }
 
@@ -112,7 +112,7 @@ class FontLibraryTest {
         Resources r = copy("plex", "Regular");
         ResourceException e = assertThrows(ResourceException.class, () -> r.fonts().find(
                 new FontFace("Helvetica", FontWeight.NORMAL, FontStyle.NORMAL)));
-        assertEquals("Fuente desconocida: Helvetica. Familias en " + r.fontsFolder() + ": IBM Plex Sans",
+        assertEquals("Unknown font: Helvetica. Families in " + r.fontsFolder() + ": IBM Plex Sans",
                 e.getMessage());
     }
 
@@ -121,7 +121,7 @@ class FontLibraryTest {
         Resources r = copy("a", "Regular");
         Files.copy(PLEX.resolve("IBMPlexSans-Regular.ttf"), r.fontsFolder().resolve("b.ttf"));
         ResourceException e = assertThrows(ResourceException.class, r::fonts);
-        assertTrue(e.getMessage().startsWith("Dos ficheros para la fuente IBM Plex Sans normal"), e.getMessage());
+        assertTrue(e.getMessage().startsWith("Two files for the font IBM Plex Sans normal"), e.getMessage());
     }
 
     @Test
@@ -129,12 +129,12 @@ class FontLibraryTest {
         Resources r = copy("plex", "Regular");
         Files.writeString(r.fontsFolder().resolve("broken.ttf"), "no es una fuente");
         ResourceException e = assertThrows(ResourceException.class, r::fonts);
-        assertTrue(e.getMessage().startsWith("No se puede leer la fuente"), e.getMessage());
+        assertTrue(e.getMessage().startsWith("Cannot read the font"), e.getMessage());
     }
 
     @Test
     void missingFolder() {
         ResourceException e = assertThrows(ResourceException.class, () -> new Resources(dir).fonts());
-        assertEquals("No existe la carpeta de fuentes " + dir.resolve("fonts"), e.getMessage());
+        assertEquals("The fonts folder " + dir.resolve("fonts") + " does not exist", e.getMessage());
     }
 }

@@ -1,0 +1,20 @@
+# Case: Rule with Box applied to a Section
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: anexo
+			Box:
+				Padding: 5
+	Section:
+		Style: anexo
+		Text: Hola

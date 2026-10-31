@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Dimensionado y colocación de {@code Image} (reference/components/image.md), con las imágenes de
- * {@code resources/images/test/}: {@code wide.png} de 200 × 100 píxeles (150 × 75 pt, proporción
- * 2), {@code tall.jpg} de 120 × 160 (90 × 120 pt) y {@code square.png} de 40 × 40 (30 × 30 pt), y los SVG
- * {@code shapes.svg} (200 × 100 px: 150 × 75 pt) y {@code label.svg}, sin {@code width} ni {@code height}
- * y con {@code viewBox="0 0 160 48"} (120 × 36 pt), y {@code pages.pdf}.
+ * Sizing and placement of {@code Image} (reference/components/image.md), with the images of
+ * {@code resources/images/test/}: {@code wide.png} of 200 × 100 pixels (150 × 75 pt, ratio
+ * 2), {@code tall.jpg} of 120 × 160 (90 × 120 pt) and {@code square.png} of 40 × 40 (30 × 30 pt), and the SVGs
+ * {@code shapes.svg} (200 × 100 px: 150 × 75 pt) and {@code label.svg}, without {@code width} or {@code height}
+ * and with {@code viewBox="0 0 160 48"} (120 × 36 pt), and {@code pages.pdf}.
  */
 class ImageLayoutTest {
 
@@ -40,12 +40,15 @@ class ImageLayoutTest {
                 "\t\tId: I",
                 "\tImage: test/tall.jpg",
                 "\t\tId: T");
-        // No se estira al ancho del área útil, como un <img>.
+        // It does not stretch to the width of the page area, like an <img>.
         assertRect(40, 40, 150, 75, f.rect("I"));
         assertRect(40, 115, 90, 120, f.rect("T"));
     }
 
-    /** Un SVG se dimensiona como un PNG: su tamaño natural a 96 ppp, sea de {@code width} y {@code height} o del {@code viewBox}. */
+    /**
+     * An SVG is sized like a PNG: its natural size at 96 dpi, from {@code width} and {@code height} or from the
+     * {@code viewBox}.
+     */
     @Test
     void svgHasItsNaturalSizeAndItsRatio() {
         LayoutFixture f = layOut(
@@ -63,8 +66,8 @@ class ImageLayoutTest {
     }
 
     /**
-     * Un PDF mide lo que su página, ya en puntos: la de {@code Pdf page}, recortada y girada ({@code pages.pdf}: 200 ×
-     * 100, 150 × 50 y 100 × 200), o la primera.
+     * A PDF measures what its page does, already in points: that of {@code Pdf page}, cropped and rotated
+     * ({@code pages.pdf}: 200 × 100, 150 × 50 and 100 × 200), or the first one.
      */
     @Test
     void pdfHasTheSizeOfItsPage() {
@@ -113,7 +116,7 @@ class ImageLayoutTest {
                 "\t\t\tWidth: 172",
                 "\t\t\tPadding: 10",
                 "\t\t\tBorder: 1");
-        // Caja de contenido de 150: 75 de alto, más relleno y borde.
+        // Content box of 150: 75 high, plus padding and border.
         assertRect(40, 40, 172, 97, f.rect("I"));
     }
 
@@ -155,7 +158,7 @@ class ImageLayoutTest {
                 "\t\tBox:",
                 "\t\t\tMin height: 100");
         assertRect(40, 40, 100, 50, f.rect("MW"));
-        // El alto limitado vuelve a fijar el ancho.
+        // The limited height fixes the width again.
         assertRect(40, 90, 100, 50, f.rect("MH"));
         assertRect(40, 140, 200, 100, f.rect("NH"));
     }
@@ -188,7 +191,7 @@ class ImageLayoutTest {
                 "\t\t\t\t\tHeight: 60");
         assertRect(40, 40, 150, 75, f.rect("I"));
         assertRect(190, 40, 90, 120, f.rect("T"));
-        // Con Height, su ancho intrínseco sale de la proporción.
+        // With Height, its intrinsic width comes from the ratio.
         assertRect(280, 40, 60, 60, f.rect("S"));
         assertRect(40, 40, 515, 120, f.rect("F"));
     }
@@ -261,7 +264,7 @@ class ImageLayoutTest {
 
     @Test
     void anImageThatDoesNotFitMovesWhole() {
-        // Área útil de 100 de alto.
+        // Page area 100 high.
         LayoutFixture f = layOutPaged(180,
                 "\tBlock:",
                 "\t\tId: B",
@@ -288,7 +291,7 @@ class ImageLayoutTest {
                 "\t\t\tId: S",
                 "\t\tImage: test/square.png",
                 "\t\t\tId: T");
-        // La primera cabe en la página 1; la segunda, no: el bloque se parte entre las dos.
+        // The first one fits on page 1; the second does not: the block is split between the two.
         assertRect(42, 102, 30, 30, f.rect(1, "S"));
         assertFalse(f.has(1, "T"));
         assertRect(42, 40, 30, 30, f.rect(2, "T"));
@@ -306,7 +309,7 @@ class ImageLayoutTest {
                 "\t\t\t\t\tImage: test/square.png",
                 "\t\t\t\t\t\tId: S",
                 "\t\t\t\tCell: Texto");
-        // En la celda, un bloque, la imagen mide su tamaño natural.
+        // In the cell, a block, the image measures its natural size.
         assertRect(40, 40, 30, 30, f.rect("S"));
         assertRect(40, 40, 100, 30, f.rect("C"));
     }
@@ -328,36 +331,36 @@ class ImageLayoutTest {
                 "\t\t\tId: B",
                 "\t\t\tBox:",
                 "\t\t\t\tWidth: 120");
-        // Columnas de 257,5: A (120 × 60) llena la primera y B pasa entera a la segunda.
+        // Columns of 257.5: A (120 × 60) fills the first and B moves whole to the second.
         assertRect(40, 40, 120, 60, f.rect("A"));
         assertRect(297.5, 40, 120, 60, f.rect("B"));
     }
 
     /**
-     * El algoritmo depende de {@link LayoutContext}, no del motor: se prueba con un doble que solo da el
-     * tamaño natural de la imagen, sin carpeta de recursos ni fichero.
+     * The algorithm depends on {@link LayoutContext}, not on the engine: it is tested with a double that only gives the
+     * natural size of the image, without a resources folder or a file.
      */
     @Test
     void anImageIsLaidOutWithAContextDouble() {
         LayoutContext context = new LayoutContext() {
             @Override
             public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-                throw new AssertionError("una imagen no maqueta otras cajas");
+                throw new AssertionError("an image does not lay out other boxes");
             }
 
             @Override
             public IntrinsicSizes intrinsic(Box box) {
-                throw new AssertionError("con Width auto no hacen falta");
+                throw new AssertionError("not needed with Width auto");
             }
 
             @Override
             public IntrinsicSizes contentIntrinsic(Box box) {
-                throw new AssertionError("con Width auto no hacen falta");
+                throw new AssertionError("not needed with Width auto");
             }
 
             @Override
             public TextMeasurer measurer() {
-                throw new AssertionError("una imagen no tiene texto");
+                throw new AssertionError("an image has no text");
             }
 
             @Override
@@ -373,12 +376,13 @@ class ImageLayoutTest {
         assertEquals(new IntrinsicSizes(120, 120), new ImageLayout(context).contentIntrinsic(image));
     }
 
-    // Casos que faltaban según las pruebas de mutación: la proporción es la de la caja de
-    // contenido, sin el borde (2) ni el relleno (3).
+    // Cases that were missing according to mutation testing: the ratio is that of the content
+    // box, without the border (2) or the padding (3).
 
     @Test
     void aHeightKeepsTheRatioOfTheContentBox() {
-        // Height: 50 deja 40 al contenido, que mide 80 de ancho: 90 con borde y relleno, también como ítem stack.
+        // Height: 50 leaves 40 for the content, which measures 80 wide: 90 with border and padding, also as a stack
+        // item.
         LayoutFixture f = layOut(
                 "\tImage: test/wide.png", "\t\tId: I", "\t\tBox:", "\t\t\tHeight: 50", "\t\t\tBorder: 2", "\t\t\tPadding: 3",
                 "\tStack:", "\t\tItem:", "\t\t\tImage: test/wide.png", "\t\t\t\tId: F", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 50",
@@ -389,7 +393,7 @@ class ImageLayoutTest {
 
     @Test
     void aMaxHeightNarrowsTheImage() {
-        // Natural: 150 + 10 de ancho y 85 de alto; Max height: 30 deja 20 al contenido, que mide 40: 50 de ancho.
+        // Natural: 150 + 10 wide and 85 high; Max height: 30 leaves 20 for the content, which measures 40: 50 wide.
         LayoutFixture f = layOut(
                 "\tImage: test/wide.png", "\t\tId: I", "\t\tBox:", "\t\t\tMax height: 30", "\t\t\tBorder: 2",
                 "\t\t\tPadding: 3");

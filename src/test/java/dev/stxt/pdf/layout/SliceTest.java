@@ -9,8 +9,8 @@ import java.util.OptionalDouble;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Reparto del alto, el borde y el relleno entre fragmentos (reference/common/breaks.md). Todas las
- * cajas tienen borde 1 y relleno 4: 5 pt de decoración arriba y 5 abajo.
+ * Distribution of the height, the border and the padding between fragments (reference/common/breaks.md). All the
+ * boxes have border 1 and padding 4: 5 pt of decoration at the top and 5 at the bottom.
  */
 class SliceTest {
 
@@ -28,7 +28,7 @@ class SliceTest {
         return ConstraintSpace.forChildren(100, NONE, OptionalDouble.of(remaining), false);
     }
 
-    /** Borde o relleno con solo los lados indicados. */
+    /** Border or padding with only the given sides. */
     private static Insets sides(Insets all, boolean top, boolean bottom) {
         return new Insets(top ? all.top() : 0, all.right(), bottom ? all.bottom() : 0, all.left());
     }
@@ -47,13 +47,13 @@ class SliceTest {
 
     @Test
     void autoHeightSliceAcrossThreeFragments() {
-        // Primero: decoración superior y el contenido; sin la inferior.
+        // First: top decoration and the content; without the bottom one.
         Slice first = Slice.of(AUTO, true, 0, 90, false, page(100));
         assertSlice(first, 95, true, false, false, 95);
-        // Intermedio: sin decoración.
+        // Middle: no decoration.
         Slice middle = Slice.of(AUTO, false, first.consumed(), 100, false, page(100));
         assertSlice(middle, 100, false, false, false, 195);
-        // Último: solo la decoración inferior.
+        // Last: only the bottom decoration.
         Slice last = Slice.of(AUTO, false, middle.consumed(), 20, true, page(100));
         assertSlice(last, 25, false, true, true, 220);
     }
@@ -61,10 +61,10 @@ class SliceTest {
     @Test
     void definiteHeightIsTheTotalOfAllFragments() {
         BoxModel m = model(OptionalDouble.of(300), 0, NONE, Edges.OPEN);
-        // El contenido termina, pero el alto propio no cabe: la página se llena y sigue.
+        // The content ends, but the box's own height does not fit: the page fills up and it continues.
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, false, false, 100);
-        // Lo que falta, con la decoración inferior.
+        // What is missing, with the bottom decoration.
         Slice last = Slice.of(m, false, first.consumed(), 0, true, page(762));
         assertSlice(last, 200, false, true, true, 300);
     }
@@ -72,10 +72,10 @@ class SliceTest {
     @Test
     void definiteHeightCutInsideTheContentFillsThePage() {
         BoxModel m = model(OptionalDouble.of(300), 0, NONE, Edges.OPEN);
-        // Llega al final de la página, pero solo consume su borde y relleno superiores (5) y lo que ocupa el contenido
-        // (50): el resto del alto queda para el contenido que sigue.
+        // It reaches the end of the page, but only consumes its top border and padding (5) and what the content takes
+        // up (50): the rest of the height is left for the content that follows.
         assertSlice(Slice.of(m, true, 0, 50, false, page(100)), 100, true, false, false, 55);
-        // Sin pasar de lo que le queda a la caja.
+        // Without going beyond what the box has left.
         assertSlice(Slice.of(m, false, 250, 10, false, page(100)), 50, false, false, false, 260);
     }
 
@@ -96,17 +96,17 @@ class SliceTest {
 
     @Test
     void closedRepeatsTheEdgesInEveryFragment() {
-        // 100 de página: 90 para el contenido.
+        // 100 of page: 90 for the content.
         Slice first = Slice.of(AUTO_CLONE, true, 0, 90, false, page(100));
         assertSlice(first, 100, true, true, false, 90);
-        // Con clone, consumed es el alto de la caja de contenido.
+        // With clone, consumed is the height of the content box.
         Slice last = Slice.of(AUTO_CLONE, false, first.consumed(), 30, true, page(100));
         assertSlice(last, 40, true, true, true, 120);
     }
 
     @Test
     void cloneWithDefiniteHeightSplitsTheContentBoxHeight() {
-        // Height 250: 240 de caja de contenido, repartidos en 90 + 90 + 60.
+        // Height 250: 240 of content box, distributed as 90 + 90 + 60.
         BoxModel m = model(OptionalDouble.of(250), 0, NONE, Edges.CLOSED);
         Slice first = Slice.of(m, true, 0, 20, true, page(100));
         assertSlice(first, 100, true, true, false, 90);
@@ -114,7 +114,7 @@ class SliceTest {
         assertSlice(second, 100, true, true, false, 180);
         Slice last = Slice.of(m, false, second.consumed(), 0, true, page(100));
         assertSlice(last, 70, true, true, true, 240);
-        // Cortado dentro del contenido, llega al final de la página y consume solo el contenido.
+        // Broken inside the content, it reaches the end of the page and consumes only the content.
         assertSlice(Slice.of(m, true, 0, 20, false, page(100)), 100, true, true, false, 20);
     }
 
@@ -127,10 +127,10 @@ class SliceTest {
 
     @Test
     void contentRemaining() {
-        // Con slice, la decoración inferior no se reserva (lo hace Engine.layout si la caja termina).
+        // With slice, the bottom decoration is not reserved (Engine.layout does it if the box ends).
         assertEquals(95, Slice.contentRemaining(AUTO, true, page(100)), 1e-9);
         assertEquals(100, Slice.contentRemaining(AUTO, false, page(100)), 1e-9);
-        // Con clone, sí: va en todos los fragmentos.
+        // With clone, it is: it goes in every fragment.
         assertEquals(90, Slice.contentRemaining(AUTO_CLONE, false, page(100)), 1e-9);
     }
 

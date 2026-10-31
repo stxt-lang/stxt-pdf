@@ -5,25 +5,25 @@ import dev.stxt.pdf.model.TextFormat;
 import java.util.List;
 
 /**
- * Una line box ya colocada, relativa a la caja de contenido de su fragmento.
+ * A placed line box, relative to the content box of its fragment.
  *
- * @param x           desplazamiento horizontal por la alineación
- * @param y           parte superior de la línea
- * @param width       ancho del texto de la línea, incluido el espaciado extra de {@code justify}
- * @param height      altura de la línea ({@code Line height})
- * @param text        contenido de la línea; las palabras van separadas por un solo espacio
- * @param wordSpacing espacio que se añade a cada espacio entre palabras ({@code justify}); 0 si no
- * @param runs        tramos de la línea en orden (reference/common/text-formatting.md); su texto seguido es
+ * @param x           horizontal offset due to the alignment
+ * @param y           top of the line
+ * @param width       width of the text of the line, including the extra spacing of {@code justify}
+ * @param height      height of the line ({@code Line height})
+ * @param text        content of the line; the words are separated by a single space
+ * @param wordSpacing space added to each space between words ({@code justify}); 0 otherwise
+ * @param runs        runs of the line in order (reference/common/text-formatting.md); their joined text is
  *                    {@code text}
  */
 public record TextLine(double x, double y, double width, double height, String text, double wordSpacing,
                        List<Run> runs) {
 
     /**
-     * Un tramo de la línea con su formato.
+     * A run of the line with its format.
      *
-     * @param x     desplazamiento desde el principio de la línea
-     * @param width ancho, incluido el espaciado extra de {@code justify} de sus espacios
+     * @param x     offset from the start of the line
+     * @param width width, including the extra {@code justify} spacing of its spaces
      */
     public record Run(double x, double width, String text, TextFormat format) {
     }
@@ -32,12 +32,12 @@ public record TextLine(double x, double y, double width, double height, String t
         runs = List.copyOf(runs);
     }
 
-    /** Línea sin formato: un único tramo con todo el texto. */
+    /** Unformatted line: a single run with all the text. */
     public TextLine(double x, double y, double width, double height, String text, double wordSpacing) {
         this(x, y, width, height, text, wordSpacing, List.of(new Run(0, width, text, TextFormat.PLAIN)));
     }
 
-    /** Línea sin formato ni espaciado extra. */
+    /** Line without format or extra spacing. */
     public TextLine(double x, double y, double width, double height, String text) {
         this(x, y, width, height, text, 0);
     }

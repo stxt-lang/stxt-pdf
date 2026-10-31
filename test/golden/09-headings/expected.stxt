@@ -1,7 +1,7 @@
-# Página 1: h1 (48) + 10 → p1 (12) + 6 → h2a (16.8) + 4 → h3 (14.4, sin márgenes) → fill (80),
-# que acaba en 231.2. h2b iría en 237.2 y acabaría en 254, pero p2 (12, tras 4 de margen) no
-# cabe: cortar entre h2b y p2 incumple el Keep with next: true del encabezado y se corta antes de h2b.
-# Página 2: h2b arriba (margen truncado) y p2 tras su margen inferior de 4.
+# Page 1: h1 (48) + 10 → p1 (12) + 6 → h2a (16.8) + 4 → h3 (14.4, no margins) → fill (80),
+# which ends at 231.2. h2b would go at 237.2 and end at 254, but p2 (12, after a margin of 4) does not
+# fit: breaking between h2b and p2 violates the heading's Keep with next: true, so the break goes before h2b.
+# Page 2: h2b at the top (margin truncated) and p2 after its bottom margin of 4.
 Result:
 	Page: 1
 		Fragment: h1

@@ -1,0 +1,19 @@
+# Case: A rotated Text that is a Stack item: the item takes the place the Stack gives it
+# Code: ROTATED_ITEM
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Stack:
+			Item:
+				Text: Lunes
+					Rotate: -90

@@ -1,0 +1,23 @@
+# Case: Word that does not fit in a box that sticks out
+# Code: TEXT_OVERFLOW
+# Line: 23
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Width: 100
+			Text:
+				Box:
+					Width: 150
+				Content >>
+					supercalifragilisticoespialidosamente

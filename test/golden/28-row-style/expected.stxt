@@ -1,4 +1,4 @@
-# t 160 × 72 (filas de 12, 24, 12 y 24; ver input.stxt). Las celdas con Id son las de las filas con el estilo.
+# t 160 × 72 (rows of 12, 24, 12 and 24; see input.stxt). The cells with an Id are those of the rows with the style.
 Result:
 	Page: 1
 		Fragment: t

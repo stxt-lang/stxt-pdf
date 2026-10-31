@@ -14,54 +14,57 @@ import dev.stxt.pdf.model.Preformatted;
 import java.util.Locale;
 
 /**
- * El grupo {@code Typography} (reference/common/typography.md): la fuente, el tamaño, el interlineado, la alineación,
- * el color, las mayúsculas, el interletraje y el espacio en blanco del texto, la numeración de los encabezados, el
- * idioma y las viudas y huérfanas. Es el único grupo que se <strong>hereda</strong>: cada caja empieza con una copia
- * del de su padre ({@link Style#inheriting}).
+ * The {@code Typography} group (reference/common/typography.md): the font, the size, the line height, the alignment,
+ * the color, the case, the letter spacing and the white space of the text, the numbering of the headings, the language
+ * and the widows and orphans. It is the only group that is <strong>inherited</strong>: each box starts with a copy of
+ * its parent's ({@link Style#inheriting}).
  */
 public final class TypographyStyle extends StyleGroup {
 
-    /** Familia; {@code null} = sin declarar, que es un error en una caja con texto (reference/common/errors.md). */
+    /** Family; {@code null} = not declared, which is an error in a box with text (reference/common/errors.md). */
     private String font;
-    /** {@code Code font}: la familia del código, en línea o en un bloque; {@code null} si no se declara. */
+    /** {@code Code font}: the family of code, inline or in a block; {@code null} if it is not declared. */
     private String codeFont;
     private FontWeight fontWeight = FontWeight.NORMAL;
     private FontStyle fontStyle = FontStyle.NORMAL;
-    /** {@code NaN} = sin declarar, que es un error en una caja con texto (reference/common/errors.md). */
+    /** {@code NaN} = not declared, which is an error in a box with text (reference/common/errors.md). */
     private double fontSize = Double.NaN;
-    /** {@code null} = 120 % del tamaño. Un número son puntos; un porcentaje, relativo al tamaño. */
+    /** {@code null} = 120% of the size. A number is points; a percentage, relative to the size. */
     private Value lineHeight;
     private TextAlign textAlign = TextAlign.LEFT;
     private LineBreaking lineBreaking = LineBreaking.SIMPLE;
     private Markup markup = Markup.NONE;
     private TextCase textCase = TextCase.NONE;
-    /** Separación entre letras, en puntos; puede ser negativa. */
+    /** Spacing between letters, in points; it can be negative. */
     private double letterSpacing;
     private boolean smallCaps;
     /**
-     * {@code Ligatures}: si el texto se mide y se pinta con las ligaduras de la fuente
-     * (reference/common/text-formatting.md). Se hereda.
+     * {@code Ligatures}: whether the text is measured and painted with the ligatures of the font
+     * (reference/common/text-formatting.md). Inherited.
      */
     private boolean ligatures;
     private Preformatted preformatted = Preformatted.FALSE;
-    /** Columnas de una tabulación en el texto preformateado ({@code Tab size}). */
+    /** Columns of a tab in preformatted text ({@code Tab size}). */
     private int tabSize = 4;
     /**
-     * {@code Numbered}: si los encabezados se numeran (reference/components/heading.md). Se hereda: la lee el
-     * encabezado.
+     * {@code Numbered}: whether the headings are numbered (reference/components/heading.md). Inherited: the heading
+     * reads it.
      */
     private boolean numbered;
-    /** {@code Number format}: cómo se escribe el número del nivel del encabezado. */
+    /** {@code Number format}: how the number of the heading level is written. */
     private NumberFormat numberFormat = NumberFormat.DECIMAL;
-    /** {@code Number label}: lo que se escribe delante del título, con {@code {number}}; {@code null} = el número. */
+    /** {@code Number label}: what is written before the title, with {@code {number}}; {@code null} = the number. */
     private String numberLabel;
     /**
-     * Idioma y configuración regional del texto: el de {@code Language} de {@code Document}
-     * (reference/components/document.md) en la raíz y, si una caja declara {@code Language} en {@code Typography}
-     * (reference/common/typography.md), el suyo. Se hereda.
+     * Language and locale of the text: the one of {@code Language} of {@code Document}
+     * (reference/components/document.md) at the root and, if a box declares {@code Language} in {@code Typography}
+     * (reference/common/typography.md), its own. Inherited.
      */
     private Locale locale = Locale.ROOT;
-    /** {@code Color} del texto; también el de los bordes y la línea de un {@code Columns} que no declaran el suyo. */
+    /**
+     * {@code Color} of the text; also that of the borders and of the rule of a {@code Columns} that do not declare
+     * their own.
+     */
     private String color = "#000000";
     private int widows = 2;
     private int orphans = 2;
@@ -69,7 +72,7 @@ public final class TypographyStyle extends StyleGroup {
     TypographyStyle() {
     }
 
-    /** Una copia abierta del de {@code parent}: lo que hereda una caja nueva. */
+    /** An open copy of the one of {@code parent}: what a new box inherits. */
     TypographyStyle(TypographyStyle parent) {
         font = parent.font;
         codeFont = parent.codeFont;
@@ -248,7 +251,7 @@ public final class TypographyStyle extends StyleGroup {
         numberFormat = v;
     }
 
-    /** La plantilla de {@code Number label}, o {@code null} si no se declara. */
+    /** The template of {@code Number label}, or {@code null} if it is not declared. */
     public String numberLabel() {
         return numberLabel;
     }
@@ -295,15 +298,15 @@ public final class TypographyStyle extends StyleGroup {
     }
 
     /**
-     * Fuente del texto. Solo en cajas con texto, que siempre tienen {@code Font} (reference/common/errors.md). Las
-     * ligaduras se desactivan con {@code Letter spacing} distinto de 0, como en CSS: separar las letras y unir dos en
-     * un glifo se contradicen.
+     * Font of the text. Only in boxes with text, which always have {@code Font} (reference/common/errors.md). Ligatures
+     * are turned off with a {@code Letter spacing} other than 0, as in CSS: spacing the letters and joining two into
+     * one glyph contradict each other.
      */
     public FontFace fontFace() {
         return new FontFace(font, fontWeight, fontStyle, ligatures && letterSpacing == 0);
     }
 
-    /** Altura de línea usada, en puntos. */
+    /** Used line height, in points. */
     public double usedLineHeight() {
         if (lineHeight == null) {
             return fontSize * 1.2;

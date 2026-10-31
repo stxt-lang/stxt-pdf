@@ -49,7 +49,7 @@ expresar. Los errores son `InvalidModelException` con un `ErrorCode` y la **lín
 (`Style.line(HEIGHT)`, con las claves de `PropertyKey`) y no la de su caja. `PropertyKey.internal` da el nombre interno de
 los nombres cortos (`Size` → `font-size`), que es la clave de `Style.line`. La línea es un `SourceLine`: su número y si es
 del documento de estilos aparte, porque una propiedad que llega de una regla suya tiene la línea de ese documento
-(`StyleRules` marca el `Style` mientras la lee). Se escribe en los mensajes tal cual (`línea 8 de los estilos`), y el error
+(`StyleRules` marca el `Style` mientras la lee). Se escribe en los mensajes tal cual (`line 8 of the styles`), y el error
 que se construye con ella lo dice también en `inStyles()`.
 
 `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`. `BoxTreeBuilder.element`
@@ -109,7 +109,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 > puede depender de `tree`. Las constantes se llaman como el valor del documento (`TextAlign.JUSTIFY` ↔ `justify`), porque
 > se leen con `Enum.valueOf` sobre el texto en mayúsculas y con el guion como guion bajo.
 
-> **Decisión:** `Box.describe()` es la única forma de nombrar una caja en los mensajes (`main (línea 12)`), y el volcado
+> **Decisión:** `Box.describe()` es la única forma de nombrar una caja en los mensajes (`main (line 12)`), y el volcado
 > escribe el `Id`.
 
 ## Las secciones y la raíz

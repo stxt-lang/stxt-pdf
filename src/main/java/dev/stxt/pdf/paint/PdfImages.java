@@ -27,26 +27,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Las imágenes que lleva un PDF (reference/components/image.md), cada fichero una sola vez aunque se use
- * en varias páginas.
+ * The images a PDF carries (reference/components/image.md), each file only once even if it is used
+ * on several pages.
  *
- * <p>Un PNG o un JPEG se incrusta tal cual ({@link PDImageXObject}: el JPEG sin recomprimir y el
- * PNG sin pérdida). Un SVG se dibuja con JSVG en un {@code Graphics2D} que convierte pdfbox-graphics2d
- * en rutas, rellenos y degradados del PDF: es un {@link PDFormXObject} del tamaño natural del
- * SVG, vectorial, que se coloca escalado donde va la imagen. JSVG dibuja el texto como contornos
- * de la fuente de {@code fonts/} que se comprobó al leer el SVG ({@link SvgFonts}, sin estado de la JVM): se
- * ve bien a cualquier tamaño, pero no se puede seleccionar. Las referencias externas están
- * prohibidas ({@link ResourcePolicy#DENY_ALL}), aunque el SVG ya las ha rechazado al leerlo.</p>
+ * <p>A PNG or a JPEG is embedded as is ({@link PDImageXObject}: the JPEG without recompressing and the
+ * PNG lossless). An SVG is drawn with JSVG on a {@code Graphics2D} that pdfbox-graphics2d converts
+ * into PDF paths, fills and gradients: it is a {@link PDFormXObject} of the natural size of the
+ * SVG, vector, placed scaled where the image goes. JSVG draws text as outlines
+ * of the {@code fonts/} font checked when reading the SVG ({@link SvgFonts}, without JVM state): it
+ * looks right at any size, but cannot be selected. External references are
+ * forbidden ({@link ResourcePolicy#DENY_ALL}), although the SVG already rejected them when it was read.</p>
  *
- * <p>La página de un PDF también es un {@link PDFormXObject}: su contenido y sus recursos, copiados con
- * {@link LayerUtility}, sin sus anotaciones ni su etiquetado ({@link PdfPages}). Los PDF de origen se abren una vez
- * y se cierran con {@link #close()}.</p>
+ * <p>The page of a PDF is also a {@link PDFormXObject}: its content and its resources, copied with
+ * {@link LayerUtility}, without its annotations or its tagging ({@link PdfPages}). The source PDFs are opened once
+ * and closed with {@link #close()}.</p>
  */
 final class PdfImages implements Closeable {
 
     /**
-     * JSVG guarda las fuentes del texto en una caché de toda la JVM que no está sincronizada ({@code FontResolver}),
-     * y también los glifos de cada fuente: los SVG con texto se dibujan de uno en uno.
+     * JSVG keeps the text fonts in a JVM-wide cache that is not synchronized ({@code FontResolver}),
+     * and also the glyphs of each font: SVGs with text are drawn one at a time.
      */
     private static final Object JSVG_FONTS = new Object();
 
@@ -64,7 +64,7 @@ final class PdfImages implements Closeable {
         this.imports = new PdfPages(doc);
     }
 
-    /** El PNG o el JPEG, incrustado la primera vez. */
+    /** The PNG or the JPEG, embedded the first time. */
     PDImageXObject bitmap(ImageFile file) throws IOException {
         PDImageXObject image = bitmaps.get(file.path());
         if (image == null) {
@@ -75,8 +75,8 @@ final class PdfImages implements Closeable {
     }
 
     /**
-     * El SVG dibujado en un formulario de {@code file.width()} × {@code file.height()} puntos, con
-     * el origen en su esquina de abajo a la izquierda (como el contenido de una página).
+     * The SVG drawn on a form of {@code file.width()} × {@code file.height()} points, with
+     * the origin at its bottom left corner (like the content of a page).
      */
     PDFormXObject drawing(ImageFile file) throws IOException {
         PDFormXObject form = drawings.get(file.path());
@@ -88,9 +88,9 @@ final class PdfImages implements Closeable {
     }
 
     /**
-     * La página {@code number} (desde 1) del PDF en un formulario de {@code file.width(number)} ×
-     * {@code file.height(number)} puntos, con el origen en su esquina de abajo a la izquierda, como {@link #drawing}.
-     * Cada página se copia una sola vez.
+     * Page {@code number} (from 1) of the PDF on a form of {@code file.width(number)} ×
+     * {@code file.height(number)} points, with the origin at its bottom left corner, like {@link #drawing}.
+     * Each page is copied only once.
      */
     PDFormXObject page(ImageFile file, int number) throws IOException {
         Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file.path(), p -> new HashMap<>());
@@ -107,7 +107,7 @@ final class PdfImages implements Closeable {
         return form;
     }
 
-    /** Cierra los PDF de origen; lo copiado ya está en el documento. */
+    /** Closes the source PDFs; what was copied is already in the document. */
     @Override
     public void close() throws IOException {
         IOException failure = null;
@@ -125,12 +125,12 @@ final class PdfImages implements Closeable {
     }
 
     private PDFormXObject draw(ImageFile file) throws IOException {
-        // Los límites de JSVG son los de Limits (por defecto solo admite 2000 elementos y 30 niveles); el motor ya
-        // comprobó los suyos antes de maquetar (Images), así que aquí no deberían saltar.
+        // The limits of JSVG are those of Limits (by default it only accepts 2000 elements and 30 levels); the engine
+        // already checked its own before layout (Images), so they should not trip here.
         LoaderContext.Builder context = LoaderContext.builder().externalResourcePolicy(ResourcePolicy.DENY_ALL)
                 .documentLimits(new DocumentLimits(limits.maxSvgDepth(), DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH,
                         limits.maxSvgElements()));
-        // Basta un <text> sin nada visible para que JSVG resuelva una fuente.
+        // A <text> with nothing visible is enough for JSVG to resolve a font.
         SvgFonts fonts = file.textFonts().isEmpty() ? null : new SvgFonts(file);
         if (fonts != null) {
             context.preProcessor(fonts::rewrite);
@@ -138,9 +138,9 @@ final class PdfImages implements Closeable {
         SVGDocument svg = new SVGLoader().load(new ByteArrayInputStream(Files.readAllBytes(file.path())),
                 URI.create("about:blank"), context.build());
         if (svg == null) {
-            throw new ImageFormatException("No se puede dibujar el SVG " + file.path().getFileName()
-                    + ": JSVG no lo carga (por ejemplo, anida más <use> que su límite de "
-                    + DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH + " niveles)");
+            throw new ImageFormatException("The SVG " + file.path().getFileName()
+                    + " cannot be drawn: JSVG does not load it (for example, it nests more <use> than its limit of "
+                    + DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH + " levels)");
         }
         PdfBoxGraphics2D graphics = new PdfBoxGraphics2D(doc, (float) file.width(), (float) file.height());
         ViewBox box = new ViewBox(0, 0, (float) file.width(), (float) file.height());

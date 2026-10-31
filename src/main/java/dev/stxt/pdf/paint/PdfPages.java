@@ -28,20 +28,21 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Copia páginas de otro PDF en el documento, cada una como un formulario (reference/components/image.md).
+ * Copies pages of another PDF into the document, each one as a form (reference/components/image.md).
  *
- * <p>{@link LayerUtility} copia el contenido de la página y sus recursos (un recurso compartido por varias páginas,
- * una vez); las anotaciones no se copian. Luego se le quita el etiquetado del PDF de origen, que en el documento no
- * significaría nada y chocaría con el suyo: el contenido marcado ({@code BMC}, {@code BDC}, {@code EMC}, {@code MP},
- * {@code DP}), salvo el del contenido opcional ({@code /OC}), que decide lo que se ve, y la entrada de los formularios
- * y las imágenes en el árbol de estructura ({@code StructParent}, {@code StructParents}). El formulario lo etiqueta
- * después la {@code Image} que lo dibuja, como figura o como decoración.</p>
+ * <p>{@link LayerUtility} copies the content of the page and its resources (a resource shared by several pages,
+ * once); annotations are not copied. Then the tagging of the source PDF is removed, since in the document it would
+ * mean nothing and would clash with the document's own: the marked content ({@code BMC}, {@code BDC}, {@code EMC},
+ * {@code MP}, {@code DP}), except that of optional content ({@code /OC}), which decides what is seen, and the entry of
+ * the forms and images in the structure tree ({@code StructParent}, {@code StructParents}). The form is tagged later
+ * by the {@code Image} that draws it, as a figure or as decoration.</p>
  *
- * <p>{@link LayerUtility} copia también al catálogo las capas del PDF de origen (su contenido opcional), que deciden
- * lo que se ve; una configuración de las capas sin nombre lo recibe, el del fichero, porque PDF/UA-1 lo pide (7.10).</p>
+ * <p>{@link LayerUtility} also copies to the catalog the layers of the source PDF (its optional content), which decide
+ * what is seen; a layer configuration without a name receives one, that of the file, because PDF/UA-1 requires it
+ * (7.10).</p>
  *
- * <p>El formulario tiene el recorte de la página ({@code BBox}) y una matriz que lo lleva, ya girado
- * ({@code Rotate}), a un rectángulo con la esquina de abajo a la izquierda en el origen, del tamaño que da
+ * <p>The form has the crop of the page ({@code BBox}) and a matrix that takes it, already rotated
+ * ({@code Rotate}), to a rectangle with its bottom left corner at the origin, of the size given by
  * {@link dev.stxt.pdf.resources.ImageFile#width(int)}.</p>
  */
 final class PdfPages {
@@ -55,7 +56,7 @@ final class PdfPages {
 
     private final PDDocument doc;
     private final LayerUtility layers;
-    /** Los formularios ya limpios: los recursos copiados se comparten entre las páginas de un mismo PDF. */
+    /** The forms already cleaned: the copied resources are shared among the pages of the same PDF. */
     private final Set<COSBase> cleaned = new HashSet<>();
 
     PdfPages(PDDocument doc) {
@@ -64,8 +65,8 @@ final class PdfPages {
     }
 
     /**
-     * La página {@code number} (desde 1) de {@code source}, copiada en un formulario; {@code name} es el nombre del
-     * fichero, el de las configuraciones de sus capas que no lo tengan.
+     * Page {@code number} (from 1) of {@code source}, copied into a form; {@code name} is the name of the file, which
+     * the layer configurations without a name receive.
      */
     PDFormXObject page(PDDocument source, int number, String name) throws IOException {
         PDPage page = source.getPage(number - 1);
@@ -78,7 +79,7 @@ final class PdfPages {
         return form;
     }
 
-    /** Pone {@code name} a las configuraciones de las capas del documento que no tienen nombre. */
+    /** Gives {@code name} to the layer configurations of the document that have no name. */
     private void nameLayers(String name) {
         COSDictionary properties = doc.getDocumentCatalog().getCOSObject().getCOSDictionary(COSName.OCPROPERTIES);
         if (properties == null) {
@@ -105,8 +106,8 @@ final class PdfPages {
     }
 
     /**
-     * La matriz que lleva el recorte de la página, girado {@code degrees} en el sentido de las agujas del reloj como
-     * lo muestra un visor, a un rectángulo con la esquina de abajo a la izquierda en el origen.
+     * The matrix that takes the crop of the page, rotated {@code degrees} clockwise as a viewer shows it, to a
+     * rectangle with its bottom left corner at the origin.
      */
     static AffineTransform placement(PDRectangle crop, int degrees) {
         double x = crop.getLowerLeftX();
@@ -122,7 +123,7 @@ final class PdfPages {
         };
     }
 
-    /** Quita el etiquetado del formulario y, una vez cada uno, de los formularios y las imágenes que usa. */
+    /** Removes the tagging of the form and, once each, of the forms and images it uses. */
     private void clean(PDFormXObject form) throws IOException {
         if (!cleaned.add(form.getCOSObject())) {
             return;
@@ -144,12 +145,12 @@ final class PdfPages {
         }
     }
 
-    /** Reescribe el contenido del formulario sin las marcas de contenido, salvo las de contenido opcional. */
+    /** Rewrites the content of the form without the content marks, except those of optional content. */
     private static void unmark(PDFormXObject form) throws IOException {
         List<Object> tokens = new PDFStreamParser(form).parse();
         List<Object> kept = new ArrayList<>(tokens.size());
         List<Object> operands = new ArrayList<>();
-        // Por cada marca abierta, si se ha conservado (para conservar también su EMC).
+        // For each open mark, whether it was kept (to keep its EMC as well).
         Deque<Boolean> open = new ArrayDeque<>();
         boolean changed = false;
         for (Object token : tokens) {
@@ -163,7 +164,7 @@ final class PdfPages {
                 keep = !operands.isEmpty() && OC.equals(operands.get(0));
                 open.push(keep);
             } else if (name.equals(OperatorName.END_MARKED_CONTENT)) {
-                // Un EMC sin su principio no se escribe: el contenido quedaría desequilibrado.
+                // An EMC without its beginning is not written: the content would be unbalanced.
                 keep = !open.isEmpty() && open.pop();
             } else if (MARKS.contains(name)) {
                 keep = false;

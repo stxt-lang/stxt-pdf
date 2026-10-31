@@ -15,15 +15,15 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Las imágenes del documento en la carpeta de recursos (reference/components/image.md): el fichero y
- * el tamaño natural de cada {@code Image}. Los errores del fichero son del documento y llevan la
- * línea de la {@code Image}: {@code IMAGE_UNKNOWN} si la ruta no existe o sale de la carpeta, e
- * {@code IMAGE_FORMAT} si no es PNG, JPEG, PDF ni un SVG admitido. Una imagen que supera los {@link Limits} es
- * {@code IMAGE_TOO_LARGE} (los píxeles de un PNG o JPEG) o {@code SVG_TOO_COMPLEX} (los elementos y los
- * niveles de un SVG), también con la línea de la {@code Image}; un PDF de más bytes que los {@link Limits},
- * {@code PDF_TOO_LARGE}, antes de abrirlo. La página de un PDF tiene que existir, y {@code Pdf page} en otro formato es
- * un error ({@code IMAGE_PAGE}, con la línea de {@code Pdf page}); una página que no se dibujaría igual que en su PDF
- * es {@code IMAGE_FORMAT}, salvo que se quite su comprobación ({@link Check#PDF_IMAGE_FONTS},
+ * The images of the document in the resources folder (reference/components/image.md): the file and
+ * the natural size of each {@code Image}. The errors of the file belong to the document and carry the
+ * line of the {@code Image}: {@code IMAGE_UNKNOWN} if the path does not exist or leaves the folder, and
+ * {@code IMAGE_FORMAT} if it is not PNG, JPEG, PDF or a supported SVG. An image that exceeds the {@link Limits} is
+ * {@code IMAGE_TOO_LARGE} (the pixels of a PNG or JPEG) or {@code SVG_TOO_COMPLEX} (the elements and the
+ * levels of an SVG), also with the line of the {@code Image}; a PDF with more bytes than the {@link Limits} is
+ * {@code PDF_TOO_LARGE}, before opening it. The page of a PDF has to exist, and {@code Pdf page} in another format is
+ * an error ({@code IMAGE_PAGE}, with the line of {@code Pdf page}); a page that would not be drawn the same as in its
+ * PDF is {@code IMAGE_FORMAT}, unless its check is removed ({@link Check#PDF_IMAGE_FONTS},
  * {@link Check#PDF_IMAGE_ANNOTATIONS}).
  */
 public final class Images {
@@ -32,7 +32,7 @@ public final class Images {
     private final Limits limits;
     private final Set<Check> excluded;
 
-    /** Sin las comprobaciones de {@code excluded}. */
+    /** Without the checks of {@code excluded}. */
     public Images(Resources resources, Limits limits, Set<Check> excluded) {
         this.resources = resources;
         this.limits = limits;
@@ -40,9 +40,9 @@ public final class Images {
     }
 
     /**
-     * Comprueba, antes de maquetar, que todas las imágenes del árbol existen y se pueden leer.
+     * Checks, before the layout, that all the images of the tree exist and can be read.
      *
-     * @throws InvalidModelException con la línea de la primera {@code Image} que falla
+     * @throws InvalidModelException with the line of the first {@code Image} that fails
      */
     public void validate(Box box) {
         if (box.isImage()) {
@@ -54,40 +54,43 @@ public final class Images {
         box.children().forEach(this::validate);
     }
 
-    /** Que la imagen no pida más de lo que admiten los {@link Limits}; se mira en la cabecera o en el recuento del SVG, sin dibujarla. */
+    /**
+     * That the image does not ask for more than the {@link Limits} allow; read from the header or the SVG count,
+     * without drawing it.
+     */
     private void checkLimits(ImageFile file, Box box) {
         if (file.pixels() > limits.maxImagePixels()) {
-            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_TOO_LARGE, "La imagen " + box.image() + " tiene "
-                    + (long) file.pixelWidth() + " × " + (long) file.pixelHeight() + " píxeles ("
-                    + megapixels(file.pixels()) + ") y el máximo es " + megapixels(limits.maxImagePixels())
-                    + ": hay que reducir su resolución (Limits.maxImagePixels lo cambia)");
+            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_TOO_LARGE, "The image " + box.image() + " has "
+                    + (long) file.pixelWidth() + " × " + (long) file.pixelHeight() + " pixels ("
+                    + megapixels(file.pixels()) + ") and the maximum is " + megapixels(limits.maxImagePixels())
+                    + ": its resolution has to be reduced (Limits.maxImagePixels changes it)");
         }
         if (file.svgDepth() > limits.maxSvgDepth()) {
-            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " anida "
-                    + file.svgDepth() + " niveles y el máximo es " + limits.maxSvgDepth()
-                    + ": hay que aplanarlo (Limits.maxSvgDepth lo cambia)");
+            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "The SVG " + box.image() + " nests "
+                    + file.svgDepth() + " levels and the maximum is " + limits.maxSvgDepth()
+                    + ": it has to be flattened (Limits.maxSvgDepth changes it)");
         }
         if (file.svgElements() > limits.maxSvgElements()) {
-            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "El SVG " + box.image() + " dibuja "
-                    + (file.svgElements() >= (1L << 50) ? "una cantidad desorbitada de" : String.valueOf(file.svgElements()))
-                    + " elementos, contando cada vez que un <use> repite un trozo, y el máximo es "
-                    + limits.maxSvgElements() + ": hay que simplificarlo (Limits.maxSvgElements lo cambia)");
+            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "The SVG " + box.image() + " draws "
+                    + (file.svgElements() >= (1L << 50) ? "an absurdly large number of" : String.valueOf(file.svgElements()))
+                    + " elements, counting each time a <use> repeats a part, and the maximum is "
+                    + limits.maxSvgElements() + ": it has to be simplified (Limits.maxSvgElements changes it)");
         }
     }
 
-    /** Que un PDF no tenga más bytes que el límite: se mira antes de abrirlo. */
+    /** That a PDF does not have more bytes than the limit: checked before opening it. */
     private void checkPdfBytes(Box box) {
         long bytes;
         try {
             bytes = resources.images().pdfBytes(box.image());
         } catch (ResourceException e) {
-            // La ruta no existe o sale de la carpeta: lo dice file(box), con su código.
+            // The path does not exist or leaves the folder: file(box) reports it, with its code.
             return;
         }
         if (bytes > limits.maxPdfBytes()) {
-            throw new InvalidModelException(box.line(), ErrorCode.PDF_TOO_LARGE, "El PDF " + box.image() + " ocupa "
-                    + megabytes(bytes) + " y el máximo es " + megabytes(limits.maxPdfBytes())
-                    + ": hace falta un PDF más pequeño, con solo las páginas que se usan (Limits.maxPdfBytes lo cambia)");
+            throw new InvalidModelException(box.line(), ErrorCode.PDF_TOO_LARGE, "The PDF " + box.image() + " takes up "
+                    + megabytes(bytes) + " and the maximum is " + megabytes(limits.maxPdfBytes())
+                    + ": a smaller PDF is needed, with only the pages that are used (Limits.maxPdfBytes changes it)");
         }
     }
 
@@ -96,27 +99,28 @@ public final class Images {
     }
 
     /**
-     * Que {@code Pdf page} sea de un PDF y la página exista, y que se pueda dibujar con las comprobaciones que se
-     * hacen.
+     * That {@code Pdf page} belongs to a PDF and the page exists, and that it can be drawn with the checks that are
+     * made.
      */
     private void checkPage(ImageFile file, Box box) {
         int page = box.style().image().pdfPage();
         if (box.style().isDeclared(PropertyKey.PDF_PAGE)) {
             if (file.format() != ImageFile.Format.PDF) {
-                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "Pdf page solo "
-                        + "tiene efecto en un PDF, y la imagen " + box.image() + " es " + file.format() + ": sobra");
+                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "Pdf page only "
+                        + "has an effect on a PDF, and the image " + box.image() + " is " + file.format()
+                        + ": it is not needed");
             }
             if (page > file.pages()) {
-                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "El PDF "
-                        + box.image() + " tiene " + file.pages() + (file.pages() == 1 ? " página" : " páginas")
-                        + " y no tiene la " + page);
+                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "The PDF "
+                        + box.image() + " has " + file.pages() + (file.pages() == 1 ? " page" : " pages")
+                        + " and has no page " + page);
             }
         }
         for (Check check : new Check[] {Check.PDF_IMAGE_ANNOTATIONS, Check.PDF_IMAGE_FONTS}) {
             String problem = excluded.contains(check) ? null : file.problem(page, check);
             if (problem != null) {
-                throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "La página " + page + " del PDF "
-                        + box.image() + " " + problem + " (o se quita la comprobación " + check + " al convertir)");
+                throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, "Page " + page + " of the PDF "
+                        + box.image() + " " + problem + " (or the check " + check + " is removed when converting)");
             }
         }
     }
@@ -125,7 +129,7 @@ public final class Images {
         return String.format(java.util.Locale.ROOT, "%.1f Mpx", pixels / 1_000_000.0);
     }
 
-    /** El fichero de una {@code Image}. */
+    /** The file of an {@code Image}. */
     public ImageFile file(Box box) {
         try {
             return resources.images().find(box.image());
@@ -133,11 +137,11 @@ public final class Images {
             throw new InvalidModelException(box.line(), ErrorCode.IMAGE_FORMAT, e.getMessage());
         } catch (ResourceException e) {
             throw new InvalidModelException(box.line(), ErrorCode.IMAGE_UNKNOWN, e.getMessage()
-                    + " (la ruta de una Image es relativa a la carpeta images/ de los recursos)");
+                    + " (the path of an Image is relative to the images/ folder of the resources)");
         }
     }
 
-    /** Tamaño natural de una {@code Image}, en puntos: el de un PDF, el de su página. */
+    /** Natural size of an {@code Image}, in points: for a PDF, the size of its page. */
     public NaturalSize natural(Box box) {
         ImageFile f = file(box);
         int page = box.style().image().pdfPage();

@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** Cómo coloca la caja a sus hijos: lo da el elemento. Una {@code IMAGE} no tiene hijos. */
+/** How the box places its children: given by the element. An {@code IMAGE} has no children. */
 public enum Layout { BLOCK, INLINE, STACK, GRID, COLUMNS, IMAGE }

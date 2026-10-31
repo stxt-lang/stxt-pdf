@@ -3,16 +3,16 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Marker;
 
 /**
- * Las propiedades de las listas (reference/components/list.md): el {@code Marker} y el {@code Start} de una {@code
- * List} y el {@code Number} de un {@code List item}. No se heredan.
+ * The properties of lists (reference/components/list.md): the {@code Marker} and the {@code Start} of a {@code
+ * List} and the {@code Number} of a {@code List item}. They are not inherited.
  */
 public final class ListStyle extends StyleGroup {
 
-    /** Marcador de los ítems de una {@code List}; {@code null} en el resto de cajas. */
+    /** Marker of the items of a {@code List}; {@code null} in the other boxes. */
     private Marker marker;
-    /** Número del primer ítem de una {@code List}. */
+    /** Number of the first item of a {@code List}. */
     private int start = 1;
-    /** Número que fija un {@code List item}; {@code null} = el siguiente al del ítem anterior. */
+    /** Number that a {@code List item} sets; {@code null} = the one after that of the previous item. */
     private Integer number;
 
     ListStyle() {

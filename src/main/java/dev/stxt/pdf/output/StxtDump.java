@@ -9,8 +9,8 @@ import java.math.RoundingMode;
 import java.util.List;
 
 /**
- * Vuelca el resultado del layout en STXT (reference/implementation/testing.md). Es el formato de los tests de
- * referencia: rectángulos de caja de borde en coordenadas absolutas de página, en pt.
+ * Dumps the result of the layout to STXT (reference/implementation/testing.md). It is the format of the reference
+ * tests: border box rectangles in absolute page coordinates, in pt.
  *
  * <pre>
  * Result:
@@ -19,8 +19,8 @@ import java.util.List;
  * 			Rect: 40 40 515 60
  * </pre>
  *
- * <p>Por defecto solo se vuelcan los fragmentos con {@code Id}; sus descendientes con
- * {@code Id} se anidan dentro.</p>
+ * <p>By default only the fragments with an {@code Id} are dumped; their descendants with an
+ * {@code Id} are nested inside.</p>
  */
 public final class StxtDump {
 
@@ -30,7 +30,7 @@ public final class StxtDump {
     public static String dump(List<Page> pages, boolean includeWithoutId) {
         StringBuilder sb = new StringBuilder("Result:\n");
         for (Page p : pages) {
-            // Las coordenadas son las de la página, con el área útil del medio de su sección
+            // The coordinates are those of the page, with the page area of the medium of its section
             // (reference/components/document.md).
             Rect pageArea = p.pageSetup().pageArea();
             sb.append("\tPage: ").append(p.number()).append('\n');
@@ -55,7 +55,7 @@ public final class StxtDump {
         double x = originX + f.x();
         double y = originY + f.y();
         if (f.box().isMarker()) {
-            // Va dentro del ítem: solo si se vuelca el ítem.
+            // It goes inside the item: only if the item is dumped.
             if (f.box().parent().id() != null || includeWithoutId) {
                 String tab = "\t".repeat(level);
                 sb.append(tab).append("Marker: ").append(f.box().text().strip()).append('\n');
@@ -80,7 +80,7 @@ public final class StxtDump {
                 .append(format(f.width())).append(' ').append(format(f.height())).append('\n');
     }
 
-    /** Hasta 2 decimales, sin ceros finales. */
+    /** Up to 2 decimals, without trailing zeros. */
     static String format(double v) {
         return BigDecimal.valueOf(v).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
     }

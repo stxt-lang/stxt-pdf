@@ -1,0 +1,21 @@
+# Case: A Link to a box of a Page overlay, which is repeated on every page
+# Code: LINK_UNKNOWN
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page overlay:
+			Offset: 0 0 auto auto
+			Text: Cabecera
+				Id: cabecera
+		Text: Pulsa aquí
+			Link: #cabecera

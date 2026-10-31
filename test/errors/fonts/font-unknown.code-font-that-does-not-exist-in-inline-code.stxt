@@ -1,0 +1,20 @@
+# Case: Code font with a family that does not exist, in inline code
+# Code: FONT_UNKNOWN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Markdown:
+			Typography:
+				Code font: Courier
+			Content >>
+				Usa `mvn test` para probar.

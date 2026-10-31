@@ -1,0 +1,21 @@
+# Case: Columns that do not fit in the grid
+# Code: BOX_OVERFLOW
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Grid:
+			Box:
+				Width: 200
+			Column sizes: * *
+			Area: 1 1 1 2
+				Text: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

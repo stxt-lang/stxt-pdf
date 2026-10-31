@@ -22,10 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Propiedades del reparto en líneas con textos y anchos al azar, con los dos algoritmos:
- * no se pierde ni se duplica ninguna palabra y quedan en orden (todos los huecos valen un espacio, también los que tienen
- * una línea en blanco: el texto es un solo párrafo), ninguna línea está vacía y toda línea de más de una palabra cabe. Con {@link FixedMetrics} cada
- * carácter mide 5 pt con {@code Size: 10}. La semilla es fija: un fallo se repite.
+ * Line-breaking properties with random texts and widths, with both algorithms:
+ * no word is lost or duplicated and they stay in order (every gap counts as a space, also those that contain
+ * a blank line: the text is a single paragraph), no line is empty and every line of more than one word fits. With
+ * {@link FixedMetrics} each character measures 5 pt with {@code Size: 10}. The seed is fixed: a failure repeats.
  */
 class LineBreakerPropertiesTest {
 
@@ -49,7 +49,7 @@ class LineBreakerPropertiesTest {
         return sb.toString();
     }
 
-    /** Las palabras del texto. */
+    /** The words of the text. */
     private static List<String> words(String text) {
         List<String> words = new ArrayList<>();
         Matcher m = WORD.matcher(text);
@@ -69,26 +69,26 @@ class LineBreakerPropertiesTest {
                 String where = wrap + ", " + available + " pt: \"" + text.replace("\n", "\\n") + "\"";
                 List<String> words = new ArrayList<>();
                 for (String line : LineBreaker.breakLines(text, available, METRICS, FONT, 10, wrap)) {
-                    assertFalse(line.isEmpty(), "línea vacía con " + where);
-                    assertEquals(line.strip(), line, "espacios en los extremos con " + where);
+                    assertFalse(line.isEmpty(), "empty line with " + where);
+                    assertEquals(line.strip(), line, "spaces at the ends with " + where);
                     List<String> inLine = Arrays.asList(line.split(" "));
                     assertTrue(inLine.size() == 1 || fits(line.length() * 5.0, available),
-                            "«" + line + "» no cabe con " + where);
+                            "\"" + line + "\" does not fit with " + where);
                     words.addAll(inLine);
                 }
-                assertEquals(words(text), words, "palabras con " + where);
+                assertEquals(words(text), words, "words with " + where);
             }
         }
     }
 
-    /** Formatos de los tramos de {@link #theGreedyBreakIsTheSameAsMeasuringEveryLine}: cada uno mide distinto. */
+    /** Formats of the runs of {@link #theGreedyBreakIsTheSameAsMeasuringEveryLine}: each one measures differently. */
     private static final TextFormat[] FORMATS = {TextFormat.PLAIN, TextFormat.PLAIN,
             new TextFormat(true, false, false, false), new TextFormat(false, true, false, false),
             new TextFormat(true, true, false, false), TextFormat.PLAIN.withSmallCaps(true)};
-    /** Trozos de palabra: con {@code fi}, {@code fl} y {@code ff}, que son ligaduras de IBM Plex Sans. */
+    /** Pieces of words: with {@code fi}, {@code fl} and {@code ff}, which are ligatures of IBM Plex Sans. */
     private static final String[] SYLLABLES = {"a", "ma", "fi", "fl", "ff", "ffi", "ti", "on", "W", "AV", "é", "ñ"};
 
-    /** Un texto de tramos con formato: los cambios de formato caen dentro de las palabras y en los espacios. */
+    /** A text of formatted runs: the format changes fall inside the words and on the spaces. */
     private static List<TextRun> randomRuns(Random random) {
         TextRun.Joiner runs = new TextRun.Joiner();
         int words = 1 + random.nextInt(40);
@@ -105,7 +105,7 @@ class LineBreakerPropertiesTest {
         return runs.build();
     }
 
-    /** El reparto voraz de antes de sumar los avances: con cada palabra, la línea se construye y se mide entera. */
+    /** The greedy line breaking from before adding up the advances: with each word, the line is built and measured. */
     private static List<LineBreaker.Line> measuringEveryLine(List<TextRun> runs, double available,
             TextMeasurer metrics, FontFace font, double size, double spacing) {
         List<LineBreaker.Line> lines = new ArrayList<>();
@@ -125,9 +125,9 @@ class LineBreakerPropertiesTest {
     }
 
     /**
-     * El reparto voraz suma los avances de las palabras y los espacios y da las mismas líneas que midiendo la
-     * línea entera con cada palabra, como antes: con las métricas reales (negrita, cursiva, versalitas y ligaduras),
-     * con interletraje y con anchos que son justo el de una línea, donde el redondeo de la suma podría decidir.
+     * Greedy line breaking adds up the advances of the words and the spaces and gives the same lines as measuring the
+     * whole line with each word, as before: with the real metrics (bold, italic, small caps and ligatures),
+     * with letter spacing and with widths that are exactly that of a line, where the rounding of the sum could decide.
      */
     @Test
     void theGreedyBreakIsTheSameAsMeasuringEveryLine() {
@@ -143,7 +143,7 @@ class LineBreakerPropertiesTest {
             if (random.nextBoolean()) {
                 available = 20 + random.nextInt(300);
             } else {
-                // El ancho de las primeras palabras, justo en el límite.
+                // The width of the first words, exactly at the limit.
                 List<LineBreaker.Word> words = LineBreaker.words(runs);
                 List<LineBreaker.Word> first = words.subList(0, 1 + random.nextInt(words.size()));
                 available = LineBreaker.width(LineBreaker.line(first).runs(), metrics, font, size, spacing)
@@ -151,11 +151,11 @@ class LineBreakerPropertiesTest {
             }
             assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
                     LineBreaker.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE),
-                    available + " pt, " + size + " pt, interletraje " + spacing + ": " + runs);
+                    available + " pt, " + size + " pt, letter spacing " + spacing + ": " + runs);
         }
     }
 
-    /** Las palabras de antes, con {@code \\S+}: la referencia de {@link #theWordsAreTheSameAsWithTheRegex}. */
+    /** The words from before, with {@code \\S+}: the reference of {@link #theWordsAreTheSameAsWithTheRegex}. */
     private static List<LineBreaker.Word> wordsWithTheRegex(List<TextRun> runs) {
         String text = TextRun.text(runs);
         int[] starts = new int[runs.size() + 1];
@@ -192,9 +192,9 @@ class LineBreakerPropertiesTest {
     }
 
     /**
-     * Las palabras se sacan recorriendo el texto y son las mismas que con la expresión regular
-     * de antes: con todos los espacios en blanco de {@code \\s}, otros que no lo son ({@code U+00A0}) y cambios de
-     * formato dentro de las palabras y de los huecos.
+     * The words are extracted by walking the text and are the same as with the regular expression
+     * from before: with all the white space of {@code \\s}, other characters that are not white space ({@code U+00A0})
+     * and format changes inside the words and the gaps.
      */
     @Test
     void theWordsAreTheSameAsWithTheRegex() {

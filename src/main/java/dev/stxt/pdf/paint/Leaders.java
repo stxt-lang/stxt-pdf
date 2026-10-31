@@ -8,28 +8,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La guía de las entradas de un índice (reference/components/table-of-contents.md): lo que se pinta en la caja
- * vacía entre el título y el número de página. Son rectángulos rellenos con el color del texto,
- * sobre la línea base de la entrada.
+ * The leader of the entries of a table of contents (reference/components/table-of-contents.md): what is painted in the
+ * empty box between the title and the page number. They are rectangles filled with the color of the text,
+ * on the baseline of the entry.
  */
 final class Leaders {
 
-    /** Lado de cada punto, relativo al tamaño de la fuente. */
+    /** Side of each dot, relative to the font size. */
     private static final double DOT = 0.09;
-    /** Distancia entre dos puntos, relativa al tamaño de la fuente. */
+    /** Distance between two dots, relative to the font size. */
     private static final double STEP = 0.5;
-    /** Grosor de la línea, relativo al tamaño de la fuente. */
+    /** Thickness of the line, relative to the font size. */
     private static final double RULE = 0.05;
-    /** Grosor mínimo de un punto o de la línea, en puntos: por debajo no se ve. */
+    /** Minimum thickness of a dot or of the line, in points: below it, it is not visible. */
     private static final double MIN = 0.4;
 
     private Leaders() {
     }
 
     /**
-     * Los rectángulos de una guía en la caja de contenido {@code content}, apoyados en la línea
-     * base {@code baseline}. Los puntos van pegados al número, a la derecha, cada medio cuerpo, y
-     * se quedan los que caben; la línea ocupa todo el ancho.
+     * The rectangles of a leader in the content box {@code content}, resting on the baseline
+     * {@code baseline}. The dots sit flush with the number, on the right, every half font size, and
+     * the ones that fit are kept; the line takes the whole width.
      */
     static List<Rect> shapes(Leader leader, Rect content, double baseline, double fontSize) {
         List<Rect> shapes = new ArrayList<>();

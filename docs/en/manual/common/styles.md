@@ -79,7 +79,7 @@ Styles (dev.stxt.pdf):
 
 The document does not say where its styles file is: it is passed when converting it ([Using from Java](java-usage.md)).
 If the document also has its own `Styles`, at each level of the list above the one in the document wins, so moving the
-`Styles` to a file changes nothing. An error in the styles file starts with `línea 8 de los estilos:`, also if it is
+`Styles` to a file changes nothing. An error in the styles file starts with `line 8 of the styles:`, also if it is
 detected during layout, such as a font that does not exist or a box that does not fit.
 
 More detail in the [reference](../../reference/common/styles.md).

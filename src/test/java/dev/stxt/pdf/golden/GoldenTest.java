@@ -28,25 +28,25 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Tests de referencia (reference/implementation/testing.md): cada carpeta de {@code golden/} contiene
- * {@code input.stxt} y {@code expected.stxt}. Se comparan nombres y valores; los números de
- * {@code Rect} con una tolerancia de 0.01 pt. La entrada se valida contra el schema; el
- * volcado no tiene namespace y se lee sin validación.
+ * Reference tests (reference/implementation/testing.md): each folder of {@code golden/} contains
+ * {@code input.stxt} and {@code expected.stxt}. Names and values are compared; the numbers of
+ * {@code Rect} with a tolerance of 0.01 pt. The input is validated against the schema; the
+ * dump has no namespace and is read without validation.
  *
- * <p>Cada caso deja además un SVG de depuración en {@code target/golden-svg/}, y el PDF y una imagen por página en
- * {@code target/reference/golden/}, que se comparan con los {@code page-N.png} versionados en su carpeta de
- * {@code test/golden/}: si cambian, el caso falla; {@code -Dgolden.update=true} los acepta (ver
- * {@link #writePdfAndImages}). El volcado esperado, que se calcula a mano, no se actualiza nunca.</p>
+ * <p>Each case also leaves a debug SVG in {@code target/golden-svg/}, and the PDF and one image per page in
+ * {@code target/reference/golden/}, which are compared with the {@code page-N.png} versioned in its folder of
+ * {@code test/golden/}: if they change, the case fails; {@code -Dgolden.update=true} accepts them (see
+ * {@link #writePdfAndImages}). The expected dump, which is calculated by hand, is never updated.</p>
  */
 class GoldenTest {
 
     private static final Path SVG_DIR = Path.of("target", "golden-svg");
-    /** Carpeta de los casos en el código fuente, con las imágenes versionadas. */
+    /** Folder of the cases in the source code, with the versioned images. */
     private static final Path SOURCE_DIR = Path.of("test", "golden");
     private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("golden");
     private static final float IMAGE_DPI = 100;
 
-    /** Casos que necesitan un hito pendiente: se saltan con el motivo. */
+    /** Cases that need a pending milestone: they are skipped with the reason. */
     private static final Map<String, String> PENDING = Map.of();
 
     private final DocumentReader reader = new DocumentReader();
@@ -82,11 +82,11 @@ class GoldenTest {
     }
 
     /**
-     * Escribe en {@code dir} ({@code target/reference/golden/<caso>/}) {@code output.pdf} y un {@code page-N.png} por
-     * página ({@link ReferenceFiles#writeActual}), y devuelve las imágenes para compararlas con las versionadas. El PDF
-     * lleva los contornos de depuración de las cajas y se maqueta con las métricas reales de las fuentes de
-     * {@code resources/fonts}, que se incrustan ({@link Converter}), no con las de la comparación. Sin comprobar el
-     * contraste: un caso golden prueba dónde va cada cosa, y sus colores solo distinguen las cajas.
+     * Writes to {@code dir} ({@code target/reference/golden/<case>/}) {@code output.pdf} and one {@code page-N.png} per
+     * page ({@link ReferenceFiles#writeActual}), and returns the images to compare them with the versioned ones. The
+     * PDF carries the debug outlines of the boxes and is laid out with the real metrics of the fonts of
+     * {@code resources/fonts}, which are embedded ({@link Converter}), not with those of the comparison. Without
+     * checking contrast: a golden case tests where each thing goes, and its colors only tell the boxes apart.
      */
     private static List<BufferedImage> writePdfAndImages(Path dir, InlineNode input, InlineNode styles)
             throws IOException {

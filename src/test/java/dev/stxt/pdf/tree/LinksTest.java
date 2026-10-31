@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los enlaces en el árbol de cajas (reference/common/links.md). */
+/** Links in the box tree (reference/common/links.md). */
 class LinksTest {
 
     private static final DocumentReader READER = new DocumentReader();
 
-    /** Un documento con estas líneas de elementos, sin sangrar, tras la cabecera (línea 8 en adelante). */
+    /** A document with these element lines, unindented, after the header (line 8 onward). */
     private static InlineNode document(String... body) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
@@ -43,7 +43,7 @@ class LinksTest {
         Box block = root.children().get(0);
         assertEquals("https://stxt.dev", block.style().link());
         assertEquals(14, block.style().line("link").number());
-        // Lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva enlace propio.
+        // What is inside a box with a link is clickable through it, but carries no link of its own.
         assertNull(block.children().get(0).style().link());
         assertEquals("mailto:a@b.c", block.children().get(1).style().link());
         assertNull(root.children().get(0).children().get(0).style().link());
@@ -82,7 +82,7 @@ class LinksTest {
     void anInternalLinkNeedsABoxWithThatId() {
         InvalidModelException unknown = error("\tText: a", "\t\tLink: #nada");
         assertEquals(ErrorCode.LINK_UNKNOWN, unknown.errorCode());
-        // La línea del Link, no la de su caja.
+        // The line of the Link, not that of its box.
         assertEquals(14, unknown.line());
         InvalidModelException fixed = error("\tPage overlay:", "\t\tText: cabecera", "\t\t\tId: cabecera",
                 "\tText: a", "\t\tLink: #cabecera");
@@ -92,7 +92,7 @@ class LinksTest {
 
     @Test
     void theRunsOfATextAreCheckedToo() {
-        // Los tramos se ponen antes de cerrar el árbol, que después no cambia.
+        // The runs are set before closing the tree, which does not change afterwards.
         new BoxTreeBuilder().build(document("\tText: Véase el anexo", "\t\tId: t", "\tText: Anexo", "\t\tId: anexo"),
                 null, root -> {
                     TextRuns.set(root, "t", List.of(TextRuns.run("Véase el "),
@@ -103,7 +103,7 @@ class LinksTest {
                     InvalidModelException e = assertThrows(InvalidModelException.class,
                             () -> LinkTargets.validate(root));
                     assertEquals(ErrorCode.LINK_UNKNOWN, e.errorCode());
-                    // Sin una línea propia para el tramo, la del texto.
+                    // Without a line of its own for the run, that of the text.
                     assertEquals(13, e.line());
                 });
     }
@@ -121,12 +121,12 @@ class LinksTest {
                 "\tMarkdown:", "\t\tContent >>", "\t\t\t# Dos", "", "\t\t\t## Dos punto uno");
         Box contents = root.children().get(0);
         assertEquals(3, contents.children().size());
-        // Un encabezado con Id se enlaza por él; uno de Markdown, por el nombre que le da el índice.
+        // A heading with Id is linked by it; one from Markdown, by the name the table of contents gives it.
         assertEquals("#uno", contents.children().get(0).style().link());
         Box markdownHeading = root.children().get(2).children().get(0);
         assertEquals("#" + markdownHeading.key(), contents.children().get(1).style().link());
         assertTrue(markdownHeading.key() != null);
-        // Sus hijos (título, guía y número) no llevan enlace: lo lleva la entrada.
+        // Its children (title, leader and number) carry no link: the entry carries it.
         contents.children().get(0).children().forEach(c -> assertNull(c.style().link()));
     }
 }

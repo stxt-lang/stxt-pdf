@@ -1,0 +1,19 @@
+# Case: Text taller than its Height
+# Code: BOX_OVERFLOW
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: uno dos tres cuatro cinco seis siete ocho nueve diez
+			Box:
+				Width: 100
+				Height: 20

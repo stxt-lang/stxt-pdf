@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Cabecera y pie repetidos (reference/components/table.md). Páginas de 180 pt con márgenes de 40: área
- * útil de 515 × 100 desde (40, 40). Las tablas tienen una columna y celdas de alto fijo.
+ * Repeated header and footer (reference/components/table.md). Pages of 180 pt with margins of 40: page
+ * area of 515 × 100 from (40, 40). The tables have one column and cells of fixed height.
  */
 class TableFragmentationTest {
 
@@ -48,8 +48,8 @@ class TableFragmentationTest {
 
     @Test
     void headerAndFooterRowsRepeatOnEveryPage() {
-        // La cabecera (20) y el pie (10) dejan 70 al cuerpo: dos filas de 30 por página. El pie va
-        // detrás de la última fila colocada.
+        // The header (20) and the footer (10) leave 70 for the body: two rows of 30 per page. The footer goes
+        // after the last row placed.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30), row("B3", 30), row("B4", 30),
@@ -67,9 +67,9 @@ class TableFragmentationTest {
     }
 
     /**
-     * La franja de una fila con {@code Id} o {@code Box} (reference/components/table.md#filas) va de la primera
-     * columna a la última, con el hueco entre ellas, y tiene el alto de su fila; el hueco entre filas no es de
-     * ninguna.
+     * The band of a row with {@code Id} or {@code Box} (reference/components/table.md#rows) goes from the first
+     * column to the last, with the gap between them, and has the height of its row; the gap between rows belongs to
+     * none.
      */
     @Test
     void theBandOfARowSpansItsColumnsAndItsHeight() {
@@ -83,17 +83,17 @@ class TableFragmentationTest {
         assertRect(40, 40, 210, 20, l.rect("R1"));
         assertRect(40, 70, 210, 30, l.rect("R2"));
         assertRect(40, 70, 100, 30, l.rect("C"));
-        // Va delante de sus celdas en el fragmento de la tabla, para pintarse debajo.
+        // It goes before its cells in the fragment of the table, to be painted underneath.
         assertEquals("R2", firstChildWithId(l, "R2", "C"));
     }
 
-    /** El primero de los dos Id que sale entre los hijos del fragmento de la tabla. */
+    /** The first of the two Ids that appears among the children of the fragment of the table. */
     private static String firstChildWithId(LayoutFixture l, String a, String b) {
         return l.fragment(1, "T").children().stream().map(f -> f.box().id())
                 .filter(id -> a.equals(id) || b.equals(id)).findFirst().orElseThrow();
     }
 
-    /** Las franjas de la cabecera y del pie se repiten en cada página, como sus celdas. */
+    /** The bands of the header and of the footer repeat on each page, like their cells. */
     @Test
     void bandsOfHeaderAndFooterRowsRepeat() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
@@ -112,9 +112,9 @@ class TableFragmentationTest {
     }
 
     /**
-     * Una fila que no cabe en una página se parte, y su franja con ella: hasta el final de su celda en la primera, que
-     * llega al final del área útil, y desde arriba en la siguiente, sin el borde del corte (con {@code Edges:
-     * slice}).
+     * A row that does not fit on a page is split, and its band with it: up to the end of its cell on the first page,
+     * which reaches the end of the page area, and from the top on the next one, without the border at the break (with
+     * {@code Edges: slice}).
      */
     @Test
     void theBandOfASplitRowIsSplitToo() {
@@ -126,7 +126,7 @@ class TableFragmentationTest {
         assertRect(40, 40, 515, 100, l.rect(1, "R"));
         assertEquals(0, l.fragment(1, "R").border().bottom());
         assertEquals(1, l.fragment(1, "R").border().top());
-        // La celda pone 60 + 40 en la primera página y los 20 que faltan en la segunda.
+        // The cell puts 60 + 40 on the first page and the remaining 20 on the second.
         assertRect(40, 40, 515, 20, l.rect(2, "R"));
         assertEquals(0, l.fragment(2, "R").border().top());
         assertEquals(1, l.fragment(2, "R").border().bottom());
@@ -134,8 +134,8 @@ class TableFragmentationTest {
 
     @Test
     void gapsSeparateHeaderAndFooterRowsFromTheBody() {
-        // Con 5 de hueco, la cabecera ocupa 25 y el pie 15: quedan 60, y B1 (30) y B2 (que acaba
-        // en 65) no caben juntas.
+        // With a gap of 5, the header takes up 25 and the footer 15: 60 remain, and B1 (30) and B2 (which ends
+        // at 65) do not fit together.
         LayoutFixture l = layOutPaged(PAGE, concat(table("5"),
                 group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30),
@@ -150,8 +150,8 @@ class TableFragmentationTest {
 
     @Test
     void tableThatDoesNotFitMovesWithItsHeaderRows() {
-        // Tras X (50), la cabecera, la primera fila y el pie (60) no caben: la tabla entera pasa
-        // a la página 2, sin dejar la cabecera sola.
+        // After X (50), the header, the first row and the footer (60) do not fit: the whole table moves
+        // to page 2, without leaving the header alone.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50"}, table(null),
                 group("Header rows"), row("H", 20), group("Body"), row("B1", 30), group("Footer rows"), row("F", 10)));
@@ -163,8 +163,8 @@ class TableFragmentationTest {
 
     @Test
     void tallBodyRowBreaksBetweenHeaderAndFooterRows() {
-        // B1 (100) no cabe en los 70 que dejan la cabecera y el pie: se parte, 70 + 30, y la
-        // cabecera y el pie se repiten alrededor de cada parte.
+        // B1 (100) does not fit in the 70 left by the header and the footer: it is split, 70 + 30, and the
+        // header and the footer repeat around each part.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Header rows"), row("H", 20), group("Body"), row("B1", 100), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());

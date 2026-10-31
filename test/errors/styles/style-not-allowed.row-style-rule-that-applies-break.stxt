@@ -1,0 +1,24 @@
+# Case: Rule of a Row style that applies Break to its cells
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: keep
+			Break:
+				Keep together: true
+	Section:
+		Table:
+			Column sizes: *
+			Body:
+				Row:
+					Style: keep
+					Cell: a

@@ -4,29 +4,29 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 
 /**
- * El medio de salida (reference/components/document.md): una secuencia de páginas de tamaño fijo. Define
- * el containing block inicial: el área útil.
+ * The output medium (reference/components/document.md): a sequence of pages of fixed size. It defines the initial
+ * reference container: the page area.
  *
- * @param width  ancho de la página, en pt
- * @param height alto de la página, en pt
- * @param margin márgenes de página, en pt
+ * @param width  width of the page, in pt
+ * @param height height of the page, in pt
+ * @param margin page margins, in pt
  */
 public record PageSetup(double width, double height, Insets margin) {
 
-    /** Área útil: el containing block inicial y el de las cajas {@code fixed}. */
+    /** Page area: the initial reference container and the one of {@code fixed} boxes. */
     public Rect pageArea() {
         return new Rect(margin.left(), margin.top(), width - margin.horizontal(), height - margin.vertical());
     }
 
     /**
-     * Los tamaños de papel con nombre de {@code Paper} (reference/components/document.md), en vertical y en puntos
-     * enteros: los de ISO 216 redondeados, como se usan siempre (A4 = 595 × 842), y los de EE. UU.
+     * The named paper sizes of {@code Paper} (reference/components/document.md), in portrait and in whole points: the
+     * ISO 216 ones rounded, as they are always used (A4 = 595 × 842), and the US ones.
      */
     public enum Paper {
         A3(842, 1191), A4(595, 842), A5(420, 595), A6(298, 420), B4(709, 1001), B5(499, 709),
         LETTER(612, 792), LEGAL(612, 1008);
 
-        /** Ancho y alto en vertical, en pt. */
+        /** Width and height in portrait, in pt. */
         public final double width;
         public final double height;
 
@@ -37,8 +37,8 @@ public record PageSetup(double width, double height, Insets margin) {
     }
 
     /**
-     * {@code Orientation} (reference/components/document.md): {@code landscape} cambia el ancho por el alto del
-     * papel.
+     * {@code Orientation} (reference/components/document.md): {@code landscape} swaps the width and the height of the
+     * paper.
      */
     public enum Orientation {
         PORTRAIT, LANDSCAPE

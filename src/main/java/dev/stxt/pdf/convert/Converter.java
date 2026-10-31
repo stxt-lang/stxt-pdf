@@ -26,29 +26,29 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Punto de entrada del motor: documento STXT → PDF (o SVG) con las métricas reales de las fuentes y las imágenes de la
- * carpeta de recursos. Reúne en un objeto lo que antes se pasaba suelto a cada llamada: la carpeta de recursos ({@link
- * Resources}), el documento de estilos aparte (reference/common/styles.md) y los contornos de depuración.
+ * Entry point of the engine: STXT document → PDF (or SVG) with the real metrics of the fonts and the images of the
+ * resources folder. It gathers in one object what used to be passed separately to each call: the resources folder
+ * ({@link Resources}), the separate styles document (reference/common/styles.md) and the debug outlines.
  *
- * <p><strong>Es inmutable y seguro entre hilos</strong>: se crea una vez y se comparte. Cada conversión
- * crea su propio {@link Engine}, que no se puede compartir (guarda la caché del layout), así que dos
- * hilos que convierten a la vez con el mismo {@code Converter} no comparten ningún estado mutable.</p>
+ * <p><strong>It is immutable and thread-safe</strong>: it is created once and shared. Each conversion
+ * creates its own {@link Engine}, which cannot be shared (it holds the layout cache), so two
+ * threads that convert at the same time with the same {@code Converter} share no mutable state.</p>
  *
  * <pre>{@code
- * Converter converter = Converter.builder().resources(new Resources(Path.of("otra"))).build();
+ * Converter converter = Converter.builder().resources(new Resources(Path.of("other"))).build();
  * InlineNode document = new DocumentReader().read(Path.of("report.stxt"));
  * converter.toPdf(document, out);
  * }</pre>
  *
- * <p><strong>Errores:</strong> todo fallo de la conversión sale como {@link StxtPdfException}, así que una sola
- * {@code catch} basta; su {@link StxtPdfException#kind() kind} dice de quién es la culpa (el documento, los
- * recursos, un límite o el propio motor), y {@code line()} y {@code code()} dónde y qué. Un error inesperado de
- * cualquier otra clase se convierte en un {@link InternalException} que guarda el original. Los fallos de
- * entrada y salida al escribir salen como {@link IOException}.</p>
+ * <p><strong>Errors:</strong> every failure of the conversion comes out as a {@link StxtPdfException}, so a single
+ * {@code catch} is enough; its {@link StxtPdfException#kind() kind} says whose fault it is (the document, the
+ * resources, a limit or the engine itself), and {@code line()} and {@code code()} where and what. An unexpected error
+ * of any other class is turned into an {@link InternalException} that keeps the original. Input and output failures
+ * when writing come out as {@link IOException}.</p>
  *
- * <p>Para usar las páginas antes de pintarlas (o pintarlas a PDF y a SVG a la vez) se maqueta con
- * {@link #layOut(InlineNode)} y se pinta el resultado con {@link #toPdf(LaidOutDocument, OutputStream)} y
- * {@link #toSvg(LaidOutDocument)}. Un {@link LaidOutDocument} no se cambia después de maquetarlo.</p>
+ * <p>To use the pages before painting them (or to paint them to PDF and SVG at once), the document is laid out with
+ * {@link #layOut(InlineNode)} and the result is painted with {@link #toPdf(LaidOutDocument, OutputStream)} and
+ * {@link #toSvg(LaidOutDocument)}. A {@link LaidOutDocument} does not change after it is laid out.</p>
  */
 public final class Converter {
 
@@ -68,7 +68,7 @@ public final class Converter {
         this.pdfUa = builder.pdfUa;
     }
 
-    /** Un conversor con la configuración por defecto: recursos en {@code resources/}, sin estilos aparte ni depuración. */
+    /** A converter with the default configuration: resources in {@code resources/}, no separate styles, no debug. */
     public static Converter create() {
         return builder().build();
     }
@@ -77,26 +77,26 @@ public final class Converter {
         return new Builder();
     }
 
-    /** La carpeta de recursos con que convierte. */
+    /** The resources folder it converts with. */
     public Resources resources() {
         return resources;
     }
 
-    /** Lo máximo que acepta ({@link Limits}). */
+    /** The most it accepts ({@link Limits}). */
     public Limits limits() {
         return limits;
     }
 
-    /** Las comprobaciones que no hace ({@link Builder#exclude}); vacío si las hace todas. */
+    /** The checks it does not run ({@link Builder#exclude}); empty if it runs all of them. */
     public Set<Check> excluded() {
         return excluded;
     }
 
     /**
-     * Maqueta un documento ya validado ({@link DocumentReader}) con las métricas reales de las fuentes de la carpeta de
-     * recursos. Falla con los errores del documento (reference/common/errors.md) antes de que se escriba nada,
-     * también con los de las comprobaciones que no se han quitado ({@link Builder#exclude}): el poco contraste de un
-     * texto y lo que impide dibujar igual la página de un PDF.
+     * Lays out an already validated document ({@link DocumentReader}) with the real metrics of the fonts of the
+     * resources folder. It fails with the errors of the document (reference/common/errors.md) before anything is
+     * written, also with those of the checks that have not been turned off ({@link Builder#exclude}): the low contrast
+     * of a text and whatever prevents the page of a PDF from being drawn faithfully.
      */
     public LaidOutDocument layOut(InlineNode document) {
         Objects.requireNonNull(document, "document");
@@ -110,15 +110,15 @@ public final class Converter {
         });
     }
 
-    /** Maqueta {@code document} y escribe el PDF en {@code target}, que no se cierra. */
+    /** Lays out {@code document} and writes the PDF to {@code target}, which is not closed. */
     public void toPdf(InlineNode document, OutputStream target) throws IOException {
         Objects.requireNonNull(target, "target");
         toPdf(layOut(document), target);
     }
 
     /**
-     * Escribe el PDF de un documento ya maquetado por este conversor (con las mismas fuentes, que son las que
-     * se incrustan) en {@code target}, que no se cierra.
+     * Writes the PDF of a document already laid out by this converter (with the same fonts, which are the ones
+     * that get embedded) to {@code target}, which is not closed.
      */
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         Objects.requireNonNull(document, "document");
@@ -126,7 +126,7 @@ public final class Converter {
         guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa));
     }
 
-    /** El SVG de cada página de un documento ya maquetado, en orden. */
+    /** The SVG of each page of an already laid out document, in order. */
     public List<String> toSvg(LaidOutDocument document) {
         Objects.requireNonNull(document, "document");
         return guarded(() -> document.pages().stream()
@@ -134,14 +134,14 @@ public final class Converter {
                 .toList());
     }
 
-    /** Un trabajo que escribe en un destino. */
+    /** A job that writes to a destination. */
     private interface Writing {
         void run() throws IOException;
     }
 
     /**
-     * Ejecuta {@code work} dejando pasar los errores del motor ({@link StxtPdfException}) y convirtiendo cualquier
-     * otra excepción de ejecución en un {@link InternalException}.
+     * Runs {@code work}, letting the errors of the engine ({@link StxtPdfException}) through and turning any
+     * other runtime exception into an {@link InternalException}.
      */
     private static <T> T guarded(Supplier<T> work) {
         try {
@@ -153,7 +153,7 @@ public final class Converter {
         }
     }
 
-    /** Como {@link #guarded(Supplier)}, para lo que escribe: los fallos de entrada y salida salen como son. */
+    /** Like {@link #guarded(Supplier)}, for what writes: input and output failures come out as they are. */
     private static void guarded(Writing work) throws IOException {
         try {
             work.run();
@@ -165,10 +165,10 @@ public final class Converter {
     }
 
     private static InternalException unexpected(RuntimeException e) {
-        return new InternalException("Fallo inesperado al convertir: " + e, e);
+        return new InternalException("Unexpected failure while converting: " + e, e);
     }
 
-    /** Configura un {@link Converter}; cada opción es opcional. */
+    /** Configures a {@link Converter}; every option is optional. */
     public static final class Builder {
 
         private Resources resources = new Resources();
@@ -181,34 +181,34 @@ public final class Converter {
         private Builder() {
         }
 
-        /** Carpeta de recursos (reference/common/resources.md); por defecto {@link Resources#DEFAULT_ROOT}. */
+        /** Resources folder (reference/common/resources.md); by default {@link Resources#DEFAULT_ROOT}. */
         public Builder resources(Resources resources) {
             this.resources = Objects.requireNonNull(resources, "resources");
             return this;
         }
 
         /**
-         * Documento de estilos aparte ya leído ({@link DocumentReader#readStyles(String)}), cuyas reglas valen menos
-         * que las del documento (reference/common/styles.md). Sin él, el documento lleva todos sus estilos.
+         * Separate styles document, already read ({@link DocumentReader#readStyles(String)}), whose rules weigh less
+         * than those of the document (reference/common/styles.md). Without it, the document carries all its styles.
          */
         public Builder styles(InlineNode styles) {
             this.styles = Objects.requireNonNull(styles, "styles");
             return this;
         }
 
-        /** Como {@link #styles(InlineNode)}, leyéndolo de un texto STXT. */
+        /** Like {@link #styles(InlineNode)}, reading it from an STXT text. */
         public Builder styles(String content) {
             return styles(new DocumentReader().readStyles(content));
         }
 
-        /** Como {@link #styles(InlineNode)}, leyéndolo de un fichero UTF-8. */
+        /** Like {@link #styles(InlineNode)}, reading it from a UTF-8 file. */
         public Builder styles(Path file) {
             return styles(new DocumentReader().readStyles(file));
         }
 
         /**
-         * Lo máximo que acepta la conversión (páginas, píxeles de una imagen, elementos y niveles de un SVG, bytes de
-         * un PDF); por defecto {@link Limits#DEFAULT}. Un documento que lo supera falla con un error {@code LIMIT}.
+         * The most the conversion accepts (pages, pixels of an image, elements and levels of an SVG, bytes of
+         * a PDF); by default {@link Limits#DEFAULT}. A document that exceeds it fails with a {@code LIMIT} error.
          */
         public Builder limits(Limits limits) {
             this.limits = Objects.requireNonNull(limits, "limits");
@@ -216,9 +216,10 @@ public final class Converter {
         }
 
         /**
-         * Quita esas comprobaciones ({@link Check}): el contraste del texto con su fondo (reference/common/pdf.md) y lo
-         * que impide dibujar igual la página de un PDF (reference/components/image.md). Por defecto se hacen todas;
-         * cada llamada añade las suyas a las que ya se quitaron.
+         * Turns off these checks ({@link Check}): the contrast of the text with its background
+         * (reference/common/pdf.md) and whatever prevents the page of a PDF from being drawn faithfully
+         * (reference/components/image.md). By default all of them run; each call adds its own to those already turned
+         * off.
          */
         public Builder exclude(Check... checks) {
             for (Check check : checks) {
@@ -228,20 +229,20 @@ public final class Converter {
         }
 
         /**
-         * La parte de PDF/UA que cumple el PDF (reference/common/pdf.md): 1, en PDF 1.7, o 2, en PDF 2.0. Por
-         * defecto 1.
+         * The part of PDF/UA the PDF conforms to (reference/common/pdf.md): 1, in PDF 1.7, or 2, in PDF 2.0. By
+         * default 1.
          *
-         * @throws IllegalArgumentException si no es 1 ni 2
+         * @throws IllegalArgumentException if it is neither 1 nor 2
          */
         public Builder pdfUa(int part) {
             if (part != 1 && part != 2) {
-                throw new IllegalArgumentException("PDF/UA tiene las partes 1 y 2: " + part);
+                throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + part);
             }
             this.pdfUa = part;
             return this;
         }
 
-        /** Dibuja el contorno de cada caja, para revisar un documento a mano; por defecto no. */
+        /** Draws the outline of each box, to review a document by hand; off by default. */
         public Builder debug(boolean debug) {
             this.debug = debug;
             return this;

@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** {@code Line breaking}: reparto en líneas voraz ({@code simple}) o Knuth-Plass ({@code balanced}). */
+/** {@code Line breaking}: greedy line breaking ({@code simple}) or Knuth-Plass ({@code balanced}). */
 public enum LineBreaking { SIMPLE, BALANCED }

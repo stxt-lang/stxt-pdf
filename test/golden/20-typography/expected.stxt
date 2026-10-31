@@ -1,5 +1,5 @@
-# row 160 × 12 con sus cuatro ítems seguidos (26, 9, 35 y 20); tight 12, loose 24, title 12 y caps 12
-# (ver input.stxt).
+# row 160 × 12 with its four items in sequence (26, 9, 35 and 20); tight 12, loose 24, title 12 and caps 12
+# (see input.stxt).
 Result:
 	Page: 1
 		Fragment: row

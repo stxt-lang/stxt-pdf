@@ -1,0 +1,26 @@
+# Case: More column breaks than columns outside a page
+# Code: BOX_OVERFLOW
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Stack:
+			Item:
+				Columns:
+					Count: 2
+					Text: A
+					Text: B
+						Break:
+							Before: column
+					Text: C
+						Break:
+							Before: column

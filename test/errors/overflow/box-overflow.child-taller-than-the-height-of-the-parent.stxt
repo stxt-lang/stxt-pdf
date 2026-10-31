@@ -1,0 +1,16 @@
+# Case: Child taller than the Height of the parent
+# Code: BOX_OVERFLOW
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Height: 50
+			Block:
+				Box:
+					Height: 80

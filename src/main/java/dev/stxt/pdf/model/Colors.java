@@ -3,9 +3,9 @@ package dev.stxt.pdf.model;
 import java.util.regex.Pattern;
 
 /**
- * Los colores del documento (reference/common/values.md): {@code #RGB}, {@code #RGBA}, {@code #RRGGBB}
- * o {@code #RRGGBBAA}, con el último par (o dígito) como opacidad. Un color sigue siendo el texto
- * que escribió el autor; aquí se valida y se pasa a componentes.
+ * The colors of the document (reference/common/values.md): {@code #RGB}, {@code #RGBA}, {@code #RRGGBB}
+ * or {@code #RRGGBBAA}, with the last pair (or digit) as the opacity. A color is still the text
+ * the author wrote; here it is validated and converted to components.
  */
 public final class Colors {
 
@@ -19,8 +19,8 @@ public final class Colors {
     }
 
     /**
-     * Los componentes rojo, verde, azul y opacidad de un color ya validado, de 0 a 1. Sin opacidad
-     * escrita, 1.
+     * The red, green, blue and opacity components of an already validated color, from 0 to 1. Without a
+     * written opacity, 1.
      */
     public static float[] rgba(String color) {
         String hex = color.substring(1);
@@ -38,7 +38,7 @@ public final class Colors {
         return rgba;
     }
 
-    /** Si el color deja ver lo que hay debajo. */
+    /** Whether the color lets what is underneath show through. */
     public static boolean isTranslucent(String color) {
         return rgba(color)[3] < 1f;
     }

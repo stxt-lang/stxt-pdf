@@ -3,11 +3,11 @@ package dev.stxt.pdf.layout.inline;
 import dev.stxt.pdf.model.FontFace;
 
 /**
- * Métrica aproximada para enseñar y para tests deterministas: cada carácter mide
- * {@code factor × tamaño}, sea cual sea la fuente. No necesita la carpeta de fuentes.
+ * Approximate metrics for teaching and for deterministic tests: each character measures
+ * {@code factor × size}, whatever the font. It does not need the fonts folder.
  *
- * <p>Es la métrica por defecto de {@link dev.stxt.pdf.layout.Engine} y la de todos los tests
- * de layout. Para la salida PDF se usan las métricas reales de {@link PdfMetrics}.</p>
+ * <p>It is the default metrics of {@link dev.stxt.pdf.layout.Engine} and the one of all the layout
+ * tests. The PDF output uses the real metrics of {@link PdfMetrics}.</p>
  */
 public final class FixedMetrics implements TextMeasurer {
 

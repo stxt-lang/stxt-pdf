@@ -1,8 +1,8 @@
-# Página 1: t en y = 60; h1 (60..77), b1…b5 de 16 en 16 desde 77 (b5 acaba en 157) y f en 157.
-#   t mide 17 + 80 + 16 = 113.
-# Página 2: h1 arriba (20..37), b6 en 37, b7 en 53, b8 y b8v en 69 (28), b9…b12 desde 97 (b12
-#   acaba en 161) y f en 161. t mide 17 + 124 + 16 = 157.
-# Página 3: h1, b13 en 37, b14 en 53 y f en 69; t mide 17 + 32 + 16 = 65 y end va en 85.
+# Page 1: t at y = 60; h1 (60..77), b1...b5 every 16 from 77 (b5 ends at 157) and f at 157.
+#   t measures 17 + 80 + 16 = 113.
+# Page 2: h1 at the top (20..37), b6 at 37, b7 at 53, b8 and b8v at 69 (28), b9...b12 from 97 (b12
+#   ends at 161) and f at 161. t measures 17 + 124 + 16 = 157.
+# Page 3: h1, b13 at 37, b14 at 53 and f at 69; t measures 17 + 32 + 16 = 65 and end goes at 85.
 Result:
 	Page: 1
 		Fragment: intro

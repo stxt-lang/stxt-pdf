@@ -23,29 +23,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Lo que comparten los tests de referencia ({@link GoldenTest}) y los de los ejemplos ({@code ExamplesTest}): comparar
- * un volcado (reference/implementation/testing.md) con el esperado, y las imágenes de cada página del PDF con las
- * versionadas en la carpeta del caso.
+ * What the reference tests ({@link GoldenTest}) and the example tests ({@code ExamplesTest}) share: comparing
+ * a dump (reference/implementation/testing.md) with the expected one, and the images of each page of the PDF with the
+ * ones versioned in the folder of the case.
  *
- * <p>El PDF y las imágenes nuevas se escriben siempre en {@code target/reference/} ({@link #writeActual}), nunca en
- * {@code test/}: {@code mvn test} no cambia ningún fichero versionado. Si una imagen nueva no es la versionada (más
- * allá del antialiasing, {@link #PIXEL_TOLERANCE}), o hay páginas de más o de menos, el test falla
- * ({@link #checkImages}) y dice cómo aceptar el cambio: con la propiedad de actualizar de su test
- * ({@code -Dgolden.update=true} o {@code -Dexamples.update=true}), que reescribe las versionadas.</p>
+ * <p>The PDF and the new images are always written to {@code target/reference/} ({@link #writeActual}), never to
+ * {@code test/}: {@code mvn test} changes no versioned file. If a new image is not the versioned one (beyond
+ * antialiasing, {@link #PIXEL_TOLERANCE}), or there are pages too many or too few, the test fails
+ * ({@link #checkImages}) and says how to accept the change: with the update property of its test
+ * ({@code -Dgolden.update=true} or {@code -Dexamples.update=true}), which rewrites the versioned ones.</p>
  */
 public final class ReferenceFiles {
 
-    /** Los {@code Rect} se comparan con esta tolerancia, en puntos: la del modelo ({@link Tolerance#MODEL}). */
+    /** The {@code Rect} values are compared with this tolerance, in points: the model's ({@link Tolerance#MODEL}). */
     public static final double TOLERANCE = Tolerance.MODEL;
     /**
-     * Diferencia máxima por canal (de 0 a 255) entre dos píxeles que se consideran iguales. El
-     * antialiasing de PDFBox cambia de una máquina a otra: entre dos equipos se han visto hasta 30
-     * píxeles por imagen con diferencias de hasta 10, en las esquinas de los contornos. Un cambio
-     * real de layout mueve líneas y texto, con diferencias cercanas a 255.
+     * Maximum difference per channel (from 0 to 255) between two pixels that are considered equal. The
+     * antialiasing of PDFBox changes from one machine to another: between two computers up to 30
+     * pixels per image have been seen with differences of up to 10, at the corners of the outlines. A real
+     * layout change moves lines and text, with differences close to 255.
      */
     public static final int PIXEL_TOLERANCE = 16;
 
-    /** Donde se escriben el PDF y las imágenes de cada caso: {@code target/reference/<grupo>/<caso>/}. */
+    /** Where the PDF and the images of each case are written: {@code target/reference/<group>/<case>/}. */
     public static final Path ACTUAL_ROOT = Path.of("target", "reference");
 
     private static final Pattern PAGE_IMAGE = Pattern.compile("page-(\\d+)\\.png");
@@ -54,10 +54,10 @@ public final class ReferenceFiles {
     }
 
     /**
-     * Escribe en {@code dir} (de {@code target/}) el PDF como {@code output.pdf} y un {@code page-N.png} por página a la
-     * resolución dada, y borra los de páginas que ya no existen.
+     * Writes to {@code dir} (in {@code target/}) the PDF as {@code output.pdf} and one {@code page-N.png} per page at
+     * the given resolution, and deletes those of pages that no longer exist.
      *
-     * @return las imágenes de las páginas, en orden
+     * @return the images of the pages, in order
      */
     public static List<BufferedImage> writeActual(Path dir, byte[] pdfBytes, float dpi) throws IOException {
         Files.createDirectories(dir);
@@ -79,12 +79,12 @@ public final class ReferenceFiles {
     }
 
     /**
-     * Compara las imágenes de un caso con los {@code page-N.png} versionados en {@code reference}. Con la propiedad
-     * {@code update} a {@code true} los reescribe en su lugar: solo los que cambian (para que git solo vea cambios
-     * reales) y borra los de páginas que ya no existen.
+     * Compares the images of a case with the {@code page-N.png} versioned in {@code reference}. With the property
+     * {@code update} set to {@code true} it rewrites them instead: only those that change (so that git only sees real
+     * changes), and it deletes those of pages that no longer exist.
      *
-     * @param actual donde {@link #writeActual} dejó las imágenes nuevas, para el mensaje
-     * @throws AssertionError si alguna página cambia, falta o sobra, y no se pide actualizar
+     * @param actual where {@link #writeActual} left the new images, for the message
+     * @throws AssertionError if any page changes, is missing or is extra, and no update is requested
      */
     public static void checkImages(Path reference, Path actual, List<BufferedImage> images, String update)
             throws IOException {
@@ -100,8 +100,8 @@ public final class ReferenceFiles {
             if (updating) {
                 ImageIO.write(images.get(i), "png", file.toFile());
             } else {
-                problems.add(page(i + 1) + (old == null ? " no está versionada"
-                        : differences < 0 ? " cambia de tamaño" : " cambia en " + differences + " píxeles"));
+                problems.add(page(i + 1) + (old == null ? " is not versioned"
+                        : differences < 0 ? " changes size" : " changes in " + differences + " pixels"));
             }
         }
         for (Path extra : pageImages(reference)) {
@@ -109,13 +109,13 @@ public final class ReferenceFiles {
                 if (updating) {
                     Files.delete(extra);
                 } else {
-                    problems.add(extra.getFileName() + " sobra: el PDF tiene " + images.size() + " páginas");
+                    problems.add(extra.getFileName() + " is extra: the PDF has " + images.size() + " pages");
                 }
             }
         }
         if (!problems.isEmpty()) {
-            fail(reference + ": " + String.join("; ", problems) + ". Las imágenes nuevas están en " + actual
-                    + ". Si el cambio es el que se busca, míralas y acéptalo con -D" + update + "=true");
+            fail(reference + ": " + String.join("; ", problems) + ". The new images are in " + actual
+                    + ". If the change is the intended one, once they are reviewed it is accepted with -D" + update + "=true");
         }
     }
 
@@ -123,7 +123,7 @@ public final class ReferenceFiles {
         return "page-" + number + ".png";
     }
 
-    /** Los {@code page-N.png} de una carpeta. */
+    /** The {@code page-N.png} files of a folder. */
     private static List<Path> pageImages(Path dir) throws IOException {
         if (!Files.isDirectory(dir)) {
             return List.of();
@@ -140,8 +140,8 @@ public final class ReferenceFiles {
     }
 
     /**
-     * Píxeles que difieren en algún canal más que {@link #PIXEL_TOLERANCE}; -1 si las imágenes no tienen el mismo
-     * tamaño.
+     * Pixels that differ in some channel by more than {@link #PIXEL_TOLERANCE}; -1 if the images do not have the same
+     * size.
      */
     static int differences(BufferedImage a, BufferedImage b) {
         if (a.getWidth() != b.getWidth() || a.getHeight() != b.getHeight()) {
@@ -163,7 +163,7 @@ public final class ReferenceFiles {
         return count;
     }
 
-    /** Compara dos volcados: nombres y valores iguales y los {@code Rect} dentro de {@link #TOLERANCE}. */
+    /** Compares two dumps: equal names and values, and the {@code Rect} values within {@link #TOLERANCE}. */
     public static void compare(Node expected, Node actual, String path) {
         String here = path + expected.getName();
         assertEquals(expected.getCanonicalName(), actual.getCanonicalName(), here);
@@ -172,14 +172,14 @@ public final class ReferenceFiles {
             double[] a = numbers(actual.getText());
             assertEquals(4, a.length, here);
             for (int i = 0; i < 4; i++) {
-                assertEquals(e[i], a[i], TOLERANCE, here + " (componente " + i + ")");
+                assertEquals(e[i], a[i], TOLERANCE, here + " (component " + i + ")");
             }
         } else {
             assertEquals(expected.getText().trim(), actual.getText().trim(), here);
         }
         List<Node> e = children(expected);
         List<Node> a = children(actual);
-        assertEquals(e.size(), a.size(), here + ": número de hijos");
+        assertEquals(e.size(), a.size(), here + ": number of children");
         for (int i = 0; i < e.size(); i++) {
             compare(e.get(i), a.get(i), here + "/");
         }

@@ -98,7 +98,7 @@ class BoxTreeBuilderTest {
         assertEquals(14, child.style().typography().fontSize(), 1e-9);
         assertEquals(3, child.style().typography().widows());
         assertEquals(16.8, child.style().typography().usedLineHeight(), 1e-9);
-        assertEquals(Sides.all(Value.pt(0)), child.style().box().padding()); // Padding no se hereda
+        assertEquals(Sides.all(Value.pt(0)), child.style().box().padding()); // Padding is not inherited
     }
 
     @Test
@@ -124,11 +124,11 @@ class BoxTreeBuilderTest {
                 "\tBlock:", "\t\tTypography:", "\t\t\tWidows: 0")));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tBlock:", "\t\tBox:", "\t\t\tWidth: 12,5")));
-        // La línea es la de la propiedad, dentro del grupo, no la del grupo.
+        // The line is that of the property, inside the group, not that of the group.
         assertEquals(11, e.line());
     }
 
-    /** Sin pasar por DocumentReader, el builder valida contra el schema y da sus mismos errores. */
+    /** Without going through DocumentReader, the builder validates against the schema and gives the same errors. */
     @Test
     void unvalidatedDocumentsAreValidatedAgainstTheSchema() {
         InlineNode misplaced = (InlineNode) STXT.rawParser().parse(Docs.sectioned(document(
@@ -142,7 +142,7 @@ class BoxTreeBuilderTest {
         assertEquals("TOO_FEW_CHILDREN",
                 assertThrows(DocumentSyntaxException.class, () -> new BoxTreeBuilder().build(noPageSetup)).code());
 
-        // Sin el namespace no se validaría nada: es un error de raíz.
+        // Without the namespace nothing would be validated: it is a root error.
         InlineNode noNamespace = (InlineNode) STXT.rawParser().parse(
                 "Document:\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842").get(0);
         assertEquals(ErrorCode.DOCUMENT_ROOT,
@@ -150,8 +150,8 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * Un documento necesita al menos una sección (reference/components/document.md): el contenido suelto no se
-     * admite.
+     * A document needs at least one section (reference/components/document.md): loose content is not
+     * allowed.
      */
     @Test
     void aDocumentNeedsASection() {
@@ -167,14 +167,14 @@ class BoxTreeBuilderTest {
                 "\tText: hola", "\t\tTypography:", "\t\t\tSize: 12")));
         assertEquals(9, e.line());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, e.errorCode());
-        assertEquals("línea 9: El texto necesita Font: se declara en el Typography del Text, de un antecesor "
-                + "o de Styles (For element: Document)", e.getMessage());
-        // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
+        assertEquals("line 9: The text needs Font: it is declared in the Typography of the Text, of an ancestor "
+                + "or of Styles (For element: Document)", e.getMessage());
+        // Also the text of an item, even if a sibling of its container declares it.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tStack:", "\t\tItem:", "\t\t\tText: b")));
         assertEquals(15, item.line());
-        // Un elemento sin texto no la necesita.
+        // An element without text does not need it.
         build(document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 10"));
     }
 
@@ -194,10 +194,10 @@ class BoxTreeBuilderTest {
         Box text = build(doc).sections().get(0).box().children().get(0).children().get(0);
         assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL), text.style().typography().fontFace());
         assertEquals(12, text.style().typography().fontSize(), 1e-9);
-        // Document admite todo Typography, no solo la fuente.
+        // Document allows all of Typography, not only the font.
         assertEquals("#333", text.style().typography().color());
         assertEquals(20, text.style().typography().usedLineHeight(), 1e-9);
-        // La línea de la declaración se hereda: los errores de fuentes la señalan.
+        // The line of the declaration is inherited: font errors point to it.
         assertEquals(10, text.style().line("font").number());
     }
 
@@ -210,7 +210,7 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * {@code Paper} y {@code Orientation} (reference/components/document.md): el tamaño en vertical, girado con
+     * {@code Paper} and {@code Orientation} (reference/components/document.md): the size in portrait, rotated with
      * {@code landscape}.
      */
     @Test
@@ -242,8 +242,8 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * {@code Rotate} y {@code Rotate origin} (reference/common/layers-and-rotation.md): el giro y su origen, con palabras
-     * clave o con medidas; sin origen, el centro.
+     * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md): the rotation and its origin,
+     * with keywords or with lengths; without an origin, the center.
      */
     @Test
     void rotateAndItsOrigin() {
@@ -264,10 +264,10 @@ class BoxTreeBuilderTest {
     }
 
     /**
-     * Lo que no tiene efecto por su sitio solo es un error si lo escribe el propio elemento con efecto imposible
-     * (reference/common/errors.md): {@code Isolate margins: false} en un ítem es el valor por defecto, un {@code
-     * Break} que llega de una regla no se mira, y en las columnas de un {@code Columns} los cortes tienen efecto aunque
-     * esté dentro de un {@code Overlay}.
+     * What has no effect because of its place is only an error if the element itself writes it with an impossible
+     * effect (reference/common/errors.md): {@code Isolate margins: false} in an item is the default value, a {@code
+     * Break} that comes from a rule is not checked, and in the columns of a {@code Columns} breaks have an effect even
+     * inside an {@code Overlay}.
      */
     @Test
     void breaksAndIsolateMarginsWithoutEffectOnlyFailWhenTheElementWritesThem() {

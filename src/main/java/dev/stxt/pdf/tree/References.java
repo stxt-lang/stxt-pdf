@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las referencias de los textos del árbol a otras cajas ({@code {page of: id}},
- * reference/common/references.md): dónde están y la comprobación de que todas señalan algo que se puede referir. Lo
- * que valen lo decide quien maqueta: la página, el {@link dev.stxt.pdf.layout.Paginator}; el número, el builder
+ * The references from the texts of the tree to other boxes ({@code {page of: id}}, reference/common/references.md):
+ * where they are and the check that all of them point to something that can be referenced. Their value is decided by
+ * whoever lays out: the page, by the {@link dev.stxt.pdf.layout.Paginator}; the number, by the builder
  * ({@link Box#number()}).
  */
 public final class References {
 
-    /** Una referencia dentro del texto de una caja. */
+    /** A reference inside the text of a box. */
     public record Site(Box box, Reference reference) {
 
-        /** Línea del documento donde está la referencia. */
+        /** Line of the document where the reference is. */
         public int line() {
             return box.textLineAt(reference.start());
         }
@@ -28,7 +28,7 @@ public final class References {
     private References() {
     }
 
-    /** Todas las referencias de los textos de un árbol, en orden del documento. */
+    /** All the references in the texts of a tree, in document order. */
     public static List<Site> sites(Box root) {
         List<Site> sites = new ArrayList<>();
         collect(root, sites);
@@ -44,7 +44,10 @@ public final class References {
         box.children().forEach(child -> collect(child, sites));
     }
 
-    /** Las cajas que se pueden referir (con {@code Id}, o encabezados de un índice) de un árbol, por su {@link Box#key}. */
+    /**
+     * The boxes of a tree that can be referenced (with {@code Id}, or headings of a table of contents), by their
+     * {@link Box#key}.
+     */
     public static Map<String, Box> byId(Box root) {
         Map<String, Box> boxes = new LinkedHashMap<>();
         index(root, boxes);
@@ -60,11 +63,10 @@ public final class References {
     }
 
     /**
-     * Comprueba que cada referencia señala una caja con ese {@code Id} y que se puede referir:
-     * la página, de una caja que no esté en un {@code Page overlay} (que está en todas las páginas), y
-     * el número, de una que lo tenga.
+     * Checks that each reference points to a box with that {@code Id} that can be referenced: the page, of a box that
+     * is not in a {@code Page overlay} (which is on every page), and the number, of one that has a number.
      *
-     * @throws InvalidModelException con la línea de la referencia
+     * @throws InvalidModelException with the line of the reference
      */
     static void validate(Box root) {
         List<Site> sites = sites(root);
@@ -78,36 +80,36 @@ public final class References {
             Box target = boxes.get(r.id());
             if (r.id().isEmpty()) {
                 throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_UNKNOWN, text
-                        + " necesita el Id de una caja: {" + r.kind().keyword() + " of: id}");
+                        + " needs the Id of a box: {" + r.kind().keyword() + " of: id}");
             }
             if (target == null) {
                 throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_UNKNOWN, text
-                        + ": ninguna caja tiene el Id " + r.id());
+                        + ": no box has the Id " + r.id());
             }
             switch (r.kind()) {
                 case PAGE -> {
                     if (insidePageOverlay(target)) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_PLACEABLE, text
-                                + ": " + r.id() + " está en un Page overlay, que se repite en todas las páginas");
+                                + ": " + r.id() + " is in a Page overlay, which is repeated on every page");
                     }
                 }
                 case NUMBER -> {
                     if (target.number() == null) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_NUMBERED, text
-                                + ": " + r.id() + " no tiene número (solo lo tienen los ítems de una lista "
-                                + "numerada y los encabezados con Numbered: true)");
+                                + ": " + r.id() + " has no number (only the items of a numbered list "
+                                + "and the headings with Numbered: true have one)");
                     }
                 }
             }
         }
     }
 
-    /** Cómo se escribió la referencia, para los mensajes. */
+    /** How the reference was written, for messages. */
     private static String text(Reference r) {
         return "{" + r.kind().keyword() + " of: " + r.id() + "}";
     }
 
-    /** Si la caja es un {@code Page overlay} o está dentro de uno. */
+    /** Whether the box is a {@code Page overlay} or is inside one. */
     static boolean insidePageOverlay(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
             if (b.style().position() == Position.PAGE_OVERLAY) {

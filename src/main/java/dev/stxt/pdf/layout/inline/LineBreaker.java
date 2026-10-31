@@ -20,41 +20,42 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reparte un texto en líneas (reference/common/typography.md). Con {@code Line breaking: simple},
- * con el algoritmo voraz (<em>first-fit</em>) de los navegadores; con {@code balanced}, con
+ * Breaks a text into lines (reference/common/typography.md). With {@code Line breaking: simple},
+ * with the greedy algorithm (<em>first-fit</em>) of browsers; with {@code balanced}, with
  * Knuth-Plass ({@link #optimal}).
  *
- * <p>Tratamiento del espacio en blanco: los saltos de línea del bloque {@code Text} y las secuencias de espacios valen
- * un espacio, y el texto es un solo párrafo (una línea en blanco es un error al leerlo, salvo en un texto
- * preformateado, que reparte {@link PreformattedText}). Una palabra más ancha que la línea ocupa una línea propia y
- * desborda.</p>
+ * <p>Handling of white space: the line breaks of the {@code Text} block and the sequences of spaces count as
+ * one space, and the text is a single paragraph (a blank line is an error when reading it, except in a
+ * preformatted text, which {@link PreformattedText} breaks). A word wider than the line takes a line of its own and
+ * overflows.</p>
  *
- * <p>El texto es una lista de tramos con formato ({@link TextRun}). Una palabra puede tener
- * partes de varios tramos ({@code **neg**rita}) y mide lo que suman sus partes, cada una con su
- * fuente; el espacio entre dos palabras tiene el formato del tramo en que está el primero de sus
- * espacios en blanco. Un texto sin formato es un único tramo y se mide igual que una cadena.</p>
+ * <p>The text is a list of formatted runs ({@link TextRun}). A word can have
+ * parts from several runs ({@code **neg**rita}) and measures the sum of its parts, each one with its
+ * font; the space between two words has the format of the run that holds the first of its
+ * white-space characters. A text without formatting is a single run and is measured the same as a string.</p>
  *
- * <p>Cada carácter avanza su ancho más el interletraje ({@code Letter spacing}, reference/common/text-formatting.md);
- * el último de la línea no lo lleva, así que el ancho de una línea es lo que suman sus caracteres menos un
- * interletraje. Un tramo en versalitas se mide al {@link TextFormat#SMALL_CAPS_SCALE} del tamaño.</p>
+ * <p>Each character advances its width plus the letter spacing ({@code Letter spacing},
+ * reference/common/text-formatting.md); the last one of the line does not carry it, so the width of a line is the
+ * sum of its characters minus one letter spacing. A run in small caps is measured at
+ * {@link TextFormat#SMALL_CAPS_SCALE} of the size.</p>
  */
 public final class LineBreaker {
 
-    /** Deméritos de cada línea además de los de su badness: favorece los repartos con menos líneas. */
+    /** Demerits of each line besides those of its badness: it favors line breakings with fewer lines. */
     private static final double LINE_PENALTY = 10;
-    /** Badness de una línea que no se puede estirar lo suficiente o que desborda. */
+    /** Badness of a line that cannot be stretched enough or that overflows. */
     private static final double MAX_BADNESS = 10_000;
-    /** Cuánto se puede estirar cada espacio, en proporción a su ancho (el de TeX). */
+    /** How much each space can stretch, in proportion to its width (TeX's value). */
     private static final double STRETCH = 0.5;
 
     /**
-     * Una palabra: sus partes, con los tramos seguidos del mismo formato unidos, y el formato
-     * del espacio que la separa de la siguiente.
+     * A word: its parts, with consecutive runs of the same format joined, and the format
+     * of the space that separates it from the next one.
      */
     record Word(List<TextRun> parts, TextFormat gap) {
     }
 
-    /** Una línea del reparto: sus tramos, con los seguidos del mismo formato unidos. */
+    /** A line of the line breaking: its runs, with consecutive ones of the same format joined. */
     public record Line(List<TextRun> runs) {
 
         public Line {
@@ -69,13 +70,13 @@ public final class LineBreaker {
     private LineBreaker() {
     }
 
-    /** Líneas del texto para un ancho disponible, con el algoritmo voraz. */
+    /** Lines of the text for an available width, with the greedy algorithm. */
     public static List<String> breakLines(String text, double available, TextMeasurer measurer,
                                           FontFace font, double fontSize) {
         return breakLines(text, available, measurer, font, fontSize, LineBreaking.SIMPLE);
     }
 
-    /** Como {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, para un texto sin formato. */
+    /** Like {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, for plain text. */
     public static List<String> breakLines(String text, double available, TextMeasurer measurer,
                                           FontFace font, double fontSize, LineBreaking wrap) {
         return breakLines(TextRun.plain(text), available, measurer, font, fontSize, wrap).stream()
@@ -83,15 +84,15 @@ public final class LineBreaker {
     }
 
     /**
-     * Líneas del texto para un ancho disponible. {@code font} es la fuente de la caja; cada tramo la cambia con su
-     * formato.
+     * Lines of the text for an available width. {@code font} is the font of the box; each run changes it with its
+     * format.
      */
     public static List<Line> breakLines(List<TextRun> runs, double available, TextMeasurer measurer,
                                         FontFace font, double fontSize, LineBreaking wrap) {
         return breakLines(runs, available, measurer, font, fontSize, 0, wrap);
     }
 
-    /** Como {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, con interletraje. */
+    /** Like {@link #breakLines(List, double, TextMeasurer, FontFace, double, LineBreaking)}, with letter spacing. */
     public static List<Line> breakLines(List<TextRun> runs, double available, TextMeasurer measurer,
                                         FontFace font, double fontSize, double letterSpacing, LineBreaking wrap) {
         List<Word> words = words(runs);
@@ -104,17 +105,17 @@ public final class LineBreaker {
     }
 
     /**
-     * El reparto voraz: cada palabra va a la línea en curso si cabe y, si no, empieza otra. El ancho de
-     * la línea en curso se lleva sumando los avances de sus palabras y espacios, cada uno medido una vez; solo
-     * cuando la suma queda a menos de {@link Tolerance#MODEL} del ancho disponible se construye la línea y se mide
-     * entera, así que la decisión es la misma que midiéndola siempre, sin que importe el redondeo de la suma.
+     * The greedy line breaking: each word goes to the current line if it fits and, if not, starts another. The width of
+     * the current line is kept by adding up the advances of its words and spaces, each one measured once; only
+     * when the sum is within {@link Tolerance#MODEL} of the available width is the line built and measured
+     * whole, so the decision is the same as measuring it every time, regardless of the rounding of the sum.
      */
     private static List<Line> greedy(List<Word> words, double available, TextMeasurer measurer, FontFace font,
                                      double fontSize, double letterSpacing) {
         Map<TextFormat, Double> spaces = new HashMap<>();
         List<Line> lines = new ArrayList<>();
         int start = 0;
-        // Avance de las palabras start..i-1 y de sus espacios, con el interletraje de todos sus caracteres.
+        // Advance of the words start..i-1 and of their spaces, with the letter spacing of all their characters.
         double advance = 0;
         for (int i = 0; i < words.size(); i++) {
             Word word = words.get(i);
@@ -144,26 +145,26 @@ public final class LineBreaker {
     }
 
     /**
-     * Knuth-Plass simplificado: los saltos del texto que minimizan la suma de los deméritos
-     * de sus líneas, por programación dinámica. Sin guiones ni encogimiento de los espacios
-     * (las líneas justificadas no se comprimen):
+     * Simplified Knuth-Plass: the breaks of the text that minimize the sum of the demerits
+     * of its lines, by dynamic programming. Without hyphens or shrinking of the spaces
+     * (justified lines are not compressed):
      *
      * <ul>
-     *   <li>{@code badness = 100 × r³}, con {@code r} = sobrante / estiramiento de la línea
-     *       (cada espacio se estira hasta la mitad de su ancho), hasta {@value #MAX_BADNESS}.
-     *       Una línea sin espacios que no llena el ancho, o una palabra que desborda, tiene la
-     *       badness máxima. La última línea no tiene badness.</li>
-     *   <li>{@code deméritos = (penalización por línea + badness)²}.</li>
+     *   <li>{@code badness = 100 × r³}, with {@code r} = leftover / stretch of the line
+     *       (each space stretches up to half its width), up to {@value #MAX_BADNESS}.
+     *       A line without spaces that does not fill the width, or a word that overflows, has the
+     *       maximum badness. The last line has no badness.</li>
+     *   <li>{@code demerits = (line penalty + badness)²}.</li>
      * </ul>
      *
-     * <p>El ancho de una línea es la suma de los de sus palabras y espacios.</p>
+     * <p>The width of a line is the sum of those of its words and spaces.</p>
      */
     static List<Line> optimal(List<Word> words, double available, TextMeasurer measurer,
                               FontFace font, double fontSize, double letterSpacing) {
         int n = words.size();
         Map<TextFormat, Double> spaces = new HashMap<>();
-        // prefix[i]: avance de las i primeras palabras; gaps[i]: el de los i primeros espacios (los dos,
-        // con el interletraje de cada carácter, también el del último).
+        // prefix[i]: advance of the first i words; gaps[i]: that of the first i spaces (both,
+        // with the letter spacing of each character, the last one's included).
         double[] prefix = new double[n + 1];
         double[] gaps = new double[n];
         for (int i = 0; i < n; i++) {
@@ -174,8 +175,8 @@ public final class LineBreaker {
                         f -> advance(" ", f, measurer, font, fontSize, letterSpacing));
             }
         }
-        // best[j]: deméritos mínimos de las líneas con las j primeras palabras; from[j]: primera
-        // palabra de la última de esas líneas.
+        // best[j]: minimum demerits of the lines with the first j words; from[j]: first
+        // word of the last of those lines.
         double[] best = new double[n + 1];
         int[] from = new int[n + 1];
         Arrays.fill(best, Double.POSITIVE_INFINITY);
@@ -186,7 +187,7 @@ public final class LineBreaker {
                 double space = gaps[j - 1] - gaps[i];
                 double width = prefix[j] - prefix[i] + space - letterSpacing;
                 if (spaced && !fits(width, available)) {
-                    // Con más palabras sería aún más ancha; una sola sí puede desbordar.
+                    // With more words it would be even wider; a single one may overflow.
                     break;
                 }
                 double d = best[i] + demerits(available - width, space * STRETCH, j == n);
@@ -203,7 +204,7 @@ public final class LineBreaker {
         return lines;
     }
 
-    /** Deméritos de una línea con este sobrante y este estiramiento posible. */
+    /** Demerits of a line with this leftover and this possible stretch. */
     private static double demerits(double slack, double stretch, boolean last) {
         double badness;
         if (slack < -EPSILON) {
@@ -218,18 +219,18 @@ public final class LineBreaker {
         return (LINE_PENALTY + badness) * (LINE_PENALTY + badness);
     }
 
-    /** Como {@link #intrinsics(List, TextMeasurer, FontFace, double)}, para un texto sin formato. */
+    /** Like {@link #intrinsics(List, TextMeasurer, FontFace, double)}, for plain text. */
     public static IntrinsicSizes intrinsics(String text, TextMeasurer measurer, FontFace font, double fontSize) {
         return intrinsics(TextRun.plain(text), measurer, font, fontSize);
     }
 
-    /** Ancho más estrecho (palabra más ancha) y ancho natural (todo el texto sin partir). */
+    /** Narrowest width (widest word) and natural width (the whole text unbroken). */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize) {
         return intrinsics(runs, measurer, font, fontSize, 0);
     }
 
-    /** Como {@link #intrinsics(List, TextMeasurer, FontFace, double)}, con interletraje. */
+    /** Like {@link #intrinsics(List, TextMeasurer, FontFace, double)}, with letter spacing. */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize, double letterSpacing) {
         List<Word> words = words(runs);
@@ -243,7 +244,7 @@ public final class LineBreaker {
         return new IntrinsicSizes(min, width(line(words).runs(), measurer, font, fontSize, letterSpacing));
     }
 
-    /** Desplazamiento horizontal de una línea según la alineación. */
+    /** Horizontal offset of a line according to the alignment. */
     public static double offset(double lineWidth, double available, TextAlign textAlign) {
         double remaining = Math.max(0, available - lineWidth);
         return switch (textAlign) {
@@ -254,14 +255,14 @@ public final class LineBreaker {
     }
 
     /**
-     * Espacio extra por cada espacio entre palabras con {@code justify}: el sobrante de la línea
-     * repartido entre sus espacios. La última línea del texto y las líneas de una sola
-     * palabra no se justifican (se alinean a la izquierda), y una línea que desborda no se
-     * comprime.
+     * Extra space for each space between words with {@code justify}: the leftover of the line
+     * distributed among its spaces. The last line of the text and the lines of a single
+     * word are not justified (they are aligned to the left), and a line that overflows is not
+     * compressed.
      *
-     * @param line      texto de la línea, con las palabras separadas por un espacio
-     * @param lineWidth ancho natural de la línea
-     * @param last      es la última línea del texto
+     * @param line      text of the line, with the words separated by a space
+     * @param lineWidth natural width of the line
+     * @param last      it is the last line of the text
      */
     public static double wordSpacing(String line, double lineWidth, double available, TextAlign textAlign,
                                      boolean last) {
@@ -272,20 +273,20 @@ public final class LineBreaker {
         return spaces == 0 ? 0 : Math.max(0, available - lineWidth) / spaces;
     }
 
-    /** Como {@link #place(List, TextMeasurer, Style, double, boolean, double, double)}, para un texto sin formato. */
+    /** Like {@link #place(List, TextMeasurer, Style, double, boolean, double, double)}, for plain text. */
     public static TextLine place(String text, TextMeasurer measurer, Style s, double available, boolean justify,
                                  double y, double height) {
         return place(TextRun.plain(text), measurer, s, available, justify, y, height);
     }
 
     /**
-     * Una línea colocada en la caja de contenido (reference/common/text-formatting.md): cada tramo medido con la
-     * fuente de {@code s} y su formato, la línea alineada en {@code available} y, si se justifica, con el espacio extra
-     * entre palabras sumado a su ancho y al de cada tramo.
+     * A line placed in the content box (reference/common/text-formatting.md): each run measured with the
+     * font of {@code s} and its format, the line aligned in {@code available} and, if justified, with the extra space
+     * between words added to its width and to that of each run.
      *
-     * @param runs    tramos de la línea, con las palabras separadas por un espacio
-     * @param justify si la línea se puede justificar: no es la última del texto (al numerar
-     *                las páginas, si ya estaba justificada)
+     * @param runs    runs of the line, with the words separated by a space
+     * @param justify whether the line can be justified: it is not the last one of the text (when numbering
+     *                the pages, whether it was already justified)
      */
     public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available,
                                  boolean justify, double y, double height) {
@@ -297,7 +298,7 @@ public final class LineBreaker {
             widths[i] = advance(r.text(), r.format(), measurer, font, s.typography().fontSize(), s.typography().letterSpacing());
             natural += widths[i];
         }
-        // El último carácter de la línea no lleva interletraje (una línea vacía, de un texto preformateado, no tiene).
+        // The last character of the line carries no letter spacing (an empty line, of a preformatted text, has none).
         if (!runs.isEmpty()) {
             natural -= s.typography().letterSpacing();
         }
@@ -316,15 +317,15 @@ public final class LineBreaker {
     }
 
     /**
-     * Ancho de unos tramos como línea: cada uno con su fuente y su tamaño, y el interletraje entre
-     * sus caracteres pero no tras el último.
+     * Width of some runs as a line: each one with its font and its size, and the letter spacing between
+     * their characters but not after the last one.
      */
     static double width(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                         double letterSpacing) {
         return advance(runs, measurer, font, fontSize, letterSpacing) - letterSpacing;
     }
 
-    /** Avance de unos tramos: su ancho más el interletraje de cada carácter, también el del último. */
+    /** Advance of some runs: their width plus the letter spacing of each character, the last one's included. */
     static double advance(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                           double letterSpacing) {
         double width = 0;
@@ -334,7 +335,7 @@ public final class LineBreaker {
         return width;
     }
 
-    /** Avance de un texto con ese formato. */
+    /** Advance of a text with that format. */
     static double advance(String text, TextFormat format, TextMeasurer measurer, FontFace font, double fontSize,
                           double letterSpacing) {
         return measurer.width(text, format.face(font), fontSize * format.scale())
@@ -342,12 +343,12 @@ public final class LineBreaker {
     }
 
     /**
-     * Las palabras del texto (ver la descripción de la clase): lo que hay entre los espacios en blanco ({@link #isSpace},
-     * el {@code \s} de las expresiones regulares), con un recorrido del texto.
+     * The words of the text (see the class description): what lies between the white-space characters
+     * ({@link #isSpace}, the {@code \s} of regular expressions), with one pass over the text.
      */
     static List<Word> words(List<TextRun> runs) {
         String text = TextRun.text(runs);
-        // starts[i]: posición en el texto donde empieza el tramo i.
+        // starts[i]: position in the text where run i starts.
         int[] starts = new int[runs.size() + 1];
         for (int i = 0; i < runs.size(); i++) {
             starts[i + 1] = starts[i] + runs.get(i).text().length();
@@ -381,12 +382,12 @@ public final class LineBreaker {
         return result;
     }
 
-    /** Los espacios en blanco que separan palabras: los de {@code \s} ({@code [ \t\n\x0B\f\r]}). */
+    /** The white-space characters that separate words: those of {@code \s} ({@code [ \t\n\x0B\f\r]}). */
     private static boolean isSpace(char c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r';
     }
 
-    /** Recorre los tramos hacia delante: las posiciones que se le piden nunca retroceden. */
+    /** Walks the runs forward: the positions asked of it never go back. */
     static final class RunCursor {
         private final List<TextRun> runs;
         private final int[] starts;
@@ -397,10 +398,10 @@ public final class LineBreaker {
             this.starts = starts;
         }
 
-        /** Formato del carácter en la posición {@code index}. */
+        /** Format of the character at position {@code index}. */
         TextFormat format(int index) {
             if (runs.size() == 1) {
-                // Un texto sin formato, que es lo normal: no hay tramo que buscar.
+                // Plain text, the usual case: there is no run to look for.
                 return runs.get(0).format();
             }
             while (starts[run + 1] <= index) {
@@ -409,11 +410,11 @@ public final class LineBreaker {
             return runs.get(run).format();
         }
 
-        /** Las partes del texto entre {@code start} y {@code end}, cada una con su formato. */
+        /** The parts of the text between {@code start} and {@code end}, each one with its format. */
         List<TextRun> parts(String text, int start, int end) {
             TextFormat first = format(start);
             if (end <= starts[run + 1]) {
-                // Todo en un tramo, que es lo normal: sin unir nada.
+                // All in one run, the usual case: nothing to join.
                 return List.of(new TextRun(text.substring(start, end), first));
             }
             TextRun.Joiner parts = new TextRun.Joiner();
@@ -427,7 +428,7 @@ public final class LineBreaker {
         }
     }
 
-    /** Las palabras en una línea, separadas por un espacio con el formato de la palabra anterior. */
+    /** The words in a line, separated by a space with the format of the previous word. */
     static Line line(List<Word> words) {
         TextRun.Joiner runs = new TextRun.Joiner();
         for (int i = 0; i < words.size(); i++) {

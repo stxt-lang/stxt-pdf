@@ -21,23 +21,23 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Layout de las cajas {@code absolute} y {@code fixed} (reference/components/frame-and-overlays.md). Se
- * resuelven cuando su containing block ya conoce su tamaño, después del layout en flujo:
+ * Layout of the {@code absolute} and {@code fixed} boxes (reference/components/frame-and-overlays.md). They are
+ * resolved when their reference container already knows its size, after the in-flow layout:
  *
  * <ul>
- *   <li>Las {@code absolute} suben como {@link PendingOverlay} hasta su containing block, y
- *       {@link LayoutContext#layout} las resuelve con {@link #resolvePending} al terminar el layout de
- *       esa caja. Sus fragmentos se añaden al final de los hijos del fragmento del containing
- *       block, no de su padre en el árbol de cajas.</li>
- *   <li>Las {@code fixed} suben hasta la raíz y las resuelve el
- *       {@link dev.stxt.pdf.layout.Paginator} en cada página, con {@link #layOut}.</li>
+ *   <li>The {@code absolute} ones go up as {@link PendingOverlay} to their reference container, and
+ *       {@link LayoutContext#layout} resolves them with {@link #resolvePending} when the layout of
+ *       that box finishes. Their fragments are added at the end of the children of the fragment of the containing
+ *       block, not of their parent in the box tree.</li>
+ *   <li>The {@code fixed} ones go up to the root and the
+ *       {@link dev.stxt.pdf.layout.Paginator} resolves them on each page, with {@link #layOut}.</li>
  * </ul>
  *
- * <p>En cada eje se resuelve la ecuación de {@link OverlayEquation}. El ancho automático es el
- * ajuste al contenido de la caja de borde, limitado después por {@code Min width} y
- * {@code Max width}; si el límite lo cambia, se vuelve a resolver con ese ancho. El alto
- * automático es el del contenido, salvo que arriba y abajo estén declarados: entonces la caja se
- * estira entre ellos. Una caja fuera de flujo no se fragmenta.</p>
+ * <p>On each axis the equation of {@link OverlayEquation} is solved. The automatic width is the
+ * shrink-to-fit of the border box, limited afterwards by {@code Min width} and
+ * {@code Max width}; if the limit changes it, it is solved again with that width. The automatic
+ * height is that of the content, unless top and bottom are declared: then the box
+ * stretches between them. An out-of-flow box is not fragmented.</p>
  */
 public final class OverlayLayout {
 
@@ -48,17 +48,17 @@ public final class OverlayLayout {
     }
 
     /**
-     * Resuelve las cajas {@code absolute} pendientes cuyo containing block es {@code box} y añade
-     * sus fragmentos al de {@code box}. Las demás siguen subiendo.
+     * Resolves the pending {@code absolute} boxes whose reference container is {@code box} and adds
+     * their fragments to that of {@code box}. The others keep going up.
      *
-     * @param r resultado del layout en flujo de {@code box}
+     * @param r result of the in-flow layout of {@code box}
      */
     public LayoutResult resolvePending(Box box, LayoutResult r) {
         if (r.pending().stream().noneMatch(p -> resolvesHere(p, box))) {
             return r;
         }
         Fragment f = r.fragment();
-        // El containing block es la caja de relleno.
+        // The reference container is the padding box.
         double cbWidth = f.width() - f.border().horizontal();
         double cbHeight = f.height() - f.border().vertical();
         List<Fragment> placed = new ArrayList<>();
@@ -80,26 +80,26 @@ public final class OverlayLayout {
     }
 
     /**
-     * Maqueta una caja fuera de flujo en su containing block.
+     * Lays out an out-of-flow box in its reference container.
      *
-     * @param p         la caja, con la posición estática relativa a la caja de contenido del
-     *                  containing block
-     * @param cbWidth   ancho de la caja de relleno del containing block
-     * @param cbHeight  alto de la caja de relleno del containing block
-     * @param cbPadding relleno del containing block
-     * @return el fragmento colocado respecto a la caja de contenido del containing block y las
-     *         cajas {@code fixed} de su interior, con la posición estática relativa a esa misma caja
+     * @param p         the box, with the static position relative to the content box of the
+     *                  reference container
+     * @param cbWidth   width of the padding box of the reference container
+     * @param cbHeight  height of the padding box of the reference container
+     * @param cbPadding padding of the reference container
+     * @return the fragment placed relative to the content box of the reference container and the
+     *         {@code fixed} boxes inside it, with the static position relative to that same box
      */
     public LayoutResult layOut(PendingOverlay p, double cbWidth, double cbHeight, Insets cbPadding) {
         Box box = p.box();
         Style s = box.style();
         OptionalDouble cbHeightBase = OptionalDouble.of(cbHeight);
         Supplier<IntrinsicSizes> intrinsic = () -> context.intrinsic(box);
-        // La ecuación trabaja en la caja de relleno del containing block.
+        // The equation works in the padding box of the reference container.
         double staticX = p.staticX() + cbPadding.left();
         double staticY = p.staticY() + cbPadding.top();
 
-        // Márgenes, borde, relleno y ancho declarado; los porcentajes son del containing block.
+        // Margins, border, padding and declared width; the percentages are of the reference container.
         ConstraintSpace probe = ConstraintSpace.free(cbWidth, cbWidth, cbHeightBase, false);
         BoxModel model = BoxModel.resolve(box, probe, intrinsic);
         Insets margin = model.margin();
@@ -109,7 +109,7 @@ public final class OverlayLayout {
         OptionalDouble width = s.box().width().isAuto() ? OptionalDouble.empty() : OptionalDouble.of(model.width());
         OptionalDouble marginLeft = term(s.box().margin().left(), margin.left());
         OptionalDouble marginRight = term(s.box().margin().right(), margin.right());
-        // Tamaños intrínsecos de la caja de borde: los de la caja de margen sin sus márgenes.
+        // Intrinsic sizes of the border box: those of the margin box without its margins.
         IntrinsicSizes content = width.isPresent()
                 ? IntrinsicSizes.ZERO : intrinsic.get().plus(-Insets.resolve(s.box().margin(), 0).horizontal());
         OverlayEquation.Solution h = OverlayEquation.horizontal(left, width, right, marginLeft, marginRight,
@@ -130,7 +130,7 @@ public final class OverlayLayout {
         BoxModel sized = BoxModel.resolve(box, space, intrinsic);
         OptionalDouble height = sized.height();
         if (height.isEmpty() && top.isPresent() && bottom.isPresent()) {
-            // Solo el alto es auto: la caja se estira entre arriba y abajo.
+            // Only the height is auto: the box stretches between top and bottom.
             double stretched = Math.max(0, cbHeight - top.getAsDouble() - bottom.getAsDouble()
                     - marginTop.orElse(0) - marginBottom.orElse(0));
             height = OptionalDouble.of(Sizing.constrain(stretched, sized.minHeight(), sized.maxHeight()));
@@ -143,14 +143,14 @@ public final class OverlayLayout {
 
         double x = h.start() + h.marginStart() - cbPadding.left();
         double y = v.start() + v.marginStart() - cbPadding.top();
-        // Las cajas fixed del interior pasan de la caja de contenido de esta a la del containing block.
+        // The fixed boxes inside go from the content box of this one to that of the reference container.
         double dx = x + f.border().left() + sized.padding().left();
         double dy = y + f.border().top() + sized.padding().top();
         List<PendingOverlay> fixed = r.pending().stream().map(q -> q.translated(dx, dy)).toList();
         return LayoutResult.finished(f.moved(x, y), fixed, AdjoiningMargins.NONE);
     }
 
-    /** Un margen {@code auto} es un término libre de la ecuación (vacío). */
+    /** An {@code auto} margin is a free term of the equation (empty). */
     private static OptionalDouble term(Value specified, double used) {
         return specified.isAuto() ? OptionalDouble.empty() : OptionalDouble.of(used);
     }

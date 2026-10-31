@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ImageFitTest {
 
-    /** Una caja de 100 × 100 en (10, 20) y una imagen de proporción 2. */
+    /** A 100 × 100 box at (10, 20) and an image with ratio 2. */
     private static final Rect BOX = new Rect(10, 20, 100, 100);
 
     @Test

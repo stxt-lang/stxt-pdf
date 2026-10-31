@@ -1,0 +1,15 @@
+# Case: Overlay outside the page
+# Code: BOX_OVERFLOW
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Overlay:
+			Offset: -100 auto auto 0
+			Box:
+				Width: 50
+				Height: 10

@@ -1,0 +1,21 @@
+# Case: Style of a Row without a rule
+# Code: STYLE_WITHOUT_RULE
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: *
+			Body:
+				Row:
+					Style: total
+					Cell: a

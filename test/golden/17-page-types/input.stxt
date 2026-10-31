@@ -1,15 +1,15 @@
-# Páginas en que sale un Page overlay (reference/components/frame-and-overlays.md). Área útil de 260 × 160 desde (20, 20).
+# Pages where a Page overlay appears (reference/components/frame-and-overlays.md). Page area of 260 × 160 from (20, 20).
 #
-# Cuatro páginas, una por bloque de 60 (Break After: page). Los Page overlay no ocupan sitio: el flujo
-# no cambia con ellos ni sin ellos. Pages cuenta las páginas desde la 1, en el orden del documento.
-#   cover (first):     x = 20, y = 20, solo en la página 1.
-#   head (not-first):  Offset 0 0 auto 0: x = 20, y = 20, 260 × 12; páginas 2, 3 y 4.
-#   foot (all):        Offset auto 0 0 0: abajo, y = 20 + 160 − 10 = 170; las cuatro.
-#   odd (odd):         Offset 30 auto auto 0: y = 20 + 30 = 50; páginas 1 y 3.
-#   even (even):       Offset 60 0 auto auto, 20 de ancho: x = 20 + 260 − 20 = 260, y = 80; páginas 2 y 4.
-#   end (last):        Offset auto 0 0 auto, 30 × 10: x = 250, y = 170; solo la página 4 (la última).
-#   inner (first):     dentro de head, que no sale en la página 1: tampoco sale (not-first y first
-#                      no coinciden en ninguna página).
+# Four pages, one per block of 60 (Break After: page). The Page overlay elements take up no space: the flow
+# is the same with or without them. Pages counts the pages from 1, in document order.
+#   cover (first):     x = 20, y = 20, only on page 1.
+#   head (not-first):  Offset 0 0 auto 0: x = 20, y = 20, 260 × 12; pages 2, 3 and 4.
+#   foot (all):        Offset auto 0 0 0: at the bottom, y = 20 + 160 − 10 = 170; all four.
+#   odd (odd):         Offset 30 auto auto 0: y = 20 + 30 = 50; pages 1 and 3.
+#   even (even):       Offset 60 0 auto auto, 20 wide: x = 20 + 260 − 20 = 260, y = 80; pages 2 and 4.
+#   end (last):        Offset auto 0 0 auto, 30 × 10: x = 250, y = 170; only page 4 (the last one).
+#   inner (first):     inside head, which does not appear on page 1: it does not appear either (not-first and first
+#                      do not coincide on any page).
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

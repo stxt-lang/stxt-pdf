@@ -1,0 +1,15 @@
+# Case: Frame rotated around its corner that sticks out at the top
+# Code: BOX_OVERFLOW
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Paper: A5
+		Margin: 20
+	Section:
+		Frame:
+			Rotate: -30
+			Rotate origin: bottom left
+			Box:
+				Height: 40

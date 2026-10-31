@@ -1,14 +1,14 @@
 package dev.stxt.pdf.model;
 
 /**
- * Texto preformateado (reference/common/text-formatting.md): {@code false} colapsa el espacio en blanco; {@code true}
- * conserva los espacios y los saltos de línea y no parte las líneas; {@code wrap} también, pero parte las líneas
- * demasiado anchas entre palabras.
+ * Preformatted text (reference/common/text-formatting.md): {@code false} collapses white space; {@code true} keeps
+ * the spaces and the line breaks and does not break the lines; {@code wrap} also, but breaks lines that are too wide
+ * between words.
  */
 public enum Preformatted {
     FALSE, TRUE, WRAP;
 
-    /** Si conserva los espacios y los saltos de línea del texto. */
+    /** Whether it keeps the spaces and the line breaks of the text. */
     public boolean enabled() {
         return this != FALSE;
     }

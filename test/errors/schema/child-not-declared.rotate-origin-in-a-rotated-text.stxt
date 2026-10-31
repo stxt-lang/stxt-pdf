@@ -1,0 +1,18 @@
+# Case: Rotate origin in a rotated Text: in flow, it always rotates about its center
+# Code: CHILD_NOT_DECLARED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Certificado n.º 2026-0147
+			Rotate: -90
+			Rotate origin: top left

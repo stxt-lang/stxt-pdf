@@ -1,15 +1,14 @@
 package dev.stxt.pdf.layout;
 
 /**
- * Márgenes verticales adyacentes pendientes de fusionar (reference/components/block.md). Guarda por
- * separado el mayor positivo y el más negativo, porque la fusión de varios márgenes es su suma
- * y no se puede calcular a partir de resultados parciales: {@code 20} y {@code −5} dan 15, pero
- * añadir {@code −10} da 10, no 5.
+ * Adjoining vertical margins pending to be merged (reference/components/block.md). It keeps the largest positive
+ * and the most negative separately, because merging several margins is their sum and cannot be computed from
+ * partial results: {@code 20} and {@code −5} give 15, but adding {@code −10} gives 10, not 5.
  *
- * <p>Es inmutable: forma parte de {@link AdjoiningMargins}, que viaja en {@link LayoutResult}.</p>
+ * <p>It is immutable: it is part of {@link AdjoiningMargins}, which travels in {@link LayoutResult}.</p>
  *
- * @param positive el mayor margen positivo, o 0
- * @param negative el margen más negativo, o 0
+ * @param positive the largest positive margin, or 0
+ * @param negative the most negative margin, or 0
  */
 public record MarginStrut(double positive, double negative) {
 
@@ -23,12 +22,12 @@ public record MarginStrut(double positive, double negative) {
         return new MarginStrut(Math.max(positive, other.positive), Math.min(negative, other.negative));
     }
 
-    /** Mayor positivo más el más negativo. */
+    /** Largest positive plus the most negative. */
     public double resolve() {
         return positive + negative;
     }
 
-    /** Fusiona una serie de márgenes adyacentes. */
+    /** Merges a series of adjoining margins. */
     public static double collapse(double... margins) {
         MarginStrut s = EMPTY;
         for (double m : margins) {

@@ -12,19 +12,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Elementos de caja del documento (reference/common/structure.md), el marcador que el motor genera para cada {@code
- * List item} (reference/components/list.md) y el flujo de columnas de cada {@code Columns}
- * (reference/components/columns.md). Cada uno da su {@code Layout} y su {@code Position}, que no se declaran, y el
- * significado que usan las reglas {@code For element}, los marcadores y las etiquetas del PDF.
+ * Box elements of the document (reference/common/structure.md), the marker that the engine generates for each {@code
+ * List item} (reference/components/list.md) and the column flow of each {@code Columns}
+ * (reference/components/columns.md). Each one gives its {@code Layout} and its {@code Position}, which are not
+ * declared, and the meaning used by the {@code For element} rules, the bookmarks and the PDF tags.
  *
- * <p>La estructura (qué hijos admite cada elemento) está solo en el schema; {@code ElementTest}
- * comprueba que este enum tiene los mismos elementos que él.</p>
+ * <p>The structure (which children each element accepts) is only in the schema; {@code ElementTest}
+ * checks that this enum has the same elements as the schema.</p>
  */
 public enum Element {
 
     /**
-     * Una sección del documento (reference/components/document.md): un bloque que es la raíz de su propio layout, con
-     * su {@code Page}. Solo es hijo de la raíz del documento.
+     * A section of the document (reference/components/document.md): a block that is the root of its own layout, with
+     * its {@code Page}. It is only a child of the root of the document.
      */
     SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
     BLOCK("Block", Layout.BLOCK, Position.STATIC, true, false, 0),
@@ -40,55 +40,55 @@ public enum Element {
     HEADING_6("Heading 6", Layout.BLOCK, Position.STATIC, true, false, 6),
     LIST("List", Layout.BLOCK, Position.STATIC, true, false, 0),
     LIST_ITEM("List item", Layout.BLOCK, Position.STATIC, false, false, 0),
-    /** Una tabla se maqueta como un grid con colocación explícita (reference/components/table.md). */
+    /** A table is laid out as a grid with explicit placement (reference/components/table.md). */
     TABLE("Table", Layout.GRID, Position.STATIC, true, false, 0),
-    /** Sin valor, un bloque; con valor, una caja de texto ({@link BoxTreeBuilder} cambia el {@code Layout}). */
+    /** Without a value, a block; with a value, a text box ({@link BoxTreeBuilder} changes the {@code Layout}). */
     CELL("Cell", Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Bloque en columnas (reference/components/columns.md): su contenido va en el flujo de columnas, {@link
+     * Block in columns (reference/components/columns.md): its content goes in the column flow, {@link
      * #COLUMN_FLOW}.
      */
     COLUMNS("Columns", Layout.COLUMNS, Position.STATIC, true, false, 0),
     /**
-     * Contenido en Markdown (reference/components/markdown.md): un bloque cuyos hijos son los elementos que
-     * {@link MarkdownBuilder} genera a partir de su {@code Content}.
+     * Content in Markdown (reference/components/markdown.md): a block whose children are the elements that
+     * {@link MarkdownBuilder} generates from its {@code Content}.
      */
     MARKDOWN("Markdown", Layout.BLOCK, Position.STATIC, true, false, 0),
     /**
-     * Imagen de la carpeta de recursos (reference/components/image.md): una caja sin hijos con la ruta en {@link
+     * Image from the resources folder (reference/components/image.md): a box without children with the path in {@link
      * Box#image()}.
      */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
-     * Índice automático (reference/common/references.md): un bloque cuyos hijos, generados al construir el árbol, son
-     * una entrada por encabezado ({@link #TOC_1} … {@link #TOC_6}).
+     * Automatic table of contents (reference/common/references.md): a block whose children, generated when the tree is
+     * built, are one entry per heading ({@link #TOC_1} ... {@link #TOC_6}).
      */
     TABLE_OF_CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
     FRAME("Frame", Layout.BLOCK, Position.FRAME, true, false, 0),
     OVERLAY("Overlay", Layout.BLOCK, Position.OVERLAY, false, false, 0),
     PAGE_OVERLAY("Page overlay", Layout.BLOCK, Position.PAGE_OVERLAY, false, false, 0),
-    /** La caja generada del marcador de un {@code List item}: no se escribe en el documento. */
+    /** The generated box of the marker of a {@code List item}: it is not written in the document. */
     MARKER(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /**
-     * La {@code Row} de una {@code Table} con {@code Id} o {@code Box} (reference/components/table.md): una franja
-     * que se pinta debajo de sus celdas. No se nombra en las reglas {@code For element}.
+     * The {@code Row} of a {@code Table} with {@code Id} or {@code Box} (reference/components/table.md): a band
+     * that is painted under its cells. It is not named in the {@code For element} rules.
      */
     ROW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * El flujo de columnas de un {@code Columns}, generado por el motor: un bloque con los hijos del {@code Columns},
-     * que es su único hijo. Cada columna es un fragmento suyo (reference/components/columns.md).
+     * The column flow of a {@code Columns}, generated by the engine: a block with the children of the {@code Columns},
+     * which is its only child. Each column is one of its fragments (reference/components/columns.md).
      */
     COLUMN_FLOW(null, Layout.BLOCK, Position.STATIC, false, false, 0),
     /**
-     * Un bloque de código de un {@link #MARKDOWN} (reference/components/markdown.md): un texto preformateado
-     * generado. No se escribe en el documento, pero las reglas {@code For element} lo nombran ({@code Code block}) para
-     * darle estilo aparte de los {@code Text} (reference/common/styles.md).
+     * A code block of a {@link #MARKDOWN} (reference/components/markdown.md): a generated preformatted
+     * text. It is not written in the document, but the {@code For element} rules name it ({@code Code block}) to
+     * style it apart from the {@code Text} (reference/common/styles.md).
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
-     * Las entradas de un {@link #TABLE_OF_CONTENTS}, una por nivel de encabezado: un {@code Stack} generado con el
-     * título, la guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las
-     * nombran ({@code TOC 2}) para darles estilo (reference/components/table-of-contents.md).
+     * The entries of a {@link #TABLE_OF_CONTENTS}, one per heading level: a generated {@code Stack} with the
+     * title, the leader and the page number. They are not written in the document, but the {@code For element} rules
+     * name them ({@code TOC 2}) to style them (reference/components/table-of-contents.md).
      */
     TOC_1("TOC 1", Layout.STACK),
     TOC_2("TOC 2", Layout.STACK),
@@ -96,14 +96,17 @@ public enum Element {
     TOC_4("TOC 4", Layout.STACK),
     TOC_5("TOC 5", Layout.STACK),
     TOC_6("TOC 6", Layout.STACK),
-    /** El título de una entrada del índice: el texto del encabezado. */
+    /** The title of a table of contents entry: the text of the heading. */
     TOC_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
-    /** La guía (puntos o línea) entre el título y el número de una entrada: una caja vacía que se pinta. */
+    /** The leader (dots or line) between the title and the number of an entry: an empty box that is painted. */
     TOC_LEADER(null, Layout.BLOCK, Position.STATIC, false, false, 0),
-    /** El número de página de una entrada del índice: {@code {page of: …}} del encabezado. */
+    /** The page number of a table of contents entry: {@code {page of: ...}} of the heading. */
     TOC_PAGE(null, Layout.INLINE, Position.STATIC, false, false, 0);
 
-    /** Los elementos que se nombran, por su nombre canónico ({@code list-item}): los escritos y las entradas del índice. */
+    /**
+     * The elements that are named, by their canonical name ({@code list-item}): the written ones and the table of
+     * contents entries.
+     */
     private static final Map<String, Element> BY_NAME = Arrays.stream(values())
             .filter(e -> e.label != null)
             .collect(Collectors.toUnmodifiableMap(Element::canonicalName, Function.identity()));
@@ -114,19 +117,19 @@ public enum Element {
     private final boolean item;
     private final boolean text;
     private final int headingLevel;
-    /** Generado por el motor, pero con nombre para las reglas {@code For element}. */
+    /** Generated by the engine, but with a name for the {@code For element} rules. */
     private final boolean selectorOnly;
 
     Element(String label, Layout layout, Position position, boolean item, boolean text, int headingLevel) {
         this(label, layout, position, item, text, headingLevel, false);
     }
 
-    /** Un elemento generado que las reglas {@code For element} pueden nombrar. */
+    /** A generated element that the {@code For element} rules can name. */
     Element(String label, Layout layout) {
         this(label, layout, false);
     }
 
-    /** Un elemento generado que las reglas {@code For element} pueden nombrar; {@code text}: lleva texto. */
+    /** A generated element that the {@code For element} rules can name; {@code text}: it carries text. */
     Element(String label, Layout layout, boolean text) {
         this(label, layout, Position.STATIC, false, text, 0, true);
     }
@@ -142,40 +145,40 @@ public enum Element {
         this.selectorOnly = selectorOnly;
     }
 
-    /** El elemento con ese nombre canónico ({@code heading-2}); vacío si no es un elemento de caja. */
+    /** The element with that canonical name ({@code heading-2}); empty if it is not a box element. */
     public static Optional<Element> of(String canonicalName) {
         return Optional.ofNullable(BY_NAME.get(canonicalName));
     }
 
-    /** Los elementos que se escriben en el documento, en el orden de la referencia. */
+    /** The elements that are written in the document, in the order of the reference. */
     public static List<Element> written() {
         return Arrays.stream(values()).filter(Element::isWritten).toList();
     }
 
     /**
-     * Los elementos que una regla {@code For element} puede nombrar: los escritos, los bloques de código y las entradas
-     * del índice.
+     * The elements that a {@code For element} rule can name: the written ones, the code blocks and the table of
+     * contents entries.
      */
     public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
     }
 
-    /** Si se escribe en el documento (no es generado). */
+    /** Whether it is written in the document (it is not generated). */
     public boolean isWritten() {
         return label != null && !selectorOnly;
     }
 
-    /** La entrada de un {@link #TABLE_OF_CONTENTS} para los encabezados de ese nivel (1 a 6). */
+    /** The entry of a {@link #TABLE_OF_CONTENTS} for the headings of that level (1 to 6). */
     public static Element tocEntry(int level) {
         return values()[TOC_1.ordinal() + level - 1];
     }
 
-    /** El nombre como se escribe ({@code List item}); {@code null} en las cajas generadas. */
+    /** The name as it is written ({@code List item}); {@code null} in the generated boxes. */
     public String label() {
         return label;
     }
 
-    /** El nombre en forma canónica, como lo da {@code Node.getCanonicalName()} ({@code list-item}). */
+    /** The name in canonical form, as {@code Node.getCanonicalName()} gives it ({@code list-item}). */
     public String canonicalName() {
         return label == null ? null : label.toLowerCase(Locale.ROOT).replace(' ', '-');
     }
@@ -188,68 +191,71 @@ public enum Element {
         return position;
     }
 
-    /** Si puede ser el elemento de un {@code Item} o un {@code Area}: está en flujo y no es parte de otro. */
+    /** Whether it can be the element of an {@code Item} or an {@code Area}: it is in flow and not part of another. */
     public boolean canBeItem() {
         return item;
     }
 
-    /** Si lleva el texto en el valor o en {@code Content} ({@code Text}, {@code Paragraph} y {@link #CODE_BLOCK}). */
+    /**
+     * Whether it carries the text in the value or in {@code Content} ({@code Text}, {@code Paragraph} and
+     * {@link #CODE_BLOCK}).
+     */
     public boolean hasText() {
         return text;
     }
 
-    /** Nivel del encabezado ({@code Heading 2} → 2); 0 si no es un encabezado. */
+    /** Level of the heading ({@code Heading 2} → 2); 0 if it is not a heading. */
     public int headingLevel() {
         return headingLevel;
     }
 
     /**
-     * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
-     * (reference/common/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
-     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Stack} o {@code Page
-     * overlay}, un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link
+     * What a box means for the reader of the document: the role with which the PDF tags it
+     * (reference/common/pdf.md) and with which the painting and the overflow check treat it. Several elements
+     * share one ({@code Paragraph} and the code block are paragraphs; {@code Block}, {@code Stack} or {@code Page
+     * overlay}, a block with no further meaning), so a new element only has to state its own ({@link
      * #role()}).
      */
     public enum Role {
-        /** La raíz anónima del documento, que no tiene elemento. */
+        /** The anonymous root of the document, which has no element. */
         DOCUMENT,
         SECTION,
         HEADING,
-        /** Un texto de un solo párrafo: {@code Paragraph} y el bloque de código. */
+        /** A text of a single paragraph: {@code Paragraph} and the code block. */
         PARAGRAPH,
-        /** Un {@code Text}: un párrafo o, dentro de un encabezado, parte de su texto. */
+        /** A {@code Text}: a paragraph or, inside a heading, part of its text. */
         TEXT,
-        /** Una lista, cuyos ítems llevan su marcador a la izquierda (reference/components/list.md). */
+        /** A list, whose items carry their marker on the left (reference/components/list.md). */
         LIST,
         LIST_ITEM,
         TABLE,
-        /** La franja de una fila de una tabla: no tiene contenido, solo se pinta. */
+        /** The band of a row of a table: it has no content, it is only painted. */
         ROW,
         CELL,
-        /** Una imagen. */
+        /** An image. */
         FIGURE,
-        /** Un índice ({@code Table of contents}, reference/components/table-of-contents.md). */
+        /** A table of contents ({@code Table of contents}, reference/components/table-of-contents.md). */
         TABLE_OF_CONTENTS,
         TOC_ENTRY,
-        /** Un trozo de texto dentro de otro: el título de una entrada del índice. */
+        /** A piece of text inside another: the title of a table of contents entry. */
         SPAN,
-        /** El número de página de una entrada del índice: un trozo de texto que no se lee en su enlace. */
+        /** The page number of a table of contents entry: a piece of text that is not read in its link. */
         PAGE_NUMBER,
         /**
-         * La guía de una entrada del índice: no tiene texto, se pinta (reference/components/table-of-contents.md) y
-         * no es contenido.
+         * The leader of a table of contents entry: it has no text, it is painted
+         * (reference/components/table-of-contents.md) and it is not content.
          */
         LEADER,
         /**
-         * El flujo de columnas de un {@code Columns}: no tiene significado propio, su contenido es el del {@code
+         * The column flow of a {@code Columns}: it has no meaning of its own, its content is that of the {@code
          * Columns}.
          */
         FLOW,
-        /** Una caja sin más significado. */
+        /** A box with no further meaning. */
         BLOCK
     }
 
-    /** El papel de la caja ({@link Role}). */
+    /** The role of the box ({@link Role}). */
     public Role role() {
         if (headingLevel > 0) {
             return Role.HEADING;

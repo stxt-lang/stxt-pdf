@@ -1,5 +1,5 @@
-# Página 1: mail en 20; md en 20 + 12 + 8 = 40; logo en 40 + 12 + 8 = 60; card en 60 + 75 + 8 = 143.
-# Página 2: end en 20 y back en 32, de 12 cada uno.
+# Page 1: mail at 20; md at 20 + 12 + 8 = 40; logo at 40 + 12 + 8 = 60; card at 60 + 75 + 8 = 143.
+# Page 2: end at 20 and back at 32, of 12 each.
 Result:
 	Page: 1
 		Fragment: mail

@@ -1,12 +1,12 @@
-# Catálogo de producto de un taller de muebles, de cinco páginas. Son dos secciones: la portada, a
-# sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit page overlays: false), y el
-# cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Table of contents, que el
-# motor rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
-# (Fit: fill) y una etiqueta «Novedad» en diagonal en la esquina (un Overlay con Rotate), y una página
-# final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
-# solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
-# In table of contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
-# ponen en mayúsculas (Case).
+# Five-page product catalog of a furniture workshop. There are two sections: the cover, full
+# bleed (Margin: 0), without a page number and without the document footer (Inherit page overlays: false), and the
+# body, numbered from 1. It has a product index with their printed pages (a Table of contents, which the
+# engine fills with the headings), product cards in a two-column grid with the photo cropped
+# (Fit: fill) and a "Novedad" label set diagonally in the corner (an Overlay with Rotate), and a final
+# page with woods, orders and contact. The cards are all alike: the style is in styles.stxt and
+# only the content changes. The titles of the cover and of the index are a Heading 1 with
+# In table of contents: false, so that they do not appear in it. The labels are written in lowercase and the rules
+# put them in uppercase (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

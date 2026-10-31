@@ -7,25 +7,25 @@ import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Un {@link Style} escrito a mano, y cajas con él, para los tests de otros packages que prueban una pieza con
- * un estilo concreto sin leer un documento: fuera de {@code tree} un estilo o una caja solo se leen. El estilo se
- * puede seguir cambiando después de crear sus cajas, como hacen esos tests entre una comprobación y la siguiente.
+ * A {@link Style} written by hand, and boxes with it, for the tests of other packages that test a piece with
+ * a specific style without reading a document: outside {@code tree} a style or a box is only read. The style can
+ * still be changed after creating its boxes, as those tests do between one check and the next.
  */
 public final class StyleEditor {
 
     private final Style style = new Style();
 
-    /** El estilo que se escribe. */
+    /** The style being written. */
     public Style style() {
         return style;
     }
 
-    /** Una caja con este estilo, sin padre ni hijos. */
+    /** A box with this style, without parent or children. */
     public Box box(String id, Element element) {
         return new Box(id, element, style, false, 1);
     }
 
-    /** Cuelga {@code children} de {@code parent}, como hijas suyas y en este orden. */
+    /** Hangs {@code children} from {@code parent}, as its children and in this order. */
     public static void addChildren(Box parent, Box... children) {
         for (Box child : children) {
             parent.addChild(child);

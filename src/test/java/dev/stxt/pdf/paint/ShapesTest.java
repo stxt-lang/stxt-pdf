@@ -13,10 +13,10 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Los caminos de las formas que pintan los lienzos (reference/common/box.md). */
+/** The paths of the shapes that the canvases paint (reference/common/box.md). */
 class ShapesTest {
 
-    /** Apunta las operaciones del camino. */
+    /** Records the path operations. */
     private static final class Recorder implements Shapes.Path {
         final List<String> ops = new ArrayList<>();
 
@@ -107,8 +107,8 @@ class ShapesTest {
         Radii radii = Radii.resolve(Corners.all(new Value.Percentage(50)), 100, 60);
         Recorder path = new Recorder();
         Shapes.roundedRect(path, BOX, radii);
-        // Radios de la mitad del ancho y del alto: los lados rectos se agotan y solo quedan las cuatro curvas.
-        // Arriba a la derecha: de (60, 20) a (110, 50), con los puntos de control a 0,5523 de cada radio.
+        // Radii of half the width and half the height: the straight sides run out and only the four curves remain.
+        // Top right: from (60, 20) to (110, 50), with the control points at 0.5523 of each radius.
         assertEquals("C 87.61 20.00 110.00 33.43 110.00 50.00", path.ops.get(1));
         assertEquals(List.of("M", "C", "C", "C", "C", "Z"), path.ops.stream().map(o -> o.substring(0, 1)).toList());
     }
@@ -119,13 +119,13 @@ class ShapesTest {
         Radii inner = Radii.resolve(Corners.all(Value.pt(14)), 100, 60).inset(w);
         Recorder top = new Recorder();
         Shapes.sidePolygon(top, Shapes.Side.TOP, BOX, w, inner);
-        // Esquinas de relleno (14, 24) y (106, 24); la diagonal sigue 2 · 10 = 20 pt hacia dentro.
+        // Padding corners (14, 24) and (106, 24); the diagonal continues 2 · 10 = 20 pt inward.
         double d = 20 / Math.sqrt(2);
         assertEquals(List.of("M 10.00 20.00", "L 110.00 20.00", "L " + Recorder.n(106 - d) + " " + Recorder.n(24 + d),
                 "L " + Recorder.n(14 + d) + " " + Recorder.n(24 + d), "Z"), top.ops);
         Recorder left = new Recorder();
         Shapes.sidePolygon(left, Shapes.Side.LEFT, BOX, w, inner);
-        // Comparten la diagonal de arriba a la izquierda: el mismo punto.
+        // They share the top left diagonal: the same point.
         assertEquals("L " + Recorder.n(14 + d) + " " + Recorder.n(24 + d), left.ops.get(2));
     }
 

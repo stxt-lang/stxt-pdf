@@ -3,8 +3,8 @@ package dev.stxt.pdf.model;
 import java.util.List;
 
 /**
- * Un valor por esquina, en el orden de CSS: arriba a la izquierda, arriba a la derecha, abajo a la
- * derecha y abajo a la izquierda. Se usa para {@code Corner radius} (reference/common/values.md).
+ * One value per corner, in CSS order: top left, top right, bottom right and bottom left. Used for
+ * {@code Corner radius} (reference/common/values.md).
  */
 public record Corners<T>(T topLeft, T topRight, T bottomRight, T bottomLeft) {
 
@@ -12,14 +12,14 @@ public record Corners<T>(T topLeft, T topRight, T bottomRight, T bottomLeft) {
         return new Corners<>(value, value, value, value);
     }
 
-    /** Abreviado de 1 a 4 valores, con el mismo convenio que CSS. */
+    /** Shorthand of 1 to 4 values, with the same convention as CSS. */
     public static <T> Corners<T> shorthand(List<T> v) {
         return switch (v.size()) {
             case 1 -> new Corners<>(v.get(0), v.get(0), v.get(0), v.get(0));
             case 2 -> new Corners<>(v.get(0), v.get(1), v.get(0), v.get(1));
             case 3 -> new Corners<>(v.get(0), v.get(1), v.get(2), v.get(1));
             case 4 -> new Corners<>(v.get(0), v.get(1), v.get(2), v.get(3));
-            default -> throw new IllegalArgumentException("Se esperan de 1 a 4 valores y hay " + v.size());
+            default -> throw new IllegalArgumentException("Expected 1 to 4 values, found " + v.size());
         };
     }
 

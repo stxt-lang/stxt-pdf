@@ -1,14 +1,14 @@
-# Contrato de servicios de diseño entre un estudio y una cooperativa, de varias páginas: cabecera
-# fija con el logotipo desde la segunda hoja (la primera lleva el título) y pie fijo con rúbricas,
-# reunidos (con las partes en negrita, gracias a Markup: markdown en la regla de Paragraph) y
-# exponen, doce cláusulas numeradas con subapartados escritas en Markdown (listas de tres niveles de
-# numeración), un anexo con la tabla de honorarios (con cabecera y pie) y el
-# bloque de firmas, que no se parte entre páginas. Los títulos se escriben en minúscula y las reglas
-# de styles.stxt los ponen en mayúsculas (Case). Los apartados (Reunidos, Exponen, Cláusulas) son
-# Heading 2 numerados (Numbered: true en styles.stxt) y el título del contrato declara Numbered: false.
-# El anexo es un Heading 1 de el estilo annex, numerado en romanos con su etiqueta (Number format y Number
-# label: «Anexo I · …»), al que remiten las cláusulas con {number of: annex-title}; el considerando III
-# remite al apartado de las cláusulas con {number of: terms}.
+# Multi-page contract for design services between a studio and a cooperative: fixed header
+# with the logo from the second sheet on (the first carries the title) and a fixed footer with initials,
+# the Reunidos section (with the parties in bold, thanks to Markup: markdown in the Paragraph rule) and the
+# Exponen section, twelve numbered clauses with subsections written in Markdown (lists with three numbering
+# levels), an annex with the fee table (with header and footer) and the
+# signature block, which is not split across pages. The titles are written in lowercase and the rules
+# of styles.stxt put them in uppercase (Case). The sections (Reunidos, Exponen, Cláusulas) are
+# numbered Heading 2 (Numbered: true in styles.stxt) and the contract title declares Numbered: false.
+# The annex is a Heading 1 with the annex style, numbered in Roman numerals with its label (Number format and Number
+# label: "Anexo I · ..."), which the clauses refer to with {number of: annex-title}; recital III
+# refers to the clauses section with {number of: terms}.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las anotaciones de enlace del PDF (reference/implementation/pdf.md): una por zona clicable, sin borde
- * visible. Un enlace a una URL lleva su acción {@code URI}; uno a una caja del documento ({@code
- * #id}) lleva un destino con la página y la posición de esa caja, que no se conoce hasta que se
- * han pintado todas las páginas (el enlace puede ir hacia delante): se apunta aquí y
- * {@link #resolve} lo completa al final.
+ * The link annotations of the PDF (reference/implementation/pdf.md): one per clickable area, without a visible
+ * border. A link to a URL carries its {@code URI} action; one to a box of the document ({@code
+ * #id}) carries a destination with the page and the position of that box, which is not known until
+ * all the pages have been painted (the link may point forward): it is recorded here and
+ * {@link #resolve} completes it at the end.
  */
 final class PdfLinks {
 
@@ -29,9 +29,9 @@ final class PdfLinks {
     private final List<Internal> internal = new ArrayList<>();
 
     /**
-     * Una anotación de enlace en el rectángulo {@code area} (coordenadas del PDF) hacia
-     * {@code destination}. {@code description} es lo que lee un lector de pantalla; sin él, el
-     * propio destino.
+     * A link annotation in the rectangle {@code area} (PDF coordinates) towards
+     * {@code destination}. {@code description} is what a screen reader reads; without it, the
+     * destination itself.
      */
     PDAnnotationLink create(PDRectangle area, String destination, String description) {
         PDAnnotationLink annotation = new PDAnnotationLink();
@@ -52,8 +52,8 @@ final class PdfLinks {
     }
 
     /**
-     * Pone a los enlaces internos el destino de su caja; con PDF/UA-2, como una acción con el destino de estructura
-     * ({@link PdfStructure#goTo}).
+     * Gives the internal links the destination of their box; with PDF/UA-2, as an action with the structure
+     * destination ({@link PdfStructure#goTo}).
      */
     void resolve(Map<Box, PDPageXYZDestination> destinations, PdfStructure structure) {
         Map<String, Box> byKey = new java.util.HashMap<>();
@@ -65,8 +65,8 @@ final class PdfLinks {
         for (Internal link : internal) {
             Box box = byKey.get(link.id());
             if (box == null) {
-                // El builder ya comprobó que existe y que no está en un Page overlay (LinkTargets).
-                throw new InternalException("Enlace sin destino: #" + link.id());
+                // The builder already checked that it exists and is not in a Page overlay (LinkTargets).
+                throw new InternalException("Link without a destination: #" + link.id());
             }
             PDActionGoTo goTo = structure.goTo(box, destinations.get(box));
             if (goTo != null) {

@@ -1,15 +1,15 @@
-# Guía rápida de un termostato, de tres páginas. Reúne lo que suele tener un manual técnico:
-# una figura con números superpuestos (un Frame con sus Overlay encima) y su leyenda al
-# lado (una List de Paragraph con la negrita escrita con Markup: markdown, que la regla de
-# Paragraph activa), avisos con color, pasos numerados en Markdown, un esquema de conexión,
-# un bloque de terminal con las columnas alineadas (un Text con Preformatted: pre, en monoespaciada), un
-# código en línea y tablas de especificaciones y de averías. La estructura
-# de encabezados da el índice del PDF (marcadores), y la tabla de averías remite al esquema con
-# {page of: wiring}, la página donde está (también dentro de Markdown). Los apartados son Heading 2
-# numerados (Numbered: true en styles.stxt: 1 a 8) y sus subapartados, Heading 3 (3.1, 8.1…, también
-# los de un Markdown); el título del producto declara Numbered: false. Un enlace de Markdown remite al
-# apartado de las especificaciones con {number of: specs-heading}. Los rótulos se escriben en
-# minúscula y se ponen en mayúsculas, separadas, con Case y Letter spacing.
+# Three-page quick guide for a thermostat. It gathers what a technical manual usually has:
+# a figure with overlaid numbers (a Frame with its Overlay elements on top) and its legend
+# beside it (a List of Paragraph with the bold written with Markup: markdown, which the Paragraph
+# rule enables), colored notices, numbered steps in Markdown, a wiring diagram,
+# a terminal block with aligned columns (a Text with Preformatted: pre, in monospace),
+# inline code and tables of specifications and of faults. The heading
+# structure gives the PDF outline (bookmarks), and the fault table refers to the diagram with
+# {page of: wiring}, the page where it is (also inside Markdown). The sections are numbered Heading 2
+# (Numbered: true in styles.stxt: 1 to 8) and their subsections, Heading 3 (3.1, 8.1..., also
+# those of a Markdown); the product title declares Numbered: false. A Markdown link refers to the
+# specifications section with {number of: specs-heading}. The labels are written in
+# lowercase and put in uppercase, spaced out, with Case and Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

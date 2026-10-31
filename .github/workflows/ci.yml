@@ -1,4 +1,4 @@
-# Integración continua.
+# Continuous integration.
 name: CI
 
 on:
@@ -26,31 +26,31 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test
-      # Los tests no deben modificar nada versionado: escriben en target/ y fallan
-      # si cambia un PNG de referencia.
-      - name: El árbol sigue limpio
+      # The tests must not modify anything under version control: they write to target/ and fail
+      # if a reference PNG changes.
+      - name: The tree is still clean
         run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
-      - name: Informes
+      - name: Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: informes-jdk${{ matrix.java }}
+          name: reports-jdk${{ matrix.java }}
           path: |
             target/surefire-reports
             target/site/jacoco
           if-no-files-found: ignore
-      # Si cambia una imagen de referencia, el PDF y las imágenes nuevas, para mirarlas.
-      - name: Imágenes nuevas
+      # If a reference image changes, the PDF and the new images, to look at them.
+      - name: New images
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: referencia-jdk${{ matrix.java }}
+          name: reference-jdk${{ matrix.java }}
           path: target/reference
           if-no-files-found: ignore
 
-  # El resultado no debe depender del idioma de la JVM: en turco tampoco cambia ningún PNG.
+  # The result must not depend on the JVM language: in Turkish no PNG changes either.
   locale:
-    name: Tests con la JVM en turco
+    name: Tests with the JVM in Turkish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,24 +61,24 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test -DargLine="-Duser.language=tr -Duser.country=TR"
-      - name: El árbol sigue limpio
+      - name: The tree is still clean
         run: git status --porcelain --untracked-files=no | tee /dev/stderr | (! grep .)
-      - name: Imágenes nuevas
+      - name: New images
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: referencia-turco
+          name: reference-turkish
           path: target/reference
           if-no-files-found: ignore
 
-  # Windows (separadores de ruta, fin de línea, ficheros abiertos que no se pueden borrar), a diario y a mano: es más
-  # lento y no bloquea los cambios.
+  # Windows (path separators, line endings, open files that cannot be deleted), daily and on demand: it is slower
+  # and does not block changes.
   windows:
-    name: Tests en Windows
+    name: Tests on Windows
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     steps:
-      # Con el core.autocrlf del runner, como una copia de trabajo de Windows: los tests deben admitir CRLF.
+      # With the runner's core.autocrlf, like a Windows working copy: the tests must accept CRLF.
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
@@ -87,27 +87,27 @@ jobs:
           cache: maven
       - name: Tests
         run: mvn -B test
-      # Cada fichero cambiado, como anotación del job: se ve sin abrir el log.
-      - name: El árbol sigue limpio
+      # Each changed file, as a job annotation: visible without opening the log.
+      - name: The tree is still clean
         shell: bash
         run: |
           changed=$(git status --porcelain --untracked-files=no)
           if [ -n "$changed" ]; then
-            echo "$changed" | while IFS= read -r line; do echo "::error title=Fichero cambiado por los tests::$line"; done
+            echo "$changed" | while IFS= read -r line; do echo "::error title=File changed by the tests::$line"; done
             git diff --stat
             exit 1
           fi
-      - name: Imágenes nuevas
+      - name: New images
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: referencia-windows
+          name: reference-windows
           path: target/reference
           if-no-files-found: ignore
 
-  # Medidas de rendimiento (@Tag("perf")), a diario y a mano; no bloquean los cambios.
+  # Performance measurements (@Tag("perf")), daily and on demand; they do not block changes.
   perf:
-    name: Rendimiento
+    name: Performance
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:

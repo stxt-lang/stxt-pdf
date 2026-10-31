@@ -1,0 +1,15 @@
+# Case: Invalid value in a rule that is not applied
+# Code: VALUE_SYNTAX
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Grid
+			Box:
+				Background: rojo
+	Section:
+		Text: Hola

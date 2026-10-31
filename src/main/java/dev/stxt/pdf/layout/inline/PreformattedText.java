@@ -10,23 +10,23 @@ import java.util.List;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reparte en líneas un texto con {@code Preformatted: true} o {@code wrap}
- * (reference/common/text-formatting.md): los espacios y los saltos de línea del texto se conservan.
+ * Breaks into lines a text with {@code Preformatted: true} or {@code wrap}
+ * (reference/common/text-formatting.md): the spaces and the line breaks of the text are kept.
  *
- * <p>Cada línea del texto es una línea de la caja, también las vacías (una línea en blanco no
- * separa párrafos: todo el texto es uno solo para las viudas y huérfanas). Una tabulación lleva
- * hasta la siguiente columna múltiplo de {@code Tab size}, contando los caracteres desde el
- * principio de la línea; un salto de línea final no añade una línea vacía. Con {@code true} las
- * líneas no se parten, así que una más ancha que la caja desborda; con {@code wrap} se parten
- * entre palabras (los espacios del corte se pierden: no se ven) y una palabra más ancha que la
- * caja desborda.</p>
+ * <p>Each line of the text is a line of the box, the empty ones too (a blank line does not
+ * separate paragraphs: the whole text is a single one for widows and orphans). A tab moves
+ * to the next column that is a multiple of {@code Tab size}, counting the characters from the
+ * start of the line; a final line break does not add an empty line. With {@code true} the
+ * lines are not broken, so one wider than the box overflows; with {@code wrap} they are broken
+ * between words (the spaces at the break are lost: they are not visible) and a word wider than the
+ * box overflows.</p>
  */
 final class PreformattedText {
 
     private PreformattedText() {
     }
 
-    /** Las líneas del texto para un ancho disponible. */
+    /** The lines of the text for an available width. */
     static List<LineBreaker.Line> lines(List<TextRun> runs, int tabSize, boolean wrap, double available,
                                         TextMeasurer measurer, FontFace font, double fontSize,
                                         double letterSpacing) {
@@ -42,8 +42,8 @@ final class PreformattedText {
     }
 
     /**
-     * Ancho más estrecho y ancho natural: con {@code true}, la línea más ancha; con {@code wrap}, la
-     * palabra más ancha y la línea más ancha.
+     * Narrowest width and natural width: with {@code true}, the widest line; with {@code wrap}, the
+     * widest word and the widest line.
      */
     static IntrinsicSizes intrinsics(List<TextRun> runs, int tabSize, boolean wrap, TextMeasurer measurer,
                                      FontFace font, double fontSize, double letterSpacing) {
@@ -67,8 +67,8 @@ final class PreformattedText {
     }
 
     /**
-     * Las líneas del texto con las tabulaciones ya expandidas, cada una como sus tramos. Una línea
-     * vacía no tiene tramos.
+     * The lines of the text with the tabs already expanded, each one as its runs. An empty line
+     * has no runs.
      */
     static List<List<TextRun>> sourceLines(List<TextRun> runs, int tabSize) {
         List<List<TextRun>> lines = new ArrayList<>();
@@ -111,9 +111,9 @@ final class PreformattedText {
     }
 
     /**
-     * Parte una línea de {@code wrap} con el algoritmo voraz: una palabra pasa a la línea
-     * siguiente si, con ella, la línea no cabe y ya tenía otra palabra. Los espacios de antes de la
-     * primera palabra (la sangría) se conservan; los del corte, no.
+     * Breaks a {@code wrap} line with the greedy algorithm: a word moves to the next
+     * line if, with it, the line does not fit and already had another word. The spaces before the
+     * first word (the indent) are kept; those at the break are not.
      */
     private static List<LineBreaker.Line> wrap(List<TextRun> source, double available, TextMeasurer measurer,
                                                FontFace font, double fontSize, double letterSpacing) {
@@ -137,7 +137,7 @@ final class PreformattedText {
         return lines;
     }
 
-    /** Dónde empieza cada tramo en el texto de la línea, y dónde acaba el último. */
+    /** Where each run starts in the text of the line, and where the last one ends. */
     private static int[] starts(List<TextRun> runs) {
         int[] starts = new int[runs.size() + 1];
         for (int i = 0; i < runs.size(); i++) {
@@ -146,12 +146,12 @@ final class PreformattedText {
         return starts;
     }
 
-    /** Los tramos del texto entre dos posiciones, cada uno con su formato. */
+    /** The runs of the text between two positions, each one with its format. */
     private static List<TextRun> slice(List<TextRun> runs, int[] starts, String text, int from, int to) {
         return new LineBreaker.RunCursor(runs, starts).parts(text, from, to);
     }
 
-    /** Las palabras de la línea (lo que no es un espacio), como {@code [inicio, fin)}. */
+    /** The words of the line (what is not a space), as {@code [start, end)}. */
     private static List<int[]> words(String text) {
         List<int[]> words = new ArrayList<>();
         for (int i = 0; i < text.length(); ) {

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/** Las imágenes de prueba de {@code resources/images/test/} (reference/components/image.md). */
+/** The test images of {@code resources/images/test/} (reference/components/image.md). */
 class ImageLibraryTest {
 
     private final ImageLibrary images = new Resources().images();
@@ -29,7 +29,7 @@ class ImageLibraryTest {
         assertEquals(ImageFile.Format.PNG, f.format());
         assertEquals(200, f.pixelWidth());
         assertEquals(100, f.pixelHeight());
-        // 96 píxeles por pulgada: 0,75 pt por píxel.
+        // 96 pixels per inch: 0.75 pt per pixel.
         assertEquals(150, f.width(), 1e-9);
         assertEquals(75, f.height(), 1e-9);
     }
@@ -50,9 +50,9 @@ class ImageLibraryTest {
     @Test
     void recognizesTheFormatByContent() {
         ImageFormatException gif = assertThrows(ImageFormatException.class, () -> images.find("test/drawing.gif"));
-        assertTrue(gif.getMessage().contains("no es PNG, JPEG, SVG ni PDF (es GIF)"), gif.getMessage());
+        assertTrue(gif.getMessage().contains("is not PNG, JPEG, SVG or PDF (it is GIF)"), gif.getMessage());
         ImageFormatException text = assertThrows(ImageFormatException.class, () -> images.find("test/broken.png"));
-        assertTrue(text.getMessage().contains("test/broken.png no es PNG, JPEG, SVG ni PDF"), text.getMessage());
+        assertTrue(text.getMessage().contains("test/broken.png is not PNG, JPEG, SVG or PDF"), text.getMessage());
     }
 
     @Test
@@ -62,15 +62,15 @@ class ImageLibraryTest {
         Files.write(root.resolve("cut.png"), java.util.Arrays.copyOf(png, 10));
         ImageFormatException e = assertThrows(ImageFormatException.class,
                 () -> new Resources(dir.resolve("resources")).images().find("cut.png"));
-        assertTrue(e.getMessage().contains("parece PNG pero está dañada"), e.getMessage());
+        assertTrue(e.getMessage().contains("looks like PNG but is damaged"), e.getMessage());
     }
 
     @Test
     void pathsAreRelativeToTheImagesFolder() {
         ResourceException missing = assertThrows(ResourceException.class, () -> images.find("test/missing.png"));
         assertFalse(missing instanceof ImageFormatException);
-        assertTrue(missing.getMessage().startsWith("No existe el recurso test/missing.png"), missing.getMessage());
-        // No puede salir de images/, ni hacia los recursos ni con una ruta absoluta.
+        assertTrue(missing.getMessage().startsWith("The resource test/missing.png does not exist"), missing.getMessage());
+        // It cannot leave images/, neither towards the resources nor with an absolute path.
         for (String path : new String[] {"../fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf", "/test/wide.png",
                 "images/test/wide.png"}) {
             assertInstanceOf(ResourceException.class, assertThrows(RuntimeException.class, () -> images.find(path)),
@@ -87,9 +87,9 @@ class ImageLibraryTest {
         try {
             Files.createSymbolicLink(link, root.resolve("logo.png"));
         } catch (UnsupportedOperationException | IOException e) {
-            assumeTrue(false, "Sin enlaces simbólicos: " + e.getMessage());
+            assumeTrue(false, "No symbolic links: " + e.getMessage());
         }
         ResourceException e = assertThrows(ResourceException.class, () -> new Resources(root).images().find("logo.png"));
-        assertTrue(e.getMessage().contains("es un enlace que sale de la carpeta images"), e.getMessage());
+        assertTrue(e.getMessage().contains("is a link that leaves the folder images"), e.getMessage());
     }
 }

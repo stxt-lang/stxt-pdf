@@ -1,7 +1,7 @@
-# Página 1: title en y = 20; m en 40, de 132. p1 en la primera columna (11 líneas); p2 (7) y
-#   las 4 primeras líneas de p3 en la segunda, desde x = 160.
-# Página 2: m en 20, de 72. p3 (4 líneas) y las 2 primeras de p4 en la primera columna; las 2
-#   últimas de p4 y p5 (3) en la segunda. end en 20 + 72 + 8 = 100.
+# Page 1: title at y = 20; m at 40, of 132. p1 in the first column (11 lines); p2 (7) and
+#   the first 4 lines of p3 in the second, from x = 160.
+# Page 2: m at 20, of 72. p3 (4 lines) and the first 2 of p4 in the first column; the last
+#   2 of p4 and p5 (3) in the second. end at 20 + 72 + 8 = 100.
 Result:
 	Page: 1
 		Fragment: title

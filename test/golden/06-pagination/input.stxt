@@ -1,12 +1,12 @@
-# Paginación (reference/common/breaks.md). Área útil de 260 × 160 desde (20, 20).
+# Pagination (reference/common/breaks.md). Page area of 260 × 160 from (20, 20).
 #
-# Página 1: intro ocupa 0..100. title iría en 110..130 y text en 140, donde solo cabe una de sus
-#   6 líneas: partirlo deja huérfanas (calidad 2) y cortar antes de text incumple el avoid de
-#   title (calidad 1). Cortar antes de title no incumple nada (calidad 3): gana.
-# Página 2: title arriba, sin su margen superior (corte no forzado), y text entero en 30.
-#   grid tiene Before: page en su Break.
-# Página 3: filas de grid en 0..50, 60..110 y 120..170; caben las dos primeras.
-# Página 4: la tercera fila, sin el hueco que la separaba de la segunda, y end.
+# Page 1: intro takes 0..100. title would go at 110..130 and text at 140, where only one of its
+#   6 lines fits: splitting it leaves orphans (quality 2) and breaking before text violates the avoid of
+#   title (quality 1). Breaking before title violates nothing (quality 3): it wins.
+# Page 2: title at the top, without its top margin (unforced break), and text whole at 30.
+#   grid has Before: page in its Break.
+# Page 3: grid rows at 0..50, 60..110 and 120..170; the first two fit.
+# Page 4: the third row, without the gap that separated it from the second, and end.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

@@ -25,18 +25,18 @@ import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Orden de pintado (reference/common/box.md), visto por los colores de fondo que se pintan. */
+/** Painting order (reference/common/box.md), seen through the background colors that are painted. */
 class StackingContextTest {
 
     private static final DocumentReader READER = new DocumentReader();
 
-    /** Lienzo que solo apunta los colores de fondo, en orden. */
+    /** Canvas that only records the background colors, in order. */
     private static final class Recorder implements Canvas, Tagging {
         final List<String> backgrounds = new ArrayList<>();
         final List<Rect> rects = new ArrayList<>();
-        /** Fondos y textos en el orden en que se pintan. */
+        /** Backgrounds and texts in the order they are painted. */
         final List<String> events = new ArrayList<>();
-        /** Cada texto con su tamaño y su interletraje: {@code 'texto' tamaño/interletraje}. */
+        /** Each text with its size and its letter spacing: {@code 'text' size/spacing}. */
         final List<String> drawn = new ArrayList<>();
 
         @Override
@@ -46,7 +46,7 @@ class StackingContextTest {
             events.add("background " + color);
         }
 
-        /** Las esquinas de cada fondo y de cada borde, {@code rx/ry} de las cuatro esquinas desde arriba a la izquierda. */
+        /** The corners of each background and each border, {@code rx/ry} of the four corners from the top left. */
         final List<String> fillRadii = new ArrayList<>();
         final List<String> borderRadii = new ArrayList<>();
         final List<Sides<String>> borderColors = new ArrayList<>();
@@ -82,7 +82,7 @@ class StackingContextTest {
             drawn.add("'" + text + "' " + fontSize + "/" + letterSpacing);
         }
 
-        /** Las zonas clicables: destino, zona y lo que dicen. */
+        /** The clickable areas: destination, area and what they say. */
         final List<String> links = new ArrayList<>();
 
         @Override
@@ -92,19 +92,19 @@ class StackingContextTest {
         }
 
         /**
-         * Las secuencias de texto: {@code [texto} o {@code [enlace}, los tramos que pinta y {@code ]}; dentro, lo que
-         * lleva {@code ActualText} entre {@code (actual 'texto'} y {@code )}.
+         * The text sequences: {@code [text} or {@code [link}, the runs it paints and {@code ]}; inside, what carries
+         * {@code ActualText} between {@code (actual 'text'} and {@code )}.
          */
         final List<String> sequences = new ArrayList<>();
 
         @Override
         public void beginText(Box box) {
-            sequences.add("[texto");
+            sequences.add("[text");
         }
 
         @Override
         public void beginLinkText(Box box) {
-            sequences.add("[enlace");
+            sequences.add("[link");
         }
 
         @Override
@@ -169,7 +169,7 @@ class StackingContextTest {
                 r.bottomLeft().rx(), r.bottomLeft().ry());
     }
 
-    /** Lo que se pinta en la página {@code index} de un documento de 100 × 100 con márgenes de 10 (área útil de 80). */
+    /** What is painted on page {@code index} of a 100 × 100 document with margins of 10 (page area of 80). */
     private static Recorder recordSmallPage(int index, String... boxLines) {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 100\n\t\tHeight: 100\n\t\tMargin: 10\n"
                 + String.join("\n", boxLines);
@@ -179,7 +179,7 @@ class StackingContextTest {
         return canvas;
     }
 
-    /** La fuente base, para los documentos con texto. */
+    /** The base font, for documents with text. */
     private static final String FONT = "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
             + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10";
 
@@ -200,7 +200,7 @@ class StackingContextTest {
         return canvas;
     }
 
-    /** La {@code absolute} cuelga del fragmento de su containing block, detrás de la {@code relative}. */
+    /** The {@code absolute} hangs from the fragment of its reference container, behind the {@code relative}. */
     @Test
     void absoluteBeforeLaterRelative() {
         List<String> order = paint(
@@ -221,7 +221,7 @@ class StackingContextTest {
         assertEquals(List.of("#000", "#111", "#222"), order);
     }
 
-    /** Las {@code fixed} se añaden al contexto raíz al final, pero se pintan en su sitio. */
+    /** The {@code fixed} ones are added to the root context at the end, but are painted in their place. */
     @Test
     void fixedInDocumentOrder() {
         List<String> order = paint(
@@ -240,9 +240,9 @@ class StackingContextTest {
     }
 
     /**
-     * La línea entre columnas va con el fondo del {@code Columns}, y solo entre columnas con
-     * contenido: tres columnas de 165 con huecos de 10 y dos bloques, una sola línea, centrada en
-     * el primer hueco y con el alto de la columna más alta.
+     * The rule between columns goes with the background of the {@code Columns}, and only between columns with
+     * content: three columns of 165 with gaps of 10 and two blocks, a single rule, centered in
+     * the first gap and with the height of the tallest column.
      */
     @Test
     void separatorBetweenColumnsWithContent() {
@@ -266,7 +266,7 @@ class StackingContextTest {
     }
 
     /**
-     * Cada tramo con su fuente; el subrayado antes del texto y el tachado después
+     * Each run with its font; the underline before the text and the strikethrough after it
      * (reference/common/text-formatting.md).
      */
     @Test
@@ -276,13 +276,13 @@ class StackingContextTest {
                 "\tText: uno dos tres", "\t\tId: T");
         assertEquals(List.of("background #112233", "text 'uno ' normal", "text 'dos' bold", "text ' tres' normal",
                 "background #112233"), r.events);
-        // Línea de 12 pt desde y = 40: línea base en 40 + (12 − 10) / 2 + 8 = 49 (aproximación del SVG).
+        // Line of 12 pt from y = 40: baseline at 40 + (12 − 10) / 2 + 8 = 49 (SVG approximation).
         assertEquals(new Rect(40, 50, 20, 0.6).toString(), round(r.rects.get(0)).toString());
         assertEquals(new Rect(60, 45.9, 15, 0.6).toString(), round(r.rects.get(1)).toString());
     }
 
     /**
-     * Las versalitas se pintan al 80 % del tamaño y el interletraje llega al lienzo (reference/common/typography.md).
+     * Small caps are painted at 80% of the size and letter spacing reaches the canvas (reference/common/typography.md).
      */
     @Test
     void smallCapsAreSmallerAndLetterSpacingIsPassedOn() {
@@ -293,8 +293,8 @@ class StackingContextTest {
     }
 
     /**
-     * Una caja con {@code Link} es clicable entera; su zona sigue a su propio texto (que el {@code Link} envuelve) y
-     * precede al de sus hijos, que se pintan después (reference/common/links.md).
+     * A box with {@code Link} is clickable as a whole; its area follows its own text (which the {@code Link} wraps) and
+     * precedes that of its children, which are painted afterwards (reference/common/links.md).
      */
     @Test
     void aBoxWithLinkIsClickableWholeAndBeforeItsChildren() {
@@ -306,7 +306,7 @@ class StackingContextTest {
     }
 
     /**
-     * Un tramo con enlace es una zona del alto de la línea; los seguidos con el mismo destino, una sola
+     * A run with a link is an area as tall as the line; consecutive ones with the same destination, a single one
      * (reference/common/links.md).
      */
     @Test
@@ -315,18 +315,18 @@ class StackingContextTest {
                         link(" tres", "", "https://a.example"), link(" cuatro", "u", "mailto:a@b.c"))),
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: uno dos tres cuatro", "\t\tId: T");
-        // "uno " son 20 pt; "dos tres" (8 caracteres, 40 pt) es una zona; " cuatro" (35 pt), otra.
+        // "uno " is 20 pt; "dos tres" (8 characters, 40 pt) is one area; " cuatro" (35 pt), another.
         assertEquals(List.of("https://a.example " + new Rect(60, 40, 40, 12) + " dos tres",
                 "mailto:a@b.c " + new Rect(100, 40, 35, 12) + "  cuatro"), r.links);
-        // Cada zona se emite dentro de la secuencia de su enlace, antes de su texto; el resto, una secuencia aparte.
+        // Each area is emitted inside the sequence of its link, before its text; the rest, a separate sequence.
         assertEquals(List.of("text 'uno ' normal", "link https://a.example", "text 'dos' bold", "text ' tres' normal",
                 "link mailto:a@b.c", "text ' cuatro' normal"), r.events.stream()
                 .filter(e -> e.startsWith("link") || e.startsWith("text")).toList());
-        assertEquals(List.of("[texto", "'uno '", "]", "[enlace", "'dos'", "' tres'", "]", "[enlace", "' cuatro'", "]"),
+        assertEquals(List.of("[text", "'uno '", "]", "[link", "'dos'", "' tres'", "]", "[link", "' cuatro'", "]"),
                 r.sequences);
     }
 
-    /** Un enlace que ocupa varias líneas tiene una zona en cada una. */
+    /** A link that spans several lines has an area on each one. */
     @Test
     void aLinkOverSeveralLinesHasAZoneInEach() {
         Recorder r = record(Map.of("T", List.of(link("aaaa bbbb cccc dddd", "", "https://a.example"))),
@@ -337,26 +337,26 @@ class StackingContextTest {
                 "https://a.example " + new Rect(40, 52, 20, 12) + " bbbb",
                 "https://a.example " + new Rect(40, 64, 20, 12) + " cccc",
                 "https://a.example " + new Rect(40, 76, 20, 12) + " dddd"), r.links);
-        // Pero es un solo contenido: una secuencia de enlace para las cuatro líneas.
-        assertEquals(List.of("[enlace", "'aaaa '", "'bbbb '", "'cccc '", "'dddd'", "]"), r.sequences);
+        // But it is a single content: one link sequence for the four lines.
+        assertEquals(List.of("[link", "'aaaa '", "'bbbb '", "'cccc '", "'dddd'", "]"), r.sequences);
     }
 
     /**
-     * Las líneas que no son la última del fragmento llevan un espacio invisible tras la última palabra (el corte
-     * se lo come), para que el texto de las líneas unido no pegue palabras; la última y el texto preformateado,
-     * no (reference/common/text-formatting.md).
+     * The lines that are not the last of the fragment carry an invisible space after the last word (the break
+     * swallows it), so that the joined text of the lines does not glue words together; the last one and preformatted
+     * text do not (reference/common/text-formatting.md).
      */
     @Test
     void aWrappedLineEndsWithASpaceExceptTheLastAndPreformatted() {
         String[] head = {"\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 10", "\tBlock:", "\t\tBox:", "\t\t\tWidth: 30"};
         Recorder normal = record(concat(head, "\t\tText: aaaa bbbb cccc"));
-        assertEquals(List.of("[texto", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
+        assertEquals(List.of("[text", "'aaaa '", "'bbbb '", "'cccc'", "]"), normal.sequences);
         Recorder pre = record(concat(head, "\t\tText: aaaa", "\t\t\tTypography:", "\t\t\t\tPreformatted: wrap"));
-        assertEquals(List.of("[texto", "'aaaa'", "]"), pre.sequences);
+        assertEquals(List.of("[text", "'aaaa'", "]"), pre.sequences);
         Recorder preWrapped = record(concat(head, "\t\tText: aaaa bbbb", "\t\t\tTypography:",
                 "\t\t\t\tPreformatted: wrap"));
-        assertEquals(List.of("[texto", "'aaaa'", "'bbbb'", "]"), preWrapped.sequences);
+        assertEquals(List.of("[text", "'aaaa'", "'bbbb'", "]"), preWrapped.sequences);
     }
 
     private static String[] concat(String[] a, String... b) {
@@ -365,27 +365,27 @@ class StackingContextTest {
         return out;
     }
 
-    /** El texto propio de una caja con {@code Link} va antes que su zona (el {@code Link} lo envuelve). */
+    /** The own text of a box with {@code Link} goes before its area (the {@code Link} wraps it). */
     @Test
     void theOwnTextOfALinkedBoxPrecedesItsZone() {
         Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: uno dos", "\t\tLink: https://a.example");
         assertEquals(List.of("text 'uno dos' normal", "link https://a.example"), r.events);
-        assertEquals(List.of("[texto", "'uno dos'", "]"), r.sequences);
+        assertEquals(List.of("[text", "'uno dos'", "]"), r.sequences);
     }
 
-    /** Un enlace seguido de más texto en la misma línea parte el texto en tres secuencias, en orden. */
+    /** A link followed by more text on the same line splits the text into three sequences, in order. */
     @Test
     void textAroundALinkIsOtherSequences() {
         Recorder r = record(Map.of("T", List.of(run("ver "), link("la web", "", "https://a.example"), run(" hoy"))),
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ver la web hoy", "\t\tId: T");
-        assertEquals(List.of("[texto", "'ver '", "]", "[enlace", "'la web'", "]", "[texto", "' hoy'", "]"), r.sequences);
+        assertEquals(List.of("[text", "'ver '", "]", "[link", "'la web'", "]", "[text", "' hoy'", "]"), r.sequences);
     }
 
     /**
-     * Con interletraje, los tramos seguidos de una línea con el mismo enlace llevan un solo {@code ActualText}, con
-     * el espacio invisible del final de la línea si llegan a él (reference/implementation/pdf.md).
+     * With letter spacing, consecutive runs of a line with the same link carry a single {@code ActualText}, with
+     * the invisible space at the end of the line if they reach it (reference/implementation/pdf.md).
      */
     @Test
     void letterSpacedRunsShareOneActualTextPerLinkSequenceAndLine() {
@@ -394,9 +394,9 @@ class StackingContextTest {
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ver la web hoy y mañana", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 90",
                 "\t\tTypography:", "\t\t\tLetter spacing: 1");
-        assertEquals(List.of("[texto", "(actual 'ver la '", "'ver '", "'la'", "' '", ")", "]",
-                "[enlace", "(actual 'web'", "'web'", ")", "]",
-                "[texto", "(actual ' hoy '", "' hoy '", ")", "(actual 'y mañana'", "'y mañana'", ")", "]"), r.sequences);
+        assertEquals(List.of("[text", "(actual 'ver la '", "'ver '", "'la'", "' '", ")", "]",
+                "[link", "(actual 'web'", "'web'", ")", "]",
+                "[text", "(actual ' hoy '", "' hoy '", ")", "(actual 'y mañana'", "'y mañana'", ")", "]"), r.sequences);
     }
 
     @Test
@@ -406,15 +406,15 @@ class StackingContextTest {
     }
 
     /**
-     * {@code Corner radius} es de la caja de borde; el fondo, dentro del borde, pierde su grosor; la imagen, el borde y
-     * el relleno.
+     * {@code Corner radius} belongs to the border box; the background, inside the border, loses its width; the image,
+     * the border and the padding.
      */
     @Test
     void radiusRoundsTheBorderBoxAndTheInnerBoxesLoseTheBorder() {
         Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 50", "\t\t\tCorner radius: 10",
                 "\t\t\tBorder: 2", "\t\t\tBackground: #CCC");
         assertEquals(List.of("8/8 8/8 8/8 8/8"), r.fillRadii);
-        // El primer borde es el de la raíz del documento.
+        // The first border is the one of the document root.
         assertEquals("10/10 10/10 10/10 10/10", r.borderRadii.get(r.borderRadii.size() - 1));
     }
 
@@ -428,7 +428,7 @@ class StackingContextTest {
     void imagesAreClippedWithTheRadiiOfTheirContentBox() {
         Recorder r = record("\tImage: test/wide.png", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 50",
                 "\t\t\tCorner radius: 50%", "\t\t\tBorder: 5", "\t\t\tPadding: 5");
-        // Radio de 25 menos 5 de borde y 5 de relleno.
+        // Radius of 25 minus 5 of border and 5 of padding.
         assertEquals(List.of("15/15 15/15 15/15 15/15"), r.imageRadii);
         assertEquals("25/25 25/25 25/25 25/25", r.borderRadii.get(r.borderRadii.size() - 1));
     }
@@ -452,13 +452,13 @@ class StackingContextTest {
     void gradientsAreHandedToTheCanvasWhole() {
         Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tHeight: 50", "\t\t\tBackground: linear(90, #000, #FFF)");
         assertEquals(List.of(new Paint.Linear(90, List.of("#000", "#FFF"))), r.fills);
-        // Un degradado no es un color liso: no pasa por background.
+        // A gradient is not a solid color: it does not go through background.
         assertEquals(List.of(), r.backgrounds);
     }
 
     /**
-     * La franja de una fila se pinta debajo de sus celdas: su fondo va antes que los de ellas, y su borde con el color
-     * del texto de la fila (reference/components/table.md#filas).
+     * The band of a row is painted below its cells: its background goes before theirs, and its border with the color
+     * of the text of the row (reference/components/table.md#rows).
      */
     @Test
     void theBandOfARowIsPaintedUnderItsCells() {
@@ -470,7 +470,10 @@ class StackingContextTest {
         assertEquals(List.of("background #EEE", "background #111", "background #222"), r.events);
     }
 
-    /** Una caja partida con {@code slice} solo redondea las esquinas de arriba en el primer fragmento y las de abajo en el último. */
+    /**
+     * A box split with {@code slice} only rounds the top corners in the first fragment and the bottom ones in the
+     * last.
+     */
     @Test
     void aSlicedBoxRoundsOnlyItsOuterCorners() {
         String[] box = {"\tBlock:", "\t\tBox:", "\t\t\tHeight: 120", "\t\t\tCorner radius: 6", "\t\t\tBackground: #CCC"};
@@ -495,8 +498,9 @@ class StackingContextTest {
     }
 
     /**
-     * Un posicionado girado se pinta girado con todo lo que contiene, también un {@code Overlay} de dentro, alrededor
-     * de su origen (reference/common/layers-and-rotation.md); una {@code Image} en flujo, sobre su centro y en sus dos pasos.
+     * A rotated positioned element is painted rotated with everything it contains, also an {@code Overlay} inside,
+     * around its origin (reference/common/layers-and-rotation.md); an in-flow {@code Image}, around its center and in
+     * its two steps.
      */
     @Test
     void rotatedBoxesWrapEverythingTheyPaint() {
@@ -508,9 +512,9 @@ class StackingContextTest {
                 "\t\t\t\tBackground: #222",
                 "\tImage: test/square.png", "\t\tRotate: 45", "\t\tBox:", "\t\t\tBackground: #333",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
-        // Primero el flujo (la imagen de 30 × 30 ocupa el cuadrado que la envuelve, de 42,43 de lado, en (40, 140), con
-        // su centro en (61,2, 161,2), girada en el paso de los fondos y en el del contenido) y después el posicionado:
-        // cada paso suyo y de lo que contiene (también el Overlay), girado.
+        // First the flow (the 30 × 30 image takes the square that encloses it, 42.43 a side, at (40, 140), with its
+        // center at (61.2, 161.2), rotated in the backgrounds step and in the content step) and then the positioned
+        // element: each step of its own and of what it contains (also the Overlay), rotated.
         String turn = "rotate 8 40.0 40.0";
         assertEquals(List.of("rotate 45 61.2 161.2", "background #333", "end rotate", "background #444",
                 "rotate 45 61.2 161.2", "image", "end rotate",
@@ -519,8 +523,8 @@ class StackingContextTest {
     }
 
     /**
-     * Un {@code Block} girado en flujo: sus descendientes se pintan en los pasos del contexto que lo contiene, cada uno
-     * con el giro del bloque, y el {@code Overlay} de dentro, que lo tiene de contenedor de referencia, también
+     * A rotated in-flow {@code Block}: its descendants are painted in the steps of the context that contains it, each
+     * with the rotation of the block, and so is the {@code Overlay} inside, which has it as reference container
      * (reference/common/layers-and-rotation.md).
      */
     @Test
@@ -532,7 +536,7 @@ class StackingContextTest {
                 "\t\tOverlay:", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10",
                 "\t\t\t\tBackground: #777",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #888");
-        // El bloque de 100 × 20 ocupa, girado, 20 × 100 en (40, 40): su centro es (50, 90).
+        // The 100 × 20 block takes, rotated, 20 × 100 at (40, 40): its center is (50, 90).
         String rotate = "rotate 90 50.0 90.0";
         assertEquals(List.of(rotate, "background #555", "end rotate", rotate, "background #666", "end rotate",
                 "background #888", rotate, "end rotate", rotate, "end rotate",
@@ -540,8 +544,8 @@ class StackingContextTest {
     }
 
     /**
-     * Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los fondos, los bordes y las
-     * imágenes de su flujo, también de un {@code Frame}, pero no su texto ni un {@code Overlay}
+     * A box with rounded corners clips, along the curve of its padding box, the backgrounds, borders and images of its
+     * flow, also those of a {@code Frame}, but not its text or an {@code Overlay}
      * (reference/common/box.md).
      */
     @Test
@@ -553,10 +557,10 @@ class StackingContextTest {
                 "\t\tFrame:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
                 "\t\tOverlay:", "\t\t\tOffset: -5 -5 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
                 "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #333");
-        // La caja de relleno: la de borde (en 40, 40, de 100 de ancho y con 22 de contenido) menos el borde de 2, con
-        // radios de 10.
+        // The padding box: the border box (at 40, 40, 100 wide and with 22 of content) minus the border of 2, with
+        // radii of 10.
         String clip = "clip 42 42 96 22 10/10 10/10 10/10 10/10";
-        // El texto se pinta sin recorte, y el Overlay, que asoma por la esquina, tampoco se recorta.
+        // The text is painted without clipping, and the Overlay, which sticks out at the corner, is not clipped either.
         assertEquals(List.of("background #000", clip, "background #111", "end clip", "text 'hola' normal",
                 clip, "background #222", "end clip", "background #333"),
                 r.events.stream().filter(e -> !e.startsWith("background #FFF")).toList());
@@ -569,7 +573,7 @@ class StackingContextTest {
         assertTrue(r.events.stream().noneMatch(e -> e.startsWith("clip")), r.events.toString());
     }
 
-    /** Una imagen dentro de una caja redondeada se recorta por la curva; su texto alternativo no cambia nada. */
+    /** An image inside a rounded box is clipped along the curve; its alternative text changes nothing. */
     @Test
     void anImageInsideARoundedBoxIsClipped() {
         Recorder r = record("\tBlock:", "\t\tBox:", "\t\t\tCorner radius: 8", "\t\tImage: test/wide.png", "\t\t\tBox:",

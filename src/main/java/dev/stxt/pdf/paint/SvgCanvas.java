@@ -30,20 +30,20 @@ import java.util.Base64;
 import java.util.Locale;
 
 /**
- * Salida SVG para depurar (hito 2): una página por fichero, en pt. Si {@code debug} está
- * activo, dibuja además el contorno de cada caja de borde.
+ * SVG output for debugging (milestone 2): one page per file, in pt. If {@code debug} is
+ * on, it also draws the outline of each border box.
  *
- * <p>No incrusta las fuentes: el visor usa las suyas, y la línea base es la aproximada
- * ({@link dev.stxt.pdf.model.VerticalMetrics#APPROXIMATE}). Las imágenes (reference/components/image.md) van
- * incrustadas ({@code data:}) si se le da la carpeta de recursos; si no, solo se ve su caja.</p>
+ * <p>It does not embed the fonts: the viewer uses its own, and the baseline is the approximate one
+ * ({@link dev.stxt.pdf.model.VerticalMetrics#APPROXIMATE}). Images (reference/components/image.md) are
+ * embedded ({@code data:}) if it is given the resources folder; otherwise, only their box is visible.</p>
  */
 public final class SvgCanvas implements Canvas {
 
     private final StringBuilder svg = new StringBuilder();
     private final boolean debug;
-    /** Número del próximo degradado o recorte, para dar nombre a sus {@code id}. */
+    /** Number of the next gradient or clip, to name their {@code id}. */
     private int ids;
-    /** Carpeta de las imágenes; {@code null} = no se pintan. */
+    /** Folder of the images; {@code null} = they are not painted. */
     private final Resources resources;
 
     public SvgCanvas(boolean debug) {
@@ -55,12 +55,12 @@ public final class SvgCanvas implements Canvas {
         this.resources = resources;
     }
 
-    /** SVG completo de una página, del tamaño del medio, sin imágenes. */
+    /** Complete SVG of a page, of the size of the paper, without images. */
     public static String page(Page page, PageSetup pageSetup, boolean debug) {
         return page(page, pageSetup, debug, null);
     }
 
-    /** SVG completo de una página, del tamaño del medio, con las imágenes de {@code resources}. */
+    /** Complete SVG of a page, of the size of the paper, with the images of {@code resources}. */
     public static String page(Page page, PageSetup pageSetup, boolean debug, Resources resources) {
         double height = pageSetup.height();
         SvgCanvas c = new SvgCanvas(debug, resources);
@@ -72,7 +72,7 @@ public final class SvgCanvas implements Canvas {
                 pageSetup.width(), height, pageSetup.width(), height, c.svg);
     }
 
-    /** Un grupo {@code <g>} con el giro, que se cierra en {@link #endRotation()}. */
+    /** A {@code <g>} group with the rotation, closed in {@link #endRotation()}. */
     @Override
     public void beginRotation(double degrees, double x, double y) {
         svg.append(String.format(Locale.ROOT, "<g transform=\"rotate(%s %.2f %.2f)\">\n", number(degrees), x, y));
@@ -83,7 +83,7 @@ public final class SvgCanvas implements Canvas {
         svg.append("</g>\n");
     }
 
-    /** Un grupo {@code <g>} con un {@code clipPath}, que se cierra en {@link #endClip()}. */
+    /** A {@code <g>} group with a {@code clipPath}, closed in {@link #endClip()}. */
     @Override
     public void beginClip(Rect r, Radii radii) {
         String id = "c" + ids++;
@@ -96,7 +96,7 @@ public final class SvgCanvas implements Canvas {
         svg.append("</g>\n");
     }
 
-    /** Un número sin ceros de más: {@code -8}, {@code 12.5}. */
+    /** A number without extra zeros: {@code -8}, {@code 12.5}. */
     private static String number(double v) {
         return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v);
     }
@@ -110,8 +110,8 @@ public final class SvgCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Un {@code <rect>} si es liso y cuadrado; si no, un camino. El degradado es un
-     * {@code linearGradient} en coordenadas de la página, con la opacidad de cada color.</p>
+     * <p>A {@code <rect>} if it is plain and square; otherwise, a path. The gradient is a
+     * {@code linearGradient} in page coordinates, with the opacity of each color.</p>
      */
     @Override
     public void fill(Rect r, Radii radii, Paint paint) {
@@ -131,7 +131,7 @@ public final class SvgCanvas implements Canvas {
         svg.append("<path d=\"").append(path(r, radii)).append('"').append(attributes).append("/>\n");
     }
 
-    /** Define el degradado y devuelve su {@code id}. */
+    /** Defines the gradient and returns its {@code id}. */
     private String gradient(Paint.Linear linear, Rect box) {
         String id = "g" + ids++;
         double[] line = linear.line(box);
@@ -148,7 +148,7 @@ public final class SvgCanvas implements Canvas {
         return id;
     }
 
-    /** {@code fill="…"} de un color, con {@code fill-opacity} si no es opaco. */
+    /** {@code fill="..."} of a color, with {@code fill-opacity} if it is not opaque. */
     private static String fillAttr(String color) {
         if (!Colors.isTranslucent(color) && color.length() <= 7) {
             return " fill=\"" + color + "\"";
@@ -158,7 +158,7 @@ public final class SvgCanvas implements Canvas {
                 Math.round(c[0] * 255), Math.round(c[1] * 255), Math.round(c[2] * 255), c[3]);
     }
 
-    /** El camino ({@code d}) del rectángulo con sus esquinas. */
+    /** The path ({@code d}) of the rectangle with its corners. */
     private static String path(Rect r, Radii radii) {
         StringBuilder d = new StringBuilder();
         Shapes.roundedRect(pathWriter(d), r, radii);
@@ -192,8 +192,8 @@ public final class SvgCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Un anillo (camino de relleno par-impar) del color de los lados; con colores distintos,
-     * uno por lado, recortado al trapecio de ese lado ({@link Shapes#sidePolygon}).</p>
+     * <p>A ring (even-odd fill path) in the color of the sides; with different colors,
+     * one per side, clipped to the trapezoid of that side ({@link Shapes#sidePolygon}).</p>
      */
     @Override
     public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
@@ -234,19 +234,19 @@ public final class SvgCanvas implements Canvas {
         }
     }
 
-    /** El SVG de depuración solo dibuja: no marca el texto ni crea enlaces. */
+    /** The debugging SVG only draws: it neither marks the text nor creates links. */
     @Override
     public Tagging tagging() {
         return Tagging.NONE;
     }
 
-    /** Sin la fuente: la aproximación 0,8/0,2 del tamaño. */
+    /** Without the font: the approximation 0.8/0.2 of the size. */
     @Override
     public VerticalMetrics vertical(FontFace font) {
         return VerticalMetrics.APPROXIMATE;
     }
 
-    /** Sin la fuente: la aproximación de las rayas. */
+    /** Without the font: the approximation of the lines. */
     @Override
     public DecorationMetrics decoration(FontFace font) {
         return DecorationMetrics.APPROXIMATE;
@@ -271,7 +271,7 @@ public final class SvgCanvas implements Canvas {
                      double wordSpacing, double letterSpacing) {
         String spacing = (wordSpacing == 0 ? "" : String.format(Locale.ROOT, " word-spacing=\"%.2f\"", wordSpacing))
                 + (letterSpacing == 0 ? "" : String.format(Locale.ROOT, " letter-spacing=\"%.2f\"", letterSpacing));
-        // Un SVG colapsa los espacios: el texto preformateado necesita conservarlos.
+        // An SVG collapses spaces: preformatted text needs to keep them.
         if (text.contains("  ") || text.startsWith(" ") || text.endsWith(" ")) {
             spacing += " xml:space=\"preserve\"";
         }
@@ -285,9 +285,9 @@ public final class SvgCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Un {@code <svg>} anidado del tamaño de la caja de contenido recorta la imagen, que va
-     * dentro sin conservar su proporción: la colocación ya la da {@link ImageFit}. Un navegador no dibuja un PDF dentro
-     * de un SVG: la página va como PNG, a 144 píxeles por pulgada.</p>
+     * <p>A nested {@code <svg>} of the size of the content box clips the image, which goes
+     * inside without keeping its proportion: {@link ImageFit} already gives the placement. A browser does not draw a
+     * PDF inside an SVG: the page goes as a PNG, at 144 pixels per inch.</p>
      */
     @Override
     public void image(Box box, Rect content, Radii radii) {
@@ -326,7 +326,7 @@ public final class SvgCanvas implements Canvas {
         }
     }
 
-    /** La página {@code number} (desde 1) de un PDF, dibujada en un PNG. */
+    /** Page {@code number} (from 1) of a PDF, drawn into a PNG. */
     private static byte[] pageAsPng(ImageFile file, int number) throws IOException {
         try (PDDocument doc = Loader.loadPDF(file.path().toFile())) {
             ByteArrayOutputStream png = new ByteArrayOutputStream();

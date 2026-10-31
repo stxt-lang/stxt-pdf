@@ -3,15 +3,13 @@ package dev.stxt.pdf.tree;
 import java.util.Map;
 
 /**
- * Claves de las propiedades en {@link Style#declared}, {@link Style#isDeclared} y
- * {@link Style#line}: el nombre canónico de la propiedad ({@code min-width}); las de
- * {@code Stack}, {@code Grid} e {@code Item} (o {@code Area}), con prefijo ({@code grid.rows}),
- * porque el mismo nombre está en varios; y las de {@code Typography} y {@code Break} con nombre
- * corto, con su nombre interno ({@code Size} es {@code font-size}).
+ * Keys of the properties in {@link Style#declared}, {@link Style#isDeclared} and {@link Style#line}: the canonical name
+ * of the property ({@code min-width}); those of {@code Stack}, {@code Grid} and {@code Item} (or {@code Area}), with a
+ * prefix ({@code grid.rows}), because the same name is in several; and those of {@code Typography} and {@code Break}
+ * with a short name, with their internal name ({@code Size} is {@code font-size}).
  *
- * <p>Las que el código consulta por su nombre están aquí como constantes, para que un error
- * tipográfico no compile; {@code PropertyKeyTest} comprueba que cada una es una propiedad del
- * schema en su sitio.</p>
+ * <p>The ones the code looks up by name are here as constants, so that a typo does not compile;
+ * {@code PropertyKeyTest} checks that each one is a property of the schema in its place.</p>
  */
 public final class PropertyKey {
 
@@ -36,7 +34,7 @@ public final class PropertyKey {
     public static final String COLOR = "color";
     public static final String CODE_FONT = "code-font";
 
-    // Propiedades de los elementos
+    // Properties of the elements
     public static final String OFFSET = "offset";
     public static final String LAYER = "layer";
     public static final String ROTATE = "rotate";
@@ -59,7 +57,7 @@ public final class PropertyKey {
     public static final String KEEP_TOGETHER = "keep-together";
     public static final String DECORATION = "edges";
 
-    // Stack, Grid e Item
+    // Stack, Grid and Item
     public static final String STACK_HORIZONTAL = "stack.horizontal";
     public static final String STACK_VERTICAL = "stack.vertical";
     public static final String STACK_LINE_DISTRIBUTION = "stack.line-distribution";
@@ -70,12 +68,11 @@ public final class PropertyKey {
     public static final String ITEM_BASE_SIZE = "item.base-size";
     public static final String ITEM_HORIZONTAL = "item.horizontal";
     public static final String ITEM_VERTICAL = "item.vertical";
-    /** La colocación de un ítem de grid: el valor de su {@code Area}, o la que calcula una {@code Table}. */
+    /** The placement of a grid item: the value of its {@code Area}, or the one a {@code Table} computes. */
     public static final String ITEM_AREA = "item.area";
 
     /**
-     * Nombre interno de cada propiedad de {@code Typography} y {@code Break} cuyo nombre en el
-     * documento es corto.
+     * Internal name of each property of {@code Typography} and {@code Break} whose name in the document is short.
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "bold", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
@@ -84,22 +81,22 @@ public final class PropertyKey {
     private PropertyKey() {
     }
 
-    /** Clave de una propiedad de {@code Typography} o {@code Break} por su nombre canónico ({@code size}). */
+    /** Key of a property of {@code Typography} or {@code Break} by its canonical name ({@code size}). */
     static String internal(String canonicalName) {
         return INTERNAL.getOrDefault(canonicalName, canonicalName);
     }
 
-    /** Clave de una propiedad de {@code Stack} ({@code gap} → {@code stack.gap}). */
+    /** Key of a property of {@code Stack} ({@code gap} → {@code stack.gap}). */
     static String stack(String canonicalName) {
         return "stack." + canonicalName;
     }
 
-    /** Clave de una propiedad de {@code Grid} ({@code rows} → {@code grid.rows}). */
+    /** Key of a property of {@code Grid} ({@code rows} → {@code grid.rows}). */
     static String grid(String canonicalName) {
         return "grid." + canonicalName;
     }
 
-    /** Clave de una propiedad de {@code Item} o {@code Area} ({@code grow} → {@code item.grow}). */
+    /** Key of a property of {@code Item} or {@code Area} ({@code grow} → {@code item.grow}). */
     static String item(String canonicalName) {
         return "item." + canonicalName;
     }

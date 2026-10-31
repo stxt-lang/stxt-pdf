@@ -1,9 +1,9 @@
-# Boletín mensual de unos pueblos, de dos páginas con aire de periódico: cabecera de portada,
-# noticia principal con una foto recortada (Fit: fill), artículos a tres columnas con filete y
-# cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
-# una rejilla. El cuerpo es Markdown dentro de Columns. La cabecera de portada es un bloque de la
-# primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
-# minúscula y se ponen en mayúsculas con Case, a veces con interletraje (Letter spacing).
+# Two-page monthly newsletter of a few villages, with a newspaper look: front-page masthead,
+# main story with a cropped photo (Fit: fill), three-column articles with a rule and
+# balanced breaks, text with a photo beside it, a calendar in a table and classified ads in
+# a grid. The body is Markdown inside Columns. The front-page masthead is a block of the
+# first page; the following ones carry a fixed running head (Pages: not-first). The labels are written in
+# lowercase and put in uppercase with Case, sometimes with letter spacing (Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

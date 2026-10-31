@@ -17,7 +17,7 @@ class ListMarkersTest {
 
     private Locale previous;
 
-    /** La numeración no depende del idioma de la JVM: en turco, {@code "i".toUpperCase()} es {@code İ}. */
+    /** Numbering does not depend on the language of the JVM: in Turkish, {@code "i".toUpperCase()} is {@code İ}. */
     @BeforeEach
     void turkishJvm() {
         previous = Locale.getDefault();

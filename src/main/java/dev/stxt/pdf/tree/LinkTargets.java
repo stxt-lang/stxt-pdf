@@ -6,10 +6,10 @@ import dev.stxt.pdf.model.TextFormat;
 import java.util.Map;
 
 /**
- * Los enlaces del árbol a otras cajas ({@code #id}, reference/common/links.md): comprueba que cada
- * uno señala una caja con ese {@code Id} y que tiene un único sitio al que llevar. La sintaxis del
- * destino y su esquema se comprueban al leerlo; esto necesita el árbol entero, porque un enlace
- * puede ir hacia delante. Los enlaces a una URL de fuera no se comprueban más.
+ * The links of the tree to other boxes ({@code #id}, reference/common/links.md): checks that each
+ * one points to a box with that {@code Id} and that it has a single place to lead to. The syntax of the
+ * target and its scheme are checked when it is read; this needs the whole tree, because a link
+ * can point forward. Links to an outside URL are not checked any further.
  */
 final class LinkTargets {
 
@@ -17,10 +17,10 @@ final class LinkTargets {
     }
 
     /**
-     * Comprueba los enlaces internos de la caja y de sus descendientes: los de {@code Link} y los
-     * de los tramos de su texto.
+     * Checks the internal links of the box and of its descendants: those of {@code Link} and those
+     * of the runs of its text.
      *
-     * @throws InvalidModelException con la línea del {@code Link} o, en un tramo, la de su texto
+     * @throws InvalidModelException with the line of the {@code Link} or, in a run, that of its text
      */
     static void validate(Box root) {
         Map<String, Box> boxes = References.byId(root);
@@ -48,12 +48,12 @@ final class LinkTargets {
         String id = Links.target(destination);
         Box target = boxes.get(id);
         if (target == null) {
-            throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "El enlace " + destination
-                    + " lleva a un Id que no existe: ninguna caja tiene el Id " + id);
+            throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "The link " + destination
+                    + " leads to an Id that does not exist: no box has the Id " + id);
         }
         if (References.insidePageOverlay(target)) {
-            throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "El enlace " + destination + " lleva a "
-                    + id + ", que está en un Page overlay y se repite en todas las páginas: no tiene un único destino");
+            throw new InvalidModelException(line, ErrorCode.LINK_UNKNOWN, "The link " + destination + " leads to "
+                    + id + ", which is in a Page overlay and is repeated on all the pages: it has no single target");
         }
     }
 }

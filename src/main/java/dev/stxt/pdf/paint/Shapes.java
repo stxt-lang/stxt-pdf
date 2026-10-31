@@ -5,19 +5,19 @@ import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 
 /**
- * Las formas que pintan los lienzos (reference/common/box.md): un rectángulo de esquinas
- * redondeadas y los cuatro trapecios en que se reparte un borde. Se describen como un camino que
- * cada lienzo dibuja a su manera ({@link Path}), para que el PDF y el SVG pinten lo mismo.
+ * The shapes the canvases paint (reference/common/box.md): a rectangle with rounded
+ * corners and the four trapezoids a border is split into. They are described as a path that
+ * each canvas draws its own way ({@link Path}), so that the PDF and the SVG paint the same.
  */
 final class Shapes {
 
-    /** Aproximación de un cuarto de elipse con una curva de Bézier cúbica. */
+    /** Approximation of a quarter ellipse with a cubic Bézier curve. */
     private static final double KAPPA = 0.5522847498307936;
 
     private Shapes() {
     }
 
-    /** Dónde se dibuja un camino, en coordenadas de la página (origen arriba a la izquierda). */
+    /** Where a path is drawn, in page coordinates (origin at the top left). */
     interface Path {
         void moveTo(double x, double y);
 
@@ -27,7 +27,7 @@ final class Shapes {
 
         void close();
 
-        /** Un rectángulo, que algunos lienzos escriben con su operador propio. Por defecto, cuatro líneas. */
+        /** A rectangle, which some canvases write with their own operator. By default, four lines. */
         default void rect(double x, double y, double width, double height) {
             moveTo(x, y);
             lineTo(x + width, y);
@@ -37,10 +37,10 @@ final class Shapes {
         }
     }
 
-    /** Un lado de la caja, para repartir el borde. */
+    /** A side of the box, to split the border. */
     enum Side { TOP, RIGHT, BOTTOM, LEFT }
 
-    /** El rectángulo {@code r} con las esquinas {@code radii}, en el sentido de las agujas del reloj. */
+    /** The rectangle {@code r} with the corners {@code radii}, clockwise. */
     static void roundedRect(Path target, Rect r, Radii radii) {
         if (radii.isSquare()) {
             target.rect(r.x(), r.y(), r.width(), r.height());
@@ -67,7 +67,7 @@ final class Shapes {
         path.close();
     }
 
-    /** Un camino que no repite el punto en que ya está: una esquina cuadrada no añade una línea de largo 0. */
+    /** A path that does not repeat the point it is already at: a square corner adds no line of length 0. */
     private static final class Pen implements Path {
         private final Path target;
         private double x;
@@ -107,8 +107,8 @@ final class Shapes {
     }
 
     /**
-     * Un cuarto de elipse de ({@code fromX}, {@code fromY}) a ({@code toX}, {@code toY}); si
-     * {@code horizontalFirst}, sale en horizontal (arriba a la derecha y abajo a la izquierda).
+     * A quarter ellipse from ({@code fromX}, {@code fromY}) to ({@code toX}, {@code toY}); if
+     * {@code horizontalFirst}, it leaves horizontally (top right and bottom left).
      */
     private static void corner(Path path, double fromX, double fromY, double toX, double toY,
                                boolean horizontalFirst, Radii.Corner c) {
@@ -128,15 +128,15 @@ final class Shapes {
     }
 
     /**
-     * La parte del borde que corresponde a un lado: el trapecio que une las esquinas de la caja de
-     * borde con las de la caja de relleno, de modo que dos lados con distinto color se encuentran
-     * en la diagonal de la esquina, como en CSS. Con el anillo del borde como relleno y este
-     * trapecio como recorte, queda el trozo del lado.
+     * The part of the border that belongs to a side: the trapezoid that joins the corners of the border
+     * box with those of the padding box, so that two sides with different colors meet
+     * at the diagonal of the corner, as in CSS. With the ring of the border as fill and this
+     * trapezoid as clip, the piece of the side remains.
      *
-     * <p>Con las esquinas de dentro redondeadas, el anillo entra en la caja de relleno (entre la
-     * curva y su esquina), así que cada diagonal sigue hacia dentro más allá de la esquina de
-     * relleno, lo que cubre la curva de {@code inner} ({@code Radii.inset} del borde). Los dos
-     * lados de una esquina comparten esa diagonal, así que no se solapan ni dejan hueco.</p>
+     * <p>With rounded inner corners, the ring enters the padding box (between the
+     * curve and its corner), so each diagonal continues inwards beyond the padding
+     * corner, which covers the curve of {@code inner} ({@code Radii.inset} of the border). The two
+     * sides of a corner share that diagonal, so they neither overlap nor leave a gap.</p>
      */
     static void sidePolygon(Path path, Side side, Rect outer, Insets widths, Radii inner) {
         double ox0 = outer.x();
@@ -160,9 +160,9 @@ final class Shapes {
     }
 
     /**
-     * El punto de la diagonal de una esquina, en la dirección ({@code dx}, {@code dy}) desde su
-     * esquina de relleno ({@code x}, {@code y}), que está más adentro que la curva de {@code c}: el
-     * doble del mayor de sus radios. Sin curva, la propia esquina.
+     * The point of the diagonal of a corner, in the direction ({@code dx}, {@code dy}) from its
+     * padding corner ({@code x}, {@code y}), that lies further in than the curve of {@code c}: twice
+     * the larger of its radii. Without a curve, the corner itself.
      */
     private static double[] inward(double x, double y, double dx, double dy, Radii.Corner c) {
         double length = Math.hypot(dx, dy);

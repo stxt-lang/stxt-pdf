@@ -1,0 +1,13 @@
+# Case: Keep together in an Image
+# Code: BREAK_IN_IMAGE
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/wide.png
+			Break:
+				Keep together: true

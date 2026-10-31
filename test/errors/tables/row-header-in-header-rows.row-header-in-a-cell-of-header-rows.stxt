@@ -1,0 +1,26 @@
+# Case: Row header in a cell of Header rows, which is already a column header
+# Code: ROW_HEADER_IN_HEADER_ROWS
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: 100 100
+			Header rows:
+				Row:
+					Cell: Concepto
+						Row header: true
+					Cell: Importe
+			Body:
+				Row:
+					Cell: Mesa
+					Cell: 120

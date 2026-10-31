@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * {@code Case}: las mayúsculas del texto (reference/common/text-formatting.md): {@code none}, {@code uppercase},
- * {@code lowercase} o {@code capitalize}.
+ * {@code Case}: the capitalization of the text (reference/common/text-formatting.md): {@code none}, {@code uppercase},
+ * {@code lowercase} or {@code capitalize}.
  */
 public enum TextCase { NONE, UPPERCASE, LOWERCASE, CAPITALIZE }

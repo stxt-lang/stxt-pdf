@@ -1,8 +1,8 @@
-# Currículum de una diseñadora de producto. Una página A4 sin márgenes: un grid de dos columnas
-# a página completa, con una barra lateral de color (foto, contacto, herramientas con barras
-# de nivel e idiomas) y el cuerpo con perfil, cifras, experiencia en línea de tiempo y formación.
-# Los párrafos y un logro llevan Markup: markdown para la negrita y la cursiva dentro de la frase. Los
-# rótulos de las secciones se escriben en minúscula y las reglas los ponen en mayúsculas (Case).
+# Resume of a product designer. One A4 page without margins: a two-column grid over
+# the full page, with a colored sidebar (photo, contact, tools with level bars
+# and languages) and the body with profile, key figures, experience as a timeline and education.
+# The paragraphs and one achievement carry Markup: markdown for the bold and italics inside the sentence. The
+# section labels are written in lowercase and the rules put them in uppercase (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

@@ -1,0 +1,13 @@
+# Case: A seven-digit color is neither RGBA nor RRGGBBAA
+# Code: VALUE_SYNTAX
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Background: #1234567

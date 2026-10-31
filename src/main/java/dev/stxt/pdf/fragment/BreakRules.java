@@ -11,14 +11,14 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Reglas de corte (reference/common/breaks.md): viudas y huérfanas, calidad de los cortes entre
- * cajas, cortes forzados y elección del corte. Son piezas puras; los algoritmos de layout las
- * usan para decidir dónde se parte cada caja.
+ * Break rules (reference/common/breaks.md): widows and orphans, quality of the breaks between
+ * boxes, forced breaks and choice of the break. They are pure pieces; the layout algorithms
+ * use them to decide where each box is broken.
  *
- * <p>La calidad de un corte es una de las constantes de {@link BreakAppeal}: mayor es mejor.
- * Se elige el <strong>último</strong> corte de mayor calidad, que es lo mismo que relajar las
- * reglas en el orden de la referencia (reference/common/breaks.md): primero viudas y huérfanas, después
- * {@code Keep with next} y {@code Keep with previous}, y por último {@code Keep together} (de {@code Break}).</p>
+ * <p>The quality of a break is one of the constants of {@link BreakAppeal}: higher is better.
+ * The <strong>last</strong> break of highest quality is chosen, which is the same as relaxing the
+ * rules in the order of the reference (reference/common/breaks.md): first widows and orphans, then
+ * {@code Keep with next} and {@code Keep with previous}, and last {@code Keep together} (of {@code Break}).</p>
  */
 public final class BreakRules {
 
@@ -26,14 +26,14 @@ public final class BreakRules {
     }
 
     /**
-     * Cuántas líneas de un párrafo colocar en el espacio disponible.
+     * How many lines of a paragraph to place in the available space.
      *
-     * @param pending               líneas que quedan por colocar
-     * @param capacity              líneas que caben en lo que queda de fragmentainer
-     * @param widows                mínimo de líneas que deben pasar al siguiente
-     * @param orphans               mínimo de líneas que deben quedar en este
-     * @param atFragmentainerStart  si estamos al principio de una página (garantía de progreso)
-     * @return líneas a colocar aquí; 0 significa "mover todo el párrafo al siguiente"
+     * @param pending               lines left to place
+     * @param capacity              lines that fit in what is left of the fragmentainer
+     * @param widows                minimum number of lines that must move to the next one
+     * @param orphans               minimum number of lines that must stay in this one
+     * @param atFragmentainerStart  whether we are at the top of a page (progress guarantee)
+     * @return lines to place here; 0 means "move the whole paragraph to the next one"
      */
     public static int linesThatFit(int pending, int capacity, int widows, int orphans,
                                    boolean atFragmentainerStart) {
@@ -48,19 +48,19 @@ public final class BreakRules {
             k = 0;
         }
         if (k <= 0 && atFragmentainerStart) {
-            // Garantía de progreso: al principio de página siempre se coloca algo,
-            // relajando viudas y huérfanas.
+            // Progress guarantee: at the top of a page something is always placed,
+            // relaxing widows and orphans.
             k = Math.max(1, Math.min(capacity, pending));
         }
         return Math.max(k, 0);
     }
 
     /**
-     * Líneas a colocar cuando ningún corte respeta viudas y huérfanas, pero el padre puede
-     * preferir partir el párrafo a separar dos cajas que se mantienen juntas: se respetan las viudas
-     * si se puede (y se incumplen las huérfanas) y, si no, se llena el espacio.
+     * Lines to place when no break respects widows and orphans, but the parent may
+     * prefer to break the paragraph rather than separate two boxes that are kept together: widows are respected
+     * if possible (and orphans are violated) and, if not, the space is filled.
      *
-     * @return entre 1 y {@code capacity}; requiere {@code 0 < capacity < pending}
+     * @return between 1 and {@code capacity}; requires {@code 0 < capacity < pending}
      */
     public static int relaxedLines(int pending, int capacity, int widows) {
         int keepingWidows = pending - widows;
@@ -68,15 +68,15 @@ public final class BreakRules {
     }
 
     /**
-     * Corte entre las líneas de un texto, que es un solo párrafo: las que caben desde {@code start}, respetando viudas
-     * y huérfanas. Si ningún corte respeta las reglas, se incumplen ({@link #relaxedLines}) para que el padre pueda
-     * comparar ese corte con cortar antes de la caja.
+     * Break between the lines of a text, which is a single paragraph: those that fit from {@code start}, respecting
+     * widows and orphans. If no break respects the rules, they are violated ({@link #relaxedLines}) so that the parent
+     * can compare that break with breaking before the box.
      *
-     * @param lines    líneas del texto
-     * @param start    primera línea de este fragmento
-     * @param capacity líneas que caben en lo que queda de página
-     * @return primera línea que pasa al fragmento siguiente (igual a {@code start} si no se
-     *         coloca ninguna: cortar antes de la caja) y la calidad del corte
+     * @param lines    lines of the text
+     * @param start    first line of this fragment
+     * @param capacity lines that fit in what is left of the page
+     * @return first line that moves to the next fragment (equal to {@code start} if none is
+     *         placed: break before the box) and the quality of the break
      */
     public static Cut cutLines(int lines, int start, int capacity, int widows, int orphans,
                                boolean atFragmentainerStart) {
@@ -91,11 +91,11 @@ public final class BreakRules {
         if (capacity > 0) {
             return new Cut(start + relaxedLines(pending, capacity, widows), BreakAppeal.VIOLATES_WIDOWS);
         }
-        // No cabe ni una línea: al principio de página se coloca igualmente (garantía de progreso).
+        // Not even one line fits: at the top of a page it is placed anyway (progress guarantee).
         return new Cut(atFragmentainerStart ? start + 1 : start, BreakAppeal.FORCED);
     }
 
-    /** Capacidad en líneas de un espacio vertical. */
+    /** Capacity in lines of a vertical space. */
     public static int capacity(double space, double lineHeight) {
         if (Double.isInfinite(space)) {
             return Integer.MAX_VALUE;
@@ -106,11 +106,11 @@ public final class BreakRules {
         return (int) Math.floor((space + EPSILON) / lineHeight);
     }
 
-    // --- Cortes entre cajas -----------------------------------------------------------------------
+    // --- Breaks between boxes ---------------------------------------------------------------------
 
     /**
-     * Calidad del corte entre dos cajas hermanas en flujo: {@code Keep with next} en la primera o {@code Keep with
-     * previous} en la segunda lo empeoran.
+     * Quality of the break between two in-flow sibling boxes: {@code Keep with next} on the first or {@code Keep with
+     * previous} on the second make it worse.
      */
     public static int between(Box before, Box after) {
         return before.style().breaks().keepWithNext() || after.style().breaks().keepWithPrevious()
@@ -118,21 +118,21 @@ public final class BreakRules {
     }
 
     /**
-     * El corte forzado entre dos cajas hermanas en flujo: {@code PAGE}, {@code COLUMN} (solo
-     * dentro de un {@code Columns}) o {@code AUTO} si no hay ninguno. Si hay de los dos, gana el
-     * de página.
+     * The forced break between two in-flow sibling boxes: {@code PAGE}, {@code COLUMN} (only
+     * inside a {@code Columns}) or {@code AUTO} if there is none. If there are both, the page
+     * break wins.
      */
     public static Break forcedBetween(Box before, Box after) {
         return stronger(forcedAfter(before), forcedBefore(after));
     }
 
     /**
-     * El corte forzado antes de la caja ({@code Before} de {@code Break}) o, si es un bloque, de
-     * su primer hijo en flujo: como en CSS, el corte forzado del primer hijo se propaga al padre,
-     * porque los dos empiezan en el mismo punto. De un {@code Columns} solo sale el de página:
-     * el de columna se queda en su primera columna.
+     * The forced break before the box ({@code Before} of {@code Break}) or, if it is a block, before
+     * its first in-flow child: as in CSS, the forced break of the first child propagates to the parent,
+     * because both start at the same point. Only the page break comes out of a {@code Columns}:
+     * the column break stays in its first column.
      *
-     * @return {@code PAGE}, {@code COLUMN} o {@code AUTO}
+     * @return {@code PAGE}, {@code COLUMN} or {@code AUTO}
      */
     public static Break forcedBefore(Box box) {
         Break own = forced(box.style().breaks().before());
@@ -140,7 +140,7 @@ public final class BreakRules {
         return children.isEmpty() ? own : stronger(own, fromInside(box, forcedBefore(children.get(0))));
     }
 
-    /** El corte forzado después de la caja o, si es un bloque, de su último hijo en flujo (ver {@link #forcedBefore}). */
+    /** The forced break after the box or, if it is a block, after its last in-flow child ({@link #forcedBefore}). */
     public static Break forcedAfter(Box box) {
         Break own = forced(box.style().breaks().after());
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
@@ -148,25 +148,25 @@ public final class BreakRules {
                 : stronger(own, fromInside(box, forcedAfter(children.get(children.size() - 1))));
     }
 
-    /** Si hay corte forzado: {@code PAGE} o {@code COLUMN}. */
+    /** Whether there is a forced break: {@code PAGE} or {@code COLUMN}. */
     public static boolean isForced(Break forced) {
         return forced == Break.PAGE || forced == Break.COLUMN;
     }
 
     /**
-     * Calidad de un corte forzado: {@link BreakAppeal#FORCED_PAGE} el de página, que debe salir
-     * de las columnas, y {@link BreakAppeal#PERFECT_BREAK} el de columna.
+     * Quality of a forced break: {@link BreakAppeal#FORCED_PAGE} for a page break, which must get out
+     * of the columns, and {@link BreakAppeal#PERFECT_BREAK} for a column break.
      */
     public static int forcedAppeal(Break forced) {
         return forced == Break.PAGE ? BreakAppeal.FORCED_PAGE : BreakAppeal.PERFECT_BREAK;
     }
 
-    /** Los cortes forzados de un bloque y de un {@code Columns} son también los de sus hijos de los extremos. */
+    /** The forced breaks of a block and of a {@code Columns} are also those of their first and last children. */
     private static boolean propagates(Box box) {
         return box.style().layout() == Layout.BLOCK || box.style().layout() == Layout.COLUMNS;
     }
 
-    /** El corte forzado de un hijo de los extremos que sale de la caja: de un {@code Columns}, solo el de página. */
+    /** The forced break of a first or last child that leaves the box: from a {@code Columns}, only page breaks. */
     private static Break fromInside(Box box, Break forced) {
         return box.style().layout() == Layout.COLUMNS && forced == Break.COLUMN ? Break.AUTO : forced;
     }
@@ -183,11 +183,11 @@ public final class BreakRules {
     }
 
     /**
-     * Calidad del corte entre dos grupos de cajas, como dos líneas stack o dos filas de una
-     * rejilla: el peor de todos los pares.
+     * Quality of the break between two groups of boxes, such as two stack lines or two rows of a
+     * grid: the worst of all the pairs.
      *
-     * @param before cajas que acaban antes del corte
-     * @param after  cajas que empiezan después
+     * @param before boxes that end before the break
+     * @param after  boxes that start after it
      */
     public static int between(List<Box> before, List<Box> after) {
         int appeal = BreakAppeal.PERFECT_BREAK;
@@ -199,7 +199,7 @@ public final class BreakRules {
         return appeal;
     }
 
-    /** El corte forzado entre dos grupos de cajas (ver {@link #between(List, List)} y {@link #forcedBetween(Box, Box)}). */
+    /** The forced break between two groups of boxes (as {@link #between(List, List)} and {@link #forcedBetween}). */
     public static Break forcedBetween(List<Box> before, List<Box> after) {
         Break forced = Break.AUTO;
         for (Box b : before) {
@@ -211,18 +211,18 @@ public final class BreakRules {
         return forced;
     }
 
-    /** Calidad de un corte dentro de una caja: {@code Keep together} lo deja en {@link BreakAppeal#FORCED}. */
+    /** Quality of a break inside a box: {@code Keep together} lowers it to {@link BreakAppeal#FORCED}. */
     public static int inside(Box box, int appeal) {
         return box.style().breaks().keepTogether() ? BreakAppeal.FORCED : appeal;
     }
 
-    // --- Elección del corte -----------------------------------------------------------------------
+    // --- Choice of the break ----------------------------------------------------------------------
 
     /**
-     * El último de los cortes de mayor calidad; {@code null} si no hay ninguno.
+     * The last of the breaks of highest quality; {@code null} if there is none.
      *
-     * @param candidates cortes posibles, en orden
-     * @param appeal     calidad de cada corte (constantes de {@link BreakAppeal})
+     * @param candidates possible breaks, in order
+     * @param appeal     quality of each break (constants of {@link BreakAppeal})
      */
     public static <T> T best(List<T> candidates, ToIntFunction<T> appeal) {
         T best = null;
@@ -235,23 +235,23 @@ public final class BreakRules {
     }
 
     /**
-     * Resultado de {@link #cutUnits}.
+     * Result of {@link #cutUnits}.
      *
-     * @param end    primera unidad que pasa al siguiente fragmento; igual al número de unidades si
-     *               caben todas, e igual a la primera si no cabe ninguna (cortar antes de la caja)
-     * @param appeal calidad del corte
+     * @param end    first unit that moves to the next fragment; equal to the number of units if
+     *               all fit, and equal to the first if none fits (break before the box)
+     * @param appeal quality of the break
      */
     public record Cut(int end, int appeal) {
     }
 
     /**
-     * Corte entre unidades que no se parten ({@link Unit}). Las posiciones son las del layout sin
-     * fragmentar, desde el principio de la caja de contenido.
+     * Break between units that are not broken ({@link Unit}). The positions are those of the unfragmented
+     * layout, from the start of the content box.
      *
-     * @param units     las unidades del contenedor
-     * @param first     primera unidad de este fragmento
-     * @param space     alto disponible desde el principio de la unidad {@code first}
-     * @param mustPlace garantía de progreso: hay que colocar al menos una unidad aunque desborde
+     * @param units     the units of the container
+     * @param first     first unit of this fragment
+     * @param space     height available from the start of unit {@code first}
+     * @param mustPlace progress guarantee: at least one unit has to be placed even if it overflows
      */
     public static Cut cutUnits(List<Unit> units, int first, double space, boolean mustPlace) {
         int n = units.size();
@@ -269,7 +269,7 @@ public final class BreakRules {
                 }
                 if (u.breakableBefore()) {
                     if (overflowing) {
-                        // Se ha colocado a la fuerza lo que no se podía separar: se corta en cuanto se puede.
+                        // What could not be separated was placed by force: break as soon as possible.
                         return new Cut(i, BreakAppeal.FORCED);
                     }
                     if (best < 0 || u.appealBefore() >= units.get(best).appealBefore()) {

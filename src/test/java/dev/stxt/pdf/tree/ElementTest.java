@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@link Element} y el schema dicen lo mismo: el schema es la única definición de la estructura,
- * así que un elemento nuevo en él falla aquí hasta que se añade al enum.
+ * {@link Element} and the schema say the same: the schema is the only definition of the structure,
+ * so a new element in it fails here until it is added to the enum.
  */
 class ElementTest {
 
     /**
-     * Los elementos de caja del schema son los nodos que admiten {@code Style} e {@code Id}, salvo la {@code Row}:
-     * admite {@code Style} e {@code Id} para sus celdas y su franja, pero no es un elemento que se maquete.
+     * The box elements of the schema are the nodes that allow {@code Style} and {@code Id}, except {@code Row}: it
+     * allows {@code Style} and {@code Id} for its cells and its band, but it is not an element that is laid out.
      */
     @Test
     void writtenElementsAreTheBoxElementsOfTheSchema() {
@@ -32,7 +32,7 @@ class ElementTest {
         assertEquals(schema, Element.written().stream().map(Element::label).collect(Collectors.toSet()));
     }
 
-    /** Los que pueden ser un ítem son los elementos que admite {@code Item}, y los mismos que {@code Area}. */
+    /** The ones that can be an item are the elements that {@code Item} allows, and the same as {@code Area}. */
     @Test
     void itemElementsAreTheElementsOfItemAndArea() {
         Set<String> expected = Element.written().stream().filter(Element::canBeItem).map(Element::label)
@@ -52,20 +52,20 @@ class ElementTest {
         }
         assertEquals(Optional.of(Element.LIST_ITEM), Element.of("list-item"));
         assertEquals(Optional.of(Element.HEADING_3), Element.of("heading-3"));
-        // El marcador es generado y Marker es una propiedad de List: no es un elemento.
+        // The marker is generated and Marker is a property of List: it is not an element.
         assertTrue(Element.of("marker").isEmpty());
         assertTrue(Element.of("item").isEmpty());
-        // El flujo de columnas de un Columns es generado y no tiene nombre: "columns" es el propio Columns.
+        // The column flow of a Columns is generated and has no name: "columns" is the Columns itself.
         assertEquals(Optional.of(Element.COLUMNS), Element.of("columns"));
-        // Generados: el marcador, la franja de una fila, el flujo de columnas, el bloque de código de un Markdown y,
-        // del índice, seis entradas, el título, la guía y el número de página.
+        // Generated: the marker, the band of a row, the column flow, the code block of a Markdown and, from the table
+        // of contents, six entries, the title, the leader and the page number.
         assertEquals(Element.values().length - 13, Element.written().size());
-        // El bloque de código lo nombran las reglas For element, pero no se escribe.
+        // The code block is named by For element rules, but it is not written.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK));
         assertTrue(!Element.written().contains(Element.CODE_BLOCK));
         assertTrue(Element.CODE_BLOCK.hasText());
-        // Las entradas del índice las nombran las reglas For element, pero no se escriben.
+        // The table of contents entries are named by For element rules, but they are not written.
         assertEquals(Optional.of(Element.TOC_2), Element.of("toc-2"));
         assertEquals(Element.TOC_4, Element.tocEntry(4));
         assertTrue(Element.of("contents-title").isEmpty());

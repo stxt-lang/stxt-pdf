@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * {@code Edges} de {@code Break} (reference/common/breaks.md): el borde y el relleno de una caja partida, abiertos en
- * el corte ({@code open}) o cerrados en cada fragmento ({@code closed}).
+ * {@code Edges} of {@code Break} (reference/common/breaks.md): the border and the padding of a broken box, open at
+ * the break ({@code open}) or closed in each fragment ({@code closed}).
  */
 public enum Edges { OPEN, CLOSED }

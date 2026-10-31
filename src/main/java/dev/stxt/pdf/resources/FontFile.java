@@ -22,29 +22,29 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Un fichero TTF de la carpeta de fuentes, ya leído, con sus métricas (reference/common/resources.md).
+ * A TTF file of the fonts folder, already read, with its metrics (reference/common/resources.md).
  *
- * <p>Los anchos son los que escribe PDFBox en el PDF al incrustar la fuente (el avance de cada
- * glifo en milésimas del cuerpo, redondeado): así el texto mide al maquetar lo mismo que al
- * pintarlo. No se aplica el kerning. Con ligaduras (ver {@link #width(String, double, boolean)}) el texto
- * se mide con los mismos glifos que PDFBox escribe, porque se aplica la misma tabla GSUB.</p>
+ * <p>The widths are those PDFBox writes in the PDF when it embeds the font (the advance of each
+ * glyph in thousandths of the font size, rounded): this way the text measures the same when it is laid out as when it
+ * is painted. Kerning is not applied. With ligatures (see {@link #width(String, double, boolean)}) the text
+ * is measured with the same glyphs PDFBox writes, because the same GSUB table is applied.</p>
  *
- * <p>Es seguro entre hilos y no usa cerrojos al medir: al abrir la fuente se calcula el avance de
- * cada glifo y el de cada carácter se memoriza al pedirlo en una tabla de enteros, cuyas escrituras
- * son idempotentes (dos hilos escriben el mismo valor en la misma casilla, y un entero se escribe
- * entero).</p>
+ * <p>It is thread-safe and uses no locks when measuring: when the font is opened the advance of
+ * each glyph is computed, and that of each character is memoized on request in a table of integers, whose writes
+ * are idempotent (two threads write the same value in the same slot, and an integer is written
+ * whole).</p>
  *
- * <p>El fichero se lee una sola vez, al indexar la carpeta: {@link #content()} da esos bytes a quien incrusta
- * la fuente en el PDF o la carga en AWT para un SVG, y {@link #digest()} sale de ellos. Lo que se incrusta y se dibuja
- * es lo que se midió aunque el fichero cambie o desaparezca después.</p>
+ * <p>The file is read only once, when the folder is indexed: {@link #content()} gives those bytes to whoever embeds
+ * the font in the PDF or loads it into AWT for an SVG, and {@link #digest()} comes from them. What is embedded and
+ * drawn is what was measured even if the file changes or disappears later.</p>
  */
 public final class FontFile {
 
-    /** Los caracteres del plano básico, que tienen su tabla de avances. */
+    /** The characters of the Basic Multilingual Plane, which have their own table of advances. */
     private static final int BMP = 0x10000;
-    /** Palabras que se memorizan como mucho con ligaduras; al pasar de aquí se vacía la memoria. */
+    /** Maximum number of words memoized with ligatures; past this, the memo is cleared. */
     private static final int MAX_LIGATURE_WORDS = 50_000;
-    /** Avance aún sin calcular en {@link #bmpAdvance}. */
+    /** Advance not yet computed in {@link #bmpAdvance}. */
     private static final int UNKNOWN = -1;
     private static final byte HAS = 1;
     private static final byte LACKS = 2;
@@ -56,18 +56,18 @@ public final class FontFile {
     private final double unitsPerEm;
     private final VerticalMetrics vertical;
     private final DecorationMetrics decoration;
-    /** Avance de cada glifo en milésimas del cuerpo, redondeado como lo escribe PDFBox. */
+    /** Advance of each glyph in thousandths of the font size, rounded as PDFBox writes it. */
     private final int[] glyphAdvance;
-    /** Avance de cada carácter del plano básico, o {@link #UNKNOWN}. */
+    /** Advance of each character of the Basic Multilingual Plane, or {@link #UNKNOWN}. */
     private final int[] bmpAdvance = new int[BMP];
-    /** Si la fuente tiene un glifo para cada carácter del plano básico: 0 sin mirar, {@link #HAS} o {@link #LACKS}. */
+    /** Whether the font has a glyph for each character of the BMP: 0 not checked, {@link #HAS} or {@link #LACKS}. */
     private final byte[] bmpHas = new byte[BMP];
-    /** Las palabras que ya se han medido con ligaduras, con su ancho en milésimas: aplicar GSUB es caro. */
+    /** The words already measured with ligatures, with their width in thousandths: applying GSUB is expensive. */
     private final ConcurrentHashMap<String, Integer> ligatureWords = new ConcurrentHashMap<>();
-    /** Lo mismo que aplica PDFBox al pintar; {@code null} hasta que se pide y si la fuente no tiene GSUB. */
+    /** The same one PDFBox applies when painting; {@code null} until requested and if the font has no GSUB. */
     private volatile GsubWorker gsub;
     private volatile boolean gsubRead;
-    /** Ver {@link #digest()}; {@code null} hasta que se pide. */
+    /** See {@link #digest()}; {@code null} until requested. */
     private volatile String digest;
 
     FontFile(Path path, FontFace face, TrueTypeFont ttf) throws IOException {
@@ -98,9 +98,9 @@ public final class FontFile {
     }
 
     /**
-     * El contenido del fichero tal como se leyó al indexar la carpeta, sin volver a leerlo. Cada llamada da un flujo
-     * nuevo sobre los bytes que guarda fontbox, sin copiarlos ({@link TrueTypeFont#getOriginalData()}), así que se
-     * puede pedir desde varios hilos.
+     * The content of the file as it was read when the folder was indexed, without reading it again. Each call gives a
+     * new stream over the bytes fontbox keeps, without copying them ({@link TrueTypeFont#getOriginalData()}), so it
+     * can be requested from several threads.
      */
     public InputStream content() {
         try {
@@ -111,8 +111,9 @@ public final class FontFile {
     }
 
     /**
-     * La huella del contenido del fichero (SHA-256 en hexadecimal, en minúsculas): dos ficheros con los mismos bytes
-     * tienen la misma, estén donde estén, y dos distintos no. Se calcula la primera vez que se pide.
+     * The fingerprint of the content of the file (SHA-256 in lowercase hexadecimal): two files with the same bytes
+     * have the same one, wherever they are, and two different ones do not. It is computed the first time it is
+     * requested.
      */
     public String digest() {
         String value = digest;
@@ -122,28 +123,28 @@ public final class FontFile {
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             } catch (NoSuchAlgorithmException e) {
-                throw new IllegalStateException("La JVM no tiene SHA-256", e);
+                throw new IllegalStateException("The JVM has no SHA-256", e);
             }
-            // Dos hilos pueden calcularla a la vez: los dos escriben la misma cadena.
+            // Two threads may compute it at the same time: both write the same string.
             digest = value;
         }
         return value;
     }
 
-    /** Ascendente y descendente de la tabla {@code hhea}. */
+    /** Ascent and descent from the {@code hhea} table. */
     public VerticalMetrics vertical() {
         return vertical;
     }
 
-    /** Subrayado (tabla {@code post}) y tachado (tabla {@code OS/2}). */
+    /** Underline ({@code post} table) and strikeout ({@code OS/2} table). */
     public DecorationMetrics decoration() {
         return decoration;
     }
 
     /**
-     * Si la fuente tiene un glifo para el carácter. Los del plano básico se memorizan: se pregunta por cada carácter
-     * del documento antes de maquetar. Como {@link #bmpAdvance}, varios hilos pueden escribir la misma
-     * respuesta a la vez.
+     * Whether the font has a glyph for the character. Those of the Basic Multilingual Plane are memoized: every
+     * character of the document is asked about before layout. As with {@link #bmpAdvance}, several threads may write
+     * the same answer at the same time.
      */
     public boolean has(int codePoint) {
         if (codePoint >= BMP) {
@@ -157,16 +158,16 @@ public final class FontFile {
         return known == HAS;
     }
 
-    /** Ancho del texto en puntos, sin ligaduras. Los caracteres sin glifo miden lo que el glifo {@code .notdef}. */
+    /** Width of the text in points, without ligatures. Characters without a glyph measure like {@code .notdef}. */
     public double width(String text, double fontSize) {
         return width(text, fontSize, false);
     }
 
     /**
-     * Ancho del texto en puntos. Con {@code ligatures}, cada palabra (lo que hay entre dos espacios en blanco)
-     * se mide con los glifos que quedan después de aplicar la tabla GSUB de la fuente, que son los que
-     * PDFBox escribe al pintar: {@code fi} puede ser un solo glifo, de otro ancho. Una fuente sin GSUB, o
-     * una palabra con algún carácter sin glifo, se mide como siempre.
+     * Width of the text in points. With {@code ligatures}, each word (what lies between two white spaces)
+     * is measured with the glyphs left after applying the GSUB table of the font, which are the ones
+     * PDFBox writes when painting: {@code fi} can be a single glyph, of a different width. A font without GSUB, or
+     * a word with some character without a glyph, is measured as usual.
      */
     public double width(String text, double fontSize, boolean ligatures) {
         GsubWorker worker = ligatures ? ligatureWorker() : null;
@@ -188,12 +189,12 @@ public final class FontFile {
         return thousandths / 1000.0 * fontSize;
     }
 
-    /** Lo que PDFBox toma por espacio al partir el texto en palabras antes de aplicar GSUB ({@code \s}). */
+    /** What PDFBox takes as a space when splitting the text into words before applying GSUB ({@code \s}). */
     private static boolean isSpace(char c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r';
     }
 
-    /** El ancho de una palabra con las ligaduras de la fuente, en milésimas del cuerpo. */
+    /** The width of a word with the ligatures of the font, in thousandths of the font size. */
     private int ligatureWord(GsubWorker worker, String word) {
         Integer known = ligatureWords.get(word);
         if (known != null) {
@@ -224,7 +225,7 @@ public final class FontFile {
         return thousandths;
     }
 
-    /** El aplicador de GSUB de la fuente, o {@code null} si no tiene tabla GSUB. */
+    /** The GSUB worker of the font, or {@code null} if it has no GSUB table. */
     private GsubWorker ligatureWorker() {
         if (!gsubRead) {
             synchronized (this) {
@@ -243,7 +244,7 @@ public final class FontFile {
         return gsub;
     }
 
-    /** Avance de un carácter, en milésimas del cuerpo. */
+    /** Advance of a character, in thousandths of the font size. */
     private int advance(int codePoint) {
         if (codePoint >= BMP) {
             return glyphAdvance(cmap.getGlyphId(codePoint));
@@ -256,12 +257,12 @@ public final class FontFile {
         return advance;
     }
 
-    /** Avance de un glifo, en milésimas del cuerpo. */
+    /** Advance of a glyph, in thousandths of the font size. */
     private int glyphAdvance(int glyph) {
         if (glyph >= 0 && glyph < glyphAdvance.length) {
             return glyphAdvance[glyph];
         }
-        // Un glifo que no existe en la fuente: lo que contesta fontbox, que no se puede usar entre hilos.
+        // A glyph that does not exist in the font: whatever fontbox answers, which cannot be used across threads.
         synchronized (ttf) {
             try {
                 return (int) Math.round(ttf.getAdvanceWidth(glyph) * 1000 / unitsPerEm);

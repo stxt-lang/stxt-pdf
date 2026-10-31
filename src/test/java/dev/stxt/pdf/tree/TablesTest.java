@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Tablas al construir el árbol (reference/components/table.md): traducción a un grid, filas y celdas. */
+/** Tables when building the tree (reference/components/table.md): translation into a grid, rows and cells. */
 class TablesTest {
 
     private static Box root(String... lines) {
@@ -25,7 +25,7 @@ class TablesTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
     }
 
-    /** Colocación de cada celda como {@code fila columna filas columnas}. */
+    /** Placement of each cell as {@code row column rows columns}. */
     private static List<String> areas(Box table) {
         return table.children().stream().map(c -> c.style().item().area())
                 .map(a -> a.row() + " " + a.column() + " " + a.rows() + " " + a.columns()).toList();
@@ -52,7 +52,9 @@ class TablesTest {
         assertEquals("Ventas", cell.text().trim());
     }
 
-    /** {@code Row header} es de la celda, no se hereda y por defecto es falso (reference/components/table.md). */
+    /**
+     * {@code Row header} belongs to the cell, is not inherited and is false by default (reference/components/table.md).
+     */
     @Test
     void headerMarksTheRowHeaderCells() {
         Box table = root("\tTable:", "\t\tColumn sizes: 100 100",
@@ -112,15 +114,15 @@ class TablesTest {
         Box b = table.children().get(1);
         assertEquals("#333333", a.style().typography().color());
         assertEquals(FontWeight.BOLD, a.style().typography().fontWeight());
-        // La regla gana a lo heredado de la fila; lo propio de la celda, a los dos.
+        // The rule beats what is inherited from the row; the cell's own value beats both.
         assertEquals(8, a.style().typography().fontSize());
         assertEquals(Value.pt(3), a.style().box().padding().top());
         assertEquals(FontWeight.NORMAL, b.style().typography().fontWeight());
     }
 
     /**
-     * Una {@code Row} con {@code Id} o {@code Box} tiene su caja, que cuelga de la tabla sin ser su hija y sabe su fila
-     * (reference/components/table.md#filas); sin ninguno de los dos, no.
+     * A {@code Row} with {@code Id} or {@code Box} has its box, which hangs from the table without being its child and
+     * knows its row (reference/components/table.md#rows); with neither of the two, it does not.
      */
     @Test
     void aRowWithAnIdOrABoxHasItsOwnBox() {
@@ -141,10 +143,10 @@ class TablesTest {
         assertEquals(1, first.style().item().area().row());
         assertEquals(new Paint.Solid("#EEEEEE"), first.style().box().background());
         assertEquals(Value.pt(1), first.style().box().border().bottom());
-        // Su Typography es el de sus celdas y el suyo: el color de su borde por defecto.
+        // Its Typography is that of its cells and its own: the default color of its border.
         assertEquals("#C0392B", first.style().typography().color());
         assertEquals("#C0392B", table.children().get(0).style().typography().color());
-        // Su Box no llega a las celdas.
+        // Its Box does not reach the cells.
         assertNull(table.children().get(0).style().box().background());
         Box third = table.rows().get(1);
         assertNull(third.id());
@@ -152,8 +154,8 @@ class TablesTest {
     }
 
     /**
-     * El {@code For id} de una fila da estilo a sus celdas: más que las clases de la celda, menos que su propio
-     * {@code For id} (reference/components/table.md#estilo-de-las-celdas).
+     * The {@code For id} of a row styles its cells: more than the classes of the cell, less than its own
+     * {@code For id} (reference/components/table.md#cell-style).
      */
     @Test
     void theForIdOfARowStylesItsCells() {
@@ -174,7 +176,7 @@ class TablesTest {
                 () -> root("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBox:",
                         "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\t\tHeight: 40", "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.ROW_BOX, e.errorCode());
-        // La línea de Height.
+        // The line of Height.
         assertEquals(19, e.line());
     }
 

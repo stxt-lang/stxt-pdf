@@ -1,10 +1,10 @@
 package dev.stxt.pdf.tree;
 
 /**
- * Lo común a {@link Style} y a sus grupos de propiedades ({@link StackStyle}…): solo {@code tree} los
- * escribe, mientras {@link BoxTreeBuilder} construye el árbol, y se cierran con su caja ({@link Box#close}).
- * Escribir en uno cerrado es un {@code IllegalStateException}: después de construir el árbol, un estilo solo
- * se lee y se puede compartir entre hilos.
+ * What {@link Style} and its property groups ({@link StackStyle}...) have in common: only {@code tree} writes them,
+ * while {@link BoxTreeBuilder} builds the tree, and they are closed with their box ({@link Box#close}). Writing to a
+ * closed one is an {@code IllegalStateException}: after the tree is built, a style is only read and can be shared
+ * between threads.
  */
 abstract class StyleGroup {
 
@@ -14,10 +14,10 @@ abstract class StyleGroup {
         closed = true;
     }
 
-    /** Se llama antes de escribir una propiedad. */
+    /** Called before writing a property. */
     void writable() {
         if (closed) {
-            throw new IllegalStateException("El estilo ya está cerrado: el árbol no cambia después de construirlo");
+            throw new IllegalStateException("The style is already closed: the tree does not change after it is built");
         }
     }
 }

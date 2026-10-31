@@ -1,12 +1,12 @@
-# Tablas (reference/components/table.md). Área útil de 260 × 160 desde (20, 20).
+# Tables (reference/components/table.md). Page area of 260 × 160 from (20, 20).
 #
-# Columnas: 100 y * con 10 de hueco: 260 − 100 − 10 = 150, desde x = 130. Cada celda tiene
-# Padding 2 4: una línea mide 12 + 4 = 16, y la cabecera, con su borde inferior, 17. El pie
-# (16) ocupa las dos columnas. b8 tiene dos líneas (92 de ancho: caben 18 caracteres), 28, y
-# estira a b8v. La cabecera y el pie (33) se repiten en cada página.
-# Página 1: intro (40) deja 120 a la tabla y 87 al cuerpo: b1…b5 (80).
-# Página 2: 127 para el cuerpo: b6…b12 (16 × 6 + 28 = 124); b13 ya no cabe.
-# Página 3: b13 y b14, el pie detrás, y end.
+# Columns: 100 and * with a gap of 10: 260 − 100 − 10 = 150, from x = 130. Each cell has
+# Padding 2 4: a line measures 12 + 4 = 16, and the header, with its bottom border, 17. The footer
+# (16) spans both columns. b8 has two lines (92 wide: 18 characters fit), 28, and
+# stretches b8v. The header and the footer (33) repeat on every page.
+# Page 1: intro (40) leaves 120 to the table and 87 to the body: b1...b5 (80).
+# Page 2: 127 for the body: b6...b12 (16 × 6 + 28 = 124); b13 no longer fits.
+# Page 3: b13 and b14, the footer after them, and end.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

@@ -1,0 +1,22 @@
+# Case: Malformed Span
+# Code: VALUE_SYNTAX
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Body:
+				Row:
+					Cell: a
+						Span: 2
+					Cell: b

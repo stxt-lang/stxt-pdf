@@ -1,0 +1,14 @@
+# Case: Frame from top and bottom
+# Code: OFFSET_CONFLICT
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Frame:
+			Offset: 5 auto 9 auto
+			Box:
+				Height: 10

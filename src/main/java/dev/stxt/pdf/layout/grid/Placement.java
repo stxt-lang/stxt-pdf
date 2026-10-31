@@ -8,32 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Colocación de ítems en la rejilla (reference/components/grid.md).
+ * Placement of items in the grid (reference/components/grid.md).
  *
  * <ol>
- *   <li>Los ítems con fila y columna explícitas se colocan primero.</li>
- *   <li>El resto, en orden del árbol, con un cursor que recorre la rejilla por filas y solo
- *       avanza (modo disperso): pueden quedar huecos atrás.</li>
- *   <li>Si un ítem no cabe en las filas existentes, se crean filas implícitas.</li>
+ *   <li>The items with explicit row and column are placed first.</li>
+ *   <li>The rest, in tree order, with a cursor that walks the grid by rows and only
+ *       moves forward (sparse mode): gaps may be left behind.</li>
+ *   <li>If an item does not fit in the existing rows, implicit rows are created.</li>
  * </ol>
  *
- * <p>Un ítem con la fila fija y la columna automática va a la primera columna libre de esa fila,
- * sin mover el cursor; si no queda ninguna, no hay colocación ({@link NoRoom}): la fila no crece. Con
- * la columna fija y la fila automática, va a la primera fila libre desde el cursor.</p>
+ * <p>An item with a fixed row and an automatic column goes to the first free column of that row,
+ * without moving the cursor; if none is left, there is no placement ({@link NoRoom}): the row does not grow. With
+ * a fixed column and an automatic row, it goes to the first free row from the cursor.</p>
  *
- * <p>{@code Flow: vertical} es el mismo algoritmo con los ejes intercambiados: se trasponen la
- * rejilla y las celdas, se coloca por filas y se deshace la trasposición.</p>
+ * <p>{@code Flow: vertical} is the same algorithm with the axes swapped: the grid and the cells are
+ * transposed, the placement goes by rows and the transposition is undone.</p>
  */
 public final class Placement {
 
     private Placement() {
     }
 
-    /** Lo que da la colocación: el área de cada ítem o el primero que no cabe. */
+    /** What the placement gives: the area of each item or the first one that does not fit. */
     public sealed interface Result permits Placed, NoRoom {
     }
 
-    /** @param areas el área asignada a cada ítem, en el orden de las celdas */
+    /** @param areas the area assigned to each item, in the order of the cells */
     public record Placed(List<Area> areas) implements Result {
         public Placed {
             areas = List.copyOf(areas);
@@ -41,23 +41,23 @@ public final class Placement {
     }
 
     /**
-     * Un ítem con la fila fija (la columna, con {@code Flow: vertical}) no cabe en ella.
+     * An item with a fixed row (the column, with {@code Flow: vertical}) does not fit in it.
      *
-     * @param item   índice del ítem
-     * @param track  la fila (o la columna) que pide
-     * @param span   columnas (o filas) que ocupa
-     * @param tracks columnas (o filas) de la rejilla
+     * @param item   index of the item
+     * @param track  the row (or the column) it asks for
+     * @param span   columns (or rows) it occupies
+     * @param tracks columns (or rows) of the grid
      */
     public record NoRoom(int item, int track, int span, int tracks) implements Result {
     }
 
     /**
-     * @param cells   celdas pedidas, en orden del árbol
-     * @param columns columnas de la rejilla explícita
-     * @param rows    filas de la rejilla explícita (solo cuentan con {@code Flow: vertical})
-     * @param flow    dirección de la colocación automática
-     * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija (la
-     *         columna, en {@code column}) no cabe en ella
+     * @param cells   requested cells, in tree order
+     * @param columns columns of the explicit grid
+     * @param rows    rows of the explicit grid (they only count with {@code Flow: vertical})
+     * @param flow    direction of the automatic placement
+     * @return the area assigned to each item, in the same order, or {@link NoRoom} if an item with a fixed row (the
+     *         column, in {@code column}) does not fit in it
      */
     public static Result place(List<Cell> cells, int columns, int rows, Direction flow) {
         if (flow == Direction.HORIZONTAL) {
@@ -76,10 +76,10 @@ public final class Placement {
     }
 
     /**
-     * @param cells   celdas pedidas, en orden del árbol
-     * @param columns columnas de la rejilla explícita
-     * @return el área asignada a cada ítem, en el mismo orden, o {@link NoRoom} si un ítem con la fila fija no
-     *         cabe en ella
+     * @param cells   requested cells, in tree order
+     * @param columns columns of the explicit grid
+     * @return the area assigned to each item, in the same order, or {@link NoRoom} if an item with a fixed row does
+     *         not fit in it
      */
     public static Result place(List<Cell> cells, int columns) {
         int cols = Math.max(1, columns);
@@ -106,7 +106,7 @@ public final class Placement {
                 continue;
             }
             if (c.row() != null) {
-                // Fila fija: primera columna libre de esa fila.
+                // Fixed row: first free column of that row.
                 int col = 1;
                 while (col + c.columns() - 1 <= cols && !occupancy.isFree(c.row(), col, c.rows(), c.columns())) {
                     col++;
@@ -116,7 +116,7 @@ public final class Placement {
                 }
                 result[i] = new Area(c.row(), col, c.rows(), c.columns());
             } else if (c.column() != null) {
-                // Columna fija: desde la fila del cursor hacia abajo.
+                // Fixed column: from the cursor row downwards.
                 int row = cursorRow;
                 if (c.column() < cursorColumn) {
                     row++;
@@ -128,7 +128,7 @@ public final class Placement {
                 cursorRow = row;
                 cursorColumn = c.column() + c.columns();
             } else {
-                // Totalmente automática: siguiente hueco desde el cursor.
+                // Fully automatic: next gap from the cursor.
                 int row = cursorRow;
                 int col = cursorColumn;
                 while (true) {
@@ -152,8 +152,8 @@ public final class Placement {
     }
 
     /**
-     * Matriz de ocupación con filas que crecen bajo demanda. Las áreas que recibe caben siempre en
-     * sus columnas: {@code place} las cuenta todas antes de empezar y no deja pasar de ellas.
+     * Occupancy matrix with rows that grow on demand. The areas it receives always fit in
+     * its columns: {@code place} counts them all before starting and lets none go past them.
      */
     private static final class Occupancy {
         private final int columns;

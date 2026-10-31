@@ -1,7 +1,7 @@
-# Papel de carta de Taller Nogal: el PDF que usan como fondo los documentos de la documentación
-# (reference/components/image.md). La página 1 es la de la primera hoja de una carta, con el membrete
-# completo; la página 2, la de las siguientes, con el logotipo pequeño. Las dos llevan el pie legal.
-# Se convierte con tools/ExamplePdfs.java en resources/images/examples/letterhead/letterhead.pdf.
+# Letterhead paper of Taller Nogal: the PDF that the documentation's documents use as a background
+# (reference/components/image.md). Page 1 is the one for the first sheet of a letter, with the full
+# letterhead; page 2, the one for the following sheets, with the small logo. Both carry the legal footer.
+# It is converted with tools/ExamplePdfs.java into resources/images/examples/letterhead/letterhead.pdf.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Papel de carta de Taller Nogal

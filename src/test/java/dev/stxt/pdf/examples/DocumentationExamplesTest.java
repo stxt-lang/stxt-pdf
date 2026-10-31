@@ -30,15 +30,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Los documentos completos de la documentación (cada bloque de código de los README, el manual y la referencia, en todos
- * los idiomas, que empieza por {@code Document (dev.stxt.pdf):}) y {@code test/spec/report.stxt} se tratan como los de
- * {@code test/examples/}: se maquetan con las métricas reales y la carpeta {@code resources/}, se escriben en PDF y el PDF
- * cumple PDF/UA-1 según veraPDF. Así ningún ejemplo del manual ni de la referencia deja de funcionar sin que se note. No
- * tienen imágenes ni volcado de referencia: lo que se ve de ellos es la documentación. El PDF queda en
- * {@code target/reference/docs/} para mirarlo.
+ * The complete documents of the documentation (each code block of the READMEs, the manual and the reference, in every
+ * language, that starts with {@code Document (dev.stxt.pdf):}) and {@code test/spec/report.stxt} are treated like those
+ * of {@code test/examples/}: they are laid out with the real metrics and the {@code resources/} folder, written to PDF,
+ * and the PDF complies with PDF/UA-1 according to veraPDF. This way no example of the manual or the reference stops
+ * working unnoticed. They have no reference images or dump: what is seen of them is the documentation. The PDF is left
+ * in {@code target/reference/docs/} for inspection.
  *
- * <p>La documentación está en {@code docs/<idioma>/}. El castellano ({@code docs/es/}) es el original y los demás idiomas
- * son su espejo, con los mismos ficheros.</p>
+ * <p>The documentation is in {@code docs/<language>/}. Spanish ({@code docs/es/}) is the original and the other
+ * languages are its mirror, with the same files.</p>
  */
 class DocumentationExamplesTest {
 
@@ -52,7 +52,7 @@ class DocumentationExamplesTest {
 
     private final DocumentReader reader = new DocumentReader();
 
-    /** Un documento de la documentación: un nombre para el test y el fichero del PDF, y su texto. */
+    /** A document of the documentation: a name for the test and the PDF file, and its text. */
     private record DocDocument(String name, String text) {
     }
 
@@ -71,32 +71,33 @@ class DocumentationExamplesTest {
         return documents.stream().map(d -> DynamicTest.dynamicTest(d.name(), () -> check(d)));
     }
 
-    /** Cada página de componente del manual tiene al menos un documento completo, que se puede copiar y probar. */
+    /** Each component page of the manual has at least one complete document, which can be copied and tried. */
     @Test
     void everyComponentOfTheManualHasACompleteDocument() throws IOException {
         for (Path language : languages()) {
             List<Path> components = pages(language.resolve("manual").resolve("components"));
             assertFalse(components.isEmpty());
             for (Path page : components) {
-                assertFalse(examples(page).isEmpty(), page + " no tiene ningún documento completo");
+                assertFalse(examples(page).isEmpty(), page + " has no complete document");
             }
         }
     }
 
-    /** Cada idioma tiene los mismos ficheros que el original. */
+    /** Each language has the same files as the original. */
     @Test
     void everyLanguageMirrorsTheOriginal() throws IOException {
         Path original = DOCS.resolve(ORIGINAL);
         List<String> expected = relativeFiles(original);
         assertFalse(expected.isEmpty());
         for (Path language : languages()) {
-            assertEquals(expected, relativeFiles(language), language + " no tiene los mismos ficheros que " + original);
+            assertEquals(expected, relativeFiles(language), language + " does not have the same files as " + original);
         }
     }
 
     /**
-     * El ejemplo completo de la referencia original es {@code test/spec/report.stxt}, sin los comentarios de su cabecera.
-     * El {@code .stxt} indenta con tabuladores y los bloques STXT de los {@code .md} con cuatro espacios por nivel.
+     * The complete example of the original reference is {@code test/spec/report.stxt}, without the comments of its
+     * header. The {@code .stxt} indents with tabs and the STXT blocks of the {@code .md} files with four spaces per
+     * level.
      */
     @Test
     void theReportIsTheCompleteExample() throws IOException {
@@ -108,7 +109,7 @@ class DocumentationExamplesTest {
         assertEquals(examples.get(0).text(), report);
     }
 
-    /** {@code README.md} y sus traducciones ({@code README.es.md}...), en orden. */
+    /** {@code README.md} and its translations ({@code README.es.md}...), in order. */
     private static List<Path> readmes() throws IOException {
         try (Stream<Path> list = Files.list(Path.of("."))) {
             return list.map(p -> Path.of(p.getFileName().toString()))
@@ -116,14 +117,14 @@ class DocumentationExamplesTest {
         }
     }
 
-    /** Las carpetas de idioma de {@code docs/}, en orden. */
+    /** The language folders of {@code docs/}, in order. */
     private static List<Path> languages() throws IOException {
         try (Stream<Path> list = Files.list(DOCS)) {
             return list.filter(Files::isDirectory).sorted().toList();
         }
     }
 
-    /** Los ficheros de una carpeta y sus subcarpetas, relativos a ella, en orden. */
+    /** The files of a folder and its subfolders, relative to it, in order. */
     private static List<String> relativeFiles(Path folder) throws IOException {
         try (Stream<Path> walk = Files.walk(folder)) {
             return walk.filter(Files::isRegularFile).map(p -> folder.relativize(p).toString().replace('\\', '/'))
@@ -131,18 +132,18 @@ class DocumentationExamplesTest {
         }
     }
 
-    /** Las páginas Markdown de una carpeta y sus subcarpetas, en orden. */
+    /** The Markdown pages of a folder and its subfolders, in order. */
     private static List<Path> pages(Path folder) throws IOException {
         try (Stream<Path> walk = Files.walk(folder)) {
             return walk.filter(p -> p.toString().endsWith(".md")).sorted().toList();
         }
     }
 
-    /** Los documentos completos de una página, en orden, con la página y la línea donde empiezan como nombre. */
+    /** The complete documents of a page, in order, named after the page and the line where they start. */
     private static List<DocDocument> examples(Path page) {
         String text;
         try {
-            // Con core.autocrlf, la copia de trabajo puede tener CRLF.
+            // With core.autocrlf, the working copy can have CRLF.
             text = Files.readString(page).replace("\r\n", "\n");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -167,10 +168,10 @@ class DocumentationExamplesTest {
         byte[] pdf = out.toByteArray();
         Files.createDirectories(ACTUAL_DIR);
         Files.write(ACTUAL_DIR.resolve(document.name() + ".pdf"), pdf);
-        assertEquals(Map.of(), PdfUa.failedRules(pdf), document.name() + ": reglas de PDF/UA-1 incumplidas");
+        assertEquals(Map.of(), PdfUa.failedRules(pdf), document.name() + ": PDF/UA-1 rules failed");
         ByteArrayOutputStream ua2 = new ByteArrayOutputStream();
         PdfDocumentWriter.write(laidOut, resources, Limits.DEFAULT, ua2, false, 2);
         assertEquals(Map.of(), PdfUa.failedRules(ua2.toByteArray(), 2),
-                document.name() + ": reglas de PDF/UA-2 incumplidas");
+                document.name() + ": PDF/UA-2 rules failed");
     }
 }

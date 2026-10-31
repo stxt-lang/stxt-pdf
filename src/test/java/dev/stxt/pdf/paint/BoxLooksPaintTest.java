@@ -24,15 +24,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El aspecto de las cajas (reference/common/box.md) en el PDF, mirando los píxeles de la
- * página que se renderiza a 72 ppp (un píxel por punto), y en el SVG, mirando su texto.
+ * The look of boxes (reference/common/box.md) in the PDF, looking at the pixels of the
+ * page rendered at 72 dpi (one pixel per point), and in the SVG, looking at its text.
  */
 class BoxLooksPaintTest {
 
     private static final String HEAD = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 400\n"
             + "\t\tMargin: 20\n";
 
-    /** Los bloques de 100 × 40 en x = 20 e y = 20, 70, 120… (10 de hueco), con las propiedades de cada uno. */
+    /** The 100 × 40 blocks at x = 20 and y = 20, 70, 120... (10 apart), with the properties of each one. */
     private static String doc(String... boxes) {
         StringBuilder out = new StringBuilder(HEAD);
         for (String box : boxes) {
@@ -65,9 +65,9 @@ class BoxLooksPaintTest {
 
     private static void assertColor(BufferedImage image, int x, int y, int r, int g, int b, int tolerance) {
         int[] c = rgb(image, x, y);
-        String at = " en (" + x + ", " + y + "): " + c[0] + " " + c[1] + " " + c[2];
+        String at = " at (" + x + ", " + y + "): " + c[0] + " " + c[1] + " " + c[2];
         assertTrue(Math.abs(c[0] - r) <= tolerance && Math.abs(c[1] - g) <= tolerance
-                && Math.abs(c[2] - b) <= tolerance, "esperado " + r + " " + g + " " + b + at);
+                && Math.abs(c[2] - b) <= tolerance, "expected " + r + " " + g + " " + b + at);
     }
 
     @BeforeAll
@@ -78,7 +78,7 @@ class BoxLooksPaintTest {
     @Test
     void roundedCornersLeaveTheCornerOfTheBoxEmpty() throws Exception {
         BufferedImage page = render(doc("Corner radius: 20\nBackground: #FF0000"));
-        // La esquina (20, 20) está fuera de la curva; el centro y el medio de un lado, dentro.
+        // The corner (20, 20) is outside the curve; the center and the middle of a side, inside.
         assertColor(page, 21, 21, 255, 255, 255, 0);
         assertColor(page, 119, 59, 255, 255, 255, 0);
         assertColor(page, 70, 40, 255, 0, 0, 0);
@@ -115,31 +115,32 @@ class BoxLooksPaintTest {
         assertColor(page, 115, 40, 0, 255, 0, 0);
         assertColor(page, 70, 56, 0, 0, 255, 0);
         assertColor(page, 24, 40, 255, 255, 0, 0);
-        // El interior no tiene fondo.
+        // The inside has no background.
         assertColor(page, 70, 40, 255, 255, 255, 0);
     }
 
     @Test
     void sidesMeetOnTheDiagonalOfTheCorner() throws Exception {
         BufferedImage page = render(doc("Border: 10\nBorder color: #FF0000 #00FF00 #0000FF #FFFF00"));
-        // Arriba a la derecha, la esquina (110..120, 20..30): por encima de la diagonal es del lado de arriba, por debajo del derecho.
+        // Top right, the corner (110..120, 20..30): above the diagonal it belongs to the top side, below it to the
+        // right one.
         assertColor(page, 113, 22, 255, 0, 0, 0);
         assertColor(page, 117, 26, 0, 255, 0, 0);
     }
 
     /**
-     * Con el borde redondeado, el anillo entra en la caja de relleno (entre la curva de dentro y su
-     * esquina): lo cubre el lado que le toca, sin dejar un hueco blanco entre el borde y el fondo.
+     * With a rounded border, the ring enters the padding box (between the inner curve and its
+     * corner): the side it belongs to covers it, without leaving a white gap between the border and the background.
      */
     @Test
     void roundedInnerCornersLeaveNoGapBetweenTheSidesAndTheBackground() throws Exception {
         BufferedImage page = render(doc("Corner radius: 20\nBorder: 6\nBorder color: #00FF00 #0000FF #00FF00 #0000FF\n"
                 + "Background: #FF0000"));
-        // (27, 27) está dentro de la caja de relleno (desde 26) y fuera de su curva (a 18 pt del centro, 14 de radio).
+        // (27, 27) is inside the padding box (from 26) and outside its curve (18 pt from the center, radius 14).
         int[] c = rgb(page, 27, 27);
-        assertFalse(c[0] == 255 && c[1] == 255 && c[2] == 255, "hueco blanco: " + c[0] + " " + c[1] + " " + c[2]);
-        assertTrue(c[0] < 60, "es del borde, no del fondo rojo: " + c[0] + " " + c[1] + " " + c[2]);
-        // Y la diagonal reparte la cuña: arriba del color de arriba, a la izquierda del de la izquierda.
+        assertFalse(c[0] == 255 && c[1] == 255 && c[2] == 255, "white gap: " + c[0] + " " + c[1] + " " + c[2]);
+        assertTrue(c[0] < 60, "it belongs to the border, not to the red background: " + c[0] + " " + c[1] + " " + c[2]);
+        // And the diagonal splits the wedge: above, the top color; to the left, the left one.
         assertColor(page, 31, 27, 0, 255, 0, 0);
         assertColor(page, 27, 31, 0, 0, 255, 0);
     }
@@ -187,7 +188,7 @@ class BoxLooksPaintTest {
     void aTranslucentColorLetsTheBackgroundShowThrough() throws Exception {
         BufferedImage page = render(doc("Background: #0000FF80"));
         assertColor(page, 70, 40, 127, 127, 255, 3);
-        // Debajo de otra caja, se mezcla con su color.
+        // Over another box, it mixes with its color.
         String over = HEAD + "\tBlock:\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 40\n\t\t\tBackground: #FF0000\n"
                 + "\t\tBlock:\n\t\t\tBox:\n\t\t\t\tHeight: 40\n\t\t\t\tBackground: #0000FF80\n";
         assertColor(render(over), 70, 40, 127, 0, 127, 3);
@@ -196,7 +197,7 @@ class BoxLooksPaintTest {
     @Test
     void aTranslucentBorderIsNotPaintedTwiceAtTheCorners() throws Exception {
         BufferedImage page = render(doc("Border: 10\nBorder color: #0000FF80"));
-        // Una esquina del borde pintada una sola vez: la misma mezcla que el lado.
+        // A border corner painted only once: the same mix as the side.
         assertColor(page, 24, 24, 127, 127, 255, 3);
         assertColor(page, 70, 24, 127, 127, 255, 3);
     }
@@ -213,7 +214,7 @@ class BoxLooksPaintTest {
                 gray |= Math.abs(c[0] - 127) <= 3;
             }
         }
-        assertTrue(gray, "El texto con opacidad 50 % se ve gris, no negro");
+        assertTrue(gray, "Text with 50% opacity looks gray, not black");
     }
 
     @Test
@@ -223,7 +224,7 @@ class BoxLooksPaintTest {
         BufferedImage page = render(image);
         assertColor(page, 22, 22, 255, 255, 255, 0);
         int[] center = rgb(page, 50, 50);
-        assertFalse(center[0] == 255 && center[1] == 255 && center[2] == 255, "El centro de la imagen no está en blanco");
+        assertFalse(center[0] == 255 && center[1] == 255 && center[2] == 255, "The center of the image is not white");
     }
 
     @Test
@@ -232,9 +233,9 @@ class BoxLooksPaintTest {
                 + "Background: linear(90, #FF000000, #FF0000)")))) {
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.contains("/Artifact BMC"), content);
-            assertTrue(content.contains(" sh"), "El degradado es un sombreado: " + content);
-            assertTrue(content.contains("f*"), "El anillo del borde se rellena con la regla par-impar");
-            assertTrue(content.contains(" c\n"), "Las esquinas son curvas");
+            assertTrue(content.contains(" sh"), "The gradient is a shading: " + content);
+            assertTrue(content.contains("f*"), "The border ring is filled with the even-odd rule");
+            assertTrue(content.contains(" c\n"), "The corners are curves");
             assertEquals(1, pdf.getNumberOfPages());
         }
     }

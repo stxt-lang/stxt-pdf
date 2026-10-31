@@ -1,0 +1,15 @@
+# Case: Rule for something that is not a box element
+# Code: STYLE_UNKNOWN_ELEMENT
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Item
+			Box:
+				Padding: 4
+	Section:
+		Text: Hola

@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Escribe los PDF en {@code target/pdf/} para revisarlos a mano. */
+/** Writes the PDFs to {@code target/pdf/} for manual review. */
 class PdfCanvasTest {
 
     private static final Path PDF_DIR = Path.of("target", "pdf");
@@ -73,7 +73,7 @@ class PdfCanvasTest {
         return out.toByteArray();
     }
 
-    /** Como {@link #render(InlineNode, String)}, con los tramos de cada texto por su {@code Id}. */
+    /** Like {@link #render(InlineNode, String)}, with the runs of each text by its {@code Id}. */
     private static byte[] render(InlineNode document, Map<String, List<TextRun>> runs, String name)
             throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -97,7 +97,7 @@ class PdfCanvasTest {
             assertTrue(text.contains("Resultados del trimestre"), text);
             assertTrue(text.contains("Informe trimestral"), text);
             assertTrue(text.contains("BORRADOR"), text);
-            // Párrafo justificado: el espacio extra va en TJ, y el texto se extrae igual.
+            // Justified paragraph: the extra space goes in TJ, and the text is extracted the same.
             assertTrue(text.contains("Primer párrafo del informe."), text);
         }
     }
@@ -115,18 +115,18 @@ class PdfCanvasTest {
                 names.add(font.getName().substring(font.getName().indexOf('+') + 1));
             }
             names.sort(null);
-            // El título en negrita; el resto, normal.
+            // The title in bold; the rest, normal.
             assertEquals(List.of("IBMPlexSans", "IBMPlexSans-Bold"), names);
         }
     }
 
     @Test
     void letterSpacingIsATjShiftBetweenCharactersButNotAfterTheLast() {
-        // 1,5 pt en un cuerpo de 10: 150 milésimas; un número positivo en TJ acerca, uno negativo separa.
+        // 1.5 pt at size 10: 150 thousandths; a positive number in TJ brings closer, a negative one separates.
         assertArrayEquals(new Object[]{"a", -150f, "b", -150f, "c"}, PdfFonts.spaced("abc", 0, 1.5, 10));
-        // Con justify, tras un espacio se suma el espacio extra.
+        // With justify, the extra space is added after a space.
         assertArrayEquals(new Object[]{"a", -150f, " ", -650f, "b"}, PdfFonts.spaced("a b", 5, 1.5, 10));
-        // Sin interletraje es el TJ de siempre.
+        // Without letter spacing it is the usual TJ.
         assertArrayEquals(PdfFonts.justified("uno dos", 5, 10), PdfFonts.spaced("uno dos", 5, 0, 10));
     }
 
@@ -186,7 +186,7 @@ class PdfCanvasTest {
             assertEquals(0, ((PDPageDestination) one.getDestination()).retrievePageNumber());
             PDPageXYZDestination target = (PDPageXYZDestination) two.getDestination();
             assertEquals(1, target.retrievePageNumber());
-            // La esquina superior del encabezado: el área útil empieza 40 pt por debajo del borde.
+            // The top corner of the heading: the page area starts 40 pt below the edge.
             assertEquals(400 - 40, target.getTop());
             assertEquals(40, target.getLeft());
         }
@@ -200,11 +200,11 @@ class PdfCanvasTest {
             PDStructureElement document = firstSection((PDStructureElement) treeRoot.getKids().get(0));
             assertEquals("Sect", document.getStructureType());
             assertEquals("Document", ((PDStructureElement) treeRoot.getKids().get(0)).getStructureType());
-            // El Page overlay es un artifact: no está en el árbol. El orden es el del documento.
+            // The Page overlay is an artifact: it is not in the tree. The order is the document order.
             assertEquals(List.of("H1", "P", "H2", "P", "H1"), types(document));
             PDStructureElement h2 = (PDStructureElement) document.getKids().get(2);
             assertEquals(List.of("Span", "Span"), types(h2));
-            // Cada Span tiene su texto marcado en la página 1.
+            // Each Span has its text marked on page 1.
             PDStructureElement span = (PDStructureElement) h2.getKids().get(0);
             PDMarkedContentReference ref = (PDMarkedContentReference) span.getKids().get(0);
             assertEquals(pdf.getPage(0), ref.getPage());
@@ -217,8 +217,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una caja que declara otro idioma lleva su {@code Lang}, que heredan los elementos de dentro; las demás no
-     * lo repiten (reference/common/typography.md y reference/components/heading.md).
+     * A box that declares another language carries its {@code Lang}, which the elements inside inherit; the others do
+     * not repeat it (reference/common/typography.md and reference/components/heading.md).
      */
     @Test
     void aBoxInAnotherLanguageHasLang() throws Exception {
@@ -233,7 +233,7 @@ class PdfCanvasTest {
             assertEquals(List.of("P", "Div", "P"), types(document));
             PDStructureElement english = (PDStructureElement) document.getKids().get(1);
             assertEquals("en-GB", english.getLanguage());
-            // Lang se hereda por el árbol de estructura: los de dentro no lo repiten.
+            // Lang is inherited through the structure tree: the ones inside do not repeat it.
             english.getKids().forEach(k -> assertNull(((PDStructureElement) k).getLanguage()));
             assertNull(((PDStructureElement) document.getKids().get(0)).getLanguage());
             assertNull(((PDStructureElement) document.getKids().get(2)).getLanguage());
@@ -252,7 +252,7 @@ class PdfCanvasTest {
             assertTrue(catalog.getViewerPreferences().displayDocTitle());
             String xmp = new String(catalog.getMetadata().toByteArray(), StandardCharsets.UTF_8);
             assertTrue(xmp.contains("<rdf:li xml:lang=\"x-default\">Informe &lt;trimestral&gt; &amp; resumen</rdf:li>"), xmp);
-            // Con título, el PDF declara que es PDF/UA-1.
+            // With a title, the PDF declares that it is PDF/UA-1.
             assertTrue(xmp.contains("<pdfuaid:part>1</pdfuaid:part>"), xmp);
         }
     }
@@ -291,7 +291,7 @@ class PdfCanvasTest {
         for (int i = 1; i <= 15; i++) {
             body.append("\t\t\tRow:\n\t\t\t\tCell: Fila ").append(i).append("\n\t\t\t\tCell: ").append(i).append('\n');
         }
-        // Área útil de 160: la cabecera y el pie (12 cada uno) dejan 136, once filas por página.
+        // Page area of 160: the header and the footer (12 each) leave 136, eleven rows per page.
         InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
                 + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
                 + "\tTable:\n\t\tColumn sizes: * 60\n"
@@ -310,7 +310,7 @@ class PdfCanvasTest {
             PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
             assertEquals(PDTableAttributeObject.SCOPE_COLUMN,
                     ((PDTableAttributeObject) th.getAttributes().getObject(0)).getScope());
-            // La cabecera es contenido solo en la página 1; en la 2 se repite como artifact.
+            // The header is content only on page 1; on page 2 it is repeated as an artifact.
             assertEquals(1, th.getKids().size());
             assertEquals(pdf.getPage(0), ((PDMarkedContentReference) th.getKids().get(0)).getPage());
             PDStructureElement tbody = (PDStructureElement) table.getKids().get(1);
@@ -332,8 +332,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una celda con {@code Row header} del cuerpo o del pie es una {@code TH} con {@code Scope: Row}; las de la
-     * cabecera siguen siendo {@code Scope: Column} y las demás, {@code TD} (reference/components/table.md).
+     * A cell with {@code Row header} in the body or the footer is a {@code TH} with {@code Scope: Row}; the ones in the
+     * header are still {@code Scope: Column} and the others, {@code TD} (reference/components/table.md).
      */
     @Test
     void headerCellsAreRowHeaders() throws Exception {
@@ -361,8 +361,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un encabezado sin entrada en el índice sigue siendo un {@code H1} y un marcador
-     * (reference/components/heading.md y reference/components/table-of-contents.md).
+     * A heading without an entry in the table of contents is still an {@code H1} and a bookmark
+     * (reference/components/heading.md and reference/components/table-of-contents.md).
      */
     @Test
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
@@ -383,7 +383,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * El número de un encabezado numerado es parte de su título: también de su marcador y de su entrada del índice
+     * The number of a numbered heading is part of its title: also of its bookmark and its table of contents entry
      * (reference/components/heading.md).
      */
     @Test
@@ -398,7 +398,7 @@ class PdfCanvasTest {
         try (PDDocument pdf = Loader.loadPDF(render(doc, "numbered-headings"))) {
             PDOutlineItem first = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild();
             assertEquals("Portada", first.getTitle());
-            // La portada no se numera ni cuenta: Uno es el 1, y Dos, el 1.1, anidado en él.
+            // The cover is neither numbered nor counted: Uno is 1, and Dos, 1.1, nested in it.
             PDOutlineItem one = first.getNextSibling();
             assertEquals("1 Uno", one.getTitle());
             assertEquals("1.1 Dos", one.getFirstChild().getTitle());
@@ -406,7 +406,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un {@code Columns} es un {@code Div} y su contenido cuelga de él, sin un elemento por columna
+     * A {@code Columns} is a {@code Div} and its content hangs from it, without one element per column
      * (reference/components/columns.md).
      */
     @Test
@@ -438,11 +438,11 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un enlace a una URL es una anotación {@code Link} sin borde con su acción {@code URI}, del
-     * tamaño de la caja o del tramo. En el PDF etiquetado, el {@code Link} envuelve lo que se pulsa
-     * (el texto de la caja, la {@code Figure} de la imagen, el texto del tramo dentro del párrafo) y
-     * lleva la {@code OBJR} de la anotación; el de un {@code Page overlay}, que no es contenido, es un
-     * {@code Link} sin contenido en su sitio del árbol, con su {@code Alt} (reference/implementation/pdf.md).
+     * A link to a URL is a borderless {@code Link} annotation with its {@code URI} action, the
+     * size of the box or the run. In the tagged PDF, the {@code Link} wraps what is clicked
+     * (the text of the box, the {@code Figure} of the image, the text of the run inside the paragraph) and
+     * carries the {@code OBJR} of the annotation; the one of a {@code Page overlay}, which is not content, is a
+     * {@code Link} without content in its place in the tree, with its {@code Alt} (reference/implementation/pdf.md).
      */
     @Test
     void externalLinksAreAnnotationsTaggedAsLinks() throws Exception {
@@ -453,11 +453,11 @@ class PdfCanvasTest {
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\tVisita [la web](https://web.example) hoy.\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "links"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
-            // Un Page overlay se pinta el último, encima de todo.
+            // A Page overlay is painted last, on top of everything.
             assertEquals(List.of("mailto:soporte@airemas.example", "https://stxt.dev", "https://web.example",
                     "https://pie.example"), links.stream().map(PdfCanvasTest::uri).toList());
             PDAnnotationLink text = links.get(0);
-            // La caja de borde del texto: 40 pt de ancho de página útil menos... el área útil entera, 12 pt de alto.
+            // The border box of the text: the whole page area wide, 12 pt tall.
             assertEquals(20, text.getRectangle().getLowerLeftX(), 0.01);
             assertEquals(200 - 20 - 12, text.getRectangle().getLowerLeftY(), 0.01);
             assertEquals(260, text.getRectangle().getWidth(), 0.01);
@@ -465,20 +465,20 @@ class PdfCanvasTest {
             assertEquals("Escribe a soporte", text.getContents());
             assertEquals(0, text.getBorderStyle().getWidth(), 0.001);
             assertEquals("Logotipo", links.get(1).getContents());
-            // El tramo con enlace del Markdown no ocupa toda la línea: "la web" y nada más.
+            // The Markdown run with a link does not take the whole line: "la web" and nothing else.
             PDRectangle run = links.get(2).getRectangle();
             assertTrue(run.getWidth() > 20 && run.getWidth() < 60, run.toString());
             assertEquals("la web", links.get(2).getContents());
-            // PDF/UA: los cuatro están en la página con las anotaciones recorridas en orden de estructura.
+            // PDF/UA: the four are on the page with the annotations traversed in structure order.
             assertEquals("S", pdf.getPage(0).getCOSObject().getNameAsString("Tabs"));
 
             PDStructureTreeRoot tree = pdf.getDocumentCatalog().getStructureTreeRoot();
             PDStructureElement outer = (PDStructureElement) tree.getKids().get(0);
             PDStructureElement document = firstSection(outer);
-            // El Link del Page overlay no envuelve contenido, pero está en su sitio de la sección: tras la imagen.
+            // The Link of the Page overlay wraps no content, but it is in its place in the section: after the image.
             assertEquals(List.of("Sect"), types(outer));
             assertEquals(List.of("P", "Link", "Link", "Div"), types(document));
-            // La caja con Link: P → Link → [contenido marcado del texto, OBJR]; sin Alt, que ya lo dice el texto.
+            // The box with Link: P → Link → [marked content of the text, OBJR]; no Alt, the text already says it.
             PDStructureElement span = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("Link"), types(span));
             PDStructureElement link = (PDStructureElement) span.getKids().get(0);
@@ -486,20 +486,20 @@ class PdfCanvasTest {
             assertNull(link.getAlternateDescription());
             PDObjectReference reference = (PDObjectReference) link.getKids().get(1);
             assertEquals(text.getCOSObject(), ((PDAnnotationLink) reference.getReferencedObject()).getCOSObject());
-            // El árbol de padres lleva de la anotación a su Link.
+            // The parent tree leads from the annotation to its Link.
             assertEquals(link.getCOSObject(), ((COSObjectable) tree.getParentTree().getValue(text.getStructParent())).getCOSObject());
-            // La imagen: Link → Figure (con su Alt) y la OBJR.
+            // The image: Link → Figure (with its Alt) and the OBJR.
             PDStructureElement imageLink = (PDStructureElement) document.getKids().get(1);
             assertEquals(List.of("Figure", "OBJR"), shape(imageLink));
             assertEquals("Logotipo", ((PDStructureElement) imageLink.getKids().get(0)).getAlternateDescription());
             assertNull(imageLink.getAlternateDescription());
-            // El tramo del Markdown: P → [texto, Link → [texto del enlace, OBJR], texto].
+            // The Markdown run: P → [text, Link → [link text, OBJR], text].
             PDStructureElement paragraph = (PDStructureElement) ((PDStructureElement) document.getKids().get(3))
                     .getKids().get(0);
             assertEquals("P", paragraph.getStructureType());
             assertEquals(List.of("MCR", "Link", "MCR"), shape(paragraph));
             assertEquals(List.of("MCR", "OBJR"), shape((PDStructureElement) paragraph.getKids().get(1)));
-            // El Page overlay: un Link sin contenido, con el texto como Alt y la OBJR.
+            // The Page overlay: a Link without content, with the text as Alt and the OBJR.
             PDStructureElement fixed = (PDStructureElement) document.getKids().get(2);
             assertEquals(List.of("OBJR"), shape(fixed));
             assertEquals("pie", fixed.getAlternateDescription());
@@ -511,8 +511,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un enlace de texto que ocupa varias líneas es un solo {@code Link} con un contenido marcado y una
-     * {@code OBJR} por línea; las zonas son una por línea (reference/implementation/pdf.md).
+     * A text link that spans several lines is a single {@code Link} with one marked content and one
+     * {@code OBJR} per line; there is one area per line (reference/implementation/pdf.md).
      */
     @Test
     void aLinkOverSeveralLinesIsOneLinkElement() throws Exception {
@@ -533,9 +533,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una caja con {@code Link} que contiene otras (un bloque con dos textos) las envuelve en su
-     * {@code Link}: {@code Div → Link → [P, P, OBJR]}; sin nada que leer dentro, el {@code Link}
-     * lleva su texto como {@code Alt}.
+     * A box with {@code Link} that contains others (a block with two texts) wraps them in its
+     * {@code Link}: {@code Div → Link → [P, P, OBJR]}; with nothing to read inside, the {@code Link}
+     * carries its text as {@code Alt}.
      */
     @Test
     void aBoxLinkWrapsItsChildren() throws Exception {
@@ -559,12 +559,12 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un enlace a una caja del documento lleva a su página y a su esquina, hacia delante y hacia
-     * atrás (reference/common/links.md).
+     * A link to a box of the document leads to its page and its corner, forward and
+     * backward (reference/common/links.md).
      */
     @Test
     void internalLinksGoToThePageOfTheirBox() throws Exception {
-        // Área útil de 160: el texto (12) y el bloque (140) llenan la primera página; el resto, la segunda.
+        // Page area of 160: the text (12) and the block (140) fill the first page; the rest, the second.
         InlineNode doc = reader.read(Docs.sectioned(LINKS
                 + "\tText: Ir al final\n\t\tId: inicio\n\t\tLink: #fin\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 140\n"
@@ -578,14 +578,14 @@ class PdfCanvasTest {
             assertEquals(200 - 20, forward.getTop());
             PDPageXYZDestination backward = (PDPageXYZDestination) links(pdf, 1).get(0).getDestination();
             assertEquals(0, pdf.getPages().indexOf(backward.getPage()));
-            // Una acción de destino, no de URI.
+            // A destination action, not a URI one.
             assertNull(links(pdf, 0).get(0).getAction());
         }
     }
 
     /**
-     * Cada entrada de un índice lleva a la página de su encabezado y su {@code TOCI} tiene el {@code Link}
-     * (reference/components/table-of-contents.md y reference/common/links.md).
+     * Each table of contents entry leads to the page of its heading and its {@code TOCI} has the {@code Link}
+     * (reference/components/table-of-contents.md and reference/common/links.md).
      */
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
@@ -605,7 +605,7 @@ class PdfCanvasTest {
                     throw new java.io.UncheckedIOException(e);
                 }
             }).toList());
-            // El texto de la entrada, sin su número de página.
+            // The text of the entry, without its page number.
             assertEquals(List.of("Uno", "Dos"), links.stream().map(PDAnnotation::getContents).toList());
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
@@ -615,8 +615,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * La cabecera de una tabla se repite en cada página: su enlace es clicable en todas, pero
-     * solo es contenido (y envuelve el texto de la celda) en la primera; las anotaciones de las demás van al mismo
+     * The header of a table is repeated on each page: its link is clickable on all of them, but
+     * it is content (and wraps the text of the cell) only on the first; the annotations of the others go to the same
      * {@code Link} (reference/implementation/pdf.md).
      */
     @Test
@@ -641,7 +641,7 @@ class PdfCanvasTest {
             PDStructureElement headRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(0)).getKids().get(0);
             PDStructureElement th = (PDStructureElement) headRow.getKids().get(0);
             assertEquals(List.of("Link"), types(th));
-            // El Link de la celda envuelve el texto de la primera página y lleva las anotaciones de las dos.
+            // The Link of the cell wraps the text of the first page and carries the annotations of both.
             PDStructureElement cellLink = (PDStructureElement) th.getKids().get(0);
             assertEquals(List.of("MCR", "OBJR", "OBJR"), shape(cellLink));
             assertEquals(pdf.getPage(0), ((PDObjectReference) cellLink.getKids().get(1)).getPage());
@@ -654,9 +654,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Lo que no es contenido no tiene a qué envolver: el enlace de un {@code Page overlay} o de una imagen decorativa
-     * es un {@code Link} sin contenido en su sitio del árbol, con una {@code OBJR} por página, y se anuncia una vez en
-     * su orden de lectura (reference/implementation/pdf.md).
+     * What is not content has nothing to wrap: the link of a {@code Page overlay} or of a decorative image is a
+     * {@code Link} without content in its place in the tree, with one {@code OBJR} per page, and it is announced once
+     * in its reading order (reference/implementation/pdf.md).
      */
     @Test
     void theLinkOfWhatIsNotContentIsInItsPlaceOnce() throws Exception {
@@ -672,7 +672,7 @@ class PdfCanvasTest {
                     .getKids().get(0);
             assertEquals(List.of("Sect"), types(outer));
             PDStructureElement section = firstSection(outer);
-            // El Page overlay está antes que el texto en el documento, y la imagen entre los dos textos.
+            // The Page overlay is before the text in the document, and the image between the two texts.
             assertEquals(List.of("Link", "P", "Link", "P"), types(section));
             PDStructureElement footer = (PDStructureElement) section.getKids().get(0);
             assertEquals(List.of("OBJR", "OBJR"), shape(footer));
@@ -685,7 +685,7 @@ class PdfCanvasTest {
         }
     }
 
-    /** Un {@code Page overlay} que no sale en ninguna página no deja un {@code Link} vacío. */
+    /** A {@code Page overlay} that appears on no page leaves no empty {@code Link}. */
     @Test
     void aFixedThatIsNeverPaintedLeavesNoEmptyLink() throws Exception {
         InlineNode doc = reader.read(Docs.sectioned(LINKS
@@ -698,7 +698,7 @@ class PdfCanvasTest {
         }
     }
 
-    /** Los hijos de un elemento en orden: el tipo de cada elemento, {@code MCR} y {@code OBJR}. */
+    /** The children of an element in order: the type of each element, {@code MCR} and {@code OBJR}. */
     private static List<String> shape(PDStructureElement e) {
         List<String> kids = new ArrayList<>();
         for (Object k : e.getKids()) {
@@ -728,8 +728,8 @@ class PdfCanvasTest {
             + "negrita a medias y un texto justificado que ocupa varias líneas con sus tramos.";
 
     /**
-     * Cada tramo con su fuente, en el mismo contenido marcado del párrafo; el subrayado y el tachado,
-     * <em>artifacts</em> (reference/common/text-formatting.md). Se revisa a ojo en {@code target/pdf/runs.pdf}.
+     * Each run with its font, in the same marked content of the paragraph; the underline and the strikethrough,
+     * <em>artifacts</em> (reference/common/text-formatting.md). It is reviewed by eye in {@code target/pdf/runs.pdf}.
      */
     @Test
     void runsUseTheirFontsAndDecorationsAreArtifacts() throws Exception {
@@ -753,7 +753,7 @@ class PdfCanvasTest {
             String text = new PDFTextStripper().getText(pdf).replaceAll("\\s+", " ");
             assertTrue(text.contains("Uno negrita, cursiva, las dos, subrayado y tachado."), text);
             assertTrue(text.contains("negrita a medias"), text);
-            // Un solo P con un solo contenido marcado: los tramos no tienen elemento propio.
+            // A single P with a single marked content: the runs have no element of their own.
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
             assertEquals(List.of("P"), types(document));
@@ -765,7 +765,7 @@ class PdfCanvasTest {
     }
 
     /**
-     * Lo que genera un Markdown se etiqueta y da marcadores como si lo hubiera escrito el autor
+     * What a Markdown generates is tagged and gives bookmarks as if the author had written it
      * (reference/components/markdown.md).
      */
     @Test
@@ -791,9 +791,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con {@code Case} y {@code Small caps} lo que se ve son mayúsculas, pero la estructura conserva el texto
-     * escrito (reference/common/text-formatting.md): {@code ActualText}. Un texto con el número de página no lo
-     * lleva, porque cambia con la página.
+     * With {@code Case} and {@code Small caps} what is seen is capitals, but the structure keeps the written text
+     * (reference/common/text-formatting.md): {@code ActualText}. A text with the page number does not carry it,
+     * because it changes with the page.
      */
     @Test
     void capsAreOnlyPaintedAndTheStructureKeepsTheWrittenText() throws Exception {
@@ -812,7 +812,8 @@ class PdfCanvasTest {
                 actual.add(((PDStructureElement) kid).getActualText());
             }
             assertEquals(java.util.Arrays.asList("Emisor y destinatario", "Año nuevo", null, null), actual);
-            // Lo que se pinta son mayúsculas, y el interletraje no parte el texto en letras (pdfbox lo lee entero).
+            // What is painted is capitals, and letter spacing does not split the text into letters (pdfbox reads it
+            // whole).
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("EMISOR Y DESTINATARIO"), text);
             assertTrue(text.contains("AÑO NUEVO"), text);
@@ -821,8 +822,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con un interletraje grande, un extractor pondría espacios entre las letras; cada tramo lleva en su contenido
-     * marcado el {@code ActualText} con su texto (reference/implementation/pdf.md), que pdfbox respeta.
+     * With large letter spacing, an extractor would put spaces between the letters; each run carries in its marked
+     * content the {@code ActualText} with its text (reference/implementation/pdf.md), which pdfbox respects.
      */
     @Test
     void letterSpacedTextIsExtractedWhole() throws Exception {
@@ -831,16 +832,16 @@ class PdfCanvasTest {
                 + "\tParagraph: Informe del trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n"
                 + "\tParagraph: Informe **del** trimestre\n\t\tTypography:\n\t\t\tLetter spacing: 3\n\t\t\tMarkup: markdown\n"));
         try (PDDocument pdf = Loader.loadPDF(render(doc, "letter-spacing"))) {
-            // pdfbox deja espacios tras el ActualText de cada secuencia: el texto es el de cada línea sin ellos.
+            // pdfbox leaves spaces after the ActualText of each sequence: the text is that of each line without them.
             assertEquals(List.of("Informe del trimestre", "Informe del trimestre"),
                     new PDFTextStripper().getText(pdf).strip().lines().map(String::stripTrailing).toList());
         }
     }
 
     /**
-     * Un índice (reference/components/table-of-contents.md) es un {@code TOC} con un {@code TOCI} por entrada (título
-     * y número, dos {@code Span}); la guía es un artifact. Con las métricas reales, escribe la página de cada
-     * encabezado, también la de un encabezado de un Markdown.
+     * A table of contents (reference/components/table-of-contents.md) is a {@code TOC} with one {@code TOCI} per entry
+     * (title and number, two {@code Span}); the leader is an artifact. With the real metrics, it writes the page of
+     * each heading, also that of a heading in a Markdown.
      */
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
@@ -856,7 +857,7 @@ class PdfCanvasTest {
             assertEquals(List.of("TOC", "Div", "Div", "H1", "H2"), types(document));
             PDStructureElement toc = (PDStructureElement) document.getKids().get(0);
             assertEquals(List.of("TOCI", "TOCI", "TOCI"), types(toc));
-            // La entrada: TOCI → Link → [título, número, OBJR].
+            // The entry: TOCI → Link → [title, number, OBJR].
             PDStructureElement entry = (PDStructureElement) toc.getKids().get(0);
             assertEquals(List.of("Link"), types(entry));
             assertEquals(List.of("Span", "Span", "OBJR"), shape((PDStructureElement) entry.getKids().get(0)));
@@ -867,8 +868,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una imagen con {@code Alt} es un {@code Figure} con su texto alternativo y su {@code BBox}; sin él, y en un
-     * {@code Page overlay}, es un artifact (reference/components/image.md). Cada fichero se incrusta una vez.
+     * An image with {@code Alt} is a {@code Figure} with its alternative text and its {@code BBox}; without it, and in
+     * a {@code Page overlay}, it is an artifact (reference/components/image.md). Each file is embedded once.
      */
     @Test
     void imagesAreFiguresOrArtifactsAndAreEmbeddedOnce() throws Exception {
@@ -888,7 +889,7 @@ class PdfCanvasTest {
             assertEquals("Paisaje", figure.getAlternateDescription());
             PDLayoutAttributeObject layout = (PDLayoutAttributeObject) figure.getAttributes().getObject(0);
             PDRectangle box = layout.getBBox();
-            // La caja de contenido de la imagen: 150 × 75 en (40, 40), con el origen abajo.
+            // The content box of the image: 150 × 75 at (40, 40), with the origin at the bottom.
             assertEquals(40, box.getLowerLeftX(), 0.01);
             assertEquals(300 - 40 - 75, box.getLowerLeftY(), 0.01);
             assertEquals(150, box.getWidth(), 0.01);
@@ -896,12 +897,12 @@ class PdfCanvasTest {
             List<PDImageXObject> first = images(pdf, 0);
             assertEquals(3, first.size());
             PDImageXObject wide = first.stream().filter(i -> i.getWidth() == 200).findFirst().orElseThrow();
-            // El PNG conserva su transparencia; el JPEG va tal cual.
+            // The PNG keeps its transparency; the JPEG goes as is.
             assertTrue(wide.getSoftMask() != null);
             assertTrue(first.stream().anyMatch(i -> i.getHeight() == 160 && "jpg".equals(i.getSuffix())));
             List<PDImageXObject> second = images(pdf, 1);
             assertTrue(second.stream().anyMatch(i -> i.getCOSObject() == wide.getCOSObject()),
-                    "La misma imagen en dos páginas se incrusta una vez");
+                    "The same image on two pages is embedded once");
 
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.contains("/Figure <</MCID 0>> BDC"), content);
@@ -909,10 +910,10 @@ class PdfCanvasTest {
     }
 
     /**
-     * Un SVG (reference/components/image.md) es un dibujo vectorial: un formulario del PDF, no una imagen, que se
-     * incrusta una vez aunque se use en dos páginas y se escala a su caja; con {@code Alt} es un {@code Figure}. El
-     * texto del SVG se dibuja con la fuente de {@code fonts/}: los píxeles de las letras están donde toca (blancos
-     * sobre el fondo oscuro).
+     * An SVG (reference/components/image.md) is a vector drawing: a PDF form, not an image, which is embedded once
+     * even if used on two pages and is scaled to its box; with {@code Alt} it is a {@code Figure}. The text of the
+     * SVG is drawn with the font from {@code fonts/}: the pixels of the letters are where they belong (white on the
+     * dark background).
      */
     @Test
     void svgIsDrawnAsOneVectorFormAndScaledToItsBox() throws Exception {
@@ -926,7 +927,7 @@ class PdfCanvasTest {
             PDResources first = pdf.getPage(0).getResources();
             List<PDFormXObject> forms = new ArrayList<>();
             for (COSName name : first.getXObjectNames()) {
-                assertInstanceOf(PDFormXObject.class, first.getXObject(name), "Un SVG no es una imagen de píxeles");
+                assertInstanceOf(PDFormXObject.class, first.getXObject(name), "An SVG is not a pixel image");
                 forms.add((PDFormXObject) first.getXObject(name));
             }
             assertEquals(2, forms.size());
@@ -934,17 +935,17 @@ class PdfCanvasTest {
             PDFormXObject shapes = forms.stream().filter(f -> f.getBBox().getWidth() == 150).findFirst().orElseThrow();
             assertTrue(second.getXObjectNames().iterator().hasNext());
             assertEquals(shapes.getCOSObject(), second.getXObject(second.getXObjectNames().iterator().next())
-                    .getCOSObject(), "El mismo SVG en dos páginas se incrusta una vez");
+                    .getCOSObject(), "The same SVG on two pages is embedded once");
             assertEquals(75, shapes.getBBox().getHeight(), 1e-3);
 
-            // 300 pt de ancho para 150 de natural: se escala por dos, desde la esquina de abajo de la caja.
+            // 300 pt wide for a natural 150: it is scaled by two, from the bottom corner of the box.
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.matches("(?s).*\\b2 0 0 2 40 \\S+ cm\\b.*"), content);
             assertTrue(content.contains("/Figure <</MCID 0>> BDC"), content);
-            // El formulario hereda el estado gráfico (como los guiones del modo debug): se parte de cero.
+            // The form inherits the graphics state (like the dashes of debug mode): it starts from scratch.
             assertTrue(content.contains("[] 0 d"), content);
 
-            // Lo vectorial lleva rutas, no una imagen; y el texto de label.svg se ve (letras blancas sobre #3b2a1e).
+            // Vector content carries paths, not an image; the text of label.svg is visible (white letters on #3b2a1e).
             String shapesContent = new String(shapes.getContentStream().createInputStream().readAllBytes(),
                     StandardCharsets.ISO_8859_1);
             assertTrue(shapesContent.contains(" c\n") || shapesContent.contains(" l\n"), shapesContent);
@@ -959,7 +960,7 @@ class PdfCanvasTest {
                     }
                 }
             }
-            assertTrue(whites > 30, "Las letras de label.svg deben verse: " + whites);
+            assertTrue(whites > 30, "The letters of label.svg have to be visible: " + whites);
         }
     }
 
@@ -973,10 +974,10 @@ class PdfCanvasTest {
     }
 
     /**
-     * Una caja girada (reference/common/layers-and-rotation.md) gira su contenido con una matriz {@code cm}; su enlace es el
-     * rectángulo que envuelve la zona girada con los {@code QuadPoints} de la zona, el {@code BBox} de una figura
-     * girada envuelve lo que se pinta, y un destino lleva a la esquina de ese envolvente. El texto girado sigue siendo
-     * texto.
+     * A rotated box (reference/common/layers-and-rotation.md) rotates its content with a {@code cm} matrix; its link is
+     * the rectangle that encloses the rotated area with the {@code QuadPoints} of the area, the {@code BBox} of a
+     * rotated figure encloses what is painted, and a destination leads to the corner of that enclosing rectangle.
+     * Rotated text is still text.
      */
     @Test
     void rotatedBoxesTurnTheirContentLinksAndFigures() throws Exception {
@@ -989,8 +990,8 @@ class PdfCanvasTest {
         try (PDDocument pdf = Loader.loadPDF(render(doc, "rotation"))) {
             List<PDAnnotationLink> links = links(pdf, 0);
             PDAnnotationLink stamp = links.stream().filter(l -> l.getAction() != null).findFirst().orElseThrow();
-            // La caja va de (100, 100) a (200, 120); girada 90 grados alrededor de (150, 110), de
-            // (140, 60) a (160, 160): con el origen abajo, de y = 140 a y = 240.
+            // The box goes from (100, 100) to (200, 120); rotated 90 degrees around (150, 110), from
+            // (140, 60) to (160, 160): with the origin at the bottom, from y = 140 to y = 240.
             PDRectangle area = stamp.getRectangle();
             assertEquals(140, area.getLowerLeftX(), 0.01);
             assertEquals(140, area.getLowerLeftY(), 0.01);
@@ -1002,14 +1003,14 @@ class PdfCanvasTest {
                 assertEquals(expected[i], quad[i], 0.01, "QuadPoints " + i);
             }
 
-            // El destino del enlace interno: la esquina de arriba a la izquierda del envolvente.
+            // The destination of the internal link: the top left corner of the enclosing rectangle.
             PDAnnotationLink internal = links.stream().filter(l -> l.getAction() == null).findFirst().orElseThrow();
             PDPageXYZDestination target = (PDPageXYZDestination) internal.getDestination();
             assertEquals(140, target.getLeft());
             assertEquals(240, target.getTop());
 
-            // La imagen, de 150 × 75 y girada 90 en flujo, ocupa 75 × 150 en (40, 40): con el origen abajo, de y = 110
-            // a y = 260.
+            // The image, 150 × 75 and rotated 90 in flow, takes 75 × 150 at (40, 40): with the origin at the bottom,
+            // from y = 110 to y = 260.
             PDStructureElement document = firstSection((PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0));
             PDStructureElement figure = (PDStructureElement) document.getKids().get(0);
@@ -1032,8 +1033,8 @@ class PdfCanvasTest {
             + "\t\t\t\tSize: 10\n\t\tFor style: english\n\t\t\tTypography:\n\t\t\t\tLanguage: en\n";
 
     /**
-     * Las etiquetas de página del PDF son el número impreso (reference/components/document.md): ninguno en la
-     * portada, y el anexo reinicia.
+     * The page labels of the PDF are the printed number (reference/components/document.md): none on the
+     * cover, and the appendix restarts.
      */
     @Test
     void pageLabelsAreThePrintedNumbers() throws Exception {
@@ -1046,7 +1047,7 @@ class PdfCanvasTest {
             assertArrayEquals(new String[] {"", "1", "2", "1"},
                     pdf.getDocumentCatalog().getPageLabels().getLabelsByPageIndices());
         }
-        // Sin nada que cambiar, ninguna etiqueta: el número impreso es el de la página.
+        // With nothing to change, no label: the printed number is the page number.
         InlineNode plain = reader.read(SECTIONS_HEAD + "\tSection:\n\t\tText: Uno\n\t\tText: Dos\n\t\t\tBreak:\n\t\t\t\tBefore: page\n");
         try (PDDocument pdf = Loader.loadPDF(render(plain, "page-labels-plain"))) {
             assertNull(pdf.getDocumentCatalog().getPageLabels());
@@ -1054,9 +1055,9 @@ class PdfCanvasTest {
     }
 
     /**
-     * Con {@code Page number format} y {@code Start}, la etiqueta lleva el estilo y el número de cada tanda (i, ii, 5,
-     * VI). Se miran las entradas del PDF y no el texto que genera PDFBox, que pasa a mayúsculas con el idioma de la
-     * JVM: en turco, «vi» sería «Vİ».
+     * With {@code Page number format} and {@code Start}, the label carries the style and the number of each page
+     * sequence (i, ii, 5, VI). The PDF entries are checked and not the text that PDFBox generates, which uppercases
+     * with the language of the JVM: in Turkish, "vi" would be "Vİ".
      */
     @Test
     void pageLabelsKeepThePageStyleAndTheStart() throws Exception {
@@ -1075,7 +1076,7 @@ class PdfCanvasTest {
         }
     }
 
-    /** Cada página del PDF mide lo que su sección, y cada sección es un {@code Sect} con su idioma. */
+    /** Each PDF page has the size of its section, and each section is a {@code Sect} with its language. */
     @Test
     void eachSectionIsASectWithItsOwnPageSizeAndLanguage() throws Exception {
         InlineNode doc = reader.read(SECTIONS_HEAD
@@ -1093,8 +1094,8 @@ class PdfCanvasTest {
     }
 
     /**
-     * La primera {@code Sect} de un documento etiquetado (reference/components/document.md): lo que cuelga de ella es
-     * el contenido.
+     * The first {@code Sect} of a tagged document (reference/components/document.md): what hangs from it is the
+     * content.
      */
     private static PDStructureElement firstSection(PDStructureElement document) {
         assertEquals("Document", document.getStructureType());

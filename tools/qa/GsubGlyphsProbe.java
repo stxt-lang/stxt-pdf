@@ -1,5 +1,5 @@
-// Sonda de QA: qué cadenas pinta distinto PDFBox con GSUB (ligaduras) que con las
-// métricas del motor, que no las aplica, para cada fuente de resources/fonts.
+// QA probe: which strings PDFBox paints differently with GSUB (ligatures) than with the
+// metrics of the engine, which does not apply them, for each font of resources/fonts.
 import org.apache.fontbox.ttf.*;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.*;
@@ -29,7 +29,7 @@ public class GsubGlyphsProbe {
                 for (String s : new String[]{"fi", "fl", "ffi", "ffl", "office", "affluent", "1/2", "->", "=>", "!=", "<=", ">=", "www", "0123456789", "Æ", "áéíóúñç", "AV To", "ǅ", "ﬁ"}) {
                     try { if (!content(p, false, s).equals(content(p, true, s))) { diff++; bad.add(s); } } catch (Exception e) { bad.add(s + "(EXC " + e.getClass().getSimpleName() + ")"); }
                 }
-                System.out.println(p.getFileName() + ": cadenas que cambian por GSUB = " + bad);
+                System.out.println(p.getFileName() + ": strings that change with GSUB = " + bad);
             }
         }
     }

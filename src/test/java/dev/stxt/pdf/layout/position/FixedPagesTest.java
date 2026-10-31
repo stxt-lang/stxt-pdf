@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Pages} de un {@code Page overlay} (reference/components/frame-and-overlays.md): en qué páginas sale. */
+/** {@code Pages} of a {@code Page overlay} (reference/components/frame-and-overlays.md): on which pages it appears. */
 class FixedPagesTest {
 
     /**
-     * Un documento de {@code pages} páginas (una por bloque) y un {@code Page overlay} por cada valor de {@code Pages}.
+     * A document of {@code pages} pages (one per block) and a {@code Page overlay} for each value of {@code Pages}.
      */
     private static LayoutFixture document(int pages, String... fixedValues) {
         List<String> lines = new ArrayList<>();
@@ -25,7 +25,7 @@ class FixedPagesTest {
             lines.addAll(List.of("\tPage overlay:", "\t\tId: " + value, "\t\tPages: " + value, "\t\tOffset: 0 auto auto 0",
                     "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10"));
         }
-        // Con 180 pt de alto el área útil mide 100, así que cada bloque de 60 ocupa su página.
+        // With a height of 180 pt the page area measures 100, so each block of 60 takes up its own page.
         return LayoutFixture.layOutPaged(180, lines.toArray(String[]::new));
     }
 

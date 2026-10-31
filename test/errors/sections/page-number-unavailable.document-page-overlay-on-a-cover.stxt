@@ -1,0 +1,22 @@
+# Case: Page overlay of the document with {page} on a cover without numbers
+# Code: PAGE_NUMBER_UNAVAILABLE
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Page overlay:
+		Offset: auto 0 0 0
+		Text: Página {page}
+	Section:
+		Page numbering: none
+		Text: Portada
+	Section:
+		Text: Interior

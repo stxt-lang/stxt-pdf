@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los destinos de un enlace (reference/common/links.md). */
+/** The targets of a link (reference/common/links.md). */
 class LinksTest {
 
     @ParameterizedTest
@@ -36,9 +36,9 @@ class LinksTest {
 
     @Test
     void theMessageSaysWhatIsWrong() {
-        assertTrue(Links.problem("javascript:alert(1)").orElseThrow().contains("esquema"));
+        assertTrue(Links.problem("javascript:alert(1)").orElseThrow().contains("scheme"));
         assertTrue(Links.problem("https://").orElseThrow().contains("URL"));
-        assertTrue(Links.problem("mailto:?subject=x").orElseThrow().contains("destinatario"));
-        assertTrue(Links.problem("").orElseThrow().contains("vacío"));
+        assertTrue(Links.problem("mailto:?subject=x").orElseThrow().contains("recipient"));
+        assertTrue(Links.problem("").orElseThrow().contains("empty"));
     }
 }

@@ -15,12 +15,14 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOutRuns;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Con {@link FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}. */
+/** With {@link FixedMetrics}, each character measures 5 pt with {@code Size: 10}. */
 class InlineLayoutTest {
 
     private static final String TEXT = "aaaa bbbb cccc dddd eeee";
 
-    /** Líneas del texto con 100 de ancho y estas propiedades en su {@code Typography} ({@code "Align: right"}). */
+    /**
+     * Lines of the text with a width of 100 and these properties in its {@code Typography} ({@code "Align: right"}).
+     */
     private static List<TextLine> lines(String... typography) {
         List<String> doc = new ArrayList<>(List.of("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\tTypography:"));
@@ -42,7 +44,7 @@ class InlineLayoutTest {
 
     @Test
     void lineBreakingBalancedIsInheritedAndUsesKnuthPlass() {
-        // El ejemplo de LineBreakerTest.prettyMinimizesTheDemerits a escala 5: ancho 50.
+        // The example of LineBreakerTest.prettyMinimizesTheDemerits at scale 5: width 50.
         String text = "a bbb c ddddd e fff";
         LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLine breaking: balanced",
                 "\t\tText: " + text, "\t\t\tId: P", "\t\t\tBox:", "\t\t\t\tWidth: 50",
@@ -56,7 +58,7 @@ class InlineLayoutTest {
 
     @Test
     void justifyFillsAllLinesButTheLast() {
-        // Primera línea: 95 pt y 3 espacios, el sobrante (5) se reparte entre ellos.
+        // First line: 95 pt and 3 spaces, the leftover (5) is distributed among them.
         LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\tTypography:",
                 "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\t" + TEXT);
         List<TextLine> lines = l.fragment("T").lines();
@@ -108,7 +110,7 @@ class InlineLayoutTest {
 
     @Test
     void runsArePlacedOneAfterTheOther() {
-        // "uno " (20) + "dos" (15) + " tres" (25) = 60, centrado en 100.
+        // "uno " (20) + "dos" (15) + " tres" (25) = 60, centered in 100.
         TextLine l = layOutRuns(Map.of("T", List.of(run("uno "), run("dos", "b"), run(" tres"))),
                 "\tText: uno dos tres", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\tTypography:",
                 "\t\t\tAlign: center").fragment("T").lines().get(0);
@@ -130,7 +132,7 @@ class InlineLayoutTest {
 
     @Test
     void theLastLineOfAParagraphIsNotJustifiedEvenWithSeveralWords() {
-        // «aa bb» (25) se justifica a 30; «cc dd», la última, no.
+        // "aa bb" (25) is justified to 30; "cc dd", the last one, is not.
         LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:",
                 "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\taa bb cc dd");
         List<TextLine> lines = l.fragment("T").lines();

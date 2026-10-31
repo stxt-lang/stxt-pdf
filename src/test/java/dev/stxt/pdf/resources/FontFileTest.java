@@ -17,12 +17,12 @@ import java.util.concurrent.Future;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/** Los anchos de {@link FontFile} sobre las fuentes del repositorio, frente a lo que contesta fontbox. */
+/** The widths of {@link FontFile} on the fonts of the repository, against what fontbox answers. */
 class FontFileTest {
 
     private static final Resources RESOURCES = new Resources();
 
-    /** El ancho que escribe PDFBox: el avance de cada glifo en milésimas del cuerpo, redondeado. */
+    /** The width PDFBox writes: the advance of each glyph in thousandths of the font size, rounded. */
     private static double expected(TrueTypeFont ttf, CmapLookup cmap, int codePoint, double size) throws IOException {
         long thousandths = Math.round(ttf.getAdvanceWidth(cmap.getGlyphId(codePoint)) * 1000 / (double) ttf.getUnitsPerEm());
         return thousandths / 1000.0 * size;
@@ -35,7 +35,7 @@ class FontFileTest {
         for (FontFile font : fonts) {
             TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(Files.readAllBytes(font.path())));
             CmapLookup cmap = ttf.getUnicodeCmapLookup();
-            // Dos pasadas: la segunda lee la tabla de avances ya memorizada.
+            // Two passes: the second one reads the advance table already cached.
             for (int pass = 0; pass < 2; pass++) {
                 for (int cp = 0; cp < 0x10000; cp++) {
                     if (cp >= 0xD800 && cp < 0xE000) {
@@ -69,7 +69,7 @@ class FontFileTest {
             all.appendCodePoint(cp);
         }
         String text = all.toString();
-        // Una fuente nueva por cada medida de referencia no sirve: la tabla de avances se llena al medir.
+        // A new font for each reference measure does not work: the advance table fills up while measuring.
         FontFile fresh = new Resources().fonts().find(font.face());
         double expected = font.width(text, 10);
         ExecutorService pool = Executors.newFixedThreadPool(4);

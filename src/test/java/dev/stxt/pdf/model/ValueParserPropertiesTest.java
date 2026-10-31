@@ -7,13 +7,13 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Propiedades de {@link ValueParser} con textos al azar: lo único que puede lanzar es un
- * {@link IllegalArgumentException}, que el builder convierte en un error con línea; nunca otra excepción. La semilla
- * es fija: un fallo se repite.
+ * Properties of {@link ValueParser} with random texts: the only thing it can throw is an
+ * {@link IllegalArgumentException}, which the builder turns into an error with a line; never another exception. The
+ * seed is fixed: a failure repeats.
  */
 class ValueParserPropertiesTest {
 
-    /** Trozos con que se escriben los valores: números, unidades, funciones, separadores y algo de basura. */
+    /** Pieces the values are written with: numbers, units, functions, separators and some garbage. */
     private static final String[] PIECES = {"0", "1", "7", "12", "250", ".", ".5", "-", "+", "e", "e3", " ", "  ", ",",
             "(", ")", "%", "pt", "px", "em", "*", "auto", "narrowest", "natural", "repeat", "repeat(",
             "between(", "fit(", "x", "#", "linear(", "deg", "\t", "1e400", "-0", "NaN", "Infinity"};
@@ -35,16 +35,16 @@ class ValueParserPropertiesTest {
             try {
                 ValueParser.value(text);
             } catch (IllegalArgumentException expected) {
-                // Un valor mal escrito: es lo esperado.
+                // A badly written value: it is what is expected.
             } catch (RuntimeException e) {
-                fail("ValueParser.value(\"" + text + "\") lanza " + e, e);
+                fail("ValueParser.value(\"" + text + "\") throws " + e, e);
             }
             try {
                 ValueParser.list(text);
             } catch (IllegalArgumentException expected) {
-                // Ídem.
+                // Same.
             } catch (RuntimeException e) {
-                fail("ValueParser.list(\"" + text + "\") lanza " + e, e);
+                fail("ValueParser.list(\"" + text + "\") throws " + e, e);
             }
         }
     }

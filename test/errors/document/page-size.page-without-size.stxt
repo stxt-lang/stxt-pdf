@@ -1,0 +1,12 @@
+# Case: Page without size: neither Paper nor Width and Height
+# Code: PAGE_SIZE
+# Line: 7
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Margin: 40
+	Section:
+		Block:
+			Box:
+				Height: 10

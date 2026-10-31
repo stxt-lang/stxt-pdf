@@ -1,18 +1,18 @@
-# Imágenes (reference/components/image.md). Área útil de 260 × 260 desde (20, 20). Las imágenes de
-# resources/images/test: wide.png de 200 × 100 píxeles (150 × 75 pt, proporción 2), tall.jpg de
-# 120 × 160 (90 × 120 pt, proporción 0,75) y square.png de 40 × 40 (30 × 30 pt).
+# Images (reference/components/image.md). Page area of 260 × 260 from (20, 20). The images in
+# resources/images/test: wide.png of 200 × 100 pixels (150 × 75 pt, ratio 2), tall.jpg of
+# 120 × 160 (90 × 120 pt, ratio 0.75) and square.png of 40 × 40 (30 × 30 pt).
 #
-# Página 1: title (12) y su margen de 8. hero, con Width: 100%, mide 260 × 130 (la proporción da
-# el alto) y deja otro margen de 8: el Stack empieza en 178. portrait tiene Height: 60, así que su
-# ancho intrínseco es 45; caption crece hasta 260 − 45 − 10 = 205 (41 caracteres por línea: dos
-# líneas) y se estira al alto de la fila, 60. moved (60 × 80 con Width: 60) no cabe en lo que
-# queda (280 − 246 = 34) y pasa entera a la página 2.
-# Página 2: moved en 20, con su margen de 8. El grid tiene dos columnas de (260 − 10) / 2 = 125 y
-# sus imágenes declaran Height: 50, así que no se estiran en vertical: la fila mide 50 (con 80,
-# su ancho mínimo sería 160 y las columnas no cabrían). contain dibuja la imagen de 100 × 50
-# centrada en su caja, sobre su fondo; cover la dibuja de 125 × 62,5 y la recorta. El Markdown traduce la imagen sola en su párrafo a una Image de su tamaño
-# natural (30 × 30) y el párrafo va debajo: md mide 30 + 12.
-# logo: un Page overlay en la esquina de arriba a la derecha, en el margen de la página, en las dos.
+# Page 1: title (12) and its margin of 8. hero, with Width: 100%, measures 260 × 130 (the ratio gives
+# the height) and leaves another margin of 8: the Stack starts at 178. portrait has Height: 60, so its
+# intrinsic width is 45; caption grows to 260 − 45 − 10 = 205 (41 characters per line: two
+# lines) and stretches to the height of the row, 60. moved (60 × 80 with Width: 60) does not fit in what
+# remains (280 − 246 = 34) and moves whole to page 2.
+# Page 2: moved at 20, with its margin of 8. The grid has two columns of (260 − 10) / 2 = 125 and
+# its images declare Height: 50, so they do not stretch vertically: the row measures 50 (with 80,
+# its minimum width would be 160 and the columns would not fit). contain draws the 100 × 50 image
+# centered in its box, over its background; cover draws it at 125 × 62.5 and crops it. The Markdown turns the lone
+# image in its paragraph into an Image of its natural size (30 × 30); the paragraph goes below: md measures 30 + 12.
+# logo: a Page overlay in the top right corner, in the page margin, on both pages.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300

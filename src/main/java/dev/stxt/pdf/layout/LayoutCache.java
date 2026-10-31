@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * Caché de medidas y layouts (reference/common/box.md). Sin ella, stack y grid anidados hacen un número de
- * layouts que crece exponencialmente con la profundidad.
+ * Cache of measurements and layouts (reference/common/box.md). Without it, nested stack and grid perform a number
+ * of layouts that grows exponentially with the depth.
  *
- * <p>No se usa {@code computeIfAbsent} porque el cálculo es recursivo y vuelve a escribir en el
- * mismo mapa, lo que {@link HashMap} no admite.</p>
+ * <p>{@code computeIfAbsent} is not used because the computation is recursive and writes again to the
+ * same map, which {@link HashMap} does not allow.</p>
  */
 public final class LayoutCache {
 
@@ -27,12 +27,12 @@ public final class LayoutCache {
     private int hits;
     private int misses;
 
-    /** Tamaños intrínsecos de la caja de margen. */
+    /** Intrinsic sizes of the margin box. */
     public IntrinsicSizes intrinsic(Box box, Supplier<IntrinsicSizes> computation) {
         return cached(intrinsics, box, computation);
     }
 
-    /** Tamaños intrínsecos del contenido. */
+    /** Intrinsic sizes of the content. */
     public IntrinsicSizes contentIntrinsic(Box box, Supplier<IntrinsicSizes> computation) {
         return cached(contents, box, computation);
     }
@@ -67,8 +67,8 @@ public final class LayoutCache {
     }
 
     /**
-     * Olvida lo que se guardó de esas cajas: sus tamaños intrínsecos y todos sus layouts. Lo de las demás sigue
-     * valiendo, porque el resultado de una caja solo depende de su subárbol y de la clave.
+     * Forgets what was stored for those boxes: their intrinsic sizes and all their layouts. What belongs to the
+     * others is still valid, because the result of a box only depends on its subtree and on the key.
      */
     public void forget(Set<Box> boxes) {
         intrinsics.keySet().removeIf(boxes::contains);
@@ -76,19 +76,19 @@ public final class LayoutCache {
         layouts.keySet().removeIf(k -> boxes.contains(k.box()));
     }
 
-    /** Layouts calculados porque no estaban guardados. */
+    /** Layouts computed because they were not stored. */
     int misses() {
         return misses;
     }
 
-    /** Cuántos resultados guarda ahora mismo. */
+    /** How many results it stores right now. */
     int entries() {
         return intrinsics.size() + contents.size() + layouts.size();
     }
 
     /**
-     * Para diagnosticar la eficacia de la caché ({@link Engine#toString}). Lo que la protege es
-     * {@code LayoutCacheTest}, que mide el trabajo de documentos muy anidados.
+     * To diagnose the effectiveness of the cache ({@link Engine#toString}). What protects it is
+     * {@code LayoutCacheTest}, which measures the work of deeply nested documents.
      */
     public String stats() {
         return "hits=" + hits + " misses=" + misses;

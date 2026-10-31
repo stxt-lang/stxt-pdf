@@ -1,25 +1,25 @@
 package dev.stxt.pdf.fragment;
 
 /**
- * Calidad de un corte (reference/common/breaks.md): mayor es mejor. {@link BreakRules#best} se
- * queda con el último corte de mayor calidad, que es lo mismo que relajar las reglas en el orden
- * de la referencia.
+ * Quality of a break (reference/common/breaks.md): higher is better. {@link BreakRules#best} keeps
+ * the last break of highest quality, which is the same as relaxing the rules in the order
+ * of the reference.
  */
 public final class BreakAppeal {
 
     /**
-     * Corte forzado de página ({@code Before} o {@code After: page} de {@code Break}): mejor que
-     * cualquier otro, y distinto de un corte perfecto para que un {@code Columns} no lo tome por
-     * el final de una columna y lo deje pasar hasta la página (reference/components/columns.md).
+     * Forced page break ({@code Before} or {@code After: page} of {@code Break}): better than
+     * any other, and different from a perfect break so that a {@code Columns} does not take it for
+     * the end of a column and lets it through to the page (reference/components/columns.md).
      */
     public static final int FORCED_PAGE = 4;
-    /** Corte que no incumple ninguna regla; también el forzado de columna. */
+    /** Break that violates no rule; also the forced column break. */
     public static final int PERFECT_BREAK = 3;
-    /** Incumple viudas o huérfanas. */
+    /** Violates widows or orphans. */
     public static final int VIOLATES_WIDOWS = 2;
-    /** Incumple {@code Keep with next} o {@code Keep with previous} de {@code Break}. */
+    /** Violates {@code Keep with next} or {@code Keep with previous} of {@code Break}. */
     public static final int VIOLATES_KEEP_BETWEEN = 1;
-    /** Incumple {@code Keep together} de {@code Break} o corta a la fuerza. */
+    /** Violates {@code Keep together} of {@code Break} or breaks by force. */
     public static final int FORCED = 0;
 
     private BreakAppeal() {

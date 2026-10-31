@@ -23,25 +23,26 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Las fuentes con que JSVG dibuja el texto de un SVG (reference/components/image.md): los ficheros de {@code fonts/}
- * que {@link ImageFile} comprobó, sin dar nada de alta en AWT ni buscar ninguna fuente por su nombre. Uno por dibujo.
+ * The fonts with which JSVG draws the text of an SVG (reference/components/image.md): the files of {@code fonts/}
+ * that {@link ImageFile} checked, without registering anything in AWT or looking up any font by its name. One per
+ * drawing.
  *
- * <p>JSVG busca la fuente por familia en AWT, que tiene dos problemas: con la JVM en turco no encuentra
- * {@code IBM Plex Sans} (pasa {@code I} a minúscula con el idioma y da {@code ıbm}) y dibuja con {@code Dialog}
- * sin avisar, y el registro de AWT es de toda la JVM, así que dos carpetas de recursos con la misma familia
- * comparten la primera. Por eso, al leer el SVG, {@link #rewrite} pone en cada
- * {@code <text>} y {@code <tspan>} la fuente que comprobó {@code ImageFile}: una familia clave
- * ({@code stxt-font-} y la huella del fichero, {@link FontFile#digest()}), que no es de ninguna fuente instalada, y
- * su peso y su estilo explícitos. JSVG no la encuentra en AWT y la pide a {@link #customFont}, que la crea con
- * {@link Font#createFont} con el contenido del fichero.</p>
+ * <p>JSVG looks up the font by family in AWT, which has two problems: with the JVM in Turkish it does not find
+ * {@code IBM Plex Sans} (it lowercases {@code I} with the locale and gets {@code ıbm}) and draws with {@code Dialog}
+ * without warning, and the AWT registry is JVM-wide, so two resources folders with the same family
+ * share the first one. That is why, when reading the SVG, {@link #rewrite} sets on each
+ * {@code <text>} and {@code <tspan>} the font that {@code ImageFile} checked: a key family
+ * ({@code stxt-font-} and the digest of the file, {@link FontFile#digest()}), which belongs to no installed font, and
+ * its explicit weight and style. JSVG does not find it in AWT and asks {@link #customFont} for it, which creates it
+ * with {@link Font#createFont} from the content of the file.</p>
  *
- * <p>JSVG guarda las fuentes que resuelve en una caché de toda la JVM cuya clave no incluye este objeto: por eso la
- * clave es la huella del contenido, y lo que guarda vale para cualquier carpeta con ese mismo fichero.</p>
+ * <p>JSVG keeps the fonts it resolves in a JVM-wide cache whose key does not include this object: that is why the
+ * key is the digest of the content, and what it keeps is valid for any folder with that same file.</p>
  */
 final class SvgFonts implements PlatformSupport {
 
     private static final String PREFIX = "stxt-font-";
-    /** Las propiedades de la fuente que se quitan de {@code style}, para que manden las que se ponen. */
+    /** The font properties removed from {@code style}, so that the ones set take precedence. */
     private static final Set<String> FONT_PROPERTIES = Set.of("font-family", "font-weight", "font-style");
 
     private final ImageFile file;
@@ -55,8 +56,9 @@ final class SvgFonts implements PlatformSupport {
     }
 
     /**
-     * El {@code DomProcessor} de JSVG: recorre el SVG en orden del documento (sin recursión, que el anidado lo limita
-     * {@code Limits}) y da a cada {@code <text>} y {@code <tspan>} su fuente de {@link ImageFile#textFonts()}.
+     * The {@code DomProcessor} of JSVG: walks the SVG in document order (without recursion, since {@code Limits}
+     * limits the nesting) and gives each {@code <text>} and {@code <tspan>} its font from
+     * {@link ImageFile#textFonts()}.
      */
     void rewrite(DomElement root) {
         List<FontFile> fonts = file.textFonts();
@@ -100,8 +102,8 @@ final class SvgFonts implements PlatformSupport {
     }
 
     /**
-     * La fuente de una familia clave (JSVG la pasa en minúsculas; la huella ya lo está). Una familia que no es clave
-     * es la de un texto sin fuente, que solo tiene espacios: JSVG usa la suya y no dibuja nada.
+     * The font of a key family (JSVG passes it in lowercase; the digest already is). A family that is not a key
+     * is that of a text without a font, which only has spaces: JSVG uses its own and draws nothing.
      */
     @Override
     public Font customFont(String family) {
@@ -111,30 +113,30 @@ final class SvgFonts implements PlatformSupport {
         }
         return created.computeIfAbsent(family, key -> {
             try {
-                // Desde los bytes y no desde el fichero: AWT deja abierto el fichero que se le pasa mientras viva la
-                // fuente, y en Windows no se podría borrar ni sustituir. Son los que se midieron.
+                // From the bytes and not from the file: AWT keeps the file it is given open while the font lives,
+                // and on Windows it could not be deleted or replaced. They are the ones that were measured.
                 return Font.createFont(Font.TRUETYPE_FONT, font.content());
             } catch (FontFormatException | IOException e) {
-                failure = "AWT no carga la fuente " + font.face() + " (" + e.getMessage() + ")";
+                failure = "AWT does not load the font " + font.face() + " (" + e.getMessage() + ")";
                 return null;
             }
         });
     }
 
     /**
-     * Después de dibujar: que JSVG ha visto los mismos textos que {@code ImageFile} y ha podido cargar sus fuentes;
-     * si no, habría dibujado alguno con otra fuente.
+     * After drawing: that JSVG has seen the same texts as {@code ImageFile} and has been able to load their fonts;
+     * otherwise, it would have drawn some with another font.
      *
-     * @throws ImageFormatException si no
+     * @throws ImageFormatException if not
      */
     void check() {
         String name = file.path().getFileName().toString();
         if (texts != file.textFonts().size()) {
-            throw new ImageFormatException("No se puede dibujar el SVG " + name + ": JSVG lee " + texts
-                    + " elementos <text> y <tspan> y el motor " + file.textFonts().size());
+            throw new ImageFormatException("The SVG " + name + " cannot be drawn: JSVG reads " + texts
+                    + " <text> and <tspan> elements and the engine " + file.textFonts().size());
         }
         if (failure != null) {
-            throw new ImageFormatException("No se puede dibujar el texto del SVG " + name + ": " + failure);
+            throw new ImageFormatException("The text of the SVG " + name + " cannot be drawn: " + failure);
         }
     }
 

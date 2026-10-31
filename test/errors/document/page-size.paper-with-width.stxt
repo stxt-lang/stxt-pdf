@@ -1,0 +1,13 @@
+# Case: Paper and Width at the same time in Page
+# Code: PAGE_SIZE
+# Line: 9
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Paper: A4
+		Width: 595
+	Section:
+		Block:
+			Box:
+				Height: 10

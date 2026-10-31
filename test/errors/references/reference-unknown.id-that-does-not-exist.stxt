@@ -1,0 +1,20 @@
+# Case: Reference to an Id that does not exist
+# Code: REFERENCE_UNKNOWN
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Ver la página {page of: nada}
+		Block:
+			Id: algo
+			Box:
+				Height: 10

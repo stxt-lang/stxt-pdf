@@ -27,22 +27,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Genera los PDF que usan las {@code Image} de la documentación y de los tests (reference/components/image.md), para
- * no subir binarios sin origen:
+ * Generates the PDFs used by the {@code Image} elements of the documentation and the tests
+ * (reference/components/image.md), so that no binaries without a source are committed:
  *
  * <ul>
- * <li>{@code resources/images/examples/letterhead/letterhead.pdf}: el papel de carta de Taller Nogal, maquetado con el
- * propio motor desde {@code tools/letterhead.stxt} (un PDF etiquetado, con fuentes incrustadas).</li>
- * <li>{@code resources/images/test/*.pdf}: los casos de los tests, escritos con PDFBox: páginas de tamaños distintos,
- * con recorte y giradas ({@code pages.pdf}), una fuente sin incrustar, una fuente sin {@code ToUnicode}, un campo de
- * formulario, un PDF cifrado y una página con contenido opcional.</li>
+ * <li>{@code resources/images/examples/letterhead/letterhead.pdf}: the letterhead of Taller Nogal, laid out with the
+ * engine itself from {@code tools/letterhead.stxt} (a tagged PDF, with embedded fonts).</li>
+ * <li>{@code resources/images/test/*.pdf}: the test cases, written with PDFBox: pages of different sizes,
+ * cropped and rotated ({@code pages.pdf}), a font not embedded, a font without {@code ToUnicode}, a form
+ * field, an encrypted PDF and a page with optional content.</li>
  * </ul>
  *
- * <p>Necesita las clases del motor y sus dependencias:</p>
+ * <p>It needs the classes of the engine and its dependencies:</p>
  *
  * <pre>
  * mvn -q compile dependency:build-classpath -Dmdep.outputFile=target/classpath.txt
- * java -cp "target/classes:$(cat target/classpath.txt)" tools/ExamplePdfs.java    # desde la raíz del repositorio
+ * java -cp "target/classes:$(cat target/classpath.txt)" tools/ExamplePdfs.java    # from the root of the repository
  * </pre>
  */
 public class ExamplePdfs {
@@ -61,7 +61,7 @@ public class ExamplePdfs {
         layers();
     }
 
-    /** El papel de carta, con el motor. */
+    /** The letterhead, with the engine. */
     static void letterhead() throws IOException {
         Path out = IMAGES.resolve("examples/letterhead/letterhead.pdf");
         Files.createDirectories(out.getParent());
@@ -71,9 +71,9 @@ public class ExamplePdfs {
     }
 
     /**
-     * Tres páginas: la 1 de 200 × 100; la 2, de 300 × 300 con un recorte de 150 × 50 en (50, 100); la 3, de 200 × 100
-     * girada 90°, que se ve de 100 × 200. Cada una dice su número y lleva una franja de color en su borde de arriba tal
-     * como se ve.
+     * Three pages: page 1, 200 × 100; page 2, 300 × 300 with a crop of 150 × 50 at (50, 100); page 3, 200 × 100
+     * rotated 90°, which shows as 100 × 200. Each one says its number and carries a color band on its top edge as
+     * it is seen.
      */
     static void pages() throws IOException {
         try (PDDocument doc = new PDDocument()) {
@@ -89,14 +89,14 @@ public class ExamplePdfs {
                 cs.setNonStrokingColor(new Color(0xF4F1EA));
                 cs.addRect(0, 0, 200, 100);
                 cs.fill();
-                // Girada 90° en el sentido de las agujas del reloj, el borde izquierdo (x = 0) queda arriba.
+                // Rotated 90° clockwise, the left edge (x = 0) ends up at the top.
                 cs.setNonStrokingColor(new Color(0x4C8C4A));
                 cs.addRect(0, 0, 10, 100);
                 cs.fill();
                 cs.beginText();
                 cs.setFont(font, 14);
                 cs.setNonStrokingColor(Color.BLACK);
-                // El texto avanza hacia arriba (+y), que en la página girada es hacia la derecha: se lee derecho.
+                // The text advances upwards (+y), which on the rotated page is to the right: it reads upright.
                 cs.setTextMatrix(new org.apache.pdfbox.util.Matrix(0, 1, -1, 0, 188, 10));
                 cs.showText("Página 3");
                 cs.endText();
@@ -111,7 +111,7 @@ public class ExamplePdfs {
         return page;
     }
 
-    /** Un fondo, una franja de 10 pt arriba y el texto, dentro del rectángulo visible de la página. */
+    /** A background, a 10 pt band at the top and the text, inside the visible rectangle of the page. */
     private static void draw(PDDocument doc, PDPage page, PDFont font, Color band, float x, float y, float w, float h,
             String text) throws IOException {
         try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
@@ -130,7 +130,7 @@ public class ExamplePdfs {
         }
     }
 
-    /** Un texto en Helvetica, una de las fuentes estándar que no se incrustan. */
+    /** A text in Helvetica, one of the standard fonts that are not embedded. */
     static void standardFont() throws IOException {
         try (PDDocument doc = new PDDocument()) {
             PDPage page = page(doc, 200, 100);
@@ -145,7 +145,7 @@ public class ExamplePdfs {
         }
     }
 
-    /** Un campo de texto relleno: su valor está en la anotación, no en el contenido de la página. */
+    /** A filled text field: its value is in the annotation, not in the content of the page. */
     static void formField() throws IOException {
         try (PDDocument doc = new PDDocument()) {
             PDPage page = page(doc, 200, 100);
@@ -168,7 +168,9 @@ public class ExamplePdfs {
         }
     }
 
-    /** Un texto en una fuente incrustada a la que se le quita el {@code ToUnicode}: no dice qué carácter es cada glifo. */
+    /**
+     * A text in an embedded font whose {@code ToUnicode} is removed: it does not say which character each glyph is.
+     */
     static void noUnicode() throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (PDDocument doc = new PDDocument()) {
@@ -186,8 +188,8 @@ public class ExamplePdfs {
     }
 
     /**
-     * Una página con una capa (contenido opcional) encendida, un texto que solo sale en ella, y una configuración de las
-     * capas sin {@code Name}, que PDF/UA pide.
+     * A page with a layer (optional content) turned on, a text that only appears in it, and a configuration of the
+     * layers without {@code Name}, which PDF/UA requires.
      */
     static void layers() throws IOException {
         try (PDDocument doc = new PDDocument()) {
@@ -215,7 +217,7 @@ public class ExamplePdfs {
         }
     }
 
-    /** Un PDF que se abre sin contraseña pero está cifrado (con la de propietario). */
+    /** A PDF that opens without a password but is encrypted (with the owner password). */
     static void encrypted() throws IOException {
         try (PDDocument doc = new PDDocument()) {
             PDPage page = page(doc, 200, 100);

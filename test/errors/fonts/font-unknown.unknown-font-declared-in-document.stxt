@@ -1,0 +1,17 @@
+# Case: Unknown font, declared in Document
+# Code: FONT_UNKNOWN
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: Helvetica
+				Size: 10
+	Section:
+		Block:
+			Text: hola

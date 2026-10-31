@@ -1,4 +1,4 @@
-# Las alturas de las filas están calculadas en input.stxt: 17 + 16 + 20 + 28 + 20 + 17 = 118.
+# The row heights are computed in input.stxt: 17 + 16 + 20 + 28 + 20 + 17 = 118.
 Result:
 	Page: 1
 		Fragment: t

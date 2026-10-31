@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Los colores del documento (reference/common/values.md): con y sin opacidad. */
+/** The colors of the document (reference/common/values.md): with and without opacity. */
 class ColorsTest {
 
     @Test

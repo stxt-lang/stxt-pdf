@@ -20,15 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Preformatted: true} y {@code wrap} y {@code Tab size} (reference/common/text-formatting.md). Con
- * {@link FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}, y cada línea, 12.
+ * {@code Preformatted: true} and {@code wrap} and {@code Tab size} (reference/common/text-formatting.md). With
+ * {@link FixedMetrics}, each character measures 5 pt with {@code Size: 10}, and each line, 12.
  */
 class PreformattedTextTest {
 
     private static final FontFace FONT = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
     private static final TextFormat BOLD = new TextFormat(true, false, false, false);
 
-    /** Un {@code Text} de 100 pt de ancho con este contenido (una línea por argumento) y estas propiedades de {@code Typography}. */
+    /** A {@code Text} 100 pt wide with this content (one line per argument) and these {@code Typography} properties. */
     private static List<String> text(int width, List<String> typography, String... content) {
         List<String> doc = new ArrayList<>(List.of("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: " + width,
                 "\t\tTypography:"));
@@ -98,8 +98,8 @@ class PreformattedTextTest {
 
     @Test
     void preformattedLinesAreNeverJustified() {
-        // Con true las líneas caben en la caja; con wrap la primera es una línea partida, que sin preformatear se
-        // justificaría.
+        // With true the lines fit in the box; with wrap the first one is a broken line, which without preformatting
+        // would be justified.
         for (String mode : List.of("true", "wrap")) {
             List<TextLine> lines = layOut(text(mode.equals("true") ? 200 : 100, List.of("Preformatted: " + mode,
                     "Align: justify"), "aaaa bbbb cccc dddd eeee", "ff gg").toArray(String[]::new)).fragment("T").lines();
@@ -143,13 +143,13 @@ class PreformattedTextTest {
         LayoutFixture l = layOut("\tStack:", "\t\tItem:", "\t\t\tText:", "\t\t\t\tId: T",
                 "\t\t\t\tTypography:", "\t\t\t\t\tPreformatted: true",
                 "\t\t\t\tContent >>", "\t\t\t\t\tab", "\t\t\t\t\tabcdef  ");
-        // El espacio final de una línea de un bloque lo quita el parser: abcdef mide 30.
+        // The trailing space of a line of a block is removed by the parser: abcdef measures 30.
         assertEquals(30, l.rect("T").width(), 1e-9);
     }
 
     @Test
     void theWholeBlockIsOneParagraphForWidowsAndOrphans() {
-        // 100 pt de área útil: caben 8 líneas. Con 9, la última sola sería una viuda: pasan 2.
+        // 100 pt of page area: 8 lines fit. With 9, the last one alone would be a widow: 2 move over.
         String[] nine = new String[9];
         Arrays.fill(nine, "x");
         LayoutFixture l = layOutPaged(180, text(100, List.of("Preformatted: true"), nine).toArray(String[]::new));
@@ -158,7 +158,7 @@ class PreformattedTextTest {
         assertEquals(2, l.fragment(2, "T").lines().size());
     }
 
-    // --- Piezas puras ------------------------------------------------------------------------------
+    // --- Pure pieces -------------------------------------------------------------------------------
 
     private static List<List<TextRun>> source(int tabSize, TextRun... runs) {
         return PreformattedText.sourceLines(List.of(runs), tabSize);
@@ -198,13 +198,13 @@ class PreformattedTextTest {
 
     @Test
     void severalTabsInALine() {
-        // «a» llega a la columna 4, «bb» a la 6 y el segundo tabulador a la 8.
+        // "a" reaches column 4, "bb" column 6 and the second tab column 8.
         assertEquals(List.of("a   bb  c"), lines(100, List.of("Preformatted: true"), "a\tbb\tc"));
     }
 
     @Test
     void narrowestOfPreserveAndPreserveWrap() {
-        // pre no parte: su ancho más estrecho es la línea entera (45); pre-wrap, la palabra más larga (25).
+        // pre does not break: its narrowest width is the whole line (45); pre-wrap, the longest word (25).
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tPreformatted: true",

@@ -1,19 +1,19 @@
-# Numeración de los encabezados (reference/components/heading.md). Área útil de 260 × 260 desde (20, 20);
-# con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
+# Heading numbering (reference/components/heading.md). Page area of 260 × 260 from (20, 20);
+# with FixedMetrics, each character measures 5 pt at Size: 10 and each line, 12.
 #
-# For element: Document activa Numbered en todos los encabezados y For element: Heading 3 lo quita en el
-# nivel 3. cover (Numbered: false) no se numera ni cuenta, y In table of contents: false lo deja fuera del
-# índice. Los números salen: intro es el 1, method el 1.1, data el 1.2, fine no lleva (nivel 3) y
-# results es el 2.
+# For element: Document enables Numbered on all the headings and For element: Heading 3 removes it at
+# level 3. cover (Numbered: false) is neither numbered nor counted, and In table of contents: false keeps it out of
+# the table of contents. The numbers come out as: intro is 1, method 1.1, data 1.2, fine has none (level 3) and
+# results is 2.
 #
-# toc lista los niveles 1 y 2 (Levels: 1 2): intro, method, data y results, cuatro entradas de 12 pt
-# (48 en total) y un margen de 8. cover ocupa 20..32, toc 32..80, intro empieza en 80 + 8 = 88, method
-# en 100, data en 112, fine en 124 y ref, que escribe «Véase la sección 1.2 y el capítulo 2.» (37
-# caracteres, 185 pt, una línea), en 136.
+# toc lists levels 1 and 2 (Levels: 1 2): intro, method, data and results, four entries of 12 pt
+# (48 in total) and a margin of 8. cover takes up 20..32, toc 32..80, intro starts at 80 + 8 = 88, method
+# at 100, data at 112, fine at 124 and ref, which writes "Véase la sección 1.2 y el capítulo 2." (37
+# characters, 185 pt, one line), at 136.
 #
-# results mide 95 pt de ancho (Width: 95, 19 caracteres). Sin número, «Resultados del año» (18
-# caracteres, 90 pt) cabría en una línea; con él, «2 Resultados del año» son 20 caracteres (100 pt) y
-# «año» pasa a una segunda línea: results mide 2 × 12 = 24 y empieza en 148.
+# results is 95 pt wide (Width: 95, 19 characters). Without a number, "Resultados del año" (18
+# characters, 90 pt) would fit on one line; with it, "2 Resultados del año" is 20 characters (100 pt) and
+# "año" moves to a second line: results measures 2 × 12 = 24 and starts at 148.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300

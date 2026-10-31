@@ -1,0 +1,19 @@
+# Case: Two-value Gap in a Columns, which only has a gap between columns
+# Code: VALUE_NOT_ALLOWED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Count: 2
+			Gap: 10 20
+			Text: Hola

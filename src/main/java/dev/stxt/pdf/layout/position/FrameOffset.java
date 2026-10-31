@@ -6,22 +6,22 @@ import dev.stxt.pdf.tree.Style;
 import java.util.OptionalDouble;
 
 /**
- * Desplazamiento visual de una caja {@code relative} (reference/components/frame-and-overlays.md). Se aplica
- * después de colocarla como si fuera {@code static}: su hueco se conserva y sus hermanos no se
- * mueven. Si se declaran arriba y abajo, gana arriba; si se declaran izquierda y derecha, gana
- * izquierda.
+ * Visual offset of a {@code relative} box (reference/components/frame-and-overlays.md). It is applied
+ * after placing it as if it were {@code static}: its space is kept and its siblings do not
+ * move. If top and bottom are declared, top wins; if left and right are declared, left
+ * wins.
  *
- * @param dx desplazamiento horizontal
- * @param dy desplazamiento vertical
+ * @param dx horizontal offset
+ * @param dy vertical offset
  */
 public record FrameOffset(double dx, double dy) {
 
     public static final FrameOffset NONE = new FrameOffset(0, 0);
 
     /**
-     * @param cbWidth  ancho del containing block, base de izquierda y derecha
-     * @param cbHeight alto del containing block, base de arriba y abajo; vacío = indefinido, y
-     *                 entonces un porcentaje se comporta como {@code auto}
+     * @param cbWidth  width of the reference container, base of left and right
+     * @param cbHeight height of the reference container, base of top and bottom; empty = indefinite, and
+     *                 then a percentage behaves as {@code auto}
      */
     public static FrameOffset of(Style s, double cbWidth, OptionalDouble cbHeight) {
         if (s.position() != Position.FRAME) {

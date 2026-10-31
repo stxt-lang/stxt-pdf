@@ -1,0 +1,12 @@
+# Case: Document without a language
+# Code: TOO_FEW_CHILDREN
+# Line: 4
+Document (dev.stxt.pdf):
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Height: 10

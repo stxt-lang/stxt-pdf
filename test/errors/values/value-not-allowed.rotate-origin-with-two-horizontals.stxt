@@ -1,0 +1,16 @@
+# Case: Rotate origin with two horizontal positions
+# Code: VALUE_NOT_ALLOWED
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Overlay:
+			Rotate: 10
+			Rotate origin: left right
+			Box:
+				Width: 10
+				Height: 10

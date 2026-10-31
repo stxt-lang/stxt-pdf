@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Las imágenes SVG de {@code images/} (reference/components/image.md): su tamaño natural y el subconjunto que se
- * admite.
+ * The SVG images of {@code images/} (reference/components/image.md): their natural size and the subset that is
+ * supported.
  */
 class SvgImageTest {
 
@@ -45,7 +45,7 @@ class SvgImageTest {
 
     @Test
     void sizeUnits() throws IOException {
-        // 1 in = 96 px = 72 pt; 36 pt = 48 px; 25,4 mm = 1 in.
+        // 1 in = 96 px = 72 pt; 36 pt = 48 px; 25.4 mm = 1 in.
         ImageFile f = read("<svg " + NS + " width=\"1in\" height=\"36pt\"/>");
         assertEquals(72, f.width(), 1e-9);
         assertEquals(36, f.height(), 1e-9);
@@ -74,12 +74,12 @@ class SvgImageTest {
 
     @Test
     void noSizeIsAnError() throws IOException {
-        assertTrue(error("<svg " + NS + "/>").contains("no tiene tamaño"));
-        assertTrue(error("<svg " + NS + " width=\"10\"/>").contains("solo tiene width y no tiene viewBox"));
-        assertTrue(error("<svg " + NS + " width=\"50%\" height=\"10\"/>").contains("no es una medida absoluta"));
-        assertTrue(error("<svg " + NS + " width=\"0\" height=\"10\"/>").contains("debe ser positivo"));
-        assertTrue(error("<svg " + NS + " viewBox=\"0 0 10\"/>").contains("no son cuatro números"));
-        assertTrue(error("<svg " + NS + " viewBox=\"0 0 0 10\"/>").contains("ancho y alto positivos"));
+        assertTrue(error("<svg " + NS + "/>").contains("has no size"));
+        assertTrue(error("<svg " + NS + " width=\"10\"/>").contains("only has width and has no viewBox"));
+        assertTrue(error("<svg " + NS + " width=\"50%\" height=\"10\"/>").contains("is not an absolute length"));
+        assertTrue(error("<svg " + NS + " width=\"0\" height=\"10\"/>").contains("must be positive"));
+        assertTrue(error("<svg " + NS + " viewBox=\"0 0 10\"/>").contains("is not four numbers"));
+        assertTrue(error("<svg " + NS + " viewBox=\"0 0 0 10\"/>").contains("positive width and height"));
     }
 
     @Test
@@ -100,9 +100,9 @@ class SvgImageTest {
 
     @Test
     void notSvg() throws IOException {
-        assertTrue(error("<html " + NS + "/>").contains("no es un SVG: su raíz es <html>"));
-        assertTrue(error("<svg width=\"10\" height=\"10\"/>").contains("no está en el espacio de nombres"));
-        assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\">").contains("no es un SVG bien formado (línea 1)"));
+        assertTrue(error("<html " + NS + "/>").contains("is not an SVG: its root is <html>"));
+        assertTrue(error("<svg width=\"10\" height=\"10\"/>").contains("is not in the namespace"));
+        assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\">").contains("is not a well-formed SVG (line 1)"));
     }
 
     @Test
@@ -110,15 +110,15 @@ class SvgImageTest {
         for (String element : new String[] {"script", "style", "filter", "mask", "pattern", "marker", "image",
                 "foreignObject", "a", "animate", "set", "symbol", "switch", "metadata"}) {
             String message = error("<svg " + NS + " width=\"10\" height=\"10\">\n<" + element + "/>\n</svg>");
-            assertTrue(message.contains("(línea 2)") && message.contains("el elemento <" + element
-                    + "> no está en el subconjunto"), element + ": " + message);
+            assertTrue(message.contains("(line 2)") && message.contains("the element <" + element
+                    + "> is not in the subset"), element + ": " + message);
         }
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><svg/></svg>")
-                .contains("un <svg> dentro de otro"));
+                .contains("an <svg> inside another one"));
         assertTrue(error("<svg " + NS + " xmlns:x=\"urn:x\" width=\"10\" height=\"10\"><x:foo/></svg>")
-                .contains("el elemento <x:foo> no es de SVG"));
+                .contains("the element <x:foo> is not SVG"));
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><tspan>a</tspan></svg>")
-                .contains("un <tspan> solo va dentro de un <text>"));
+                .contains("a <tspan> only goes inside a <text>"));
     }
 
     @Test
@@ -126,16 +126,16 @@ class SvgImageTest {
         for (String property : new String[] {"filter", "mask", "marker-start"}) {
             String message = error("<svg " + NS + " width=\"10\" height=\"10\"><rect " + property
                     + "=\"url(#x)\"/></svg>");
-            assertTrue(message.contains(property + " (filtros, máscaras y marcadores)"), message);
+            assertTrue(message.contains(property + " (filters, masks and markers)"), message);
         }
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><rect style=\"fill:red; filter:url(#f)\"/></svg>")
                 .contains("filter"));
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><rect onclick=\"x()\"/></svg>")
-                .contains("manejador de eventos"));
+                .contains("event handler"));
         assertTrue(error("<svg " + NS + " xmlns:i=\"urn:i\" width=\"10\" height=\"10\"><rect i:x=\"1\"/></svg>")
-                .contains("es de otro espacio de nombres"));
+                .contains("is from another namespace"));
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><rect style=\"fill\"/></svg>")
-                .contains("no es propiedad: valor"));
+                .contains("is not property: value"));
     }
 
     @Test
@@ -144,16 +144,16 @@ class SvgImageTest {
         for (String use : new String[] {"<use xlink:href=\"logo.svg#mark\"/>", "<use href=\"https://example.com/a.svg\"/>",
                 "<use href=\"file:///etc/passwd\"/>"}) {
             String message = error("<svg " + NS + xlink + " width=\"10\" height=\"10\">" + use + "</svg>");
-            assertTrue(message.contains("sale del fichero"), message);
+            assertTrue(message.contains("leaves the file"), message);
         }
         for (String fill : new String[] {"url(http://example.com/g.svg#g)", "url('other.svg#g')", "url( x.svg )"}) {
             String message = error("<svg " + NS + " width=\"10\" height=\"10\"><rect fill=\"" + fill + "\"/></svg>");
-            assertTrue(message.contains("sale del fichero"), message);
+            assertTrue(message.contains("leaves the file"), message);
         }
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><rect style=\"fill:url(x.svg#g)\"/></svg>")
-                .contains("sale del fichero"));
+                .contains("leaves the file"));
         assertTrue(error("<svg " + NS + " width=\"10\" height=\"10\"><rect href=\"#a\"/></svg>")
-                .contains("href no tiene sentido en <rect>"));
+                .contains("href has no meaning in <rect>"));
     }
 
     @Test
@@ -166,7 +166,7 @@ class SvgImageTest {
     void dtdAndEntitiesAreErrors() throws IOException {
         String message = error("<?xml version=\"1.0\"?><!DOCTYPE svg [<!ENTITY x SYSTEM \"file:///etc/passwd\">]>"
                 + "<svg " + NS + " width=\"10\" height=\"10\"><title>&x;</title></svg>");
-        assertTrue(message.contains("no se admiten DTD ni entidades"), message);
+        assertTrue(message.contains("DTDs and entities are not supported"), message);
     }
 
     @Test
@@ -177,28 +177,28 @@ class SvgImageTest {
                 + "Hola <tspan font-family=\"IBM Plex Mono, monospace\" font-style=\"normal\">mundo</tspan></text></g></svg>");
 
         String unknown = error(head + "\n<text font-family=\"Comic Sans MS\">Hola</text></svg>");
-        assertTrue(unknown.contains("El texto \"Hola\" del SVG image.svg (línea 2)") && unknown.contains("Fuente desconocida: "
+        assertTrue(unknown.contains("The text \"Hola\" of the SVG image.svg (line 2)") && unknown.contains("Unknown font: "
                 + "Comic Sans MS"), unknown);
-        assertTrue(error(head + "<text>Hola</text></svg>").contains("no declara font-family"));
+        assertTrue(error(head + "<text>Hola</text></svg>").contains("declares no font-family"));
         assertTrue(error(head + "<text font-family=\"sans-serif\">Hola</text></svg>")
-                .contains("familia genérica sans-serif"));
-        // Solo cuenta la primera familia de la lista.
+                .contains("generic family sans-serif"));
+        // Only the first family of the list counts.
         read(head + "<text font-family=\"IBM Plex Sans, sans-serif\" font-style=\"italic\" "
                 + "font-weight=\"bold\">Hola</text></svg>");
         String glyph = error(head + "<text font-family=\"IBM Plex Sans\">Hola 中</text></svg>");
         assertTrue(glyph.contains("'中' (U+4E2D)"), glyph);
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-weight=\"300\">Hola</text></svg>")
-                .contains("font-weight 300: solo se admiten normal (400) y bold (700)"));
+                .contains("font-weight 300: only normal (400) and bold (700) are supported"));
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-style=\"oblique\">Hola</text></svg>")
-                .contains("font-style oblique: solo se admiten normal e italic"));
-        // Un tspan de otra fuente que no existe.
+                .contains("font-style oblique: only normal and italic are supported"));
+        // A tspan with another font that does not exist.
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\">Hola <tspan font-family=\"Nope\">x</tspan></text></svg>")
-                .contains("Fuente desconocida: Nope"));
+                .contains("Unknown font: Nope"));
     }
 
     @Test
     void everyTextAndTspanHasTheFontThatDrawsIt() throws IOException {
-        // En orden del documento, con la herencia del fichero y lo que declara style; null en uno sin familia.
+        // In document order, with the inheritance of the file and what style declares; null for one without a family.
         ImageFile f = read("<svg " + NS + " width=\"100\" height=\"50\">"
                 + "<g font-family=\"'IBM Plex Serif'\" font-style=\"italic\"><text style=\"font-weight:bold\">"
                 + "Hola <tspan font-family=\"IBM Plex Mono, monospace\" font-style=\"normal\">mundo</tspan></text></g>"
@@ -217,20 +217,20 @@ class SvgImageTest {
                 : dev.stxt.pdf.model.FontStyle.NORMAL);
     }
 
-    // --- Cuánto dibuja un SVG ---------------------------------------------------
+    // --- How much an SVG draws --------------------------------------------------
 
     @Test
     void anSvgCountsItsElementsAndItsDepth() throws IOException {
         ImageFile f = read("<svg " + NS + " width=\"10\" height=\"10\"><g><rect/><rect/></g><circle/></svg>");
         assertEquals(5, f.svgElements());
         assertEquals(3, f.svgDepth());
-        // Un PNG o un JPEG no tienen elementos y un SVG no tiene píxeles.
+        // A PNG or a JPEG has no elements and an SVG has no pixels.
         assertEquals(0, f.pixels());
     }
 
     @Test
     void everyUseCountsWhatItRepeats() throws IOException {
-        // svg (1) + defs con un g de dos rect (1 + 3) + tres use de ese g (cada uno 1 + 3).
+        // svg (1) + defs with a g of two rect (1 + 3) + three use of that g (each 1 + 3).
         ImageFile f = read("<svg " + NS + " width=\"10\" height=\"10\"><defs><g id=\"a\"><rect/><rect/></g></defs>"
                 + "<use href=\"#a\"/><use href=\"#a\"/><use href=\"#a\"/></svg>");
         assertEquals(1 + 4 + 3 * 4, f.svgElements());
@@ -245,10 +245,13 @@ class SvgImageTest {
     @Test
     void aSelfRepeatingSvgIsRejected() throws IOException {
         String message = error("<svg " + NS + " width=\"10\" height=\"10\"><g id=\"a\"><use href=\"#a\"/></g></svg>");
-        assertTrue(message.contains("se repite a sí mismo"), message);
+        assertTrue(message.contains("repeats itself"), message);
     }
 
-    /** Diez multiplicado nueve veces no cabe en un entero ni se puede recorrer: el recuento satura y no desborda. */
+    /**
+     * Ten multiplied nine times does not fit in an integer and cannot be traversed: the count saturates and does not
+     * overflow.
+     */
     @Test
     void theCountSaturatesInsteadOfOverflowing() throws IOException {
         StringBuilder svg = new StringBuilder("<svg " + NS + " width=\"10\" height=\"10\"><defs><g id=\"l0\"><rect/></g>");
@@ -263,7 +266,7 @@ class SvgImageTest {
         assertEquals(SvgInspector.SATURATED, read(svg.toString()).svgElements());
     }
 
-    /** Un SVG hostil con decenas de miles de niveles, anidados o encadenados, no agota la pila del inspector. */
+    /** A hostile SVG with tens of thousands of levels, nested or chained, does not exhaust the inspector's stack. */
     @Test
     void veryDeepOrLongChainsDoNotOverflowTheStack() throws IOException {
         StringBuilder nested = new StringBuilder("<svg " + NS + " width=\"10\" height=\"10\">");

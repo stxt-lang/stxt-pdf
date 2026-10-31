@@ -1,0 +1,19 @@
+# Case: Inherited Line height taller than the page
+# Code: PAGE_OVERFLOW
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Typography:
+				Line height: 900
+			Text: a

@@ -1,0 +1,20 @@
+# Case: Edges from a rule in a rotated Frame
+# Code: BREAK_IN_ROTATED
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For style: stamp
+			Break:
+				Edges: closed
+	Section:
+		Frame:
+			Style: stamp
+			Rotate: -8
+			Block:
+				Box:
+					Height: 10

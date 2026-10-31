@@ -22,7 +22,7 @@ class TextFormatTest {
         assertEquals(BOLD, new TextFormat(true, false, false, false).face(REGULAR));
         assertEquals(new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC),
                 new TextFormat(false, true, true, false).face(BOLD));
-        // Negrita dentro de negrita sigue siendo negrita.
+        // Bold inside bold is still bold.
         assertEquals(BOLD, new TextFormat(true, false, false, false).face(BOLD));
     }
 
@@ -33,7 +33,7 @@ class TextFormatTest {
         assertEquals(new FontFace("M", FontWeight.BOLD, FontStyle.NORMAL), code.face(BOLD));
         assertEquals(new FontFace("M", FontWeight.BOLD, FontStyle.ITALIC),
                 new TextFormat(true, true, false, false).withFamily("M").face(REGULAR));
-        // Los demás cambios del formato la conservan.
+        // The other changes of the format keep it.
         assertEquals("M", code.withLink("https://example.com/a").withSmallCaps(true).family());
         assertEquals("https://example.com/a", code.withLink("https://example.com/a").link());
     }
@@ -43,7 +43,7 @@ class TextFormatTest {
         TextFormat code = TextFormat.PLAIN.asCode();
         assertTrue(code.withLink("https://example.com/a").withSmallCaps(true).withFamily("M").code());
         assertFalse(TextFormat.PLAIN.withFamily("M").code());
-        // Sin su familia todavía, se pinta con la de la caja.
+        // Without its family yet, it is painted with the one of the box.
         assertEquals(REGULAR, code.face(REGULAR));
     }
 
@@ -63,7 +63,7 @@ class TextFormatTest {
 
     @Test
     void decorationRectsFromTheBaseline() {
-        // Posiciones de la parte de arriba de la raya, hacia arriba desde la línea base.
+        // Positions of the top of the line, upwards from the baseline.
         DecorationMetrics d = new DecorationMetrics(-0.1, 0.05, 0.3, 0.04);
         assertEquals(new Rect(5, 101, 20, 0.5), d.underline(5, 100, 20, 10));
         assertEquals(new Rect(5, 97, 20, 0.4), d.strikeout(5, 100, 20, 10));
@@ -77,7 +77,7 @@ class TextFormatTest {
         assertNull(plain.link());
         assertEquals(REGULAR, link.face(REGULAR));
         assertFalse(link.decorated());
-        // Dos enlaces distintos no se unen en un tramo, aunque lo demás sea igual.
+        // Two different links are not merged into one run, even if everything else is equal.
         assertNotEquals(link, plain.withLink("https://otro.example"));
         assertNotEquals(link, plain);
     }

@@ -3,254 +3,271 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
 
 /**
- * Código estable de cada error del modelo (reference/common/errors.md). Los tests comparan el código y
- * la línea, no el texto del mensaje, que puede mejorar sin romperlos. Los errores de sintaxis
- * STXT y del schema llevan los códigos de la librería {@code stxt-core}
- * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}…), en un {@link DocumentSyntaxException}.
- * Cada código dice de quién es la culpa ({@link #kind()}).
+ * Stable code of each error of the model (reference/common/errors.md). The tests compare the code and
+ * the line, not the text of the message, which can improve without breaking them. STXT syntax errors
+ * and schema errors carry the codes of the {@code stxt-core} library
+ * ({@code INVALID_VALUE}, {@code CHILD_NOT_DECLARED}...), in a {@link DocumentSyntaxException}.
+ * Each code says whose fault it is ({@link #kind()}).
  */
 public enum ErrorCode {
 
-    // --- Documento y medio ------------------------------------------------------------------
-    /** El documento no tiene un único nodo raíz {@code Document} con el namespace del modelo. */
+    // --- Document and medium ----------------------------------------------------------------
+    /** The document does not have a single root node {@code Document} with the namespace of the model. */
     DOCUMENT_ROOT,
-    /** Un tamaño o un margen del medio no válido, o márgenes que no dejan área útil. */
+    /** An invalid size or margin of the medium, or margins that leave no page area. */
     PAGE_SIZE,
     /**
-     * Una {@code Section} sin contenido (solo {@code Page overlay}, que no ocupan sitio): no tendría ninguna página.
+     * A {@code Section} without content (only {@code Page overlay}, which take no space): it would have no page.
      */
     SECTION_EMPTY,
-    /** Un texto con {@code {page}} o {@code {pages}} en una página que no tiene número ({@code Page numbering: none}). */
+    /** A text with {@code {page}} or {@code {pages}} on a page that has no number ({@code Page numbering: none}). */
     PAGE_NUMBER_UNAVAILABLE,
 
-    // --- Valores ------------------------------------------------------------------------------
-    /** Sintaxis de un valor (reference/common/values.md): número, porcentaje, función, lista… */
+    // --- Values --------------------------------------------------------------------------------
+    /** Syntax of a value (reference/common/values.md): number, percentage, function, list... */
     VALUE_SYNTAX,
-    /** Un valor bien escrito que la propiedad no admite ({@code Width: *}, {@code Padding: -2}…). */
+    /** A well-written value that the property does not allow ({@code Width: *}, {@code Padding: -2}...). */
     VALUE_NOT_ALLOWED,
-    /** {@code fit} como pista de grid. */
+    /** {@code fit} as a grid track. */
     FIT_TRACK,
 
-    // --- Estructura ---------------------------------------------------------------------------
-    /** Dos cajas con el mismo {@code Id}. */
+    // --- Structure ----------------------------------------------------------------------------
+    /** Two boxes with the same {@code Id}. */
     DUPLICATE_ID,
-    /** Un {@code Item} o un {@code Area} que no contiene exactamente un elemento. */
+    /** An {@code Item} or an {@code Area} that does not contain exactly one element. */
     SINGLE_ELEMENT,
-    /** Un {@code Text} sin texto, o con texto en el valor y en {@code Content}. */
+    /** A {@code Text} without text, or with text in the value and in {@code Content}. */
     TEXT_CONTENT,
-    /** Texto sin {@code Font} en {@code Typography}, propia o heredada. */
+    /** Text without {@code Font} in {@code Typography}, its own or inherited. */
     TEXT_WITHOUT_FONT,
-    /** Texto sin {@code Size} en {@code Typography}, propio o heredado. */
+    /** Text without {@code Size} in {@code Typography}, its own or inherited. */
     TEXT_WITHOUT_FONT_SIZE,
 
-    // --- Encabezados y párrafos ----------------------------------------------------------------
-    /** Un salto en la jerarquía de encabezados: el primero no es {@code Heading 1}, o uno sube más de un nivel. */
+    // --- Headings and paragraphs --------------------------------------------------------------
+    /** A skip in the heading hierarchy: the first one is not {@code Heading 1}, or one goes up more than one level. */
     HEADING_LEVEL,
-    /** Un encabezado dentro de un {@code Page overlay}. */
+    /** A heading inside a {@code Page overlay}. */
     HEADING_IN_PAGE_OVERLAY,
-    /** Un {@code Text} de un encabezado con {@code Break}: el motor ya evita el corte. */
+    /** A {@code Text} of a heading with {@code Break}: the engine already avoids the break. */
     BREAK_IN_HEADING,
     /**
-     * Una línea en blanco en un {@code Paragraph}, que lo partiría en varios párrafos, o en un {@code Text} que no es
-     * preformateado.
+     * A blank line in a {@code Paragraph}, which would split it into several paragraphs, or in a {@code Text} that is
+     * not preformatted.
      */
     TEXT_BLANK_LINE,
 
-    // --- Listas ----------------------------------------------------------------------------------
-    /** Un {@code List item} sin ningún elemento. */
+    // --- Lists -----------------------------------------------------------------------------------
+    /** A {@code List item} without any element. */
     LIST_ITEM_EMPTY,
-    /** {@code Start} o {@code Number} en una lista que no numera ({@code bullet}, {@code dash}, {@code none}). */
+    /** {@code Start} or {@code Number} in a list that does not number ({@code bullet}, {@code dash}, {@code none}). */
     LIST_NUMBER_NOT_ALLOWED,
-    /** Un número que la numeración no puede escribir: negativo, 0 en letras o romanos, o más de 3999 en romanos. */
+    /**
+     * A number that the numbering cannot write: negative, 0 in letters or Roman numerals, or over 3999 in Roman
+     * numerals.
+     */
     LIST_NUMBER_RANGE,
-    /** Un ítem con marcador cuyo contenido no empieza con un texto con el que alinearlo. */
+    /** An item with a marker whose content does not start with a text to align it with. */
     LIST_ITEM_WITHOUT_LINE,
 
-    // --- Tablas -----------------------------------------------------------------------------------
-    /** {@code Header rows}, {@code Body} y {@code Footer rows} fuera de ese orden. */
+    // --- Tables -----------------------------------------------------------------------------------
+    /** {@code Header rows}, {@code Body} and {@code Footer rows} out of that order. */
     TABLE_ORDER,
-    /** Una fila que no llena exactamente las columnas de la tabla. */
+    /** A row that does not fill exactly the columns of the table. */
     TABLE_ROW_CELLS,
-    /** Un {@code Span} que sale de la tabla o de su grupo, o que se solapa con otra celda. */
+    /** A {@code Span} that goes outside the table or its group, or that overlaps another cell. */
     TABLE_SPAN,
-    /** Una {@code Cell} con texto en el valor y elementos. */
+    /** A {@code Cell} with text in the value and elements. */
     CELL_CONTENT,
-    /** {@code Break} en una fila de {@code Header rows} o de {@code Footer rows}, que se repiten en cada página. */
+    /** {@code Break} in a row of {@code Header rows} or {@code Footer rows}, which are repeated on each page. */
     TABLE_ROW_BREAK,
-    /** Un {@code Column align} con distinto número de alineaciones que columnas tiene la tabla. */
+    /** A {@code Column align} with a number of alignments different from the number of columns of the table. */
     TABLE_COLUMN_ALIGN,
-    /** {@code Row header} en una celda de {@code Header rows}, cuyas celdas ya son cabeceras de columna. */
+    /** {@code Row header} in a cell of {@code Header rows}, whose cells are already column headers. */
     ROW_HEADER_IN_HEADER_ROWS,
 
-    // --- Columnas ------------------------------------------------------------------------------
-    /** Un {@code Columns} sin {@code Count} ni {@code Min column width}. */
+    // --- Columns -------------------------------------------------------------------------------
+    /** A {@code Columns} without {@code Count} or {@code Min column width}. */
     COLUMNS_WITHOUT_COUNT,
-    /** {@code Separator} más ancho que {@code Gap}: la línea se pintaría sobre las columnas. */
+    /** {@code Separator} wider than {@code Gap}: the line would be painted over the columns. */
     SEPARATOR_WIDTH,
-    /** {@code Before} o {@code After: column} fuera de un {@code Columns}. */
+    /** {@code Before} or {@code After: column} outside a {@code Columns}. */
     COLUMN_BREAK_OUTSIDE_COLUMNS,
-    /** {@code Keep with next} con {@code After}, o {@code Keep with previous} con {@code Before}, en la misma caja. */
+    /**
+     * {@code Keep with next} with {@code After}, or {@code Keep with previous} with {@code Before}, in the same box.
+     */
     KEEP_CONFLICT,
-    /** Un {@code Overlay} o un {@code Page overlay} dentro de un {@code Columns}. */
+    /** An {@code Overlay} or a {@code Page overlay} inside a {@code Columns}. */
     OVERLAY_IN_COLUMNS,
 
     // --- Markdown ------------------------------------------------------------------------------
-    /** Algo de Markdown fuera del subconjunto admitido: enlaces, imágenes dentro de un texto, código, citas, HTML… */
+    /** Some Markdown outside the supported subset: links, images inside a text, code, quotes, HTML... */
     MARKDOWN_UNSUPPORTED,
     /**
-     * Una lista o una tabla de un {@code Markdown} sin su {@code Bullet markers}, {@code Number markers} o {@code Table
-     * columns}.
+     * A list or a table of a {@code Markdown} without its {@code Bullet markers}, {@code Number markers} or
+     * {@code Table columns}.
      */
     MARKDOWN_PROPERTY_MISSING,
-    /** Código, en línea o en un bloque, sin {@code Code font} en {@code Typography}, propia o heredada. */
+    /** Code, inline or in a block, without {@code Code font} in {@code Typography}, its own or inherited. */
     CODE_WITHOUT_FONT,
 
-    // --- Imágenes -------------------------------------------------------------------------------
-    /** Una {@code Image} sin ruta, con una ruta que sale de la carpeta o que no existe. */
+    // --- Images ---------------------------------------------------------------------------------
+    /** An {@code Image} without a path, with a path that goes outside the folder or that does not exist. */
     IMAGE_UNKNOWN,
     /**
-     * Una {@code Image} que no es PNG, JPEG, PDF ni un SVG admitido, que no se puede leer o cuya página de un PDF no se
-     * puede dibujar.
+     * An {@code Image} that is not PNG, JPEG, PDF or a supported SVG, that cannot be read or whose page of a PDF cannot
+     * be drawn.
      */
     IMAGE_FORMAT,
     /**
-     * {@code Pdf page} en una {@code Image} que no es un PDF, o una página que el PDF no tiene (línea de {@code Pdf
+     * {@code Pdf page} in an {@code Image} that is not a PDF, or a page that the PDF does not have (line of {@code Pdf
      * page}).
      */
     IMAGE_PAGE,
-    /** {@code Keep together} o {@code Edges} en una {@code Image}, que no se parte. */
+    /** {@code Keep together} or {@code Edges} in an {@code Image}, which is not split. */
     BREAK_IN_IMAGE,
 
-    // --- Referencias --------------------------------------------------------------------------
-    /** Una referencia ({@code {page of: id}}) sin {@code Id}, o con un {@code Id} que no tiene ninguna caja. */
+    // --- References ----------------------------------------------------------------------------
+    /** A reference ({@code {page of: id}}) without {@code Id}, or with an {@code Id} that no box has. */
     REFERENCE_UNKNOWN,
     /**
-     * Una referencia a la página de una caja que no tiene una única página: la de un {@code Page overlay} o una de sus
-     * cajas.
+     * A reference to the page of a box that does not have a single page: that of a {@code Page overlay} or one of its
+     * boxes.
      */
     REFERENCE_NOT_PLACEABLE,
-    /** Una referencia a una caja que no tiene número: ni es un ítem de una lista numerada ni un encabezado. */
+    /** A reference to a box that has no number: it is neither an item of a numbered list nor a heading. */
     REFERENCE_NOT_NUMBERED,
-    /** Las páginas a las que se refiere el texto no se estabilizan: cada pasada de paginación las cambia. */
+    /** The pages the text refers to do not stabilize: each pagination pass changes them. */
     REFERENCE_UNSTABLE,
 
-    // --- Enlaces ------------------------------------------------------------------------------
-    /** Un destino de enlace vacío, mal escrito o con un esquema que no es https, http, mailto ni {@code #id}. */
+    // --- Links --------------------------------------------------------------------------------
+    /** A link target that is empty, malformed or with a scheme that is not https, http, mailto or {@code #id}. */
     LINK_SCHEME,
     /**
-     * Un enlace {@code #id} a un {@code Id} que no existe o que está en un {@code Page overlay}, que se repite en todas
-     * las páginas.
+     * A {@code #id} link to an {@code Id} that does not exist or that is in a {@code Page overlay}, which is repeated
+     * on all the pages.
      */
     LINK_UNKNOWN,
 
-    // --- Índice -------------------------------------------------------------------------------
-    /** Un {@code Table of contents} sin ningún encabezado en los niveles de {@code Levels}. */
+    // --- Table of contents --------------------------------------------------------------------
+    /** A {@code Table of contents} without any heading in the levels of {@code Levels}. */
     TABLE_OF_CONTENTS_EMPTY,
 
-    // --- Reglas reutilizables (Styles) ---------------------------------------------------------
-    /** {@code For element} con un nombre que no es un elemento de caja. */
+    // --- Reusable rules (Styles) ---------------------------------------------------------------
+    /** {@code For element} with a name that is not a box element. */
     STYLE_UNKNOWN_ELEMENT,
-    /** Dos reglas con el mismo selector. */
+    /** Two rules with the same selector. */
     STYLE_DUPLICATE,
     /**
-     * Una regla aplica un grupo que el elemento no admite: {@code Break} en {@code Overlay},
-     * {@code Page overlay}, un encabezado, un {@code Text} de un encabezado o una {@code Cell}.
+     * A rule applies a group that the element does not accept: {@code Break} in {@code Overlay},
+     * {@code Page overlay}, a heading, a {@code Text} of a heading or a {@code Cell}.
      */
     STYLE_NOT_ALLOWED,
-    /** Una clase de {@code Style} sin regla {@code For style}. */
+    /** A {@code Style} class without a {@code For style} rule. */
     STYLE_WITHOUT_RULE,
 
-    // --- Combinaciones sin efecto o contradictorias --------------------------------------------
-    /** Un {@code Frame} con arriba y abajo, o con izquierda y derecha. */
+    // --- Combinations without effect or contradictory ----------------------------------------
+    /** A {@code Frame} with top and bottom, or with left and right. */
     OFFSET_CONFLICT,
-    /** Un {@code Overlay} o un {@code Page overlay} con inicio, tamaño y fin declarados y sin márgenes {@code auto}. */
+    /**
+     * An {@code Overlay} or a {@code Page overlay} with start, size and end declared and without {@code auto} margins.
+     */
     OVERCONSTRAINED,
-    /** Un margen {@code auto} donde no centra ni absorbe nada. */
+    /** An {@code auto} margin where it neither centers nor absorbs anything. */
     MARGIN_AUTO_WITHOUT_EFFECT,
-    /** {@code Start} en una {@code Section} sin {@code Page numbering: restart}. */
+    /** {@code Start} in a {@code Section} without {@code Page numbering: restart}. */
     START_WITHOUT_RESTART,
     /**
-     * Algo que no es el aspecto ({@code Background}, {@code Border}, {@code Border color}, {@code Corner radius}) en el
-     * {@code Box} de una {@code Row}.
+     * Something that is not the appearance ({@code Background}, {@code Border}, {@code Border color},
+     * {@code Corner radius}) in the {@code Box} of a {@code Row}.
      */
     ROW_BOX,
-    /** {@code Page number format} en una {@code Section} con {@code Page numbering: none}. */
+    /** {@code Page number format} in a {@code Section} with {@code Page numbering: none}. */
     PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
-    /** {@code Begin on: odd} en la primera {@code Section}, que ya empieza en la página 1. */
+    /** {@code Begin on: odd} in the first {@code Section}, which already starts on page 1. */
     BEGIN_ON_FIRST_SECTION,
-    /** {@code Line distribution} sin {@code Wrap: true}. */
+    /** {@code Line distribution} without {@code Wrap: true}. */
     LINE_DISTRIBUTION_WITHOUT_WRAP,
-    /** {@code Gap} de dos valores en un {@code Stack} sin {@code Wrap: true}. */
+    /** Two-value {@code Gap} in a {@code Stack} without {@code Wrap: true}. */
     GAP_WITHOUT_WRAP,
-    /** {@code Grow} en un {@code Stack} vertical sin alto definido. */
+    /** {@code Grow} in a vertical {@code Stack} without a definite height. */
     GROW_WITHOUT_EFFECT,
-    /** {@code Horizontal} o {@code Vertical} de un {@code Item} en el eje principal de su {@code Stack}. */
+    /** {@code Horizontal} or {@code Vertical} of an {@code Item} on the main axis of its {@code Stack}. */
     ITEM_MAIN_AXIS,
-    /** {@code Aspect ratio} con {@code Width} y {@code Height} declarados. */
+    /** {@code Aspect ratio} with {@code Width} and {@code Height} declared. */
     ASPECT_RATIO_CONFLICT,
-    /** Mínimo mayor que el máximo, o un tamaño fuera de su mínimo y su máximo. */
+    /** Minimum greater than the maximum, or a size outside its minimum and its maximum. */
     MIN_MAX_CONFLICT,
-    /** Un porcentaje vertical cuya base no es un alto definido. */
+    /** A vertical percentage whose base is not a definite height. */
     INDEFINITE_PERCENTAGE,
-    /** {@code Areas} no rectangulares o un valor de {@code Area} no válido. */
+    /** Non-rectangular {@code Areas} or an invalid {@code Area} value. */
     GRID_PLACEMENT,
-    /** {@code Rotate origin} sin {@code Rotate}. */
+    /** {@code Rotate origin} without {@code Rotate}. */
     ROTATE_ORIGIN_WITHOUT_ROTATE,
-    /** {@code Gap} o {@code Separator} en un {@code Columns} con {@code Count: 1}. */
+    /** {@code Gap} or {@code Separator} in a {@code Columns} with {@code Count: 1}. */
     SINGLE_COLUMN,
-    /** {@code Separator color} sin {@code Separator}. */
+    /** {@code Separator color} without {@code Separator}. */
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,
-    /** {@code Isolate margins: true} en un ítem de {@code Stack} o {@code Grid}, que ya aísla. */
+    /** {@code Isolate margins: true} on an item of {@code Stack} or {@code Grid}, which already isolates. */
     ISOLATE_MARGINS_IN_ITEM,
     /**
-     * Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja
-     * girada en flujo.
+     * An own {@code Break} inside an {@code Overlay}, a {@code Page overlay}, a rotated {@code Frame} or a rotated
+     * in-flow box.
      */
     BREAK_IN_UNBREAKABLE,
     /**
-     * {@code Keep together} o {@code Edges} en un {@code Frame} girado o en una caja girada en flujo, que no se parten.
+     * {@code Keep together} or {@code Edges} in a rotated {@code Frame} or in a rotated in-flow box, which are not
+     * split.
      */
     BREAK_IN_ROTATED,
-    /** {@code Isolate margins: true} en una caja girada en flujo, que ya aísla. */
+    /** {@code Isolate margins: true} in a rotated in-flow box, which already isolates. */
     ISOLATE_MARGINS_IN_ROTATED,
-    /** {@code Rotate} en un {@code Block}, un {@code Text}, un {@code Paragraph} o una {@code Image} que es un ítem de {@code Stack} o {@code Grid}. */
+    /**
+     * {@code Rotate} in a {@code Block}, a {@code Text}, a {@code Paragraph} or an {@code Image} that is an item of
+     * {@code Stack} or {@code Grid}.
+     */
     ROTATED_ITEM,
 
-    // --- Desbordamientos (al maquetar) -------------------------------------------------------
-    /** Una palabra más ancha que su línea. */
+    // --- Overflows (during layout) -----------------------------------------------------------
+    /** A word wider than its line. */
     TEXT_OVERFLOW,
     /**
-     * Una caja que no cabe en su contenedor, contenido que pasa de un alto fijado, o un {@code Overlay} que sale de la
-     * página.
+     * A box that does not fit in its container, content that exceeds a fixed height, or an {@code Overlay} that goes
+     * outside the page.
      */
     BOX_OVERFLOW,
-    /** Algo del flujo más alto que la página que no se puede partir. */
+    /** Something in the flow taller than the page that cannot be split. */
     PAGE_OVERFLOW,
-    /** El marcador de un ítem no cabe en la sangría: el relleno izquierdo de la lista más el margen del ítem. */
+    /** The marker of an item does not fit in the indent: the left padding of the list plus the margin of the item. */
     LIST_MARKER_OVERFLOW,
-    /** La cabecera y el pie de una tabla, que se repiten en cada página, no dejan sitio al cuerpo en una página vacía. */
+    /**
+     * The header and the footer of a table, which are repeated on each page, leave no room for the body on an empty
+     * page.
+     */
     TABLE_REPEAT_OVERFLOW,
 
-    // --- Fuentes ------------------------------------------------------------------------------
-    /** {@code Font} no está en la carpeta de fuentes. */
+    // --- Fonts --------------------------------------------------------------------------------
+    /** {@code Font} is not in the fonts folder. */
     FONT_UNKNOWN,
-    /** La familia no tiene la variante de {@code Bold} e {@code Italic}. */
+    /** The family does not have the variant of {@code Bold} and {@code Italic}. */
     FONT_VARIANT_MISSING,
-    /** La fuente no tiene un carácter del texto. */
+    /** The font does not have a character of the text. */
     GLYPH_MISSING,
 
-    // --- Accesibilidad (al convertir) -------------------------------------------------------
-    /** El texto tiene poco contraste con lo que hay debajo; se puede desactivar al convertir. */
+    // --- Accessibility (during conversion) ---------------------------------------------------
+    /** The text has low contrast with what is under it; the check can be disabled when converting. */
     CONTRAST_LOW,
 
-    // --- Límites ------------------------------------------------------------------------------
-    /** El documento ocupa más páginas que {@code Limits.maxPages}; no es de ninguna línea. */
+    // --- Limits -------------------------------------------------------------------------------
+    /** The document takes up more pages than {@code Limits.maxPages}; it belongs to no line. */
     PAGE_LIMIT(Kind.LIMIT),
-    /** Una imagen PNG o JPEG con más píxeles que {@code Limits.maxImagePixels} (línea de la {@code Image}). */
+    /** A PNG or JPEG image with more pixels than {@code Limits.maxImagePixels} (line of the {@code Image}). */
     IMAGE_TOO_LARGE(Kind.LIMIT),
-    /** Un SVG que dibuja más elementos o anida más niveles que {@code Limits.maxSvgElements} y {@code maxSvgDepth} (línea de la {@code Image}). */
+    /**
+     * An SVG that draws more elements or nests more levels than {@code Limits.maxSvgElements} and
+     * {@code maxSvgDepth} (line of the {@code Image}).
+     */
     SVG_TOO_COMPLEX(Kind.LIMIT),
-    /** Un PDF de más bytes que {@code Limits.maxPdfBytes} (línea de la {@code Image}). */
+    /** A PDF of more bytes than {@code Limits.maxPdfBytes} (line of the {@code Image}). */
     PDF_TOO_LARGE(Kind.LIMIT);
 
     private final Kind kind;
@@ -263,7 +280,7 @@ public enum ErrorCode {
         this.kind = kind;
     }
 
-    /** De quién es la culpa: del documento ({@link Kind#INVALID_DOCUMENT}) salvo los límites ({@link Kind#LIMIT}). */
+    /** Whose fault it is: the document's ({@link Kind#INVALID_DOCUMENT}) except for the limits ({@link Kind#LIMIT}). */
     public Kind kind() {
         return kind;
     }

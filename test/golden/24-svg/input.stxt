@@ -1,17 +1,17 @@
-# Imágenes vectoriales (reference/components/image.md). Área útil de 260 × 260 desde (20, 20). Los SVG de
-# resources/images/test: shapes.svg de 200 × 100 px (150 × 75 pt, proporción 2) y label.svg, sin
-# width ni height y con viewBox="0 0 160 48" (120 × 36 pt, proporción 10/3). Se dimensionan, se
-# cortan entre páginas y se colocan como un PNG; solo cambia el pintado, que es vectorial.
+# Vector images (reference/components/image.md). Page area of 260 × 260 from (20, 20). The SVG files in
+# resources/images/test: shapes.svg of 200 × 100 px (150 × 75 pt, ratio 2) and label.svg, without
+# width or height and with viewBox="0 0 160 48" (120 × 36 pt, ratio 10/3). They are sized, take
+# part in page breaks and are placed like a PNG; only the painting changes, which is vector.
 #
-# Página 1: title (12) y su margen de 8. art mide su tamaño natural (150 × 75) en 40 y deja otro
-# margen de 8; scaled, con Width: 100%, mide 260 × 130 (la proporción da el alto) en 40 + 75 + 8 =
-# 123 y acaba en 253, y su margen deja el siguiente en 261. label (36) no cabe en lo que queda
-# (280 − 261 = 19) y pasa entera a la página 2.
-# Página 2: label en 20, de 120 × 36, con su margen de 8. row empieza en 64: mini tiene Height: 30,
-# así que su ancho es 30 × 2 = 60; banner, con Grow, ocupa lo que queda (260 − 60 − 10 = 190) y
-# con los dos ejes declarados la imagen cubre la caja (Fit: fill). md traduce la imagen sola en
-# su párrafo a una Image de su tamaño natural (150 × 75) y el párrafo va debajo: md mide 75 + 12.
-# logo: un Page overlay en la esquina de arriba a la derecha, de 12 × 6, en las dos.
+# Page 1: title (12) and its margin of 8. art measures its natural size (150 × 75) at 40 and leaves another
+# margin of 8; scaled, with Width: 100%, measures 260 × 130 (the ratio gives the height) at 40 + 75 + 8 =
+# 123 and ends at 253, and its margin leaves the next one at 261. label (36) does not fit in what remains
+# (280 − 261 = 19) and moves whole to page 2.
+# Page 2: label at 20, of 120 × 36, with its margin of 8. row starts at 64: mini has Height: 30,
+# so its width is 30 × 2 = 60; banner, with Grow, takes up what remains (260 − 60 − 10 = 190) and
+# with both axes declared the image covers the box (Fit: fill). md turns the lone image in
+# its paragraph into an Image of its natural size (150 × 75) and the paragraph goes below: md measures 75 + 12.
+# logo: a Page overlay in the top right corner, of 12 × 6, on both pages.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300

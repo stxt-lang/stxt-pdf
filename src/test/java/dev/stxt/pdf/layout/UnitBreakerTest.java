@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Corte entre unidades (reference/common/breaks.md) con unidades sintéticas: un contenedor de 100 pt
- * de ancho sin borde ni relleno y ítems de bloque con un {@code Height}, uno por unidad salvo
- * que se diga otra cosa.
+ * Break between units (reference/common/breaks.md) with synthetic units: a container 100 pt
+ * wide without border or padding and block items with a {@code Height}, one per unit unless
+ * stated otherwise.
  */
 class UnitBreakerTest {
 
@@ -42,7 +42,7 @@ class UnitBreakerTest {
         return new StyleEditor().height(Value.pt(height)).box(id, Element.BLOCK);
     }
 
-    /** Ítem ya maquetado sin fragmentar, en {@code y} de la caja de contenido del contenedor. */
+    /** Item already laid out without fragmenting, at {@code y} of the content box of the container. */
     private static UnitBreaker.Placed placed(Box item, double y, int unit) {
         double h = ((Value.Points) item.style().box().height()).pt();
         LayoutResult r = LayoutResult.finished(new Fragment(item, 0, 0, 100, h, Insets.ZERO, Insets.ZERO,
@@ -51,12 +51,12 @@ class UnitBreakerTest {
                 FrameOffset.NONE);
     }
 
-    /** Tres unidades de 40, con un ítem cada una. */
+    /** Three units of 40, with one item each. */
     private static List<UnitBreaker.Placed> threeItems() {
         return List.of(placed(item("A", 40), 0, 0), placed(item("B", 40), 40, 1), placed(item("D", 40), 80, 2));
     }
 
-    /** Tres unidades de 40, con la calidad del corte y el corte forzado delante de cada una. */
+    /** Three units of 40, with the break quality and the forced break before each one. */
     private static UnitBreaker.Units units(int[] appeal, boolean[] forced, boolean splittable) {
         List<Unit> units = new ArrayList<>();
         for (int u = 0; u < 3; u++) {
@@ -100,7 +100,7 @@ class UnitBreakerTest {
         assertEquals(80, first.fragment().height(), 1e-9);
         assertEquals(List.of(0.0, 40.0), ys(first.fragment()));
 
-        // La página siguiente empieza en la primera unidad que queda.
+        // The next page starts at the first unit that remains.
         LayoutResult last = fragment(page(100, true), first.breakToken(), threeItems(), THREE,
                 UnitBreaker.Repeat.NONE);
         assertNull(last.breakToken());
@@ -111,12 +111,12 @@ class UnitBreakerTest {
 
     @Test
     void unitsThatCannotBeSeparatedGoTogether() {
-        // No se puede cortar delante de la unidad 1: las dos primeras son un grupo de 80.
+        // A break before unit 1 is not possible: the first two are a group of 80.
         UnitBreaker.Units grouped = units(new int[]{PERFECT, -1, PERFECT}, new boolean[3], false);
         LayoutResult r = fragment(page(60, false), null, threeItems(), grouped, UnitBreaker.Repeat.NONE);
         assertInstanceOf(BreakToken.Before.class, r.breakToken());
 
-        // Al principio de página, el grupo se coloca aunque desborde y se corta en cuanto se puede.
+        // At the start of a page, the group is placed even if it overflows, and it breaks as soon as possible.
         LayoutResult forced = fragment(page(60, true), null, threeItems(), grouped, UnitBreaker.Repeat.NONE);
         assertEquals(new BreakToken.Container(2, List.of(), 80), forced.breakToken());
         assertEquals(BreakAppeal.FORCED, forced.breakAppeal());
@@ -138,7 +138,7 @@ class UnitBreakerTest {
         Box foot = item("F", 10);
         UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(List.of(placed(head, 0, -1)), 10,
                 List.of(placed(foot, 0, -1)), 10);
-        // 100 de página: 80 para las unidades, entre la cabecera y el pie.
+        // 100 of page: 80 for the units, between the header and the footer.
         LayoutResult first = fragment(page(100, true), null, threeItems(), THREE, repeat);
         assertEquals(100, first.fragment().height(), 1e-9);
         assertEquals(List.of(0.0, 10.0, 50.0, 90.0), ys(first.fragment()));
@@ -153,7 +153,7 @@ class UnitBreakerTest {
 
     @Test
     void unitTallerThanThePageSplitsItsItemsInParallel() {
-        // Una sola unidad con dos ítems de 150 y 60, que no cabe ni al principio de una página de 100.
+        // A single unit with two items of 150 and 60, which does not fit even at the start of a page of 100.
         Box a = item("A", 150);
         Box b = item("B", 60);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0), placed(b, 0, 0));
@@ -167,7 +167,7 @@ class UnitBreakerTest {
         assertEquals(100, first.fragment().height(), 1e-9);
         assertEquals(List.of(100.0, 60.0), first.fragment().children().stream().map(Fragment::height).toList());
 
-        // Solo continúa A, desde arriba.
+        // Only A continues, from the top.
         LayoutResult last = fragment(page(100, true), token, placed, one, UnitBreaker.Repeat.NONE);
         assertNull(last.breakToken());
         assertEquals(50, last.fragment().height(), 1e-9);
@@ -191,7 +191,7 @@ class UnitBreakerTest {
         Box a = item("A", 150);
         List<UnitBreaker.Placed> placed = List.of(placed(a, 0, 0));
         UnitBreaker.Units one = new UnitBreaker.Units(List.of(new Unit(0, 150, PERFECT, Break.AUTO)), 150, false);
-        // Se coloca entera, desbordando (garantía de progreso).
+        // It is placed whole, overflowing (progress guarantee).
         LayoutResult r = fragment(page(100, true), null, placed, one, UnitBreaker.Repeat.NONE);
         assertNull(r.breakToken());
         assertEquals(150, r.fragment().height(), 1e-9);

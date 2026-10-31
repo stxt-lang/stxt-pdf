@@ -3,12 +3,12 @@
 Si el documento tiene un problema, la conversión se para en el primero y da un mensaje así:
 
 ```
-línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width o Max width
+line 18: Margin auto does not center a box that takes up the whole width: Width or Max width is missing
 ```
 
 - **La línea** es la de la propiedad que falla, no la de su elemento: la del `Margin`, no la del `Block`. Si el problema es
   una combinación de dos propiedades, el mensaje nombra la línea de la otra. En un fichero de estilos aparte dice
-  `línea 8 de los estilos`.
+  `line 8 of the styles`.
 - **El mensaje** dice qué falla y cómo arreglarlo.
 - **Cada error tiene un código** (`MARGIN_AUTO_WITHOUT_EFFECT`) que no cambia aunque cambie el mensaje.
 

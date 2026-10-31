@@ -1,0 +1,22 @@
+# Case: Vertical percentage inside a Columns
+# Code: INDEFINITE_PERCENTAGE
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Box:
+				Height: 200
+			Count: 2
+			Block:
+				Box:
+					Height: 50%

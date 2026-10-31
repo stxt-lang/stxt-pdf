@@ -1,0 +1,24 @@
+# Case: A table row with Break inside a Page overlay, which is repeated and does not break
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 23
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Cuerpo
+		Page overlay:
+			Table:
+				Column sizes: *
+				Body:
+					Row:
+						Break:
+							Keep together: true
+						Cell: Pie

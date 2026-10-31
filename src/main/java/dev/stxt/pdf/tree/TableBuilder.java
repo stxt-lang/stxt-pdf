@@ -25,42 +25,42 @@ import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 
 /**
- * Las filas de una {@code Table} (reference/components/table.md) como ítems de un grid con colocación
- * explícita, y el texto de una {@code Cell} con valor.
+ * The rows of a {@code Table} (reference/components/table.md) as items of a grid with explicit placement, and the
+ * text of a {@code Cell} with a value.
  */
 final class TableBuilder {
 
-    /** Grupos de filas de una {@code Table}, en el orden en que van. */
+    /** Row groups of a {@code Table}, in the order they go in. */
     private static final List<String> TABLE_GROUPS = List.of("header-rows", "body", "footer-rows");
 
-    /** Lo que admite el {@code Box} de una {@code Row}: su aspecto (reference/components/table.md#filas). */
+    /** What the {@code Box} of a {@code Row} allows: its look (reference/components/table.md#rows). */
     private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
 
     private TableBuilder() {
     }
 
     /**
-     * Construye la caja de una {@code Cell}, con su {@code Row} y su posición en la tabla: la tabla
-     * no sabe construir elementos.
+     * Builds the box of a {@code Cell}, with its {@code Row} and its position in the table: the table does not know how
+     * to build elements.
      */
     @FunctionalInterface
     interface Cells {
         Box build(InlineNode cell, InlineNode row, CellPosition position);
     }
 
-    /** Filas y columnas que ocupa una {@code Cell}, y la línea de su {@code Span} (o de la celda, sin él). */
+    /** Rows and columns a {@code Cell} takes up, and the line of its {@code Span} (or of the cell, without one). */
     private record Span(int rows, int columns, int line) {
     }
 
     /**
-     * Las filas de una {@code Table} (reference/components/table.md) como ítems de un grid con colocación explícita:
-     * cada {@code Cell} va en la primera columna libre de su fila, contando las que ocupan los {@code Span} de las
-     * filas de arriba. Los grupos van en el orden {@code Header rows}, {@code Body}, {@code Footer rows}; cada fila
-     * llena exactamente las columnas de {@code Column sizes}, y un {@code Span} no sale de la tabla ni de su grupo. Las
-     * filas de {@code Header rows} y {@code Footer rows} se repiten en cada página y no admiten {@code Break}.
-     * {@code cells} construye la caja de cada celda, con la tabla como padre. Cada celda lleva su posición
-     * ({@link CellPosition}) para las reglas de {@code Styles} y el {@code Column align} de su columna. Una fila con
-     * {@code Id} o {@code Box} tiene además su caja ({@link #row}).
+     * The rows of a {@code Table} (reference/components/table.md) as items of a grid with explicit placement: each
+     * {@code Cell} goes in the first free column of its row, counting the ones taken up by the {@code Span} of the rows
+     * above. The groups go in the order {@code Header rows}, {@code Body}, {@code Footer rows}; each row fills exactly
+     * the columns of {@code Column sizes}, and a {@code Span} does not go outside the table or its group. The rows of
+     * {@code Header rows} and {@code Footer rows} are repeated on each page and do not allow {@code Break}.
+     * {@code cells} builds the box of each cell, with the table as parent. Each cell carries its position
+     * ({@link CellPosition}) for the rules of {@code Styles} and the {@code Column align} of its column. A row with
+     * {@code Id} or {@code Box} also has its own box ({@link #row}).
      */
     static void table(BuildContext ctx, InlineNode n, Box table, Cells cells) {
         int count = table.style().grid().columnSizes().size();
@@ -74,9 +74,9 @@ final class TableBuilder {
                 continue;
             }
             if (group < last) {
-                throw error(g, ErrorCode.TABLE_ORDER, g.getName() + " va después de "
+                throw error(g, ErrorCode.TABLE_ORDER, g.getName() + " goes after "
                         + label(TABLE_GROUPS.get(last))
-                        + ": los grupos de una Table van en el orden Header rows, Body, Footer rows");
+                        + ": the groups of a Table go in the order Header rows, Body, Footer rows");
             }
             last = group;
             int rows = rows(ctx, g, group, firstRow, columns, table, cells);
@@ -90,14 +90,15 @@ final class TableBuilder {
     }
 
     /**
-     * Las columnas de la tabla: cuántas hay ({@code Column sizes}) y su {@code Column align}, con su línea (0 sin él).
+     * The columns of the table: how many there are ({@code Column sizes}) and their {@code Column align}, with its line
+     * (0 without one).
      */
     private record Columns(int count, List<TextAlign> aligns, int alignLine) {
     }
 
     /**
-     * Las filas de un grupo ({@code g}, el {@code group}-ésimo de {@link #TABLE_GROUPS}), cuya primera es la fila
-     * {@code firstRow} de la tabla (desde 0). Construye sus celdas y devuelve cuántas filas tiene.
+     * The rows of a group ({@code g}, the {@code group}-th of {@link #TABLE_GROUPS}), whose first is row
+     * {@code firstRow} of the table (from 0). Builds their cells and returns how many rows it has.
      */
     private static int rows(BuildContext ctx, Node g, int group, int firstRow, Columns columns, Box table,
                             Cells cells) {
@@ -107,8 +108,8 @@ final class TableBuilder {
             InlineNode row = rows.get(r);
             if (group != 1) {
                 child(row, "break").ifPresent(b -> {
-                    throw error(b, ErrorCode.TABLE_ROW_BREAK, "Las filas de " + g.getName() + " se repiten en "
-                            + "cada página de la tabla y no se cortan: sobra el Break");
+                    throw error(b, ErrorCode.TABLE_ROW_BREAK, "The rows of " + g.getName() + " are repeated on "
+                            + "each page of the table and do not break: Break is not needed");
                 });
             }
             row(ctx, row, table, firstRow + r + 1, columns.count());
@@ -131,8 +132,8 @@ final class TableBuilder {
             }
             for (int cc = 0; cc < columns.count(); cc++) {
                 if (!taken[r][cc]) {
-                    throw error(row, ErrorCode.TABLE_ROW_CELLS, "La fila deja libre la columna " + (cc + 1)
-                            + " de " + columns.count() + " (Columns): falta una Cell, vacía si hace falta, o un Span");
+                    throw error(row, ErrorCode.TABLE_ROW_CELLS, "The row leaves column " + (cc + 1)
+                            + " of " + columns.count() + " (Columns) free: a Cell is missing, empty if needed, or a Span");
                 }
             }
         }
@@ -140,11 +141,10 @@ final class TableBuilder {
     }
 
     /**
-     * La caja de una {@code Row} con {@code Id} o {@code Box} (reference/components/table.md#filas): la franja de la
-     * fila {@code tableRow} de la tabla (desde 1), de la primera columna a la última, que se pinta debajo de sus
-     * celdas. Su {@code Box} solo admite el aspecto ({@code ROW_BOX}); lee también su {@code Typography} (el color de
-     * su borde por defecto) y su {@code Break} (su {@code Edges}). Sin {@code Id} ni {@code Box}, la fila no tiene
-     * caja.
+     * The box of a {@code Row} with {@code Id} or {@code Box} (reference/components/table.md#rows): the band of row
+     * {@code tableRow} of the table (from 1), from the first column to the last, which is painted below its cells. Its
+     * {@code Box} only allows the look ({@code ROW_BOX}); it also reads its {@code Typography} (the default color of
+     * its border) and its {@code Break} (its {@code Edges}). Without {@code Id} or {@code Box}, the row has no box.
      */
     private static void row(BuildContext ctx, InlineNode row, Box table, int tableRow, int columns) {
         Optional<Node> id = child(row, "id");
@@ -160,9 +160,9 @@ final class TableBuilder {
         look.map(Nodes::inline).ifPresent(b -> {
             for (Node p : b.getChildren()) {
                 if (!ROW_LOOK.contains(p.getCanonicalName())) {
-                    throw error(p, ErrorCode.ROW_BOX, p.getName() + " no tiene efecto en una Row, que no es una caja "
-                            + "del layout: su Box solo admite Background, Border, Border color y Corner radius; dáselo a sus "
-                            + "celdas");
+                    throw error(p, ErrorCode.ROW_BOX, p.getName() + " has no effect on a Row, which is not a layout "
+                            + "box: its Box only allows Background, Border, Border color and Corner radius; it goes on its "
+                            + "cells");
                 }
             }
             box(b, s);
@@ -172,38 +172,38 @@ final class TableBuilder {
         table.addRow(box);
     }
 
-    /** La primera columna libre de la fila desde {@code from}, contando las que ocupan los {@code Span} de arriba. */
+    /** The first free column of the row from {@code from}, counting the ones taken up by the {@code Span} above. */
     private static int freeColumn(boolean[] taken, int from, InlineNode cell) {
         int c = from;
         while (c < taken.length && taken[c]) {
             c++;
         }
         if (c == taken.length) {
-            throw error(cell, ErrorCode.TABLE_ROW_CELLS, "No queda columna libre para esta Cell: la tabla "
-                    + "tiene " + taken.length + " (Columns), contando las que ocupan los Span de las filas de arriba");
+            throw error(cell, ErrorCode.TABLE_ROW_CELLS, "No free column is left for this Cell: the table "
+                    + "has " + taken.length + " (Columns), counting the ones taken up by the Span of the rows above");
         }
         return c;
     }
 
     /**
-     * Marca como ocupadas las filas y columnas de la celda que empieza en la fila {@code r} y la columna {@code c}
-     * de su grupo ({@code group}, su nombre): un {@code Span} no sale de la tabla ni del grupo, ni se solapa.
+     * Marks as taken the rows and columns of the cell that begins at row {@code r} and column {@code c} of its group
+     * ({@code group}, its name): a {@code Span} does not go outside the table or the group, and does not overlap.
      */
     private static void occupy(boolean[][] taken, int r, int c, Span span, String group) {
         int columns = taken[r].length;
         if (c + span.columns() > columns) {
-            throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa de la columna " + (c + 1)
-                    + " a la " + (c + span.columns()) + ", y la tabla tiene " + columns + " (Columns)");
+            throw error(span.line(), ErrorCode.TABLE_SPAN, "The cell takes up from column " + (c + 1)
+                    + " to " + (c + span.columns()) + ", and the table has " + columns + " (Columns)");
         }
         if (r + span.rows() > taken.length) {
-            throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda ocupa " + span.rows() + " filas y en su "
-                    + group + " quedan " + (taken.length - r) + ": un Span no pasa de un grupo a otro");
+            throw error(span.line(), ErrorCode.TABLE_SPAN, "The cell takes up " + span.rows() + " rows and its "
+                    + group + " has " + (taken.length - r) + " left: a Span does not cross from one group to another");
         }
         for (int rr = r; rr < r + span.rows(); rr++) {
             for (int cc = c; cc < c + span.columns(); cc++) {
                 if (taken[rr][cc]) {
-                    throw error(span.line(), ErrorCode.TABLE_SPAN, "La celda se solapa en la columna "
-                            + (cc + 1) + " con otra que ocupa varias filas");
+                    throw error(span.line(), ErrorCode.TABLE_SPAN, "The cell overlaps in column "
+                            + (cc + 1) + " with another one that takes up several rows");
                 }
                 taken[rr][cc] = true;
             }
@@ -211,8 +211,8 @@ final class TableBuilder {
     }
 
     /**
-     * El {@code Column align} de una {@code Table}: una alineación por columna, en el orden de
-     * {@code Column sizes}. Vacío si no lo declara.
+     * The {@code Column align} of a {@code Table}: one alignment per column, in the order of {@code Column sizes}.
+     * Empty if it does not declare it.
      */
     private static List<TextAlign> columnAlign(InlineNode table, int columns) {
         Optional<Node> node = child(table, "column-align");
@@ -225,18 +225,18 @@ final class TableBuilder {
             try {
                 aligns.add(TextAlign.valueOf(word.toUpperCase(Locale.ROOT)));
             } catch (IllegalArgumentException ex) {
-                throw error(node.get(), ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en Column align: " + word
-                        + " (left, center, right o justify)");
+                throw error(node.get(), ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in Column align: " + word
+                        + " (left, center, right or justify)");
             }
         }
         if (aligns.size() != columns) {
-            throw error(node.get(), ErrorCode.TABLE_COLUMN_ALIGN, "Column align da " + aligns.size()
-                    + " alineaciones y la tabla tiene " + columns + " columnas (Columns): va una por columna");
+            throw error(node.get(), ErrorCode.TABLE_COLUMN_ALIGN, "Column align gives " + aligns.size()
+                    + " alignments and the table has " + columns + " columns (Columns): one goes per column");
         }
         return aligns;
     }
 
-    /** El {@code Span} de una celda: {@code filas columnas}, dos enteros positivos; sin él, 1 1. */
+    /** The {@code Span} of a cell: {@code rows columns}, two positive integers; without it, 1 1. */
     private static Span span(InlineNode cell) {
         Optional<Node> node = child(cell, "span");
         if (node.isEmpty()) {
@@ -245,17 +245,17 @@ final class TableBuilder {
         String text = node.get().getText().trim();
         String[] t = text.split("\\s+");
         if (t.length != 2 || !t[0].matches("[1-9]\\d*") || !t[1].matches("[1-9]\\d*")) {
-            throw error(node.get(), ErrorCode.VALUE_SYNTAX, "Span espera 'filas columnas', dos enteros "
-                    + "positivos: '" + text + "'");
+            throw error(node.get(), ErrorCode.VALUE_SYNTAX, "Span expects 'rows columns', two positive "
+                    + "integers: '" + text + "'");
         }
         return new Span(Integer.parseInt(t[0]), Integer.parseInt(t[1]), node.get().getLine());
     }
 
-    /** El texto de una {@code Cell} con valor: una línea, sin elementos al lado. */
+    /** The text of a {@code Cell} with a value: one line, with no elements beside it. */
     static void cellText(InlineNode n, Box box) {
         n.getChildren().stream().filter(Nodes::isElement).findFirst().ifPresent(e -> {
-            throw error(e, ErrorCode.CELL_CONTENT, "Una Cell tiene texto en el valor (línea " + n.getLine()
-                    + ") o elementos y no las dos cosas: el texto va en un Paragraph");
+            throw error(e, ErrorCode.CELL_CONTENT, "A Cell has text in the value (line " + n.getLine()
+                    + ") or elements, not both: the text goes in a Paragraph");
         });
         font(n, n, box);
         box.setText(n.getText(), n.getLine(), false);

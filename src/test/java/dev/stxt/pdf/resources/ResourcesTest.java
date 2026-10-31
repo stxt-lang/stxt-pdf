@@ -39,7 +39,7 @@ class ResourcesTest {
         for (String path : new String[] {"../secret.txt", "images/../../secret.txt", "images/../images/logos/a.png",
                 "images\\..\\..\\secret.txt", ".."}) {
             ResourceException e = assertThrows(ResourceException.class, () -> r.resolve(path), path);
-            assertTrue(e.getMessage().startsWith("Ruta de recurso hacia atrás"), e.getMessage());
+            assertTrue(e.getMessage().startsWith("Backward resource path"), e.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ class ResourcesTest {
         for (String path : new String[] {dir.resolve("secret.txt").toString(), "/etc/passwd", "\\secret.txt",
                 "C:\\secret.txt", "c:secret.txt", "~/secret.txt"}) {
             ResourceException e = assertThrows(ResourceException.class, () -> r.resolve(path), path);
-            assertTrue(e.getMessage().startsWith("Ruta de recurso absoluta"), e.getMessage());
+            assertTrue(e.getMessage().startsWith("Absolute resource path"), e.getMessage());
         }
     }
 
@@ -58,7 +58,7 @@ class ResourcesTest {
         Resources r = resources();
         assertThrows(ResourceException.class, () -> r.resolve(""));
         ResourceException e = assertThrows(ResourceException.class, () -> r.resolve("images/b.png"));
-        assertTrue(e.getMessage().startsWith("No existe el recurso images/b.png"), e.getMessage());
+        assertTrue(e.getMessage().startsWith("The resource images/b.png does not exist"), e.getMessage());
     }
 
     @Test
@@ -68,10 +68,10 @@ class ResourcesTest {
         try {
             Files.createSymbolicLink(link, dir.resolve("secret.txt"));
         } catch (UnsupportedOperationException | IOException e) {
-            assumeTrue(false, "El sistema no admite enlaces simbólicos");
+            assumeTrue(false, "The system does not support symbolic links");
         }
         ResourceException e = assertThrows(ResourceException.class, () -> r.resolve("images/secret.txt"));
-        assertTrue(e.getMessage().contains("es un enlace que sale de la carpeta de recursos"), e.getMessage());
+        assertTrue(e.getMessage().contains("is a link that leaves the resources folder"), e.getMessage());
 
         Files.createSymbolicLink(r.root().resolve("images/inside.png"), r.root().resolve("images/logos/a.png"));
         assertEquals(r.root().resolve("images/inside.png"), r.resolve("images/inside.png"));

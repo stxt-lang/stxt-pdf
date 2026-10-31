@@ -1,8 +1,8 @@
-// Sonda de QA: documentos de texto largo de 200 a 12 800 párrafos, con {page} y {pages}
-// en un Page overlay; da el tiempo de lectura, layout y pintado y los aciertos y fallos de la caché, también por
-// página. Los de 2000 y 2100 párrafos quedan a los dos lados de la página 100, donde {pages} necesita una cifra más;
-// los "indice" llevan además un Table of contents y un {page of: …} por capítulo, que se repiten hasta converger. Para
-// el perfil: añade -XX:StartFlightRecording=filename=rec.jfr,settings=profile y mira "jfr print --events
+// QA probe: long text documents of 200 to 12 800 paragraphs, with {page} and {pages}
+// in a Page overlay; it gives the time of reading, layout and painting and the hits and misses of the cache, also per
+// page. Those of 2000 and 2100 paragraphs fall on both sides of page 100, where {pages} needs one more digit;
+// the "toc" ones also carry a Table of contents and a {page of: ...} per chapter, which repeat until they converge. For
+// the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
 // jdk.ExecutionSample".
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.layout.Engine;
@@ -47,20 +47,20 @@ public class ScaleProbe {
         long t3 = System.nanoTime();
         String stats = e.toString();
         long misses = Long.parseLong(stats.replaceAll(".*misses=(\\d+).*", "$1"));
-        System.out.printf("%-28s paginas=%4d  leer=%5d ms  layout=%6d ms  pintar=%6d ms  pdf=%d KB  %s  fallos/pagina=%.1f%n",
+        System.out.printf("%-28s pages=%4d  read=%5d ms  layout=%6d ms  paint=%6d ms  pdf=%d KB  %s  misses/page=%.1f%n",
             label, lo.pages().size(), (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000, (t3 - t2) / 1_000_000, o.size() / 1024,
             stats, (double) misses / lo.pages().size());
     }
 
     public static void main(String[] a) throws Exception {
         Resources r = new Resources();
-        run("calentar 50", big(50, false), r);
-        run("calentar 50", big(50, false), r);
+        run("warm-up 50", big(50, false), r);
+        run("warm-up 50", big(50, false), r);
         for (int n : new int[]{200, 800, 2000, 2100, 3200, 12800}) {
-            run("parrafos " + n, big(n, false), r);
+            run("paragraphs " + n, big(n, false), r);
         }
         for (int n : new int[]{800, 3200}) {
-            run("indice " + n, big(n, true), r);
+            run("toc " + n, big(n, true), r);
         }
         System.out.println("max heap MB: " + Runtime.getRuntime().maxMemory() / 1048576);
     }

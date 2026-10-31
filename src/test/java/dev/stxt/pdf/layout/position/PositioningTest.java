@@ -30,7 +30,7 @@ class PositioningTest {
 
     @Test
     void relativeOffsets() {
-        // Arriba y abajo, o izquierda y derecha, a la vez son un error (catálogo de errores).
+        // Top and bottom, or left and right, at the same time are an error (error catalog).
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: start", "\t\tOffset: 5 auto auto 11", "\t\tBox:", "\t\t\tHeight: 20",
                 "\tFrame:", "\t\tId: endOnly", "\t\tOffset: auto 7 9 auto", "\t\tBox:", "\t\t\tHeight: 20");
@@ -40,8 +40,8 @@ class PositioningTest {
 
     @Test
     void relativePercentages() {
-        // Izquierda: 10 % de 515. Arriba: 10 % del alto del padre (200). Un porcentaje vertical
-        // con el alto del padre indefinido es un error (catálogo de errores).
+        // Left: 10 % of 515. Top: 10 % of the height of the parent (200). A vertical percentage
+        // with an indefinite height of the parent is an error (error catalog).
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: top", "\t\tOffset: auto auto auto 10%", "\t\tBox:", "\t\t\tHeight: 20",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
@@ -53,7 +53,7 @@ class PositioningTest {
 
     @Test
     void absoluteWithoutPositionedAncestorUsesThePageArea() {
-        // El área útil mide 515 × 762 desde (40, 40), sea cual sea el alto del flujo.
+        // The page area measures 515 × 762 from (40, 40), whatever the height of the flow.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tOverlay:", "\t\tId: S", "\t\tOffset: 0 0 auto auto", "\t\tBox:", "\t\t\tWidth: 80",
@@ -66,7 +66,7 @@ class PositioningTest {
 
     @Test
     void containingBlockIsThePaddingBoxOfThePositionedAncestor() {
-        // Caja de relleno de R: (42, 42), 511 × 96.
+        // Padding box of R: (42, 42), 511 × 96.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: R", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 10",
                 "\t\tOverlay:", "\t\t\tId: TL", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tWidth: 50",
@@ -89,7 +89,7 @@ class PositioningTest {
 
     @Test
     void staticPositionAndShrinkToFit() {
-        // A estaría en la caja de contenido de M: (40 + 5, 40 + 10 + 5). Su texto mide 30.
+        // A would be in the content box of M: (40 + 5, 40 + 10 + 5). Its text measures 30.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tId: R",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
@@ -119,7 +119,7 @@ class PositioningTest {
 
     @Test
     void minAndMaxWidthLimitTheAutomaticWidth() {
-        // El máximo convierte el estiramiento en un ancho fijo: sobre-restringida, se ignora la derecha.
+        // The maximum turns the stretch into a fixed width: over-constrained, the right side is ignored.
         LayoutFixture l = layOut(
                 "\tOverlay:", "\t\tId: min", "\t\tBox:", "\t\t\tMin width: 100",
                 "\t\tText: aaa", "\tOverlay:", "\t\tId: max", "\t\tOffset: 0 0 auto 0", "\t\tBox:",
@@ -148,7 +148,7 @@ class PositioningTest {
 
     @Test
     void nestedOverlayUsesTheNearestPositionedAncestor() {
-        // B es absolute y por tanto containing block de C, aunque esté dentro de R.
+        // B is absolute and therefore the reference container of C, even though it is inside R.
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tOverlay:", "\t\t\tId: B", "\t\t\tOffset: 10 auto auto 10", "\t\t\tBox:", "\t\t\t\tWidth: 100",
@@ -169,7 +169,7 @@ class PositioningTest {
 
     @Test
     void fixedIgnoresPositionedAncestors() {
-        // G no tiene desplazamientos: queda en su posición estática, en la caja de contenido de R.
+        // G has no offsets: it stays at its static position, in the content box of R.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 30",
                 "\tFrame:", "\t\tBox:", "\t\t\tPadding: 10", "\t\t\tHeight: 100",
@@ -180,12 +180,12 @@ class PositioningTest {
         assertRect(50, 80, 10, 10, l.rect("G"));
     }
 
-    // Casos que faltaban según las pruebas de mutación: el borde y el relleno de las cajas
-    // entre un Overlay y su containing block, en un bloque, un ítem stack y un área de grid.
+    // Cases that were missing according to mutation testing: the border and the padding of the boxes
+    // between an Overlay and its reference container, in a block, a stack item and a grid area.
 
     @Test
     void staticPositionInsideABorderedBox() {
-        // La caja de contenido de M empieza en (40 + 3 + 5, 40 + 3 + 5).
+        // The content box of M starts at (40 + 3 + 5, 40 + 3 + 5).
         String inner = "\t\t\tBox:\n\t\t\t\tBorder: 3\n\t\t\t\tPadding: 5\n\t\t\tOverlay:\n\t\t\t\tId: %s\n"
                 + "\t\t\t\tText: aaa";
         LayoutFixture l = layOut(
@@ -206,8 +206,8 @@ class PositioningTest {
 
     @Test
     void anAbsoluteMayLeaveItsContainingBlockButNotThePage() {
-        // La caja de relleno de R empieza en (42, 42); A sale 42 por la izquierda y por arriba, hasta la esquina de la
-        // página (0, 0), y no más: no es un desbordamiento (reference/common/overflow.md).
+        // The padding box of R starts at (42, 42); A extends 42 to the left and to the top, up to the corner of the
+        // page (0, 0), and no further: it is not an overflow (reference/common/overflow.md).
         LayoutFixture l = layOut(
                 "\tFrame:", "\t\tBox:", "\t\t\tHeight: 100", "\t\t\tBorder: 2", "\t\t\tPadding: 30",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tOffset: -42 auto auto -42", "\t\t\tBox:", "\t\t\t\tWidth: 20",
@@ -217,7 +217,7 @@ class PositioningTest {
 
     @Test
     void staticPositionInsideAContainingBlockWithPadding() {
-        // Sin Offset, A va en la caja de contenido de R: (40 + 3 + 7, 40 + 3 + 7).
+        // Without Offset, A goes in the content box of R: (40 + 3 + 7, 40 + 3 + 7).
         LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
                 "\t\tOverlay:", "\t\t\tId: A", "\t\t\tText: aaa");
         assertRect(50, 50, 15, 12, l.rect("A"));
@@ -225,7 +225,7 @@ class PositioningTest {
 
     @Test
     void staticPositionAfterABottomMargin() {
-        // Detrás de un bloque de 10 con 6 de margen inferior: (40, 40 + 10 + 6).
+        // After a block of 10 with a bottom margin of 6: (40, 40 + 10 + 6).
         LayoutFixture l = layOut("\tFrame:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10",
                 "\t\t\t\tMargin: 0 0 6 0", "\t\tOverlay:", "\t\t\tId: A", "\t\t\tText: aaa");
         assertRect(40, 56, 15, 12, l.rect("A"));
@@ -233,7 +233,7 @@ class PositioningTest {
 
     @Test
     void shrinkToFitAndStretchLeaveTheMargins() {
-        // F: el texto mide 30 (ancho natural), entre 10 de margen a cada lado. S: 100 − 10 − 20 − 5 − 7 de alto.
+        // F: the text measures 30 (natural width), between margins of 10 on each side. S: 100 − 10 − 20 − 5 − 7 high.
         LayoutFixture l = layOut("\tFrame:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tOverlay:", "\t\t\tId: F", "\t\t\tOffset: 0 auto auto 0", "\t\t\tBox:", "\t\t\t\tMargin: 0 10",
                 "\t\t\tText: aaa bb",
@@ -245,7 +245,7 @@ class PositioningTest {
 
     @Test
     void aFixedInsideABorderedAbsoluteStartsInItsContentBox() {
-        // A, en (50, 50), tiene 3 de borde y 7 de relleno: F, sin Offset, empieza en (60, 60).
+        // A, at (50, 50), has a border of 3 and padding of 7: F, without Offset, starts at (60, 60).
         LayoutFixture l = layOut("\tOverlay:", "\t\tOffset: 10 auto auto 10", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 50", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
                 "\t\tPage overlay:", "\t\t\tId: F", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10");
@@ -254,7 +254,7 @@ class PositioningTest {
 
     @Test
     void autoMarginOnOneSide() {
-        // A: 10 a la izquierda y el resto a la derecha. B: 10 a la derecha y el resto (305) a la izquierda.
+        // A: 10 on the left and the rest on the right. B: 10 on the right and the rest (305) on the left.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 10", "\t\t\tMargin: 0 auto 0 10",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 10", "\t\t\tMargin: 0 10 0 auto");

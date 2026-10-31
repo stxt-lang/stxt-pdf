@@ -1,7 +1,7 @@
-# Horario escolar semanal en una página A4 apaisada (Paper: A4 y Orientation: landscape, 842 × 595): una tabla con las celdas
-# separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
-# recreo y comedor que ocupan los cinco días con Span, una leyenda en un Stack con salto de línea
-# y unas notas en Markdown. Cada color es un estilo de styles.stxt.
+# Weekly school timetable on one landscape A4 page (Paper: A4 and Orientation: landscape, 842 × 595): a table with
+# the cells separated by a Gap, an hour cell on the left, subjects with their color, and break and lunch
+# bands that span the five days with Span, a legend in a Stack with a line break
+# and some notes in Markdown. Each color is a style in styles.stxt.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

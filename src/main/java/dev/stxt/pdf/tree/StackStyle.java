@@ -6,21 +6,21 @@ import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades del elemento {@code Stack} (reference/components/stack.md): el eje, el reparto y el hueco entre ítems
- * y líneas. No se heredan.
+ * The properties of the {@code Stack} element (reference/components/stack.md): the axis, the distribution and the gap
+ * between items and lines. They are not inherited.
  */
 public final class StackStyle extends StyleGroup {
 
     private Direction direction = Direction.HORIZONTAL;
     private boolean wrap;
-    /** {@code Horizontal} y {@code Vertical} como se escribieron; {@code null} = sin declarar. */
+    /** {@code Horizontal} and {@code Vertical} as they were written; {@code null} = not declared. */
     private Distribution horizontal;
     private Distribution vertical;
     private Distribution lineDistribution = Distribution.STRETCH;
-    /** {@code Gap}: entre filas y entre columnas. */
+    /** {@code Gap}: between rows and between columns. */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
-    /** Si {@code Gap} se escribió con dos valores. */
+    /** Whether {@code Gap} was written with two values. */
     private boolean gapPair;
 
     StackStyle() {
@@ -44,13 +44,14 @@ public final class StackStyle extends StyleGroup {
         wrap = v;
     }
 
-    /** Si el eje principal es el horizontal ({@code Direction: horizontal}). */
+    /** Whether the main axis is the horizontal one ({@code Direction: horizontal}). */
     public boolean isHorizontal() {
         return direction == Direction.HORIZONTAL;
     }
 
     /**
-     * {@code Horizontal} o {@code Vertical}, la del eje principal: el reparto del sobrante. Por defecto, {@code start}.
+     * {@code Horizontal} or {@code Vertical}, the one of the main axis: the distribution of the free space. By default,
+     * {@code start}.
      */
     public Distribution mainAxis() {
         Distribution v = isHorizontal() ? horizontal : vertical;
@@ -58,25 +59,25 @@ public final class StackStyle extends StyleGroup {
     }
 
     /**
-     * {@code Horizontal} o {@code Vertical}, la del eje cruzado: la alineación de los ítems. Por defecto, {@code
-     * stretch}. Que sea una alineación lo comprueba {@code ModelValidator.validateStack}.
+     * {@code Horizontal} or {@code Vertical}, the one of the cross axis: the alignment of the items. By default,
+     * {@code stretch}. {@code ModelValidator.validateStack} checks that it is an alignment.
      */
     public Alignment crossAxis() {
         Distribution v = isHorizontal() ? vertical : horizontal;
         return v != null ? Alignment.valueOf(v.name()) : Alignment.STRETCH;
     }
 
-    /** La clave de la propiedad del eje principal ({@code stack.horizontal} o {@code stack.vertical}), para su línea. */
+    /** The key of the property of the main axis ({@code stack.horizontal} or {@code stack.vertical}), for its line. */
     String mainAxisKey() {
         return isHorizontal() ? PropertyKey.STACK_HORIZONTAL : PropertyKey.STACK_VERTICAL;
     }
 
-    /** La clave de la propiedad del eje cruzado, para su línea. */
+    /** The key of the property of the cross axis, for its line. */
     String crossAxisKey() {
         return isHorizontal() ? PropertyKey.STACK_VERTICAL : PropertyKey.STACK_HORIZONTAL;
     }
 
-    /** Lo que se escribió en el eje cruzado; {@code null} si no se declaró. */
+    /** What was written for the cross axis; {@code null} if it was not declared. */
     Distribution crossDeclared() {
         return isHorizontal() ? vertical : horizontal;
     }
@@ -108,7 +109,7 @@ public final class StackStyle extends StyleGroup {
         return columnGap;
     }
 
-    /** Si {@code Gap} tiene dos valores ({@code filas columnas}) y no uno para los dos ejes. */
+    /** Whether {@code Gap} has two values ({@code rows columns}) and not one for both axes. */
     boolean gapPair() {
         return gapPair;
     }

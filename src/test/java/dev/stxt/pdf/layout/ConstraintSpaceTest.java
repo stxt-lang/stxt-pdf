@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConstraintSpaceTest {
 
-    /** Un espacio con todos los campos distintos de los valores por defecto. */
+    /** A space with every field different from the default values. */
     private static final ConstraintSpace FULL = new ConstraintSpace(100, OptionalDouble.of(50), true, true,
             80, OptionalDouble.of(40), OptionalDouble.of(30), true, true);
 

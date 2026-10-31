@@ -9,9 +9,9 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Propiedad de la fragmentación con documentos y páginas al azar: los fragmentos de un
- * párrafo repartido en varias páginas suman lo que mide entero, así que no se pierde ni se repite ninguna línea, y
- * cada uno empieza en la página en que acaba el anterior o en la siguiente. La semilla es fija: un fallo se repite.
+ * Fragmentation property with random documents and pages: the fragments of a paragraph spread over several pages add
+ * up to its whole height, so no line is lost or repeated, and each one starts on the page where the previous one ends
+ * or on the next. The seed is fixed: a failure repeats.
  */
 class FragmentationPropertiesTest {
 
@@ -49,9 +49,9 @@ class FragmentationPropertiesTest {
                         sum += paged.rect(page, id).height();
                     }
                 }
-                String where = id + " con páginas de " + height + " pt (caso " + i + ")";
+                String where = id + " with pages of " + height + " pt (case " + i + ")";
                 assertEquals(whole.rect(id).height(), sum, 1e-9, where);
-                assertEquals(true, first == last || first == last + 1, where + ": empieza en la página " + first);
+                assertEquals(true, first == last || first == last + 1, where + ": starts on page " + first);
                 for (int page = first; page <= paged.pages() && paged.has(page, id); page++) {
                     last = page;
                 }

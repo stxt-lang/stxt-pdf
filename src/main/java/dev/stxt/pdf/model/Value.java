@@ -3,28 +3,28 @@ package dev.stxt.pdf.model;
 import java.util.OptionalDouble;
 
 /**
- * Valor <em>especificado</em> de una propiedad, tal como lo escribe el autor
- * (reference/common/values.md). El layout lo convierte en un valor <em>usado</em>, en puntos,
- * con {@link #resolve(OptionalDouble)}.
+ * <em>Specified</em> value of a property, as the author writes it
+ * (reference/common/values.md). The layout turns it into a <em>used</em> value, in points,
+ * with {@link #resolve(OptionalDouble)}.
  *
- * <p>Se conservan separados los valores especificados de los usados porque stack y grid
- * necesitan saber si un valor era {@code auto} en origen (reference/common/values.md).</p>
+ * <p>Specified values are kept apart from used values because stack and grid
+ * need to know whether a value was originally {@code auto} (reference/common/values.md).</p>
  */
 public sealed interface Value {
 
-    /** Longitud absoluta en puntos tipográficos. */
+    /** Absolute length in typographic points. */
     record Points(double pt) implements Value {}
 
-    /** Porcentaje del containing block (o del tamaño de fuente en {@code Line height}). */
+    /** Percentage of the reference container (or of the font size in {@code Line height}). */
     record Percentage(double percent) implements Value {}
 
-    /** Fracción de espacio libre en pistas de grid ({@code *}, {@code 2*}), con su peso. */
+    /** Fraction of free space in grid tracks ({@code *}, {@code 2*}), with its weight. */
     record Fraction(double weight) implements Value {}
 
-    /** {@code between(min, max)} en pistas de grid. */
+    /** {@code between(min, max)} in grid tracks. */
     record Between(Value min, Value max) implements Value {}
 
-    /** Palabras clave que dependen del contenido. */
+    /** Keywords that depend on the content. */
     enum Keyword implements Value { AUTO, NARROWEST, NATURAL, FIT }
 
     Value AUTO = Keyword.AUTO;
@@ -37,17 +37,17 @@ public sealed interface Value {
         return this == Keyword.AUTO;
     }
 
-    /** {@code narrowest}, {@code natural} o {@code fit}. */
+    /** {@code narrowest}, {@code natural} or {@code fit}. */
     default boolean isIntrinsic() {
         return this instanceof Keyword k && k != Keyword.AUTO;
     }
 
     /**
-     * Resuelve el valor a puntos.
+     * Resolves the value to points.
      *
-     * @param base tamaño de referencia (normalmente del containing block); vacío si es indefinido
-     * @return los puntos, o vacío si el valor depende del contenido ({@code auto}, intrínsecos,
-     *         fracciones) o es un porcentaje sobre una base indefinida (reference/common/box.md)
+     * @param base reference size (usually that of the reference container); empty if it is indefinite
+     * @return the points, or empty if the value depends on the content ({@code auto}, intrinsic,
+     *         fractions) or is a percentage of an indefinite base (reference/common/box.md)
      */
     default OptionalDouble resolve(OptionalDouble base) {
         if (this instanceof Points p) {

@@ -1,0 +1,18 @@
+# Case: Rotated Frame taller than the page area: it does not break
+# Code: PAGE_OVERFLOW
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Paper: A6
+		Margin: 20
+	Section:
+		Frame:
+			Rotate: 180
+			Block:
+				Box:
+					Height: 300
+			Block:
+				Box:
+					Height: 300

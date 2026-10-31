@@ -1,0 +1,17 @@
+# Case: Keep together in a rotated Frame, which does not break
+# Code: BREAK_IN_ROTATED
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Frame:
+			Rotate: 5
+			Break:
+				Keep together: true
+			Block:
+				Box:
+					Height: 10

@@ -50,91 +50,93 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Significado del documento en el PDF (reference/implementation/pdf.md): el árbol de estructura del PDF
- * etiquetado y los marcadores (<em>outline</em>) de los encabezados.
+ * Meaning of the document in the PDF (reference/implementation/pdf.md): the structure tree of the tagged PDF and the
+ * bookmarks (<em>outline</em>) of the headings.
  *
- * <p>Árbol de estructura: un elemento por caja, en orden del documento, que es el orden de
- * lectura. {@code Document} para la raíz, {@code H1}…{@code H6} para los encabezados, {@code P} para {@code Paragraph}
- * y para {@code Text} ({@code Span} si es parte del texto de un encabezado), {@code L} y {@code LI} para las listas y
- * sus ítems (con el marcador en {@code Lbl} y el contenido en {@code LBody}, reference/components/list.md), {@code
- * Table} con {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} y {@code TD} para las tablas
- * (reference/components/table.md), {@code Figure} para las imágenes con {@code Alt} (con su texto alternativo y su
- * {@code BBox}, reference/components/image.md) y {@code Div} para el resto, también un {@code Columns}
- * (reference/components/columns.md), cuyas columnas no tienen elemento propio. El texto de cada fragmento es
- * contenido marcado ({@code BDC}/{@code EMC} con su {@code MCID}) que cuelga del elemento de su caja; una caja partida
- * entre páginas tiene contenido en varias. Los fondos, los bordes, las imágenes sin {@code Alt} (decorativas) y los
- * {@code Page overlay} (repetidos en cada página) son <em>artifacts</em>: no forman parte del contenido.</p>
+ * <p>Structure tree: one element per box, in document order, which is the reading
+ * order. {@code Document} for the root, {@code H1} to {@code H6} for the headings, {@code P} for {@code Paragraph}
+ * and for {@code Text} ({@code Span} if it is part of the text of a heading), {@code L} and {@code LI} for lists and
+ * their items (with the marker in {@code Lbl} and the content in {@code LBody}, reference/components/list.md), {@code
+ * Table} with {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} and {@code TD} for tables
+ * (reference/components/table.md), {@code Figure} for images with {@code Alt} (with their alternative text and their
+ * {@code BBox}, reference/components/image.md) and {@code Div} for the rest, a {@code Columns} included
+ * (reference/components/columns.md), whose columns have no element of their own. The text of each fragment is
+ * marked content ({@code BDC}/{@code EMC} with its {@code MCID}) that hangs from the element of its box; a box broken
+ * across pages has content on several. Backgrounds, borders, images without {@code Alt} (decorative) and
+ * {@code Page overlay} boxes (repeated on every page) are <em>artifacts</em>: they are not part of the content.</p>
  *
- * <p>El idioma de una caja que declara otro ({@code Language} en {@code Typography}, reference/common/typography.md) es
- * el {@code Lang} de su elemento, que heredan los de dentro.</p>
+ * <p>The language of a box that declares a different one ({@code Language} in {@code Typography},
+ * reference/common/typography.md) is the {@code Lang} of its element, inherited by the ones inside.</p>
  *
- * <p>El título y el idioma del documento ({@code Title} y {@code Language}) van a la
- * información del documento, a los metadatos XMP y al catálogo.</p>
+ * <p>The title and the language of the document ({@code Title} and {@code Language}) go to the
+ * document information, the XMP metadata and the catalog.</p>
  *
- * <p>Un enlace (reference/implementation/pdf.md) es un {@code Link} que envuelve lo que se pulsa y lleva la anotación
- * del PDF como referencia a objeto ({@code OBJR}): el de una caja entera ({@code Link} del elemento), hijo del elemento
- * de la caja y padre de su contenido (una imagen cuelga de él, no al revés); el de un tramo de texto ({@code
- * [texto](destino)}), hijo del elemento de la caja con el contenido marcado de su texto, uno por enlace y fragmento
- * aunque ocupe varias líneas.</p>
+ * <p>A link (reference/implementation/pdf.md) is a {@code Link} that wraps what is clicked and carries the PDF
+ * annotation as an object reference ({@code OBJR}): that of a whole box ({@code Link} of the element), child of the
+ * element of the box and parent of its content (an image hangs from it, not the other way round); that of a text run
+ * ({@code [text](destination)}), child of the element of the box with the marked content of its text, one per link
+ * and fragment even if it takes several lines.</p>
  *
- * <p>Marcadores: uno por encabezado, anidados por nivel (la jerarquía es correcta, reference/common/errors.md), que
- * llevan a la esquina superior izquierda de su primer fragmento ({@link PdfDestinations}).</p>
+ * <p>Bookmarks: one per heading, nested by level (the hierarchy is correct, reference/common/errors.md), that
+ * lead to the top left corner of their first fragment ({@link PdfDestinations}).</p>
  */
 final class PdfStructure {
 
     private final PDStructureTreeRoot treeRoot = new PDStructureTreeRoot();
-    /** Elemento de estructura de cada caja; las de un {@code Page overlay} no tienen. */
+    /** Structure element of each box; those of a {@code Page overlay} have none. */
     private final Map<Box, PDStructureElement> elements = new HashMap<>();
-    /** Por página, los elementos a los que pertenece cada {@code MCID}: el árbol de padres. */
+    /** Per page, the elements each {@code MCID} belongs to: the parent tree. */
     private final Map<Integer, PDParentTreeValue> parents = new HashMap<>();
-    /** Encabezados en orden del documento. */
+    /** Headings in document order. */
     private final List<Box> headings = new ArrayList<>();
-    /** Cajas de la cabecera y el pie de las tablas, que se repiten en cada página de su tabla. */
+    /** Boxes of the header and the footer of tables, which repeat on every page of their table. */
     private final Set<Box> repeated = new HashSet<>();
-    /** Primera página con contenido de cada caja de {@link #repeated}: en las demás es un <em>artifact</em>. */
+    /** First page with content of each box of {@link #repeated}: on the others it is an <em>artifact</em>. */
     private final Map<Box, PDPage> firstPage = new HashMap<>();
 
-    /** El {@code Link} de cada caja con {@code Link}: contiene su contenido y las anotaciones de su zona. */
+    /** The {@code Link} of each box with {@code Link}: it holds its content and the annotations of its area. */
     private final Map<Box, PDStructureElement> boxLinks = new HashMap<>();
-    /** Donde cuelga el contenido propio (el texto) de las cajas con {@code Link}: su {@code Link}. */
+    /** Where the own content (the text) of the boxes with {@code Link} hangs: their {@code Link}. */
     private final Map<Box, PDStructureElement> holders = new HashMap<>();
-    /** Los {@code Link} de cajas sin texto ni figura, que no se leen por su contenido sino por su {@code Alt}. */
+    /** The {@code Link} elements of boxes without text or figure, read by their {@code Alt}, not by their content. */
     private final Set<PDStructureElement> emptyLinks = new HashSet<>();
-    /** El {@code Link} del enlace de texto que se está pintando, para colgarle la anotación de su zona. */
+    /** The {@code Link} of the text link being painted, to hang the annotation of its area from it. */
     private PDStructureElement inline;
     /**
-     * Los {@code Link} de los enlaces de lo que no es contenido (un {@code Page overlay}, una imagen decorativa), por
-     * caja y destino: están en el sitio de la caja en el árbol, sin contenido, y reciben las anotaciones de todas las
-     * páginas.
+     * The {@code Link} elements of the links of what is not content (a {@code Page overlay}, a decorative image), by
+     * box and destination: they are in the place of the box in the tree, without content, and receive the annotations
+     * of all the pages.
      */
     private final Map<Box, Map<String, PDStructureElement>> standIns = new HashMap<>();
     /**
-     * Los {@code Link} de los enlaces de texto de las cajas que se repiten (la cabecera y el pie de una tabla), por
-     * caja y destino: los de la primera página, que reciben las anotaciones de las repeticiones.
+     * The {@code Link} elements of the text links of the boxes that repeat (the header and the footer of a table), by
+     * box and destination: those of the first page, which receive the annotations of the repetitions.
      */
     private final Map<Box, Map<String, PDStructureElement>> firstLinks = new HashMap<>();
 
-    /** El espacio de nombres estándar de PDF 2.0 (ISO 32000-2, 14.8.6). */
+    /** The standard namespace of PDF 2.0 (ISO 32000-2, 14.8.6). */
     static final String PDF_2_NAMESPACE = "http://iso.org/pdf2/ssn";
 
     private static final String[] TABLE_GROUPS = {"THead", "TBody", "TFoot"};
-    /** Los tipos que no están en el espacio de nombres de PDF 2.0: se quedan en el de PDF 1.7, el de omisión. */
+    /** The types that are not in the PDF 2.0 namespace: they stay in that of PDF 1.7, the default one. */
     private static final Set<String> PDF_1_7_ONLY = Set.of("TOC", "TOCI", "Reference");
 
-    /** La parte de PDF/UA que cumple el PDF: 1 o 2 (reference/implementation/pdf.md). */
+    /** The part of PDF/UA the PDF complies with: 1 or 2 (reference/implementation/pdf.md). */
     private final int ua;
-    /** Con PDF/UA-2, el espacio de nombres de PDF 2.0 de los elementos; con PDF/UA-1, {@code null}. */
+    /** With PDF/UA-2, the PDF 2.0 namespace of the elements; with PDF/UA-1, {@code null}. */
     private final COSDictionary pdf2;
-    /** Con PDF/UA-2, el {@code TOCI} de cada entrada de índice, que señala con {@code Ref} a su encabezado. */
+    /** With PDF/UA-2, the {@code TOCI} of each table of contents entry, pointing to its heading with {@code Ref}. */
     private final Map<Box, PDStructureElement> entries = new HashMap<>();
 
-    /** La raíz del documento: es el «padre» de sus secciones, que no lo tienen (reference/components/document.md). */
+    /**
+     * The root of the document: it is the "parent" of its sections, which have none (reference/components/document.md).
+     */
     private final Box root;
 
     private PDPage page;
     private COSArray pageParents;
 
-    /** {@code ua}: la parte de PDF/UA, 1 o 2. */
+    /** {@code ua}: the part of PDF/UA, 1 or 2. */
     PdfStructure(PDDocument doc, Box root, int ua) {
         this.root = root;
         this.ua = ua;
@@ -157,8 +159,8 @@ final class PdfStructure {
     }
 
     /**
-     * Elementos de la caja y de sus descendientes, salvo los {@code Page overlay}. El flujo de columnas
-     * de un {@code Columns} no tiene elemento: su contenido cuelga del {@code Columns}.
+     * Elements of the box and of its descendants, except {@code Page overlay} boxes. The column flow
+     * of a {@code Columns} has no element: its content hangs from the {@code Columns}.
      */
     private void build(Box box, PDStructureNode parent) {
         if (box.role() == Role.FLOW) {
@@ -166,11 +168,11 @@ final class PdfStructure {
             return;
         }
         if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER) {
-            // Decorativa (o la guía de un índice): no tiene elemento y se pinta como artifact; su enlace, sí.
+            // Decorative (or the leader of a table of contents): no element, painted as an artifact; its link has one.
             standIns(box, parent);
             return;
         }
-        // Una imagen con enlace es el contenido de su Link: Link → Figure.
+        // An image with a link is the content of its Link: Link → Figure.
         PDStructureNode owner = box.isImage() && box.style().link() != null ? newLink(box, parent) : parent;
         PDStructureElement e = element(type(box), owner);
         owner.appendKid(e);
@@ -185,7 +187,7 @@ final class PdfStructure {
         }
         PDStructureNode content = e;
         if (box.role() == Role.LIST_ITEM) {
-            // LI: el marcador (Lbl) y el contenido (LBody).
+            // LI: the marker (Lbl) and the content (LBody).
             if (box.marker() != null) {
                 PDStructureElement label = element("Lbl", e);
                 e.appendKid(label);
@@ -196,7 +198,7 @@ final class PdfStructure {
             content = body;
         }
         if (pdf2 != null && box.role() == Role.TOC_ENTRY) {
-            // PDF/UA-2: un TOCI no contiene un Link, sino una Reference que lo contiene; y señala a su encabezado.
+            // PDF/UA-2: a TOCI does not contain a Link, but a Reference that contains it; and it points to its heading.
             entries.put(box, e);
             PDStructureElement reference = element("Reference", e);
             e.appendKid(reference);
@@ -207,8 +209,8 @@ final class PdfStructure {
     }
 
     /**
-     * Un elemento de estructura nuevo de ese tipo; con PDF/UA-2, en el espacio de nombres de PDF 2.0 si el tipo está
-     * en él. Lo añade a su padre quien lo crea.
+     * A new structure element of that type; with PDF/UA-2, in the PDF 2.0 namespace if the type is in it. Whoever
+     * creates it adds it to its parent.
      */
     private PDStructureElement element(String type, PDStructureNode parent) {
         PDStructureElement e = new PDStructureElement(type, parent);
@@ -218,7 +220,7 @@ final class PdfStructure {
         return e;
     }
 
-    /** Los elementos de los hijos de la caja; de un {@code Page overlay}, que no es contenido, solo sus enlaces. */
+    /** The elements of the children of the box; of a {@code Page overlay}, which is not content, only its links. */
     private void children(Box box, PDStructureNode content) {
         for (Box child : box.children()) {
             if (child.style().position() == Position.PAGE_OVERLAY) {
@@ -230,8 +232,8 @@ final class PdfStructure {
     }
 
     /**
-     * Los {@code Link} de los enlaces de una caja que no es contenido y de lo que contiene, en su sitio del árbol: el
-     * de la caja ({@code Link} del elemento) y uno por destino de sus enlaces de texto, en orden.
+     * The {@code Link} elements of the links of a box that is not content and of what it contains, in its place in
+     * the tree: that of the box ({@code Link} of the element) and one per destination of its text links, in order.
      */
     private void standIns(Box box, PDStructureNode parent) {
         if (box.style().link() != null) {
@@ -256,13 +258,13 @@ final class PdfStructure {
     }
 
     /**
-     * Lo que el elemento dice de la caja además de su tipo: su idioma si cambia, el texto alternativo de una
-     * imagen, el texto escrito si se pinta transformado y la numeración de una lista.
+     * What the element says about the box besides its type: its language if it changes, the alternative text of an
+     * image, the written text if it is painted transformed, and the numbering of a list.
      */
     private void attributes(Box box, PDStructureElement e) {
         Box outer = box.role() == Role.SECTION ? root : box.parent();
         if (outer != null && !box.style().typography().locale().equals(outer.style().typography().locale())) {
-            // Lang se hereda por el árbol de estructura: solo donde el idioma cambia respecto al de fuera.
+            // Lang is inherited down the structure tree: only where the language changes from the outer one.
             e.setLanguage(box.style().typography().locale().toLanguageTag());
         }
         if (box.isImage()) {
@@ -270,8 +272,9 @@ final class PdfStructure {
         }
         if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
                 && !PageNumbers.contains(box.text())) {
-            // Las mayúsculas son solo de pintado (reference/common/text-formatting.md): el texto de la estructura es
-            // el escrito. Si lleva números de página o referencias, el texto cambia con la página y no se puede dar.
+            // Upper case is only a painting matter (reference/common/text-formatting.md): the text of the structure
+            // is the written one. If it has page numbers or references, the text changes with the page and cannot be
+            // given.
             e.setActualText(box.text());
         }
         if (box.role() == Role.LIST) {
@@ -282,9 +285,9 @@ final class PdfStructure {
     }
 
     /**
-     * Si la caja tiene {@code Link} (reference/implementation/pdf.md), el {@code Link} que envuelve su contenido (su
-     * texto y sus hijos) y que recibe las anotaciones de su zona; si no, {@code content}. Una imagen es la excepción:
-     * su {@code Link} envuelve a su {@code Figure} ({@link #build}).
+     * If the box has {@code Link} (reference/implementation/pdf.md), the {@code Link} that wraps its content (its
+     * text and its children) and that receives the annotations of its area; otherwise, {@code content}. An image is
+     * the exception: its {@code Link} wraps its {@code Figure} ({@link #build}).
      */
     private PDStructureNode linked(Box box, PDStructureNode content) {
         if (box.style().link() == null || box.isImage()) {
@@ -295,7 +298,7 @@ final class PdfStructure {
         return link;
     }
 
-    /** Un {@code Link} hijo de {@code parent} para la caja. */
+    /** A {@code Link} child of {@code parent} for the box. */
     private PDStructureElement newLink(Box box, PDStructureNode parent) {
         PDStructureElement link = element("Link", parent);
         parent.appendKid(link);
@@ -306,7 +309,7 @@ final class PdfStructure {
         return link;
     }
 
-    /** Si la caja o lo que contiene tiene algo que leer: texto, un marcador o una imagen con {@code Alt}. */
+    /** Whether the box or what it contains has something to read: text, a marker or an image with {@code Alt}. */
     private static boolean hasContent(Box box) {
         if (box.hasText() || box.marker() != null || box.isImage() && box.style().image().alt() != null) {
             return true;
@@ -315,11 +318,11 @@ final class PdfStructure {
     }
 
     /**
-     * Una tabla (reference/components/table.md): sus celdas, en orden de filas, en {@code THead}, {@code TBody} y
-     * {@code TFoot}, una {@code TR} por fila. Cada celda es {@code TH} (con {@code Scope:
-     * Column}) en la cabecera y {@code TD} en el resto, con {@code RowSpan} y {@code ColSpan} si
-     * ocupa más de una fila o columna. Las celdas de la cabecera y el pie, y lo que contienen, se
-     * repiten en cada página: solo la primera vez son contenido.
+     * A table (reference/components/table.md): its cells, in row order, in {@code THead}, {@code TBody} and
+     * {@code TFoot}, one {@code TR} per row. Each cell is {@code TH} (with {@code Scope:
+     * Column}) in the header and {@code TD} in the rest, with {@code RowSpan} and {@code ColSpan} if
+     * it spans more than one row or column. The cells of the header and the footer, and what they contain,
+     * repeat on every page: only the first time are they content.
      */
     private void table(Box table, PDStructureElement e) {
         PDStructureElement[] groups = new PDStructureElement[TABLE_GROUPS.length];
@@ -362,7 +365,7 @@ final class PdfStructure {
         }
     }
 
-    /** Apunta la caja y su descendencia (y el marcador de los ítems) como contenido que se repite. */
+    /** Records the box and its descendants (and the marker of the items) as content that repeats. */
     private void repeats(Box box) {
         repeated.add(box);
         if (box.marker() != null) {
@@ -371,10 +374,10 @@ final class PdfStructure {
         box.children().forEach(this::repeats);
     }
 
-    /** Grupo de una celda de tabla: 0 en la cabecera, 1 en el cuerpo, 2 en el pie. */
+    /** Group of a table cell: 0 in the header, 1 in the body, 2 in the footer. */
     private static int group(Box cell) {
         Box table = cell.parent();
-        // Fila desde 0 de la celda en el grid de la tabla; la colocación la da TableBuilder.
+        // Row from 0 of the cell in the grid of the table; the placement comes from TableBuilder.
         int row = cell.style().item().area().row() - 1;
         if (row < table.headerRows()) {
             return 0;
@@ -385,8 +388,8 @@ final class PdfStructure {
     }
 
     /**
-     * {@code ListNumbering} de una lista; {@code dash} no tiene equivalente en PDF/UA-1 y es {@code None}, y en
-     * PDF/UA-2 es {@code Unordered}, de PDF 2.0.
+     * {@code ListNumbering} of a list; {@code dash} has no equivalent in PDF/UA-1 and is {@code None}, and in
+     * PDF/UA-2 it is {@code Unordered}, from PDF 2.0.
      */
     private static String listNumbering(Marker marker, int ua) {
         return switch (marker) {
@@ -402,9 +405,9 @@ final class PdfStructure {
     }
 
     /**
-     * Título e idioma del documento. El título va en la información del documento y en los
-     * metadatos XMP ({@code dc:title}), y el visor lo muestra en lugar del nombre del fichero; el
-     * idioma ({@code Lang} del catálogo) es el de todo el contenido.
+     * Title and language of the document. The title goes in the document information and in the
+     * XMP metadata ({@code dc:title}), and the viewer shows it instead of the file name; the
+     * language ({@code Lang} of the catalog) is that of all the content.
      */
     static void metadata(PDDocument doc, Metadata metadata, int ua) throws IOException {
         PDDocumentCatalog catalog = doc.getDocumentCatalog();
@@ -424,9 +427,9 @@ final class PdfStructure {
     }
 
     /**
-     * Paquete XMP mínimo con el título y la declaración de PDF/UA ({@code pdfuaid:part}, 1 o 2; la 2 con la revisión
-     * de la norma, {@code pdfuaid:rev}). Un documento siempre tiene {@code Title} (obligatorio): sin título el PDF no
-     * cumpliría PDF/UA (7.1) y no podría afirmarlo.
+     * Minimal XMP packet with the title and the PDF/UA declaration ({@code pdfuaid:part}, 1 or 2; 2 with the revision
+     * of the standard, {@code pdfuaid:rev}). A document always has a {@code Title} (required): without a title the PDF
+     * would not comply with PDF/UA (7.1) and could not claim it.
      */
     static String xmp(String title, int ua) {
         String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
@@ -445,14 +448,14 @@ final class PdfStructure {
                 + "<?xpacket end=\"w\"?>";
     }
 
-    /** Tipo estándar de estructura de la caja (decisión G1 de la hoja de ruta). */
+    /** Standard structure type of the box (decision G1 of the roadmap). */
     static String type(Box box) {
         return switch (box.role()) {
             case DOCUMENT -> "Document";
             case SECTION -> "Sect";
             case HEADING -> "H" + box.headingLevel();
             case PARAGRAPH -> "P";
-            // Un Text es un bloque de texto, un párrafo; dentro de un encabezado es parte de su texto.
+            // A Text is a block of text, a paragraph; inside a heading it is part of its text.
             case TEXT -> box.parent() != null && box.parent().headingLevel() > 0 ? "Span" : "P";
             case LIST -> "L";
             case LIST_ITEM -> "LI";
@@ -467,7 +470,7 @@ final class PdfStructure {
         };
     }
 
-    /** Empieza el contenido de una página. */
+    /** Starts the content of a page. */
     void startPage(PDPage page) {
         this.page = page;
         pageParents = new COSArray();
@@ -477,9 +480,9 @@ final class PdfStructure {
     }
 
     /**
-     * Apunta el texto de un fragmento de la caja en la página actual y da su {@code MCID}; -1 si
-     * es un <em>artifact</em> (dentro de un {@code Page overlay}). Cuelga del elemento de la caja o, si la caja
-     * tiene {@code Link}, de este.
+     * Records the text of a fragment of the box on the current page and gives its {@code MCID}; -1 if
+     * it is an <em>artifact</em> (inside a {@code Page overlay}). It hangs from the element of the box or, if the box
+     * has {@code Link}, from that.
      */
     int mark(Box box) {
         PDStructureElement e = holders.containsKey(box) ? holders.get(box) : elements.get(box);
@@ -490,9 +493,9 @@ final class PdfStructure {
     }
 
     /**
-     * Apunta el texto de un enlace de la caja ({@code [texto](destino)}) como contenido de un
-     * {@code Link} nuevo, hijo del elemento de la caja, en la página actual y da su {@code MCID}; -1 si es
-     * un <em>artifact</em>. Las anotaciones de sus zonas cuelgan de él ({@link #inlineLink}).
+     * Records the text of a link of the box ({@code [text](destination)}) as content of a new
+     * {@code Link}, child of the element of the box, on the current page and gives its {@code MCID}; -1 if it is
+     * an <em>artifact</em>. The annotations of its areas hang from it ({@link #inlineLink}).
      */
     int markLink(Box box) {
         inline = null;
@@ -507,7 +510,7 @@ final class PdfStructure {
         return reference(link);
     }
 
-    /** Un contenido marcado de la página actual que cuelga de {@code e}; su {@code MCID}. */
+    /** A marked content of the current page that hangs from {@code e}; its {@code MCID}. */
     private int reference(PDStructureElement e) {
         int mcid = pageParents.size();
         pageParents.add(e);
@@ -519,8 +522,8 @@ final class PdfStructure {
     }
 
     /**
-     * Si la caja es contenido en la página actual: la cabecera y el pie de una tabla lo son en la
-     * primera página en que salen, y en las demás, donde se repiten, no.
+     * Whether the box is content on the current page: the header and the footer of a table are on the
+     * first page they appear on, and not on the others, where they repeat.
      */
     private boolean isContent(Box box) {
         if (repeated.contains(box)) {
@@ -531,11 +534,11 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta la zona de una caja con {@code Link} (reference/implementation/pdf.md): la
-     * anotación es una referencia a objeto ({@code OBJR}) del {@code Link} que envuelve el contenido
-     * de la caja. Un {@code Link} sin nada que leer dentro lleva su texto como {@code Alt}. Donde la caja no es
-     * contenido, el enlace va al {@code Link} que la sustituye en su sitio ({@link #standIns}) o, en las filas
-     * repetidas de una tabla, al de la primera página.
+     * Tags the area of a box with {@code Link} (reference/implementation/pdf.md): the
+     * annotation is an object reference ({@code OBJR}) of the {@code Link} that wraps the content
+     * of the box. A {@code Link} with nothing to read inside carries its text as {@code Alt}. Where the box is not
+     * content, the link goes to the {@code Link} that stands in for it in its place ({@link #standIns}) or, in the
+     * repeated rows of a table, to that of the first page.
      */
     void link(Box box, String destination, PDAnnotationLink annotation, String description) {
         PDStructureElement parent = elements.get(box);
@@ -545,7 +548,7 @@ final class PdfStructure {
         }
         PDStructureElement link = boxLinks.get(box);
         if (link == null) {
-            // Una caja que no puede envolver su contenido en un Link (una tabla): un Link aparte, hijo suyo.
+            // A box that cannot wrap its content in a Link (a table): a separate Link, a child of it.
             link = element("Link", parent);
             link.setPage(page);
             parent.appendKid(link);
@@ -559,9 +562,9 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta la zona de una línea del enlace de texto que empezó {@link #markLink}; si el texto no es contenido, va
-     * al {@code Link} de su caja y su destino que lo sustituye en su sitio ({@link #standIns}) o, en las filas
-     * repetidas de una tabla, al de la primera página.
+     * Tags the area of a line of the text link started by {@link #markLink}; if the text is not content, it goes to
+     * the {@code Link} of its box and its destination that stands in for it in its place ({@link #standIns}) or, in
+     * the repeated rows of a table, to that of the first page.
      */
     void inlineLink(Box box, String destination, PDAnnotationLink annotation, String description) {
         if (inline != null) {
@@ -578,25 +581,25 @@ final class PdfStructure {
     }
 
     /**
-     * Etiqueta el enlace de una caja que no es contenido (en un {@code Page overlay}, una imagen decorativa): PDF/UA
-     * exige que toda anotación de enlace esté en un {@code Link}. Es el {@code Link} de la caja y su destino que se
-     * puso en su sitio del árbol al construirlo, sin contenido marcado y con el texto del enlace como {@code Alt}: un
-     * lector de pantalla lo anuncia una vez, en su orden de lectura, aunque se repita en cada página (un pie con una
-     * web).
+     * Tags the link of a box that is not content (in a {@code Page overlay}, a decorative image): PDF/UA
+     * requires every link annotation to be in a {@code Link}. It is the {@code Link} of the box and its destination
+     * placed in its place in the tree when building it, without marked content and with the text of the link as
+     * {@code Alt}: a screen reader announces it once, in its reading order, even if it repeats on every page (a footer
+     * with a website).
      */
     private void outside(Box box, String destination, PDAnnotationLink annotation, String description) {
         PDStructureElement link = standIns.getOrDefault(box, Map.of()).get(destination);
         if (link == null) {
-            throw new IllegalStateException("Enlace sin Link en la estructura: " + destination);
+            throw new IllegalStateException("Link without a Link element in the structure: " + destination);
         }
         describe(link, annotation, description);
         attach(link, annotation);
     }
 
     /**
-     * El {@code Alt} de un {@code Link} sin nada que leer dentro: el texto de su primera zona. Con PDF/UA-2, la
-     * anotación no lleva además su texto ({@code Contents}): lo que se lee es el {@code Alt}, y los dos
-     * tendrían que coincidir.
+     * The {@code Alt} of a {@code Link} with nothing to read inside: the text of its first area. With PDF/UA-2, the
+     * annotation does not also carry its text ({@code Contents}): what is read is the {@code Alt}, and the two
+     * would have to match.
      */
     private void describe(PDStructureElement link, PDAnnotationLink annotation, String description) {
         if (link.getAlternateDescription() == null) {
@@ -607,7 +610,7 @@ final class PdfStructure {
         }
     }
 
-    /** El elemento de la caja con esa clave ({@link Box#key()}), o del antecesor más cercano que lo tiene. */
+    /** The element of the box with that key ({@link Box#key()}), or of the nearest ancestor that has one. */
     private PDStructureElement target(String key) {
         for (Box box : elements.keySet()) {
             if (key.equals(box.key())) {
@@ -617,7 +620,7 @@ final class PdfStructure {
         return null;
     }
 
-    /** El elemento de la caja o, si no tiene, el del antecesor más cercano que lo tiene. */
+    /** The element of the box or, if it has none, that of the nearest ancestor that has one. */
     private PDStructureElement element(Box box) {
         for (Box b = box; b != null; b = b.parent()) {
             if (elements.containsKey(b)) {
@@ -628,9 +631,9 @@ final class PdfStructure {
     }
 
     /**
-     * Con PDF/UA-2, la acción que lleva a la caja: un destino de estructura ({@code SD}, el elemento de la caja con la
-     * posición de {@code destination}) y, para los visores que no lo entienden, el destino de su página ({@code D});
-     * con PDF/UA-1, {@code null}, y se usa el destino de la página.
+     * With PDF/UA-2, the action that leads to the box: a structure destination ({@code SD}, the element of the box
+     * with the position of {@code destination}) and, for viewers that do not understand it, the destination of its
+     * page ({@code D}); with PDF/UA-1, {@code null}, and the page destination is used.
      */
     PDActionGoTo goTo(Box box, PDPageXYZDestination destination) {
         if (ua != 2) {
@@ -653,15 +656,15 @@ final class PdfStructure {
         reference.setReferencedObject(annotation);
         reference.setPage(page);
         link.appendKid(reference);
-        // La anotación se ve desde el árbol de padres con su propia clave, junto a las de las páginas.
+        // The annotation is visible from the parent tree with its own key, next to those of the pages.
         int key = parents.size();
         annotation.setStructParent(key);
         parents.put(key, new PDParentTreeValue(link.getCOSObject()));
     }
 
     /**
-     * El {@code BBox} del {@code Figure} de una imagen: su caja de contenido en la página, en
-     * coordenadas del PDF. Una imagen no se parte, así que solo está en una página.
+     * The {@code BBox} of the {@code Figure} of an image: its content box on the page, in
+     * PDF coordinates. An image is not broken, so it is only on one page.
      */
     void figureBox(Box box, PDRectangle r) {
         PDStructureElement e = elements.get(box);
@@ -674,11 +677,11 @@ final class PdfStructure {
     }
 
     /**
-     * Termina: el árbol de padres y los marcadores de los encabezados, que llevan a su destino de
+     * Finishes: the parent tree and the bookmarks of the headings, which lead to their destination in
      * {@code destinations}.
      */
     void finish(PDDocument doc, Map<Box, PDPageXYZDestination> destinations) {
-        // Un Link sin anotaciones (el de un Page overlay que no sale en ninguna página) no puede quedar vacío.
+        // A Link without annotations (that of a Page overlay that appears on no page) cannot be left empty.
         for (Map<String, PDStructureElement> links : standIns.values()) {
             for (PDStructureElement link : links.values()) {
                 if (link.getKids().isEmpty()) {
@@ -686,7 +689,7 @@ final class PdfStructure {
                 }
             }
         }
-        // PDF/UA-2: cada entrada de índice señala con Ref el elemento de su encabezado.
+        // PDF/UA-2: each table of contents entry points with Ref to the element of its heading.
         entries.forEach((entry, toci) -> {
             PDStructureElement heading = target(Links.target(entry.style().link()));
             if (heading != null) {
@@ -703,7 +706,7 @@ final class PdfStructure {
             return;
         }
         PDDocumentOutline outline = new PDDocumentOutline();
-        // Pila de los encabezados abiertos: el padre de cada uno es el último de nivel menor.
+        // Stack of the open headings: the parent of each one is the last one of a lower level.
         Deque<PDOutlineItem> open = new ArrayDeque<>();
         Deque<Integer> levels = new ArrayDeque<>();
         for (Box h : headings) {

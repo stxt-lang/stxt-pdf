@@ -6,8 +6,8 @@ import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
 
 /**
- * El grupo {@code Box} (reference/common/box.md): el modelo de caja (tamaños, márgenes, relleno y borde) y su aspecto
- * (fondo, color del borde y esquinas redondeadas), que solo cambia el pintado. No se hereda.
+ * The {@code Box} group (reference/common/box.md): the box model (sizes, margins, padding and border) and its
+ * appearance (background, border color and rounded corners), which only changes the painting. It is not inherited.
  */
 public final class BoxStyle extends StyleGroup {
 
@@ -15,20 +15,20 @@ public final class BoxStyle extends StyleGroup {
     private Value height = Value.AUTO;
     private Value minWidth = Value.AUTO;
     private Value minHeight = Value.AUTO;
-    /** {@code null} = sin máximo. */
+    /** {@code null} = no maximum. */
     private Value maxWidth;
-    /** {@code null} = sin máximo. */
+    /** {@code null} = no maximum. */
     private Value maxHeight;
-    /** Ancho / alto; {@code null} = sin proporción. */
+    /** Width / height; {@code null} = no ratio. */
     private Double aspectRatio;
     private Sides<Value> margin = Sides.all(Value.pt(0));
     private Sides<Value> padding = Sides.all(Value.pt(0));
     private Sides<Value> border = Sides.all(Value.pt(0));
-    /** {@code null} = transparente. */
+    /** {@code null} = transparent. */
     private Paint background;
-    /** Un color por lado; {@code null} = el {@code Color} del texto ({@link TypographyStyle#color()}). */
+    /** One color per side; {@code null} = the {@code Color} of the text ({@link TypographyStyle#color()}). */
     private Sides<String> borderColor;
-    /** Esquinas redondeadas, de la caja de borde; solo pintado. */
+    /** Rounded corners, of the border box; painting only. */
     private Corners<Value> cornerRadius = Corners.all(Value.pt(0));
 
     BoxStyle() {

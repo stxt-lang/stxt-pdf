@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class StackResolverTest {
 
-    private static final double AVAILABLE = 515 - 2 * 20; // contenedor 515, dos huecos de 20
+    private static final double AVAILABLE = 515 - 2 * 20; // container 515, two gaps of 20
 
     @Test
     void module5Growth() {
@@ -39,8 +39,8 @@ class StackResolverTest {
 
     @Test
     void freezesAtMinimum() {
-        // Faltan 100 pt; B cedería 50 y bajaría a 150, por debajo de su mínimo 160:
-        // se congela en 160 y A absorbe el resto.
+        // 100 pt are missing; B would give up 50 and go down to 150, below its minimum 160:
+        // it freezes at 160 and A absorbs the rest.
         double[] r = StackResolver.resolve(List.of(
                 StackItem.of(200, 0, 1, 50),
                 StackItem.of(200, 0, 1, 160)), 300);
@@ -49,12 +49,12 @@ class StackResolverTest {
 
     @Test
     void factorsSummingLessThanOne() {
-        // Solo se reparte la mitad del espacio libre.
+        // Only half of the free space is distributed.
         double[] r = StackResolver.resolve(List.of(StackItem.of(100, 0.5, 1, 0)), 300);
         assertArrayEquals(new double[]{200}, r, 1e-9);
     }
 
-    /** Al crecer, A llega a su máximo (150): se congela y B y C se reparten el resto (175 cada uno). */
+    /** When growing, A reaches its maximum (150): it freezes and B and C share the rest (175 each). */
     @Test
     void anItemAtItsMaximumLeavesTheRestToTheOthers() {
         double[] r = StackResolver.resolve(List.of(
@@ -64,7 +64,7 @@ class StackResolverTest {
         assertArrayEquals(new double[]{150, 175, 175}, r, 1e-9);
     }
 
-    /** Al encoger, A no baja de su mínimo (250): B y C ceden el resto (175 cada uno). */
+    /** When shrinking, A does not go below its minimum (250): B and C give up the rest (175 each). */
     @Test
     void anItemAtItsMinimumLeavesTheRestToTheOthers() {
         double[] r = StackResolver.resolve(List.of(

@@ -1,0 +1,18 @@
+# Case: Pages in a Block
+# Code: CHILD_NOT_DECLARED
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Pages: first
+			Text: Hola

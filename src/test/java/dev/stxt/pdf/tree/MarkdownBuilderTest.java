@@ -20,15 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * La traducción de {@code Markdown} a nodos STXT (reference/components/markdown.md). El {@code Markdown}
- * está en la línea 8 del documento, sus propiedades en las siguientes y después {@code Content}:
- * sin propiedades, la primera línea del Markdown es la 10.
+ * The translation of {@code Markdown} into STXT nodes (reference/components/markdown.md). The {@code Markdown}
+ * is on line 8 of the document, its properties on the following ones and then {@code Content}:
+ * without properties, the first line of the Markdown is line 10.
  */
 class MarkdownBuilderTest {
 
     private static final DocumentReader READER = new DocumentReader();
 
-    /** Un {@code Markdown} con estas propiedades y este contenido, traducido. */
+    /** A {@code Markdown} with these properties and this content, translated. */
     private static MarkdownBuilder.Translation translate(List<String> properties, String... content) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10", "\tMarkdown:"));
@@ -45,7 +45,7 @@ class MarkdownBuilderTest {
         return translate(List.of(), content);
     }
 
-    /** {@code Nombre: valor} de un nodo y de sus hijos, con dos espacios por nivel, y la línea. */
+    /** {@code Name: value} of a node and its children, with two spaces per level, and the line. */
     private static List<String> outline(Node n) {
         List<String> out = new ArrayList<>();
         outline(n, "", out);
@@ -65,7 +65,7 @@ class MarkdownBuilderTest {
         MarkdownBuilder.Translation t = translate("# Título **grande**", "", "Uno *dos*", "tres ~sin~ tachar");
         assertEquals(2, t.elements().size());
         assertEquals(List.of("Heading 1 @15", "  Text: Título grande @15"), outline(t.elements().get(0)));
-        // Un salto de línea simple es un espacio; una tilde sola no tacha.
+        // A single line break is a space; a lone tilde does not strike through.
         assertEquals(List.of("Paragraph: Uno dos tres ~sin~ tachar @17"), outline(t.elements().get(1)));
         Node text = ((InlineNode) t.elements().get(0)).getChildren().get(0);
         assertEquals(List.of(run("Título "), run("grande", "b")), t.runs().get(text));
@@ -84,7 +84,7 @@ class MarkdownBuilderTest {
     void anImageAloneInItsParagraphIsAnImage() {
         MarkdownBuilder.Translation t = translate("![Un *paisaje*](test/wide.png)", "", "![](logos/acme.png)",
                 "", "Texto.");
-        // El texto alternativo pierde su formato; sin él, la imagen es decorativa.
+        // The alternative text loses its formatting; without it, the image is decorative.
         assertEquals(List.of("Image: test/wide.png @15", "  Alt: Un paisaje @15"), outline(t.elements().get(0)));
         assertEquals(List.of("Image: logos/acme.png @17"), outline(t.elements().get(1)));
         assertEquals(List.of("Paragraph: Texto. @19"), outline(t.elements().get(2)));
@@ -109,7 +109,7 @@ class MarkdownBuilderTest {
                 "      List item @18",
                 "        Paragraph: b @18",
                 "        List @19",
-                // El último marcador sirve para los niveles más profundos.
+                // The last marker serves the deeper levels.
                 "          Marker: dash @14",
                 "          List item @19",
                 "            Paragraph: c @19"), outline(t.elements().get(0)));
@@ -144,7 +144,7 @@ class MarkdownBuilderTest {
                 "          Align: right @18",
                 "    Row @19",
                 "      Cell: Feb @19",
-                // GFM completa la fila con una celda vacía.
+                // GFM completes the row with an empty cell.
                 "      Cell @19"), outline(t.elements().get(0)));
         InlineNode body = (InlineNode) ((InlineNode) t.elements().get(0)).getChild("body");
         Node cell = ((InlineNode) body.getChildren().get(0)).getChildren().get(1);
@@ -152,8 +152,8 @@ class MarkdownBuilderTest {
     }
 
     /**
-     * Una fila con más celdas que la cabecera es un error, en la línea de la fila (reference/components/markdown.md);
-     * una barra escapada no separa celdas, y las de los extremos son opcionales.
+     * A row with more cells than the header is an error, on the line of the row (reference/components/markdown.md);
+     * an escaped bar does not separate cells, and the ones at the ends are optional.
      */
     @Test
     void rowsWithMoreCellsThanTheHeadAreAnError() {
@@ -172,7 +172,7 @@ class MarkdownBuilderTest {
 
     @Test
     void unusedPropertiesAreAllowed() {
-        // Bullet markers, Number markers y Table columns solo son obligatorias si hay listas o tablas (K6).
+        // Bullet markers, Number markers and Table columns are only required if there are lists or tables (K6).
         MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table columns: auto"), "Hola.");
         assertEquals(1, t.elements().size());
         assertNull(t.runs().get(t.elements().get(0)));
@@ -187,7 +187,7 @@ class MarkdownBuilderTest {
     }
 
     /**
-     * Un enlace es un tramo subrayado con su destino; el formato de dentro se conserva (reference/common/links.md).
+     * A link is an underlined run with its destination; the formatting inside is kept (reference/common/links.md).
      */
     @Test
     void linksAreUnderlinedRunsWithTheirDestination() {
@@ -203,7 +203,7 @@ class MarkdownBuilderTest {
                 "| A | B |", "|---|---|", "| [uno](https://a.example) | dos |");
         assertEquals(List.of(run("Ver "), link("anexo", "u", "#anexo")),
                 t.runs().get(t.elements().get(0).getChildren().get(0)));
-        // Table: Columns, Header rows, Body; la primera celda de la primera fila del cuerpo.
+        // Table: Columns, Header rows, Body; the first cell of the first row of the body.
         Node body = ((InlineNode) t.elements().get(1)).getChildren().get(2);
         Node cell = ((InlineNode) ((InlineNode) body).getChildren().get(0)).getChildren().get(0);
         assertEquals(List.of(link("uno", "u", "https://a.example")), t.runs().get(cell));
@@ -236,7 +236,7 @@ class MarkdownBuilderTest {
                 () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).errorCode());
     }
 
-    /** {@code {#id}} al final de un encabezado le da su {@code Id} y se quita del texto. */
+    /** {@code {#id}} at the end of a heading gives it its {@code Id} and is removed from the text. */
     @Test
     void aHeadingTakesTheIdAtTheEndOfItsText() {
         MarkdownBuilder.Translation t = translate("# Ventas del año {#ventas}", "", "## **Costes** {#costes}", "",
@@ -266,9 +266,9 @@ class MarkdownBuilderTest {
         return dev.stxt.pdf.tree.TextRuns.link(text, format, destination);
     }
 
-    // --- Código ------------------------------------------------------------------------------------
+    // --- Code --------------------------------------------------------------------------------------
 
-    /** El código es un tramo de código; su familia, la de {@code Code font}, la recibe al construir su caja. */
+    /** Code is a code run; it receives its family, that of {@code Code font}, when its box is built. */
     @Test
     void inlineCodeIsACodeRun() {
         MarkdownBuilder.Translation t = translate("Usa `mvn test` ya.");
@@ -309,7 +309,7 @@ class MarkdownBuilderTest {
         MarkdownBuilder.Translation t = translate("Antes.", "", "    uno", "      dos");
         InlineNode code = t.elements().get(1);
         assertEquals("uno\n  dos", ((InlineNode) code).getChild("content").getText());
-        // El Content >> va en la línea anterior a la primera línea del código (la 17).
+        // The Content >> goes on the line before the first line of the code (line 17).
         assertEquals(16, code.getChild("content").getLine());
     }
 

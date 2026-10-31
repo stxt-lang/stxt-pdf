@@ -11,93 +11,93 @@ import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Destino de pintado: {@link SvgCanvas} (depuración) o {@link PdfCanvas}. Coordenadas absolutas en pt. Solo
- * dibuja; lo que dice qué es lo dibujado (el texto marcado del PDF etiquetado y los enlaces) lo hace su
- * {@link #tagging()}, que en un lienzo que no lo entiende es {@link Tagging#NONE}.
+ * Painting target: {@link SvgCanvas} (debugging) or {@link PdfCanvas}. Absolute coordinates in pt. It only draws;
+ * saying what the drawing is (the marked text of the tagged PDF and the links) is done by its {@link #tagging()},
+ * which on a canvas that does not understand it is {@link Tagging#NONE}.
  */
 public interface Canvas {
 
-    /** Un rectángulo liso de un color: fondos de las columnas, guías, rayas de texto. */
+    /** A plain rectangle of one color: column backgrounds, leaders, text lines. */
     void background(Rect r, String color);
 
     /**
-     * El fondo de una caja (reference/common/box.md): un color o un degradado que llena
-     * {@code paddingBox} con las esquinas {@code radii}, que son las de la caja de relleno.
+     * The background of a box (reference/common/box.md): a color or a gradient that fills
+     * {@code paddingBox} with the corners {@code radii}, which are those of the padding box.
      */
     void fill(Rect paddingBox, Radii radii, Paint paint);
 
     /**
-     * El borde alrededor de la caja de borde {@code r}: el anillo entre ella (con las esquinas
-     * {@code radii}) y la caja de relleno, que se reparte entre los lados con ancho en {@code w}
-     * (uno con su color, en la diagonal de cada esquina).
+     * The border around the border box {@code r}: the ring between it (with the corners
+     * {@code radii}) and the padding box, which is shared among the sides with a width in {@code w}
+     * (each one with its color, split at the diagonal of each corner).
      *
-     * @param colors el color de cada lado, ya resuelto
+     * @param colors the color of each side, already resolved
      */
     void border(Rect r, Insets w, Radii radii, Sides<String> colors);
 
     /**
-     * Lo que hace el lienzo con el significado de lo que pinta: el texto marcado del PDF etiquetado y los
-     * enlaces; {@link Tagging#NONE} si solo dibuja.
+     * What the canvas does with the meaning of what it paints: the marked text of the tagged PDF and the
+     * links; {@link Tagging#NONE} if it only draws.
      */
     Tagging tagging();
 
-    /** Contorno de depuración de una caja de borde, si el lienzo pinta en modo de depuración ({@link #outlines()}). */
+    /** Debugging outline of a border box, if the canvas paints in debugging mode ({@link #outlines()}). */
     void outline(Rect borderBox);
 
     /**
-     * Si pinta los contornos de depuración: el pintado los pide aparte, sin los recortes de las esquinas redondeadas,
-     * para que se vea la caja entera.
+     * Whether it paints the debugging outlines: painting requests them separately, without the clips of the rounded
+     * corners, so that the whole box is visible.
      */
     default boolean outlines() {
         return false;
     }
 
     /**
-     * Texto con la línea base en {@code baselineY}.
+     * Text with the baseline at {@code baselineY}.
      *
-     * @param wordSpacing   espacio que se añade a cada espacio entre palabras ({@code justify})
-     * @param letterSpacing espacio que se añade tras cada carácter menos el último ({@code Letter spacing})
+     * @param wordSpacing   space added to each space between words ({@code justify})
+     * @param letterSpacing space added after each character except the last ({@code Letter spacing})
      */
     void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
               double wordSpacing, double letterSpacing);
 
     /**
-     * La imagen de una {@code Image} (reference/components/image.md) en su caja de contenido
-     * {@code content}, colocada según su {@code Fit} ({@link ImageFit}) y recortada a la caja con
-     * las esquinas {@code radii} (las de la caja de contenido).
+     * The image of an {@code Image} (reference/components/image.md) in its content box
+     * {@code content}, placed according to its {@code Fit} ({@link ImageFit}) and clipped to the box with
+     * the corners {@code radii} (those of the content box).
      */
     void image(Box box, Rect content, Radii radii);
 
     /**
-     * Empieza a pintar girado (reference/common/layers-and-rotation.md): todo lo que se pinte hasta
-     * {@link #endRotation()}, también las zonas de los enlaces, gira {@code degrees} grados en el
-     * sentido de las agujas del reloj alrededor del punto ({@code x}, {@code y}) de la página. Los
-     * giros se anidan: uno dentro de otro se suma al de fuera.
+     * Starts painting rotated (reference/common/layers-and-rotation.md): everything painted until
+     * {@link #endRotation()}, link areas included, rotates {@code degrees} degrees clockwise around the
+     * point ({@code x}, {@code y}) of the page. Rotations nest: one inside another adds to the outer
+     * one.
      */
     void beginRotation(double degrees, double x, double y);
 
-    /** Termina el giro empezado con {@link #beginRotation}. */
+    /** Ends the rotation started with {@link #beginRotation}. */
     void endRotation();
 
     /**
-     * Empieza a recortar (reference/common/box.md): lo que se pinte hasta {@link #endClip()} solo se ve dentro de
-     * {@code r} con las esquinas {@code radii}, con los giros en curso. Los recortes se anidan con los giros: cada uno
-     * termina antes que lo que empezó antes que él.
+     * Starts clipping (reference/common/box.md): what is painted until {@link #endClip()} is only visible inside
+     * {@code r} with the corners {@code radii}, under the current rotations. Clips nest with rotations: each one ends
+     * before whatever started before it.
      */
     void beginClip(Rect r, Radii radii);
 
-    /** Termina el recorte empezado con {@link #beginClip}. */
+    /** Ends the clip started with {@link #beginClip}. */
     void endClip();
 
     /**
-     * Ascendente y descendente con que se pinta la fuente, para colocar la línea base
-     * (reference/common/typography.md); sin la fuente, {@link VerticalMetrics#APPROXIMATE}.
+     * Ascent and descent with which the font is painted, to place the baseline
+     * (reference/common/typography.md); without the font, {@link VerticalMetrics#APPROXIMATE}.
      */
     VerticalMetrics vertical(FontFace font);
 
     /**
-     * Posición y grosor del subrayado y del tachado de la fuente (reference/common/text-formatting.md); sin la
-     * fuente, {@link DecorationMetrics#APPROXIMATE}.
+     * Position and thickness of the underline and the strikethrough of the font (reference/common/text-formatting.md);
+     * without the font, {@link DecorationMetrics#APPROXIMATE}.
      */
     DecorationMetrics decoration(FontFace font);
 }

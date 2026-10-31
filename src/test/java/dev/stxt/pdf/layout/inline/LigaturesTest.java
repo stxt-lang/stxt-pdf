@@ -29,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Ligatures} (reference/common/text-formatting.md): sin ella, un glifo por carácter; con ella, el texto se
- * mide y se pinta con los glifos que deja la tabla GSUB de la fuente, y lo medido es lo pintado.
+ * {@code Ligatures} (reference/common/text-formatting.md): without it, one glyph per character; with it, the text is
+ * measured and painted with the glyphs that the GSUB table of the font leaves, and what is measured is what is painted.
  */
 class LigaturesTest {
 
@@ -42,7 +42,7 @@ class LigaturesTest {
         return new FontFace("IBM Plex Serif", FontWeight.NORMAL, FontStyle.NORMAL, ligatures);
     }
 
-    /** Un documento de un solo {@code Text} con la tipografía de {@code typography} (líneas con tabuladores) en el documento. */
+    /** A document with a single {@code Text} with the typography of {@code typography} (lines with tabs). */
     private static String document(String text, String... typography) {
         StringBuilder t = new StringBuilder();
         for (String line : typography) {
@@ -74,7 +74,7 @@ class LigaturesTest {
         return firstLine(layOut(document(text, typography)).pages().get(0).content()).width();
     }
 
-    /** Los glifos (dos bytes cada uno, Identity-H) que el PDF escribe para el texto de la primera página. */
+    /** The glyphs (two bytes each, Identity-H) that the PDF writes for the text of the first page. */
     private static int glyphs(LaidOutDocument document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfDocumentWriter.write(document, RESOURCES, Limits.DEFAULT, out, false);
@@ -110,7 +110,7 @@ class LigaturesTest {
         double plain = METRICS.width("office", serif(false), 20);
         double ligated = METRICS.width("office", serif(true), 20);
         assertTrue(ligated < plain, ligated + " < " + plain);
-        // Una palabra sin ligadura mide lo mismo; los espacios y las palabras se miden por separado.
+        // A word without a ligature measures the same; spaces and words are measured separately.
         assertEquals(METRICS.width("Hello world", serif(false), 20), METRICS.width("Hello world", serif(true), 20), 1e-9);
         assertEquals(METRICS.width("office", serif(true), 20) + METRICS.width(" ", serif(true), 20)
                 + METRICS.width("office", serif(true), 20), METRICS.width("office office", serif(true), 20), 1e-9);
@@ -124,7 +124,7 @@ class LigaturesTest {
 
     @Test
     void aWordWithoutGlyphIsMeasuredAsAlways() {
-        // El carácter que la fuente no tiene mide lo que .notdef; no hay ligadura posible.
+        // The character that the font does not have measures what .notdef does; no ligature is possible.
         String text = "fi";
         assertEquals(METRICS.width(text, serif(false), 20), METRICS.width(text, serif(true), 20), 1e-9);
     }
@@ -144,8 +144,8 @@ class LigaturesTest {
 
     @Test
     void thePdfWritesWhatWasMeasured() throws IOException {
-        assertEquals(6, glyphs(layOut(document("office"))), "un glifo por carácter");
-        assertTrue(glyphs(layOut(document("office", "Ligatures: true"))) < 6, "las ligaduras juntan glifos");
+        assertEquals(6, glyphs(layOut(document("office"))), "one glyph per character");
+        assertTrue(glyphs(layOut(document("office", "Ligatures: true"))) < 6, "ligatures join glyphs");
         assertEquals(6, glyphs(layOut(document("office", "Ligatures: true", "Letter spacing: 1"))));
         assertFalse(width("office", "Ligatures: true") == width("office"));
     }

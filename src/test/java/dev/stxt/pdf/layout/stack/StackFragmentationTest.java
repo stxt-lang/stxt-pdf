@@ -8,7 +8,7 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/** Páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde (40, 40). */
+/** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
 class StackFragmentationTest {
 
     private static final double PAGE = 180;
@@ -21,7 +21,7 @@ class StackFragmentationTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    /** Ítem de 40 de alto; {@code box} son más propiedades de su {@code Box} ({@code "Width: 300"}). */
+    /** Item 40 high; {@code box} are more properties of its {@code Box} ({@code "Width: 300"}). */
     private static String[] item(String id, String... box) {
         String[] base = {"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: " + id, "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40"};
         String[] all = new String[base.length + box.length];
@@ -38,7 +38,7 @@ class StackFragmentationTest {
 
     @Test
     void rowBreaksBetweenLines() {
-        // Una línea por ítem (300 + 10 + 300 > 515): líneas en 0, 50, 100 y 150.
+        // One line per item (300 + 10 + 300 > 515): lines at 0, 50, 100 and 150.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10"},
                 item("I1", "Width: 300"), item("I2", "Width: 300"),
@@ -66,7 +66,7 @@ class StackFragmentationTest {
 
     @Test
     void columnRespectsKeepsBetweenItems() {
-        // Cortar antes de C incumple su Keep with previous: se corta antes de B.
+        // Breaking before C violates its Keep with previous: the break goes before B.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
                 item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true"}));
@@ -78,8 +78,8 @@ class StackFragmentationTest {
 
     @Test
     void rowLineTallerThanAPageBreaksItsItemsInParallel() {
-        // A: 20 líneas de 12 (240). B se estira a la línea (240) y reparte ese alto entre las
-        // páginas. Líneas de A: 8 + 8 + 4; B: 100 + 100 + 40. La página 3 mide lo que A.
+        // A: 20 lines of 12 (240). B stretches to the line (240) and distributes that height across the
+        // pages. Lines of A: 8 + 8 + 4; B: 100 + 100 + 40. Page 3 measures what A does.
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE,
                 "\tStack:", "\t\tId: F",
@@ -109,7 +109,7 @@ class StackFragmentationTest {
 
     @Test
     void containerThatDoesNotFitMovesToTheNextPage() {
-        // Tras X (70) no cabe ni la primera línea: el contenedor entero pasa a la página 2.
+        // After X (70) not even the first line fits: the whole container moves to page 2.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70"},
                 new String[]{"\tStack:", "\t\tId: F"},
@@ -120,8 +120,8 @@ class StackFragmentationTest {
     }
 
     /**
-     * Una columna con Wrap se corta entera (es una sola unidad). Tras X (50), F (Height: 60, líneas de 40) cabe
-     * con sus ítems en la página 1 y su alto sigue en la 2.
+     * A column with Wrap breaks whole (it is a single unit). After X (50), F (Height: 60, lines of 40) fits
+     * with its items on page 1 and its height continues on page 2.
      */
     @Test
     void aWrappedColumnIsASingleUnit() {

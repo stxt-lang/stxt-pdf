@@ -11,16 +11,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** La numeración de los encabezados, {@code Numbered} (reference/components/heading.md), al construir el árbol. */
+/** Heading numbering, {@code Numbered} (reference/components/heading.md), when building the tree. */
 class HeadingNumbersTest {
 
-    /** Lo que {@code For element: Document} añade para numerar todos los encabezados. */
+    /** What {@code For element: Document} adds to number all the headings. */
     private static final String NUMBERED = "\t\t\t\tNumbered: true\n";
 
     /**
-     * Construye el árbol de un documento. {@code documentTypography} son líneas más de la regla
-     * {@code For element: Document} (con cuatro tabuladores) y {@code rules}, reglas más de {@code Styles}
-     * (con dos); {@code lines}, el contenido.
+     * Builds the tree of a document. {@code documentTypography} are extra lines of the rule
+     * {@code For element: Document} (with four tabs) and {@code rules}, extra rules of {@code Styles}
+     * (with two); {@code lines}, the content.
      */
     private static BoxTreeBuilder.Result build(String documentTypography, String rules, String... lines) {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -29,7 +29,7 @@ class HeadingNumbersTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc))));
     }
 
-    /** Los encabezados del documento, en orden. */
+    /** The headings of the document, in order. */
     private static List<Box> headings(BoxTreeBuilder.Result tree) {
         List<Box> out = new ArrayList<>();
         collect(tree.root(), out);
@@ -77,7 +77,7 @@ class HeadingNumbersTest {
                 "\tHeading 2:", "\t\tText: Ventas");
         Box h1 = headings(tree).get(0);
         assertEquals("1 Resultados", h1.children().get(0).text());
-        // Solo el primer Text lleva el número.
+        // Only the first Text carries the number.
         assertEquals("del trimestre", h1.children().get(1).text());
         assertEquals("1 Resultados del trimestre", h1.headingText());
         assertEquals("1.1 Ventas", headings(tree).get(1).headingText());
@@ -125,7 +125,7 @@ class HeadingNumbersTest {
                 "\tHeading 2:", "\t\tStyle: plain", "\t\tText: C",
                 "\tHeading 1:", "\t\tText: D",
                 "\tHeading 2:", "\t\tText: E");
-        // Las secciones de C no se numeran, pero la E vuelve a ser 2.1 porque D abre el capítulo 2.
+        // The sections of C are not numbered, but E is 2.1 again because D opens chapter 2.
         assertEquals(java.util.Arrays.asList("1", "1.1", null, "2", "2.1"), numbers(tree));
     }
 
@@ -161,7 +161,7 @@ class HeadingNumbersTest {
 
     @Test
     void numberedHeadingsUnderAnUnnumberedTitleCountFromOne() {
-        // El caso normal: un título (Heading 1) sin número y las secciones debajo, numeradas.
+        // The usual case: a title (Heading 1) without a number and the sections below it, numbered.
         BoxTreeBuilder.Result tree = build(NUMBERED, "",
                 "\tHeading 1:", "\t\tText: Contrato", "\t\tTypography:", "\t\t\tNumbered: false",
                 "\tHeading 2:", "\t\tText: Reunidos",
@@ -182,7 +182,7 @@ class HeadingNumbersTest {
                 "\tHeading 3:", "\t\tText: D",
                 "\tHeading 2:", "\t\tStyle: plain", "\t\tText: E",
                 "\tHeading 3:", "\t\tText: F");
-        // El Heading 3 cuenta dentro de su Heading 2, aunque este no tenga número, y empieza otra vez en cada uno.
+        // The Heading 3 counts within its Heading 2, even if that one has no number, and starts again in each one.
         assertEquals(java.util.Arrays.asList("1", null, "1.1", "1.2", null, "1.1"), numbers(tree));
     }
 
@@ -206,7 +206,7 @@ class HeadingNumbersTest {
         assertEquals("1.1", headings(tree).get(1).number());
     }
 
-    /** Un encabezado de Markdown con {@code {#id}} se puede referir y su {@code Id} es del documento. */
+    /** A Markdown heading with {@code {#id}} can be referred to and its {@code Id} belongs to the document. */
     @Test
     void aMarkdownHeadingWithAnIdCanBeReferred() {
         BoxTreeBuilder.Result tree = build(NUMBERED, "",
@@ -221,7 +221,7 @@ class HeadingNumbersTest {
         assertEquals(ErrorCode.DUPLICATE_ID, e.errorCode());
     }
 
-    /** Cada nivel del número se escribe con el {@code Number format} de su encabezado. */
+    /** Each level of the number is written with the {@code Number format} of its heading. */
     @Test
     void eachLevelIsWrittenWithTheStyleOfItsHeading() {
         BoxTreeBuilder.Result tree = build(NUMBERED,
@@ -237,8 +237,8 @@ class HeadingNumbersTest {
     }
 
     /**
-     * {@code Number label} es lo que va delante del título, con el número en su {@code {number}}; {@code {number of:
-     * id}} sigue siendo el número.
+     * {@code Number label} is what goes in front of the title, with the number in its {@code {number}};
+     * {@code {number of: id}} is still the number.
      */
     @Test
     void aLabelGoesInFrontOfTheTitleWithTheNumberInside() {

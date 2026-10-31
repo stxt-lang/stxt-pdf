@@ -1,12 +1,12 @@
 package dev.stxt.pdf.layout.image;
 
 /**
- * Tamaño natural de una imagen en puntos (reference/components/image.md): el de sus píxeles, a 96 por
- * pulgada. Es el de su caja de contenido si no se declara otro.
+ * Natural size of an image in points (reference/components/image.md): that of its pixels, at 96 per
+ * inch. It is the size of its content box if no other is declared.
  */
 public record NaturalSize(double width, double height) {
 
-    /** Proporción ancho / alto. */
+    /** Width / height ratio. */
     public double ratio() {
         return width / height;
     }

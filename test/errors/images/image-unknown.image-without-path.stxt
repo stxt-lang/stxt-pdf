@@ -1,0 +1,12 @@
+# Case: Image without a path
+# Code: IMAGE_UNKNOWN
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image:
+			Id: logo

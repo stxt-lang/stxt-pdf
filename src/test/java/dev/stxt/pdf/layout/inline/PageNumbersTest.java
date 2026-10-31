@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde (40, 40). */
+/** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
 class PageNumbersTest {
 
     private static final double PAGE = 180;
     private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
 
-    /** Pie fijo; el {@code Id} está en su {@code Text}, que ocupa todo el ancho del pie. */
+    /** Fixed footer; the {@code Id} is on its {@code Text}, which takes up the whole width of the footer. */
     private static final String[] FOOTER = {"\tPage overlay:", "\t\tOffset: auto 0 -30 0", "\t\tBox:", "\t\t\tHeight: 20",
             "\t\tTypography:", "\t\t\tAlign: right",
             "\t\tText: Página {page} de {pages}", "\t\t\tId: footer"};
@@ -45,7 +45,7 @@ class PageNumbersTest {
                 PageNumbers.probing(new FixedMetrics(1), "000").width("Página {page}", F, 1), 1e-9);
     }
 
-    /** El número de prueba solo crece: el más largo de los dos, con la letra más ancha ({@code 0}, {@code m}, {@code M}). */
+    /** The trial number only grows: the longer of the two, with the widest letter ({@code 0}, {@code m}, {@code M}). */
     @Test
     void theProbeCoversTheWidestNumber() {
         assertEquals("000", PageNumbers.cover("00", "000"));
@@ -57,8 +57,8 @@ class PageNumbersTest {
 
     @Test
     void moreThan99PagesRepaginatesWithThreeDigits() {
-        // A ocupa 100 páginas. El pie mide 35 pt (7 caracteres): "Hoja 00" cabe, pero "Hoja 100"
-        // no. Al repaginar reservando tres cifras, el número pasa a su propia línea.
+        // A takes up 100 pages. The footer measures 35 pt (7 characters): "Hoja 00" fits, but "Hoja 100"
+        // does not. When paginating again reserving three figures, the number moves to its own line.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tPage overlay:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
                 "\t\tText: Hoja {page}", "\t\t\tId: footer",
@@ -73,8 +73,9 @@ class PageNumbersTest {
 
     @Test
     void romanNumbersRepaginateWithTheWidestOne() {
-        // A ocupa 8 páginas, numeradas en romanos. El pie mide 35 pt (7 caracteres): "Hoja 00" cabe, pero "Hoja viii"
-        // no. Al repaginar reservando cuatro letras (las de viii), el número pasa a su propia línea.
+        // A takes up 8 pages, numbered in Roman numerals. The footer measures 35 pt (7 characters): "Hoja 00" fits,
+        // but "Hoja viii" does not. When paginating again reserving four letters (those of viii), the number moves to
+        // its own line.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tPage overlay:", "\t\tOffset: auto auto -30 0", "\t\tBox:", "\t\t\tWidth: 35",
                 "\t\tText: Hoja {page}", "\t\t\tId: footer",
@@ -87,7 +88,7 @@ class PageNumbersTest {
 
     @Test
     void fixedFooterShowsEachPageNumber() {
-        // A ocupa tres páginas. "Página 2 de 3" mide 13 × 5 = 65: alineada a la derecha, en 450.
+        // A takes up three pages. "Página 2 de 3" measures 13 × 5 = 65: aligned to the right, at 450.
         LayoutFixture l = layOutPaged(PAGE, concat(FOOTER, new String[]{"\tBlock:", "\t\tId: A", "\t\tBox:",
                 "\t\t\tHeight: 250"}));
         assertEquals(3, l.pages());
@@ -101,7 +102,7 @@ class PageNumbersTest {
 
     @Test
     void inFlowTextIsNumberedToo() {
-        // N cae en la página 2, detrás de los 50 pt que quedan de A.
+        // N falls on page 2, after the 50 pt left of A.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 150",
                 "\tText: Hoja {page}", "\t\tId: N");

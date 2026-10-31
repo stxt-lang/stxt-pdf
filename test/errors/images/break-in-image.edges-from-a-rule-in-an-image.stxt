@@ -1,0 +1,18 @@
+# Case: Edges from a rule in an Image
+# Code: BREAK_IN_IMAGE
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For style: photo
+			Break:
+				Edges: closed
+	Section:
+		Block:
+			Style: photo
+		Image: test/wide.png
+			Style: photo

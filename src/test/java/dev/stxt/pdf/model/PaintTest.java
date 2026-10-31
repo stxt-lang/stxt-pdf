@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** El relleno de un fondo (reference/common/box.md): colores lisos y degradados. */
+/** The fill of a background (reference/common/box.md): solid colors and gradients. */
 class PaintTest {
 
     private static final Rect BOX = new Rect(10, 20, 100, 50);
@@ -19,7 +19,7 @@ class PaintTest {
 
     @Test
     void zeroDegreesGoesUpAndTheLineCrossesTheCenter() {
-        // Centro (60, 45); el degradado mide el alto: va de abajo (70) a arriba (20).
+        // Center (60, 45); the gradient spans the height: it goes from the bottom (70) to the top (20).
         assertLine(new double[]{60, 70, 60, 20}, new Paint.Linear(0, List.of("#000", "#FFF")).line(BOX));
     }
 
@@ -35,7 +35,7 @@ class PaintTest {
 
     @Test
     void aDiagonalReachesTheCornersWithTheFirstAndLastColor() {
-        // 45°: la línea mide |w sen| + |h cos| = (100 + 50) · 0,7071; el centro está a medio camino.
+        // 45°: the line measures |w sin| + |h cos| = (100 + 50) · 0.7071; the center is halfway.
         double[] line = new Paint.Linear(45, List.of("#000", "#FFF")).line(BOX);
         double half = (100 + 50) * Math.sqrt(0.5) / 2;
         assertLine(new double[]{60 - half * Math.sqrt(0.5), 45 + half * Math.sqrt(0.5),

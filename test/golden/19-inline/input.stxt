@@ -1,19 +1,19 @@
-# Hito 26: formato dentro de la línea fuera de Markdown (reference/common/text-formatting.md). Página de
-# 200 × 200 con márgenes de 20: área útil de 160 × 160 desde (20, 20). Líneas de 12 (Size 10);
-# con 5 pt por carácter caben 32 caracteres por línea.
+# Milestone 26: inline formatting outside Markdown (reference/common/text-formatting.md). Page of
+# 200 × 200 with margins of 20: page area of 160 × 160 from (20, 20). Lines of 12 (Size 10);
+# at 5 pt per character, 32 characters fit per line.
 #
-# Document declara Markup: markdown y se hereda en todo el texto. Las marcas (**, \) no miden:
-# el texto mide lo que se ve.
-#   lit:     Markup: none; "**aaaa** **bbbb** **cccc** **dddd**" es literal: 35 caracteres, así que
-#            2 líneas (tres palabras de 8 caben en 26; la cuarta lo pasa a 35): 24. Desde y = 20.
-#   fmt:     lo mismo con Markup heredado: "aaaa bbbb cccc dddd" son 19 caracteres: 1 línea, 12. y = 44.
-#   escaped: con \* delante, los asteriscos son literales: 35 caracteres otra vez, 2 líneas: 24. y = 56.
-#   blocks:  un Block con dos Paragraph con Content; el salto de línea simple del primero vale un
-#            espacio: cada uno es una línea: 24. y = 80.
-#   tab:     una Cell de 80 de ancho (16 caracteres): "**aaaa** **bbbb**" literal serían 17 y dos
-#            líneas; interpretada, "aaaa bbbb" es una línea: la fila y la tabla miden 12. y = 104.
-#   md:      un Markdown no se interpreta dos veces: "\*\*aaaa\*\* …" da 35 caracteres literales
-#            (Markup: markdown lo hereda, pero no actúa dentro): 2 líneas, 24. y = 116.
+# Document declares Markup: markdown and all the text inherits it. The marks (**, \) have no width:
+# the text measures what is seen.
+#   lit:     Markup: none; "**aaaa** **bbbb** **cccc** **dddd**" is literal: 35 characters, so
+#            2 lines (three words of 8 fit in 26; the fourth takes it to 35): 24. From y = 20.
+#   fmt:     the same with inherited Markup: "aaaa bbbb cccc dddd" is 19 characters: 1 line, 12. y = 44.
+#   escaped: with \* in front, the asterisks are literal: 35 characters again, 2 lines: 24. y = 56.
+#   blocks:  a Block with two Paragraph with Content; the single line break of the first counts as a
+#            space: each one is one line: 24. y = 80.
+#   tab:     a Cell 80 wide (16 characters): "**aaaa** **bbbb**" as literal text would be 17 and two
+#            lines; interpreted, "aaaa bbbb" is one line: the row and the table measure 12. y = 104.
+#   md:      a Markdown is not interpreted twice: "\*\*aaaa\*\* ..." gives 35 literal characters
+#            (Markup: markdown is inherited, but does not act inside it): 2 lines, 24. y = 116.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

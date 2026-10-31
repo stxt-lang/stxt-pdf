@@ -13,17 +13,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Regresión de la regla de la arquitectura (reference/architecture.md): toda recursión de layout y de tamaños intrínsecos
- * pasa por {@code engine.layout}/{@code engine.intrinsic}, que usan la {@link LayoutCache}. Sin
- * ella, cada nivel de stack o grid maqueta a sus hijos varias veces (medida, intrínsecos, layout
- * final) y el trabajo crece de forma exponencial con la profundidad. El trabajo se mide por las
- * veces que se mide el texto de la hoja.
+ * Regression test for the architecture rule (reference/architecture.md): every recursion of layout and intrinsic sizes
+ * goes through {@code engine.layout}/{@code engine.intrinsic}, which use the {@link LayoutCache}. Without
+ * it, each level of stack or grid lays out its children several times (measurement, intrinsic sizes, final
+ * layout) and the work grows exponentially with depth. The work is measured by the number of
+ * times the text of the leaf is measured.
  */
 class LayoutCacheTest {
 
     private static final DocumentReader READER = new DocumentReader();
 
-    /** {@link FixedMetrics} que cuenta las mediciones. */
+    /** {@link FixedMetrics} that counts the measurements. */
     private static final class CountingMetrics implements TextMeasurer {
         private final TextMeasurer metrics = new FixedMetrics();
         int calls;
@@ -35,7 +35,7 @@ class LayoutCacheTest {
         }
     }
 
-    /** {@code Stack} y {@code Grid} alternos, {@code depth} niveles, cada uno con un texto al lado. */
+    /** Alternating {@code Stack} and {@code Grid}, {@code depth} levels, each one with a text beside it. */
     private static String nested(int depth) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
@@ -67,9 +67,9 @@ class LayoutCacheTest {
         int four = measurements(4);
         int eight = measurements(8);
         int twelve = measurements(12);
-        // Lineal: el doble de niveles, algo más del doble de trabajo. Exponencial (base 2 o más):
-        // al menos 16 veces más con cada 4 niveles.
-        assertTrue(eight < 4 * four, () -> "4 niveles: " + four + " mediciones; 8: " + eight);
-        assertTrue(twelve < 3 * eight, () -> "8 niveles: " + eight + " mediciones; 12: " + twelve);
+        // Linear: twice the levels, a little more than twice the work. Exponential (base 2 or more):
+        // at least 16 times more with every 4 levels.
+        assertTrue(eight < 4 * four, () -> "4 levels: " + four + " measurements; 8: " + eight);
+        assertTrue(twelve < 3 * eight, () -> "8 levels: " + eight + " measurements; 12: " + twelve);
     }
 }

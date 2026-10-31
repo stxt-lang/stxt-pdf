@@ -8,16 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Volver a paginar porque el total necesita más cifras o porque cambia la página de una referencia solo vuelve a
- * maquetar los textos que las escriben y sus antepasados; el resto sale de la caché.
- * Se mide con los layouts calculados: antes se vaciaba la caché entera y el documento costaba el doble.
+ * Paginating again because the total needs more figures or because the page of a reference changes only lays out
+ * again the texts that write them and their ancestors; the rest comes from the cache.
+ * It is measured with the computed layouts: the whole cache used to be emptied and the document cost twice as much.
  */
 class PaginationCacheTest {
 
     private static final String PARAGRAPH = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
             + "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.";
 
-    /** Un documento con un pie {@code footer} y {@code first} delante de {@code paragraphs} párrafos. */
+    /** A document with a footer {@code footer} and {@code first} before {@code paragraphs} paragraphs. */
     private static String document(String footer, String first, int paragraphs) {
         StringBuilder sb = new StringBuilder("Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n"
                 + "\tTitle: Caché\n\tLanguage: es\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
@@ -30,7 +30,7 @@ class PaginationCacheTest {
         return sb.toString();
     }
 
-    /** Las páginas y los layouts calculados al maquetar el documento con un motor nuevo. */
+    /** The pages and the computed layouts when laying out the document with a new engine. */
     private static int[] layOut(String text) {
         Engine engine = new Engine();
         int pages = engine.layOutDocument(new DocumentReader().read(text)).pages().size();
@@ -42,23 +42,24 @@ class PaginationCacheTest {
         int[] plain = layOut(document("Pie de página", "Primero", 3100));
         int[] numbered = layOut(document("Página {page} de {pages}", "Primero", 3100));
         assertEquals(plain[0], numbered[0]);
-        assertTrue(numbered[0] > 99, "la prueba necesita más de 99 páginas: " + numbered[0]);
-        // La segunda paginación solo maqueta otra vez el pie y la sección de cada página.
-        assertTrue(numbered[1] < plain[1] * 1.25, numbered[1] + " layouts frente a " + plain[1]);
+        assertTrue(numbered[0] > 99, "the test needs more than 99 pages: " + numbered[0]);
+        // The second pagination only lays out again the footer and the section of each page.
+        assertTrue(numbered[1] < plain[1] * 1.25, numbered[1] + " layouts versus " + plain[1]);
     }
 
     @Test
     void aReferenceThatChangesOnlyRelaysOutItsText() {
-        // La primera pasada supone la página 00 y la segunda escribe la de verdad, la última.
+        // The first pass assumes page 00 and the second writes the real one, the last.
         int[] referred = layOut(document("Pie de página", "El final está en la página {page of: end}", 600));
         int[] plain = layOut(document("Pie de página", "El final está en la página " + referred[0], 600));
         assertEquals(plain[0], referred[0]);
-        assertTrue(referred[1] < plain[1] * 1.25, referred[1] + " layouts frente a " + plain[1]);
+        assertTrue(referred[1] < plain[1] * 1.25, referred[1] + " layouts versus " + plain[1]);
     }
 
     /**
-     * Con 101 páginas, el texto con {page} del flujo se vuelve a medir con tres cifras: «Página 000» (50) no cabe en su
-     * caja de 48 y ocupa dos líneas; medido con dos (45) cabría en una. La caché tiene que olvidarlo (pruebas de mutación).
+     * With 101 pages, the text with {page} in the flow is measured again with three figures: "Página 000" (50) does not
+     * fit in its box of 48 and takes two lines; measured with two (45) it would fit in one. The cache has to forget it
+     * (mutation testing).
      */
     @Test
     void aThirdDigitIsMeasuredInTheTextsThatWriteIt() {

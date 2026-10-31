@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** Alineación de un ítem dentro de su línea o celda. */
+/** Alignment of an item within its line or cell. */
 public enum Alignment { START, END, CENTER, STRETCH }

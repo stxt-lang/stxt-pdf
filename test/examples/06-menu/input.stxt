@@ -1,8 +1,8 @@
-# Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
-# doble dibujados con Page overlay de Layer negativa, que quedan detrás del contenido en todas las
-# páginas; platos con descripción y precio en un Stack, y un recuadro para el menú degustación,
-# con el precio y la nota final en negrita dentro de la línea (Markup: markdown). Los rótulos de las
-# secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Case y Letter spacing.
+# Two-page restaurant menu in a tall format (420 × 700). A cream background and a double frame
+# drawn with Page overlay elements with a negative Layer, which stay behind the content on all the
+# pages; dishes with description and price in a Stack, and a box for the tasting menu,
+# with the price and the closing note in bold inside the line (Markup: markdown). The section
+# labels are written in lowercase and put in uppercase, spaced out, with Case and Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 420

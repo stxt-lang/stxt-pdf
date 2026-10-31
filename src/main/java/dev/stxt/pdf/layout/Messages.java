@@ -2,28 +2,28 @@ package dev.stxt.pdf.layout;
 
 import java.util.Locale;
 
-/** Piezas comunes de los mensajes de error del layout ({@link Overflow}, {@code TableLayout}). */
+/** Common pieces of the layout error messages ({@link Overflow}, {@code TableLayout}). */
 public final class Messages {
 
     private Messages() {
     }
 
-    /** Máximo de caracteres de un texto del documento que se cita en un mensaje. */
+    /** Maximum number of characters of a document text quoted in a message. */
     private static final int EXCERPT = 40;
 
     /**
-     * Un texto del documento para citarlo en un mensaje: entero si es corto y, si no, sus primeros
-     * caracteres con la longitud total, para que el mensaje no crezca con el texto.
+     * A document text to quote in a message: whole if it is short and, if not, its first characters with the
+     * total length, so that the message does not grow with the text.
      */
     public static String excerpt(String text) {
         int length = text.codePointCount(0, text.length());
         if (length <= EXCERPT) {
             return text;
         }
-        return text.substring(0, text.offsetByCodePoints(0, EXCERPT)) + "… (" + length + " caracteres)";
+        return text.substring(0, text.offsetByCodePoints(0, EXCERPT)) + "... (" + length + " characters)";
     }
 
-    /** Una medida en puntos con dos decimales como mucho y sin ceros finales: {@code 12.5}, {@code 100}. */
+    /** A measure in points with at most two decimals and no trailing zeros: {@code 12.5}, {@code 100}. */
     public static String pt(double v) {
         String s = String.format(Locale.ROOT, "%.2f", v);
         return s.replaceAll("\\.?0+$", "");

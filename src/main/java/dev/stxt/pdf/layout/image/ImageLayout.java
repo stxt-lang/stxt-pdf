@@ -20,14 +20,14 @@ import java.util.OptionalDouble;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Layout de una {@code Image} (reference/components/image.md): una caja sin hijos con el tamaño y la
- * proporción del fichero, como un elemento reemplazado de CSS. El tamaño lo resuelve
- * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, que también usan los padres stack, grid
- * y absolute para medirla; aquí solo se coloca.
+ * Layout of an {@code Image} (reference/components/image.md): a box without children with the size and the
+ * aspect ratio of the file, like a CSS replaced element. The size is resolved by
+ * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, which the stack, grid and absolute parents also
+ * use to measure it; here it is only placed.
  *
- * <p>No se parte entre páginas (reference/common/breaks.md): si no cabe en lo que queda de página, corta antes de
- * ella ({@link BreakToken#BEFORE}) y pasa entera a la siguiente; al principio de una página se
- * coloca aunque no quepa, y es {@code PAGE_OVERFLOW}.</p>
+ * <p>It is not split across pages (reference/common/breaks.md): if it does not fit in what is left of the page, it
+ * breaks before it ({@link BreakToken#BEFORE}) and moves whole to the next one; at the start of a page it is
+ * placed even if it does not fit, and it is {@code PAGE_OVERFLOW}.</p>
  */
 public final class ImageLayout implements LayoutAlgorithm {
 
@@ -38,9 +38,9 @@ public final class ImageLayout implements LayoutAlgorithm {
     }
 
     /**
-     * El ancho natural de la caja de contenido o, si la caja declara su {@code Height} en
-     * puntos, el que sale de él con la proporción (sin porcentajes, que necesitan el containing
-     * block).
+     * The natural width of the content box or, if the box declares its {@code Height} in
+     * points, the one that follows from it with the aspect ratio (without percentages, which need the reference
+     * container).
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {

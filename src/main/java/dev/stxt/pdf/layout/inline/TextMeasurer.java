@@ -5,31 +5,31 @@ import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Mide el ancho de un texto en puntos.
+ * Measures the width of a text in points.
  *
- * <p>El ancho tiene que ser aditivo entre palabras: el de un texto es la suma de los de sus palabras y de los
- * espacios que las separan (sin kerning entre ellos, y las ligaduras dentro de cada palabra). {@link LineBreaker}
- * reparte las líneas sumándolos, y solo mide la línea entera cuando la suma queda muy cerca del ancho
- * disponible.</p>
+ * <p>The width has to be additive between words: that of a text is the sum of those of its words and of the
+ * spaces that separate them (without kerning between them, and the ligatures within each word). {@link LineBreaker}
+ * breaks the lines by adding them up, and only measures the whole line when the sum is very close to the available
+ * width.</p>
  */
 public interface TextMeasurer {
 
     double width(String text, FontFace font, double fontSize);
 
     /**
-     * Ascendente y descendente de la fuente, para alinear líneas base al maquetar (el marcador de
-     * una lista, reference/components/list.md). Por defecto, la aproximación sin fuente, que es la que
-     * usa el pintado SVG.
+     * Ascent and descent of the font, to align baselines during the layout (the marker of
+     * a list, reference/components/list.md). By default, the approximation without a font, which is the one
+     * the SVG painting uses.
      */
     default VerticalMetrics vertical(FontFace font) {
         return VerticalMetrics.APPROXIMATE;
     }
 
     /**
-     * Comprueba, antes de maquetar, que puede medir todo el texto del árbol: que existen sus
-     * fuentes y tienen todos sus caracteres. Los errores llevan la línea del documento.
+     * Checks, before the layout, that it can measure all the text of the tree: that its
+     * fonts exist and have all their characters. The errors carry the line of the document.
      *
-     * @throws dev.stxt.pdf.tree.InvalidModelException si algún texto no se puede medir
+     * @throws dev.stxt.pdf.tree.InvalidModelException if some text cannot be measured
      */
     default void validate(Box root) {
     }

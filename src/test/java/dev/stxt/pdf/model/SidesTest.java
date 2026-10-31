@@ -18,7 +18,7 @@ class SidesTest {
 
     @Test
     void verticalPercentagesUseTheWidth() {
-        // Módulo 1: los porcentajes de margen y relleno, también verticales, usan el ancho.
+        // Module 1: the percentages of margin and padding, vertical ones too, use the width.
         Insets i = Insets.resolve(Sides.shorthand(ValueParser.list("10% auto")), 200);
         assertEquals(new Insets(20, 0, 20, 0), i);
     }

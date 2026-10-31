@@ -1,4 +1,4 @@
-# Los fragmentos del flujo y, después, los Page overlay del documento y los de la sección (reference/components/document.md). La sección no se vuelca.
+# The flow fragments and, after them, the Page overlay elements of the document and those of the section (reference/components/document.md). The section is not dumped.
 Result:
 	Page: 1
 		Fragment: cover-box

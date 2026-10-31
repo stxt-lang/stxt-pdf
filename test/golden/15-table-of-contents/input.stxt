@@ -1,12 +1,12 @@
-# Referencias a páginas e índice (reference/components/table-of-contents.md). Área útil de 260 × 260 desde (20, 20);
-# con FixedMetrics, cada carácter mide 5 pt con Size: 10 y cada línea, 12.
+# Page references and table of contents (reference/components/table-of-contents.md). Page area of 260 × 260
+# from (20, 20); with FixedMetrics, each character measures 5 pt at Size: 10 and each line, 12.
 #
-# toc lista los encabezados de los niveles 1 y 2 (Levels: 1 2): Introducción, Método, Datos y
-# Resultados, cuatro entradas de 12 pt, y no Fino, que es de nivel 3. Mide 4 × 12 = 48 y deja un
-# margen de 8: intro empieza en 20 + 48 + 8 = 76, y ref, que escribe la página de results, justo
-# debajo, en 88 (con el 3 ya escrito: «Véase la página 3.» son 18 caracteres, 90 pt, una línea).
-# Cada encabezado grande va en un bloque con Break: Before: page. Página 2: method en 20, data
-# (Heading 2) en 32 y fine (Heading 3) en 44. Página 3: results en 20.
+# toc lists the headings of levels 1 and 2 (Levels: 1 2): Introducción, Método, Datos and
+# Resultados, four entries of 12 pt, and not Fino, which is level 3. It measures 4 × 12 = 48 and leaves a
+# margin of 8: intro starts at 20 + 48 + 8 = 76, and ref, which writes the page of results, right
+# below, at 88 (with the 3 already written: "Véase la página 3." is 18 characters, 90 pt, one line).
+# Each large heading goes in a block with Break: Before: page. Page 2: method at 20, data
+# (Heading 2) at 32 and fine (Heading 3) at 44. Page 3: results at 20.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300

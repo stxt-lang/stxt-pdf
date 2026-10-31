@@ -12,33 +12,35 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Índice de las fuentes de la carpeta {@code fonts/} (reference/common/resources.md), por familia,
- * peso y estilo.
+ * Index of the fonts of the {@code fonts/} folder (reference/common/resources.md), by family,
+ * weight and style.
  *
- * <p>Se recorren la carpeta y sus subcarpetas buscando ficheros {@code .ttf}. De cada uno se
- * leen la familia (la tipográfica, {@code nameID} 16, o si no la hay la 1), el peso
- * ({@code usWeightClass} de la tabla {@code OS/2}: 400 es {@code normal} y 700 {@code bold}) y
- * el estilo (el bit de cursiva de {@code fsSelection}). Los ficheros de otros pesos (300, 500…)
- * se leen pero no se pueden usar, porque {@code Bold} solo distingue el
- * normal (400) y la negrita (700).</p>
+ * <p>The folder and its subfolders are walked looking for {@code .ttf} files. From each one the
+ * family (the typographic one, {@code nameID} 16, or else 1), the weight
+ * ({@code usWeightClass} of the {@code OS/2} table: 400 is {@code normal} and 700 {@code bold}) and
+ * the style (the italic bit of {@code fsSelection}) are read. Files of other weights (300, 500...)
+ * are read but cannot be used, because {@code Bold} only distinguishes
+ * normal (400) and bold (700).</p>
  *
- * <p>Son errores: que no exista la carpeta, un fichero que no se puede leer, una fuente
- * variable, dos ficheros con la misma familia, peso y estilo, y un enlace que sale de la
- * carpeta de recursos.</p>
+ * <p>These are errors: a missing folder, a file that cannot be read, a variable
+ * font, two files with the same family, weight and style, and a link that leaves the
+ * resources folder.</p>
  */
 public final class FontLibrary {
 
-    /** Familia tipográfica en la tabla {@code name}. */
+    /** Typographic family in the {@code name} table. */
     private static final int TYPOGRAPHIC_FAMILY = 16;
 
     private static final int NORMAL_WEIGHT = 400;
@@ -46,19 +48,19 @@ public final class FontLibrary {
 
     private final Path folder;
     private final Map<FontFace, FontFile> faces;
-    /** Todas las familias encontradas, incluidas las que solo tienen otros pesos. */
-    private final Set<String> families;
+    /** All the families found, including those that only have other weights, in alphabetical order. */
+    private final SortedSet<String> families;
 
     private FontLibrary(Path folder, Map<FontFace, FontFile> faces, Set<String> families) {
         this.folder = folder;
         this.faces = Map.copyOf(faces);
-        this.families = Set.copyOf(families);
+        this.families = Collections.unmodifiableSortedSet(new TreeSet<>(families));
     }
 
     static FontLibrary scan(Resources resources) {
         Path folder = resources.fontsFolder();
         if (!Files.isDirectory(folder)) {
-            throw new ResourceException("No existe la carpeta de fuentes " + folder);
+            throw new ResourceException("The fonts folder " + folder + " does not exist");
         }
         List<Path> files;
         try (Stream<Path> walk = Files.walk(folder)) {
@@ -79,17 +81,17 @@ public final class FontLibrary {
             }
             FontFile previous = faces.putIfAbsent(entry.font().face(), entry.font());
             if (previous != null) {
-                throw new ResourceException("Dos ficheros para la fuente " + entry.font().face() + ": "
-                        + folder.relativize(previous.path()) + " y " + folder.relativize(file));
+                throw new ResourceException("Two files for the font " + entry.font().face() + ": "
+                        + folder.relativize(previous.path()) + " and " + folder.relativize(file));
             }
         }
         return new FontLibrary(folder, faces, families);
     }
 
     /**
-     * El fichero de una fuente.
+     * The file of a font.
      *
-     * @throws ResourceException si no hay ninguna fuente de esa familia o no tiene esa variante
+     * @throws ResourceException if there is no font of that family or it does not have that variant
      */
     public FontFile find(FontFace requested) {
         FontFile file = lookup(requested);
@@ -101,27 +103,27 @@ public final class FontLibrary {
             String similar = families.stream()
                     .filter(f -> f.equalsIgnoreCase(face.family()))
                     .findFirst()
-                    .map(f -> " ¿Querías decir '" + f + "'?")
+                    .map(f -> " The closest name is '" + f + "'.")
                     .orElse("");
-            throw new ResourceException("Fuente desconocida: " + face.family() + "." + similar
-                    + " Familias en " + folder + ": " + (families.isEmpty() ? "ninguna" : String.join(", ", families)));
+            throw new ResourceException("Unknown font: " + face.family() + "." + similar
+                    + " Families in " + folder + ": " + (families.isEmpty() ? "none" : String.join(", ", families)));
         }
         String variants = faces.keySet().stream()
                 .filter(f -> f.family().equals(face.family()))
                 .map(FontFace::variant)
                 .sorted()
                 .collect(Collectors.joining(", "));
-        throw new ResourceException("La fuente " + face.family() + " no tiene la variante " + face.variant()
-                + ". Variantes en " + folder + ": " + (variants.isEmpty() ? "ninguna" : variants));
+        throw new ResourceException("The font " + face.family() + " has no variant " + face.variant()
+                + ". Variants in " + folder + ": " + (variants.isEmpty() ? "none" : variants));
     }
 
-    /** El fichero de una fuente, o {@code null} si no está. */
+    /** The file of a font, or {@code null} if it is not there. */
     FontFile lookup(FontFace requested) {
-        // Un fichero sirve con y sin ligaduras: se identifica sin esa opción.
+        // A file serves with and without ligatures: it is identified without that option.
         return faces.get(requested.base());
     }
 
-    /** Todas las fuentes que se pueden usar, en orden de familia y variante. */
+    /** All the fonts that can be used, in order of family and variant. */
     public List<FontFile> all() {
         return faces.values().stream()
                 .sorted(java.util.Comparator.comparing((FontFile f) -> f.face().family())
@@ -129,12 +131,12 @@ public final class FontLibrary {
                 .toList();
     }
 
-    /** Familias encontradas, en orden alfabético. */
+    /** Families found, in alphabetical order. */
     public Set<String> families() {
         return new TreeSet<>(families);
     }
 
-    /** Familia de un fichero y la fuente, o {@code null} si su peso no es 400 ni 700. */
+    /** Family of a file and the font, or {@code null} if its weight is neither 400 nor 700. */
     private record Entry(String family, FontFile font) {
     }
 
@@ -143,11 +145,11 @@ public final class FontLibrary {
         try {
             ttf = new TTFParser().parse(new RandomAccessReadBuffer(Files.readAllBytes(file)));
         } catch (IOException e) {
-            throw new ResourceException("No se puede leer la fuente " + file + ": " + e.getMessage(), e);
+            throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
         }
         try {
             if (ttf.getTableMap().containsKey("fvar")) {
-                throw new ResourceException("La fuente " + file + " es variable: hacen falta los ficheros TTF estáticos de cada variante");
+                throw new ResourceException("The font " + file + " is variable: the static TTF files of each variant are needed");
             }
             String family = ttf.getNaming().getName(TYPOGRAPHIC_FAMILY, NameRecord.PLATFORM_WINDOWS,
                     NameRecord.ENCODING_WINDOWS_UNICODE_BMP, NameRecord.LANGUAGE_WINDOWS_EN_US);
@@ -155,7 +157,7 @@ public final class FontLibrary {
                 family = ttf.getNaming().getFontFamily();
             }
             if (family == null || family.isBlank()) {
-                throw new ResourceException("La fuente " + file + " no declara su familia");
+                throw new ResourceException("The font " + file + " does not declare its family");
             }
             family = family.trim();
             int weightClass = ttf.getOS2Windows().getWeightClass();
@@ -168,7 +170,7 @@ public final class FontLibrary {
             };
             return new Entry(family, weight == null ? null : new FontFile(file, new FontFace(family, weight, style), ttf));
         } catch (IOException e) {
-            throw new ResourceException("No se puede leer la fuente " + file + ": " + e.getMessage(), e);
+            throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
         }
     }
 }

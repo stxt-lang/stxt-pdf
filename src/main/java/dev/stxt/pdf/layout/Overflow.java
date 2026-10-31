@@ -38,35 +38,35 @@ import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
 import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
 
 /**
- * Comprueba, ya paginado, que nada desborda (reference/common/overflow.md): cada línea de texto y
- * cada hijo en flujo (con sus márgenes horizontales) caben en la caja de contenido de su padre;
- * el flujo cabe en el área útil de cada página, y las cajas {@code absolute} y
- * {@code fixed} y las giradas caben en la página (las giradas, y las que están dentro de una
- * girada, con el rectángulo que envuelve lo que se pinta). Se mira el resultado final, no las
- * pasadas de medida.
+ * Checks, once paginated, that nothing overflows (reference/common/overflow.md): each line of text and
+ * each in-flow child (with its horizontal margins) fit in the content box of its parent;
+ * the flow fits in the page area of each page, and the {@code absolute} and
+ * {@code fixed} boxes and the rotated ones fit on the page (the rotated ones, and those inside a
+ * rotated one, with the rectangle that encloses what is painted). It looks at the final result, not at the
+ * measuring passes.
  *
- * <p>El error señala al culpable más profundo: la palabra que no cabe en su línea, la caja más
- * interior que se sale, o el {@code Height} que se queda corto.</p>
+ * <p>The error points to the deepest culprit: the word that does not fit on its line, the innermost
+ * box that sticks out, or the {@code Height} that falls short.</p>
  */
 public final class Overflow {
 
-    /** Lo que una caja puede salirse sin que sea un error ({@link Tolerance#MODEL}). */
+    /** How far a box can stick out without it being an error ({@link Tolerance#MODEL}). */
     private static final double TOLERANCE = Tolerance.MODEL;
 
-    /** Sin giros. Nadie la modifica: un giro se compone en una copia. */
+    /** No rotations. Nobody modifies it: a rotation is composed on a copy. */
     private static final AffineTransform NONE = new AffineTransform();
 
     private Overflow() {
     }
 
-    /** @throws InvalidModelException con el primer desbordamiento que encuentra */
+    /** @throws InvalidModelException with the first overflow it finds */
     public static void check(List<Page> pages) {
         for (Page p : pages) {
-            // Cada página tiene el medio de su sección (reference/components/document.md).
+            // Each page has the medium of its section (reference/components/document.md).
             PageSetup pageSetup = p.pageSetup();
             Rect area = pageSetup.pageArea();
             Insets m = pageSetup.margin();
-            // La página física, en coordenadas del área útil.
+            // The physical page, in page area coordinates.
             Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
             content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
             for (Fragment f : p.fixed()) {
@@ -76,8 +76,8 @@ public final class Overflow {
     }
 
     /**
-     * Un fragmento cuya caja de contenido del padre empieza en ({@code ox}, {@code oy});
-     * {@code turn} son los giros de sus ancestros (reference/common/layers-and-rotation.md), que se pintan con él.
+     * A fragment whose parent's content box starts at ({@code ox}, {@code oy});
+     * {@code turn} is the rotations of its ancestors (reference/common/layers-and-rotation.md), painted with it.
      */
     private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn) {
         double x = ox + f.x();
@@ -89,34 +89,34 @@ public final class Overflow {
             turn.concatenate(s.rotation().transform(borderBox));
         }
         if (s.rotation() != null || (s.isOutOfFlow() && !turn.isIdentity())) {
-            // Lo girado se comprueba como se pinta: el rectángulo que lo envuelve, en la página.
+            // What is rotated is checked as it is painted: the rectangle that encloses it, on the page.
             if (!inside(Rotation.envelope(turn, borderBox), page)) {
                 boolean own = s.rotation() != null;
                 throw new InvalidModelException(own ? s.line(ROTATE) : SourceLine.of(f.box().line()),
                         ErrorCode.BOX_OVERFLOW,
-                        "La caja " + f.box().describe() + (own ? " girada" : ", dentro de una caja girada,")
-                                + " se sale de la página: hay que revisar " + (own ? "su Rotate, su Rotate origin, " : "")
-                                + "su posición y su tamaño");
+                        "Box " + f.box().describe() + (own ? ", rotated," : ", inside a rotated box,")
+                                + " goes off the page: " + (own ? "its Rotate, its Rotate origin, " : "")
+                                + "its position and its size have to be checked");
             }
         } else if (s.isOutOfFlow() && !inside(borderBox, page)) {
             throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : SourceLine.of(f.box().line()),
-                    ErrorCode.BOX_OVERFLOW, "La caja " + f.box().describe() + " se sale de la página: hay que revisar "
-                    + "su Offset y su tamaño");
+                    ErrorCode.BOX_OVERFLOW, "Box " + f.box().describe() + " goes off the page: its Offset and its "
+                    + "size have to be checked");
         }
         double cx = borderBox.x() + f.border().left() + f.padding().left();
         double cy = borderBox.y() + f.border().top() + f.padding().top();
         content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn);
     }
 
-    /** Si {@code r} está dentro de {@code page}, con la tolerancia. */
+    /** Whether {@code r} is inside {@code page}, with the tolerance. */
     private static boolean inside(Rect r, Rect page) {
         return r.x() >= page.x() - TOLERANCE && r.y() >= page.y() - TOLERANCE
                 && r.right() <= page.right() + TOLERANCE && r.bottom() <= page.bottom() + TOLERANCE;
     }
 
     /**
-     * Las líneas y los hijos de un fragmento, cuya caja de contenido empieza en ({@code cx},
-     * {@code cy}) y mide {@code width} × {@code height}; {@code isPage}: es el flujo de una página.
+     * The lines and the children of a fragment, whose content box starts at ({@code cx},
+     * {@code cy}) and measures {@code width} × {@code height}; {@code isPage}: it is the flow of a page.
      */
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
                                 Rect page, AffineTransform turn) {
@@ -130,7 +130,7 @@ public final class Overflow {
         }
         for (Fragment c : f.children()) {
             if (c.box().isMarker()) {
-                // Cuelga fuera del ítem: se comprueba en la sangría de su lista (marker).
+                // It hangs outside the item: it is checked in the indent of its list (marker).
                 fragment(c, cx, cy, page, turn);
                 continue;
             }
@@ -138,7 +138,7 @@ public final class Overflow {
                 marker(f, c);
             }
             if (!c.box().style().isOutOfFlow()) {
-                // Las relative se comprueban en su sitio, sin el desplazamiento.
+                // The relative ones are checked in their place, without the offset.
                 double x = c.x() - c.offsetX();
                 double y = c.y() - c.offsetY();
                 Insets margin = c.margin();
@@ -157,8 +157,8 @@ public final class Overflow {
     }
 
     /**
-     * El marcador de un ítem cabe en su sangría (reference/components/list.md): el relleno izquierdo de la lista más
-     * el margen izquierdo del ítem.
+     * The marker of an item fits in its indent (reference/components/list.md): the left padding of the list plus
+     * the left margin of the item.
      */
     private static void marker(Fragment list, Fragment item) {
         for (Fragment m : item.children()) {
@@ -167,38 +167,41 @@ public final class Overflow {
             }
             double room = item.x() + list.padding().left();
             if (m.width() > room + TOLERANCE) {
-                throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "El marcador '"
-                        + m.box().text().strip() + "' del List item " + item.box().describe() + " mide " + pt(m.width())
-                        + " con su espacio, y la sangría deja " + pt(room) + ": hay que aumentar el Padding izquierdo "
-                        + "de la lista o el margen izquierdo del ítem");
+                throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "The marker '"
+                        + m.box().text().strip() + "' of List item " + item.box().describe() + " measures "
+                        + pt(m.width()) + " with its space, and the indent leaves " + pt(room)
+                        + ": the left Padding of the list or "
+                        + "the left margin of the item has to be increased");
             }
         }
     }
 
     // ------------------------------------------------------------------------------------------
-    // Culpables
+    // Culprits
     // ------------------------------------------------------------------------------------------
 
     /**
-     * Un hijo se sale por los lados: el culpable es lo más interior que se sale. Si la caja
-     * declara su ancho ({@code Width} o {@code Min width}), sus hijos que solo la llenan no son
-     * culpables: solo se baja a un hijo que se sale también de ella. Solo cuenta la posición horizontal: {@code x} es
-     * la de la caja de borde de {@code c} en las coordenadas de {@code left} y {@code right}.
+     * A child sticks out at the sides: the culprit is the innermost thing that sticks out. If the box
+     * declares its width ({@code Width} or {@code Min width}), its children that only fill it are not
+     * culprits: it only goes down to a child that also sticks out of it. Only the horizontal position counts:
+     * {@code x} is that of the border box of {@code c} in the coordinates of {@code left} and {@code right}.
      */
     private static InvalidModelException tooWide(Fragment c, double x, double left, double right) {
         while (true) {
             Style s = c.box().style();
             if (s.rotatesInFlow()) {
-                // Lo de dentro está girado: lo que se sale es el rectángulo que la envuelve.
+                // What is inside is rotated: what sticks out is the rectangle that encloses it.
                 String property = s.isDeclared(WIDTH) ? WIDTH : ROTATE;
-                return new InvalidModelException(s.line(property), ErrorCode.BOX_OVERFLOW, "La caja "
-                        + c.box().describe() + " girada no cabe a lo ancho: el rectángulo que la envuelve mide "
-                        + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left) + ". "
-                        + (s.isDeclared(WIDTH) ? "Hay que reducir su Width" : "Le falta un Width, que reparte su texto en líneas,")
-                        + " o hay que cambiar su Rotate");
+                return new InvalidModelException(s.line(property), ErrorCode.BOX_OVERFLOW, "Box "
+                        + c.box().describe()
+                        + ", rotated, does not fit in width: the rectangle that encloses it measures "
+                        + pt(c.width()) + " and the content of its container measures " + pt(right - left) + ". "
+                        + (s.isDeclared(WIDTH) ? "Its Width has to be reduced"
+                                : "It needs a Width, which breaks its text into lines,")
+                        + " or its Rotate has to be changed");
             }
             double cx = x + c.border().left() + c.padding().left();
-            // Una palabra que no cabe en su propia caja es la culpable; si cabe, lo es la caja.
+            // A word that does not fit in its own box is the culprit; if it fits, the box is.
             for (TextLine l : c.lines()) {
                 if (l.x() < -TOLERANCE || l.x() + l.width() > c.contentWidth() + TOLERANCE) {
                     throw textOverflow(c.box(), l, c.contentWidth());
@@ -223,46 +226,48 @@ public final class Overflow {
             if (inner == null) {
                 String property = s.isDeclared(WIDTH) ? WIDTH : s.isDeclared(MIN_WIDTH) ? MIN_WIDTH : null;
                 return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(c.box().line()),
-                        ErrorCode.BOX_OVERFLOW, "La caja " + c.box().describe() + " no cabe a lo ancho: mide "
-                        + pt(c.width()) + " y el contenido de su contenedor mide " + pt(right - left)
-                        + ": hay que reducir su ancho o el de su contenido");
+                        ErrorCode.BOX_OVERFLOW, "Box " + c.box().describe() + " does not fit in width: it measures "
+                        + pt(c.width()) + " and the content of its container measures " + pt(right - left)
+                        + ": its width or that of its content has to be reduced");
             }
             c = inner;
         }
     }
 
     /**
-     * El contenido de una caja pasa de su alto: el culpable es lo que lo fija, por este orden, su
-     * {@code Height}, su {@code Max height}, su {@code Aspect ratio} o las filas de un grid
-     * ({@code Row sizes}; si fueran {@code auto}, crecerían con su contenido).
+     * The content of a box exceeds its height: the culprit is what fixes it, in this order, its
+     * {@code Height}, its {@code Max height}, its {@code Aspect ratio} or the rows of a grid
+     * ({@code Row sizes}; if they were {@code auto}, they would grow with their content).
      */
     private static InvalidModelException tooTall(Fragment container, double needed, double height, Fragment child) {
         Box box = container.box();
         Style s = box.style();
         String property = Stream.of(HEIGHT, MAX_HEIGHT, ASPECT_RATIO, GRID_ROWS)
                 .filter(s::isDeclared).findFirst().orElse(null);
-        String what = child == null ? "su texto" : "la caja " + child.box().describe();
+        String what = child == null ? "its text" : "box " + child.box().describe();
         return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(box.line()),
                 ErrorCode.BOX_OVERFLOW,
-                "El contenido de la caja " + box.describe() + " no cabe en su alto: " + what + " llega a "
-                        + pt(needed) + " y la caja deja " + pt(height));
+                "The content of box " + box.describe() + " does not fit in its height: " + what + " reaches "
+                        + pt(needed) + " and the box leaves " + pt(height));
     }
 
     /**
-     * Algo del flujo no cabe en la página y no se ha podido partir: el culpable es lo más interior
-     * que pasa del final, y en él, lo que no se puede partir: el {@code Rotate} de una caja girada, que
-     * no se parte (reference/common/breaks.md), su borde y su relleno si ya no caben
-     * en la página ({@code pageHeight}), su {@code Line height} (o su {@code Size}) si tiene texto,
-     * o su {@code Height} (en una imagen sin él, su {@code Width}). Solo cuenta la posición vertical: {@code y} es la
-     * de la caja de borde de {@code c} en las coordenadas de {@code bottom}.
+     * Something in the flow does not fit on the page and could not be broken: the culprit is the innermost thing
+     * that goes past the end, and in it, what cannot be broken: the {@code Rotate} of a rotated box, which
+     * is not broken (reference/common/breaks.md), its border and its padding if they no longer fit
+     * on the page ({@code pageHeight}), its {@code Line height} (or its {@code Size}) if it has text,
+     * or its {@code Height} (in an image without it, its {@code Width}). Only the vertical position counts:
+     * {@code y} is that of the border box of {@code c} in the coordinates of {@code bottom}.
      */
     private static InvalidModelException pageOverflow(Fragment c, double y, double bottom, double pageHeight) {
         while (true) {
             if (c.box().style().rotation() != null) {
-                // Lo que impide partirla es el giro: lo que contiene se partiría.
-                return new InvalidModelException(c.box().style().line(ROTATE), ErrorCode.PAGE_OVERFLOW, "La caja "
-                        + c.box().describe() + " está girada, así que no se parte entre páginas, y no cabe en una: mide "
-                        + pt(c.height()) + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
+                // What prevents breaking it is the rotation: what it contains would be broken.
+                return new InvalidModelException(c.box().style().line(ROTATE), ErrorCode.PAGE_OVERFLOW, "Box "
+                        + c.box().describe()
+                        + " is rotated, so it is not broken across pages, and it does not fit on one: it is "
+                        + pt(c.height()) + " high and extends " + pt(y + c.height() - bottom)
+                        + " beyond the page area");
             }
             double cy = y + c.border().top() + c.padding().top();
             Fragment inner = null;
@@ -282,34 +287,34 @@ public final class Overflow {
                 } else if (!c.lines().isEmpty()) {
                     property = s.isDeclared(LINE_HEIGHT) ? LINE_HEIGHT : FONT_SIZE;
                 } else if (c.box().isImage() && !s.isDeclared(HEIGHT)) {
-                    // El alto de una imagen sale de su ancho.
+                    // The height of an image follows from its width.
                     property = WIDTH;
                 } else {
                     property = HEIGHT;
                 }
                 SourceLine line = s.isDeclared(property) ? s.line(property) : SourceLine.of(c.box().line());
-                return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "La caja " + c.box().describe()
-                        + " no cabe en la página y no se puede partir: mide " + pt(c.height())
-                        + " de alto y llega " + pt(y + c.height() - bottom) + " más allá del área útil");
+                return new InvalidModelException(line, ErrorCode.PAGE_OVERFLOW, "Box " + c.box().describe()
+                        + " does not fit on the page and cannot be broken: it is " + pt(c.height())
+                        + " high and extends " + pt(y + c.height() - bottom) + " beyond the page area");
             }
             c = inner;
         }
     }
 
-    /** Una línea más ancha que su caja: una palabra que no cabe. Señala la línea del documento de esa palabra. */
+    /** A line wider than its box: a word that does not fit. Points to the document line of that word. */
     private static InvalidModelException textOverflow(Box box, TextLine l, double width) {
         String word = Arrays.stream(l.text().split(" ")).max(Comparator.comparingInt(String::length)).orElse(l.text());
-        // No está en el texto si la ha cambiado el layout, como un número de página.
+        // It is not in the text if the layout has changed it, like a page number.
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
         if (box.style().typography().preformatted() == Preformatted.TRUE) {
-            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "Una línea de un texto con Preformatted: "
-                    + "true ('" + excerpt(word) + "'...) no cabe en la caja: la línea mide " + pt(l.width()) + " y la caja "
-                    + "deja " + pt(width) + ". Hay que ensanchar la caja, reducir el Size o usar Preformatted: wrap, que "
-                    + "parte las líneas");
+            return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "A line of a text with Preformatted: "
+                    + "true ('" + excerpt(word) + "'...) does not fit in the box: the line measures " + pt(l.width())
+                    + " and the box leaves " + pt(width) + ". The box has to be wider, the Size smaller, or the text "
+                    + "needs Preformatted: wrap, which breaks the lines");
         }
-        return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "La palabra '" + excerpt(word) + "' no cabe en "
-                + "la línea: la línea mide " + pt(l.width()) + " y la caja deja " + pt(width)
-                + ": hay que ensanchar la caja o reducir el Size del texto");
+        return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "The word '" + excerpt(word) + "' does not fit "
+                + "on the line: the line measures " + pt(l.width()) + " and the box leaves " + pt(width)
+                + ": the box has to be wider or the Size of the text smaller");
     }
 }

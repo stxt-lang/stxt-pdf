@@ -1,0 +1,14 @@
+# Case: Rotate: 360, a full turn that leaves the box as it was
+# Code: VALUE_NOT_ALLOWED
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Frame:
+			Rotate: 360
+			Box:
+				Height: 10

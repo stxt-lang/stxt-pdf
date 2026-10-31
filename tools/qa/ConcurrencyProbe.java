@@ -1,7 +1,7 @@
-// Sonda de QA: convierte los ejemplos en secuencial y con 8 hilos y compara
-// los PDF (sin fechas ni ID). Mide también la contención de un Resources compartido frente a uno por hilo
-// (cuatro fases alternadas, para que el calentamiento de la JVM no favorezca a ninguno).
-// Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
+// QA probe: converts the examples sequentially and with 8 threads and compares
+// the PDFs (without dates or ID). It also measures the contention of a shared Resources against one per thread
+// (four alternating phases, so that the warm-up of the JVM favors neither).
+// It runs from the root of the repository; see tools/qa/README.md.
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.resources.Resources;
@@ -22,7 +22,7 @@ public class ConcurrencyProbe {
         return o.toByteArray();
     }
 
-    static byte[] norm(byte[] b) { // quita fechas e IDs
+    static byte[] norm(byte[] b) { // removes dates and IDs
         String s = new String(b, java.nio.charset.StandardCharsets.ISO_8859_1);
         s = s.replaceAll("/CreationDate\\(.*?\\)", "").replaceAll("/ModDate\\(.*?\\)", "").replaceAll("/ID ?\\[.*?\\]", "");
         return s.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
@@ -43,14 +43,14 @@ public class ConcurrencyProbe {
         Map<String, byte[]> base = new HashMap<>();
         long t0 = System.nanoTime();
         for (In in : ins) base.put(in.name, norm(convert(in, shared)));
-        System.out.printf("secuencial 1ª ronda (frío): %d ms%n", (System.nanoTime() - t0) / 1_000_000);
+        System.out.printf("sequential 1st round (cold): %d ms%n", (System.nanoTime() - t0) / 1_000_000);
         for (int k = 0; k < 3; k++) {
             t0 = System.nanoTime();
             for (In in : ins) convert(in, shared);
-            System.out.printf("secuencial caliente: %d ms (%d docs)%n", (System.nanoTime() - t0) / 1_000_000, ins.size());
+            System.out.printf("sequential warm: %d ms (%d docs)%n", (System.nanoTime() - t0) / 1_000_000, ins.size());
         }
-        // determinismo
-        for (In in : ins) if (!Arrays.equals(base.get(in.name), norm(convert(in, shared)))) System.out.println("NO DETERMINISTA " + in.name);
+        // determinism
+        for (In in : ins) if (!Arrays.equals(base.get(in.name), norm(convert(in, shared)))) System.out.println("NOT DETERMINISTIC " + in.name);
 
         for (boolean sharedRes : new boolean[]{false, true, false, true}) {
             int threads = 8, rounds = 10;
@@ -68,13 +68,13 @@ public class ConcurrencyProbe {
                                 if (!Arrays.equals(base.get(in.name), norm(convert(in, r)))) { bad++; }
                             } catch (Throwable e) { bad++; if (bad < 3) System.out.println("EXC " + in.name + " " + e); }
                         }
-                    return "hilo " + tt + " diferencias=" + bad;
+                    return "thread " + tt + " differences=" + bad;
                 }));
             }
             int total = 0;
             for (var f : fs) { String s = f.get(); if (!s.endsWith("=0")) System.out.println(s); total++; }
             ex.shutdown();
-            System.out.printf("paralelo resources %s: %d hilos x %d rondas: %d ms%n", sharedRes ? "compartido" : "propio", threads, rounds, (System.nanoTime() - t1) / 1_000_000);
+            System.out.printf("parallel resources %s: %d threads x %d rounds: %d ms%n", sharedRes ? "shared" : "own", threads, rounds, (System.nanoTime() - t1) / 1_000_000);
         }
     }
 }

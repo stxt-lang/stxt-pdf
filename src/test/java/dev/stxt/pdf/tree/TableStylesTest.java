@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Estilo de las celdas de una tabla por su posición y su columna (reference/common/styles.md y
+ * Style of the cells of a table by their position and their column (reference/common/styles.md and
  * reference/components/table.md): {@code Header cell}, {@code Body cell}, {@code Footer cell}, {@code Odd row cell},
- * {@code Even row cell}, {@code For column} y {@code Column align}.
+ * {@code Even row cell}, {@code For column} and {@code Column align}.
  */
 class TableStylesTest {
 
@@ -25,7 +25,7 @@ class TableStylesTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(doc)))).sections().get(0).box();
     }
 
-    /** Una tabla de dos columnas con una fila de cabecera, tres de cuerpo y una de pie. */
+    /** A two-column table with one header row, three body rows and one footer row. */
     private static final String[] TABLE = {
             "\tTable:", "\t\tColumn sizes: * *",
             "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
@@ -44,7 +44,7 @@ class TableStylesTest {
         return table.children().stream().filter(c -> text.equals(c.text().trim())).findFirst().orElseThrow();
     }
 
-    /** El color liso del fondo de una celda. */
+    /** The solid background color of a cell. */
     private static String color(Box cell) {
         return ((dev.stxt.pdf.model.Paint.Solid) cell.style().box().background()).color();
     }
@@ -67,7 +67,7 @@ class TableStylesTest {
         assertEquals(FontWeight.NORMAL, cell(table, "a1").style().typography().fontWeight());
         assertEquals(Value.pt(3), ((Value.Points) cell(table, "b2").style().box().padding().top()));
         assertEquals(Value.pt(0), ((Value.Points) cell(table, "h1").style().box().padding().top()));
-        // La línea de lo que aporta la regla es la de la regla.
+        // The line of what the rule contributes is that of the rule.
         assertEquals(14, cell(table, "h1").style().line("font-weight").number());
     }
 
@@ -76,7 +76,7 @@ class TableStylesTest {
         Box table = root(doc(new String[]{"\tStyles:",
                 "\t\tFor element: Odd row cell", "\t\t\tBox:", "\t\t\t\tBackground: #111111",
                 "\t\tFor element: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #222222"}, TABLE)).children().get(0);
-        // Ni la cabecera ni el pie entran en la cebra.
+        // Neither the header nor the footer enters the zebra.
         assertEquals(List.of("-", "-", "#111111", "#111111", "#222222", "#222222", "#111111", "#111111", "-", "-"),
                 background(table).stream().map(b -> b.equals("-") ? b : b.toLowerCase()).toList());
     }
@@ -90,7 +90,7 @@ class TableStylesTest {
                 "\t\t\tRow:", "\t\t\t\tCell: d", "\t\t\t\tCell: e").children().get(0);
         assertNull(cell(table, "a").style().box().background());
         assertNull(cell(table, "b").style().box().background());
-        // c está en la fila 2 (par); d y e, en la 3.
+        // c is in row 2 (even); d and e, in row 3.
         assertEquals("#222222", color(cell(table, "c")).toLowerCase());
         assertNull(cell(table, "d").style().box().background());
     }
@@ -152,11 +152,11 @@ class TableStylesTest {
                 "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center").children().get(0);
         assertEquals(TextAlign.LEFT, cell(table, "a1").style().typography().textAlign());
         assertEquals(TextAlign.RIGHT, cell(table, "a2").style().typography().textAlign());
-        // For column pisa a Column align; la cabecera, también.
+        // For column overrides Column align; so does the header.
         assertEquals(TextAlign.LEFT, cell(table, "a3").style().typography().textAlign());
         assertEquals(TextAlign.CENTER, cell(table, "h2").style().typography().textAlign());
         assertEquals(TextAlign.CENTER, cell(table, "b3").style().typography().textAlign());
-        // La línea de la alineación es la de Column align.
+        // The line of the alignment is that of Column align.
         assertEquals(21, cell(table, "a2").style().line("text-align").number());
     }
 
@@ -181,7 +181,7 @@ class TableStylesTest {
         Box table = markdown.children().get(0);
         assertEquals(FontWeight.BOLD, cell(table, "A").style().typography().fontWeight());
         assertEquals(FontWeight.NORMAL, cell(table, "1").style().typography().fontWeight());
-        // La primera columna es left en la fila de separación: gana a For column.
+        // The first column is left in the separator row: it beats For column.
         assertEquals(TextAlign.LEFT, cell(table, "A").style().typography().textAlign());
         assertEquals(TextAlign.LEFT, cell(table, "3").style().typography().textAlign());
         assertEquals(TextAlign.RIGHT, cell(table, "4").style().typography().textAlign());
@@ -190,8 +190,8 @@ class TableStylesTest {
     }
 
     /**
-     * reference/components/table.md: el {@code Style} de una {@code Row} aplica sus reglas {@code For style} a cada
-     * celda de la fila.
+     * reference/components/table.md: the {@code Style} of a {@code Row} applies its {@code For style} rules to each
+     * cell of the row.
      */
     @Test
     void aRowClassGivesItsRulesToEveryCellOfTheRow() {
@@ -210,11 +210,11 @@ class TableStylesTest {
             assertEquals(FontWeight.NORMAL, cell(table, other).style().typography().fontWeight(), other);
             assertNull(cell(table, other).style().box().background(), other);
         }
-        // La línea de lo que aporta la clase es la de su regla.
+        // The line of what the class contributes is that of its rule.
         assertEquals(14, cell(table, "t2").style().line("font-weight").number());
     }
 
-    /** Gana a las reglas de columna y de posición y pierde con las clases de la propia celda. */
+    /** It beats the column and position rules and loses to the classes of the cell itself. */
     @Test
     void aRowClassIsBetweenTheCellClassesAndTheColumnAndPositionRules() {
         Box table = root("\tStyles:",
@@ -226,14 +226,15 @@ class TableStylesTest {
                 "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tStyle: row", "\t\t\t\tCell: a1", "\t\t\t\t\tStyle: own", "\t\t\t\tCell: a2",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2").children().get(0);
-        // a1: su clase; a2: la de su fila, que gana a las impares y a la columna; b1 (fila par): nada; b2: la columna.
+        // a1: its class; a2: that of its row, which beats the odd ones and the column; b1 (even row): nothing; b2: the
+        // column.
         assertEquals(List.of("#555555", "#444444", "-", "#333333"),
                 background(table).stream().map(String::toLowerCase).toList());
     }
 
     /**
-     * Como el {@code Style} de una caja: una clase sin regla {@code For style} es un error, con la línea del {@code
-     * Style}.
+     * Like the {@code Style} of a box: a class without a {@code For style} rule is an error, with the line of the
+     * {@code Style}.
      */
     @Test
     void aRowClassWithoutARuleIsAnError() {
@@ -244,7 +245,7 @@ class TableStylesTest {
         assertEquals(17, e.line());
     }
 
-    /** Los cortes de una fila son los de su {@code Row}: una clase de fila no los da, como la clase de una celda. */
+    /** The breaks of a row are those of its {@code Row}: a row class does not give them, like the class of a cell. */
     @Test
     void aRowClassCannotGiveBreaksToTheCells() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,

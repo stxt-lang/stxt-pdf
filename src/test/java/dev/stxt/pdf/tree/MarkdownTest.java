@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** El {@code Markdown} en el árbol de cajas (reference/components/markdown.md). */
+/** The {@code Markdown} in the box tree (reference/components/markdown.md). */
 class MarkdownTest {
 
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -41,7 +41,7 @@ class MarkdownTest {
         Box paragraph = md.children().get(1);
         assertEquals("Un párrafo.", paragraph.text());
         assertEquals(List.of(run("Un "), run("párrafo", "b"), run(".")), paragraph.formattedRuns());
-        // Sin formato, el texto no tiene tramos.
+        // Without formatting, the text has no runs.
         assertNull(md.children().get(0).children().get(0).formattedRuns());
         Box cell = md.children().get(3).children().get(1);
         assertEquals(List.of(run("1", "i")), cell.formattedRuns());
@@ -72,7 +72,7 @@ class MarkdownTest {
 
     @Test
     void allowedWhereAFlowElementGoes() {
-        // En un ítem de lista, una celda, un Columns y un Item de Stack (K1).
+        // In a list item, a cell, a Columns and a Stack Item (K1).
         assertDoesNotThrow(() -> build("\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tMarkdown:",
                 "\t\t\t\tContent >>", "\t\t\t\t\tUno **dos**"));
         assertDoesNotThrow(() -> build("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell:",
@@ -110,8 +110,9 @@ class MarkdownTest {
     }
 
     /**
-     * {@code Code font} es de {@code Typography}: se hereda de un antecesor, y {@code For element: Code block} cambia
-     * la de los bloques sin tocar la del código en línea (reference/components/markdown.md).
+     * {@code Code font} belongs to {@code Typography}: it is inherited from an ancestor, and
+     * {@code For element: Code block} changes that of the blocks without touching that of inline code
+     * (reference/components/markdown.md).
      */
     @Test
     void theCodeFontIsInheritedAndACodeBlockRuleChangesOnlyTheBlocks() {
@@ -132,8 +133,8 @@ class MarkdownTest {
     }
 
     /**
-     * reference/common/styles.md: la regla {@code For element: Code block} da estilo al código y no a los demás
-     * textos, ni al revés.
+     * reference/common/styles.md: the rule {@code For element: Code block} styles the code and not the other
+     * texts, nor the other way round.
      */
     @Test
     void aCodeBlockHasItsOwnElementRule() {
@@ -146,7 +147,7 @@ class MarkdownTest {
         Box md = root.children().get(0);
         Box title = md.children().get(0).children().get(0);
         Box code = md.children().get(1);
-        // El Text del encabezado sigue alcanzándolo For element: Text; el bloque de código, solo Code block.
+        // For element: Text still reaches the Text of the heading; the code block, only Code block.
         assertEquals(Element.TEXT, title.element());
         assertEquals("#FF0000", title.style().typography().color());
         assertEquals(Element.CODE_BLOCK, code.element());
@@ -155,11 +156,11 @@ class MarkdownTest {
         assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
         assertEquals(Preformatted.TRUE, code.style().typography().preformatted());
         assertEquals("IBM Plex Mono", code.style().typography().font());
-        // Y el Text del encabezado no recibe lo del bloque de código.
+        // And the Text of the heading does not receive what belongs to the code block.
         assertNull(title.style().box().background());
     }
 
-    /** Un {@code Text} escrito a mano con {@code Preformatted: true} sigue siendo un {@code Text}. */
+    /** A {@code Text} written by hand with {@code Preformatted: true} is still a {@code Text}. */
     @Test
     void aWrittenPreformattedTextIsNotACodeBlock() {
         Box root = build("\tText:", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\tContent >>", "\t\t\ta  b");

@@ -1,11 +1,11 @@
-# Hitos 16 y 17: tramos y Markdown (reference/common/text-formatting.md y reference/components/markdown.md). Páginas de 595 × 300 con
-# márgenes de 40: área útil de 515 × 220 desde (40, 40), que acaba en y = 260. Líneas de 12
-# (Size 10); con 5 pt por carácter caben 103 caracteres por línea.
+# Milestones 16 and 17: runs and Markdown (reference/common/text-formatting.md and reference/components/markdown.md).
+# Pages of 595 × 300 with margins of 40: page area of 515 × 220 from (40, 40), which ends at y = 260. Lines of 12
+# (Size 10); at 5 pt per character, 103 characters fit per line.
 #
-# Los elementos que genera un Markdown no tienen Id: el volcado solo enseña cada Markdown, y su
-# alto comprueba la traducción. El estilo de cada tipo de elemento está en Styles (Heading 1 de
-# 20 con 8 de margen inferior, Heading 2 de 15, la sangría de las listas). Los tramos (negrita,
-# cursiva, subrayado y tachado) no cambian las medidas con 5 pt por carácter; se ven en los PNG.
+# The elements that a Markdown generates have no Id: the dump only shows each Markdown, and its
+# height checks the translation. The style of each element type is in Styles (Heading 1 of
+# 20 with a bottom margin of 8, Heading 2 of 15, the indent of the lists). The runs (bold,
+# italic, underline and strikethrough) do not change the measurements at 5 pt per character; they show in the PNGs.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

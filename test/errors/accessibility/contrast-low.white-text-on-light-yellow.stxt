@@ -1,0 +1,22 @@
+# Case: White text on the light yellow background of its box
+# Code: CONTRAST_LOW
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Background: #FFEE88
+				Padding: 10
+			Text: Aviso
+				Typography:
+					Color: #FFFFFF

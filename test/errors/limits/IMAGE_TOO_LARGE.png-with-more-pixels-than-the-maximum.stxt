@@ -1,0 +1,11 @@
+# Case: A PNG of 6000 × 6000 pixels, weighing 35 KB, exceeds the maximum of 25 million pixels
+# Code: IMAGE_TOO_LARGE
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/limit-huge.png

@@ -1,22 +1,22 @@
-# Giro y papel con nombre (reference/components/document.md, reference/common/layers-and-rotation.md, reference/common/breaks.md y reference/common/overflow.md).
+# Rotation and named paper (reference/components/document.md, reference/common/layers-and-rotation.md, reference/common/breaks.md and reference/common/overflow.md).
 #
-# Paper: A6 apaisado: 420 × 298. Área útil de 380 × 258 desde (20, 20); acaba en y = 278.
-# El giro de un posicionado solo cambia el pintado: sus Rect son los de las cajas sin girar. Una caja girada en
-# flujo ocupa el rectángulo que la envuelve: su Rect es ese.
+# Paper: A6 landscape: 420 × 298. Page area of 380 × 258 from (20, 20); it ends at y = 278.
+# The rotation of a positioned element only changes the painting: its Rect values are those of the unrotated boxes.
+# A rotated box in flow takes up the rectangle that encloses it: that is its Rect.
 #   tag (Overlay):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
-#                     Girado 45 grados alrededor de su centro (360, 50), lo envuelve un cuadrado de
-#                     (80 + 20) × cos 45 = 70,7: de y = 14,6 a 85,4 y de x = 324,6 a 395,4; cabe.
-#   intro:            el primer bloque del flujo, 380 × 150 en (20, 20).
-#   stamp (Frame): 120 × 60 en (20, 170), girado −8 alrededor de su centro (80, 200): lo
-#                     envuelve de x = 16,4 a 143,6 y de y = 161,9 a 238,1; cabe.
-#   big (Frame):   girado 180, mide 40 + 50 = 90 y en la página 1 quedan 278 − 230 = 48. Sin girar
-#                     se partiría entre b1 (40, que cabe) y b2; girado no se parte y pasa entero a la
-#                     página 2: (20, 20), con b1 en y = 20 y b2 en y = 60.
-#   badge (Image):    test/square.png, 30 × 30, girada 45 sobre su centro: en flujo detrás de big, ocupa el
-#                     cuadrado que la envuelve, de 30 × √2 = 42,43 de lado, en (20, 110).
-#   side (Page overlay):     texto vertical en el margen izquierdo, en las dos páginas. Offset 229 auto auto −17:
-#                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Girado −90 alrededor de su esquina
-#                     de arriba a la izquierda, sube de y = 249 a 49 y ocupa de x = 3 a 17.
+#                     Rotated 45 degrees around its center (360, 50), it is enclosed by a square of
+#                     (80 + 20) × cos 45 = 70.7: from y = 14.6 to 85.4 and from x = 324.6 to 395.4; it fits.
+#   intro:            the first block of the flow, 380 × 150 at (20, 20).
+#   stamp (Frame): 120 × 60 at (20, 170), rotated −8 around its center (80, 200): it is
+#                     enclosed from x = 16.4 to 143.6 and from y = 161.9 to 238.1; it fits.
+#   big (Frame):   rotated 180, it measures 40 + 50 = 90 and on page 1 there remain 278 − 230 = 48. Unrotated
+#                     it would be split between b1 (40, which fits) and b2; rotated it is not split and moves whole to
+#                     page 2: (20, 20), with b1 at y = 20 and b2 at y = 60.
+#   badge (Image):    test/square.png, 30 × 30, rotated 45 around its center: in flow after big, it takes up the
+#                     square that encloses it, 30 × √2 = 42.43 per side, at (20, 110).
+#   side (Page overlay):     vertical text in the left margin, on both pages. Offset 229 auto auto −17:
+#                     x = 20 − 17 = 3, y = 20 + 229 = 249; 200 × 14. Rotated −90 around its top left
+#                     corner, it rises from y = 249 to 49 and takes up from x = 3 to 17.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Bloques en columnas al construir el árbol (reference/components/columns.md): propiedades y flujo de columnas. */
+/** Blocks in columns when building the tree (reference/components/columns.md): properties and column flow. */
 class ColumnsElementTest {
 
     private static Box root(String... lines) {
@@ -45,7 +45,7 @@ class ColumnsElementTest {
         assertTrue(flow.isolatesMargins());
         assertEquals(List.of(Element.PARAGRAPH, Element.BLOCK), flow.children().stream().map(b -> b.element()).toList());
         assertSame(flow, flow.children().get(1).parent());
-        // La tipografía del Columns llega a su contenido a través del flujo.
+        // The typography of the Columns reaches its content through the flow.
         assertEquals(9, flow.children().get(0).style().typography().fontSize());
     }
 
@@ -68,7 +68,7 @@ class ColumnsElementTest {
         assertEquals(Break.COLUMN, flow.children().get(1).style().breaks().before());
     }
 
-    /** Los casos de error están en el catálogo; aquí, el que solo se da con una regla de {@code Styles}. */
+    /** The error cases are in the catalog; here, the one that only happens with a {@code Styles} rule. */
     @Test
     void columnBreakFromARuleOutsideAColumns() {
         InvalidModelException ex = assertThrows(InvalidModelException.class, () -> root(

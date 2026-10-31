@@ -9,8 +9,8 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * La numeración de los encabezados, {@code Numbered} (reference/components/heading.md), ya maquetada. Con
- * {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
+ * The numbering of headings, {@code Numbered} (reference/components/heading.md), laid out. With
+ * {@code FixedMetrics} and {@code Size: 10}, each character measures 5 pt and each line, 12.
  */
 class HeadingNumberingTest {
 
@@ -34,7 +34,7 @@ class HeadingNumberingTest {
                 "\tHeading 2:", "\t\tText: Ventas", "\t\t\tId: t2"));
         assertEquals("1 Resultados", text(l.fragment("t1")));
         assertEquals("1.1 Ventas", text(l.fragment("t2")));
-        // Ocupa lo que escribe, número incluido: «1 Resultados» son 12 caracteres.
+        // It takes up what it writes, number included: "1 Resultados" is 12 characters.
         assertEquals(12 * 5, l.fragment("t1").lines().get(0).width(), 1e-9);
         assertEquals(10 * 5, l.fragment("t2").lines().get(0).width(), 1e-9);
     }
@@ -47,7 +47,7 @@ class HeadingNumberingTest {
                 "\tHeading 2:", "\t\tId: ventas", "\t\tText: Ventas",
                 "\tText: Véase la sección {number of: ventas} y el capítulo {number of: cap}.", "\t\tId: ref",
                 "\tHeading 1:", "\t\tId: cap", "\t\tText: Tres"));
-        // La referencia puede ser hacia delante: el número sale del árbol, no de la paginación.
+        // The reference can point forward: the number comes from the tree, not from pagination.
         assertEquals("Véase la sección 2.1 y el capítulo 3.", text(l.fragment("ref")));
     }
 
@@ -57,7 +57,7 @@ class HeadingNumberingTest {
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 2:", "\t\tText: Dos",
                 "\tHeading 3:", "\t\tText: Detalle", "\t\t\tId: t3"));
-        // Solo los niveles 1 y 2 tienen Numbered: true.
+        // Only levels 1 and 2 have Numbered: true.
         assertEquals("Detalle", text(l.fragment("t3")));
     }
 

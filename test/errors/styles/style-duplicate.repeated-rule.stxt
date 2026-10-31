@@ -1,0 +1,18 @@
+# Case: Repeated rule
+# Code: STYLE_DUPLICATE
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Block
+			Box:
+				Padding: 4
+		For element: block
+			Box:
+				Margin: 4
+	Section:
+		Text: Hola

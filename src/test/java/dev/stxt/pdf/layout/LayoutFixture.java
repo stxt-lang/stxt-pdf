@@ -14,20 +14,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Maqueta un documento de 595 pt de ancho con márgenes de 40 (área útil de 515 pt desde
- * (40, 40)) y da los fragmentos con {@code Id} y su caja de borde en coordenadas de página,
- * incluidos los de las cajas {@code fixed}. Sin número de página, se refiere a la primera.
+ * Lays out a document 595 pt wide with margins of 40 (page area of 515 pt from
+ * (40, 40)) and gives the fragments with an {@code Id} and their border box in page coordinates,
+ * including those of {@code fixed} boxes. Without a page number, it refers to the first one.
  *
- * <p>Declara en el {@code Typography} de {@code Document} {@code Font: IBM Plex Sans} y
- * {@code Size: 10}, porque el texto los necesita (reference/common/errors.md); con {@link
- * dev.stxt.pdf.layout.inline.FixedMetrics} la familia no influye en las medidas.</p>
+ * <p>It declares {@code Font: IBM Plex Sans} and {@code Size: 10} in the {@code Typography} of {@code Document},
+ * because the text needs them (reference/common/errors.md); with {@link
+ * dev.stxt.pdf.layout.inline.FixedMetrics} the family does not affect the measurements.</p>
  */
 public final class LayoutFixture {
 
     private static final DocumentReader READER = new DocumentReader();
     private static final String FONT = "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n";
     private static final String A4 = "\t\tWidth: 595\n\t\tHeight: 842\n\t\tMargin: 40\n";
-    /** Sufijo de la clave del marcador de un ítem. */
+    /** Suffix of the key of the marker of an item. */
     private static final String MARKER = "#marker";
 
     private final List<Page> pages;
@@ -47,24 +47,24 @@ public final class LayoutFixture {
     }
 
     /**
-     * Documento A4 (595 × 842; área útil de 515 × 762). Líneas de las cajas de primer nivel, con
-     * tabuladores como en el documento.
+     * A4 document (595 × 842; page area of 515 × 762). Lines of the top-level boxes, with
+     * tabs as in the document.
      */
     public static LayoutFixture layOut(String... boxLines) {
         return layOut(A4, boxLines);
     }
 
-    /** Documento con páginas de {@code height} pt: el área útil mide {@code height − 80}. */
+    /** Document with pages of {@code height} pt: the page area measures {@code height − 80}. */
     public static LayoutFixture layOutPaged(double height, String... boxLines) {
         return layOut(paged(height), boxLines);
     }
 
-    /** Como {@link #layOut(String...)}, con los tramos de cada texto por su {@code Id} ({@link TextRuns}). */
+    /** Like {@link #layOut(String...)}, with the runs of each text by its {@code Id} ({@link TextRuns}). */
     public static LayoutFixture layOutRuns(Map<String, List<TextRun>> runs, String... boxLines) {
         return layOut(A4, runs, boxLines);
     }
 
-    /** Como {@link #layOutPaged(double, String...)}, con tramos ({@link #layOutRuns}). */
+    /** Like {@link #layOutPaged(double, String...)}, with runs ({@link #layOutRuns}). */
     public static LayoutFixture layOutPagedRuns(double height, Map<String, List<TextRun>> runs, String... boxLines) {
         return layOut(paged(height), runs, boxLines);
     }
@@ -93,7 +93,7 @@ public final class LayoutFixture {
     public Rect rect(int page, String id) {
         Rect r = rects.get(page - 1).get(id);
         if (r == null) {
-            throw new IllegalArgumentException("No hay fragmento con Id " + id + " en la página " + page
+            throw new IllegalArgumentException("There is no fragment with Id " + id + " on page " + page
                     + ": " + rects.get(page - 1).keySet());
         }
         return r;
@@ -103,7 +103,7 @@ public final class LayoutFixture {
         return rects.get(page - 1).containsKey(id);
     }
 
-    /** Caja del marcador del {@code List item} con ese {@code Id} (reference/components/list.md). */
+    /** Box of the marker of the {@code List item} with that {@code Id} (reference/components/list.md). */
     public Rect marker(String id) {
         return marker(1, id);
     }
@@ -125,7 +125,7 @@ public final class LayoutFixture {
         return fragments.get(page - 1).get(id);
     }
 
-    /** Recorre fragmentos relativos a una caja de contenido que empieza en (x, y). */
+    /** Walks fragments relative to a content box that starts at (x, y). */
     private static void walk(List<Fragment> children, double x, double y,
                              Map<String, Fragment> fragments, Map<String, Rect> rects) {
         for (Fragment f : children) {
@@ -137,7 +137,7 @@ public final class LayoutFixture {
                 fragments.put(f.box().id(), f);
                 rects.put(f.box().id(), border);
             }
-            // En una caja girada en flujo, el rectángulo es el que ocupa y sus hijos van en su caja sin girar.
+            // In a rotated box in flow, the rectangle is the one it takes up and its children go in its unrotated box.
             Rect content = f.borderBox(x + f.x(), y + f.y()).shrink(f.border()).shrink(f.padding());
             walk(f.children(), content.x(), content.y(), fragments, rects);
         }

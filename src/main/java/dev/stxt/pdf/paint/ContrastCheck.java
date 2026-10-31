@@ -30,43 +30,44 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * La comprobación del contraste del texto con su fondo (reference/common/pdf.md): un lienzo que no dibuja,
- * sino que apunta lo que se pinta en cada página, en el mismo orden que los demás ({@link StackingContext}), y en cada
- * tramo de texto mira qué hay debajo de su primera letra. El contraste es el de las pautas WCAG (nivel AA): al menos
- * {@link #NORMAL}, o {@link #LARGE} en el texto grande.
+ * The check of the contrast of text with its background (reference/common/pdf.md): a canvas that does not draw, but
+ * records what is painted on each page, in the same order as the others ({@link StackingContext}), and for each text
+ * run looks at what lies under its first letter. The contrast is that of the WCAG guidelines (level AA): at least
+ * {@link #NORMAL}, or {@link #LARGE} for large text.
  *
- * <p>Lo de debajo son los fondos de las cajas y los rectángulos lisos pintados antes que el texto, mezclados con su
- * opacidad sobre el blanco de la página; de un degradado cuenta cada color, y vale el peor. Una imagen debajo del
- * texto, si nada opaco la tapa, es un fondo desconocido: ese texto no se comprueba. Los bordes no cuentan.</p>
+ * <p>What lies underneath is the backgrounds of the boxes and the plain rectangles painted before the text, blended
+ * with their opacity over the white of the page; for a gradient each color counts, and the worst one applies. An image
+ * under the text, if nothing opaque covers it, is an unknown background: that text is not checked. Borders do not
+ * count.</p>
  */
 public final class ContrastCheck implements Canvas {
 
-    /** El contraste mínimo del texto normal. */
+    /** The minimum contrast of normal text. */
     public static final double NORMAL = 4.5;
-    /** El contraste mínimo del texto grande: {@link #LARGE_SIZE} o más, o {@link #LARGE_BOLD_SIZE} en negrita. */
+    /** The minimum contrast of large text: {@link #LARGE_SIZE} or more, or {@link #LARGE_BOLD_SIZE} in bold. */
     public static final double LARGE = 3;
     public static final double LARGE_SIZE = 18;
     public static final double LARGE_BOLD_SIZE = 14;
 
     private static final float[] WHITE = {1, 1, 1, 1};
 
-    /** Lo pintado en la página, en orden: la zona en coordenadas de la página y sus colores ({@code null}, imagen). */
+    /** What is painted on the page, in order: the area in page coordinates and its colors ({@code null}, an image). */
     private record Layer(Shape area, List<float[]> colors) {
     }
 
     private final List<Layer> layers = new ArrayList<>();
     private final Deque<AffineTransform> turns = new ArrayDeque<>();
     private AffineTransform turn = new AffineTransform();
-    /** La caja cuyo texto se pinta ahora ({@link Tagging#beginText}); {@code null} fuera de un texto. */
+    /** The box whose text is being painted ({@link Tagging#beginText}); {@code null} outside a text. */
     private Box current;
 
     private ContrastCheck() {
     }
 
     /**
-     * Comprueba el contraste de todo el texto de un documento maquetado.
+     * Checks the contrast of all the text of a laid-out document.
      *
-     * @throws InvalidModelException {@link ErrorCode#CONTRAST_LOW} en el primer texto con poco contraste
+     * @throws InvalidModelException {@link ErrorCode#CONTRAST_LOW} on the first text with too little contrast
      */
     public static void check(LaidOutDocument document) {
         for (Page page : document.pages()) {
@@ -117,7 +118,7 @@ public final class ContrastCheck implements Canvas {
         turn = turns.pop();
     }
 
-    /** Un recorte solo quita lo que queda fuera de él: lo que hay debajo del texto, que está dentro, no cambia. */
+    /** A clip only removes what lies outside it: what lies under the text, which is inside, does not change. */
     @Override
     public void beginClip(Rect r, Radii radii) {
     }
@@ -142,7 +143,7 @@ public final class ContrastCheck implements Canvas {
         if (current == null || text.isBlank()) {
             return;
         }
-        // La mitad de la primera letra: por encima de la línea base, donde no llega el subrayado.
+        // The middle of the first letter: above the baseline, where the underline does not reach.
         Point2D at = turn.transform(new Point2D.Double(x + fontSize / 4, baselineY - fontSize / 3), null);
         List<float[]> backdrops = backdrops(at);
         if (backdrops == null) {
@@ -162,8 +163,8 @@ public final class ContrastCheck implements Canvas {
     }
 
     /**
-     * Los colores que puede haber debajo del punto, del blanco de la página hacia arriba; {@code null} si hay una
-     * imagen que nada opaco tapa.
+     * The colors that may lie under the point, from the white of the page upwards; {@code null} if there is an image
+     * that nothing opaque covers.
      */
     private List<float[]> backdrops(Point2D at) {
         List<float[]> below = List.of(WHITE);
@@ -185,27 +186,27 @@ public final class ContrastCheck implements Canvas {
                     }
                 }
             }
-            // Un color translúcido sobre una imagen deja el fondo sin conocer.
+            // A translucent color over an image leaves the background unknown.
             below = next.size() < layer.colors().size() && below == null ? null : next;
         }
         return below;
     }
 
-    /** {@code top} sobre el color opaco {@code bottom}: el color que se ve. */
+    /** {@code top} over the opaque color {@code bottom}: the color that is seen. */
     static float[] over(float[] top, float[] bottom) {
         float a = top[3];
         return new float[]{top[0] * a + bottom[0] * (1 - a), top[1] * a + bottom[1] * (1 - a),
                 top[2] * a + bottom[2] * (1 - a), 1};
     }
 
-    /** El contraste entre dos colores opacos, de 1 a 21. */
+    /** The contrast between two opaque colors, from 1 to 21. */
     static double ratio(float[] a, float[] b) {
         double la = luminance(a);
         double lb = luminance(b);
         return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
     }
 
-    /** La luminancia relativa de un color opaco. */
+    /** The relative luminance of an opaque color. */
     private static double luminance(float[] c) {
         return 0.2126 * linear(c[0]) + 0.7152 * linear(c[1]) + 0.0722 * linear(c[2]);
     }
@@ -217,16 +218,16 @@ public final class ContrastCheck implements Canvas {
     private static InvalidModelException error(Box box, double ratio, double needed, float[] ink, float[] backdrop) {
         SourceLine line = box.style().isDeclared(PropertyKey.COLOR) ? box.style().line(PropertyKey.COLOR)
                 : SourceLine.of(box.line());
-        return new InvalidModelException(line, ErrorCode.CONTRAST_LOW, "El texto de la caja " + box.describe()
-                + " tiene un contraste de " + decimal(ratio) + ":1 con su fondo (" + hex(ink) + " sobre "
-                + hex(backdrop) + ") y necesita " + decimal(needed) + ":1 (3:1 en el texto grande: Size de 18 o más, "
-                + "o de 14 en negrita): hay que cambiar su Color o el fondo");
+        return new InvalidModelException(line, ErrorCode.CONTRAST_LOW, "The text of box " + box.describe()
+                + " has a contrast of " + decimal(ratio) + ":1 with its background (" + hex(ink) + " on "
+                + hex(backdrop) + ") and needs " + decimal(needed) + ":1 (3:1 for large text: Size of 18 or more, "
+                + "or 14 in bold): its Color or the background has to be changed");
     }
 
-    /** {@code 2,85}: con coma y hacia abajo, para que nunca parezca que llega. */
+    /** {@code 2.85}: rounded down, so that it never seems to reach the threshold. */
     private static String decimal(double v) {
-        String s = String.format(Locale.ROOT, "%.2f", Math.floor(v * 100) / 100).replace('.', ',');
-        if (s.endsWith(",00")) {
+        String s = String.format(Locale.ROOT, "%.2f", Math.floor(v * 100) / 100);
+        if (s.endsWith(".00")) {
             return s.substring(0, s.length() - 3);
         }
         return s.endsWith("0") ? s.substring(0, s.length() - 1) : s;
@@ -242,7 +243,7 @@ public final class ContrastCheck implements Canvas {
         return tagging;
     }
 
-    /** Lo único que interesa del etiquetado: de qué caja es el texto que se pinta. */
+    /** The only thing of interest from tagging: which box the painted text belongs to. */
     private final Tagging tagging = new Tagging() {
         @Override
         public void beginText(Box box) {

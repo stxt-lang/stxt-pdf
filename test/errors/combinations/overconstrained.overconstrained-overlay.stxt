@@ -1,0 +1,15 @@
+# Case: Overconstrained Overlay
+# Code: OVERCONSTRAINED
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Overlay:
+			Offset: 0 10 auto 10
+			Box:
+				Width: 100
+				Height: 10

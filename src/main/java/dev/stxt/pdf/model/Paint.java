@@ -3,12 +3,12 @@ package dev.stxt.pdf.model;
 import java.util.List;
 
 /**
- * El relleno de un fondo (reference/common/box.md): un color o un degradado lineal. Los colores
- * siguen siendo el texto del documento ({@link Colors}).
+ * The fill of a background (reference/common/box.md): a color or a linear gradient. The colors
+ * are still the text of the document ({@link Colors}).
  */
 public sealed interface Paint {
 
-    /** Un color liso, con su opacidad si la escribe. */
+    /** A solid color, with its opacity if it is written. */
     record Solid(String color) implements Paint {
 
         @Override
@@ -18,8 +18,8 @@ public sealed interface Paint {
     }
 
     /**
-     * {@code linear(ángulo, color, color…)}: el ángulo en grados como en CSS (0 va hacia arriba,
-     * 90 hacia la derecha, 180 hacia abajo), con los colores repartidos a partes iguales.
+     * {@code linear(angle, color, color...)}: the angle in degrees as in CSS (0 goes up,
+     * 90 to the right, 180 down), with the colors spread evenly.
      */
     record Linear(double angle, List<String> stops) implements Paint {
 
@@ -28,9 +28,9 @@ public sealed interface Paint {
         }
 
         /**
-         * Los extremos de la línea del degradado en {@code box} (coordenadas absolutas): pasa por el
-         * centro y mide lo que hace falta para que las esquinas tengan el color del primer y del
-         * último color, como en CSS. Devuelve {@code {x1, y1, x2, y2}}.
+         * The ends of the gradient line in {@code box} (absolute coordinates): it goes through the
+         * center and is as long as needed for the corners to have the first and the last color,
+         * as in CSS. Returns {@code {x1, y1, x2, y2}}.
          */
         public double[] line(Rect box) {
             double rad = Math.toRadians(angle);
@@ -48,6 +48,6 @@ public sealed interface Paint {
         }
     }
 
-    /** Si algún color del relleno deja ver lo que hay debajo. */
+    /** Whether some color of the fill lets what is underneath show through. */
     boolean isTranslucent();
 }

@@ -1,4 +1,4 @@
-# Case: Un bloque con un alto fijo de diez millones de puntos ocupa más páginas que el máximo
+# Case: A block with a fixed height of ten million points takes more pages than the maximum
 # Code: PAGE_LIMIT
 # Line: 0
 Document (dev.stxt.pdf):

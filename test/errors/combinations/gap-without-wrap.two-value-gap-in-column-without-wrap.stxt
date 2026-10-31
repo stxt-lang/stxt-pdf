@@ -1,0 +1,15 @@
+# Case: Two-value Gap in a column Stack without Wrap
+# Code: GAP_WITHOUT_WRAP
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Direction: vertical
+			Gap: 7 13
+			Item:
+				Block:

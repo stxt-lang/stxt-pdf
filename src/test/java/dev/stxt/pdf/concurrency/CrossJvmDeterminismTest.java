@@ -19,10 +19,10 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * El PDF de cada ejemplo y de cada caso golden es el mismo en otra JVM, sin fechas ni
- * identificadores. En otra JVM cambian los {@code identityHashCode} de las cajas, y con ellos el orden en que se
- * recorre un {@code IdentityHashMap} o un {@code HashSet} de cajas: si el resultado dependiera de ese orden, aquí se
- * vería. Dentro de una misma JVM lo comprueba {@link ConcurrentConversionTest}.
+ * The PDF of each example and of each golden case is the same in another JVM, without dates or
+ * identifiers. In another JVM the {@code identityHashCode} of the boxes changes, and with it the order in which an
+ * {@code IdentityHashMap} or a {@code HashSet} of boxes is traversed: if the result depended on that order, it would
+ * show here. Within the same JVM, {@link ConcurrentConversionTest} checks it.
  */
 class CrossJvmDeterminismTest {
 
@@ -36,7 +36,7 @@ class CrossJvmDeterminismTest {
         assertEquals(Hashes.all(), other.lines().filter(l -> l.startsWith("test")).toList());
     }
 
-    /** Escribe la huella del PDF de cada documento, uno por línea. */
+    /** Writes the hash of the PDF of each document, one per line. */
     static final class Hashes {
         public static void main(String[] args) throws Exception {
             all().forEach(System.out::println);
@@ -53,7 +53,7 @@ class CrossJvmDeterminismTest {
             for (Path dir : dirs) {
                 InlineNode document = reader.read(dir.resolve("input.stxt"));
                 Path styles = dir.resolve("styles.stxt");
-                // Los colores de un caso golden solo distinguen las cajas: no se les pide contraste.
+                // The colors of a golden case only tell the boxes apart: no contrast is required of them.
                 Converter.Builder builder = Converter.builder();
                 if (dir.startsWith(Path.of("test", "golden"))) {
                     builder.exclude(Check.CONTRAST);

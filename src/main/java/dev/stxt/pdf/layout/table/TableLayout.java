@@ -22,19 +22,19 @@ import static dev.stxt.pdf.layout.Messages.pt;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Layout de una {@code Table} (reference/components/table.md): el de su grid, con las filas de
- * {@code Header rows} y {@code Footer rows} repetidas en cada fragmento.
+ * Layout of a {@code Table} (reference/components/table.md): that of its grid, with the rows of
+ * {@code Header rows} and {@code Footer rows} repeated in each fragment.
  *
- * <p>{@code BoxTreeBuilder} traduce la tabla a un grid con colocación explícita; las primeras
- * {@link Box#headerRows()} filas de la rejilla son la cabecera y las últimas {@link Box#footerRows()},
- * el pie. Aquí se maqueta el grid entero sin fragmentar ({@link GridLayout#arrange}) y solo se
- * cortan las filas del cuerpo, con {@link UnitBreaker}: lo que queda de página para ellas es el
- * resto tras la cabecera y el pie, que van enteros en cada fragmento, la cabecera arriba y el pie
- * detrás de la última fila del cuerpo colocada. Sin cabecera ni pie, es el layout del grid.</p>
+ * <p>{@code BoxTreeBuilder} translates the table into a grid with explicit placement; the first
+ * {@link Box#headerRows()} rows of the grid are the header and the last {@link Box#footerRows()},
+ * the footer. Here the whole grid is laid out without fragmenting ({@link GridLayout#arrange}) and only
+ * the rows of the body are broken, with {@link UnitBreaker}: what is left of the page for them is the
+ * rest after the header and the footer, which go whole in each fragment, the header on top and the footer
+ * after the last placed row of the body. Without header or footer, it is the layout of the grid.</p>
  *
- * <p>Si al principio de una página la cabecera y el pie no dejan sitio al cuerpo, la tabla no
- * puede avanzar: es un error ({@link ErrorCode#TABLE_REPEAT_OVERFLOW}). Una fila del cuerpo que
- * no cabe en el sitio que dejan se parte en paralelo, como en un grid.</p>
+ * <p>If at the start of a page the header and the footer leave no room for the body, the table cannot
+ * advance: it is an error ({@link ErrorCode#TABLE_REPEAT_OVERFLOW}). A row of the body that
+ * does not fit in the room they leave is split in parallel, as in a grid.</p>
  */
 public final class TableLayout implements LayoutAlgorithm {
 
@@ -57,16 +57,16 @@ public final class TableLayout implements LayoutAlgorithm {
         UnitBreaker.Units all = a.units();
         int head = box.headerRows();
         int bodyEnd = all.size() - box.footerRows();
-        // La cabecera mide hasta el principio del cuerpo y el pie desde su final: los dos, con su hueco.
+        // The header measures up to the start of the body and the footer from its end: both, with their gap.
         double bodyStart = all.get(head).start();
         double bodyBottom = all.get(bodyEnd - 1).end();
         double footHeight = box.footerRows() == 0 ? 0 : all.extent() - bodyBottom;
         if (head + box.footerRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
                 && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
-            throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "La cabecera y el pie de la "
-                    + "tabla " + box.describe() + " miden " + pt(bodyStart + footHeight) + " y no dejan sitio al cuerpo "
-                    + "en una página vacía, y se repiten en cada página: hay que reducir su alto o quitar filas "
-                    + "de Header rows y Footer rows");
+            throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "The header and footer of the "
+                    + "table " + box.describe() + " measure " + pt(bodyStart + footHeight) + " and leave no room for the "
+                    + "body on an empty page, and they repeat on every page: their height has to be reduced or rows "
+                    + "removed from Header rows and Footer rows");
         }
 
         List<UnitBreaker.Placed> headItems = new ArrayList<>();
@@ -83,7 +83,7 @@ public final class TableLayout implements LayoutAlgorithm {
                         p.unit(), p.relative()));
             }
         }
-        // Las franjas de las filas: las de la cabecera y el pie, ya colocadas; las del cuerpo, en su unidad.
+        // The bands of the rows: those of the header and the footer, already placed; those of the body, in their unit.
         List<Fragment> headBands = new ArrayList<>();
         List<UnitBreaker.Band> bodyBands = new ArrayList<>();
         List<Fragment> footBands = new ArrayList<>();

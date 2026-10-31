@@ -11,53 +11,52 @@ import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 /**
- * Modelo de caja usado de una caja en un espacio concreto (reference/common/box.md):
- * márgenes, borde y relleno en puntos, el ancho de la caja de borde y su alto si es definido.
- * Es la parte común a todos los algoritmos de layout.
+ * Used box model of a box in a given space (reference/common/box.md): margins, border and padding in points, the
+ * width of the border box and its height if it is definite. It is the part common to all layout algorithms.
  *
- * <p>Los porcentajes se resuelven contra las bases del {@link ConstraintSpace}. Un {@code auto}
- * en los márgenes vale 0 aquí: el centrado lo hace el padre, que es quien coloca la caja.</p>
+ * <p>Percentages are resolved against the bases of the {@link ConstraintSpace}. An {@code auto} in the margins is
+ * 0 here: the parent does the centering, since it places the box.</p>
  *
- * @param margin    márgenes usados ({@code auto} = 0)
- * @param border    grosores del borde
- * @param padding   relleno
- * @param width     ancho de la caja de borde, ya limitado por mínimo y máximo
- * @param height    alto de la caja de borde si es definido (número, porcentaje de un alto
- *                  definido, impuesto por el padre o deducido de {@code Aspect ratio}); vacío
- *                  si depende del contenido
- * @param minHeight alto mínimo de la caja de borde
- * @param maxHeight alto máximo de la caja de borde; vacío = sin máximo
- * @param decoration borde y relleno en los cortes ({@link Slice})
+ * @param margin    used margins ({@code auto} = 0)
+ * @param border    border widths
+ * @param padding   padding
+ * @param width     width of the border box, already limited by minimum and maximum
+ * @param height    height of the border box if it is definite (a number, a percentage of a definite
+ *                  height, imposed by the parent or deduced from {@code Aspect ratio}); empty
+ *                  if it depends on the content
+ * @param minHeight minimum height of the border box
+ * @param maxHeight maximum height of the border box; empty = no maximum
+ * @param decoration border and padding at the breaks ({@link Slice})
  */
 public record BoxModel(Insets margin, Insets border, Insets padding, double width,
                        OptionalDouble height, double minHeight, OptionalDouble maxHeight,
                        Edges decoration) {
 
     /**
-     * Resuelve el modelo de caja de una caja con los tamaños intrínsecos del motor y, si es una
-     * {@code Image}, su tamaño natural.
+     * Resolves the box model of a box with the engine's intrinsic sizes and, if it is an
+     * {@code Image}, its natural size.
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, LayoutContext context) {
         return resolve(box, space, () -> context.intrinsic(box), box.isImage() ? context.natural(box) : null);
     }
 
     /**
-     * Resuelve el modelo de caja de una caja que no es una {@code Image}.
+     * Resolves the box model of a box that is not an {@code Image}.
      *
-     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: narrowest} y
-     *                  similares; solo se calculan si hacen falta
+     * @param intrinsic intrinsic sizes of the box, for {@code Width: narrowest} and
+     *                  similar; they are only computed if needed
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic) {
         return resolve(box, space, intrinsic, null);
     }
 
     /**
-     * Resuelve el modelo de caja de una caja.
+     * Resolves the box model of a box.
      *
-     * @param intrinsic tamaños intrínsecos de la caja, para {@code Width: narrowest} y
-     *                  similares; solo se calculan si hacen falta
-     * @param natural   tamaño natural de una {@code Image}, que se dimensiona como un elemento
-     *                  reemplazado ({@link #replaced}); {@code null} en el resto de cajas
+     * @param intrinsic intrinsic sizes of the box, for {@code Width: narrowest} and
+     *                  similar; they are only computed if needed
+     * @param natural   natural size of an {@code Image}, which is sized as a replaced
+     *                  element ({@link #replaced}); {@code null} for the other boxes
      */
     public static BoxModel resolve(Box box, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
                                    NaturalSize natural) {
@@ -90,7 +89,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         } else {
             height = s.box().height().resolve(baseHeight);
             if (height.isEmpty() && s.box().aspectRatio() != null) {
-                // Simplificación: la proporción se aplica a la caja de borde.
+                // Simplification: the ratio applies to the border box.
                 height = OptionalDouble.of(width / s.box().aspectRatio());
             }
             if (height.isPresent()) {
@@ -101,12 +100,12 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Una {@code Image} (reference/components/image.md), como un elemento reemplazado de CSS: su caja de contenido
-     * tiene la proporción del fichero (o la de {@code Aspect ratio}, que la sustituye). Con {@code Width: auto} mide su
-     * ancho natural, también en flujo de bloque, o el que sale de un alto declarado; el alto {@code auto} sale siempre
-     * del ancho, así que es definido. Si los dos son {@code auto} y el alto choca con su mínimo o su máximo, el ancho
-     * se vuelve a deducir del alto limitado. Con {@code measuringContentHeight}, el alto es también el de la
-     * proporción.
+     * An {@code Image} (reference/components/image.md), like a CSS replaced element: its content box has the ratio
+     * of the file (or that of {@code Aspect ratio}, which replaces it). With {@code Width: auto} it measures its
+     * natural width, also in block flow, or the one that follows from a declared height; the {@code auto} height
+     * always follows from the width, so it is definite. If both are {@code auto} and the height hits its minimum or
+     * maximum, the width is deduced again from the limited height. With {@code measuringContentHeight}, the height
+     * is also that of the ratio.
      */
     private static BoxModel replaced(Style s, ConstraintSpace space, Supplier<IntrinsicSizes> intrinsic,
                                      NaturalSize natural, Insets margin, Insets border, Insets padding,
@@ -154,9 +153,9 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
     }
 
     /**
-     * Limita un ancho de caja de borde por {@code Min width} y {@code Max width} (reference/common/box.md).
+     * Limits a border box width by {@code Min width} and {@code Max width} (reference/common/box.md).
      *
-     * @param baseWidth base de los porcentajes
+     * @param baseWidth base of the percentages
      */
     public static double constrainWidth(Style s, double width, double baseWidth) {
         return Sizing.constrain(width,
@@ -164,7 +163,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 s.box().maxWidth() == null ? OptionalDouble.empty() : s.box().maxWidth().resolve(baseWidth));
     }
 
-    /** Ancho de caja de borde antes de mínimo y máximo. */
+    /** Border box width before minimum and maximum. */
     private static double specifiedWidth(Style s, ConstraintSpace space, Insets margin,
                                          Supplier<IntrinsicSizes> intrinsic) {
         OptionalDouble declared = s.box().width().resolve(space.percentBaseWidth());
@@ -172,7 +171,7 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             return declared.getAsDouble();
         }
         if (s.box().width() instanceof Value.Keyword k && k != Value.Keyword.AUTO) {
-            // Los intrínsecos son de la caja de margen.
+            // The intrinsic sizes are those of the margin box.
             IntrinsicSizes i = intrinsic.get();
             double marginBox = switch (k) {
                 case NARROWEST -> i.narrowest();
@@ -181,14 +180,14 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
             };
             return Math.max(0, marginBox - margin.horizontal());
         }
-        // auto, o un valor que depende de una base indefinida.
+        // auto, or a value that depends on an indefinite base.
         return Sizing.autoWidthInFlow(space.availableWidth(), margin);
     }
 
     /**
-     * Tamaños intrínsecos de la caja de margen a partir de los de su contenido (reference/common/box.md). Una caja
-     * con {@code Width} fijo tiene ese valor como ancho más estrecho y ancho natural. Los porcentajes no
-     * se pueden resolver sin containing block y cuentan como 0 (o como {@code auto}).
+     * Intrinsic sizes of the margin box from those of its content (reference/common/box.md). A box with a fixed
+     * {@code Width} has that value as narrowest width and natural width. Percentages cannot be resolved without a
+     * reference container and count as 0 (or as {@code auto}).
      */
     public static IntrinsicSizes intrinsic(Box box, IntrinsicSizes content) {
         Style s = box.style();
@@ -210,14 +209,14 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return Math.max(0, width - border.horizontal() - padding.horizontal());
     }
 
-    /** Alto de la caja de contenido si el alto es definido. */
+    /** Height of the content box if the height is definite. */
     public OptionalDouble contentHeight() {
         return height.isPresent()
                 ? OptionalDouble.of(Math.max(0, height.getAsDouble() - border.vertical() - padding.vertical()))
                 : OptionalDouble.empty();
     }
 
-    /** Alto final de la caja de borde: el definido o, con {@code auto}, el del contenido. */
+    /** Final height of the border box: the definite one or, with {@code auto}, that of the content. */
     public double usedHeight(double contentHeight) {
         if (height.isPresent()) {
             return height.getAsDouble();
@@ -225,28 +224,28 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
         return Sizing.constrain(contentHeight + border.vertical() + padding.vertical(), minHeight, maxHeight);
     }
 
-    /** Cada fragmento lleva borde y relleno completos ({@code Edges: closed}). */
+    /** Each fragment carries full border and padding ({@code Edges: closed}). */
     public boolean clones() {
         return decoration == Edges.CLOSED;
     }
 
-    /** Nada separa el borde superior de la caja de su contenido: ni borde ni relleno. */
+    /** Nothing separates the top border of the box from its content: neither border nor padding. */
     public boolean openAtTop() {
         return border.top() == 0 && padding.top() == 0;
     }
 
-    /** Ídem por abajo, y además el alto depende del contenido. */
+    /** Likewise at the bottom, and in addition the height depends on the content. */
     public boolean openAtBottom() {
         return border.bottom() == 0 && padding.bottom() == 0 && height.isEmpty();
     }
 
     /**
-     * Espacio para los hijos en flujo: la caja de contenido es su containing block. Lo que
-     * queda de página se mide desde el principio de la caja de contenido (y,
-     * con {@code Edges: closed}, sin el borde y el relleno inferiores).
+     * Space for the in-flow children: the content box is their reference container. What is left of the page is
+     * measured from the start of the content box (and, with {@code Edges: closed}, without the bottom border and
+     * padding).
      *
-     * @param first es el primer fragmento de la caja (con {@code open}, los siguientes no llevan
-     *              borde ni relleno superiores, ver {@link Slice})
+     * @param first it is the first fragment of the box (with {@code open}, the following ones carry no
+     *              top border or padding, see {@link Slice})
      */
     public ConstraintSpace childSpace(ConstraintSpace space, boolean first) {
         double w = contentWidth();

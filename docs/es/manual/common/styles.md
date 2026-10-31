@@ -79,7 +79,7 @@ Styles (dev.stxt.pdf):
 
 El documento no dice dónde está su fichero de estilos: se pasa al convertirlo ([Uso desde Java](java-usage.md)). Si el
 documento tiene también su `Styles`, en cada nivel de la lista de arriba gana el del documento, así que sacar el `Styles`
-a un fichero no cambia nada. Un error en el fichero de estilos empieza por `línea 8 de los estilos:`, también si se ve al
+a un fichero no cambia nada. Un error en el fichero de estilos empieza por `line 8 of the styles:`, también si se ve al
 maquetar, como una fuente que no existe o una caja que no cabe.
 
 Más detalle en la [referencia](../../reference/common/styles.md).

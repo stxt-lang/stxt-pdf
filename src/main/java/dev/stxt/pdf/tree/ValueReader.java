@@ -20,14 +20,14 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.parse;
 
 /**
- * Interpreta el valor de una propiedad (reference/common/values.md y reference/common/structure.md) y comprueba lo
- * que admite: longitudes, {@code auto}, palabras clave intrínsecas, pistas de grid, enteros, colores… Los errores
- * llevan la línea del nodo.
+ * Parses the value of a property (reference/common/values.md and reference/common/structure.md) and checks what it
+ * allows: lengths, {@code auto}, intrinsic keywords, grid tracks, integers, colors... Errors carry the line of the
+ * node.
  */
 final class ValueReader {
 
     /**
-     * Clases de valor, para comprobar lo que admite cada propiedad (reference/common/values.md y
+     * Value classes, to check what each property allows (reference/common/values.md and
      * reference/common/structure.md).
      */
     enum Kind { LENGTH, AUTO, INTRINSIC, FRACTION, BETWEEN }
@@ -39,7 +39,7 @@ final class ValueReader {
     private ValueReader() {
     }
 
-    /** Un valor de una clase admitida; sin {@code negative}, sin números negativos. */
+    /** A value of an allowed class; without {@code negative}, no negative numbers. */
     static Value value(Node p, Set<Kind> allowed, boolean negative) {
         Value v = parse(p, () -> ValueParser.value(p.getText()));
         check(p, v, allowed, negative);
@@ -55,31 +55,31 @@ final class ValueReader {
     static void check(Node p, Value v, Set<Kind> allowed, boolean negative) {
         Kind kind = kind(v);
         if (kind == null || !allowed.contains(kind)) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + p.getText().trim()
-                    + ": admite " + describe(allowed));
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow " + p.getText().trim()
+                    + ": it allows " + describe(allowed));
         }
         if (!negative && isNegative(v)) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite valores negativos: " + p.getText().trim());
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow negative values: " + p.getText().trim());
         }
     }
 
-    /** Pistas de grid: longitudes, {@code auto}, {@code narrowest}, {@code natural}, fracciones y {@code between}. */
+    /** Grid tracks: lengths, {@code auto}, {@code narrowest}, {@code natural}, fractions and {@code between}. */
     static List<Value> tracks(Node p) {
         List<Value> list = parse(p, () -> ValueParser.list(p.getText()));
         for (Value v : list) {
             if (v == Value.Keyword.FIT) {
-                throw error(p, ErrorCode.FIT_TRACK, "fit no es una pista de grid: la que se ajusta al contenido "
-                        + "es auto");
+                throw error(p, ErrorCode.FIT_TRACK, "fit is not a grid track: the one that fits the content "
+                        + "is auto");
             }
             boolean valid = v instanceof Value.Between b
                     ? track(b.min()) && (track(b.max()) || kind(b.max()) == Kind.FRACTION)
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
-                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite " + v + " como pista: admite "
-                        + "números, porcentajes, fracciones (*), auto, narrowest, natural o between(a, b)");
+                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow " + v + " as a track: it allows "
+                        + "numbers, percentages, fractions (*), auto, narrowest, natural or between(a, b)");
             }
             if (isNegative(v)) {
-                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " no admite pistas negativas: " + p.getText().trim());
+                throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow negative tracks: " + p.getText().trim());
             }
         }
         return list;
@@ -90,7 +90,7 @@ final class ValueReader {
         return k == Kind.LENGTH || k == Kind.AUTO || (k == Kind.INTRINSIC && v != Value.Keyword.FIT);
     }
 
-    /** Clase de un valor. */
+    /** Class of a value. */
     private static Kind kind(Value v) {
         if (v instanceof Value.Points || v instanceof Value.Percentage) {
             return Kind.LENGTH;
@@ -106,10 +106,10 @@ final class ValueReader {
 
     private static String describe(Set<Kind> allowed) {
         return allowed.stream().map(k -> switch (k) {
-            case LENGTH -> "un número o un porcentaje";
+            case LENGTH -> "a number or a percentage";
             case AUTO -> "auto";
-            case INTRINSIC -> "narrowest, natural o fit";
-            case FRACTION -> "una fracción";
+            case INTRINSIC -> "narrowest, natural or fit";
+            case FRACTION -> "a fraction";
             case BETWEEN -> "between(a, b)";
         }).collect(Collectors.joining("; "));
     }
@@ -124,12 +124,12 @@ final class ValueReader {
         return parts(v).stream().anyMatch(ValueReader::isNegative);
     }
 
-    /** El valor depende de una base de porcentajes (directamente o dentro de {@code between}). */
+    /** The value depends on a percentage base (directly or inside {@code between}). */
     static boolean hasPercentage(Value v) {
         return v instanceof Value.Percentage || parts(v).stream().anyMatch(ValueReader::hasPercentage);
     }
 
-    /** Los dos extremos de {@code between}. */
+    /** The two ends of {@code between}. */
     private static List<Value> parts(Value v) {
         return v instanceof Value.Between m ? List.of(m.min(), m.max()) : List.of();
     }
@@ -146,10 +146,10 @@ final class ValueReader {
     static <E extends Enum<E>> E enumValue(Class<E> type, Node n) {
         String text = n.getText().trim();
         try {
-            // lower-alpha es LOWER_ALPHA: el guion no cabe en el nombre de una constante.
+            // lower-alpha is LOWER_ALPHA: a hyphen cannot go in the name of a constant.
             return Enum.valueOf(type, text.toUpperCase(Locale.ROOT).replace('-', '_'));
         } catch (IllegalArgumentException ex) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en " + n.getName() + ": " + text);
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + n.getName() + ": " + text);
         }
     }
 
@@ -157,7 +157,7 @@ final class ValueReader {
         return switch (n.getText().trim().toLowerCase(Locale.ROOT)) {
             case "true", "yes" -> true;
             case "false", "no" -> false;
-            default -> throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Se esperaba true o false: " + n.getText().trim());
+            default -> throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Expected true or false: " + n.getText().trim());
         };
     }
 
@@ -165,31 +165,31 @@ final class ValueReader {
         try {
             return Integer.parseInt(n.getText().trim());
         } catch (NumberFormatException ex) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Se esperaba un entero: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Expected an integer: " + n.getText().trim());
         }
     }
 
     /**
-     * {@code Rotate} (reference/common/layers-and-rotation.md): grados entre −360 y 360, sin 0 ni las vueltas enteras, que no
-     * girarían nada.
+     * {@code Rotate} (reference/common/layers-and-rotation.md): degrees between −360 and 360, without 0 or the whole
+     * turns, which would not rotate anything.
      */
     static double angle(Node n) {
         double v;
         try {
             v = Double.parseDouble(n.getText().trim());
         } catch (NumberFormatException ex) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Se esperaba un número de grados: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Expected a number of degrees: " + n.getText().trim());
         }
         if (v == 0 || Math.abs(v) >= 360) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate admite grados entre -360 y 360, sin 0 ni 360 ni -360, "
-                    + "que no giran nada: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate allows degrees between -360 and 360, except 0, 360 and -360, "
+                    + "which do not rotate anything: " + n.getText().trim());
         }
         return v;
     }
 
     /**
-     * {@code Rotate origin} (reference/common/layers-and-rotation.md): el origen horizontal y el vertical, desde la esquina de
-     * arriba a la izquierda de la caja de borde.
+     * {@code Rotate origin} (reference/common/layers-and-rotation.md): the horizontal and the vertical origin, from the
+     * top left corner of the border box.
      */
     static Value[] rotateOrigin(Node n) {
         try {
@@ -199,16 +199,16 @@ final class ValueReader {
         }
     }
 
-    /** Etiqueta de idioma BCP 47 (forma simple): {@code es}, {@code en-US}, {@code ca}… */
+    /** BCP 47 language tag (simple form): {@code es}, {@code en-US}, {@code ca}... */
     private static final java.util.regex.Pattern LANGUAGE = java.util.regex.Pattern
             .compile("[a-zA-Z]{2,3}(-[a-zA-Z0-9]{1,8})*");
 
-    /** El valor de {@code Language}: una etiqueta de idioma BCP 47. */
+    /** The value of {@code Language}: a BCP 47 language tag. */
     static String language(Node n) {
         String tag = n.getText().trim();
         if (!LANGUAGE.matcher(tag).matches()) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Language espera una etiqueta de idioma BCP 47 "
-                    + "(es, en-US, ca…): '" + tag + "'");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Language expects a BCP 47 language tag "
+                    + "(es, en-US, ca...): '" + tag + "'");
         }
         return tag;
     }
@@ -216,7 +216,7 @@ final class ValueReader {
     static int positiveInteger(Node n) {
         int v = integer(n);
         if (v < 1) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " debe ser al menos 1");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be at least 1");
         }
         return v;
     }
@@ -224,17 +224,17 @@ final class ValueReader {
     static double points(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p) || p.pt() <= 0) {
-            throw error(n, ErrorCode.PAGE_SIZE, n.getName() + " del medio debe ser un número de puntos positivo: "
+            throw error(n, ErrorCode.PAGE_SIZE, n.getName() + " of the medium must be a positive number of points: "
                     + n.getText().trim());
         }
         return p.pt();
     }
 
-    /** Un número de puntos, positivo, cero o negativo. */
+    /** A number of points, positive, zero or negative. */
     static double signedPoints(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p)) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " debe ser un número de puntos: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a number of points: " + n.getText().trim());
         }
         return p.pt();
     }
@@ -242,7 +242,7 @@ final class ValueReader {
     static double positive(Node n) {
         double v = nonNegative(n);
         if (v == 0) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " debe ser mayor que 0");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be greater than 0");
         }
         return v;
     }
@@ -250,7 +250,7 @@ final class ValueReader {
     static double nonNegative(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p) || p.pt() < 0) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " debe ser un número no negativo: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a non-negative number: " + n.getText().trim());
         }
         return p.pt();
     }
@@ -262,8 +262,8 @@ final class ValueReader {
                     || (allowsPercentage && v instanceof Value.Percentage q && q.percent() >= 0);
             if (!valid) {
                 throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + (allowsPercentage
-                        ? " solo admite puntos o porcentajes no negativos"
-                        : " solo admite puntos no negativos"));
+                        ? " only allows non-negative points or percentages"
+                        : " only allows non-negative points"));
             }
         }
         return sides;
@@ -285,37 +285,37 @@ final class ValueReader {
                 }
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-            // se informa abajo
+            // reported below
         }
-        throw error(n, ErrorCode.VALUE_SYNTAX, "Aspect ratio espera 'ancho/alto' o un número positivo: " + t);
+        throw error(n, ErrorCode.VALUE_SYNTAX, "Aspect ratio expects 'width/height' or a positive number: " + t);
     }
 
     static String color(Node n) {
         String t = n.getText().trim();
         if (!Colors.isValid(t)) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Color no válido (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + t);
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Invalid color (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + t);
         }
         return t;
     }
 
-    /** {@code Border color}: de 1 a 4 colores, arriba, derecha, abajo, izquierda. */
+    /** {@code Border color}: from 1 to 4 colors, top, right, bottom, left. */
     static Sides<String> colorSides(Node n) {
         String[] parts = n.getText().trim().split("\\s+");
         if (parts.length > 4) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " admite de 1 a 4 colores y hay " + parts.length);
+            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " allows from 1 to 4 colors and there are " + parts.length);
         }
         for (String part : parts) {
             if (!Colors.isValid(part)) {
                 throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Color no válido (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + part);
+                        "Invalid color (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + part);
             }
         }
         return Sides.shorthand(List.of(parts));
     }
 
     /**
-     * {@code Background}: un color o {@code linear(ángulo, color, color…)}, con el ángulo en grados
-     * (como en CSS: 0 hacia arriba, 90 hacia la derecha, 180 hacia abajo) y al menos dos colores.
+     * {@code Background}: a color or {@code linear(angle, color, color...)}, with the angle in degrees (as in CSS: 0
+     * upward, 90 to the right, 180 downward) and at least two colors.
      */
     static Paint paint(Node n) {
         String t = n.getText().trim();
@@ -323,28 +323,28 @@ final class ValueReader {
             return new Paint.Solid(color(n));
         }
         if (!t.endsWith(")")) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "linear( no está cerrado: " + t);
+            throw error(n, ErrorCode.VALUE_SYNTAX, "linear( is not closed: " + t);
         }
         String[] args = t.substring("linear(".length(), t.length() - 1).split(",", -1);
         if (args.length < 3) {
             throw error(n, ErrorCode.VALUE_SYNTAX,
-                    "linear espera un ángulo y al menos dos colores: linear(180, #FFFFFF00, #FFFFFF)");
+                    "linear expects an angle and at least two colors: linear(180, #FFFFFF00, #FFFFFF)");
         }
         double angle;
         try {
             angle = Double.parseDouble(args[0].trim());
         } catch (NumberFormatException e) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "El ángulo de linear es un número de grados: " + args[0].trim());
+            throw error(n, ErrorCode.VALUE_SYNTAX, "The angle of linear is a number of degrees: " + args[0].trim());
         }
         if (!Double.isFinite(angle)) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "El ángulo de linear es un número de grados: " + args[0].trim());
+            throw error(n, ErrorCode.VALUE_SYNTAX, "The angle of linear is a number of degrees: " + args[0].trim());
         }
         List<String> stops = new java.util.ArrayList<>();
         for (int i = 1; i < args.length; i++) {
             String stop = args[i].trim();
             if (!Colors.isValid(stop)) {
                 throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Color no válido en linear (se escribe #RGB, #RGBA, #RRGGBB o #RRGGBBAA): " + stop);
+                        "Invalid color in linear (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + stop);
             }
             stops.add(stop);
         }
@@ -352,19 +352,19 @@ final class ValueReader {
     }
 
     /**
-     * {@code Corner radius}: de 1 a 4 radios (puntos o porcentajes no negativos), arriba izquierda, arriba derecha,
-     * abajo derecha, abajo izquierda.
+     * {@code Corner radius}: from 1 to 4 radii (non-negative points or percentages), top left, top right, bottom right,
+     * bottom left.
      */
     static Corners<Value> radius(Node n) {
         List<Value> list = parse(n, () -> ValueParser.list(n.getText()));
         if (list.isEmpty() || list.size() > 4) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " admite de 1 a 4 valores y hay " + list.size());
+            throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " allows from 1 to 4 values and there are " + list.size());
         }
         for (Value v : list) {
             boolean valid = (v instanceof Value.Points p && p.pt() >= 0)
                     || (v instanceof Value.Percentage q && q.percent() >= 0);
             if (!valid) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " solo admite puntos o porcentajes no negativos");
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " only allows non-negative points or percentages");
             }
         }
         return parse(n, () -> Corners.shorthand(list));
@@ -373,7 +373,7 @@ final class ValueReader {
     static String fontFamily(Node n) {
         String family = n.getText().trim();
         if (family.isEmpty()) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " necesita el nombre de una familia");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " needs the name of a family");
         }
         return family;
     }

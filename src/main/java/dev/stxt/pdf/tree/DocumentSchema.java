@@ -13,20 +13,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * El schema del modelo de cajas ({@code src/main/resources/stxt/dev.stxt.pdf.stxt},
- * reference/common/structure.md), compilado una sola vez. Es la única definición de qué hijos admite
- * cada nodo: la usan {@code DocumentReader} al leer y {@link BoxTreeBuilder} al construir el
- * árbol, de modo que un documento que no ha pasado por el lector da los mismos errores.
+ * The schema of the box model ({@code src/main/resources/stxt/dev.stxt.pdf.stxt},
+ * reference/common/structure.md), compiled only once. It is the only definition of which children each
+ * node accepts: {@code DocumentReader} uses it when reading and {@link BoxTreeBuilder} when building the
+ * tree, so a document that has not gone through the reader gives the same errors.
  *
- * <p>Seguro entre hilos: el schema se carga en un inicializador estático y no cambia después. Se apoya en
- * dos hechos de {@code stxt-core} 1.0.3 (la versión fijada en el {@code pom.xml}), comprobados leyendo su
- * código: {@code SchemaProviderMemory.getSchema} solo lee de su mapa, y {@code SchemaValidator} solo escribe
- * sus campos en el constructor (cada validación crea el suyo). Si se cambia de versión, hay que volver a
- * comprobarlo; {@code ConcurrentConversionTest} es la red de seguridad.</p>
+ * <p>Thread-safe: the schema is loaded in a static initializer and does not change afterwards. It relies on
+ * two facts of {@code stxt-core} 1.0.3 (the version pinned in the {@code pom.xml}), checked by reading its
+ * code: {@code SchemaProviderMemory.getSchema} only reads from its map, and {@code SchemaValidator} only writes
+ * its fields in the constructor (each validation creates its own). If the version changes, this has to be
+ * checked again; {@code ConcurrentConversionTest} is the safety net.</p>
  */
 public final class DocumentSchema {
 
-    /** Namespace del modelo de cajas, el que declara el schema. */
+    /** Namespace of the box model, the one the schema declares. */
     public static final String NAMESPACE = "dev.stxt.pdf";
 
     private static final String RESOURCE = "/stxt/dev.stxt.pdf.stxt";
@@ -36,22 +36,22 @@ public final class DocumentSchema {
     private DocumentSchema() {
     }
 
-    /** El proveedor del schema, para validar mientras se lee. */
+    /** The schema provider, to validate while reading. */
     public static SchemaProvider provider() {
         return PROVIDER;
     }
 
     /**
-     * Valida un árbol ya leído, con todos sus descendientes.
+     * Validates a tree already read, with all its descendants.
      *
-     * @throws DocumentSyntaxException el primer error, con los códigos de {@code stxt-core}
-     *         ({@code CHILD_NOT_DECLARED}, {@code TOO_FEW_CHILDREN}…) y su línea
+     * @throws DocumentSyntaxException the first error, with the codes of {@code stxt-core}
+     *         ({@code CHILD_NOT_DECLARED}, {@code TOO_FEW_CHILDREN}...) and its line
      */
     public static void validate(Node root) {
         validate(root, false);
     }
 
-    /** Como {@link #validate(Node)}; {@code inStyles}, si es un documento de estilos aparte. */
+    /** Like {@link #validate(Node)}; {@code inStyles}, if it is a separate styles document. */
     static void validate(Node root, boolean inStyles) {
         List<ValidationException> errors = new SchemaValidator(PROVIDER, true).validate(root);
         if (!errors.isEmpty()) {
@@ -62,13 +62,13 @@ public final class DocumentSchema {
     private static SchemaProviderMemory load() {
         try (InputStream in = DocumentSchema.class.getResourceAsStream(RESOURCE)) {
             if (in == null) {
-                throw new InternalException("No se encuentra el schema " + RESOURCE + " en el classpath");
+                throw new InternalException("Schema " + RESOURCE + " not found in the classpath");
             }
             SchemaProviderMemory provider = new SchemaProviderMemory();
             provider.addSchema(new String(in.readAllBytes(), StandardCharsets.UTF_8));
             return provider;
         } catch (IOException e) {
-            throw new InternalException("No se puede leer el schema " + RESOURCE, e);
+            throw new InternalException("Schema " + RESOURCE + " cannot be read", e);
         }
     }
 }

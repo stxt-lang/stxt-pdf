@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Imágenes de la carpeta {@code images/} (reference/components/image.md), por su ruta relativa a
- * ella ({@code logos/acme.png}). Cada fichero se lee una sola vez (salvo en una carrera entre hilos, que deja una de las lecturas). Es segura entre hilos.
+ * Images of the {@code images/} folder (reference/components/image.md), by their path relative to
+ * it ({@code logos/acme.png}). Each file is read only once (except in a race between threads, which keeps one of the
+ * reads). It is thread-safe.
  */
 public final class ImageLibrary {
 
@@ -20,30 +21,30 @@ public final class ImageLibrary {
     }
 
     /**
-     * Los bytes del fichero de esa ruta si es un PDF, sin abrirlo ni leerlo entero, para comprobar su límite antes
-     * de leerlo con {@link #find}; 0 si es de otro formato.
+     * The bytes of the file at that path if it is a PDF, without opening it or reading it whole, to check its limit
+     * before reading it with {@link #find}; 0 if it is of another format.
      *
-     * @throws ResourceException si la ruta sale de la carpeta, no existe o no se puede leer
+     * @throws ResourceException if the path leaves the folder, does not exist or cannot be read
      */
     public long pdfBytes(String path) {
         Path file = resources.resolve("images", path);
         try {
             return ImageFile.isPdf(file) ? Files.size(file) : 0;
         } catch (IOException e) {
-            throw new ResourceException("No se puede leer la imagen " + path + ": " + e.getMessage(), e);
+            throw new ResourceException("Cannot read the image " + path + ": " + e.getMessage(), e);
         }
     }
 
     /**
-     * La imagen de esa ruta, relativa a {@code images/}.
+     * The image at that path, relative to {@code images/}.
      *
-     * @throws ImageFormatException si no es PNG, JPEG, PDF ni un SVG admitido, o no se puede leer
-     * @throws ResourceException    si la ruta sale de la carpeta o no existe
+     * @throws ImageFormatException if it is not PNG, JPEG, PDF or a supported SVG, or cannot be read
+     * @throws ResourceException    if the path leaves the folder or does not exist
      */
     public ImageFile find(String path) {
         ImageFile file = files.get(path);
         if (file == null) {
-            // Dos hilos que piden a la vez la misma imagen la leen los dos y se queda una: son iguales.
+            // Two threads that request the same image at the same time both read it and one is kept: they are equal.
             file = ImageFile.read(resources.resolve("images", path), path, resources);
             ImageFile previous = files.putIfAbsent(path, file);
             if (previous != null) {

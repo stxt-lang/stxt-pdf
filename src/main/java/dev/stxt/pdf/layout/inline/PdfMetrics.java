@@ -23,31 +23,32 @@ import static dev.stxt.pdf.tree.PropertyKey.FONT_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_WEIGHT;
 
 /**
- * Métricas reales de las fuentes TTF de la carpeta de recursos (reference/common/resources.md): es la
- * métrica que corresponde a la salida de {@link dev.stxt.pdf.paint.PdfCanvas}, que incrusta
- * esas mismas fuentes: {@code new Engine(new PdfMetrics(resources))}.
+ * Real metrics of the TTF fonts of the resources folder (reference/common/resources.md): they are the
+ * metrics that match the output of {@link dev.stxt.pdf.paint.PdfCanvas}, which embeds
+ * those same fonts: {@code new Engine(new PdfMetrics(resources))}.
  *
- * <p>{@link #validate(Box)} comprueba antes de maquetar que cada texto tiene su fuente (familia,
- * peso y estilo) y que la fuente tiene todos sus caracteres; no hay fuentes de sustitución. Un texto con tramos
- * (reference/common/text-formatting.md) necesita la variante de cada tramo, y cada tramo, sus caracteres en ella.</p>
+ * <p>{@link #validate(Box)} checks before the layout that each text has its font (family,
+ * weight and style) and that the font has all its characters; there are no fallback fonts. A text with runs
+ * (reference/common/text-formatting.md) needs the variant of each run, and each run, its characters in it.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
-    /** Lo que pueden pintar {@code {page}} y {@code {pages}}. */
+    /** What {@code {page}} and {@code {pages}} can paint. */
     private static final String DIGITS = "0123456789";
 
     private final Resources resources;
     /**
-     * La última fuente que se ha pedido y su fichero: el texto de una caja se mide casi siempre con la misma, y
-     * buscarla en {@link FontLibrary} en cada palabra se notaba. Se puede leer y escribir desde varios hilos sin
-     * cerrojo: la entrada es un {@code record}, con los campos finales, y en el peor caso se vuelve a buscar.
+     * The last font requested and its file: the text of a box is almost always measured with the same one, and
+     * looking it up in {@link FontLibrary} for each word was noticeable. It can be read and written from several
+     * threads without a lock: the entry is a {@code record}, with final fields, and in the worst case it is looked up
+     * again.
      */
     private Found last;
 
     private record Found(FontFace face, FontFile file) {
     }
 
-    /** Métricas de las fuentes de la carpeta de recursos por defecto. */
+    /** Metrics of the fonts of the default resources folder. */
     public PdfMetrics() {
         this(new Resources());
     }
@@ -70,7 +71,7 @@ public final class PdfMetrics implements TextMeasurer {
         return found.file();
     }
 
-    /** Las de la tabla {@code hhea} de la fuente, las mismas con que pinta {@link dev.stxt.pdf.paint.PdfCanvas}. */
+    /** Those of the {@code hhea} table of the font, the same ones {@link dev.stxt.pdf.paint.PdfCanvas} paints with. */
     @Override
     public VerticalMetrics vertical(FontFace font) {
         return file(font).vertical();
@@ -79,8 +80,8 @@ public final class PdfMetrics implements TextMeasurer {
     /**
      * {@inheritDoc}
      *
-     * <p>Los errores de la propia carpeta (que no exista, un fichero ilegible…) no son del
-     * documento: son {@link ResourceException}, sin línea.</p>
+     * <p>The errors of the folder itself (that it does not exist, an unreadable file...) do not belong to the
+     * document: they are {@link ResourceException}, without a line.</p>
      */
     @Override
     public void validate(Box root) {
@@ -106,10 +107,10 @@ public final class PdfMetrics implements TextMeasurer {
             for (int i = 0; i < text.length(); ) {
                 int cp = text.codePointAt(i);
                 if (cp == '{') {
-                    // {page}, {pages} y las referencias empiezan por llave: solo entonces se buscan.
+                    // {page}, {pages} and the references start with a brace: only then are they looked for.
                     int end = markerEnd(text, i);
                     if (end > i) {
-                        // Una página o un número, que se pintan con cifras (o letras, en las listas).
+                        // A page or a number, painted with digits (or letters, in lists).
                         for (char d : DIGITS.toCharArray()) {
                             requireGlyph(box, font, d, start + i);
                         }
@@ -117,7 +118,7 @@ public final class PdfMetrics implements TextMeasurer {
                         continue;
                     }
                 }
-                // Los espacios en blanco del documento se pintan como espacios (reference/common/typography.md).
+                // The white-space characters of the document are painted as spaces (reference/common/typography.md).
                 requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
                 i += Character.charCount(cp);
             }
@@ -125,7 +126,7 @@ public final class PdfMetrics implements TextMeasurer {
         }
     }
 
-    /** Dónde acaba el {@code {page}}, el {@code {pages}} o la referencia que empieza en {@code i}; {@code i} si no hay. */
+    /** Where the {@code {page}}, {@code {pages}} or reference starting at {@code i} ends; {@code i} if none. */
     private static int markerEnd(String text, int i) {
         if (text.startsWith(PageNumbers.PAGES, i)) {
             return i + PageNumbers.PAGES.length();
@@ -138,9 +139,9 @@ public final class PdfMetrics implements TextMeasurer {
     }
 
     /**
-     * La fuente de un tramo que empieza en el carácter {@code index} del texto. Si no existe la
-     * variante de la caja, el error señala el texto y las declaraciones; si es la de un tramo con
-     * formato, la línea del tramo.
+     * The font of a run that starts at character {@code index} of the text. If the variant of the box
+     * does not exist, the error points to the text and the declarations; if it is the one of a formatted
+     * run, to the line of the run.
      */
     private static FontFile font(Box box, FontLibrary fonts, FontFace face, int index) {
         Style s = box.style();
@@ -149,16 +150,16 @@ public final class PdfMetrics implements TextMeasurer {
         } catch (ResourceException e) {
             if (!fonts.families().contains(face.family())) {
                 if (!face.family().equals(s.typography().font())) {
-                    // La familia de un tramo de código: el culpable es la declaración de Code font.
+                    // The family of a code run: the culprit is the declaration of Code font.
                     throw new InvalidModelException(s.line(CODE_FONT), ErrorCode.FONT_UNKNOWN,
-                            e.getMessage() + " (la fuente del código, Code font)");
+                            e.getMessage() + " (the code font, Code font)");
                 }
-                // El culpable es la declaración de Font, aunque esté en una antecesora.
+                // The culprit is the declaration of Font, even if it is in an ancestor.
                 throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }
             if (!face.equals(s.typography().fontFace())) {
                 throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_VARIANT_MISSING,
-                        e.getMessage() + " (texto con formato " + face.variant() + ")");
+                        e.getMessage() + " (text with " + face.variant() + " formatting)");
             }
             throw new InvalidModelException(box.textLine(), ErrorCode.FONT_VARIANT_MISSING,
                     e.getMessage() + " (" + declarations(s) + ")");
@@ -168,23 +169,23 @@ public final class PdfMetrics implements TextMeasurer {
     private static void requireGlyph(Box box, FontFile font, int cp, int index) {
         if (!font.has(cp)) {
             throw new InvalidModelException(box.textLineAt(index), ErrorCode.GLYPH_MISSING,
-                    "La fuente " + font.face() + " no tiene el carácter " + describe(cp));
+                    "The font " + font.face() + " has no character " + describe(cp));
         }
     }
 
-    /** Dónde se declaran la familia, el peso y el estilo, para los mensajes. */
+    /** Where the family, the weight and the style are declared, for the messages. */
     private static String declarations(Style s) {
         List<String> parts = new ArrayList<>();
         for (String p : List.of(FONT, FONT_WEIGHT, FONT_STYLE)) {
             if (s.isDeclared(p)) {
                 String name = p.equals(FONT) ? "Font" : p.equals(FONT_WEIGHT) ? "Bold" : "Italic";
-                parts.add(name + " en la " + s.line(p));
+                parts.add(name + " on " + s.line(p));
             }
         }
         return String.join(", ", parts);
     }
 
-    /** {@code '→' (U+2192)}; los caracteres de control, solo con su código. */
+    /** {@code '→' (U+2192)}; control characters, only with their code. */
     private static String describe(int cp) {
         String code = String.format(Locale.ROOT, "U+%04X", cp);
         return Character.isISOControl(cp) ? code : "'" + new String(Character.toChars(cp)) + "' (" + code + ")";

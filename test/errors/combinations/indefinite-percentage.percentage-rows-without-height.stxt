@@ -1,0 +1,12 @@
+# Case: Percentage rows without height
+# Code: INDEFINITE_PERCENTAGE
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Grid:
+			Row sizes: 50% 50%

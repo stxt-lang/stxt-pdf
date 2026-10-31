@@ -1,0 +1,15 @@
+# Case: Minimum greater than the maximum
+# Code: MIN_MAX_CONFLICT
+# Line: 15
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Height: 10
+				Max width: 100
+				Min width: 150

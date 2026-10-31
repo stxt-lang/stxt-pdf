@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * {@code Markup: markdown}: el formato dentro de la línea de un {@code Text}, un {@code Paragraph} o una {@code Cell}
+ * {@code Markup: markdown}: inline formatting inside a {@code Text}, a {@code Paragraph} or a {@code Cell}
  * (reference/common/text-formatting.md).
  */
 class InlineFormatTest {
@@ -28,7 +28,7 @@ class InlineFormatTest {
         return new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(Docs.mergeStyles(HEADER + String.join("\n", lines))))).sections().get(0).box();
     }
 
-    /** Como {@link #build}, con {@code Markup: markdown} en el {@code Typography} del documento. */
+    /** Like {@link #build}, with {@code Markup: markdown} in the {@code Typography} of the document. */
     private static Box buildInline(String... lines) {
         return new BoxTreeBuilder().build(new DocumentReader()
                 .read(Docs.sectioned(Docs.mergeStyles(HEADER + "\t\t\t\tMarkup: markdown\n" + String.join("\n", lines))))).sections().get(0).box();
@@ -111,7 +111,7 @@ class InlineFormatTest {
 
     @Test
     void insideAMarkdownTheTextIsNotInterpretedTwice() {
-        // Lo escapado en un Markdown es literal: no se vuelve a interpretar como negrita.
+        // What is escaped in a Markdown is literal: it is not interpreted again as bold.
         Box root = buildInline("\tMarkdown:", "\t\tContent >>",
                 "\t\t\t\\*\\*x\\*\\* y **z**");
         Box paragraph = root.children().get(0).children().get(0);
@@ -125,14 +125,14 @@ class InlineFormatTest {
                 () -> buildInline("\tText: Uno", "\tText: Ver ![logo](logo.png)"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, image.errorCode());
         assertEquals(15, image.line());
-        // En un bloque, la línea del texto, la primera del bloque.
+        // In a block, the line of the text, the first of the block.
         InvalidModelException block = assertThrows(InvalidModelException.class,
                 () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "\t\t\tver ![logo](logo.png)"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, block.errorCode());
         assertEquals(16, block.line());
     }
 
-    /** Lo que en un Markdown empezaría un bloque es texto, sin escaparlo (reference/common/text-formatting.md). */
+    /** What would start a block in a Markdown is text, without escaping it (reference/common/text-formatting.md). */
     @Test
     void blockSyntaxIsLiteralText() {
         Box root = buildInline("\tText: - 5 % de descuento", "\tText: 2024. Un buen año", "\tText: # 1 en ventas",
@@ -145,7 +145,7 @@ class InlineFormatTest {
                 root.children().get(6).formattedRuns());
     }
 
-    /** El código en línea usa la familia de {@code Code font}, que se hereda (reference/common/text-formatting.md). */
+    /** Inline code uses the family of {@code Code font}, which is inherited (reference/common/text-formatting.md). */
     @Test
     void inlineCodeUsesTheInheritedCodeFont() {
         Box root = buildInline("\tBlock:", "\t\tTypography:", "\t\t\tCode font: IBM Plex Mono",

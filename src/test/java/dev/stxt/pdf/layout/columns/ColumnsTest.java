@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Número y ancho de las columnas (reference/components/columns.md). */
+/** Number and width of the columns (reference/components/columns.md). */
 class ColumnsTest {
 
     @Test
@@ -15,9 +15,9 @@ class ColumnsTest {
 
     @Test
     void columnWidthFitsAsManyColumnsAsPossible() {
-        // (515 + 10) / (150 + 10) = 3,28: tres columnas, que se ensanchan hasta 165.
+        // (515 + 10) / (150 + 10) = 3.28: three columns, which widen to 165.
         assertEquals(new Columns(3, 165, 10), Columns.of(null, 150.0, 10, 515));
-        // Justo cuatro de 121,25 con tres huecos de 10.
+        // Exactly four of 121.25 with three gaps of 10.
         assertEquals(4, Columns.of(null, 121.25, 10, 515).count());
     }
 
@@ -45,7 +45,7 @@ class ColumnsTest {
         assertEquals(350, c.x(2));
     }
 
-    /** Las columnas que caben cuentan el hueco con el ancho de cada una: (515 + 50) / (100 + 50) = 3,77. */
+    /** The columns that fit count the gap with the width of each one: (515 + 50) / (100 + 50) = 3.77. */
     @Test
     void aWideGapLeavesFewerColumns() {
         assertEquals(3, Columns.of(null, 100.0, 50, 515).count());

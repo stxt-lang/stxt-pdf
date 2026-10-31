@@ -9,8 +9,8 @@
     <version>0.8.0</version>
     <packaging>jar</packaging>
 
-    <!-- Metadatos exigidos por Maven Central (name, description, url, licencia, desarrolladores y scm),
-         los mismos que los de dev.stxt:stxt-core. -->
+    <!-- Metadata required by Maven Central (name, description, url, license, developers and scm),
+         the same as those of dev.stxt:stxt-core. -->
     <name>STXT PDF</name>
     <description>Layout engine and PDF generator for STXT documents: tagged PDF/UA output with embedded fonts.</description>
     <url>https://github.com/stxt-lang/stxt-pdf</url>
@@ -47,7 +47,7 @@
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Build reproducible: fija las fechas dentro del jar. Se actualiza en cada release. -->
+        <!-- Reproducible build: fixes the dates inside the jar. Updated on each release. -->
         <project.build.outputTimestamp>2026-10-31T18:00:00Z</project.build.outputTimestamp>
         <junit.version>5.10.2</junit.version>
         <commonmark.version>0.30.1</commonmark.version>
@@ -55,25 +55,25 @@
     </properties>
 
     <dependencies>
-        <!-- Parser y validador oficial de STXT. Lo usa stxt.DocumentReader, y el motor trabaja con sus nodos.
-             Comprueba la última versión en https://central.sonatype.com/artifact/dev.stxt/stxt-core
-             Al cambiarla, vuelve a comprobar que el schema compartido (SchemaProviderMemory, SchemaValidator) se
-             lee sin escribir: ver tree/DocumentSchema, y ConcurrentConversionTest. 1.0.3 es la versión revisada. -->
+        <!-- Official STXT parser and validator. Used by stxt.DocumentReader, and the engine works with its nodes.
+             Latest version at https://central.sonatype.com/artifact/dev.stxt/stxt-core
+             When it changes, check again that the shared schema (SchemaProviderMemory, SchemaValidator) is
+             read without writing: see tree/DocumentSchema, and ConcurrentConversionTest. 1.0.3 is the reviewed version. -->
         <dependency>
             <groupId>dev.stxt</groupId>
             <artifactId>stxt-core</artifactId>
             <version>1.0.3</version>
         </dependency>
 
-        <!-- Salida PDF (paint.PdfCanvas) y métricas reales de fuentes (layout.inline.PdfMetrics). -->
+        <!-- PDF output (paint.PdfCanvas) and real font metrics (layout.inline.PdfMetrics). -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>3.0.8</version>
         </dependency>
 
-        <!-- Elemento Markdown (tree.MarkdownBuilder): CommonMark con las tablas y el tachado de GFM
-             y el subrayado de la extensión ins (++texto++). -->
+        <!-- Markdown element (tree.MarkdownBuilder): CommonMark with the GFM tables and strikethrough
+             and the underline of the ins extension (++text++). -->
         <dependency>
             <groupId>org.commonmark</groupId>
             <artifactId>commonmark</artifactId>
@@ -95,8 +95,8 @@
             <version>${commonmark.version}</version>
         </dependency>
 
-        <!-- Imágenes SVG (resources.ImageFile, paint.PdfCanvas): JSVG lee y dibuja el SVG en un Graphics2D y
-             pdfbox-graphics2d convierte lo dibujado en rutas, rellenos y texto del PDF (reference/components/image.md). -->
+        <!-- SVG images (resources.ImageFile, paint.PdfCanvas): JSVG reads and draws the SVG on a Graphics2D and
+             pdfbox-graphics2d turns what is drawn into PDF paths, fills and text (reference/components/image.md). -->
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>
@@ -115,7 +115,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Validador de PDF/UA (accesibilidad) de los PDF de los ejemplos: solo en los tests. -->
+        <!-- PDF/UA (accessibility) validator for the PDFs of the examples: tests only. -->
         <dependency>
             <groupId>org.verapdf</groupId>
             <artifactId>validation-model</artifactId>
@@ -137,14 +137,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <!-- Las medidas de rendimiento (@Tag("perf")) no van en la suite normal:
+                    <!-- The performance measurements (@Tag("perf")) are not part of the normal suite:
                          mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest -->
                     <excludedGroups>${excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
 
-            <!-- Cobertura de los tests: mvn test deja el informe en target/site/jacoco/index.html.
-                 Solo el informe, sin umbral. -->
+            <!-- Test coverage: mvn test leaves the report in target/site/jacoco/index.html.
+                 Report only, no threshold. -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -165,8 +165,8 @@
                 </executions>
             </plugin>
 
-            <!-- Empaquetado. La versión va fijada para que el build no dependa de la que traiga por defecto cada
-                 versión de Maven. -->
+            <!-- Packaging. The version is pinned so that the build does not depend on the default one of each
+                 Maven version. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -174,15 +174,15 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <!-- Nombre de módulo estable para consumidores con JPMS, mientras no haya
-                                 module-info.java. El de stxt-core es dev.stxt. -->
+                            <!-- Stable module name for JPMS consumers, while there is no
+                                 module-info.java. The one of stxt-core is dev.stxt. -->
                             <Automatic-Module-Name>dev.stxt.pdf</Automatic-Module-Name>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
 
-            <!-- Central exige el jar de fuentes junto al binario. -->
+            <!-- Central requires the sources jar alongside the binary. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -197,7 +197,7 @@
                 </executions>
             </plugin>
 
-            <!-- Central exige también el jar de javadoc. -->
+            <!-- Central also requires the javadoc jar. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -215,8 +215,8 @@
     </build>
 
     <profiles>
-        <!-- Firma GPG solo al publicar: `mvn -Prelease ...`. Fuera de este perfil el build diario no necesita
-             clave ni passphrase. Es el mismo perfil que el de stxt-core. -->
+        <!-- GPG signing only when publishing: `mvn -Prelease ...`. Outside this profile the daily build needs
+             neither key nor passphrase. It is the same profile as the one of stxt-core. -->
         <profile>
             <id>release</id>
             <build>
@@ -236,24 +236,24 @@
                         </executions>
                     </plugin>
 
-                    <!-- Sube el bundle firmado al Central Portal (fase deploy). `extensions` es imprescindible:
-                         registra el participante de ciclo de vida que desactiva el maven-deploy-plugin, que si no
-                         intentaría desplegar además en un <distributionManagement> que no existe. -->
+                    <!-- Uploads the signed bundle to the Central Portal (deploy phase). `extensions` is essential:
+                         it registers the lifecycle participant that disables the maven-deploy-plugin, which otherwise
+                         would also try to deploy to a <distributionManagement> that does not exist. -->
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
                         <version>0.11.0</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <!-- id del <server> de ~/.m2/settings.xml que lleva el user token del Portal (no la
-                                 contraseña de la cuenta). -->
+                            <!-- id of the <server> in ~/.m2/settings.xml that holds the Portal user token (not the
+                                 account password). -->
                             <publishingServerId>central</publishingServerId>
-                            <!-- El deploy deja el despliegue validado y *pendiente* en el Portal, para revisarlo y
-                                 confirmarlo a mano desde la web. Una vez publicado en Central no se puede retirar
-                                 ni sustituir. -->
+                            <!-- The deploy leaves the deployment validated and *pending* in the Portal, to review
+                                 and confirm it by hand from the website. Once published on Central it cannot be
+                                 withdrawn or replaced. -->
                             <autoPublish>false</autoPublish>
-                            <!-- Espera a que el Portal valide el bundle, para que un error de validación falle el
-                                 build en vez de quedarse escondido en la web. -->
+                            <!-- Waits for the Portal to validate the bundle, so that a validation error fails the
+                                 build instead of staying hidden on the website. -->
                             <waitUntil>VALIDATED</waitUntil>
                         </configuration>
                     </plugin>
@@ -261,9 +261,9 @@
             </build>
         </profile>
 
-        <!-- Pruebas de mutación: una pasada puntual sobre layout y fragment, no en la CI.
+        <!-- Mutation testing: an occasional run over layout and fragment, not in CI.
              mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage
-             El informe queda en target/pit-reports/index.html. -->
+             The report is left in target/pit-reports/index.html. -->
         <profile>
             <id>pit</id>
             <build>
@@ -287,8 +287,8 @@
                             <targetTests>
                                 <param>dev.stxt.pdf.*</param>
                             </targetTests>
-                            <!-- Los que escriben en carpetas compartidas de target/ (los minions corren a la vez) o
-                                 arrancan otra JVM. -->
+                            <!-- Those that write to shared folders in target/ (the minions run at the same time) or
+                                 start another JVM. -->
                             <excludedTestClasses>
                                 <param>dev.stxt.pdf.golden.GoldenTest</param>
                                 <param>dev.stxt.pdf.examples.*</param>

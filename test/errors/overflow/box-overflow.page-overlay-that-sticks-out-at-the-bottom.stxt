@@ -1,0 +1,16 @@
+# Case: Page overlay that sticks out at the bottom
+# Code: BOX_OVERFLOW
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+		Page overlay:
+			Offset: 830 auto auto 0
+			Box:
+				Width: 50
+				Height: 20

@@ -1,28 +1,28 @@
 package dev.stxt.pdf.model;
 
 /**
- * Lo máximo que acepta una conversión (reference/common/limits.md). Un documento que lo supera es válido pero
- * pide más de lo que se quiere pagar en memoria y en tiempo, y falla con un error de
- * {@link StxtPdfException.Kind#LIMIT}: es lo que impide que un documento, o una imagen, pequeños en bytes
- * ocupen un servidor entero. Los valores por defecto ({@link #DEFAULT}) son conservadores y se miden en
- * {@code tools/qa/BombsProbe.java}; un servicio con más memoria o con documentos más grandes los sube.
+ * The most a conversion accepts (reference/common/limits.md). A document that exceeds it is valid but
+ * asks for more than one wants to pay in memory and time, and fails with an error of
+ * {@link StxtPdfException.Kind#LIMIT}: this is what keeps a document, or an image, small in bytes from
+ * taking up a whole server. The default values ({@link #DEFAULT}) are conservative and are measured in
+ * {@code tools/qa/BombsProbe.java}; a service with more memory or with larger documents raises them.
  *
- * <p>No incluye los límites de lectura del texto STXT (10 MB, 100 niveles de anidado y 10 000 caracteres por
- * línea), que son los de {@code stxt-core} y salen como {@link StxtPdfException.Kind#LIMIT} del lector.</p>
+ * <p>It does not include the reading limits of the STXT text (10 MB, 100 nesting levels and 10,000 characters per
+ * line), which are those of {@code stxt-core} and come out of the reader as {@link StxtPdfException.Kind#LIMIT}.</p>
  *
- * @param maxPages       páginas de todo el documento ({@code PAGE_LIMIT})
- * @param maxImagePixels píxeles (ancho × alto) de una imagen PNG o JPEG, que se miran en la cabecera sin
- *                       decodificarla ({@code IMAGE_TOO_LARGE}); el SVG no tiene píxeles
- * @param maxSvgElements elementos que dibuja un SVG, contando cada vez que un {@code <use>} repite un trozo
- *                       ({@code SVG_TOO_COMPLEX}); un SVG puede ser pequeño y repetirse miles de millones de veces
- * @param maxSvgDepth    niveles de anidado de un SVG, contando el {@code <svg>} de la raíz
- *                       ({@code SVG_TOO_COMPLEX}); más profundos agotan la pila del dibujo
- * @param maxPdfBytes    bytes del fichero de un PDF que dibuja una {@code Image}, que se miran antes de abrirlo
+ * @param maxPages       pages of the whole document ({@code PAGE_LIMIT})
+ * @param maxImagePixels pixels (width × height) of a PNG or JPEG image, read from the header without
+ *                       decoding it ({@code IMAGE_TOO_LARGE}); SVG has no pixels
+ * @param maxSvgElements elements an SVG draws, counting each time a {@code <use>} repeats a piece
+ *                       ({@code SVG_TOO_COMPLEX}); an SVG can be small and repeat billions of times
+ * @param maxSvgDepth    nesting levels of an SVG, counting the root {@code <svg>}
+ *                       ({@code SVG_TOO_COMPLEX}); deeper ones exhaust the drawing stack
+ * @param maxPdfBytes    bytes of the file of a PDF that an {@code Image} draws, checked before opening it
  *                       ({@code PDF_TOO_LARGE})
  */
 public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int maxSvgDepth, long maxPdfBytes) {
 
-    /** 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF. */
+    /** 2000 pages, 25 million pixels per image, 20,000 elements and 64 levels per SVG and 20 MB per PDF. */
     public static final Limits DEFAULT = new Limits(2_000, 25_000_000L, 20_000, 64, 20_000_000L);
 
     public Limits {
@@ -35,7 +35,7 @@ public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int 
 
     private static void require(String name, long value) {
         if (value < 1) {
-            throw new IllegalArgumentException(name + " debe ser al menos 1 y es " + value);
+            throw new IllegalArgumentException(name + " must be at least 1 and is " + value);
         }
     }
 

@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El PDF con PDF/UA-2 (reference/implementation/pdf.md): PDF 2.0, los elementos en el espacio de nombres de PDF 2.0,
- * las entradas de índice con {@code Reference} y {@code Ref}, los destinos de estructura y {@code Unordered} para las
- * listas con guion. veraPDF lo valida con su perfil de PDF/UA-2.
+ * The PDF with PDF/UA-2 (reference/implementation/pdf.md): PDF 2.0, the elements in the PDF 2.0 namespace, the table
+ * of contents entries with {@code Reference} and {@code Ref}, the structure destinations and {@code Unordered} for
+ * dash lists. veraPDF validates it with its PDF/UA-2 profile.
  */
 class PdfUa2Test {
 
@@ -72,7 +72,7 @@ class PdfUa2Test {
             assertEquals("http://iso.org/pdf2/ssn", namespace.getString("NS"));
             PDStructureElement document = document(doc);
             assertEquals(namespace, document.getCOSObject().getDictionaryObject("NS"));
-            // TOC, TOCI y Reference no están en PDF 2.0: se quedan en el de PDF 1.7, el de omisión.
+            // TOC, TOCI and Reference are not in PDF 2.0: they stay in the PDF 1.7 one, the default.
             PDStructureElement toc = find(document, "TOC");
             assertNull(toc.getCOSObject().getDictionaryObject("NS"));
         }
@@ -112,7 +112,7 @@ class PdfUa2Test {
             COSDictionary action = back.getCOSObject().getCOSDictionary(COSName.A);
             assertEquals("GoTo", action.getNameAsString(COSName.S));
             assertEquals(second, ((COSArray) action.getDictionaryObject("SD")).getObject(0));
-            // Y el destino de la página, para los visores que no entienden el de estructura.
+            // And the page destination, for viewers that do not understand the structure one.
             assertNotNull(action.getDictionaryObject(COSName.D));
             COSDictionary bookmark = doc.getDocumentCatalog().getDocumentOutline().getFirstChild().getCOSObject()
                     .getCOSDictionary(COSName.A);
@@ -167,7 +167,7 @@ class PdfUa2Test {
         return find(e, type, null);
     }
 
-    /** El primer elemento de ese tipo (y con ese {@code Alt}, si no es {@code null}), en orden del documento. */
+    /** The first element of that type (and with that {@code Alt}, if not {@code null}), in document order. */
     private static PDStructureElement find(PDStructureElement e, String type, String alt) {
         List<PDStructureElement> found = new ArrayList<>();
         collect(e, type, alt, found);

@@ -1,0 +1,11 @@
+# Case: A small SVG whose chained use elements draw more than one hundred thousand elements
+# Code: SVG_TOO_COMPLEX
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/limit-uses.svg

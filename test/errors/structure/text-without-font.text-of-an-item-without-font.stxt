@@ -1,0 +1,13 @@
+# Case: Text of an item without Font
+# Code: TEXT_WITHOUT_FONT
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Item:
+				Text: hola

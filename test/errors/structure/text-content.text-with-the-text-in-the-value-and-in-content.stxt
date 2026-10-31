@@ -1,0 +1,13 @@
+# Case: Text with the text in the value and in Content
+# Code: TEXT_CONTENT
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Text: hola
+			Content >>
+				adiós

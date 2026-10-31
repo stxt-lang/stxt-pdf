@@ -7,33 +7,33 @@ import dev.stxt.pdf.model.Value;
 import java.util.OptionalDouble;
 
 /**
- * Reglas comunes de dimensionado (módulos 1 y 7, reference/common/box.md).
+ * Common sizing rules (modules 1 and 7, reference/common/box.md).
  */
 public final class Sizing {
 
     private Sizing() {
     }
 
-    /** Aplica primero el máximo y después el mínimo: si chocan, gana el mínimo. */
+    /** Applies the maximum first and then the minimum: if they clash, the minimum wins. */
     public static double constrain(double provisional, double min, OptionalDouble max) {
         double v = max.isPresent() ? Math.min(provisional, max.getAsDouble()) : provisional;
         return Math.max(v, min);
     }
 
     /**
-     * Ancho de caja de borde de una caja en flujo de bloque con {@code Width: auto}: ocupa el
-     * containing block menos sus márgenes horizontales.
+     * Border box width of a box in block flow with {@code Width: auto}: it takes up the
+     * reference container minus its horizontal margins.
      */
     public static double autoWidthInFlow(double containingBlockWidth, Insets margin) {
         return Math.max(0, containingBlockWidth - margin.horizontal());
     }
 
     /**
-     * Márgenes horizontales de una caja en flujo de bloque con ancho conocido: si ambos son
-     * {@code auto}, el sobrante se reparte y la caja queda centrada; si solo uno es {@code auto},
-     * absorbe el sobrante.
+     * Horizontal margins of a box in block flow with a known width: if both are
+     * {@code auto}, the leftover is shared and the box is centered; if only one is {@code auto},
+     * it absorbs the leftover.
      *
-     * @return {izquierdo, derecho}
+     * @return {left, right}
      */
     public static double[] horizontalMargins(double containingBlockWidth, double borderBoxWidth,
                                              Value marginLeft, Value marginRight) {
@@ -54,9 +54,9 @@ public final class Sizing {
     }
 
     /**
-     * Desplazamiento de una caja de tamaño {@code size} alineada en un espacio {@code space}
-     * (reference/components/stack.md y reference/components/grid.md). Con {@code stretch} la caja ya ocupa el
-     * espacio y empieza al principio.
+     * Offset of a box of size {@code size} aligned in a space {@code space}
+     * (reference/components/stack.md and reference/components/grid.md). With {@code stretch} the box already takes
+     * up the space and starts at the beginning.
      */
     public static double align(Alignment alignment, double space, double size) {
         return switch (alignment) {

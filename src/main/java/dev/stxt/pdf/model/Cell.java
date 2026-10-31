@@ -1,16 +1,16 @@
 package dev.stxt.pdf.model;
 
 /**
- * Colocación de un ítem de grid, la pedida por su {@code Area} (reference/components/grid.md).
+ * Placement of a grid item, the one requested by its {@code Area} (reference/components/grid.md).
  *
- * <p>Sintaxis: un nombre de área ({@code Area: side}) o {@code fila columna [filas columnas]},
- * donde {@code fila} y {@code columna} pueden ser {@code auto}. Las extensiones son 1 si no se
- * indican.</p>
+ * <p>Syntax: an area name ({@code Area: side}) or {@code row column [rows columns]},
+ * where {@code row} and {@code column} can be {@code auto}. The spans are 1 if they are not
+ * given.</p>
  *
- * @param row     fila inicial (desde 1), o {@code null} = automática
- * @param column  columna inicial (desde 1), o {@code null} = automática
- * @param rows    número de filas que ocupa
- * @param columns número de columnas que ocupa
+ * @param row     starting row (from 1), or {@code null} = automatic
+ * @param column  starting column (from 1), or {@code null} = automatic
+ * @param rows    number of rows it spans
+ * @param columns number of columns it spans
  */
 public record Cell(Integer row, Integer column, int rows, int columns) {
 
@@ -20,7 +20,7 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
         return row != null && column != null;
     }
 
-    /** Interpreta el valor de {@code Area}; los nombres se buscan en las {@code Areas} del grid. */
+    /** Parses the value of {@code Area}; names are looked up in the {@code Areas} of the grid. */
     public static Cell parse(String text, GridAreas areas) {
         if (text == null || text.isBlank()) {
             return AUTO;
@@ -29,12 +29,12 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
         if (t.length == 1 && !t[0].equals("auto") && !t[0].matches("\\d+")) {
             Area a = areas.named().get(t[0]);
             if (a == null) {
-                throw new IllegalArgumentException("Área desconocida en Area: " + t[0]);
+                throw new IllegalArgumentException("Unknown area in Area: " + t[0]);
             }
             return new Cell(a.row(), a.column(), a.rows(), a.columns());
         }
         if (t.length != 2 && t.length != 4) {
-            throw new IllegalArgumentException("Area espera un área o 'fila columna [filas columnas]': " + text);
+            throw new IllegalArgumentException("Area expects an area or 'row column [rows columns]': " + text);
         }
         Integer row = position(t[0], text);
         Integer column = position(t[1], text);
@@ -48,14 +48,14 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
             return null;
         }
         if (!s.matches("\\d+") || Integer.parseInt(s) < 1) {
-            throw new IllegalArgumentException("Posición no válida en Area (se cuenta desde 1): " + original);
+            throw new IllegalArgumentException("Invalid position in Area (counted from 1): " + original);
         }
         return Integer.parseInt(s);
     }
 
     private static int span(String s, String original) {
         if (!s.matches("\\d+") || Integer.parseInt(s) < 1) {
-            throw new IllegalArgumentException("Extensión no válida en Area: " + original);
+            throw new IllegalArgumentException("Invalid span in Area: " + original);
         }
         return Integer.parseInt(s);
     }

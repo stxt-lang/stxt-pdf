@@ -5,11 +5,11 @@ import java.util.List;
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Resuelve los tamaños flexibles de una línea stack (reference/components/stack.md; Flexbox §9.7).
+ * Resolves the flexible sizes of a stack line (reference/components/stack.md; Flexbox §9.7).
  *
- * <p>Si sobra espacio se crece en proporción a {@code Grow}; si falta, se encoge en proporción a
- * {@code Shrink × Base size}. Los ítems que chocan con su mínimo o máximo se congelan y el reparto se
- * repite entre los demás.</p>
+ * <p>If there is space left over, items grow in proportion to {@code Grow}; if space is lacking, they shrink in
+ * proportion to {@code Shrink × Base size}. The items that hit their minimum or maximum are frozen and the
+ * distribution is repeated among the others.</p>
  */
 public final class StackResolver {
 
@@ -17,9 +17,9 @@ public final class StackResolver {
     }
 
     /**
-     * @param items     ítems de la línea, en orden
-     * @param available espacio del eje principal ya descontados los huecos
-     * @return tamaño principal final de cada ítem
+     * @param items     items of the line, in order
+     * @param available space of the main axis with the gaps already subtracted
+     * @return final main size of each item
      */
     public static double[] resolve(List<StackItem> items, double available) {
         int n = items.size();
@@ -32,7 +32,7 @@ public final class StackResolver {
         }
         boolean growing = hypotheticalSum < available;
 
-        // Ítems inflexibles: factor 0, o base fuera del sentido del reparto.
+        // Inflexible items: factor 0, or base against the direction of the distribution.
         for (int i = 0; i < n; i++) {
             StackItem it = items.get(i);
             double factor = growing ? it.grow() : it.shrink();
@@ -63,7 +63,7 @@ public final class StackResolver {
 
             double free = free(items, target, frozen, available);
             if (factorSum < 1) {
-                // Factores que suman menos de 1: solo se reparte esa fracción del espacio libre.
+                // Factors that add up to less than 1: only that fraction of the free space is distributed.
                 double fraction = initialFree * factorSum;
                 if (Math.abs(fraction) < Math.abs(free)) {
                     free = fraction;
@@ -83,7 +83,7 @@ public final class StackResolver {
                 }
             }
 
-            // Corregir violaciones de mínimo y máximo.
+            // Fix minimum and maximum violations.
             double totalViolation = 0;
             double[] clamped = new double[n];
             for (int i = 0; i < n; i++) {

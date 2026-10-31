@@ -6,9 +6,9 @@ import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades de {@code Item} y {@code Area} (reference/components/stack.md y reference/components/grid.md), que
- * pasan al elemento que envuelven: cómo crece y se encoge en un {@code Stack}, dónde va en un {@code Grid} (o la celda
- * que le da la tabla) y su alineación. No se heredan.
+ * The properties of {@code Item} and {@code Area} (reference/components/stack.md and reference/components/grid.md),
+ * which pass to the element they wrap: how it grows and shrinks in a {@code Stack}, where it goes in a {@code Grid}
+ * (or the cell the table gives it) and its alignment. They are not inherited.
  */
 public final class ItemStyle extends StyleGroup {
 
@@ -16,13 +16,13 @@ public final class ItemStyle extends StyleGroup {
     private double shrink = 1;
     private Value baseSize = Value.AUTO;
     /**
-     * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
-     * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
+     * Placement requested by {@code Area}, with the names already resolved, or the one the table gives to
+     * each {@code Cell}; {@link Cell#AUTO} = automatic placement.
      */
     private Cell area = Cell.AUTO;
-    /** {@code null} = la del contenedor. */
+    /** {@code null} = that of the container. */
     private Alignment horizontal;
-    /** {@code null} = la del contenedor. */
+    /** {@code null} = that of the container. */
     private Alignment vertical;
 
     ItemStyle() {

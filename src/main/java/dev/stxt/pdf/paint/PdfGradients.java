@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Los degradados del PDF ({@code Background: linear(…)}, reference/common/box.md): el sombreado axial con
- * sus colores y, si alguno no es opaco, la máscara suave de luminosidad con las opacidades, porque PDF no tiene
- * opacidad por color en un sombreado. Solo construye los diccionarios; los pinta {@link PdfCanvas}.
+ * The gradients of the PDF ({@code Background: linear(...)}, reference/common/box.md): the axial shading with
+ * its colors and, if any of them is not opaque, the luminosity soft mask with the opacities, because PDF has no
+ * per-color opacity in a shading. It only builds the dictionaries; {@link PdfCanvas} paints them.
  */
 final class PdfGradients {
 
@@ -34,8 +34,8 @@ final class PdfGradients {
     }
 
     /**
-     * Un estado gráfico con una máscara suave de luminosidad: el degradado de las opacidades en grises, en
-     * {@code bbox} (la caja que se pinta, en coordenadas del PDF).
+     * A graphics state with a luminosity soft mask: the gradient of the opacities in grays, in
+     * {@code bbox} (the box being painted, in PDF coordinates).
      */
     static PDExtendedGraphicsState opacityMask(PDDocument doc, Paint.Linear linear, PDRectangle bbox,
                                                double[] pdfLine) throws IOException {
@@ -59,9 +59,9 @@ final class PdfGradients {
     }
 
     /**
-     * Un sombreado axial de {@code line} ({@code x1 y1 x2 y2}, en coordenadas del PDF) con los
-     * colores repartidos a partes iguales y extendido más allá de los extremos; con
-     * {@code opacities}, en grises con la opacidad de cada color.
+     * An axial shading along {@code line} ({@code x1 y1 x2 y2}, in PDF coordinates) with the
+     * colors evenly spaced and extended beyond the ends; with
+     * {@code opacities}, in grays with the opacity of each color.
      */
     static PDShading axial(PDColorSpace space, double[] line, List<String> stops,
                                    boolean opacities) throws IOException {
@@ -81,13 +81,13 @@ final class PdfGradients {
         return shading;
     }
 
-    /** Los componentes de un color en el espacio del sombreado: RGB, o su opacidad en gris. */
+    /** The components of a color in the color space of the shading: RGB, or its opacity in gray. */
     private static float[] components(String color, boolean opacity) {
         float[] rgba = Colors.rgba(color);
         return opacity ? new float[]{rgba[3]} : new float[]{rgba[0], rgba[1], rgba[2]};
     }
 
-    /** Una función por tramo entre dos colores, unidas en una de tipo 3 (o la del único tramo). */
+    /** One function per segment between two colors, stitched into one of type 3 (or that of the only segment). */
     private static COSDictionary stitched(List<String> stops, boolean opacities) {
         int n = stops.size();
         COSArray domain = floats(0, 1);

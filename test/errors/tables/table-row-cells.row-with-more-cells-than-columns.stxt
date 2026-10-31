@@ -1,0 +1,22 @@
+# Case: Row with more cells than columns
+# Code: TABLE_ROW_CELLS
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Body:
+				Row:
+					Cell: a
+					Cell: b
+					Cell: c

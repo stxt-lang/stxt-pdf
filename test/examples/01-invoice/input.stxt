@@ -1,9 +1,9 @@
-# Factura de un taller de muebles a un hotel. Una página A4 con logotipo, datos de las partes,
-# una tira con las condiciones, la tabla de líneas con sus totales en el pie y el pie de página
-# fijo. El estilo está todo en styles.stxt: los elementos solo llevan su contenido. Los textos llevan
-# Markup: markdown para poner una negrita dentro de la frase, y los datos para el pago, además, Code
-# font: el IBAN y el BIC, como código en línea, en la fuente monoespaciada. Los rótulos se escriben como
-# una frase normal y las reglas los ponen en mayúsculas (Case) y los separan (Letter spacing).
+# Invoice from a furniture workshop to a hotel. One A4 page with a logo, the details of the parties,
+# a strip with the terms, the table of lines with their totals in the footer and the fixed page
+# footer. All the styling is in styles.stxt: the elements carry only their content. The texts carry
+# Markup: markdown to put a bold word inside the sentence, and the payment details also carry Code
+# font: the IBAN and the BIC, as inline code, in the monospaced font. The labels are written as
+# a normal sentence and the rules put them in uppercase (Case) and space them out (Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

@@ -1,5 +1,5 @@
-# Cada Block deja 10 de margen inferior (For element: Block). b mide la mitad de 515 = 257.5.
-# t y u: una línea de 1.2 × 12 = 14.4; t no tiene margen, así que p empieza justo debajo.
+# Each Block leaves a bottom margin of 10 (For element: Block). b measures half of 515 = 257.5.
+# t and u: one line of 1.2 × 12 = 14.4; t has no margin, so p starts right below.
 Result:
 	Page: 1
 		Fragment: a

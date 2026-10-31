@@ -3,15 +3,14 @@ package dev.stxt.pdf.layout;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Caja {@code absolute} o {@code fixed} encontrada durante el layout en flujo, pendiente de
- * resolver cuando su containing block conozca su tamaño. Sube por los {@link LayoutResult}
- * hasta él; cada caja traslada la posición a su propia caja de contenido. La resuelve
- * {@link dev.stxt.pdf.layout.position.OverlayLayout}.
+ * {@code absolute} or {@code fixed} box found during the in-flow layout, pending to be resolved when its
+ * reference container knows its size. It goes up through the {@link LayoutResult}s to it; each box translates the
+ * position to its own content box. Resolved by {@link dev.stxt.pdf.layout.position.OverlayLayout}.
  *
- * @param box     la caja absoluta
- * @param staticX posición que habría tenido en flujo (para izquierda {@code auto}), relativa a
- *                la caja de contenido de la caja que devuelve el resultado
- * @param staticY ídem (para arriba {@code auto})
+ * @param box     the absolute box
+ * @param staticX position it would have had in flow (for left {@code auto}), relative to
+ *                the content box of the box that returns the result
+ * @param staticY likewise (for top {@code auto})
  */
 public record PendingOverlay(Box box, double staticX, double staticY) {
 

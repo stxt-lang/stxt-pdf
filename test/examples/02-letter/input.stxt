@@ -1,6 +1,6 @@
-# Carta comercial en una página: membrete con logotipo, remitente, destinatario, asunto, cuerpo
-# en Markdown (justificado con el reparto de Knuth-Plass), firma escaneada y pie fijo. Todo el
-# cuerpo en serif; el membrete y el pie, en sans.
+# One-page business letter: letterhead with a logo, sender, recipient, subject, body
+# in Markdown (justified with Knuth-Plass line breaking), scanned signature and fixed footer. The whole
+# body in serif; the letterhead and the footer, in sans.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

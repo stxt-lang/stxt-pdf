@@ -1,9 +1,9 @@
-# Hito 35: Style en una Row (reference/common/styles.md y reference/components/table.md). Página de 200 × 300 con márgenes de 20: área útil de
-# 160 × 260 desde (20, 20). Líneas de 12 (Size 10) y dos columnas de 80.
-#   El estilo total da Padding 6 (arriba y abajo) a cada celda de las filas que la declaran en su Row: una celda
-#   de una línea mide 12 + 12 = 24. Las filas sin estilo miden 12.
-#   Body: fila 1, sin estilo: 12 (y = 20); fila 2, con el estilo: 24 (y = 32); fila 3, sin estilo: 12 (y = 56).
-#   Footer rows: una fila con el estilo, 24 (y = 68). La tabla mide 12 + 24 + 12 + 24 = 72.
+# Milestone 35: Style on a Row (reference/common/styles.md and reference/components/table.md). Page of 200 × 300
+# with margins of 20: page area of 160 × 260 from (20, 20). Lines of 12 (Size 10) and two columns of 80.
+#   The total style gives Padding 6 (top and bottom) to each cell of the rows that declare it in their Row: a one-line
+#   cell measures 12 + 12 = 24. The rows without the style measure 12.
+#   Body: row 1, no style: 12 (y = 20); row 2, with the style: 24 (y = 32); row 3, no style: 12 (y = 56).
+#   Footer rows: one row with the style, 24 (y = 68). The table measures 12 + 24 + 12 + 24 = 72.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

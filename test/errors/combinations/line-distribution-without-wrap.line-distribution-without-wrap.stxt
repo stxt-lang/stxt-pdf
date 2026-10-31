@@ -1,0 +1,12 @@
+# Case: Line distribution without Wrap
+# Code: LINE_DISTRIBUTION_WITHOUT_WRAP
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Line distribution: center

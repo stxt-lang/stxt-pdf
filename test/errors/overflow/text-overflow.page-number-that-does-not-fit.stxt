@@ -1,0 +1,18 @@
+# Case: Page number that does not fit
+# Code: TEXT_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: {page}
+			Box:
+				Width: 5

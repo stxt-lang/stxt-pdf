@@ -1,0 +1,17 @@
+# Case: A Text rotated 10 degrees without Width: it measures its text on one line and does not fit across
+# Code: BOX_OVERFLOW
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 400
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Un texto girado que, sin Width, no reparte sus palabras en líneas y se sale por la derecha.
+			Rotate: 10

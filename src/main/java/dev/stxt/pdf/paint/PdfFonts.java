@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Las fuentes de un PDF y cómo se escribe el texto con ellas. Cada fuente TTF de la carpeta de recursos
- * (reference/common/resources.md) se incrusta una vez por documento y combinación de {@link FontFace}, como subconjunto
- * (solo los glifos usados) en una fuente Type 0 con codificación Identity-H: el PDF se ve igual en cualquier
- * máquina. Con Identity-H cada carácter ocupa dos bytes y el operador {@code Tw} no actúa, así que la
- * justificación y el interletraje van en los argumentos de {@code TJ} ({@link #spaced}).
+ * The fonts of a PDF and how text is written with them. Each TTF font of the resources folder
+ * (reference/common/resources.md) is embedded once per document and {@link FontFace} combination, as a subset
+ * (only the glyphs used) in a Type 0 font with Identity-H encoding: the PDF looks the same on any
+ * machine. With Identity-H each character takes two bytes and the {@code Tw} operator has no effect, so
+ * justification and letter spacing go in the arguments of {@code TJ} ({@link #spaced}).
  */
 final class PdfFonts {
 
     private final PDDocument doc;
     private final Resources resources;
-    /** Fuentes incrustadas en el documento, compartidas por todas sus páginas. */
+    /** Fonts embedded in the document, shared by all its pages. */
     private final Map<FontFace, PDFont> fonts = new HashMap<>();
 
     PdfFonts(PDDocument doc, Resources resources) {
@@ -34,13 +34,13 @@ final class PdfFonts {
         this.resources = resources;
     }
 
-    /** La fuente incrustada; se carga la primera vez que se usa en el documento. */
+    /** The embedded font; it is loaded the first time it is used in the document. */
     PDFont font(FontFace font) throws IOException {
         PDFont f = fonts.get(font);
         if (f == null) {
-            // Sin ligaduras se quita la tabla GSUB: PDFBox escribe un glifo por carácter, que es lo que se midió.
-            // Desde los bytes que se midieron, sin volver a leer el fichero. Se parsea de nuevo porque
-            // TrueTypeFont no es seguro entre hilos y PDFBox lo cambia al incrustarlo.
+            // Without ligatures the GSUB table is dropped: PDFBox writes one glyph per character, which is what was
+            // measured. From the bytes that were measured, without reading the file again. It is parsed again because
+            // TrueTypeFont is not thread-safe and PDFBox changes it when embedding it.
             TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(
                     resources.fonts().find(font).content()));
             ttf.setEnableGsub(font.ligatures());
@@ -51,18 +51,18 @@ final class PdfFonts {
     }
 
     /**
-     * Argumento de {@code TJ}: el texto partido tras cada espacio, con el espacio extra entre
-     * los trozos. Un número en {@code TJ} desplaza a la izquierda, en milésimas del cuerpo.
+     * Argument of {@code TJ}: the text split after each space, with the extra space between
+     * the pieces. A number in {@code TJ} shifts to the left, in thousandths of the font size.
      */
     static Object[] justified(String text, double wordSpacing, double fontSize) {
         return spaced(text, wordSpacing, 0, fontSize);
     }
 
     /**
-     * Argumento de {@code TJ} con el espacio extra de {@code justify} tras cada espacio y el
-     * interletraje tras cada carácter, salvo el último. Sin interletraje, el texto se parte solo
-     * tras los espacios; con él, un trozo por carácter. Se usa {@code TJ} y no {@code Tc}/{@code Tw}
-     * porque las fuentes son Type 0 Identity-H, donde {@code Tw} no actúa.
+     * Argument of {@code TJ} with the extra space of {@code justify} after each space and the
+     * letter spacing after each character except the last. Without letter spacing, the text is split only
+     * after the spaces; with it, one piece per character. {@code TJ} is used and not {@code Tc}/{@code Tw}
+     * because the fonts are Type 0 Identity-H, where {@code Tw} has no effect.
      */
     static Object[] spaced(String text, double wordSpacing, double letterSpacing, double fontSize) {
         if (letterSpacing != 0) {

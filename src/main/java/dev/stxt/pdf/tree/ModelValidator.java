@@ -52,9 +52,9 @@ import static dev.stxt.pdf.tree.ValueReader.comparable;
 import static dev.stxt.pdf.tree.ValueReader.hasPercentage;
 
 /**
- * Reglas del modelo que el schema no puede expresar (reference/common/errors.md) y que miran la caja
- * ya leída: desplazamientos, márgenes {@code auto}, mínimo y máximo, porcentajes verticales y si
- * el alto es definido (reference/common/values.md), y la fuente de los textos.
+ * Model rules that the schema cannot express (reference/common/errors.md) and that look at the box once read: offsets,
+ * {@code auto} margins, minimum and maximum, vertical percentages and whether the height is definite
+ * (reference/common/values.md), and the font of the texts.
  */
 final class ModelValidator {
 
@@ -62,124 +62,127 @@ final class ModelValidator {
     }
 
     /**
-     * {@code Horizontal} y {@code Vertical}, {@code Line distribution} y {@code Gap} de un {@code Stack}: la del eje principal
-     * reparte y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code justify}, {@code around} ni
-     * {@code distribute} (reference/components/stack.md).
+     * {@code Horizontal} and {@code Vertical}, {@code Line distribution} and {@code Gap} of a {@code Stack}: the one of
+     * the main axis distributes and does not allow {@code stretch}; the one of the cross axis aligns and does not allow
+     * {@code justify}, {@code around} or {@code distribute} (reference/components/stack.md).
      */
     static void validateStack(Style s) {
         String main = s.stack().isHorizontal() ? "Horizontal" : "Vertical";
         String cross = s.stack().isHorizontal() ? "Vertical" : "Horizontal";
         String direction = "Direction: " + (s.stack().isHorizontal() ? "horizontal" : "vertical");
         if (s.stack().mainAxis() == Distribution.STRETCH) {
-            throw error(s.line(s.stack().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " es el eje principal de "
-                    + "este Stack (" + direction + ") y reparte el espacio sobrante: no admite stretch. Lo que estira los "
-                    + "ítems es su Grow");
+            throw error(s.line(s.stack().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " is the main axis of "
+                    + "this Stack (" + direction + ") and distributes the free space: it does not allow stretch. What stretches the "
+                    + "items is their Grow");
         }
         String spread = crossSpread(s);
         if (spread != null) {
-            throw error(s.line(s.stack().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " es el eje cruzado de "
-                    + "este Stack (" + direction + ") y alinea los ítems: admite start, end, center o stretch y no "
-                    + spread + ", que reparte el eje principal (" + main + ")");
+            throw error(s.line(s.stack().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " is the cross axis of "
+                    + "this Stack (" + direction + ") and aligns the items: it allows start, end, center or stretch and not "
+                    + spread + ", which distributes the main axis (" + main + ")");
         }
         if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrap()) {
             throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.LINE_DISTRIBUTION_WITHOUT_WRAP,
-                    "Line distribution solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
+                    "Line distribution only has an effect with Wrap: true, because without Wrap there is a single line");
         }
-        // Sin Wrap hay una sola línea: no hay hueco entre filas en horizontal ni entre columnas en vertical.
+        // Without Wrap there is a single line: no gap between rows in horizontal or between columns in vertical.
         if (s.stack().gapPair() && !s.stack().wrap()) {
             String unused = s.stack().direction() == Direction.HORIZONTAL
-                    ? "primero, el hueco entre filas," : "segundo, el hueco entre columnas,";
-            throw error(s.line(STACK_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
-                    + " línea y el " + unused + " no tiene efecto: va un solo valor, el hueco entre ítems");
+                    ? "first, the gap between rows," : "second, the gap between columns,";
+            throw error(s.line(STACK_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap has two values, but without Wrap there is a single"
+                    + " line and the " + unused + " has no effect: one value is enough, the gap between items");
         }
     }
 
     /**
-     * Un {@code Columns} fija sus columnas con {@code Count}, {@code Min column width} o los dos; con una sola columna
-     * no hay hueco ni línea entre columnas, {@code Separator color} necesita {@code Separator} y la línea cabe en el
-     * hueco (reference/components/columns.md).
+     * A {@code Columns} sets its columns with {@code Count}, {@code Min column width} or both; with a single column
+     * there is no gap or rule between columns, {@code Separator color} needs {@code Separator} and the rule fits in the
+     * gap (reference/components/columns.md).
      */
     static void validateColumns(Style s, int line) {
         if (s.columns().count() == null && s.columns().minColumnWidth() == null) {
-            throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "Un Columns necesita Count, Min column width o los dos: "
-                    + "Count fija el número de columnas y Min column width su ancho mínimo");
+            throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "A Columns needs Count, Min column width or both: "
+                    + "Count sets the number of columns and Min column width their minimum width");
         }
         if (s.columns().count() != null && s.columns().count() == 1) {
             for (String p : List.of(COLUMN_GAP, SEPARATOR)) {
                 if (s.isDeclared(p)) {
                     throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(SEPARATOR) ? "Separator" : "Gap")
-                            + " no tiene efecto con Count: 1, porque no hay dos columnas que separar: sobra");
+                            + " has no effect with Count: 1, because there are not two columns to separate: it is not needed");
                 }
             }
         }
         if (s.isDeclared(SEPARATOR_COLOR) && !s.isDeclared(SEPARATOR)) {
             throw error(s.line(SEPARATOR_COLOR), ErrorCode.SEPARATOR_COLOR_WITHOUT_SEPARATOR,
-                    "Separator color no tiene efecto sin Separator, el grosor de la línea entre columnas: falta el "
-                            + "grosor o sobra el color");
+                    "Separator color has no effect without Separator, the thickness of the rule between columns: the "
+                            + "thickness is missing or the color is not needed");
         }
         if (s.columns().separator() > s.columns().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Gap (" + s.line(COLUMN_GAP) + ")"
-                    : "Gap, que sin declarar es 0";
-            throw error(s.line(SEPARATOR), ErrorCode.SEPARATOR_WIDTH, "Separator es más ancho que " + gap
-                    + ": la línea se pintaría sobre las columnas. Hay que ensanchar Gap o adelgazar Separator");
+                    : "Gap, which is 0 when not declared";
+            throw error(s.line(SEPARATOR), ErrorCode.SEPARATOR_WIDTH, "Separator is wider than " + gap
+                    + ": the rule would be painted over the columns. Gap has to be widened or Separator made thinner");
         }
     }
 
     /**
-     * Una {@code Image} no se parte (reference/components/image.md): {@code Keep together} y {@code Edges}, que solo
-     * cuentan al partir una caja, no tienen efecto (también si los da una regla de {@code Styles}).
+     * An {@code Image} does not split (reference/components/image.md): {@code Keep together} and {@code Edges}, which
+     * only count when a box splits, have no effect (also if a rule of {@code Styles} gives them).
      */
     static void validateImage(Style s) {
         for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " no tiene efecto en una Image, que no se parte entre páginas: sobra");
+                        + " has no effect on an Image, which does not split across pages: it is not needed");
             }
         }
     }
 
     /**
-     * El giro de una caja (reference/common/layers-and-rotation.md): {@code Rotate origin} sin {@code Rotate} no tiene efecto,
-     * y un {@code Frame} girado o una caja girada en flujo no se parten entre páginas, así que {@code Keep together} y
-     * {@code Edges} tampoco (también si los da una regla de {@code Styles}). Una caja girada en flujo ya aísla los
-     * márgenes: {@code Isolate margins} no tiene efecto en ella.
+     * The rotation of a box (reference/common/layers-and-rotation.md): {@code Rotate origin} without {@code Rotate} has
+     * no effect, and a rotated {@code Frame} or a box rotated in flow does not split across pages, so neither do
+     * {@code Keep together} and {@code Edges} (also if a rule of {@code Styles} gives them). A box rotated in flow
+     * already isolates margins: {@code Isolate margins} has no effect on it.
      */
     static void validateRotation(Style s) {
         if (s.rotation() == null) {
             if (s.isDeclared(ROTATE_ORIGIN)) {
-                throw error(s.line(ROTATE_ORIGIN), ErrorCode.ROTATE_ORIGIN_WITHOUT_ROTATE, "Rotate origin no tiene "
-                        + "efecto sin Rotate: falta el giro o sobra Rotate origin");
+                throw error(s.line(ROTATE_ORIGIN), ErrorCode.ROTATE_ORIGIN_WITHOUT_ROTATE, "Rotate origin has no "
+                        + "effect without Rotate: the rotation is missing or Rotate origin is not needed");
             }
             return;
         }
         if (s.position() != Position.FRAME && !s.rotatesInFlow()) {
             return;
         }
-        String what = s.rotatesInFlow() ? "una caja girada" : "un Frame girado";
+        String what = s.rotatesInFlow() ? "a rotated box" : "a rotated Frame";
         for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " no tiene efecto en " + what + ", que no se parte entre páginas: sobra");
+                        + " has no effect on " + what + ", which does not split across pages: it is not needed");
             }
         }
         if (s.rotatesInFlow() && s.isolateMargins()) {
-            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins no tiene efecto en una caja girada, "
-                    + "que ya corta la fusión de márgenes con sus hijos: sobra");
+            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins has no effect on a rotated box, "
+                    + "which already stops margin merging with its children: it is not needed");
         }
     }
 
-    /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
+    /**
+     * The rules of a box already read, before it is created: placement, offset, margins, sizes, percentages and column
+     * breaks.
+     */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
         Layout parentLayout = parent.style().layout();
-        // Los hijos en flujo de un Stack o un Grid son ítems (con su Item o su Area), y las celdas
-        // de una Table, ítems de su grid.
+        // The in-flow children of a Stack or a Grid are items (with their Item or their Area), and the cells
+        // of a Table, items of its grid.
         boolean stackItem = !s.isOutOfFlow() && parentLayout == Layout.STACK;
         boolean gridItem = !s.isOutOfFlow() && parentLayout == Layout.GRID;
         if ((stackItem || gridItem) && s.rotatesInFlow()) {
-            // Un ítem ocupa el sitio que le da su contenedor (reference/common/layers-and-rotation.md).
-            throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (stackItem ? "Stack" : "Grid")
-                    + " no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem (un "
-                    + "Block con la caja girada dentro)");
+            // An item takes up the place its container gives it (reference/common/layers-and-rotation.md).
+            throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "A " + (stackItem ? "Stack" : "Grid")
+                    + " item cannot rotate: it takes up the place its container gives it. What rotates is a box inside the item (a "
+                    + "Block with the rotated box inside)");
         }
 
         if (stackItem) {
@@ -189,7 +192,7 @@ final class ModelValidator {
         validateMargins(s, parentLayout, stackItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
             throw error(s.line(ASPECT_RATIO), ErrorCode.ASPECT_RATIO_CONFLICT,
-                    "Aspect ratio no tiene efecto si Width y Height están declarados");
+                    "Aspect ratio has no effect if Width and Height are declared");
         }
         validateMinMax(s, WIDTH, s.box().width(), MIN_WIDTH, s.box().minWidth(), MAX_WIDTH, s.box().maxWidth());
         validateMinMax(s, HEIGHT, s.box().height(), MIN_HEIGHT, s.box().minHeight(), MAX_HEIGHT, s.box().maxHeight());
@@ -199,8 +202,8 @@ final class ModelValidator {
     }
 
     /**
-     * El valor del eje cruzado de un {@code Stack} si es un reparto ({@code justify}…), que no vale ahí; si no, {@code
-     * null}.
+     * The value of the cross axis of a {@code Stack} if it is a distribution ({@code justify}...), which is not valid
+     * there; otherwise, {@code null}.
      */
     private static String crossSpread(Style s) {
         Distribution v = s.stack().crossDeclared();
@@ -209,9 +212,9 @@ final class ModelValidator {
     }
 
     /**
-     * En un ítem de {@code Stack}, {@code Horizontal} o {@code Vertical} solo en el eje cruzado: en el principal reparte
-     * el {@code Stack}, con su propia propiedad, y el ítem crece o se encoge con {@code Grow} y {@code Shrink}
-     * (reference/components/stack.md).
+     * In a {@code Stack} item, {@code Horizontal} or {@code Vertical} only on the cross axis: on the main one the
+     * {@code Stack} distributes, with its own property, and the item grows or shrinks with {@code Grow} and
+     * {@code Shrink} (reference/components/stack.md).
      */
     private static void validateStackItem(Style s, Box parent) {
         boolean horizontal = parent.style().stack().isHorizontal();
@@ -219,13 +222,13 @@ final class ModelValidator {
         if (s.isDeclared(key)) {
             String main = horizontal ? "Horizontal" : "Vertical";
             String cross = horizontal ? "Vertical" : "Horizontal";
-            throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " no tiene efecto en un ítem de un Stack con "
-                    + "Direction: " + main.toLowerCase(Locale.ROOT) + ", porque es su eje principal: el reparto "
-                    + "lo dan el " + main + " del Stack y el tamaño, Grow y Shrink, y el ítem se alinea con " + cross);
+            throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " has no effect on an item of a Stack with "
+                    + "Direction: " + main.toLowerCase(Locale.ROOT) + ", because it is its main axis: the distribution "
+                    + "comes from the " + main + " of the Stack and the size from Grow and Shrink, and the item is aligned with " + cross);
         }
     }
 
-    /** {@code Before} y {@code After: column} solo dentro de un {@code Columns}, que es quien tiene columnas. */
+    /** {@code Before} and {@code After: column} only inside a {@code Columns}, which is what has columns. */
     private static void validateColumnBreaks(BuildContext ctx, Style s) {
         if (ctx.insideColumns) {
             return;
@@ -234,24 +237,24 @@ final class ModelValidator {
                 : s.breaks().after() == Break.COLUMN ? BREAK_AFTER : null;
         if (property != null) {
             throw error(s.line(property), ErrorCode.COLUMN_BREAK_OUTSIDE_COLUMNS, (property.equals(BREAK_BEFORE)
-                    ? "Before" : "After") + ": column solo tiene efecto dentro de un Columns: para "
-                    + "cortar la página se usa page");
+                    ? "Before" : "After") + ": column only has an effect inside a Columns: a page "
+                    + "break uses page");
         }
     }
 
     /**
-     * {@code Keep with next} con un salto después de la caja, o {@code Keep with previous} con uno antes: la caja no
-     * puede ir con la otra y separarse de ella a la vez (reference/common/breaks.md).
+     * {@code Keep with next} with a break after the box, or {@code Keep with previous} with one before: the box cannot
+     * go with the other one and be separated from it at the same time (reference/common/breaks.md).
      */
     private static void validateKeeps(Style s) {
         BreakStyle b = s.breaks();
         if (b.keepWithNext() && b.after() != Break.AUTO) {
-            throw error(s.line(KEEP_WITH_NEXT), ErrorCode.KEEP_CONFLICT, "Keep with next mantiene la caja con la "
-                    + "siguiente y After: " + value(b.after()) + " la separa de ella: sobra uno de los dos");
+            throw error(s.line(KEEP_WITH_NEXT), ErrorCode.KEEP_CONFLICT, "Keep with next keeps the box with the "
+                    + "next one and After: " + value(b.after()) + " separates it from it: one of the two is not needed");
         }
         if (b.keepWithPrevious() && b.before() != Break.AUTO) {
-            throw error(s.line(KEEP_WITH_PREVIOUS), ErrorCode.KEEP_CONFLICT, "Keep with previous mantiene la caja con "
-                    + "la anterior y Before: " + value(b.before()) + " la separa de ella: sobra uno de los dos");
+            throw error(s.line(KEEP_WITH_PREVIOUS), ErrorCode.KEEP_CONFLICT, "Keep with previous keeps the box with "
+                    + "the previous one and Before: " + value(b.before()) + " separates it from it: one of the two is not needed");
         }
     }
 
@@ -267,31 +270,31 @@ final class ModelValidator {
         Sides<Value> o = s.offset();
         if (s.position() == Position.FRAME) {
             if (!o.top().isAuto() && !o.bottom().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
-                        + "desde arriba y desde abajo: uno de los dos tiene que quedar en auto");
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "A Frame cannot be offset both "
+                        + "from the top and from the bottom: one of the two has to stay auto");
             }
             if (!o.left().isAuto() && !o.right().isAuto()) {
-                throw error(line, ErrorCode.OFFSET_CONFLICT, "Un Frame no puede desplazarse a la vez "
-                        + "desde la izquierda y desde la derecha: uno de los dos tiene que quedar en auto");
+                throw error(line, ErrorCode.OFFSET_CONFLICT, "A Frame cannot be offset both "
+                        + "from the left and from the right: one of the two has to stay auto");
             }
             return;
         }
-        // Overlay y Page overlay: inicio + tamaño + fin no puede fijar la posición dos veces.
+        // Overlay and Page overlay: start + size + end cannot set the position twice.
         if (!o.left().isAuto() && !s.box().width().isAuto() && !o.right().isAuto()
                 && !s.box().margin().left().isAuto() && !s.box().margin().right().isAuto()) {
-            throw error(line, ErrorCode.OVERCONSTRAINED, "Izquierda, Width y derecha declarados fijan la "
-                    + "posición dos veces: uno tiene que quedar en auto, o centrar con Margin auto");
+            throw error(line, ErrorCode.OVERCONSTRAINED, "Left, Width and right, all declared, set the "
+                    + "position twice: one has to stay auto, or the box is centered with Margin auto");
         }
         if (!o.top().isAuto() && !s.box().height().isAuto() && !o.bottom().isAuto()
                 && !s.box().margin().top().isAuto() && !s.box().margin().bottom().isAuto()) {
-            throw error(line, ErrorCode.OVERCONSTRAINED, "Arriba, Height y abajo declarados fijan la "
-                    + "posición dos veces: uno tiene que quedar en auto, o centrar con Margin auto");
+            throw error(line, ErrorCode.OVERCONSTRAINED, "Top, Height and bottom, all declared, set the "
+                    + "position twice: one has to stay auto, or the box is centered with Margin auto");
         }
     }
 
     /**
-     * Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Overlay y Page
-     * overlay, con inicio, tamaño y fin.
+     * {@code auto} margins only center: in block flow, horizontally and with a limited width; in Overlay and Page
+     * overlay, with start, size and end.
      */
     private static void validateMargins(Style s, Layout parentLayout, boolean stackItem, boolean gridItem) {
         Sides<Value> m = s.box().margin();
@@ -302,8 +305,8 @@ final class ModelValidator {
         }
         SourceLine line = s.line(MARGIN);
         if (stackItem || gridItem) {
-            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de Stack o "
-                    + "Grid: se alinean con Horizontal y Vertical");
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto has no effect on items of a Stack or "
+                    + "Grid: they are aligned with Horizontal and Vertical");
         }
         if (s.isOutOfFlow()) {
             validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);
@@ -312,57 +315,57 @@ final class ModelValidator {
         if (parentLayout == Layout.BLOCK) {
             if (verticalAuto) {
                 throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT,
-                        "Margin auto en vertical no tiene efecto en flujo de bloque: va un número");
+                        "Vertical Margin auto has no effect in block flow: a number is needed");
             }
-            // Una imagen con Width auto mide su ancho natural, y una caja girada en flujo, su contenido: no todo el
-            // ancho, así que se pueden centrar.
+            // An image with Width auto measures its natural width, and a box rotated in flow, its content: not the
+            // whole width, so they can be centered.
             if (s.box().width().isAuto() && s.box().maxWidth() == null && s.layout() != Layout.IMAGE
                     && !s.rotatesInFlow()) {
-                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no centra una caja que ocupa "
-                        + "todo el ancho: le falta Width o Max width");
+                throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto does not center a box that takes up "
+                        + "the whole width: Width or Max width is missing");
             }
         }
     }
 
     /**
-     * Un {@code Overlay} o un {@code Page overlay} solo se centra con {@code Margin auto} si declara inicio, tamaño y
-     * fin.
+     * An {@code Overlay} or a {@code Page overlay} is only centered with {@code Margin auto} if it declares start, size
+     * and end.
      */
     private static void validateOutOfFlowMargins(Style s, SourceLine line, boolean horizontalAuto,
                                                  boolean verticalAuto) {
         Sides<Value> o = s.offset();
         if (horizontalAuto && (o.left().isAuto() || s.box().width().isAuto() || o.right().isAuto())) {
-            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en horizontal solo centra un "
-                    + position(s) + " con izquierda, Width y derecha declarados");
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Horizontal Margin auto only centers the "
+                    + position(s) + " when left, Width and right are declared");
         }
         if (verticalAuto && (o.top().isAuto() || s.box().height().isAuto() || o.bottom().isAuto())) {
-            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto en vertical solo centra un "
-                    + position(s) + " con arriba, Height y abajo declarados");
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Vertical Margin auto only centers the "
+                    + position(s) + " when top, Height and bottom are declared");
         }
     }
 
-    /** Tamaño, mínimo y máximo comparables (los dos en puntos o los dos en porcentaje) que se contradicen. */
+    /** Comparable size, minimum and maximum (both in points or both in percentage) that contradict each other. */
     private static void validateMinMax(Style s, String size, Value value, String min, Value minValue,
                                        String max, Value maxValue) {
         if (maxValue != null && comparable(minValue, maxValue) && amount(minValue) > amount(maxValue)) {
             throw error(s.line(min), ErrorCode.MIN_MAX_CONFLICT,
-                    label(min) + " es mayor que " + label(max) + " (" + s.line(max) + ")");
+                    label(min) + " is greater than " + label(max) + " (" + s.line(max) + ")");
         }
         if (comparable(value, minValue) && amount(value) < amount(minValue)) {
             throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
-                    label(size) + " es menor que " + label(min) + " (" + s.line(min) + ")");
+                    label(size) + " is less than " + label(min) + " (" + s.line(min) + ")");
         }
         if (maxValue != null && comparable(value, maxValue) && amount(value) > amount(maxValue)) {
             throw error(s.line(size), ErrorCode.MIN_MAX_CONFLICT,
-                    label(size) + " es mayor que " + label(max) + " (" + s.line(max) + ")");
+                    label(size) + " is greater than " + label(max) + " (" + s.line(max) + ")");
         }
     }
 
     /**
-     * Porcentajes verticales de la caja: su base debe ser un alto definido (reference/common/values.md). La base de
-     * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
-     * definido para Overlay y Page overlay) o el área (los ítems de grid); la de los desplazamientos
-     * de un Frame y de {@code Base size} en un stack {@code column}, la caja de contenido del padre.
+     * Vertical percentages of the box: their base must be a definite height (reference/common/values.md). The base of
+     * {@code Height}, {@code Min height} and {@code Max height} is the reference container (always definite for Overlay
+     * and Page overlay) or the area (grid items); that of the offsets of a Frame and of {@code Base size} in a
+     * {@code column} stack, the content box of the parent.
      */
     private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean stackItem,
                                             boolean gridItem) {
@@ -380,21 +383,21 @@ final class ModelValidator {
         boolean parentDefinite = ctx.isDefinite(parent);
         if (s.position() == Position.FRAME && !parentDefinite
                 && (hasPercentage(s.offset().top()) || hasPercentage(s.offset().bottom()))) {
-            throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
+            throw indefinite(s.line(OFFSET), "The vertical offset of Offset");
         }
         boolean column = parent.style().stack().direction() == Direction.VERTICAL;
         if (stackItem && column && !parentDefinite) {
             if (hasPercentage(s.item().baseSize())) {
-                throw indefinite(s.line(ITEM_BASE_SIZE), "Base size en un Stack vertical");
+                throw indefinite(s.line(ITEM_BASE_SIZE), "Base size in a vertical Stack");
             }
             if (s.item().grow() > 0) {
-                throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el Stack "
-                        + "vertical del padre no tiene un alto definido que repartir: le falta su Height");
+                throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow has no effect: the vertical "
+                        + "Stack of the parent has no definite height to distribute: its Height is missing");
             }
         }
     }
 
-    /** Porcentajes verticales del propio contenedor: filas y hueco entre filas. */
+    /** Vertical percentages of the container itself: rows and gap between rows. */
     static void validateContainer(BuildContext ctx, Style s, Box box) {
         if (ctx.isDefinite(box)) {
             return;
@@ -402,21 +405,20 @@ final class ModelValidator {
         if (s.grid().rowSizes().stream().anyMatch(ValueReader::hasPercentage)) {
             throw indefinite(s.line(GRID_ROWS), "Row sizes");
         }
-        // En stack, el hueco entre filas solo cuenta en vertical o con varias líneas.
+        // In a stack, the gap between rows only counts in vertical or with several lines.
         boolean rowGapUsed = s.layout() == Layout.GRID
                 || (s.layout() == Layout.STACK && (s.stack().wrap() || s.stack().direction() == Direction.VERTICAL));
         Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.stack().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
             String gap = s.layout() == Layout.GRID ? GRID_GAP : STACK_GAP;
-            throw indefinite(s.line(gap), "El hueco entre filas de Gap");
+            throw indefinite(s.line(gap), "The gap between rows of Gap");
         }
     }
 
     /**
-     * Si el alto de la caja de contenido es definido, sin maquetar: un {@code Height} que se
-     * resuelve (puntos, o porcentaje de una base definida), {@code Aspect ratio} con alto
-     * {@code auto}, un Overlay o un Page overlay estirado entre arriba y abajo, o un ítem de grid
-     * estirado ({@code Vertical: stretch}) en su área.
+     * Whether the height of the content box is definite, without laying out: a {@code Height} that resolves (points, or
+     * a percentage of a definite base), {@code Aspect ratio} with {@code auto} height, an Overlay or a Page overlay
+     * stretched between top and bottom, or a grid item stretched ({@code Vertical: stretch}) in its area.
      */
     static boolean definiteHeight(BuildContext ctx, Style s, Box parent) {
         boolean gridItem = !s.isOutOfFlow() && parent.style().layout() == Layout.GRID;
@@ -436,19 +438,19 @@ final class ModelValidator {
     }
 
     private static InvalidModelException indefinite(SourceLine line, String what) {
-        return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " usa un porcentaje de un alto que no es "
-                + "definido: hace falta el Height de su contenedor de referencia, o una medida en puntos");
+        return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " uses a percentage of a height that is not "
+                + "definite: the Height of its reference container is needed, or a measure in points");
     }
 
-    /** Un texto necesita {@code Font} y {@code Size}, propios o heredados; el error señala {@code source}. */
+    /** A text needs {@code Font} and {@code Size}, its own or inherited; the error points to {@code source}. */
     static void font(InlineNode n, Node source, Box box) {
         if (box.style().typography().font() == null) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "El texto necesita Font: se declara en el Typography del "
-                    + n.getName() + ", de un antecesor o de Styles (For element: Document)");
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT, "The text needs Font: it is declared in the Typography of the "
+                    + n.getName() + ", of an ancestor or of Styles (For element: Document)");
         }
         if (!box.style().isDeclared(FONT_SIZE)) {
-            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "El texto necesita Size: se declara en el Typography del "
-                    + n.getName() + ", de un antecesor o de Styles (For element: Document)");
+            throw error(source, ErrorCode.TEXT_WITHOUT_FONT_SIZE, "The text needs Size: it is declared in the Typography of the "
+                    + n.getName() + ", of an ancestor or of Styles (For element: Document)");
         }
     }
 }

@@ -4,9 +4,9 @@ import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Edges;
 
 /**
- * El grupo {@code Break} (reference/common/breaks.md): los saltos de página o de columna antes y después de la caja, lo
- * que se mantiene junto ({@code Keep with next}, {@code Keep with previous}, {@code Keep together}) y su decoración en
- * un corte. No se hereda; las viudas y las huérfanas son de {@code Typography}.
+ * The {@code Break} group (reference/common/breaks.md): the page or column breaks before and after the box, what is
+ * kept together ({@code Keep with next}, {@code Keep with previous}, {@code Keep together}) and its decoration at a
+ * break. It is not inherited; widows and orphans belong to {@code Typography}.
  */
 public final class BreakStyle extends StyleGroup {
 

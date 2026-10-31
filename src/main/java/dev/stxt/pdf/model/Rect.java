@@ -1,6 +1,6 @@
 package dev.stxt.pdf.model;
 
-/** Rectángulo en puntos. */
+/** Rectangle in points. */
 public record Rect(double x, double y, double width, double height) {
 
     public Rect expand(Insets i) {

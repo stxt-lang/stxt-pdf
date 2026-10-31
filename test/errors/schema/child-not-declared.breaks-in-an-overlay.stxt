@@ -1,0 +1,15 @@
+# Case: Breaks in an Overlay
+# Code: CHILD_NOT_DECLARED
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Overlay:
+			Box:
+				Height: 10
+			Break:
+				Before: page

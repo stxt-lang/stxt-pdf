@@ -1,15 +1,15 @@
 package dev.stxt.pdf.layout.stack;
 
 /**
- * Datos de un ítem para el reparto en el eje principal (reference/components/stack.md). Tamaños de caja de margen.
+ * Data of an item for the distribution along the main axis (reference/components/stack.md). Margin box sizes.
  *
- * @param basis   tamaño base ({@code Base size}, el tamaño declarado o el ancho natural)
- * @param grow    factor {@code Grow}
- * @param shrink  factor {@code Shrink}
- * @param min     mínimo; con {@code Min width: auto} es el tamaño de su contenido, sin pasar del
- *                tamaño declarado (reference/components/stack.md)
- * @param max     máximo; {@link Double#POSITIVE_INFINITY} si no hay
- * @param margins los márgenes del ítem en el eje principal, incluidos en los demás tamaños
+ * @param basis   base size ({@code Base size}, the declared size or the natural width)
+ * @param grow    {@code Grow} factor
+ * @param shrink  {@code Shrink} factor
+ * @param min     minimum; with {@code Min width: auto} it is the size of its content, not exceeding the
+ *                declared size (reference/components/stack.md)
+ * @param max     maximum; {@link Double#POSITIVE_INFINITY} if there is none
+ * @param margins the margins of the item on the main axis, included in the other sizes
  */
 public record StackItem(double basis, double grow, double shrink, double min, double max, double margins) {
 
@@ -18,7 +18,8 @@ public record StackItem(double basis, double grow, double shrink, double min, do
     }
 
     /**
-     * Lo que pesa al encoger: {@code Shrink × Base size}, con la base sin los márgenes (reference/components/stack.md).
+     * Its weight when shrinking: {@code Shrink × Base size}, with the base without the margins
+     * (reference/components/stack.md).
      */
     double scaledShrink() {
         return shrink * (basis - margins);

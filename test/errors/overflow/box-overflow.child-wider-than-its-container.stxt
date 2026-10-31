@@ -1,0 +1,17 @@
+# Case: Child wider than its container
+# Code: BOX_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Width: 100
+			Block:
+				Box:
+					Width: 150
+					Height: 10

@@ -1,5 +1,5 @@
-// Sonda de QA: entradas patológicas (anidado, rejillas enormes, palabras largas,
-// muchas páginas, índice con muchas referencias) con tiempo y resultado o error de cada una.
+// QA probe: pathological inputs (nesting, huge grids, long words,
+// many pages, table of contents with many references) with the time and result or error of each one.
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
@@ -28,12 +28,12 @@ public class HostileInputsProbe {
         return head("") + "\t\tGrid:\n\t\t\tColumn sizes: repeat(" + n + ", *)\n\t\t\tArea:\n\t\t\t\tText: hola\n";
     }
     static String longWord(int n) { return head("") + "\t\tText: " + "x".repeat(n) + "\n"; }
-    static String manyPages(int n) { // n bloques con salto de pagina forzado
+    static String manyPages(int n) { // n blocks with a forced page break
         StringBuilder sb = new StringBuilder(head(""));
         for (int i = 0; i < n; i++) sb.append("\t\tText: pagina\n\t\t\tBreak:\n\t\t\t\tAfter: page\n");
         return sb.toString();
     }
-    static String refs(int n) { // n encabezados + indice
+    static String refs(int n) { // n headings + table of contents
         StringBuilder sb = new StringBuilder(head(""));
         sb.append("\t\tTable of contents:\n");
         for (int i = 0; i < n; i++) sb.append("\t\tBlock:\n\t\t\tBreak:\n\t\t\t\tBefore: page\n\t\t\tHeading 1:\n\t\t\t\tId: h").append(i).append("\n\t\t\t\tText: Capitulo ").append(i).append("\n\t\t\tParagraph: Ver pagina {page of: h").append(i).append("} y texto de relleno para el capitulo.\n");
@@ -50,7 +50,7 @@ public class HostileInputsProbe {
             var lo = e.layOutDocument(doc);
             ByteArrayOutputStream o = new ByteArrayOutputStream();
             PdfDocumentWriter.write(lo, r, dev.stxt.pdf.model.Limits.DEFAULT, o, false);
-            return "OK paginas=" + lo.pages().size() + " pdf=" + o.size() / 1024 + "KB";
+            return "OK pages=" + lo.pages().size() + " pdf=" + o.size() / 1024 + "KB";
         });
         String res;
         try { res = f.get(timeoutSec, TimeUnit.SECONDS); }
@@ -61,11 +61,11 @@ public class HostileInputsProbe {
     }
 
     public static void main(String[] a) {
-        run("calentar", nested(3), 60);
-        for (int d : new int[]{50, 200, 1000, 3000}) run("anidado " + d, nested(d), 60);
+        run("warm-up", nested(3), 60);
+        for (int d : new int[]{50, 200, 1000, 3000}) run("nested " + d, nested(d), 60);
         for (int n : new int[]{100, 5000, 100000}) run("grid repeat(" + n + ")", gridRepeat(n), 60);
-        for (int n : new int[]{1000, 100000, 1000000}) run("palabra de " + n, longWord(n), 60);
-        for (int n : new int[]{500, 2000}) run("saltos de pagina " + n, manyPages(n), 120);
-        for (int n : new int[]{50, 200, 800, 1600}) run("indice con " + n + " cap.", refs(n), 280);
+        for (int n : new int[]{1000, 100000, 1000000}) run("word of " + n, longWord(n), 60);
+        for (int n : new int[]{500, 2000}) run("page breaks " + n, manyPages(n), 120);
+        for (int n : new int[]{50, 200, 800, 1600}) run("toc with " + n + " ch.", refs(n), 280);
     }
 }

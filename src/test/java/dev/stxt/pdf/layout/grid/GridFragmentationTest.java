@@ -8,7 +8,7 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/** Páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde (40, 40). */
+/** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
 class GridFragmentationTest {
 
     private static final double PAGE = 180;
@@ -34,7 +34,7 @@ class GridFragmentationTest {
 
     @Test
     void breaksBetweenRows() {
-        // Filas de 40 en 0, 40 y 80: la tercera pasa a la página 2.
+        // Rows of 40 at 0, 40 and 80: the third moves to page 2.
         LayoutFixture l = layOutPaged(PAGE, concat(GRID,
                 cell("A", "1 1"), cell("B", "1 2"), cell("C", "2 1"), cell("D", "2 2"), cell("E", "3 1")));
         assertEquals(2, l.pages());
@@ -51,9 +51,9 @@ class GridFragmentationTest {
 
     @Test
     void rowTallerThanAPageBreaksItsItemsInParallel() {
-        // La fila 1 mide 150: no cabe ni al principio de página. A se parte (100 + 50) y B cabe
-        // entera. En la página 2 sigue A desde arriba, y la fila 2 va detrás de lo que queda
-        // de A: 150 − 100 = 50.
+        // Row 1 measures 150: it does not fit even at the start of a page. A is split (100 + 50) and B fits
+        // whole. On page 2, A continues from the top, and row 2 goes after what remains
+        // of A: 150 − 100 = 50.
         LayoutFixture l = layOutPaged(PAGE, concat(GRID,
                 box("A", "150", "1 1"), box("B", "60", "1 2"), box("C", "40", "2 1")));
         assertEquals(2, l.pages());
@@ -68,8 +68,8 @@ class GridFragmentationTest {
 
     @Test
     void rowThatFitsInAPageIsNotBrokenInParallel() {
-        // Tras X (30), la fila de 80 no cabe en lo que queda de página pero sí en una entera: pasa
-        // entera a la página 2 (como breaksBetweenRows).
+        // After X (30), the row of 80 does not fit in what remains of the page but does fit in a whole one: it moves
+        // whole to page 2 (like breaksBetweenRows).
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
                 box("A", "80", "1 1"), box("B", "40", "1 2")));
@@ -80,7 +80,7 @@ class GridFragmentationTest {
 
     @Test
     void parallelBreakCanSpanSeveralPages() {
-        // A mide 250 y su fila no cabe en ninguna página: 100 + 100 + 50, siempre desde arriba.
+        // A measures 250 and its row does not fit on any page: 100 + 100 + 50, always from the top.
         LayoutFixture l = layOutPaged(PAGE, concat(GRID, box("A", "250", "1 1"), box("B", "120", "1 2")));
         assertEquals(3, l.pages());
         assertRect(40, 40, 257.5, 100, l.rect(1, "A"));
@@ -93,7 +93,7 @@ class GridFragmentationTest {
 
     @Test
     void doesNotBreakInsideASpanningItem() {
-        // S ocupa las filas 2 y 3: no se puede cortar entre ellas, así que se corta antes de la 2.
+        // S spans rows 2 and 3: a break between them is not possible, so the break goes before row 2.
         LayoutFixture l = layOutPaged(PAGE, concat(GRID,
                 cell("A", "1 1"), cell("B", "1 2"), cell("S", "2 1 2 1"), cell("D", "2 2"), cell("E", "3 2")));
         assertEquals(2, l.pages());
@@ -106,7 +106,7 @@ class GridFragmentationTest {
 
     @Test
     void relativePercentOffsetUsesTheWholeHeightOfAFragmentedGrid() {
-        // Como en el flujo de bloque: el 10 % es del Height entero del grid (30).
+        // As in block flow: the 10 % is of the whole Height of the grid (30).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 300", "\t\tRow sizes: 80 15",
                 "\t\tArea: 2 1", "\t\t\tFrame:", "\t\t\t\tId: R", "\t\t\t\tOffset: 10% auto auto auto",
@@ -116,9 +116,9 @@ class GridFragmentationTest {
     }
 
     /**
-     * La segunda fila (20 líneas de 12 en una columna de 30) no cabe en ninguna página: empieza en la 2, donde se
-     * parte en paralelo desde arriba aunque en el grid entero empiece en 30 (pruebas de mutación). T no se estira (8, 8 y
-     * 4 líneas); B se estira a la fila y se parte con ella: 100, 100 y 40.
+     * The second row (20 lines of 12 in a column of 30) does not fit on any page: it starts on page 2, where it is
+     * split in parallel from the top even though in the whole grid it starts at 30 (mutation testing). T does not
+     * stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and 40.
      */
     @Test
     void aTallRowAfterTheFirstPageIsSplitFromTheTop() {
@@ -136,8 +136,8 @@ class GridFragmentationTest {
     }
 
     /**
-     * Un texto estirado a una fila que se parte tiene el alto de la fila (240) y sus líneas dejan 4 al final de cada
-     * página: ese hueco no se le quita, y sus 4 últimas líneas caben en la página 4 (antes era BOX_OVERFLOW).
+     * A text stretched to a row that is split has the height of the row (240) and its lines leave 4 at the end of each
+     * page: that gap is not taken from it, and its last 4 lines fit on page 4 (it used to be BOX_OVERFLOW).
      */
     @Test
     void aStretchedTextInATallRowFitsItsLines() {

@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * El documento PDF: crea las páginas, pinta cada una con su {@link PdfCanvas}, y pone las etiquetas de
- * las páginas, los destinos de los enlaces y el árbol de estructura ({@link PdfStructure}) antes de guardarlo.
- * Una página PDF por página del resultado, en pt, del tamaño del medio de su sección.
+ * The PDF document: creates the pages, paints each one with its {@link PdfCanvas}, and sets the page labels, the
+ * link destinations and the structure tree ({@link PdfStructure}) before saving it.
+ * One PDF page per page of the result, in pt, with the size of the paper of its section.
  *
- * <p><strong>Hilos:</strong> {@link #write} es estático y todo su estado (el documento PDF, las fuentes
- * incrustadas, la estructura, los enlaces) es de esa llamada, así que se puede llamar a la vez desde varios
- * hilos, también con el mismo {@link LaidOutDocument} y los mismos {@link Resources}. La única salvedad es
- * global a la JVM: la caché de fuentes de JSVG, que {@link PdfImages} usa con un cerrojo.</p>
+ * <p><strong>Threads:</strong> {@link #write} is static and all its state (the PDF document, the embedded
+ * fonts, the structure, the links) belongs to that call, so it can be called concurrently from several
+ * threads, also with the same {@link LaidOutDocument} and the same {@link Resources}. The only exception is
+ * global to the JVM: the font cache of JSVG, which {@link PdfImages} uses under a lock.</p>
  */
 public final class PdfDocumentWriter {
 
@@ -40,13 +40,13 @@ public final class PdfDocumentWriter {
     }
 
     /**
-     * Pinta un documento maquetado con {@code new PdfMetrics(resources)}, con el título y el
-     * idioma de sus metadatos, y escribe el PDF en {@code target}, que no se cierra. Para maquetar
-     * y pintar en una llamada está {@link dev.stxt.pdf.convert.Converter}.
+     * Paints a document laid out with {@code new PdfMetrics(resources)}, with the title and the
+     * language of its metadata, and writes the PDF to {@code target}, which is not closed. To lay out
+     * and paint in one call there is {@link dev.stxt.pdf.convert.Converter}.
      *
-     * @param limits los de las imágenes SVG, que se dibujan con ellos (los comprobó antes el motor que maquetó)
-     * @throws IOException un fallo de entrada y salida, también el de las primitivas del lienzo (que no pueden
-     *         declararlo y lo lanzan como {@link UncheckedIOException}: aquí salen como lo que son)
+     * @param limits those of the SVG images, which are drawn with them (the engine that laid out checked them first)
+     * @throws IOException an input and output failure, also those of the canvas primitives (which cannot
+     *         declare it and throw it as {@link UncheckedIOException}: here they come out as what they are)
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug) throws IOException {
@@ -54,13 +54,13 @@ public final class PdfDocumentWriter {
     }
 
     /**
-     * Como {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean)}, cumpliendo la parte {@code ua} de
-     * PDF/UA: 1 (PDF 1.7) o 2 (PDF 2.0), reference/implementation/pdf.md.
+     * Like {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean)}, complying with part {@code ua} of
+     * PDF/UA: 1 (PDF 1.7) or 2 (PDF 2.0), reference/implementation/pdf.md.
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua) throws IOException {
         if (ua != 1 && ua != 2) {
-            throw new IllegalArgumentException("PDF/UA tiene las partes 1 y 2: " + ua);
+            throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + ua);
         }
         try {
             paintAndSave(document, resources, limits, target, debug, ua);
@@ -74,7 +74,7 @@ public final class PdfDocumentWriter {
         List<Page> pages = document.pages();
         try (PDDocument doc = new PDDocument(); PdfImages images = new PdfImages(doc, limits)) {
             if (ua == 2) {
-                // La cabecera del fichero y la versión del catálogo.
+                // The file header and the catalog version.
                 doc.getDocument().setVersion(2.0f);
                 doc.getDocumentCatalog().setVersion("2.0");
             }
@@ -82,7 +82,7 @@ public final class PdfDocumentWriter {
             PdfStructure structure = new PdfStructure(doc, document.root(), ua);
             PdfLinks links = new PdfLinks();
             PdfStructure.metadata(doc, document.metadata(), ua);
-            // Todas las páginas existen antes de pintar ninguna: un enlace puede ir hacia delante.
+            // All the pages exist before any is painted: a link may point forward.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {
                 PageSetup pageSetup = pages.get(i).pageSetup();
@@ -92,7 +92,7 @@ public final class PdfDocumentWriter {
             }
             for (int i = 0; i < pages.size(); i++) {
                 Page p = pages.get(i);
-                // Cada página tiene el medio de su sección (reference/components/document.md).
+                // Each page has the paper of its section (reference/components/document.md).
                 PageSetup pageSetup = p.pageSetup();
                 Rect area = pageSetup.pageArea();
                 PDPage page = pdfPages.get(i);
@@ -105,7 +105,7 @@ public final class PdfDocumentWriter {
                 }
                 if (!canvas.tagging().annotations().isEmpty()) {
                     page.setAnnotations(canvas.tagging().annotations());
-                    // Las anotaciones se recorren en el orden de la estructura (PDF/UA, 7.18.3).
+                    // Annotations are traversed in structure order (PDF/UA, 7.18.3).
                     page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
             }
@@ -118,9 +118,9 @@ public final class PdfDocumentWriter {
     }
 
     /**
-     * Las etiquetas de las páginas (reference/components/document.md): el visor muestra el número impreso de cada
-     * una, y ninguno en las que no se numeran. Solo se escriben si alguna página no es su número físico; si no, no
-     * añaden nada. Una etiqueta nueva empieza donde el número no sigue al de la página anterior.
+     * The page labels (reference/components/document.md): the viewer shows the printed number of each page, and none
+     * on the pages that are not numbered. They are only written if some page is not its physical number; otherwise
+     * they add nothing. A new label starts where the number does not follow that of the previous page.
      */
     private static void labels(PDDocument doc, List<Page> pages) {
         if (pages.stream().allMatch(p -> p.printed() == p.number() && p.style() == NumberFormat.DECIMAL)) {

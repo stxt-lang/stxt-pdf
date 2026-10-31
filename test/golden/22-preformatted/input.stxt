@@ -1,19 +1,19 @@
-# Hito 29: texto preformateado y código (reference/common/text-formatting.md y reference/components/markdown.md). Página de 200 × 300 con
-# márgenes de 20: área útil de 160 × 260 desde (20, 20). Líneas de 12 (Size 10); con las métricas de prueba cada
-# carácter mide 5 pt.
-#   term:    Preformatted pre, cinco líneas del bloque, la cuarta vacía (una línea en blanco es una línea,
-#            no separa párrafos), y una tabulación tras «PE» que lleva a la columna 4. La más larga mide
-#            18 caracteres, 90 pt: cabe y no se parte. 5 × 12 = 60. y = 20.
-#   tabs:    Tab size 8: «a» + tabulación son 8 columnas y «abcdefgh» + tabulación, 16; dos líneas: 24. y = 80.
-#   wrapped: pre-wrap. La primera línea del texto, «  aaaa bbbb cccc dddd eeee ffff gggg hhhh» (42
-#            caracteres), se parte tras «ffff»: la sangría se conserva y las palabras hasta «ffff» son 31
-#            caracteres, 155 pt (con « gggg» serían 36 caracteres, 180). Quedan «gggg hhhh» y la segunda
-#            línea del texto, «corta»: 3 líneas, 36. y = 104.
-#   plain:   sin Preformatted, los espacios se colapsan: una línea de 12. y = 140.
-#   md:      un Markdown con Code font: un Paragraph de una línea («Usa ls -l aquí.» con «ls -l» en la fuente
-#            del código; en un párrafo los espacios se colapsan, también en el código en línea: 12) y un
-#            bloque de código de dos líneas («a  b» y «  c»), que es un Text con Preformatted pre: 24.
-#            Los dos van seguidos y sin márgenes: 36. y = 152.
+# Milestone 29: preformatted text and code (reference/common/text-formatting.md and reference/components/markdown.md).
+# Page of 200 × 300 with margins of 20: page area of 160 × 260 from (20, 20). Lines of 12 (Size 10); with the test
+# metrics each character measures 5 pt.
+#   term:    Preformatted pre, five lines of the block, the fourth empty (a blank line is a line,
+#            it does not separate paragraphs), and a tab after "PE" that leads to column 4. The longest one is
+#            18 characters, 90 pt: it fits and is not broken. 5 × 12 = 60. y = 20.
+#   tabs:    Tab size 8: "a" + tab is 8 columns and "abcdefgh" + tab, 16; two lines: 24. y = 80.
+#   wrapped: pre-wrap. The first line of the text, "  aaaa bbbb cccc dddd eeee ffff gggg hhhh" (42
+#            characters), breaks after "ffff": the indent is kept and the words up to "ffff" are 31
+#            characters, 155 pt (with " gggg" they would be 36 characters, 180). "gggg hhhh" remains, and the
+#            second line of the text, "corta": 3 lines, 36. y = 104.
+#   plain:   without Preformatted, the spaces are collapsed: one line of 12. y = 140.
+#   md:      a Markdown with Code font: a one-line Paragraph ("Usa ls -l aquí." with "ls -l" in the code
+#            font; in a paragraph the spaces are collapsed, also in inline code: 12) and a
+#            two-line code block ("a  b" and "  c"), which is a Text with Preformatted pre: 24.
+#            The two follow each other without margins: 36. y = 152.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

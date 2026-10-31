@@ -20,7 +20,7 @@ class BlockLayoutTest {
 
     @Test
     void parentAndFirstChildMarginsCollapse() {
-        // max(10, 20) sale de P: P y C empiezan en 40 + 20.
+        // max(10, 20) comes out of P: P and C start at 40 + 20.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tMargin: 10 0 0 0",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 0 0",
@@ -32,7 +32,7 @@ class BlockLayoutTest {
 
     @Test
     void stylesRulesShapeTheLayout() {
-        // La regla da a cada Block 30 de alto y 10 de margen inferior; B la sobrescribe con 50.
+        // The rule gives each Block a height of 30 and a bottom margin of 10; B overrides it with 50.
         LayoutFixture l = layOut(
                 "\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 0 0 10 0",
                 "\t\tFor style: narrow", "\t\t\tBox:", "\t\t\t\tWidth: 100",
@@ -84,7 +84,7 @@ class BlockLayoutTest {
 
     @Test
     void emptyBoxLetsItsMarginsCollapseThrough() {
-        // A (inferior 0), E vacía (25 y 15), C (superior 10): un solo margen de 25.
+        // A (bottom 0), empty E (25 and 15), C (top 10): a single margin of 25.
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
                 "\tBlock:", "\t\tId: E", "\t\tBox:", "\t\t\tMargin: 25 0 15 0",
@@ -120,7 +120,7 @@ class BlockLayoutTest {
                 "\t\t\tHeight: 10",
                 "\tBlock:", "\t\tId: margins", "\t\tBox:", "\t\t\tMargin: 0 15 0 25", "\t\t\tHeight: 10");
         assertEquals(257.5, l.rect("half").width(), 1e-9);
-        // Width y Height miden siempre la caja de borde, con el relleno y el borde dentro.
+        // Width and Height always measure the border box, with the padding and the border inside.
         assertRect(40, 50, 100, 40, l.rect("sized"));
         assertRect(355, 90, 200, 10, l.rect("right"));
         assertRect(65, 100, 475, 10, l.rect("margins"));
@@ -128,7 +128,7 @@ class BlockLayoutTest {
 
     @Test
     void minWinsWhenItCannotBeComparedBeforeLayout() {
-        // 150 frente al 20 % de 515 (103): si se pudieran comparar al leer, sería un error.
+        // 150 versus 20 % of 515 (103): if they could be compared when reading, it would be an error.
         LayoutFixture l = layOut("\tBlock:", "\t\tId: minWins", "\t\tBox:", "\t\t\tMax width: 20%",
                 "\t\t\tMin width: 150", "\t\t\tHeight: 10");
         assertEquals(150, l.rect("minWins").width(), 1e-9);
@@ -136,7 +136,7 @@ class BlockLayoutTest {
 
     @Test
     void percentHeightOfADefiniteContainingBlock() {
-        // El área útil siempre tiene alto definido; un padre con alto auto, no (catálogo de errores).
+        // The page area always has a definite height; a parent with auto height does not (error catalog).
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
                 "\t\tBlock:", "\t\t\tId: half", "\t\t\tBox:", "\t\t\t\tHeight: 50%");
@@ -152,14 +152,14 @@ class BlockLayoutTest {
 
     @Test
     void intrinsicWidths() {
-        // FixedMetrics: 5 pt por carácter con Size 10.
+        // FixedMetrics: 5 pt per character with Size 10.
         LayoutFixture l = layOut(
                 "\tText: aaa bbbbbb", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\t\tPadding: 5",
                 "\tText: aaa bbbbbb", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural",
                 "\tBlock:", "\t\tId: block", "\t\tBox:", "\t\t\tWidth: natural",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tWidth: 120", "\t\t\t\tMargin: 0 10",
                 "\t\tText: aaa bbbbbb");
-        // Ancho más estrecho: la palabra más larga (30) + relleno; el texto ocupa dos líneas.
+        // Narrowest width: the longest word (30) + padding; the text takes up two lines.
         assertEquals(40, l.rect("min").width(), 1e-9);
         assertEquals(34, l.rect("min").height(), 1e-9);
         assertEquals(50, l.rect("max").width(), 1e-9);

@@ -14,53 +14,53 @@ import java.util.Set;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 /**
- * Estado de una llamada a {@link BoxTreeBuilder#build}: lo que se va sabiendo del documento
- * mientras se construye el árbol, en orden. Uno por documento, de modo que el builder no guarda
- * estado entre llamadas.
+ * State of a call to {@link BoxTreeBuilder#build}: what becomes known about the document
+ * while the tree is built, in order. One per document, so the builder keeps no
+ * state between calls.
  */
 final class BuildContext {
 
-    /** Las reglas de {@code Styles} del documento. */
+    /** The {@code Styles} rules of the document. */
     final StyleRules rules;
-    /** Línea del {@code Id} de cada caja, para detectar los repetidos. */
+    /** Line of the {@code Id} of each box, to detect duplicates. */
     final Map<String, Integer> ids = new HashMap<>();
     /**
-     * Si el alto de la caja de contenido es definido: base de los porcentajes verticales (reference/common/values.md).
+     * Whether the height of the content box is definite: base of vertical percentages (reference/common/values.md).
      */
     final Map<Box, Boolean> definiteHeight = new HashMap<>();
-    /** Número de cada {@code List item} ya construido: el siguiente continúa desde él. */
+    /** Number of each {@code List item} already built: the next one continues from it. */
     final Map<Box, Integer> itemNumbers = new HashMap<>();
-    /** Nivel del último encabezado, en orden del documento; 0 antes del primero. */
+    /** Level of the last heading, in document order; 0 before the first. */
     int headingLevel;
-    /** Los contadores de la numeración de los encabezados ({@code Numbered}, reference/components/heading.md). */
+    /** The counters of the heading numbering ({@code Numbered}, reference/components/heading.md). */
     final HeadingNumbers headingNumbers = new HeadingNumbers();
-    /** Si se está construyendo el contenido de un {@code Page overlay}. */
+    /** Whether the content of a {@code Page overlay} is being built. */
     boolean insidePageOverlay;
-    /** Si se está construyendo el contenido de un {@code Columns}. */
+    /** Whether the content of a {@code Columns} is being built. */
     boolean insideColumns;
     /**
-     * La caja que no se parte entre páginas ({@code un Overlay}, {@code un Page overlay} o {@code un Frame girado})
-     * cuyo contenido se está construyendo, o {@code null}: dentro, un {@code Break} no tiene efecto, salvo en las
-     * columnas de un {@code Columns} (reference/common/breaks.md).
+     * The box that is not split across pages ({@code an Overlay}, {@code a Page overlay} or {@code a rotated Frame})
+     * whose content is being built, or {@code null}: inside it, a {@code Break} has no effect, except in the
+     * columns of a {@code Columns} (reference/common/breaks.md).
      */
     String unbreakable;
     /**
-     * Si se está construyendo el contenido de un {@code Markdown}: sus textos ya vienen interpretados
+     * Whether the content of a {@code Markdown} is being built: its texts come already interpreted
      * (reference/components/markdown.md).
      */
     boolean insideMarkdown;
     /**
-     * Los {@code Table of contents} del documento, en orden: sus entradas se generan al final, con todos los
-     * encabezados.
+     * The {@code Table of contents} of the document, in order: their entries are generated at the end, with all the
+     * headings.
      */
     final List<Box> contents = new ArrayList<>();
     /**
-     * Tramos de los textos con formato que genera {@link MarkdownBuilder}, por nodo
+     * Runs of the formatted texts that {@link MarkdownBuilder} generates, by node
      * (reference/common/text-formatting.md).
      */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
     /**
-     * Los {@code Text} que {@link MarkdownBuilder} genera como bloques de código: su elemento es {@code Code block}
+     * The {@code Text} that {@link MarkdownBuilder} generates as code blocks: their element is {@code Code block}
      * (reference/components/markdown.md).
      */
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -69,17 +69,17 @@ final class BuildContext {
         this.rules = rules;
     }
 
-    /** El {@code Id} de una caja, que no se repite en el documento. */
+    /** The {@code Id} of a box, which is not repeated in the document. */
     String id(Node p) {
         String id = p.getText().trim();
         Integer previous = ids.putIfAbsent(id, p.getLine());
         if (previous != null) {
-            throw error(p, ErrorCode.DUPLICATE_ID, "Id repetido: " + id + " (ya se usa en la línea " + previous + ")");
+            throw error(p, ErrorCode.DUPLICATE_ID, "Duplicate Id: " + id + " (already used on line " + previous + ")");
         }
         return id;
     }
 
-    /** Si el alto de la caja de contenido es definido; la caja ya está construida. */
+    /** Whether the height of the content box is definite; the box is already built. */
     boolean isDefinite(Box box) {
         return definiteHeight.get(box);
     }

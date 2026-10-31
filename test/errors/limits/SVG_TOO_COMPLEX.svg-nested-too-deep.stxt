@@ -1,0 +1,11 @@
+# Case: An SVG with 70 nested groups exceeds the 64 levels that are accepted
+# Code: SVG_TOO_COMPLEX
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/limit-depth.svg

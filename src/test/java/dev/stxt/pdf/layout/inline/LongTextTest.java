@@ -16,10 +16,10 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Coste de un texto largo: un solo {@code Text} de muchas
- * páginas. {@link InlineLayout} lo parte en líneas una sola vez y no en cada página, así que el
- * trabajo crece de forma lineal con las páginas, no cuadrática. Se mide por las veces que se
- * mide el texto.
+ * Cost of a long text: a single {@code Text} of many
+ * pages. {@link InlineLayout} breaks it into lines only once and not on each page, so the
+ * work grows linearly with the pages, not quadratically. It is measured by the number of times the
+ * text is measured.
  */
 class LongTextTest {
 
@@ -27,7 +27,7 @@ class LongTextTest {
     private static final String SENTENCE = "El motor maqueta cajas en páginas de tamaño fijo y parte el texto en "
             + "líneas con las métricas de la fuente, respetando viudas y huérfanas al cortar. ";
 
-    /** {@link TextMeasurer} que cuenta las mediciones. */
+    /** {@link TextMeasurer} that counts the measurements. */
     private static final class Counting implements TextMeasurer {
         private final TextMeasurer metrics;
         long calls;
@@ -48,7 +48,7 @@ class LongTextTest {
         }
     }
 
-    /** {@code paragraphs} párrafos ({@code Paragraph}) de cuatro frases. */
+    /** {@code paragraphs} paragraphs ({@code Paragraph}) of four sentences. */
     private static String document(int paragraphs, String wrap) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
@@ -71,19 +71,19 @@ class LongTextTest {
         return new Run(laidOut.pages().size(), counting.calls, millis);
     }
 
-    /** Con el doble de páginas, el doble de mediciones (antes, el cuádruple). */
+    /** With twice the pages, twice the measurements (before, four times as many). */
     @Test
     void measurementsGrowLinearlyWithThePages() {
         Run small = run(new FixedMetrics(), 100, "simple");
         Run large = run(new FixedMetrics(), 200, "simple");
-        assertTrue(large.pages() >= 2 * small.pages() - 1, large.pages() + " páginas, " + small.pages());
+        assertTrue(large.pages() >= 2 * small.pages() - 1, large.pages() + " pages, " + small.pages());
         double ratio = (double) large.measurements() / small.measurements();
-        assertTrue(ratio < 2.5, "Con el doble de texto, " + ratio + " veces más mediciones");
+        assertTrue(ratio < 2.5, "With twice the text, " + ratio + " times more measurements");
     }
 
     /**
-     * Tiempos con las dos métricas y los dos repartos, de 25 a 100 páginas. No está en la suite
-     * normal ({@code perf}): {@code mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest}.
+     * Timings with the two metrics and the two line-breaking modes, from 25 to 100 pages. It is not in the normal
+     * suite ({@code perf}): {@code mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest}.
      */
     @Tag("perf")
     @Test
@@ -92,10 +92,10 @@ class LongTextTest {
         String[] names = {"FixedMetrics", "PdfMetrics"};
         for (int m = 0; m < metrics.length; m++) {
             for (String wrap : List.of("simple", "balanced")) {
-                run(metrics[m], 50, wrap); // calentamiento de la JVM
+                run(metrics[m], 50, wrap); // JVM warm-up
                 for (int paragraphs : new int[]{260, 520, 1040}) {
                     Run r = run(metrics[m], paragraphs, wrap);
-                    System.out.printf(Locale.ROOT, "%-12s %-6s %4d párrafos %4d páginas %,12d mediciones %9.1f ms%n",
+                    System.out.printf(Locale.ROOT, "%-12s %-6s %4d paragraphs %4d pages %,12d measurements %9.1f ms%n",
                             names[m], wrap, paragraphs, r.pages(), r.measurements(), r.millis());
                     assertTrue(r.pages() > 1);
                 }

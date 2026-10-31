@@ -1,11 +1,11 @@
-# Página 1: intro desde y = 40: el Heading 1 (Size 20, una línea de 24) y su margen de 8, y el
-# párrafo (12): 44. points desde 84: el Heading 2 (Size 15, 18), la lista de viñetas (12 de
-# "Ventas en alza" y 36 del ítem "Costes:", su párrafo y la lista anidada de dos ítems) y la
-# numerada (24): 90. table desde 174: la fila de Header rows y las tres de Body, de 12: 48.
-# long es un párrafo de 61 palabras de 7 letras: 13 por línea (103 caracteres), así que 5
-# líneas. Empieza en 222 y le quedan 38: caben 3 y quedan 2, que respeta viudas y huérfanas.
-# foot (Page overlay, Offset auto 0 -30 0) acaba 30 por debajo del área útil, en 290: y = 278.
-# Página 2: las 2 líneas que faltan de long y after.
+# Page 1: intro from y = 40: the Heading 1 (Size 20, one line of 24) and its margin of 8, and the
+# paragraph (12): 44. points from 84: the Heading 2 (Size 15, 18), the bullet list (12 for
+# "Ventas en alza" and 36 for the item "Costes:", its paragraph and the nested list of two items) and the
+# numbered one (24): 90. table from 174: the Header rows row and the three Body rows, of 12: 48.
+# long is a paragraph of 61 words of 7 letters: 13 per line (103 characters), so 5
+# lines. It starts at 222 and 38 remain for it: 3 fit and 2 remain, which respects widows and orphans.
+# foot (Page overlay, Offset auto 0 -30 0) ends 30 below the page area, at 290: y = 278.
+# Page 2: the 2 remaining lines of long and after.
 Result:
 	Page: 1
 		Fragment: intro

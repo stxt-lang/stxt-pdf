@@ -8,19 +8,19 @@ import dev.stxt.pdf.model.Value;
 import java.util.List;
 
 /**
- * Las propiedades de los elementos {@code Grid} y {@code Table} (reference/components/grid.md): las pistas, las
- * áreas, la colocación automática, la alineación de los ítems y el hueco entre pistas. No se heredan.
+ * The properties of the {@code Grid} and {@code Table} elements (reference/components/grid.md): the tracks, the
+ * areas, automatic placement, the alignment of the items and the gap between tracks. They are not inherited.
  */
 public final class GridStyle extends StyleGroup {
 
     private List<Value> columnSizes = List.of();
     private List<Value> rowSizes = List.of();
-    /** {@code Areas} ya interpretado; {@link GridAreas#NONE} si no se declara. */
+    /** {@code Areas} already interpreted; {@link GridAreas#NONE} if it is not declared. */
     private GridAreas areas = GridAreas.NONE;
     private Direction flow = Direction.HORIZONTAL;
     private Alignment horizontal = Alignment.STRETCH;
     private Alignment vertical = Alignment.STRETCH;
-    /** {@code Gap}: entre filas ({@code row}) y entre columnas ({@code column}). */
+    /** {@code Gap}: between rows ({@code row}) and between columns ({@code column}). */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
 

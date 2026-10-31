@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Cómo participa la caja en el flujo de su padre: {@code Frame}, {@code Overlay} y {@code Page overlay}; el resto,
+ * How the box takes part in the flow of its parent: {@code Frame}, {@code Overlay} and {@code Page overlay}; the rest,
  * {@code STATIC}.
  */
 public enum Position { STATIC, FRAME, OVERLAY, PAGE_OVERLAY }

@@ -30,15 +30,15 @@ import static dev.stxt.pdf.tree.TableBuilder.cellText;
 import static dev.stxt.pdf.tree.TableBuilder.table;
 
 /**
- * Lo propio de cada familia de elementos al construir su caja: las propiedades de su tipo, lo que
- * comprueba de las propiedades ya leídas y su contenido (un texto, una imagen o sus hijos).
- * {@link BoxTreeBuilder#element} hace lo común a todos, en orden, y llama a la familia del elemento
- * ({@link #of}) en cada paso. Un elemento nuevo sin nada propio es un {@link #CONTAINER}; si tiene algo propio,
- * es una familia nueva aquí, sin tocar el orden de {@code element}.
+ * What is specific to each family of elements when its box is built: the properties of its type, what it
+ * checks of the properties already read and its content (a text, an image or its children).
+ * {@link BoxTreeBuilder#element} does what is common to all, in order, and calls the family of the element
+ * ({@link #of}) at each step. A new element with nothing specific is a {@link #CONTAINER}; if it has something
+ * specific, it is a new family here, without touching the order of {@code element}.
  */
 enum ElementReader {
 
-    /** {@code Text}, {@code Paragraph} y el bloque de código de un {@code Markdown}: el texto, con sus tramos. */
+    /** {@code Text}, {@code Paragraph} and the code block of a {@code Markdown}: the text, with its runs. */
     TEXT {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
@@ -50,16 +50,16 @@ enum ElementReader {
     },
 
     /**
-     * El bloque de código de un {@code Markdown} (reference/components/markdown.md): un texto cuya fuente es su
-     * {@code Code font}, propia o heredada, con la línea de su declaración.
+     * The code block of a {@code Markdown} (reference/components/markdown.md): a text whose font is its
+     * {@code Code font}, its own or inherited, with the line of its declaration.
      */
     CODE_BLOCK {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             if (s.typography().codeFont() == null) {
-                throw error(n, ErrorCode.CODE_WITHOUT_FONT, "El bloque de código necesita Code font: se declara en el "
-                        + "Typography del Markdown, de un antecesor o de Styles (For element: Document o For element: Code "
-                        + "block), como Code font: IBM Plex Mono");
+                throw error(n, ErrorCode.CODE_WITHOUT_FONT, "The code block needs Code font: it is declared in the "
+                        + "Typography of the Markdown, of an ancestor or of Styles (For element: Document or For element: Code "
+                        + "block), as in Code font: IBM Plex Mono");
             }
             s.typography().setFont(s.typography().codeFont());
             s.declared(PropertyKey.FONT, s.line(PropertyKey.CODE_FONT));
@@ -84,8 +84,8 @@ enum ElementReader {
     },
 
     /**
-     * La {@code Cell} de una tabla (reference/components/table.md): con valor es una caja de texto y, sin él, un
-     * bloque. Su fila ({@code wrapper}) le da su {@code Typography}, como herencia, y su {@code Break}.
+     * The {@code Cell} of a table (reference/components/table.md): with a value it is a text box and, without one, a
+     * block. Its row ({@code wrapper}) gives it its {@code Typography}, as inheritance, and its {@code Break}.
      */
     CELL {
         @Override
@@ -95,17 +95,17 @@ enum ElementReader {
 
         @Override
         void wrapper(InlineNode wrapper, Style s, Box parent) {
-            // El Typography de la fila lo heredan sus celdas: va antes que las reglas.
+            // The Typography of the row is inherited by its cells: it goes before the rules.
             child(wrapper, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
         }
 
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
-            // El Break de la fila es el de sus celdas: con él se corta entre filas, como en un grid.
+            // The Break of the row is that of its cells: with it the break falls between rows, as in a grid.
             child(wrapper, "break").map(Nodes::inline).ifPresent(b -> fragmentation(b, s));
             if (s.rowHeader() && position != null && position.group() == CellPosition.HEADER) {
-                throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEADER_ROWS, "Row header no tiene efecto en "
-                        + "una celda de Header rows: las celdas de la cabecera ya son cabeceras de columna");
+                throw error(s.line("row-header"), ErrorCode.ROW_HEADER_IN_HEADER_ROWS, "Row header has no effect on "
+                        + "a cell of Header rows: the header cells are already column headers");
             }
         }
 
@@ -122,7 +122,7 @@ enum ElementReader {
         }
     },
 
-    /** Una {@code Table} (reference/components/table.md): un grid cuyas celdas coloca {@link TableBuilder}. */
+    /** A {@code Table} (reference/components/table.md): a grid whose cells {@link TableBuilder} places. */
     TABLE {
         @Override
         boolean property(Node p, Style s) {
@@ -174,10 +174,10 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Columns} (reference/components/columns.md): su contenido va en su flujo de columnas, una caja de
-     * bloque generada que es su único hijo y de la que cada columna es un fragmento. Aísla los márgenes, para que
-     * no salgan de las columnas, y su alto no es definido: lo decide el reparto en
-     * columnas.
+     * A {@code Columns} (reference/components/columns.md): its content goes in its column flow, a generated block
+     * box that is its only child and of which each column is a fragment. It isolates margins, so that they
+     * do not leave the columns, and its height is not definite: the distribution into
+     * columns decides it.
      */
     COLUMNS {
         @Override
@@ -212,8 +212,8 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Markdown} (reference/components/markdown.md): los elementos que genera {@link MarkdownBuilder},
-     * construidos como si los hubiera escrito el autor; sus textos con formato llevan sus tramos.
+     * A {@code Markdown} (reference/components/markdown.md): the elements that {@link MarkdownBuilder} generates,
+     * built as if the author had written them; its formatted texts carry their runs.
      */
     MARKDOWN {
         @Override
@@ -230,8 +230,8 @@ enum ElementReader {
     },
 
     /**
-     * Un {@code Table of contents} (reference/components/table-of-contents.md): sus entradas las genera {@link
-     * TableOfContentsBuilder} al final, con todos los encabezados.
+     * A {@code Table of contents} (reference/components/table-of-contents.md): its entries are generated by {@link
+     * TableOfContentsBuilder} at the end, with all the headings.
      */
     TABLE_OF_CONTENTS {
         @Override
@@ -241,13 +241,13 @@ enum ElementReader {
         }
     },
 
-    /** El resto: {@code Block}, los encabezados, {@code List item}, las cajas posicionadas…, con sus hijos. */
+    /** The rest: {@code Block}, the headings, {@code List item}, the positioned boxes..., with their children. */
     CONTAINER;
 
-    /** Una línea en blanco dentro del texto: separa párrafos (reference/common/typography.md). */
+    /** A blank line inside the text: it separates paragraphs (reference/common/typography.md). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
 
-    /** La familia de un elemento. */
+    /** The family of an element. */
     static ElementReader of(Element kind) {
         if (kind == Element.CODE_BLOCK) {
             return CODE_BLOCK;
@@ -269,14 +269,14 @@ enum ElementReader {
         };
     }
 
-    /** El layout de la caja: el del elemento, salvo en una {@code Cell}. */
+    /** The layout of the box: that of the element, except in a {@code Cell}. */
     Layout layout(InlineNode n, Element kind) {
         return kind.layout();
     }
 
     /**
-     * Lo que le da su envoltorio antes de aplicar las reglas: a un ítem, las propiedades de su {@code Item} o su
-     * {@code Area}; {@code wrapper} es {@code null} si no tiene.
+     * What its wrapper gives it before the rules are applied: to an item, the properties of its {@code Item} or its
+     * {@code Area}; {@code wrapper} is {@code null} if it has none.
      */
     void wrapper(InlineNode wrapper, Style s, Box parent) {
         if (wrapper != null) {
@@ -284,25 +284,28 @@ enum ElementReader {
         }
     }
 
-    /** Lee {@code p} si es una propiedad del tipo del elemento ({@code Stack}, {@code Grid}…); {@code false} si no. */
+    /**
+     * Reads {@code p} if it is a property of the type of the element ({@code Stack}, {@code Grid}...); {@code false}
+     * if not.
+     */
     boolean property(Node p, Style s) {
         return false;
     }
 
-    /** Lo que comprueba la familia de las propiedades ya leídas, antes de crear la caja. */
+    /** What the family checks of the properties already read, before the box is created. */
     void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
     }
 
-    /** El contenido de la caja: por defecto, sus elementos hijos. */
+    /** The content of the box: by default, its child elements. */
     void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
         builder.buildContent(ctx, n, box);
     }
 
     /**
-     * Con {@code Markup: markdown} (reference/common/text-formatting.md), el texto de la caja es Markdown en línea:
-     * pasa a ser el texto seguido, sin las marcas, y los tramos con formato van en {@link Box#formattedRuns()}. Dentro
-     * de un {@code Markdown} no hace nada, porque sus textos ya vienen interpretados. El texto deja de ser un bloque:
-     * sus errores señalan la línea donde empieza.
+     * With {@code Markup: markdown} (reference/common/text-formatting.md), the text of the box is inline Markdown:
+     * it becomes the joined text, without the marks, and the formatted runs go in {@link Box#formattedRuns()}. Inside
+     * a {@code Markdown} it does nothing, because its texts come already interpreted. The text stops being a block:
+     * its errors point to the line where it starts.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
         if (box.style().typography().markup() != Markup.MARKDOWN || ctx.insideMarkdown) {
@@ -315,8 +318,9 @@ enum ElementReader {
     }
 
     /**
-     * El código en línea (reference/common/text-formatting.md) se escribe con la familia de {@code Code font}, propia
-     * o heredada, que solo conoce la caja: sus tramos la reciben aquí. Sin ella es un error, con la línea del código.
+     * Inline code (reference/common/text-formatting.md) is written with the family of {@code Code font}, its own
+     * or inherited, which only the box knows: its runs receive it here. Without it, it is an error, with the line of
+     * the code.
      */
     private static void codeFont(Box box) {
         List<TextRun> runs = box.formattedRuns();
@@ -329,9 +333,9 @@ enum ElementReader {
         for (TextRun r : runs) {
             if (r.format().code()) {
                 if (family == null) {
-                    throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "El código necesita Code font: "
-                            + "se declara en el Typography del texto, de un antecesor o de Styles (For element: Document), "
-                            + "como Code font: IBM Plex Mono");
+                    throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "The code needs Code font: "
+                            + "it is declared in the Typography of the text, of an ancestor or of Styles (For element: Document), "
+                            + "as in Code font: IBM Plex Mono");
                 }
                 r = new TextRun(r.text(), r.format().withFamily(family));
             }
@@ -342,49 +346,49 @@ enum ElementReader {
     }
 
     /**
-     * La ruta de una {@code Image} (reference/components/image.md), relativa a {@code images/}. Que el fichero exista
-     * y sea una imagen se comprueba al maquetar, porque hace falta la carpeta de recursos.
+     * The path of an {@code Image} (reference/components/image.md), relative to {@code images/}. That the file exists
+     * and is an image is checked during layout, because the resources folder is needed.
      */
     private static void image(InlineNode n, Box box) {
         String path = n.getText().trim();
         if (path.isEmpty()) {
-            throw error(n, ErrorCode.IMAGE_UNKNOWN, "Image necesita la ruta de la imagen, relativa a la carpeta "
-                    + "images/ de los recursos: Image: logos/acme.png");
+            throw error(n, ErrorCode.IMAGE_UNKNOWN, "Image needs the path of the image, relative to the "
+                    + "images/ folder of the resources: Image: logos/acme.png");
         }
         box.setImage(path);
     }
 
     /**
-     * El texto de un {@code Text} o un {@code Paragraph}: en su valor o en {@code Content}, uno de los dos, y sin líneas en
-     * blanco, que lo partirían en párrafos (reference/components/text.md). En un texto preformateado, una línea en blanco
-     * es contenido y sí vale, salvo en un {@code Paragraph}, que es siempre un solo párrafo.
+     * The text of a {@code Text} or a {@code Paragraph}: in its value or in {@code Content}, one of the two, and
+     * without blank lines, which would split it into paragraphs (reference/components/text.md). In preformatted text, a
+     * blank line is content and is allowed, except in a {@code Paragraph}, which is always a single paragraph.
      */
     private static void text(InlineNode n, Box box) {
         Optional<Node> content = child(n, "content");
         boolean value = !n.getText().isBlank();
         if (value && content.isPresent()) {
-            throw error(content.get(), ErrorCode.TEXT_CONTENT, n.getName() + " tiene el texto en el valor y en Content "
-                    + "(línea " + n.getLine() + "): va en uno solo");
+            throw error(content.get(), ErrorCode.TEXT_CONTENT, n.getName() + " has the text in the value and in Content "
+                    + "(line " + n.getLine() + "): it goes in only one");
         }
         if (!value && content.isEmpty()) {
-            throw error(n, ErrorCode.TEXT_CONTENT, n.getName() + " necesita su texto: en el valor ("
-                    + n.getName() + ": …) o en un bloque Content >>");
+            throw error(n, ErrorCode.TEXT_CONTENT, n.getName() + " needs its text: in the value ("
+                    + n.getName() + ": ...) or in a Content >> block");
         }
         Node source = content.orElse(n);
         font(n, source, box);
         boolean paragraph = box.element() == Element.PARAGRAPH;
         if (paragraph || !box.style().typography().preformatted().enabled()) {
-            // Las líneas en blanco al principio o al final no separan nada.
+            // Blank lines at the start or at the end separate nothing.
             String text = source.getText();
             Matcher blank = BLANK_LINE.matcher(text)
                     .region(text.length() - text.stripLeading().length(), text.stripTrailing().length());
             if (blank.find()) {
-                // El bloque empieza en la línea siguiente a Content; la línea en blanco, tras el salto encontrado.
+                // The block starts on the line after Content; the blank line, after the line break found.
                 int line = source.getLine() + 2 + (int) text.substring(0, blank.start()).chars().filter(c -> c == '\n').count();
                 throw error(line, ErrorCode.TEXT_BLANK_LINE, paragraph
-                        ? "Un Paragraph es un solo párrafo: sobra la línea en blanco, o va un Paragraph para cada uno"
-                        : "Un Text no tiene párrafos: sobra la línea en blanco, o va un Paragraph para cada párrafo "
-                        + "(en un Block si van juntos). En un texto preformateado (Preformatted: true) sí vale");
+                        ? "A Paragraph is a single paragraph: the blank line is not needed, or each one goes in its own Paragraph"
+                        : "A Text has no paragraphs: the blank line is not needed, or each paragraph goes in its own "
+                        + "Paragraph (in a Block if they go together). In preformatted text (Preformatted: true) it is allowed");
             }
         }
         box.setText(source.getText(), source.getLine(), source instanceof TextNode);

@@ -3,15 +3,15 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.Fit;
 
 /**
- * Las propiedades de una {@code Image} (reference/components/image.md): el texto alternativo, cómo llena su caja y la
- * página de un PDF. No se heredan.
+ * The properties of an {@code Image} (reference/components/image.md): the alternative text, how it fills its box and
+ * the page of a PDF. They are not inherited.
  */
 public final class ImageStyle extends StyleGroup {
 
-    /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
+    /** Alternative text of an {@code Image}; {@code null} = decorative. */
     private String alt;
     private Fit fit = Fit.INSIDE;
-    /** Página de un PDF, desde 1. */
+    /** Page of a PDF, from 1. */
     private int pdfPage = 1;
 
     ImageStyle() {
@@ -35,7 +35,7 @@ public final class ImageStyle extends StyleGroup {
         fit = v;
     }
 
-    /** La página que se dibuja de un PDF, desde 1; 1 si no se declara. */
+    /** The page of a PDF that is drawn, from 1; 1 if it is not declared. */
     public int pdfPage() {
         return pdfPage;
     }

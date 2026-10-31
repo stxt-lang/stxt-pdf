@@ -15,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code {page of: id}} (reference/common/references.md). Páginas de 180 pt con márgenes de 40: área
- * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada
- * línea, 12.
+ * {@code {page of: id}} (reference/common/references.md). Pages of 180 pt with margins of 40: page
+ * area of 515 × 100; with {@code FixedMetrics} and {@code Size: 10}, each character measures 5 pt and each
+ * line, 12.
  */
 class PageReferencesTest {
 
     private static final double PAGE = 180;
 
-    /** Una página entera: una caja de 100 pt. */
+    /** A whole page: a box of 100 pt. */
     private static String[] fullPages(int n) {
         String[] lines = new String[n * 4];
         for (int i = 0; i < n; i++) {
@@ -43,7 +43,10 @@ class PageReferencesTest {
         return l.fragment(page, id).lines().stream().map(x -> x.text()).reduce((a, b) -> a + "|" + b).orElse("");
     }
 
-    /** Una fila con {@code Id} se puede referir: su página es la de su franja (reference/components/table.md#filas). */
+    /**
+     * A row with an {@code Id} can be referred to: its page is that of its band
+     * (reference/components/table.md#rows).
+     */
     @Test
     void aReferenceToARowGivesThePageOfItsBand() {
         LayoutFixture l = layOutPaged(PAGE, concat(
@@ -61,11 +64,11 @@ class PageReferencesTest {
                 new String[]{"\tText: Ver la página {page of: target}.", "\t\tId: ref"},
                 fullPages(2),
                 new String[]{"\tBlock:", "\t\tId: target", "\t\tBox:", "\t\t\tHeight: 10"}));
-        // Una caja con Height se parte entre páginas: 12 + 200 + 10 = 222 pt, en tres páginas.
+        // A box with Height is split between pages: 12 + 200 + 10 = 222 pt, over three pages.
         assertEquals(3, l.pages());
         assertTrue(l.has(3, "target"));
         assertEquals("Ver la página 3.", text(l, 1, "ref"));
-        // El texto mide lo que se escribe: 16 caracteres de 5 pt.
+        // The text measures what is written: 16 characters of 5 pt.
         assertEquals(80, l.fragment("ref").lines().get(0).width(), 1e-9);
     }
 
@@ -85,7 +88,7 @@ class PageReferencesTest {
                 new String[]{"\tBlock:", "\t\tId: story", "\t\tBox:", "\t\t\tHeight: 60"},
                 new String[]{"\tBlock:", "\t\tId: other", "\t\tBox:", "\t\t\tHeight: 10"},
                 new String[]{"\tBlock:", "\t\tId: split", "\t\tBox:", "\t\t\tHeight: 150"}));
-        // ref (12) + story (60) + other (10) = 82; split empieza en la 1 (18 pt) y sigue en la 2.
+        // ref (12) + story (60) + other (10) = 82; split starts on page 1 (18 pt) and continues on page 2.
         assertTrue(l.has(1, "split"));
         assertTrue(l.has(2, "split"));
         assertEquals("Empieza en la 1", text(l, 1, "ref"));
@@ -102,10 +105,10 @@ class PageReferencesTest {
 
     @Test
     void theTextIsRepaginatedUntilItsWidthAndItsPageAgree() {
-        // El texto cabe en una línea de 62 pt con una cifra ("Ver página 5" = 60 pt), pero no con
-        // el número de prueba de dos cifras ("Ver página 00" = 65 pt). Tras la primera pasada ocupa
-        // dos líneas, y el bloque X (10 pt) queda en la página 2; con la página 2 sigue cabiendo
-        // en una línea y X vuelve a la 1: la tercera pasada confirma que la página es la 1.
+        // The text fits on a line of 62 pt with one figure ("Ver página 5" = 60 pt), but not with
+        // the two-figure trial number ("Ver página 00" = 65 pt). After the first pass it takes
+        // two lines, and block X (10 pt) ends up on page 2; with page 2 it still fits
+        // on one line and X goes back to page 1: the third pass confirms that the page is 1.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 76",
                 "\tText: Ver página {page of: x}", "\t\tId: ref", "\t\tBox:", "\t\t\tWidth: 62",
@@ -128,9 +131,9 @@ class PageReferencesTest {
 
     @Test
     void aPageThatKeepsChangingIsReportedWithTheLineOfTheReference() {
-        // Un medidor de pega: un texto con un 7 mide 100 pt y se parte en dos líneas; los demás,
-        // 5 pt por carácter. Con la caja X en la página 7, suponer "7" la lleva a la 8 (el texto
-        // ocupa dos líneas) y suponer "8" la devuelve a la 7: no hay página que se cumpla.
+        // A fake measurer: a text with a 7 measures 100 pt and breaks into two lines; the others,
+        // 5 pt per character. With box X on page 7, assuming "7" takes it to page 8 (the text
+        // takes two lines) and assuming "8" brings it back to page 7: no page holds.
         TextMeasurer wideSevens = new TextMeasurer() {
             @Override
             public double width(String text, FontFace font, double fontSize) {
@@ -139,8 +142,8 @@ class PageReferencesTest {
         };
         StringBuilder doc = new StringBuilder("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: "
                 + PAGE + "\n\t\tMargin: 40\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n");
-        // El primer bloque es un texto con {number of: n}: el culpable es la referencia de página que cambia, no la
-        // primera referencia del documento (pruebas de mutación). Mide y ocupa lo mismo que los demás.
+        // The first block is a text with {number of: n}: the culprit is the page reference that changes, not the
+        // first reference of the document (mutation testing). It measures and takes up the same as the others.
         doc.append("\tText: Punto {number of: n}\n\t\tBox:\n\t\t\tHeight: 100\n");
         for (int i = 1; i < 6; i++) {
             doc.append("\tBlock:\n\t\tBox:\n\t\t\tHeight: 100\n");
@@ -152,7 +155,7 @@ class PageReferencesTest {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> new Engine(wideSevens).layOutDocument(new DocumentReader().read(Docs.sectioned(doc.toString()))));
         assertEquals(ErrorCode.REFERENCE_UNSTABLE, e.errorCode());
-        // Cabecera (11 líneas), seis bloques de 3, el de 76 (3) y la línea del texto.
+        // Header (11 lines), six blocks of 3, the one of 76 (3) and the line of the text.
         assertEquals(13 + 6 * 3 + 3 + 1, e.line());
     }
 }

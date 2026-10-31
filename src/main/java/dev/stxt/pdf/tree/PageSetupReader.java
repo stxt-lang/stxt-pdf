@@ -17,8 +17,8 @@ import static dev.stxt.pdf.tree.ValueReader.enumValue;
 import static dev.stxt.pdf.tree.ValueReader.points;
 
 /**
- * Lo que el documento dice de sí mismo y de sus páginas: el {@code Page} del documento y de cada {@code Section}
- * (reference/components/document.md) y el {@code Title} y el {@code Language} (reference/components/document.md).
+ * What the document says about itself and its pages: the {@code Page} of the document and of each {@code Section}
+ * (reference/components/document.md) and the {@code Title} and the {@code Language} (reference/components/document.md).
  */
 final class PageSetupReader {
 
@@ -26,18 +26,18 @@ final class PageSetupReader {
     }
 
     /**
-     * Un medio y el papel con nombre de que sale, si sale de uno: una sección puede girarlo
+     * A medium and the named paper it comes from, if it comes from one: a section can rotate it
      * (reference/components/document.md).
      */
     record Spec(PageSetup pageSetup, PageSetup.Paper paper) {
     }
 
-    /** {@code Title} y {@code Language} de {@code Document}: un título no vacío y una etiqueta BCP 47. */
+    /** {@code Title} and {@code Language} of {@code Document}: a non-empty title and a BCP 47 tag. */
     static Metadata metadata(InlineNode document) {
         String title = child(document, "title").map(n -> {
             String t = n.getText().trim();
             if (t.isEmpty()) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Title necesita un texto");
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Title needs a text");
             }
             return t;
         }).orElse(null);
@@ -46,9 +46,9 @@ final class PageSetupReader {
     }
 
     /**
-     * El medio (reference/components/document.md): su tamaño es un {@code Paper} con su {@code Orientation} o un
-     * {@code Width} y un {@code Height}, nunca las dos cosas; el schema solo sabe que cada uno va una vez. El de una
-     * sección hereda por grupos el del documento, {@code base} ({@code null} en el del documento).
+     * The medium (reference/components/document.md): its size is a {@code Paper} with its {@code Orientation} or a
+     * {@code Width} and a {@code Height}, never both; the schema only knows that each one appears once. The one of a
+     * section inherits by groups the one of the document, {@code base} ({@code null} in the one of the document).
      */
     static Spec pageSetup(InlineNode n, Spec base) {
         Optional<Node> orientation = child(n, "orientation");
@@ -63,18 +63,18 @@ final class PageSetupReader {
             width = landscape ? named.height : named.width;
             height = landscape ? named.width : named.height;
         } else if (base != null && widthNode.isEmpty() && heightNode.isEmpty() && orientation.isEmpty()) {
-            // El tamaño es el del documento.
+            // The size is the one of the document.
             width = base.pageSetup().width();
             height = base.pageSetup().height();
             named = base.paper();
         } else {
             if (orientation.isPresent()) {
-                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "documento no lo declara: hace falta Paper, o cambiar el Width por el Height");
+                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation rotates the paper of Paper, and the "
+                        + "document does not declare it: Paper is needed, or the Width and the Height swapped");
             }
             if (widthNode.isEmpty() || heightNode.isEmpty()) {
-                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.PAGE_SIZE, "Page necesita "
-                        + "su tamaño: un Paper (A4, Letter…) o un Width y un Height");
+                throw error(widthNode.or(() -> heightNode).orElse(n), ErrorCode.PAGE_SIZE, "Page needs "
+                        + "its size: a Paper (A4, Letter...) or a Width and a Height");
             }
             width = points(widthNode.get());
             height = points(heightNode.get());
@@ -84,14 +84,14 @@ final class PageSetupReader {
                 .orElse(base != null ? base.pageSetup().margin() : Insets.ZERO);
         PageSetup pageSetup = new PageSetup(width, height, margin);
         if (pageSetup.pageArea().width() <= 0 || pageSetup.pageArea().height() <= 0) {
-            throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "Los márgenes de la página no dejan área útil");
+            throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "The margins of the page leave no page area");
         }
         return new Spec(pageSetup, named);
     }
 
     /**
-     * El papel con nombre del medio: su {@code Paper} o, en una sección que solo declara {@code Orientation},
-     * el del documento; {@code null} si el tamaño no sale de un papel.
+     * The named paper of the medium: its {@code Paper} or, in a section that only declares {@code Orientation}, the
+     * one of the document; {@code null} if the size does not come from a paper.
      */
     private static PageSetup.Paper paper(InlineNode n, Spec base) {
         Optional<Node> paper = child(n, "paper");
@@ -101,16 +101,16 @@ final class PageSetupReader {
         if (paper.isPresent()) {
             Optional<Node> both = widthNode.isPresent() ? widthNode : heightNode;
             if (both.isPresent()) {
-                throw error(both.get(), ErrorCode.PAGE_SIZE, "Page declara Paper y " + both.get().getName()
-                        + ": el tamaño de la página es uno de los dos, Paper (con Orientation) o Width y Height");
+                throw error(both.get(), ErrorCode.PAGE_SIZE, "Page declares Paper and " + both.get().getName()
+                        + ": the size of the page is one of the two, Paper (with Orientation) or Width and Height");
             }
             return enumValue(PageSetup.Paper.class, paper.get());
         }
         if (base != null && orientation.isPresent() && widthNode.isEmpty() && heightNode.isEmpty()) {
-            // Una sección que solo gira el papel del documento.
+            // A section that only rotates the paper of the document.
             if (base.paper() == null) {
-                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation gira el papel de Paper, y el "
-                        + "documento no lo declara (da Width y Height): Paper se declara en la sección o en el documento");
+                throw error(orientation.get(), ErrorCode.PAGE_SIZE, "Orientation rotates the paper of Paper, and the "
+                        + "document does not declare it (it gives Width and Height): Paper is declared in the section or in the document");
             }
             return base.paper();
         }
@@ -120,7 +120,7 @@ final class PageSetupReader {
     private static Insets margin(Node n) {
         List<Double> v = parse(n, () -> ValueParser.list(n.getText())).stream().map(x -> {
             if (!(x instanceof Value.Points p)) {
-                throw error(n, ErrorCode.PAGE_SIZE, "El margen de la página solo admite puntos: " + n.getText().trim());
+                throw error(n, ErrorCode.PAGE_SIZE, "The margin of the page only allows points: " + n.getText().trim());
             }
             return p.pt();
         }).toList();

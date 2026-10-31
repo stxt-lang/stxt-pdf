@@ -30,35 +30,35 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
- * Layout {@code stack} (reference/components/stack.md). Los ocho pasos:
+ * Layout {@code stack} (reference/components/stack.md). The eight steps:
  * <ol>
- *   <li>Espacio disponible en el eje principal.</li>
- *   <li>Base de cada ítem: {@code Base size}, el tamaño declarado o el ancho natural.</li>
- *   <li>Tamaño hipotético: base limitada por el mínimo (con {@code Min width: auto}, el tamaño
- *       del contenido, sin pasar del declarado).</li>
- *   <li>Repartir en líneas si {@code Wrap}.</li>
- *   <li>Resolver tamaños flexibles con {@link StackResolver}.</li>
- *   <li>Tamaño cruzado: layout de cada ítem con su tamaño principal; la línea mide el mayor.</li>
- *   <li>Estirar los ítems con {@code stretch} y repetir su layout.</li>
- *   <li>Alinear en el eje principal, en el cruzado y las líneas.</li>
+ *   <li>Available space on the main axis.</li>
+ *   <li>Base of each item: {@code Base size}, the declared size or the natural width.</li>
+ *   <li>Hypothetical size: base limited by the minimum (with {@code Min width: auto}, the size
+ *       of the content, not exceeding the declared one).</li>
+ *   <li>Break into lines if {@code Wrap}.</li>
+ *   <li>Resolve flexible sizes with {@link StackResolver}.</li>
+ *   <li>Cross size: layout of each item with its main size; the line measures the largest.</li>
+ *   <li>Stretch the items with {@code stretch} and repeat their layout.</li>
+ *   <li>Align on the main axis, on the cross axis and the lines.</li>
  * </ol>
  *
- * <p>Los tamaños de {@link StackItem} son de caja de margen; los márgenes {@code auto} valen 0.
- * En un contenedor de una sola línea (sin {@code Wrap}) con tamaño cruzado definido, la línea
- * mide lo que el contenedor. En vertical, los ítems con {@code stretch} de un contenedor
- * de una sola línea se miden ya con el ancho del contenedor; en el resto de casos, con su ajuste
- * al contenido.</p>
+ * <p>The sizes of {@link StackItem} are margin box sizes; the {@code auto} margins are 0.
+ * In a single-line container (without {@code Wrap}) with a definite cross size, the line
+ * measures the same as the container. In vertical, the items with {@code stretch} of a single-line
+ * container are measured already at the width of the container; in all other cases, with their fit
+ * to the content.</p>
  *
- * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
- * {@link PendingOverlay} con la esquina de la caja de contenido como posición estática. Los
- * ítems {@code relative} se desplazan con {@link FrameOffset} después de alinearlos.</p>
+ * <p>The {@code absolute} and {@code fixed} children are not items: they are returned as
+ * {@link PendingOverlay} with the corner of the content box as static position. The
+ * {@code relative} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
- * <p>Simplificación: en vertical, el mínimo automático de un ítem con {@code Height}
- * declarado es ese alto, no el de su contenido.</p>
+ * <p>Simplification: in vertical, the automatic minimum of an item with a declared {@code Height}
+ * is that height, not the height of its content.</p>
  *
- * <p>Entre páginas (reference/common/breaks.md) se corta entre líneas en horizontal y entre ítems en
- * vertical, con {@link UnitBreaker}; una línea (en vertical, un ítem) que no cabe en
- * una página se parte en paralelo. Un contenedor vertical con {@code Wrap} no se parte.</p>
+ * <p>Across pages (reference/common/breaks.md) the break goes between lines in horizontal and between items in
+ * vertical, with {@link UnitBreaker}; a line (in vertical, an item) that does not fit on
+ * a page is split in parallel. A vertical container with {@code Wrap} is not split.</p>
  */
 public final class StackLayout implements LayoutAlgorithm {
 
@@ -68,11 +68,11 @@ public final class StackLayout implements LayoutAlgorithm {
         this.context = context;
     }
 
-    /** Tabla de reference/common/box.md. */
+    /** Table of reference/common/box.md. */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
-        // Sin containing block, un hueco en porcentaje cuenta como 0.
+        // Without a reference container, a percentage gap counts as 0.
         double gap = s.stack().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<Box> items = box.inFlowChildren();
         double maxMin = 0;
@@ -104,20 +104,20 @@ public final class StackLayout implements LayoutAlgorithm {
         return new Run(box, model, space).layOut(from);
     }
 
-    /** Un ítem y su estado durante el layout. */
+    /** An item and its state during the layout. */
     private static final class Item {
         final Box box;
         final Insets margin;
         final Alignment align;
         StackItem stack;
-        /** En vertical: ancho de caja de borde con el que se mide el ítem. */
+        /** In vertical: border box width the item is measured with. */
         double crossWidth;
-        /** Tamaño principal final, de caja de margen. */
+        /** Final main size, of the margin box. */
         double main;
-        /** Tamaño cruzado, de caja de margen. */
+        /** Cross size, of the margin box. */
         double cross;
         LayoutResult result;
-        /** Espacio de {@link #result}. */
+        /** Space of {@link #result}. */
         ConstraintSpace space;
 
         Item(Box box, Insets margin, Alignment align) {
@@ -127,15 +127,15 @@ public final class StackLayout implements LayoutAlgorithm {
         }
     }
 
-    /** Tamaño cruzado de cada línea y lo que sobra en el eje cruzado (paso 6). */
+    /** Cross size of each line and the space left over on the cross axis (step 6). */
     private record CrossSizes(double[] lines, double free) {
     }
 
-    /** Lo que ocupa una unidad en el eje en que se corta, y sus ítems. */
+    /** What a unit occupies on the axis of the break, and its items. */
     private record Span(double start, double end, List<Box> boxes) {
     }
 
-    /** Layout de un contenedor concreto. */
+    /** Layout of a specific container. */
     private final class Run {
         final Box box;
         final Style s;
@@ -161,7 +161,7 @@ public final class StackLayout implements LayoutAlgorithm {
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
-            // Base de los porcentajes: la caja de contenido en el eje de cada hueco (reference/common/values.md).
+            // Base of the percentages: the content box on the axis of each gap (reference/common/values.md).
             double columnGap = s.stack().columnGap().resolve(contentWidth).orElse(0);
             double rowGap = s.stack().rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
@@ -181,7 +181,7 @@ public final class StackLayout implements LayoutAlgorithm {
                 }
             }
 
-            // Pasos 4 y 5: líneas y tamaños flexibles.
+            // Steps 4 and 5: lines and flexible sizes.
             List<List<Item>> lines = breakLines(items);
             for (List<Item> line : lines) {
                 resolveMainSizes(line);
@@ -193,7 +193,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return UnitBreaker.fragment(context, box, space, from, arrange(lines, cross, pending));
         }
 
-        /** Paso 6: tamaño cruzado de cada línea y lo que sobra en el eje cruzado. */
+        /** Step 6: cross size of each line and the space left over on the cross axis. */
         CrossSizes crossSizes(List<List<Item>> lines) {
             int n = lines.size();
             double[] lineCross = new double[n];
@@ -218,7 +218,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return new CrossSizes(lineCross, crossFree);
         }
 
-        /** Paso 7: estirar los ítems con {@code stretch} al tamaño cruzado de su línea. */
+        /** Step 7: stretch the items with {@code stretch} to the cross size of their line. */
         void stretchItems(List<List<Item>> lines, double[] lineCross) {
             for (int l = 0; l < lines.size(); l++) {
                 for (Item it : lines.get(l)) {
@@ -230,8 +230,8 @@ public final class StackLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Paso 8: alinear. Las unidades de la fragmentación son las líneas en horizontal y los ítems en
-         * vertical (con Wrap, el contenedor entero).
+         * Step 8: align. The fragmentation units are the lines in horizontal and the items in
+         * vertical (with Wrap, the whole container).
          */
         UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingOverlay> pending) {
             int n = lines.size();
@@ -274,7 +274,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return new UnitBreaker.Arranged(model, placed, pending, units(spans, extent));
         }
 
-        /** Las unidades, con la calidad del corte entre cada una y la anterior según sus ítems. */
+        /** The units, with the quality of the break between each one and the previous one according to their items. */
         UnitBreaker.Units units(List<Span> spans, double extent) {
             List<Unit> units = new ArrayList<>();
             for (int u = 0; u < spans.size(); u++) {
@@ -290,7 +290,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return new UnitBreaker.Units(units, extent, row || !multiLine);
         }
 
-        // --- Pasos 2 y 3: base, mínimo y máximo de cada ítem ------------------------------------
+        // --- Steps 2 and 3: base, minimum and maximum of each item ------------------------------
 
         Item rowItem(Box b) {
             Style is = b.style();
@@ -309,8 +309,8 @@ public final class StackLayout implements LayoutAlgorithm {
                     : is.box().maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.box().minWidth().isAuto()) {
-                // Mínimo automático (reference/components/stack.md): el ancho más estrecho de su contenido, sin pasar de Max
-                // width, y nunca más que el ancho declarado.
+                // Automatic minimum (reference/components/stack.md): the narrowest width of its content, not exceeding
+                // Max width, and never more than the declared width.
                 double content = Math.min(context.contentIntrinsic(b).narrowest() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
@@ -326,7 +326,7 @@ public final class StackLayout implements LayoutAlgorithm {
             double margins = it.margin.vertical();
             BoxModel probe = BoxModel.resolve(b, probeSpace(), context);
 
-            // Ancho con el que se mide: el declarado, el del contenedor (stretch) o el ajuste al contenido.
+            // Width it is measured with: the declared one, the container's (stretch) or the fit to the content.
             double width;
             if (!is.box().width().isAuto()) {
                 width = probe.width();
@@ -345,8 +345,8 @@ public final class StackLayout implements LayoutAlgorithm {
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
             double min;
             if (is.box().minHeight().isAuto()) {
-                // Mínimo automático (reference/components/stack.md): el alto de su contenido, sin pasar de Max height,
-                // y nunca más que el alto declarado.
+                // Automatic minimum (reference/components/stack.md): the height of its content, not exceeding Max
+                // height, and never more than the declared height.
                 double content = sized.height().isPresent()
                         ? context.layout(b, measure.measuringContentHeight(), null).fragment().height()
                         : contentSize;
@@ -360,7 +360,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return it;
         }
 
-        /** {@code Base size} en caja de borde; vacío si es {@code auto} o un porcentaje de un tamaño indefinido. */
+        /** {@code Base size} as border box; empty if it is {@code auto} or a percentage of an indefinite size. */
         OptionalDouble declaredBasis(Style is) {
             return is.item().baseSize().resolve(mainSize);
         }
@@ -370,7 +370,7 @@ public final class StackLayout implements LayoutAlgorithm {
             return own != null ? own : s.stack().crossAxis();
         }
 
-        // --- Pasos 4 a 7 ----------------------------------------------------------------------------
+        // --- Steps 4 to 7 -----------------------------------------------------------------------------
 
         List<List<Item>> breakLines(List<Item> items) {
             List<List<Item>> lines = new ArrayList<>();
@@ -400,7 +400,7 @@ public final class StackLayout implements LayoutAlgorithm {
 
         void resolveMainSizes(List<Item> line) {
             if (mainSize.isEmpty()) {
-                // Sin tamaño principal definido no hay espacio libre: Grow no tiene efecto.
+                // Without a definite main size there is no free space: Grow has no effect.
                 line.forEach(it -> it.main = it.stack.hypothetical());
                 return;
             }
@@ -412,9 +412,9 @@ public final class StackLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Layout del ítem con su tamaño principal final.
+         * Layout of the item with its final main size.
          *
-         * @param cross tamaño cruzado impuesto (caja de borde), al estirar; vacío si no
+         * @param cross imposed cross size (border box), when stretching; empty otherwise
          */
         void layOutItem(Item it, OptionalDouble cross) {
             if (row) {
@@ -431,7 +431,7 @@ public final class StackLayout implements LayoutAlgorithm {
             }
         }
 
-        /** Un ítem sin tamaño cruzado declarado pasa a medir lo que la línea (paso 7). */
+        /** An item without a declared cross size takes the size of the line (step 7). */
         void stretch(Item it, double lineCross) {
             Style is = it.box.style();
             double target;
@@ -453,9 +453,9 @@ public final class StackLayout implements LayoutAlgorithm {
             }
         }
 
-        // --- Paso 8 ----------------------------------------------------------------------------------
+        // --- Step 8 ----------------------------------------------------------------------------------
 
-        /** Coloca el ítem; {@code mainPos} y {@code crossPos} son de su caja de margen. */
+        /** Places the item; {@code mainPos} and {@code crossPos} refer to its margin box. */
         UnitBreaker.Placed place(Item it, double mainPos, double crossPos, int unit) {
             double x = (row ? mainPos : crossPos) + it.margin.left();
             double y = (row ? crossPos : mainPos) + it.margin.top();
@@ -465,25 +465,25 @@ public final class StackLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Espacio de un ítem con el ancho y, si lo hay, el alto impuestos. Los porcentajes de los
-         * ítems se resuelven contra la caja de contenido del contenedor.
+         * Space of an item with the imposed width and, if there is one, the imposed height. The percentages of the
+         * items resolve against the content box of the container.
          */
         ConstraintSpace itemSpace(double width, OptionalDouble fixedHeight) {
             return ConstraintSpace.fixed(width, fixedHeight, contentWidth, contentHeight, atStart);
         }
 
-        /** Espacio de la sonda que resuelve márgenes, borde, relleno y tamaños declarados del ítem. */
+        /** Space of the probe that resolves the margins, border, padding and declared sizes of the item. */
         ConstraintSpace probeSpace() {
             return ConstraintSpace.free(contentWidth, contentWidth, contentHeight, atStart);
         }
     }
 
     /**
-     * Reparto del sobrante {@code free} entre {@code n} elementos (tabla del eje principal,
-     * reference/components/stack.md). Si falta sitio, {@code justify} se alinea al principio y {@code around} y
-     * {@code distribute} se centran, como en CSS.
+     * Distribution of the leftover {@code free} among {@code n} elements (main axis table,
+     * reference/components/stack.md). If space is lacking, {@code justify} aligns to the start and {@code around} and
+     * {@code distribute} are centered, as in CSS.
      *
-     * @return {antes del primero, extra entre elementos}
+     * @return {before the first, extra between elements}
      */
     static double[] distribute(Distribution d, double free, int n) {
         if (n == 0) {

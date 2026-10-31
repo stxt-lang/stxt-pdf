@@ -1,5 +1,5 @@
-# Columnas de grid: (260 − 10) / 2 = 125. header: y = 20 − 15 = 5. footer: arriba = 160 + 15 − 10 = 165,
-# y = 20 + 165 = 185. Las cajas fixed se repiten en todas las páginas.
+# Grid columns: (260 − 10) / 2 = 125. header: y = 20 − 15 = 5. footer: top = 160 + 15 − 10 = 165,
+# y = 20 + 165 = 185. The fixed boxes repeat on every page.
 Result:
 	Page: 1
 		Fragment: intro

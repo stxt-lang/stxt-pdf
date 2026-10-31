@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Adónde lleva el PDF a quien busca una caja: la esquina superior izquierda de su primer
- * fragmento, en su página. Lo usan los marcadores de los encabezados ({@link PdfStructure}) y los
- * enlaces a una caja del documento ({@link PdfLinks}, reference/common/links.md).
+ * Where the PDF takes whoever looks for a box: the top left corner of its first
+ * fragment, on its page. Used by the bookmarks of the headings ({@link PdfStructure}) and the
+ * links to a box of the document ({@link PdfLinks}, reference/common/links.md).
  *
- * <p>Tienen destino los encabezados y las cajas que se pueden señalar ({@link Box#key()}: con
- * {@code Id}, o los encabezados que lista un índice). Los {@code Page overlay} no: se repiten en todas
- * las páginas y no tienen un único destino.</p>
+ * <p>Headings and the boxes that can be pointed to ({@link Box#key()}: with {@code Id}, or the
+ * headings a table of contents lists) have a destination. {@code Page overlay} boxes do not: they repeat on every
+ * page and have no single destination.</p>
  */
 final class PdfDestinations {
 
@@ -28,8 +28,8 @@ final class PdfDestinations {
     }
 
     /**
-     * El destino de cada caja que lo tiene, en orden del documento. {@code pdfPages} son sus
-     * páginas del PDF, en el mismo orden que {@code pages}; cada una tiene el medio de su sección.
+     * The destination of each box that has one, in document order. {@code pdfPages} are their
+     * PDF pages, in the same order as {@code pages}; each one has the paper of its section.
      */
     static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
@@ -42,9 +42,9 @@ final class PdfDestinations {
     }
 
     /**
-     * {@code x}, {@code y}: la esquina de la caja de borde del fragmento en la página, sin girar;
-     * {@code turn}, los giros de sus ancestros (reference/common/box.md). La esquina de una caja girada, o de dentro
-     * de una girada, es la del rectángulo que envuelve lo que se pinta.
+     * {@code x}, {@code y}: the corner of the border box of the fragment on the page, unrotated;
+     * {@code turn}, the rotations of its ancestors (reference/common/box.md). The corner of a rotated box, or of one
+     * inside a rotated one, is that of the rectangle that encloses what is painted.
      */
     private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double pageHeight,
                              Map<Box, PDPageXYZDestination> targets) {

@@ -6,33 +6,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La numeración de los encabezados (reference/components/heading.md): {@code 1}, {@code 1.1}, {@code II.a}…
+ * The numbering of the headings (reference/components/heading.md): {@code 1}, {@code 1.1}, {@code II.a}...
  *
- * <p>Se cuenta en orden del documento, atravesando las secciones y los {@code Markdown}: un
- * contador por nivel que sube con cada encabezado numerado de ese nivel y vuelve a 0 con cualquier
- * encabezado de un nivel superior (numerado o no). Un encabezado con {@code Numbered: false} no
- * cuenta ni lleva número. El número de un encabezado de nivel N son los contadores de los niveles
- * 1 a N que están numerados, cada uno escrito con el {@code Number format} de su encabezado: bajo un título sin número
- * (un {@code Heading 1}), los {@code Heading 2} numerados son 1, 2, 3…</p>
+ * <p>It is counted in document order, across the sections and the {@code Markdown}: one
+ * counter per level that goes up with each numbered heading of that level and goes back to 0 with any
+ * heading of a higher level (numbered or not). A heading with {@code Numbered: false} neither
+ * counts nor carries a number. The number of a heading of level N is the counters of the levels
+ * 1 to N that are numbered, each one written with the {@code Number format} of its heading: under a title without a
+ * number (a {@code Heading 1}), the numbered {@code Heading 2} are 1, 2, 3...</p>
  */
 final class HeadingNumbers {
 
-    /** Lo que {@code Number label} sustituye por el número. */
+    /** What {@code Number label} replaces with the number. */
     static final String NUMBER = "{number}";
 
-    /** El nivel más profundo de encabezado ({@code Heading 6}). */
+    /** The deepest heading level ({@code Heading 6}). */
     private static final int LEVELS = 6;
 
-    /** Contador de cada nivel (el índice 0 no se usa). */
+    /** Counter of each level (index 0 is not used). */
     private final int[] counters = new int[LEVELS + 1];
-    /** Si el último encabezado de cada nivel está numerado: el de cada nivel anterior es un antecesor del siguiente. */
+    /** Whether the last heading of each level is numbered: that of each previous level is an ancestor of the next. */
     private final boolean[] numbered = new boolean[LEVELS + 1];
-    /** Cómo se escribe el número de cada nivel: el {@code Number format} de su último encabezado. */
+    /** How the number of each level is written: the {@code Number format} of its last heading. */
     private final NumberFormat[] styles = new NumberFormat[LEVELS + 1];
 
     /**
-     * Registra un encabezado en orden del documento y devuelve su número ({@code "4.2"}, {@code "II.a"}), o
-     * {@code null} si no se numera.
+     * Records a heading in document order and returns its number ({@code "4.2"}, {@code "II.a"}), or
+     * {@code null} if it is not numbered.
      */
     String next(int level, boolean number, NumberFormat style) {
         for (int deeper = level + 1; deeper <= LEVELS; deeper++) {
@@ -46,7 +46,7 @@ final class HeadingNumbers {
         counters[level]++;
         List<String> parts = new ArrayList<>(level);
         for (int l = 1; l <= level; l++) {
-            // Los antecesores sin número no aportan: su contador no existe.
+            // Ancestors without a number contribute nothing: their counter does not exist.
             if (l == level || numbered[l]) {
                 parts.add(styles[l].format(counters[l]));
             }
@@ -55,9 +55,9 @@ final class HeadingNumbers {
     }
 
     /**
-     * Escribe el número delante del título del encabezado, como un texto más: lo ven el layout, el
-     * índice y los marcadores del PDF sin tratarlo aparte. Va en el primer {@code Text}, seguido de
-     * un espacio; con {@code Number label}, la plantilla con el número en su {@code {number}}.
+     * Writes the number before the title of the heading, as one more piece of text: the layout, the
+     * table of contents and the PDF bookmarks see it without treating it apart. It goes in the first {@code Text},
+     * followed by a space; with {@code Number label}, the template with the number in its {@code {number}}.
      */
     static void prefix(Box heading, String number) {
         heading.setNumber(number);

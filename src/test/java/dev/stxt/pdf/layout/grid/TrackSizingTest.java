@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class TrackSizingTest {
 
-    /** Ancho más estrecho y ancho natural del contenido de cada columna. */
+    /** Narrowest width and natural width of the content of each column. */
     private static final double[][] CONTENT = {{60, 140}, {50, 90}, {80, 220}, {40, 120}};
 
     private static double[] columns(String tracks, double available) {
@@ -24,40 +24,40 @@ class TrackSizingTest {
 
     @Test
     void fixedAutoAndFraction() {
-        // 475 para pistas: 150 fija, auto llega a su ancho natural (90), * recibe 235.
+        // 475 for tracks: 150 fixed, auto reaches its natural width (90), * receives 235.
         assertArrayEquals(new double[]{150, 90, 235}, columns("150 auto *", 515), 1e-9);
     }
 
     @Test
     void fractionNeverBelowItsNarrowest() {
-        // 210 para pistas: 70 por fracción; la tercera (min 80) se congela.
+        // 210 for tracks: 70 per fraction; the third (min 80) freezes.
         assertArrayEquals(new double[]{65, 65, 80}, columns("* * *", 250), 1e-9);
     }
 
     @Test
     void withoutFractionsAutoTracksStretch() {
-        // 495: base 140 + 90 = 230; sobran 265, 132.5 para cada una.
+        // 495: base 140 + 90 = 230; 265 left over, 132.5 for each one.
         assertArrayEquals(new double[]{272.5, 222.5}, columns("auto auto", 515), 1e-9);
     }
 
     @Test
     void percentagesWithoutBaseAreAuto() {
-        // Sin base, 50% es auto (ancho natural 140, como la auto de al lado, 90) y between(100, 50%)
-        // pasa a between(100, auto) (ancho natural 220); 120 es fija.
+        // Without a base, 50% is auto (natural width 140, like the auto next to it, 90) and between(100, 50%)
+        // becomes between(100, auto) (natural width 220); 120 is fixed.
         assertArrayEquals(new double[]{140, 90, 220, 120},
                 columns("50% auto between(100, 50%) 120", Double.POSITIVE_INFINITY), 1e-9);
     }
 
     @Test
     void percentagesWithBase() {
-        // 50% de 515 = 257.5 (los huecos no se descuentan); de los 495 para pistas, el resto
-        // para la auto (estirada).
+        // 50% of 515 = 257.5 (the gaps are not subtracted); of the 495 for tracks, the rest
+        // for the auto one (stretched).
         assertArrayEquals(new double[]{257.5, 237.5}, columns("50% auto", 515), 1e-9);
     }
 
     @Test
     void percentagesIgnoreGaps() {
-        // Como en CSS, 50% 50% con hueco desborda el hueco.
+        // As in CSS, 50% 50% with a gap overflows the gap.
         assertArrayEquals(new double[]{257.5, 257.5}, columns("50% 50%", 515), 1e-9);
     }
 
@@ -68,7 +68,7 @@ class TrackSizingTest {
 
     @Test
     void itemCrossingFractionsGrowsThem() {
-        // El ítem necesita 300 en dos fracciones: 150 cada una, aunque solo haya 200.
+        // The item needs 300 in two fractions: 150 each, even though there are only 200.
         assertArrayEquals(new double[]{150, 150},
                 spanning("* *", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
         assertArrayEquals(new double[]{150, 150},
@@ -79,14 +79,14 @@ class TrackSizingTest {
     void itemCrossingFractionsInProportionToFr() {
         assertArrayEquals(new double[]{200, 100},
                 spanning("2* *", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
-        // Con pesos que suman 0.75: 0.75 del exceso en proporción y el resto a partes iguales.
+        // With weights that add up to 0.75: 0.75 of the excess in proportion and the rest in equal parts.
         assertArrayEquals(new double[]{187.5, 112.5},
                 spanning("0.5* 0.25*", 200, new ItemContribution(0, 2, 300, 300)), 1e-9);
     }
 
     @Test
     void itemCrossingFractionsOnlyGrowsTheFractions() {
-        // La auto se queda con su ítem (50); la fracción toma los 250 que faltan.
+        // The auto one keeps its item (50); the fraction takes the 250 that are missing.
         assertArrayEquals(new double[]{50, 250}, spanning("auto *", 200,
                 new ItemContribution(0, 1, 50, 50), new ItemContribution(0, 2, 300, 300)), 1e-9);
     }
@@ -103,8 +103,8 @@ class TrackSizingTest {
 
     @Test
     void itemSpanningSeveralTracks() {
-        // Dos columnas auto vacías y un ítem de 2 columnas con min 100 y max 300:
-        // el exceso se reparte entre ambas; el resto del espacio estira las auto.
+        // Two empty auto columns and an item of 2 columns with min 100 and max 300:
+        // the excess is distributed between both; the rest of the space stretches the auto ones.
         List<Track> t = ValueParser.list("auto auto").stream().map(Track::of).toList();
         double[] r = TrackSizing.size(t, List.of(new ItemContribution(0, 2, 100, 300)), 1000, 0);
         assertArrayEquals(new double[]{500, 500}, r, 1e-9);
@@ -113,9 +113,10 @@ class TrackSizingTest {
     }
 
     /**
-     * Un ítem sobre una pista fija y una auto, con hueco: el exceso de su ancho más estrecho va solo a la auto, y su
-     * ancho natural se cuenta con las bases ya subidas (como en CSS, reference/components/grid.md): el área del ítem
-     * mide su ancho natural (50 + 10 + 340 = 400), no más. Antes la auto llegaba a 480 (pruebas de mutación).
+     * An item over a fixed track and an auto one, with a gap: the excess of its narrowest width goes only to the auto
+     * one, and its natural width is counted with the bases already raised (as in CSS, reference/components/grid.md):
+     * the area of the item measures its natural width (50 + 10 + 340 = 400), no more. Before, the auto one reached 480
+     * (mutation testing).
      */
     @Test
     void itemSpanningAFixedAndAnAutoTrack() {
@@ -127,18 +128,18 @@ class TrackSizingTest {
                 List.of(new ItemContribution(0, 2, 200, 400)), Double.POSITIVE_INFINITY, 10), 1e-9);
     }
 
-    /** Los huecos que cruza el ítem cuentan como suyos, y el exceso se reparte a partes iguales entre las auto. */
+    /** The gaps that the item spans count as its own, and the excess is split in equal parts among the auto ones. */
     @Test
     void itemSpanningThreeTracksCountsItsGaps() {
         List<Track> t = ValueParser.list("50 auto auto").stream().map(Track::of).toList();
-        // 300 − 50 − 2 × 10 = 230, 115 por pista auto.
+        // 300 − 50 − 2 × 10 = 230, 115 per auto track.
         assertArrayEquals(new double[]{50, 115, 115}, TrackSizing.size(t,
                 List.of(new ItemContribution(0, 3, 300, 300)), Double.POSITIVE_INFINITY, 10), 1e-9);
     }
 
     /**
-     * Un ítem de dos pistas sobre una que ya tiene un ítem propio: el ancho más estrecho que falta se reparte entre las dos,
-     * y el ancho natural que falta se suma a lo que ya tienen (237.5 + 62.5 = 300).
+     * An item of two tracks over one that already has an item of its own: the missing narrowest width is distributed
+     * between the two, and the missing natural width is added to what they already have (237.5 + 62.5 = 300).
      */
     @Test
     void itemSpanningTracksThatAlreadyHaveContent() {
@@ -146,20 +147,20 @@ class TrackSizingTest {
                 new ItemContribution(0, 1, 50, 200), new ItemContribution(0, 2, 100, 300)), 1e-9);
     }
 
-    /** between(50, 200) crece hasta su máximo antes que la fracción, que se queda con el resto. */
+    /** between(50, 200) grows up to its maximum before the fraction, which keeps the rest. */
     @Test
     void aFixedMaximumIsALimitToGrowTo() {
         assertArrayEquals(new double[]{200, 295}, spanning("between(50, 200) *", 495), 1e-9);
     }
 
-    /** Sin ancho, las fracciones miden en proporción: * y 2* con contenido de 100 son 100 y 200. */
+    /** Without a width, the fractions measure in proportion: * and 2* with content of 100 are 100 and 200. */
     @Test
     void fractionsOfAnIndefiniteSizeKeepTheirProportion() {
         assertArrayEquals(new double[]{100, 200}, spanning("* 2*", Double.POSITIVE_INFINITY,
                 new ItemContribution(0, 1, 100, 100), new ItemContribution(1, 1, 100, 100)), 1e-9);
     }
 
-    /** Un ítem que cruza tres fracciones con huecos de 10: le faltan 300 − 20, 93,33 por fracción. */
+    /** An item that spans three fractions with gaps of 10: it lacks 300 − 20, 93.33 per fraction. */
     @Test
     void itemCrossingFractionsCountsItsGaps() {
         List<Track> t = ValueParser.list("* * *").stream().map(Track::of).toList();

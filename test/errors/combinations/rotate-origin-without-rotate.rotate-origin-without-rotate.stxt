@@ -1,0 +1,12 @@
+# Case: Rotate origin without Rotate
+# Code: ROTATE_ORIGIN_WITHOUT_ROTATE
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Overlay:
+			Rotate origin: top left

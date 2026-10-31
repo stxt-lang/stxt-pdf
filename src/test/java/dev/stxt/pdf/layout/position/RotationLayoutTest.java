@@ -12,15 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Rotate} en el layout (reference/common/layers-and-rotation.md, reference/common/breaks.md y
- * reference/common/overflow.md): un posicionado girado no mueve nada, una caja girada en flujo ocupa el
- * rectángulo que la envuelve, una caja girada no se parte, y lo que se comprueba contra la página es lo que se pinta.
+ * {@code Rotate} in the layout (reference/common/layers-and-rotation.md, reference/common/breaks.md and
+ * reference/common/overflow.md): a rotated positioned element moves nothing, a rotated box in flow takes up the
+ * rectangle that wraps it, a rotated box is not split, and what is checked against the page is what is painted.
  */
 class RotationLayoutTest {
 
     /**
-     * La caja girada ocupa su sitio sin girar: su rectángulo y el de su hermana son los de siempre.
-     * Va detrás de un bloque de 100 porque, girada 30 grados, sube unos 72 pt sobre su centro.
+     * The rotated box takes up its place unrotated: its rectangle and that of its sibling are the usual ones.
+     * It goes after a block of 100 because, rotated 30 degrees, it rises about 72 pt above its center.
      */
     @Test
     void rotationDoesNotChangeTheLayout() {
@@ -32,8 +32,8 @@ class RotationLayoutTest {
     }
 
     /**
-     * Área útil de 100: tras un bloque de 60 quedan 40, y el {@code Frame} girado mide 60. Sin
-     * girar se partiría entre sus dos bloques; girado pasa entero a la página siguiente.
+     * Page area of 100: after a block of 60, 40 remain, and the rotated {@code Frame} measures 60. Unrotated
+     * it would be split between its two blocks; rotated, it moves whole to the next page.
      */
     @Test
     void aRotatedRelativeIsNotSplit() {
@@ -52,7 +52,7 @@ class RotationLayoutTest {
         assertEquals(new Rect(40, 70, 515, 30), turned.rect(2, "Z"));
     }
 
-    /** Al principio de una página no hay adónde pasar: si cabe, se coloca entera. */
+    /** At the start of a page there is nowhere to move to: if it fits, it is placed whole. */
     @Test
     void aRotatedRelativeThatFitsStaysOnItsPage() {
         LayoutFixture l = LayoutFixture.layOutPaged(180,
@@ -62,8 +62,8 @@ class RotationLayoutTest {
     }
 
     /**
-     * Un {@code Overlay} de 60 × 100 en y = 760 de la página se sale por abajo sin girar (llega a
-     * 860 de 842), pero girado 90 grados alrededor de su centro (30, 50) ocupa de 780 a 840: cabe.
+     * An {@code Overlay} of 60 × 100 at y = 760 of the page overflows at the bottom unrotated (it reaches
+     * 860 of 842), but rotated 90 degrees around its center (30, 50) it spans from 780 to 840: it fits.
      */
     @Test
     void aRotatedBoxIsCheckedAsItIsPainted() {
@@ -76,22 +76,22 @@ class RotationLayoutTest {
         assertEquals(new Rect(40, 760, 60, 100), l.rect("S"));
     }
 
-    /** Al revés: cabe sin girar, pero girada sale por encima de la página. */
+    /** The other way around: it fits unrotated, but rotated it goes off the top of the page. */
     @Test
     void aRotatedBoxThatLeavesThePageIsAnOverflow() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
                 "\tFrame:", "\t\tRotate: -90", "\t\tRotate origin: top left", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\t\tHeight: 10"));
         assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
-        assertTrue(e.getMessage().contains("girada"), e.getMessage());
+        assertTrue(e.getMessage().contains("rotated"), e.getMessage());
     }
 
-    // Giro en flujo: Block, Text, Paragraph e Image ocupan el rectángulo que los envuelve girados. Con FixedMetrics y
-    // Size 10, cada carácter mide 5 pt y cada línea, 12.
+    // Rotation in flow: Block, Text, Paragraph and Image take up the rectangle that wraps them rotated. With
+    // FixedMetrics and Size 10, each character measures 5 pt and each line, 12.
 
     /**
-     * Un {@code Text} girado −90 sin {@code Width} mide su texto en una línea, 25 × 12, y ocupa 12 × 25: lo siguiente
-     * va 25 más abajo. Sus líneas no se parten.
+     * A {@code Text} rotated −90 without {@code Width} measures its text on one line, 25 × 12, and takes up 12 × 25:
+     * what follows goes 25 lower. Its lines are not broken.
      */
     @Test
     void aTextRotatedInFlowTakesTheRectangleAroundIt() {
@@ -99,12 +99,12 @@ class RotationLayoutTest {
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 10");
         assertEquals(new Rect(40, 40, 12, 25), l.rect("T"));
         assertEquals(new Rect(40, 65, 515, 10), l.rect("B"));
-        // Su caja sin girar, centrada en la que ocupa.
+        // Its unrotated box, centered in the one it takes up.
         assertEquals(new Rect(-6.5, 6.5, 25, 12), l.fragment("T").turned());
         assertEquals(1, l.fragment("T").lines().size());
     }
 
-    /** Con {@code Width}, la caja girada reparte su texto en ese ancho: dos líneas de 50 ocupan 24 × 50. */
+    /** With {@code Width}, the rotated box breaks its text in that width: two lines of 50 take up 24 × 50. */
     @Test
     void aRotatedBoxWithAWidthWrapsItsText() {
         LayoutFixture l = LayoutFixture.layOut("\tText: aaa bbb ccc", "\t\tId: T", "\t\tRotate: 90", "\t\tBox:",
@@ -113,7 +113,9 @@ class RotationLayoutTest {
         assertEquals(2, l.fragment("T").lines().size());
     }
 
-    /** Lo que aporta a su contenedor es el ancho girado: un ítem de Stack con una caja girada dentro mide 12. */
+    /**
+     * What it contributes to its container is the rotated width: a Stack item with a rotated box inside measures 12.
+     */
     @Test
     void theIntrinsicWidthOfARotatedBoxIsItsTurnedWidth() {
         LayoutFixture l = LayoutFixture.layOut("\tStack:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: I",
@@ -121,7 +123,7 @@ class RotationLayoutTest {
         assertEquals(new Rect(40, 40, 12, 25), l.rect("I"));
     }
 
-    /** Los márgenes {@code auto} la centran por lo que ocupa: (515 − 12) / 2. */
+    /** The {@code auto} margins center it by what it takes up: (515 − 12) / 2. */
     @Test
     void autoMarginsCenterTheTurnedRectangle() {
         LayoutFixture l = LayoutFixture.layOut("\tText: Lunes", "\t\tId: T", "\t\tRotate: 90", "\t\tBox:",
@@ -130,9 +132,9 @@ class RotationLayoutTest {
     }
 
     /**
-     * Un {@code Block} de 100 × 20 girado 90 ocupa 20 × 100 en (40, 40), y su caja sin girar está en (0, 80). Es el
-     * contenedor de referencia del {@code Overlay} de dentro, que se coloca en su caja sin girar; el margen de su
-     * hijo no sale de él.
+     * A {@code Block} of 100 × 20 rotated 90 takes up 20 × 100 at (40, 40), and its unrotated box is at (0, 80). It is
+     * the reference container of the {@code Overlay} inside, which is placed in its unrotated box; the margin of its
+     * child does not leave it.
      */
     @Test
     void aRotatedBlockContainsItsAbsolutesAndItsMargins() {
@@ -146,7 +148,7 @@ class RotationLayoutTest {
         assertEquals(new Rect(90, 80, 10, 10), l.rect("A"));
     }
 
-    /** No se parte: con 40 libres y 50 de alto girada, pasa entera a la página siguiente. */
+    /** It is not split: with 40 free and 50 of rotated height, it moves whole to the next page. */
     @Test
     void aBoxRotatedInFlowIsNotSplit() {
         LayoutFixture l = LayoutFixture.layOutPaged(180, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
@@ -155,16 +157,16 @@ class RotationLayoutTest {
         assertEquals(new Rect(40, 40, 24, 50), l.rect(2, "T"));
     }
 
-    /** Sin {@code Width}, un texto largo no parte sus líneas: girado poco, no cabe a lo ancho. */
+    /** Without {@code Width}, a long text does not break its lines: slightly rotated, it does not fit horizontally. */
     @Test
     void aLongRotatedTextWithoutAWidthIsTooWide() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
                 "\tText: " + "palabra ".repeat(20).strip(), "\t\tRotate: 5"));
         assertEquals(ErrorCode.BOX_OVERFLOW, e.errorCode());
-        assertTrue(e.getMessage().contains("Le falta un Width"), e.getMessage());
+        assertTrue(e.getMessage().contains("It needs a Width"), e.getMessage());
     }
 
-    /** Las líneas del documento con {@code {}} sustituida por {@code line}. */
+    /** The lines of the document with {@code {}} replaced by {@code line}. */
     private static String[] with(String[] lines, String line) {
         return java.util.Arrays.stream(lines).map(s -> s.equals("{}") ? line : s).toArray(String[]::new);
     }

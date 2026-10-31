@@ -1,0 +1,20 @@
+# Case: Before: page in a text inside an Overlay, which does not break
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Cuerpo
+		Overlay:
+			Paragraph: Sello
+				Break:
+					Before: page

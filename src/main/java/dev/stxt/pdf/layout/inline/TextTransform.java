@@ -11,15 +11,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Las mayúsculas del texto al pintarlo: {@code Case} y {@code Small caps}
- * (reference/common/text-formatting.md). Se aplica a los tramos antes de repartirlos en líneas, porque cambia lo
- * que miden (la «ß» pasa a «SS», las versalitas se pintan más pequeñas); el texto de la caja no
- * cambia.
+ * The case of the text when painting it: {@code Case} and {@code Small caps}
+ * (reference/common/text-formatting.md). It is applied to the runs before breaking them into lines, because it
+ * changes what they measure ("ß" becomes "SS", small caps are painted smaller); the text of the box does not
+ * change.
  *
- * <p>Primero va {@code Case} y después las versalitas: las minúsculas que quedan pasan a
- * mayúsculas con {@link TextFormat#smallCaps()}. Las reglas de cada letra son las del idioma
- * ({@link Locale}) de {@code Language}. Los marcadores {@code {page}} y {@code {pages}} se dejan
- * como están: se sustituyen al terminar de paginar ({@link PageNumbers}).</p>
+ * <p>{@code Case} goes first and then the small caps: the lowercase letters that remain become
+ * uppercase with {@link TextFormat#smallCaps()}. The rules of each letter are those of the language
+ * ({@link Locale}) of {@code Language}. The markers {@code {page}} and {@code {pages}} are left
+ * as they are: they are replaced when pagination ends ({@link PageNumbers}).</p>
  */
 public final class TextTransform {
 
@@ -28,21 +28,21 @@ public final class TextTransform {
     private TextTransform() {
     }
 
-    /** Si hay algo que transformar. */
+    /** Whether there is something to transform. */
     public static boolean applies(Style s) {
         return s.typography().textCase() != TextCase.NONE || s.typography().smallCaps();
     }
 
-    /** Los tramos con la transformación y las versalitas de {@code s}; los mismos si no se piden. */
+    /** The runs with the transformation and the small caps of {@code s}; the same ones if none is requested. */
     public static List<TextRun> apply(List<TextRun> runs, Style s) {
         return applies(s) ? apply(runs, s.typography().textCase(), s.typography().smallCaps(), s.typography().locale()) : runs;
     }
 
-    /** Los tramos transformados, con los seguidos del mismo formato unidos. */
+    /** The transformed runs, with consecutive ones of the same format joined. */
     public static List<TextRun> apply(List<TextRun> runs, TextCase transform, boolean smallCaps,
                                       Locale locale) {
         TextRun.Joiner out = new TextRun.Joiner();
-        // Para capitalize: si el carácter anterior (aunque sea de otro tramo) separa palabras.
+        // For capitalize: whether the previous character (even from another run) separates words.
         boolean wordStart = true;
         for (TextRun run : runs) {
             String text = run.text();
@@ -77,7 +77,7 @@ public final class TextTransform {
         };
     }
 
-    /** La primera letra de cada palabra en mayúscula; el resto, como estaba. */
+    /** The first letter of each word in uppercase; the rest, as it was. */
     private static String capitalize(String text, boolean wordStart, Locale locale) {
         StringBuilder sb = new StringBuilder(text.length());
         boolean start = wordStart;
@@ -91,7 +91,7 @@ public final class TextTransform {
         return sb.toString();
     }
 
-    /** Añade el texto al tramo; con versalitas, sus minúsculas pasan a mayúsculas marcadas. */
+    /** Adds the text to the run; with small caps, its lowercase letters become marked uppercase letters. */
     private static void emit(TextRun.Joiner out, String text, TextFormat format, boolean smallCaps, Locale locale) {
         if (!smallCaps) {
             out.add(text, format);

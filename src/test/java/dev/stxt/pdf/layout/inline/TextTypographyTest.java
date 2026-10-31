@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Case}, {@code Letter spacing} y {@code Small caps} (reference/common/text-formatting.md). Con {@link
- * FixedMetrics}, cada carácter mide 5 pt con {@code Size: 10}.
+ * {@code Case}, {@code Letter spacing} and {@code Small caps} (reference/common/text-formatting.md). With {@link
+ * FixedMetrics}, each character measures 5 pt with {@code Size: 10}.
  */
 class TextTypographyTest {
 
-    /** Las líneas de un {@code Text} de 100 pt de ancho con estas propiedades en su {@code Typography}. */
+    /** The lines of a {@code Text} 100 pt wide with these properties in its {@code Typography}. */
     private static List<TextLine> lines(String text, String... typography) {
         List<String> doc = new ArrayList<>(List.of("\tText: " + text, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\tTypography:"));
@@ -66,7 +66,7 @@ class TextTypographyTest {
 
     @Test
     void letterSpacingChangesTheBreaks() {
-        // «aaaa bbbb» mide 45 y cabe en 45; con 1 pt de interletraje mide 53.
+        // "aaaa bbbb" measures 45 and fits in 45; with 1 pt of letter spacing it measures 53.
         LayoutFixture fits = layOut("\tText: aaaa bbbb", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 45");
         assertEquals(1, fits.fragment("T").lines().size());
         LayoutFixture wider = layOut("\tText: aaaa bbbb", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 45",
@@ -76,7 +76,7 @@ class TextTypographyTest {
 
     @Test
     void letterSpacingCountsInTheIntrinsicWidth() {
-        // Un ítem stack sin ancho mide su ancho natural: «abcd» con 2 de interletraje, 26.
+        // A stack item without a width measures its natural width: "abcd" with a letter spacing of 2, 26.
         LayoutFixture l = layOut("\tStack:", "\t\tItem:", "\t\t\tText: abcd", "\t\t\t\tId: T",
                 "\t\t\t\tTypography:", "\t\t\t\t\tLetter spacing: 2");
         assertEquals(26, l.rect("T").width(), 1e-9);
@@ -92,7 +92,7 @@ class TextTypographyTest {
     @Test
     void justifyDistributesTheRestAfterTheSpacing() {
         TextLine line = lines("aaaa bbbb cccc dddd", "Letter spacing: 1", "Align: justify").get(0);
-        // «aaaa bbbb cccc» mide 70 + 13 = 83 y, justificada, se llena hasta 100.
+        // "aaaa bbbb cccc" measures 70 + 13 = 83 and, justified, is filled up to 100.
         assertEquals("aaaa bbbb cccc", line.text());
         assertEquals(100, line.width(), 1e-9);
     }
@@ -110,7 +110,7 @@ class TextTypographyTest {
 
     @Test
     void smallCapsKeepTheSpacesAtFullSize() {
-        // a (4) + espacio (5) + b (4)
+        // a (4) + space (5) + b (4)
         assertEquals(13, lines("a b", "Small caps: true").get(0).width(), 1e-9);
     }
 

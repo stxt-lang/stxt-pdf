@@ -1,0 +1,17 @@
+# Case: Code in a text with Markup: markdown, without Code font
+# Code: CODE_WITHOUT_FONT
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Text: Usa `mvn test` para probar

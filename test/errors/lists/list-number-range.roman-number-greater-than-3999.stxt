@@ -1,0 +1,22 @@
+# Case: Roman number greater than 3999
+# Code: LIST_NUMBER_RANGE
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: upper-roman
+			Start: 3999
+			List item:
+				Text: Uno
+			List item:
+				Text: Dos

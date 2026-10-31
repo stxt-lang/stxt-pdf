@@ -33,22 +33,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Ejemplos de documentos completos ({@code test/examples/NN-nombre/}). A diferencia de los casos
- * golden, que comprueban un algoritmo con un resultado calculado a mano, un ejemplo es un
- * documento como los que escribiría un autor, maquetado con las fuentes y las imágenes reales de
- * {@code resources/} y sin contornos de depuración.
+ * Examples of complete documents ({@code test/examples/NN-name/}). Unlike the golden cases,
+ * which check an algorithm against a result calculated by hand, an example is a
+ * document like the ones an author would write, laid out with the real fonts and images of
+ * {@code resources/} and without debug outlines.
  *
- * <p>Cada carpeta tiene {@code input.stxt}, que debe validar y maquetarse sin errores, y puede
- * tener {@code styles.stxt}, el documento de estilos aparte que se pasa junto a él
- * (reference/common/styles.md); el volcado de las cajas con {@code Id} ({@code expected.stxt},
- * reference/implementation/testing.md), que se compara con tolerancia de 0.01 pt; una imagen por página ({@code
- * page-N.png}, versionadas) y el PDF ({@code output.pdf}, versionado para poder abrirlo desde el repositorio, pero no
- * se compara: lleva la fecha y un identificador que cambian en cada ejecución). El PDF y las imágenes nuevas se
- * escriben en {@code target/reference/examples/}, y si alguna imagen no es la versionada el ejemplo falla.</p>
+ * <p>Each folder has {@code input.stxt}, which must validate and lay out without errors, and can
+ * have {@code styles.stxt}, the separate styles document that is passed along with it
+ * (reference/common/styles.md); the dump of the boxes with {@code Id} ({@code expected.stxt},
+ * reference/implementation/testing.md), which is compared with a tolerance of 0.01 pt; one image per page ({@code
+ * page-N.png}, versioned) and the PDF ({@code output.pdf}, versioned so it can be opened from the repository, but not
+ * compared: it carries the date and an identifier that change on every run). The PDF and the new images are
+ * written to {@code target/reference/examples/}, and if any image is not the versioned one the example fails.</p>
  *
- * <p>El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que el
- * autor revisa mirando las imágenes. {@code -Dexamples.update=true} acepta los cambios (reescribe el volcado, el PDF
- * y las imágenes que cambian), y se puede probar un solo ejemplo con {@code -Dexamples.only=01-invoice}.</p>
+ * <p>The expected dump is not calculated by hand: it is a snapshot of what the engine gives, which the
+ * author reviews by looking at the images. {@code -Dexamples.update=true} accepts the changes (it rewrites the dump,
+ * the PDF and the images that change), and a single example can be tested with
+ * {@code -Dexamples.only=01-invoice}.</p>
  */
 class ExamplesTest {
 
@@ -57,9 +58,9 @@ class ExamplesTest {
     private static final float IMAGE_DPI = 110;
 
     /**
-     * Reglas de PDF/UA-1 que los ejemplos todavía incumplen y no son de lo que se comprueba aquí; el resto
-     * debe cumplirse. Ahora ninguna: cada ejemplo, que declara PDF/UA-1 (tiene {@code Title}), lo cumple
-     * según veraPDF. Se añade aquí una regla solo con su motivo escrito al lado.
+     * PDF/UA-1 rules that the examples still fail and that are not what is checked here; the rest
+     * must be met. None at the moment: each example, which declares PDF/UA-1 (it has {@code Title}), complies with it
+     * according to veraPDF. A rule is added here only with its reason written next to it.
      */
     private static final Set<String> KNOWN_UA_FAILURES = Set.of();
 
@@ -94,7 +95,7 @@ class ExamplesTest {
             Files.writeString(expectedFile, dump, StandardCharsets.UTF_8);
             Files.write(pdfFile, pdf);
         } else if (!Files.exists(expectedFile) || !Files.exists(pdfFile)) {
-            fail(dir + ": falta expected.stxt u output.pdf; genéralos con -Dexamples.update=true y revisa las imágenes");
+            fail(dir + ": expected.stxt or output.pdf is missing; -Dexamples.update=true generates them, and the images have to be reviewed");
         } else {
             Node expected = STXT.rawParser().parseFile(expectedFile.toFile()).get(0);
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), dir.getFileName() + "/");
@@ -114,10 +115,10 @@ class ExamplesTest {
         return out.toByteArray();
     }
 
-    /** El PDF etiquetado cumple la parte {@code ua} de PDF/UA salvo en {@link #KNOWN_UA_FAILURES}. */
+    /** The tagged PDF complies with part {@code ua} of PDF/UA except for {@link #KNOWN_UA_FAILURES}. */
     private static void accessibility(Path dir, byte[] pdf, int ua) {
         Map<String, String> unexpected = new LinkedHashMap<>(PdfUa.failedRules(pdf, ua));
         unexpected.keySet().removeAll(KNOWN_UA_FAILURES);
-        assertEquals(Map.of(), unexpected, dir.getFileName() + ": reglas de PDF/UA-" + ua + " incumplidas");
+        assertEquals(Map.of(), unexpected, dir.getFileName() + ": PDF/UA-" + ua + " rules failed");
     }
 }

@@ -6,16 +6,16 @@ import java.util.OptionalDouble;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * Resuelve la posición y el tamaño de una caja {@code absolute} o {@code fixed} en un eje
- * (reference/components/frame-and-overlays.md). Siempre se cumple:
+ * Resolves the position and the size of an {@code absolute} or {@code fixed} box on one axis
+ * (reference/components/frame-and-overlays.md). It always holds that:
  *
- * <pre>inicio + margen inicio + tamaño + margen fin + fin = tamaño del containing block</pre>
+ * <pre>start + start margin + size + end margin + end = size of the reference container</pre>
  *
- * <p>Un {@link OptionalDouble} vacío representa {@code auto}. El tamaño es el de la caja de borde.</p>
+ * <p>An empty {@link OptionalDouble} represents {@code auto}. The size is that of the border box.</p>
  */
 public final class OverlayEquation {
 
-    /** Solución de la ecuación en un eje. */
+    /** Solution of the equation on one axis. */
     public record Solution(double start, double marginStart, double size, double marginEnd, double end) {
     }
 
@@ -23,8 +23,8 @@ public final class OverlayEquation {
     }
 
     /**
-     * Eje horizontal. Un ancho {@code auto} que no se puede despejar se ajusta al contenido
-     * (<em>shrink-to-fit</em>). Si está sobre-restringida, se ignora {@code right}.
+     * Horizontal axis. An {@code auto} width that cannot be solved for fits the content
+     * (<em>shrink-to-fit</em>). If it is over-constrained, {@code right} is ignored.
      */
     public static Solution horizontal(OptionalDouble left, OptionalDouble width, OptionalDouble right,
                                       OptionalDouble marginLeft, OptionalDouble marginRight,
@@ -35,8 +35,8 @@ public final class OverlayEquation {
     }
 
     /**
-     * Eje vertical. Un alto {@code auto} que no se puede despejar toma la altura del contenido.
-     * Si está sobre-restringida, se ignora {@code bottom}.
+     * Vertical axis. An {@code auto} height that cannot be solved for takes the height of the content.
+     * If it is over-constrained, {@code bottom} is ignored.
      */
     public static Solution vertical(OptionalDouble top, OptionalDouble height, OptionalDouble bottom,
                                     OptionalDouble marginTop, OptionalDouble marginBottom,
@@ -52,14 +52,14 @@ public final class OverlayEquation {
         double ms = mStart.orElse(0);
         double me = mEnd.orElse(0);
 
-        // 1. Todo auto: posición estática y tamaño automático.
+        // 1. All auto: static position and automatic size.
         if (start.isEmpty() && size.isEmpty() && end.isEmpty()) {
             double s = staticStart;
             double t = autoSize.applyAsDouble(cb - s - ms - me);
             return new Solution(s, ms, t, me, cb - s - ms - t - me);
         }
 
-        // 2. Nada auto: los márgenes auto absorben el sobrante; si no hay, se ignora el fin.
+        // 2. Nothing auto: the auto margins absorb the leftover; if there are none, the end is ignored.
         if (start.isPresent() && size.isPresent() && end.isPresent()) {
             double s = start.getAsDouble();
             double t = size.getAsDouble();
@@ -77,10 +77,10 @@ public final class OverlayEquation {
             if (mEnd.isEmpty()) {
                 return new Solution(s, ms, t, cb - s - ms - t - e, e);
             }
-            return new Solution(s, ms, t, me, cb - s - ms - t - me); // sobre-restringida
+            return new Solution(s, ms, t, me, cb - s - ms - t - me); // over-constrained
         }
 
-        // 3. Algún auto (los márgenes auto valen 0).
+        // 3. Some auto (the auto margins are 0).
         if (start.isEmpty() && size.isEmpty()) {
             double e = end.getAsDouble();
             double t = autoSize.applyAsDouble(cb - e - ms - me);

@@ -14,20 +14,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Bloques en columnas en páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde
- * (40, 40). Con {@code Count: 2} y {@code Gap: 15}, la segunda columna empieza en x = 305.
+ * Blocks in columns on pages of 180 pt with margins of 40: page area of 515 × 100 from
+ * (40, 40). With {@code Count: 2} and {@code Gap: 15}, the second column starts at x = 305.
  */
 class ColumnsFragmentationTest {
 
     private static final double PAGE = 180;
     private static final List<String> TWO = List.of("Count: 2", "Gap: 15");
 
-    /** Bloques de 25 con {@code Id} A, B, C…: caben cuatro en una columna. */
+    /** Blocks of 25 with {@code Id} A, B, C...: four fit in a column. */
     private static List<String>[] blocks(int n) {
         return blocks(n, false);
     }
 
-    /** Ídem; {@code whole}: con {@code Keep together: true}. */
+    /** Same; {@code whole}: with {@code Keep together: true}. */
     @SuppressWarnings("unchecked")
     private static List<String>[] blocks(int n, boolean whole) {
         List<List<String>> blocks = new ArrayList<>();
@@ -45,7 +45,7 @@ class ColumnsFragmentationTest {
         assertRect(40, 115, 250, 25, l.rect(1, "D"));
         assertRect(305, 40, 250, 25, l.rect(1, "E"));
         assertRect(305, 115, 250, 25, l.rect(1, "H"));
-        // Página 2: I y J, equilibrados en dos columnas de 25.
+        // Page 2: I and J, balanced in two columns of 25.
         assertRect(40, 40, 515, 25, l.rect(2, "M"));
         assertRect(40, 40, 250, 25, l.rect(2, "I"));
         assertRect(305, 40, 250, 25, l.rect(2, "J"));
@@ -81,7 +81,7 @@ class ColumnsFragmentationTest {
     }
 
     /**
-     * La primera columna no puede colocar ninguna línea en los 10 pt que quedan: el Columns pasa entero a la página 2.
+     * The first column cannot place any line in the 10 pt that remain: the Columns moves whole to page 2.
      */
     @Test
     void columnsThatCannotStartMoveToTheNextPage() {
@@ -91,7 +91,7 @@ class ColumnsFragmentationTest {
         assertRect(40, 40, 515, 12, l.rect(2, "M"));
     }
 
-    /** Partir un bloque con {@code Keep together: true} es el peor corte: antes se corta delante del Columns. */
+    /** Splitting a block with {@code Keep together: true} is the worst break: the break goes before the Columns. */
     @Test
     void keepTogetherInTheFirstColumnMovesTheColumns() {
         List<String> lines = new ArrayList<>(List.of("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90"));
@@ -101,7 +101,7 @@ class ColumnsFragmentationTest {
         assertRect(40, 40, 250, 25, l.rect(2, "A"));
     }
 
-    /** Un {@code Height} de 150 es el total: 100 en la página 1 y 50 en la 2, que se llenan en orden. */
+    /** A {@code Height} of 150 is the total: 100 on page 1 and 50 on page 2, which are filled in order. */
     @Test
     void heightAcrossPages() {
         LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
@@ -117,8 +117,8 @@ class ColumnsFragmentationTest {
     void closedEdgesRepeatBorderAndPadding() {
         LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 5",
                 "Break:", "\tEdges: closed"), blocks(8, true)));
-        // Columnas de 90 entre los 5 de arriba y de abajo, y de 245 de ancho: tres bloques enteros
-        // por columna en la página 1.
+        // Columns of 90 between the 5 at the top and at the bottom, and 245 wide: three whole blocks
+        // per column on page 1.
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 85, l.rect(1, "M"));
         assertRect(305, 45, 245, 25, l.rect(1, "D"));
@@ -128,12 +128,12 @@ class ColumnsFragmentationTest {
         assertRect(305, 45, 245, 25, l.rect(2, "H"));
     }
 
-    // Casos que faltaban según las pruebas de mutación.
+    // Cases that were missing according to mutation testing.
 
     /**
-     * Height: 160 con clone y relleno de 5: en la página 1 las columnas miden 90 (las limita la página) y caben tres
-     * bloques de 25 por columna, que consumen 75 (reference/common/breaks.md); en la 2 les quedan 160 − 10 − 75 = 75,
-     * otros tres por columna.
+     * Height: 160 with clone and padding of 5: on page 1 the columns measure 90 (limited by the page) and three
+     * blocks of 25 fit per column, which consume 75 (reference/common/breaks.md); on page 2 they have 160 − 10 − 75 =
+     * 75 left, another three per column.
      */
     @Test
     void cloneWithHeightLeavesTheRestToTheLastPage() {
@@ -146,7 +146,7 @@ class ColumnsFragmentationTest {
         assertRect(305, 45, 245, 25, l.rect(2, "J"));
     }
 
-    /** El contenido cabe en la página 1, pero Height: 150 sigue: la página 2 tiene el resto de la caja, vacío. */
+    /** The content fits on page 1, but Height: 150 continues: page 2 has the rest of the box, empty. */
     @Test
     void theHeightGoesOnAfterTheContent() {
         LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 150"),
@@ -156,7 +156,7 @@ class ColumnsFragmentationTest {
         assertRect(40, 40, 515, 50, l.rect(2, "M"));
     }
 
-    /** Height: 150 con doce bloques: en la página 2 quedan 50, dos bloques por columna (K empieza la segunda). */
+    /** Height: 150 with twelve blocks: on page 2, 50 remain, two blocks per column (K starts the second). */
     @Test
     void theRestOfTheHeightLimitsTheLastPage() {
         LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",

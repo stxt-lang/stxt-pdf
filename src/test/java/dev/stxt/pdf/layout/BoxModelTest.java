@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** Modelo de caja usado (reference/common/box.md), con estilos escritos a mano. */
+/** Used box model (reference/common/box.md), with hand-written styles. */
 class BoxModelTest {
 
     private static final OptionalDouble NONE = OptionalDouble.empty();
-    /** Los intrínsecos no deben hacer falta salvo con {@code Width} intrínseco. */
+    /** Intrinsic sizes should not be needed except with an intrinsic {@code Width}. */
     private static final Supplier<IntrinsicSizes> UNUSED = () -> {
-        throw new AssertionError("no hacen falta los tamaños intrínsecos");
+        throw new AssertionError("intrinsic sizes are not needed");
     };
 
     private final StyleEditor style = new StyleEditor();
@@ -47,7 +47,7 @@ class BoxModelTest {
         assertEquals(Insets.all(40), m.margin());
         assertEquals(Insets.all(20), m.padding());
         assertEquals(Insets.all(2), m.border());
-        // Width auto en flujo: el ancho disponible menos los márgenes.
+        // Width auto in flow: the available width minus the margins.
         assertEquals(320, m.width(), 1e-9);
         assertEquals(400 - 80 - 4 - 40, m.contentWidth(), 1e-9);
     }
@@ -59,7 +59,7 @@ class BoxModelTest {
         assertEquals(200, resolve(space).width(), 1e-9);
         style.minWidth(pt(250));
         assertEquals(250, resolve(space).width(), 1e-9);
-        // Si chocan, gana el mínimo.
+        // If they clash, the minimum wins.
         style.minWidth(pt(150));
         style.maxWidth(pt(100));
         assertEquals(150, resolve(space).width(), 1e-9);
@@ -81,7 +81,7 @@ class BoxModelTest {
         assertEquals(40, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
         style.width(Value.Keyword.NATURAL);
         assertEquals(180, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
-        // fit: el disponible (150) entre el ancho más estrecho y el natural.
+        // fit: the available width (150) between the narrowest width and the natural width.
         style.width(Value.Keyword.FIT);
         assertEquals(130, BoxModel.resolve(box, space, intrinsic).width(), 1e-9);
     }
@@ -152,17 +152,17 @@ class BoxModelTest {
         style.padding(Sides.all(pt(3)));
         style.margin(Sides.all(pt(5)));
         IntrinsicSizes content = new IntrinsicSizes(30, 80);
-        // Contenido + borde y relleno (10) + márgenes (10).
+        // Content + border and padding (10) + margins (10).
         assertEquals(new IntrinsicSizes(50, 100), BoxModel.intrinsic(box, content));
         style.minWidth(pt(50));
         style.maxWidth(pt(60));
         assertEquals(new IntrinsicSizes(60, 70), BoxModel.intrinsic(box, content));
-        // Un Width fijo es a la vez el ancho más estrecho y el natural, también limitado.
+        // A fixed Width is both the narrowest width and the natural width, also limited.
         style.width(pt(100));
         assertEquals(new IntrinsicSizes(70, 70), BoxModel.intrinsic(box, content));
         style.maxWidth(null);
         assertEquals(new IntrinsicSizes(110, 110), BoxModel.intrinsic(box, content));
-        // Un porcentaje no se puede resolver sin containing block: cuenta como auto.
+        // A percentage cannot be resolved without a reference container: it counts as auto.
         style.width(percent(50));
         style.minWidth(Value.AUTO);
         assertEquals(new IntrinsicSizes(50, 100), BoxModel.intrinsic(box, content));
@@ -177,7 +177,7 @@ class BoxModelTest {
         BoxModel m = resolve(space);
         assertEquals(ConstraintSpace.forChildren(190, OptionalDouble.of(90), OptionalDouble.of(55), true),
                 m.childSpace(space, true));
-        // Los fragmentos siguientes no tienen la decoración superior.
+        // The following fragments do not have the top decoration.
         assertEquals(ConstraintSpace.forChildren(190, OptionalDouble.of(90), OptionalDouble.of(60), true),
                 m.childSpace(space, false));
         ConstraintSpace free = ConstraintSpace.free(200, 200, NONE, false);

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las esquinas redondeadas ya resueltas (reference/common/box.md). */
+/** The rounded corners already resolved (reference/common/box.md). */
 class RadiiTest {
 
     private static Corners<Value> radius(Value... v) {
@@ -39,14 +39,14 @@ class RadiiTest {
     void aPercentageIsOfTheWidthHorizontallyAndOfTheHeightVertically() {
         Radii r = Radii.resolve(Corners.all(new Value.Percentage(50)), 100, 40);
         assertEquals(new Radii.Corner(50, 20), r.topLeft());
-        // Ancho y alto iguales: un círculo.
+        // Equal width and height: a circle.
         Radii circle = Radii.resolve(Corners.all(new Value.Percentage(50)), 60, 60);
         assertEquals(new Radii.Corner(30, 30), circle.topRight());
     }
 
     @Test
     void radiiThatDoNotFitAreScaledTogether() {
-        // 40 + 40 = 80 en un lado de 50: todos por 50/80, no solo el que se pasa.
+        // 40 + 40 = 80 on a side of 50: all of them times 50/80, not only the one that exceeds it.
         Radii r = Radii.resolve(radius(Value.pt(40), Value.pt(40), Value.pt(10), Value.pt(10)), 50, 200);
         assertEquals(25, r.topLeft().rx(), 1e-9);
         assertEquals(25, r.topRight().rx(), 1e-9);

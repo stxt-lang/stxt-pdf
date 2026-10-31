@@ -10,19 +10,19 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Dimensionado de pistas (reference/components/grid.md; simplificación de Grid §12). La misma función sirve para
- * columnas y filas: solo cambian las aportaciones de los ítems.
+ * Track sizing (reference/components/grid.md; simplification of Grid §12). The same function serves for
+ * columns and rows: only the contributions of the items change.
  *
  * <ol>
- *   <li>Inicializar base (mínimo) y límite (máximo) de cada pista.</li>
- *   <li>Aportaciones intrínsecas: primero ítems de una pista, después los que ocupan varias sin
- *       cruzar ninguna fracción y, al final, los que cruzan alguna (solo crecen las fracciones).</li>
- *   <li>Maximizar: repartir el espacio libre hasta el límite de cada pista no flexible.</li>
- *   <li>Expandir fracciones, con bucle de congelación por el ancho más estrecho.</li>
- *   <li>Si no hay fracciones, estirar las pistas {@code auto} con el sobrante.</li>
+ *   <li>Initialize base (minimum) and limit (maximum) of each track.</li>
+ *   <li>Intrinsic contributions: first items of one track, then the ones that span several without
+ *       crossing any fraction and, last, the ones that cross one (only the fractions grow).</li>
+ *   <li>Maximize: distribute the free space up to the limit of each non-flexible track.</li>
+ *   <li>Expand fractions, with a freezing loop for the narrowest width.</li>
+ *   <li>If there are no fractions, stretch the {@code auto} tracks with the leftover space.</li>
  * </ol>
  *
- * <p>Simplificación: {@code fit} se trata como {@code auto}.</p>
+ * <p>Simplification: {@code fit} is treated as {@code auto}.</p>
  */
 public final class TrackSizing {
 
@@ -30,13 +30,13 @@ public final class TrackSizing {
     }
 
     /**
-     * @param declared  definiciones de las pistas (explícitas e implícitas)
-     * @param items     aportaciones de los ítems colocados
-     * @param available tamaño de la caja de contenido del contenedor en este eje;
-     *                  {@link Double#POSITIVE_INFINITY} si es indefinido (los porcentajes de las
-     *                  pistas se comportan entonces como {@code auto})
-     * @param gap       separación entre pistas
-     * @return tamaño de cada pista
+     * @param declared  definitions of the tracks (explicit and implicit)
+     * @param items     contributions of the placed items
+     * @param available size of the content box of the container on this axis;
+     *                  {@link Double#POSITIVE_INFINITY} if indefinite (the percentages of the
+     *                  tracks then behave as {@code auto})
+     * @param gap       spacing between tracks
+     * @return size of each track
      */
     public static double[] size(List<Track> declared, List<ItemContribution> items,
                                 double available, double gap) {
@@ -46,10 +46,10 @@ public final class TrackSizing {
         double[] base = new double[n];
         double[] limit = new double[n];
         double space = finite ? available - gap * Math.max(0, n - 1) : Double.POSITIVE_INFINITY;
-        // Los porcentajes se refieren a la caja de contenido entera, huecos incluidos (reference/common/values.md).
+        // Percentages refer to the whole content box, gaps included (reference/common/values.md).
         double reference = finite ? available : 0;
 
-        // 1. Inicializar.
+        // 1. Initialize.
         for (int i = 0; i < n; i++) {
             Track t = tracks.get(i);
             base[i] = t.minIntrinsic() ? 0 : t.min().resolve(reference).orElse(0);
@@ -62,7 +62,7 @@ public final class TrackSizing {
             }
         }
 
-        // 2a. Ítems de una sola pista.
+        // 2a. Items of a single track.
         for (ItemContribution it : items) {
             if (it.span() != 1) {
                 continue;
@@ -84,13 +84,13 @@ public final class TrackSizing {
             }
         }
 
-        // 2b. Ítems de varias pistas, de menor a mayor extensión.
+        // 2b. Items of several tracks, from smallest to largest span.
         items.stream()
                 .filter(it -> it.span() > 1)
                 .sorted(Comparator.comparingInt(ItemContribution::span))
                 .forEach(it -> distributeExcess(tracks, base, limit, it, gap));
 
-        // 2c. Ítems que cruzan alguna fracción, todos juntos.
+        // 2c. Items that cross some fraction, all together.
         distributeToFlexible(tracks, base, items, gap);
 
         for (int i = 0; i < n; i++) {
@@ -100,8 +100,8 @@ public final class TrackSizing {
         }
 
         if (!finite) {
-            // Tamaño indefinido: las pistas no flexibles llegan a su límite y las fracciones
-            // toman el mayor base/peso (simplificación de "find the size of an fr").
+            // Indefinite size: the non-flexible tracks reach their limit and the fractions
+            // take the largest base/weight (simplification of "find the size of an fr").
             double frSize = 0;
             for (int i = 0; i < n; i++) {
                 Track t = tracks.get(i);
@@ -120,7 +120,7 @@ public final class TrackSizing {
             return base;
         }
 
-        // 3. Maximizar.
+        // 3. Maximize.
         double free = space - Sizing.sum(base);
         boolean[] active = new boolean[n];
         for (int i = 0; i < n; i++) {
@@ -140,7 +140,7 @@ public final class TrackSizing {
             }
         }
 
-        // 4. Expandir fracciones.
+        // 4. Expand fractions.
         boolean anyFlexible = tracks.stream().anyMatch(Track::flexible);
         if (anyFlexible) {
             boolean[] inflexible = new boolean[n];
@@ -177,7 +177,7 @@ public final class TrackSizing {
                 }
             }
         } else {
-            // 5. Estirar pistas auto.
+            // 5. Stretch auto tracks.
             free = space - Sizing.sum(base);
             int autoTracks = 0;
             for (Track t : tracks) {
@@ -226,8 +226,8 @@ public final class TrackSizing {
                 }
             }
         }
-        // Los límites, con las bases ya subidas (un límite nunca es menor que su base): lo que el ítem ya tiene
-        // no se vuelve a dar.
+        // The limits, with the bases already raised (a limit is never smaller than its base): what the item already
+        // has is not given again.
         double limitSum = gaps;
         for (int i = from; i < to; i++) {
             limitSum += Math.max(limit[i], base[i]);
@@ -243,11 +243,11 @@ public final class TrackSizing {
     }
 
     /**
-     * Ítems de varias pistas que cruzan alguna fracción (Grid §12.5, paso 4): lo que les falta
-     * hasta su ancho más estrecho se reparte solo entre las fracciones con mínimo intrínseco que ocupan,
-     * en proporción a su peso (si los pesos suman menos de 1, esa parte en proporción y
-     * el resto a partes iguales). Se calcula con las bases de antes del paso, y cada pista crece
-     * lo que pida el ítem que más le pida.
+     * Items of several tracks that cross some fraction (Grid §12.5, step 4): what they lack
+     * to reach their narrowest width is distributed only among the fractions with an intrinsic minimum that they span,
+     * in proportion to their weight (if the weights add up to less than 1, that part in proportion and
+     * the rest in equal parts). It is computed with the bases from before the step, and each track grows
+     * by what the item asking the most of it asks for.
      */
     private static void distributeToFlexible(List<Track> tracks, double[] base, List<ItemContribution> items,
                                              double gap) {

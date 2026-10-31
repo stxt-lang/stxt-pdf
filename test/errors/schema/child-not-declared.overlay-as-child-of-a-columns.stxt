@@ -1,0 +1,19 @@
+# Case: Overlay as a child of a Columns
+# Code: CHILD_NOT_DECLARED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Count: 2
+			Overlay:
+				Text: Nota

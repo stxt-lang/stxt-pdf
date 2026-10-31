@@ -1,0 +1,20 @@
+# Case: Unrotated Overlay inside a rotated Frame that takes it off the page
+# Code: BOX_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Section:
+		Frame:
+			Rotate: 180
+			Box:
+				Height: 100
+			Overlay:
+				Offset: 0 auto auto 0
+				Box:
+					Width: 20
+					Height: 150

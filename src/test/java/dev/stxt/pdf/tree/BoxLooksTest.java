@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * {@code Corner radius}, {@code Border color} por lado y {@code Background} con degradado (reference/common/box.md).
+ * {@code Corner radius}, {@code Border color} per side and {@code Background} with a gradient
+ * (reference/common/box.md).
  */
 class BoxLooksTest {
 
@@ -69,7 +70,8 @@ class BoxLooksTest {
                 + "\tStyles:\n\t\tFor element: Block\n\t\t\tBox:\n\t\t\t\tCorner radius: 6\n\t\t\t\tBackground: linear(90, #000, #FFF)\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tBackground: #CCC\n\tBlock:\n";
         Box root = new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).sections().get(0).box();
-        // Lo propio gana a la regla propiedad a propiedad: el color, no el degradado; el radio de la regla se mantiene.
+        // The element's own value beats the rule property by property: the color, not the gradient; the radius of the
+        // rule stays.
         assertEquals(new Paint.Solid("#CCC"), root.children().get(0).style().box().background());
         assertEquals(Corners.all(Value.pt(6)), root.children().get(0).style().box().cornerRadius());
         assertEquals(new Paint.Linear(90, List.of("#000", "#FFF")), root.children().get(1).style().box().background());

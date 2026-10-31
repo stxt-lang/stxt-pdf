@@ -1,14 +1,14 @@
-# Informe anual de una cooperativa de energía renovable, de siete páginas. Son dos secciones: la
-# portada, a sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit page overlays: false),
-# y el cuerpo, que numera desde 1 («Página 1 de 6» en la primera interior). Muestra además cifras clave
-# en un grid, gráficos como imágenes, texto en dos columnas con filete, una tabla financiera con
-# cabecera y pie, y capítulos que empiezan siempre en página nueva. El contenido es un Table of contents:
-# lista los capítulos con su página impresa, que el motor calcula. El título de la portada y el de la
-# página de contenido son un Heading 1 con In table of contents: false, para que no salgan en el índice, y con
-# Numbered: false, para que no cuenten. Los capítulos son Heading 1 numerados (Numbered: true en
-# styles.stxt: 1 a 6) y sus apartados, Heading 2 (1.1, 2.1…); el índice y los marcadores del PDF llevan el
-# número. Los rótulos se escriben en minúscula y las reglas los ponen en mayúsculas, con un poco de
-# interletraje (Case).
+# Seven-page annual report of a renewable energy cooperative. There are two sections: the
+# cover, full bleed (Margin: 0), without a page number and without the document footer (Inherit page overlays: false),
+# and the body, numbered from 1 ("Página 1 de 6" on the first inside page). It also shows key figures
+# in a grid, charts as images, two-column text with a rule, a financial table with
+# header and footer, and chapters that always start on a new page. The contents page is a Table of contents:
+# it lists the chapters with their printed page, which the engine computes. The titles of the cover and of
+# the contents page are a Heading 1 with In table of contents: false, to keep them out of the contents, and with
+# Numbered: false, so that they do not count. The chapters are numbered Heading 1 (Numbered: true in
+# styles.stxt: 1 to 6) and their sections, Heading 2 (1.1, 2.1...); the contents and the PDF bookmarks carry the
+# number. The labels are written in lowercase and the rules put them in uppercase, with a little
+# letter spacing (Case).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

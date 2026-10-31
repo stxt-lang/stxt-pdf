@@ -53,23 +53,23 @@ class TextTransformTest {
         assertEquals(List.of(run("Hola Mundo De IPhone")),
                 apply(List.of(run("hola mundo de iPhone")), TextCase.CAPITALIZE, false, ES));
         assertEquals(List.of(run("Dos\nLíneas")), apply(List.of(run("dos\nlíneas")), TextCase.CAPITALIZE, false, ES));
-        // Una cifra o un signo delante no impiden que la palabra empiece por una letra después de un espacio.
+        // A digit or a sign in front does not prevent the word from starting with a letter after a space.
         assertEquals(List.of(run("3 Ratones")), apply(List.of(run("3 ratones")), TextCase.CAPITALIZE, false, ES));
     }
 
     @Test
     void capitalizeContinuesAcrossRuns() {
-        // «neg|rita» es una sola palabra: solo la primera letra va en mayúscula.
+        // "neg|rita" is a single word: only the first letter goes in uppercase.
         assertEquals(List.of(run("Una "), run("Neg", "b"), run("rita")),
                 apply(List.of(run("una "), run("neg", "b"), run("rita")), TextCase.CAPITALIZE, false, ES));
-        // Tras un espacio al final de un tramo, el siguiente empieza palabra.
+        // After a space at the end of a run, the next one starts a word.
         assertEquals(List.of(run("Uno "), run("Dos", "b")),
                 apply(List.of(run("uno "), run("dos", "b")), TextCase.CAPITALIZE, false, ES));
     }
 
     @Test
     void smallCapsTurnLowercaseLettersIntoMarkedCapitals() {
-        // El espacio y las cifras no son minúsculas: no se reducen.
+        // The space and the digits are not lowercase: they are not reduced.
         assertEquals(List.of(run("A"), new TextRun("BC", SMALL), run(" D1")),
                 apply(List.of(run("Abc D1")), TextCase.NONE, true, ES));
     }
@@ -83,17 +83,17 @@ class TextTransformTest {
 
     @Test
     void smallCapsWithTransform() {
-        // lowercase deja todo en minúsculas, así que todo son versalitas; uppercase no deja ninguna.
+        // lowercase leaves everything in lowercase, so everything is small caps; uppercase leaves none.
         assertEquals(List.of(new TextRun("ABC", SMALL)), apply(List.of(run("AbC")), TextCase.LOWERCASE, true, ES));
         assertEquals(List.of(run("ABC")), apply(List.of(run("abc")), TextCase.UPPERCASE, true, ES));
-        // capitalize: la inicial es una mayúscula de verdad y el resto son versalitas.
+        // capitalize: the initial is a real capital and the rest are small caps.
         assertEquals(List.of(run("H"), new TextRun("OLA", SMALL), run(" M"), new TextRun("UNDO", SMALL)),
                 apply(List.of(run("hola mundo")), TextCase.CAPITALIZE, true, ES));
     }
 
     @Test
     void letterWithoutCapitalIsNotMarked() {
-        // «ª» es minúscula pero no tiene mayúscula distinta.
+        // "ª" is lowercase but has no distinct uppercase.
         assertEquals(List.of(run("1ª")), apply(List.of(run("1ª")), TextCase.NONE, true, ES));
     }
 

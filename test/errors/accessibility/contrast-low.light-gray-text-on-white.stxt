@@ -1,0 +1,17 @@
+# Case: Light gray text on the white page, with the Color inherited from For element: Document
+# Code: CONTRAST_LOW
+# Line: 15
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Color: #AAAAAA
+	Section:
+		Text: Un texto que casi no se ve

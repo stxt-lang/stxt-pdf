@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Las imágenes de los tests de referencia se comparan con las versionadas y fallan si cambian. */
+/** The images of the reference tests are compared with the versioned ones and fail if they change. */
 class ReferenceFilesTest {
 
     private static final String UPDATE = "reference-files-test.update";
@@ -65,14 +65,14 @@ class ReferenceFilesTest {
     void aChangedMissingOrExtraPageFailsAndSaysHowToAcceptIt() throws IOException {
         Path reference = versioned(image(0xffffff), image(0xffffff));
         String changed = failure(reference, image(0xffffff), image(Color.RED.getRGB()));
-        assertTrue(changed.contains("page-2.png cambia en 200 píxeles"), changed);
+        assertTrue(changed.contains("page-2.png changes in 200 pixels"), changed);
         assertTrue(changed.contains("-D" + UPDATE + "=true") && changed.contains(dir.resolve("actual").toString()),
                 changed);
         assertTrue(failure(reference, image(0xffffff), image(0xffffff), image(0xffffff))
-                .contains("page-3.png no está versionada"));
-        assertTrue(failure(reference, image(0xffffff)).contains("page-2.png sobra: el PDF tiene 1 páginas"));
+                .contains("page-3.png is not versioned"));
+        assertTrue(failure(reference, image(0xffffff)).contains("page-2.png is extra: the PDF has 1 pages"));
         assertTrue(failure(reference, image(0xffffff), new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB))
-                .contains("page-2.png cambia de tamaño"));
+                .contains("page-2.png changes size"));
     }
 
     @Test
@@ -82,7 +82,7 @@ class ReferenceFilesTest {
         long before = Files.getLastModifiedTime(first).toMillis();
         System.setProperty(UPDATE, "true");
         ReferenceFiles.checkImages(reference, dir, List.of(image(0xfffffe), image(Color.RED.getRGB())), UPDATE);
-        assertEquals(before, Files.getLastModifiedTime(first).toMillis(), "una diferencia de antialiasing no se escribe");
+        assertEquals(before, Files.getLastModifiedTime(first).toMillis(), "an antialiasing difference is not written");
         assertEquals(Color.RED.getRGB(), ImageIO.read(reference.resolve("page-2.png").toFile()).getRGB(0, 0));
         assertFalse(Files.exists(reference.resolve("page-3.png")));
     }

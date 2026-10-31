@@ -1,0 +1,23 @@
+# Case: Child with a Width that sticks out and grandchildren that fill it
+# Code: BOX_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Width: 100
+			Frame:
+				Box:
+					Width: 150
+				Block:
+					Box:
+						Height: 10
+				Overlay:
+					Box:
+						Width: 10
+						Height: 10

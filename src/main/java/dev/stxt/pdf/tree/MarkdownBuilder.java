@@ -56,27 +56,25 @@ import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 /**
- * Traduce un {@code Markdown} (reference/components/markdown.md) a los nodos STXT de los elementos que ya existen:
- * encabezados a {@code Heading 1}…{@code Heading 6} con un {@code Text}, párrafos a {@code Paragraph}, listas a {@code
- * List} y {@code List item}, tablas GFM a {@code Table}, bloques de código a un {@code Text} con {@code Preformatted:
- * true} e imágenes solas en su párrafo a {@code Image} (reference/components/image.md). Un enlace es un tramo
- * subrayado con su destino (reference/common/links.md); el código en línea, un tramo de código, que recibe la
- * familia de {@code Code font} al construir su caja. {@link BoxTreeBuilder} construye después esos nodos como
- * cualquier otro elemento, así que el schema, las reglas de {@code Styles}, la validación de
- * reference/common/errors.md, el PDF etiquetado y los marcadores los tratan igual.
+ * Translates a {@code Markdown} (reference/components/markdown.md) into the STXT nodes of the elements that already
+ * exist: headings to {@code Heading 1}...{@code Heading 6} with a {@code Text}, paragraphs to {@code Paragraph}, lists
+ * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
+ * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md). A
+ * link is an underlined run with its target (reference/common/links.md); inline code, a code run, which gets the
+ * family of {@code Code font} when its box is built. {@link BoxTreeBuilder} then builds those nodes like any other
+ * element, so the schema, the rules of {@code Styles}, the validation of reference/common/errors.md, the tagged PDF and
+ * the bookmarks treat them the same way.
  *
- * <p>El formato dentro de una línea (negrita, cursiva, subrayado, tachado y enlace) no cabe en un nodo
- * STXT: el texto del nodo es el texto seguido y sus tramos van aparte, en
- * {@link Translation#runs()}.</p>
+ * <p>Inline formatting (bold, italic, underline, strikethrough and link) does not fit in an STXT node: the text of the
+ * node is the plain text and its runs go separately, in {@link Translation#runs()}.</p>
  *
- * <p>Solo se admite un subconjunto cerrado; el resto es un error
- * ({@link ErrorCode#MARKDOWN_UNSUPPORTED}). Cada nodo generado lleva la línea del documento donde
- * empieza su bloque de Markdown; el marcador de una lista, la de {@code Bullet markers} o
- * {@code Number markers}, y las columnas de una tabla, la de {@code Table columns}.</p>
+ * <p>Only a closed subset is allowed; the rest is an error ({@link ErrorCode#MARKDOWN_UNSUPPORTED}). Each generated
+ * node carries the line of the document where its Markdown block begins; the marker of a list, that of
+ * {@code Bullet markers} or {@code Number markers}, and the columns of a table, that of {@code Table columns}.</p>
  */
 final class MarkdownBuilder {
 
-    /** Seguro entre hilos (lo garantiza commonmark-java). */
+    /** Thread-safe (guaranteed by commonmark-java). */
     private static final Parser PARSER = Parser.builder()
             .extensions(List.of(TablesExtension.create(),
                     StrikethroughExtension.builder().requireTwoTildes(true).build(), InsExtension.create()))
@@ -84,8 +82,8 @@ final class MarkdownBuilder {
             .build();
 
     /**
-     * El de un texto con {@code Markup: markdown}: sin bloques ni tablas, así que lo que en un {@code Markdown}
-     * empezaría un bloque ({@code -}, {@code 2024.}, {@code #}, {@code >}, {@code ---}) es texto
+     * The one of a text with {@code Markup: markdown}: no blocks or tables, so what would begin a block in a
+     * {@code Markdown} ({@code -}, {@code 2024.}, {@code #}, {@code >}, {@code ---}) is text
      * (reference/common/text-formatting.md).
      */
     private static final Parser INLINE_PARSER = Parser.builder()
@@ -94,20 +92,20 @@ final class MarkdownBuilder {
             .includeSourceSpans(IncludeSourceSpans.BLOCKS)
             .build();
 
-    /** El {@code {#id}} al final del texto de un encabezado. */
+    /** The {@code {#id}} at the end of the text of a heading. */
     private static final Pattern HEADING_ID = Pattern.compile("\\{#([^{}]*)}\\s*$");
 
-    private static final String SUBSET = "solo admite encabezados, párrafos, listas, tablas, bloques de código, "
-            + "imágenes solas en su párrafo y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, "
-            + "`código` y [enlaces](destino)";
+    private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
+            + "images alone in their paragraph and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
+            + "`code` and [links](target) are allowed";
 
-    private static final String INLINE_SUBSET = "un texto con Markup: markdown solo admite texto con **negrita**, "
-            + "*cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino); lo demás va en un Markdown, y un carácter "
-            + "especial se escribe con \\ delante (\\*)";
+    private static final String INLINE_SUBSET = "a text with Markup: markdown only allows text with **bold**, "
+            + "*italic*, ++underline++, ~~strikethrough~~ and [links](target); the rest goes in a Markdown, and a special "
+            + "character is written with \\ before it (\\*)";
 
     /**
-     * Los elementos generados, en orden, y los tramos de los textos con formato, por nodo
-     * ({@code Text}, {@code Paragraph} o {@code Cell}).
+     * The generated elements, in order, and the runs of the formatted texts, by node ({@code Text}, {@code Paragraph}
+     * or {@code Cell}).
      */
     record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks) {
     }
@@ -117,23 +115,23 @@ final class MarkdownBuilder {
 
     static Translation translate(InlineNode markdown) {
         Node content = child(markdown, "content").orElseThrow();
-        // El bloque Content >> empieza en la línea siguiente a la suya.
+        // The Content >> block begins on the line after its own.
         Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1));
         List<InlineNode> elements = t.blocks(PARSER.parse(content.getText()), false);
         if (elements.isEmpty()) {
-            throw error(content, ErrorCode.TEXT_CONTENT, "Markdown necesita contenido en Content");
+            throw error(content, ErrorCode.TEXT_CONTENT, "Markdown needs content in Content");
         }
-        // Red de seguridad: lo generado cumple el schema, como lo que escribe el autor.
+        // Safety net: what is generated conforms to the schema, like what the author writes.
         elements.forEach(DocumentSchema::validate);
         return new Translation(List.copyOf(elements), t.runs, t.codeBlocks);
     }
 
     /**
-     * Un texto con {@code Markup: markdown} (reference/common/text-formatting.md): sus tramos. Solo párrafos, que se
-     * separan con una línea en blanco, como en un {@code Text}; la sintaxis de los bloques es texto, y lo que no se
-     * admite dentro de la línea, {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
+     * A text with {@code Markup: markdown} (reference/common/text-formatting.md): its runs. Only paragraphs, which are
+     * separated by a blank line, as in a {@code Text}; block syntax is text, and what is not allowed inline,
+     * {@link ErrorCode#MARKDOWN_UNSUPPORTED}.
      *
-     * @param firstLine línea del documento donde empieza el texto
+     * @param firstLine line of the document where the text begins
      */
     static List<TextRun> inline(String text, int firstLine) {
         Translator t = new Translator(null, firstLine, true, new String[0]);
@@ -162,14 +160,14 @@ final class MarkdownBuilder {
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
-        /** Los {@code Text} que son bloques de código: el builder les da el elemento {@code Code block}. */
+        /** The {@code Text} nodes that are code blocks: the builder gives them the {@code Code block} element. */
         private final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
-        /** Listas con viñetas y numeradas que contienen el bloque que se traduce. */
+        /** Bulleted and numbered lists that contain the block being translated. */
         private int bulletDepth;
         private int numberingDepth;
-        /** Es el texto en línea de un {@code Markup: markdown}, no un elemento {@code Markdown}. */
+        /** It is the inline text of a {@code Markup: markdown}, not a {@code Markdown} element. */
         private final boolean inlineOnly;
-        /** Las líneas del Markdown, para contar las celdas de una fila de tabla, que el parser no conserva. */
+        /** The lines of the Markdown, to count the cells of a table row, which the parser does not keep. */
         private final String[] source;
 
         Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source) {
@@ -184,7 +182,7 @@ final class MarkdownBuilder {
             this.numberings = numbering.map(n -> markers(n, true)).orElse(List.of());
         }
 
-        /** Los bloques hijos de {@code parent}; {@code inItem} si están dentro de un ítem de lista. */
+        /** The child blocks of {@code parent}; {@code inItem} if they are inside a list item. */
         List<InlineNode> blocks(org.commonmark.node.Node parent, boolean inItem) {
             List<InlineNode> out = new ArrayList<>();
             for (org.commonmark.node.Node b = parent.getFirstChild(); b != null; b = b.getNext()) {
@@ -197,22 +195,22 @@ final class MarkdownBuilder {
             int line = line(b);
             if (b instanceof Heading h) {
                 if (inItem) {
-                    throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Un encabezado no puede estar dentro de un "
-                            + "ítem de lista, como en un List item");
+                    throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "A heading cannot be inside a "
+                            + "list item, as in a List item");
                 }
                 InlineNode heading = node("Heading " + h.getLevel(), "", line);
                 String id = headingId(h, line);
                 if (id != null) {
                     heading.addChild(node("Id", id, line));
                 }
-                heading.addChild(text("Text", h, line, "Un encabezado de Markdown necesita texto"));
+                heading.addChild(text("Text", h, line, "A Markdown heading needs text"));
                 return heading;
             }
             if (b instanceof Paragraph p) {
                 if (p.getFirstChild() instanceof Image i && i.getNext() == null) {
                     return image(i, line);
                 }
-                return text("Paragraph", p, line, "Un párrafo de Markdown necesita texto");
+                return text("Paragraph", p, line, "A Markdown paragraph needs text");
             }
             if (b instanceof ListBlock l) {
                 return list(l, line);
@@ -227,30 +225,30 @@ final class MarkdownBuilder {
         }
 
         /**
-         * Un bloque de código (con vallas o sangrado): un {@code Text} con {@code Preformatted: true}, con el código en
-         * un {@code Content}; es un {@code Code block} y su fuente es su {@code Code font} ({@link ElementReader}). La
-         * etiqueta de lenguaje de las vallas (<code>```java</code>) no tendría efecto, porque no hay resaltado, y es un
-         * error.
+         * A code block (fenced or indented): a {@code Text} with {@code Preformatted: true}, with the code in a
+         * {@code Content}; it is a {@code Code block} and its font is its {@code Code font} ({@link ElementReader}).
+         * The language tag of the fences (<code>```java</code>) would have no effect, because there is no highlighting,
+         * and it is an error.
          */
         private InlineNode codeBlock(org.commonmark.node.Node b, int line) {
             boolean fenced = b instanceof FencedCodeBlock;
             String literal = fenced ? ((FencedCodeBlock) b).getLiteral() : ((IndentedCodeBlock) b).getLiteral();
             if (fenced && !((FencedCodeBlock) b).getInfo().isBlank()) {
-                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite la etiqueta de lenguaje de un "
-                        + "bloque de código (" + ((FencedCodeBlock) b).getInfo().strip() + "): no hay resaltado, así que "
-                        + "sobra");
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow the language tag of a "
+                        + "code block (" + ((FencedCodeBlock) b).getInfo().strip() + "): there is no highlighting, so it is "
+                        + "not needed");
             }
             if (literal.endsWith("\n")) {
                 literal = literal.substring(0, literal.length() - 1);
             }
             if (literal.isBlank()) {
-                throw error(line, ErrorCode.TEXT_CONTENT, "Un bloque de código de Markdown necesita texto");
+                throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown code block needs text");
             }
             InlineNode text = node("Text", "", line);
             InlineNode typography = node("Typography", "", line);
             typography.addChild(node("Preformatted", "true", line));
             text.addChild(typography);
-            // El Content >> va en la línea de las vallas; con sangría, en la anterior a la primera línea.
+            // The Content >> goes on the line of the fences; when indented, on the line before the first line.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
                     fenced ? line : line - 1));
             codeBlocks.add(text);
@@ -258,14 +256,14 @@ final class MarkdownBuilder {
         }
 
         /**
-         * Una imagen sola en su párrafo: una {@code Image} con la ruta y, si lo tiene, su texto
-         * alternativo (sin formato) en {@code Alt}; sin él, es decorativa. El título
-         * ({@code "…"}) no tendría efecto y es un error.
+         * An image alone in its paragraph: an {@code Image} with the path and, if it has one, its alternative text
+         * (without formatting) in {@code Alt}; without it, it is decorative. The title ({@code "..."}) would have no
+         * effect and is an error.
          */
         private InlineNode image(Image i, int line) {
             if (i.getTitle() != null && !i.getTitle().isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de una imagen "
-                        + "(\"" + i.getTitle() + "\"): la imagen se describe en su texto alternativo, ![...]");
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow the title of an image "
+                        + "(\"" + i.getTitle() + "\"): the image is described in its alternative text, ![...]");
             }
             InlineNode image = node("Image", i.getDestination(), line);
             String alt = TextRun.text(inline(i, line)).strip();
@@ -279,9 +277,9 @@ final class MarkdownBuilder {
             boolean numbered = l instanceof OrderedList;
             Optional<Node> property = numbered ? numbering : bullet;
             if (property.isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, (numbered ? "La lista numerada" : "La lista")
-                        + " necesita " + (numbered ? "Number markers" : "Bullet markers") + " en su Markdown (línea "
-                        + markdown.getLine() + "): el marcador de cada nivel, como "
+                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, (numbered ? "The numbered list" : "The list")
+                        + " needs " + (numbered ? "Number markers" : "Bullet markers") + " in its Markdown (line "
+                        + markdown.getLine() + "): the marker of each level, as in "
                         + (numbered ? "Number markers: decimal lower-alpha" : "Bullet markers: bullet dash"));
             }
             List<String> markers = numbered ? numberings : bullets;
@@ -307,8 +305,8 @@ final class MarkdownBuilder {
 
         private InlineNode table(TableBlock t, int line) {
             if (tableColumns.isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "La tabla necesita Table columns en su "
-                        + "Markdown (línea " + markdown.getLine() + "): equal o auto");
+                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "The table needs Table columns in its "
+                        + "Markdown (line " + markdown.getLine() + "): equal or auto");
             }
             TableHead head = null;
             TableBody body = null;
@@ -320,8 +318,8 @@ final class MarkdownBuilder {
                 }
             }
             if (head == null || body == null) {
-                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Una tabla de Markdown necesita al menos una fila "
-                        + "debajo de la cabecera");
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "A Markdown table needs at least one row "
+                        + "below the header");
             }
             int columns = 0;
             for (org.commonmark.node.Node c = head.getFirstChild().getFirstChild(); c != null; c = c.getNext()) {
@@ -340,8 +338,8 @@ final class MarkdownBuilder {
         }
 
         /**
-         * Una fila con más celdas que la cabecera es un error (reference/components/markdown.md#tablas): el parser
-         * descarta las que sobran, así que se cuentan en el texto de la fila, separadas por {@code |} sin escapar.
+         * A row with more cells than the header is an error (reference/components/markdown.md#tables): the parser
+         * discards the extra ones, so they are counted in the text of the row, separated by unescaped {@code |}.
          */
         private void extraCells(org.commonmark.node.Node row, int columns) {
             if (row.getSourceSpans().isEmpty()) {
@@ -358,12 +356,12 @@ final class MarkdownBuilder {
                 }
             }
             if (cells > columns) {
-                throw error(line(row), ErrorCode.MARKDOWN_UNSUPPORTED, "La fila tiene " + cells + " celdas y la "
-                        + "cabecera " + columns + ": sobran celdas, que Markdown descartaría sin avisar");
+                throw error(line(row), ErrorCode.MARKDOWN_UNSUPPORTED, "The row has " + cells + " cells and the "
+                        + "header " + columns + ": the extra cells would be discarded by Markdown without warning");
             }
         }
 
-        /** {@code Header rows} o {@code Body} con sus filas; las celdas no tienen línea propia: la de su fila. */
+        /** {@code Header rows} or {@code Body} with its rows; cells have no line of their own: that of their row. */
         private InlineNode rows(String name, org.commonmark.node.Node group) {
             InlineNode out = node(name, "", line(group));
             for (org.commonmark.node.Node r = group.getFirstChild(); r != null; r = r.getNext()) {
@@ -377,7 +375,7 @@ final class MarkdownBuilder {
             return out;
         }
 
-        /** Con texto, un {@code Cell} con valor y la alineación de su columna; vacía, un {@code Cell} vacío. */
+        /** With text, a {@code Cell} with a value and the alignment of its column; empty, an empty {@code Cell}. */
         private InlineNode cell(TableCell c, int line) {
             List<TextRun> text = inline(c, line);
             String value = TextRun.text(text);
@@ -394,11 +392,11 @@ final class MarkdownBuilder {
             return cell;
         }
 
-        /** Un {@code Text} o un {@code Paragraph} con el texto de un bloque y sus tramos. */
+        /** A {@code Text} or a {@code Paragraph} with the text of a block and its runs. */
         /**
-         * El {@code Id} de un encabezado, escrito al final de su texto como {@code {#id}}
-         * (reference/components/markdown.md), que se quita del texto; {@code null} si no lo lleva. Un {@code {#…}}
-         * vacío o con espacios es un error.
+         * The {@code Id} of a heading, written at the end of its text as {@code {#id}}
+         * (reference/components/markdown.md), which is removed from the text; {@code null} if it has none. An empty
+         * {@code {#...}} or one with spaces is an error.
          */
         private String headingId(Heading h, int line) {
             if (!(h.getLastChild() instanceof Text last)) {
@@ -410,8 +408,8 @@ final class MarkdownBuilder {
             }
             String id = m.group(1);
             if (id.isEmpty() || !id.equals(id.strip()) || id.chars().anyMatch(Character::isWhitespace)) {
-                throw error(line, ErrorCode.VALUE_NOT_ALLOWED, "El Id de un encabezado de Markdown, {#" + id + "}, "
-                        + "necesita un nombre sin espacios: ## Ventas {#ventas}");
+                throw error(line, ErrorCode.VALUE_NOT_ALLOWED, "The Id of a Markdown heading, {#" + id + "}, "
+                        + "needs a name without spaces: ## Sales {#sales}");
             }
             String rest = last.getLiteral().substring(0, m.start()).stripTrailing();
             if (rest.isEmpty()) {
@@ -445,13 +443,13 @@ final class MarkdownBuilder {
             return out.build();
         }
 
-        /** El texto de los hijos de {@code parent}, con el formato que acumulan sus antecesores. */
+        /** The text of the children of {@code parent}, with the formatting its ancestors accumulate. */
         void inline(org.commonmark.node.Node parent, TextFormat f, TextRun.Joiner out, int line) {
             for (org.commonmark.node.Node n = parent.getFirstChild(); n != null; n = n.getNext()) {
                 if (n instanceof Text t) {
                     out.add(t.getLiteral(), f);
                 } else if (n instanceof SoftLineBreak) {
-                    // Un salto de línea simple vale un espacio, como en un Text (reference/common/typography.md).
+                    // A single line break counts as a space, as in a Text (reference/common/typography.md).
                     out.add(" ", f);
                 } else if (n instanceof StrongEmphasis) {
                     inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
@@ -472,24 +470,24 @@ final class MarkdownBuilder {
         }
 
         /**
-         * El formato de los tramos de un enlace (reference/common/links.md): el de fuera, subrayado y con su destino.
-         * Un enlace de Markdown es el único que se subraya solo. El título ({@code "…"}) no
-         * tendría efecto y es un error, como el de una imagen.
+         * The formatting of the runs of a link (reference/common/links.md): the outer one, underlined and with its
+         * target. A Markdown link is the only one that is underlined by itself. The title ({@code "..."}) would have no
+         * effect and is an error, like that of an image.
          */
         private static TextFormat link(Link l, TextFormat f, int line) {
             if (l.getTitle() != null && !l.getTitle().isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite el título de un enlace (\""
-                        + l.getTitle() + "\"): sobra, [texto](destino)");
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow the title of a link (\""
+                        + l.getTitle() + "\"): it is not needed, [text](target)");
             }
             String destination = l.getDestination().strip();
             Links.problem(destination).ifPresent(problem -> {
-                throw error(line, ErrorCode.LINK_SCHEME, "Enlace de Markdown: " + problem);
+                throw error(line, ErrorCode.LINK_SCHEME, "Markdown link: " + problem);
             });
             return new TextFormat(f.bold(), f.italic(), true, f.strike(), destination);
         }
 
         /**
-         * Marcadores de {@code Bullet markers} (sin numerar) o de {@code Number markers} (numerados), uno por nivel.
+         * Markers of {@code Bullet markers} (unnumbered) or of {@code Number markers} (numbered), one per level.
          */
         private static List<String> markers(Node n, boolean numbered) {
             List<String> markers = new ArrayList<>();
@@ -501,17 +499,17 @@ final class MarkdownBuilder {
                 try {
                     marker = Enum.valueOf(Marker.class, token.toUpperCase(Locale.ROOT).replace('-', '_'));
                 } catch (IllegalArgumentException e) {
-                    // Se informa abajo, con los valores admitidos.
+                    // Reported below, with the allowed values.
                 }
                 if (marker == null || marker.numbered() != numbered) {
-                    throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Valor no permitido en " + n.getName() + ": " + token
-                            + (numbered ? " (decimal, lower-alpha, upper-alpha, lower-roman o upper-roman)"
-                                    : " (bullet, dash o none)"));
+                    throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + n.getName() + ": " + token
+                            + (numbered ? " (decimal, lower-alpha, upper-alpha, lower-roman or upper-roman)"
+                                    : " (bullet, dash or none)"));
                 }
                 markers.add(token.toLowerCase(Locale.ROOT));
             }
             if (markers.isEmpty()) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " necesita al menos un marcador");
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " needs at least one marker");
             }
             return markers;
         }
@@ -519,29 +517,29 @@ final class MarkdownBuilder {
         InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
             if (n instanceof Image) {
-                what = inlineOnly ? "imágenes (una imagen va en un Image)"
-                        : "imágenes dentro de un texto (una imagen va sola en su párrafo)";
+                what = inlineOnly ? "images (an image goes in an Image)"
+                        : "images inside a text (an image goes alone in its paragraph)";
             } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
-                what = "código";
+                what = "code";
             } else if (n instanceof BlockQuote) {
-                what = "citas (>)";
+                what = "quotes (>)";
             } else if (n instanceof ThematicBreak) {
-                what = "líneas horizontales";
+                what = "horizontal rules";
             } else if (n instanceof HtmlBlock || n instanceof HtmlInline) {
                 what = "HTML";
             } else if (n instanceof HardLineBreak) {
-                what = "saltos de línea forzados (dos espacios o \\ al final de la línea)";
+                what = "forced line breaks (two spaces or \\ at the end of the line)";
             } else if (n instanceof LinkReferenceDefinition) {
-                what = "definiciones de enlaces";
+                what = "link definitions";
             } else {
                 what = n.getClass().getSimpleName();
             }
             return inlineOnly
-                    ? error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markup: markdown no admite " + what + ": " + INLINE_SUBSET)
-                    : error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown no admite " + what + ": " + SUBSET);
+                    ? error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markup: markdown does not allow " + what + ": " + INLINE_SUBSET)
+                    : error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow " + what + ": " + SUBSET);
         }
 
-        /** Línea del documento donde empieza el bloque; la del {@code Content} si no la tiene. */
+        /** Line of the document where the block begins; that of the {@code Content} if it has none. */
         int line(org.commonmark.node.Node b) {
             return b.getSourceSpans().isEmpty() ? firstLine - 1 : firstLine + b.getSourceSpans().get(0).getLineIndex();
         }

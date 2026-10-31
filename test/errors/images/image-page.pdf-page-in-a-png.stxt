@@ -1,0 +1,12 @@
+# Case: Page in an image that is not a PDF
+# Code: IMAGE_PAGE
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/wide.png
+			Pdf page: 1

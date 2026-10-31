@@ -1,26 +1,26 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las comprobaciones de una conversión que quien convierte puede quitar (reference/implementation/api.md). Por
- * defecto se hacen todas; las que se quitan no fallan, y el resultado puede no verse como se espera o no ser accesible.
- * Las reglas del documento no están aquí: un documento que las incumple no se puede maquetar.
+ * The checks of a conversion that the caller can turn off (reference/implementation/api.md). By default all of them
+ * run; the ones turned off do not fail, and the result may not look as expected or may not be accessible. The rules of
+ * the document are not here: a document that breaks them cannot be laid out.
  */
 public enum Check {
 
-    /** El contraste del texto con su fondo (reference/common/pdf.md): con poco, {@code CONTRAST_LOW}. */
+    /** The contrast of the text with its background (reference/common/pdf.md): when it is low, {@code CONTRAST_LOW}. */
     CONTRAST,
 
     /**
-     * Las fuentes de la página de un PDF que dibuja una {@code Image} (reference/components/image.md): incrustadas y
-     * con lo que dice qué carácter es cada glifo; si no, {@code IMAGE_FORMAT}. Sin ella, el visor puede sustituir una
-     * fuente y el documento puede no ser PDF/UA.
+     * The fonts of the page of a PDF that an {@code Image} draws (reference/components/image.md): embedded and with
+     * the mapping from each glyph to its character; otherwise, {@code IMAGE_FORMAT}. Without this check, the viewer may
+     * substitute a font and the document may not be PDF/UA.
      */
     PDF_IMAGE_FONTS,
 
     /**
-     * Las anotaciones que se ven en la página de un PDF que dibuja una {@code Image}, como un campo de formulario
-     * relleno o un comentario (reference/components/image.md): si las tiene, {@code IMAGE_FORMAT}. Sin ella, la página
-     * se dibuja sin ellas.
+     * The visible annotations on the page of a PDF that an {@code Image} draws, such as a filled form field or a
+     * comment (reference/components/image.md): if it has any, {@code IMAGE_FORMAT}. Without this check, the page is
+     * drawn without them.
      */
     PDF_IMAGE_ANNOTATIONS
 }

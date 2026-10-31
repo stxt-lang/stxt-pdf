@@ -8,17 +8,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * El número impreso de cada página física, el último de su tanda y cómo se escriben
- * (reference/components/document.md): la tanda son las páginas desde el último {@code Page numbering: restart}, que
- * empieza en su {@code Start}; {@code none} no numera ni avanza el contador. Cada página se escribe con el {@code Page
- * style} de su sección. La página en blanco con que acaba una sección ({@code Begin on: odd}) es una página más de
- * ella.
+ * The printed number of each physical page, the last one of its page sequence and how they are written
+ * (reference/components/document.md): the page sequence is the pages since the last {@code Page numbering: restart},
+ * which starts at its {@code Start}; {@code none} neither numbers nor advances the counter. Each page is written with
+ * the {@code Page style} of its section. The blank page with which a section ends ({@code Begin on: odd}) is one more
+ * page of it.
  */
 record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
 
     /**
-     * @param results    el flujo de cada sección, un resultado por página
-     * @param blankAfter si cada sección acaba con una página en blanco
+     * @param results    the flow of each section, one result per page
+     * @param blankAfter whether each section ends with a blank page
      */
     static Numbering of(List<Section> sections, List<List<LayoutResult>> results, boolean[] blankAfter) {
         int pages = results.stream().mapToInt(List::size).sum();
@@ -53,34 +53,35 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
         return printed.length;
     }
 
-    /** Número impreso de la página física {@code number} (desde 1); 0 si no se numera. */
+    /** Printed number of the physical page {@code number} (from 1); 0 if it is not numbered. */
     int printed(int number) {
         return printed[number - 1];
     }
 
-    /** Último número de la tanda de la página física {@code number}. */
+    /** Last number of the page sequence of the physical page {@code number}. */
     int total(int number) {
         return totals[number - 1];
     }
 
-    /** Cómo se escribe el número de la página física {@code number}. */
+    /** How the number of the physical page {@code number} is written. */
     NumberFormat style(int number) {
         return styles[number - 1];
     }
 
-    /** El número impreso de la página física {@code number}, escrito con su estilo ({@code {page}}, {@code iv}). */
+    /** The printed number of the physical page {@code number}, written with its style ({@code {page}}, {@code iv}). */
     String label(int number) {
         return style(number).format(printed(number));
     }
 
-    /** El último número de su tanda, escrito con el estilo de la página ({@code {pages}}). */
+    /** The last number of its page sequence, written with the style of the page ({@code {pages}}). */
     String totalLabel(int number) {
         return style(number).format(total(number));
     }
 
     /**
-     * El número de prueba que mide al menos lo que cualquier número impreso de las páginas numeradas: tantos caracteres
-     * como el más largo, en cifras ({@code 0}) o, si hay romanos, con la letra más ancha ({@code M} o {@code m}).
+     * The probe number that measures at least as much as any printed number of the numbered pages: as many characters
+     * as the longest, in digits ({@code 0}) or, if there are Roman numerals, with the widest letter ({@code M} or
+     * {@code m}).
      */
     String probe() {
         int length = 0;

@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Con las fuentes del repositorio ({@code resources/fonts}): IBM Plex Sans en sus cuatro variantes. */
+/** With the fonts of the repository ({@code resources/fonts}): IBM Plex Sans in its four variants. */
 class PdfMetricsTest {
 
     private static final FontFace REGULAR = face(FontWeight.NORMAL, FontStyle.NORMAL);
@@ -46,7 +46,7 @@ class PdfMetricsTest {
 
     @Test
     void widthsFromTheTrueTypeFile() {
-        // hmtx de IBM Plex Sans (1000 unidades por em): H + o + l + a = 2073 en la normal, 2160 en negrita.
+        // hmtx of IBM Plex Sans (1000 units per em): H + o + l + a = 2073 in regular, 2160 in bold.
         assertEquals(20.73, metrics.width("Hola", REGULAR, 10), 1e-9);
         assertEquals(41.46, metrics.width("Hola", REGULAR, 20), 1e-9);
         assertEquals(21.60, metrics.width("Hola", BOLD, 10), 1e-9);
@@ -67,7 +67,7 @@ class PdfMetricsTest {
                         "\t\tText: Hola"));
         assertEquals(ErrorCode.FONT_UNKNOWN, e.errorCode());
         assertEquals(14, e.line());
-        assertTrue(e.getMessage().contains("Fuente desconocida: ibm plex sans. ¿Querías decir 'IBM Plex Sans'?"),
+        assertTrue(e.getMessage().contains("Unknown font: ibm plex sans. The closest name is 'IBM Plex Sans'."),
                 e.getMessage());
     }
 
@@ -83,7 +83,7 @@ class PdfMetricsTest {
                 () -> regularOnly.validate(new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
         assertEquals(16, e.line());
-        assertTrue(e.getMessage().endsWith("(Font en la línea 10, Bold en la línea 15)"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(Font on line 10, Bold on line 15)"), e.getMessage());
     }
 
     @Test
@@ -99,9 +99,9 @@ class PdfMetricsTest {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> regularOnly.validate(
                 new BoxTreeBuilder().build(reader.read(Docs.sectioned(doc)), reader.readStyles(styles)).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
-        // El error es del texto, en el documento; la familia está declarada en los estilos.
+        // The error belongs to the text, in the document; the family is declared in the styles.
         assertFalse(e.inStyles());
-        assertTrue(e.getMessage().endsWith("(Font en la línea 4 de los estilos, Bold en la línea 10)"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(Font on line 4 of the styles, Bold on line 10)"), e.getMessage());
     }
 
     @Test
@@ -112,7 +112,7 @@ class PdfMetricsTest {
                         "\t\t\t\tPrimera línea", "\t\t\t\tKanji 漢"));
         assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
         assertEquals(20, e.line());
-        assertEquals("línea 20: La fuente IBM Plex Sans bold no tiene el carácter '漢' (U+6F22)", e.getMessage());
+        assertEquals("line 20: The font IBM Plex Sans bold has no character '漢' (U+6F22)", e.getMessage());
     }
 
     @Test
@@ -128,7 +128,7 @@ class PdfMetricsTest {
                         Map.of("T", List.of(run("Primera línea\nsegunda "), run("línea", "bi")))).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
         assertEquals(17, e.line());
-        assertTrue(e.getMessage().endsWith("(texto con formato bold italic)"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(text with bold italic formatting)"), e.getMessage());
     }
 
     @Test
@@ -140,14 +140,14 @@ class PdfMetricsTest {
                 () -> metrics.validate(TextRuns.build(new DocumentReader().read(Docs.sectioned(doc)),
                         Map.of("T", List.of(run("Primera "), run("línea\nKanji 漢", "i")))).root()));
         assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
-        assertEquals("línea 17: La fuente IBM Plex Sans italic no tiene el carácter '漢' (U+6F22)", e.getMessage());
+        assertEquals("line 17: The font IBM Plex Sans italic has no character '漢' (U+6F22)", e.getMessage());
     }
 
     @Test
     void theCodeFontOfAMarkdownIsCheckedAndMeasuredWithItsOwnFile() {
         assertDoesNotThrow(() -> validate("\tMarkdown:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tCode font: IBM Plex Mono", "\t\tContent >>",
                 "\t\t\tFont Plex Sans y `mono`.", "", "\t\t\t```", "\t\t\tint x;", "\t\t\t```"));
-        // hmtx de IBM Plex Mono: 600 unidades por carácter.
+        // hmtx of IBM Plex Mono: 600 units per character.
         assertEquals(12, metrics.width("ab", new FontFace("IBM Plex Mono", FontWeight.NORMAL, FontStyle.NORMAL), 10),
                 1e-9);
     }

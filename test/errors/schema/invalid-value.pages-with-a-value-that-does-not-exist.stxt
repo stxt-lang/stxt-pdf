@@ -1,0 +1,19 @@
+# Case: Pages with a value that is not in the list
+# Code: INVALID_VALUE
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page overlay:
+			Offset: 0 auto auto 0
+			Pages: second
+			Text: Hola

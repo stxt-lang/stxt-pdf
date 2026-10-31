@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El contrato de {@link Engine}: el protocolo con el {@link Paginator} no es
- * público, y un motor guardado entre conversiones no retiene nada del último documento ni cambia el resultado
- * del siguiente.
+ * The contract of {@link Engine}: the protocol with the {@link Paginator} is not
+ * public, and an engine kept between conversions retains nothing of the last document and does not change the result
+ * of the next one.
  */
 class EngineContractTest {
 
@@ -36,9 +36,9 @@ class EngineContractTest {
         Set<String> publicMethods = Arrays.stream(Engine.class.getMethods()).map(Method::getName)
                 .collect(Collectors.toSet());
         for (String internal : List.of("reservePageNumbers", "assume", "number", "absolute")) {
-            assertFalse(publicMethods.contains(internal), internal + " es del Paginator y no debe ser público");
+            assertFalse(publicMethods.contains(internal), internal + " belongs to the Paginator and must not be public");
         }
-        // Lo que sí es de quien usa el motor.
+        // What does belong to the caller.
         assertTrue(publicMethods.containsAll(Set.of("layOutDocument", "layout", "intrinsic", "measurer")));
     }
 
@@ -49,14 +49,16 @@ class EngineContractTest {
         Resources resources = new Resources();
         Engine engine = new Engine(new PdfMetrics(resources), resources);
         BoxTreeBuilder.Result tree = new BoxTreeBuilder().build(document, styles(dir));
-        // Se llena la caché por fuera de layOutDocument, para ver que éste la vacía.
+        // The cache is filled outside layOutDocument, to check that the latter empties it.
         engine.intrinsic(tree.root());
-        assertTrue(engine.cachedEntries() > 0, "la prueba necesita una caché con algo dentro");
+        assertTrue(engine.cachedEntries() > 0, "the test needs a cache with something in it");
         engine.layOutDocument(tree);
         assertEquals(0, engine.cachedEntries());
     }
 
-    /** Un motor guardado y reutilizado da lo mismo que uno nuevo: con {@code {pages}}, referencias e índices. */
+    /**
+     * An engine kept and reused gives the same as a new one: with {@code {pages}}, references and tables of contents.
+     */
     @Test
     void aReusedEngineGivesTheSameDocumentsAsFreshOnes() throws IOException {
         DocumentReader reader = new DocumentReader();
@@ -67,7 +69,7 @@ class EngineContractTest {
             dirs = list.filter(Files::isDirectory).sorted().toList();
         }
         assertFalse(dirs.isEmpty());
-        // Dos vueltas, para que cada documento también siga a otro distinto del que lo precedió.
+        // Two rounds, so that each document also follows a different one from the one that preceded it.
         for (int round = 0; round < 2; round++) {
             for (Path dir : dirs) {
                 InlineNode document = reader.read(dir.resolve("input.stxt"));
@@ -75,7 +77,7 @@ class EngineContractTest {
                 String fresh = StxtDump.dump(new Engine(new PdfMetrics(resources), resources)
                         .layOutDocument(document, styles).pages(), true);
                 String again = StxtDump.dump(reused.layOutDocument(document, styles).pages(), true);
-                assertEquals(fresh, again, dir.getFileName() + " (vuelta " + (round + 1) + ")");
+                assertEquals(fresh, again, dir.getFileName() + " (round " + (round + 1) + ")");
             }
         }
     }
@@ -92,8 +94,8 @@ class EngineContractTest {
     }
 
     /**
-     * Un motor reutilizado olvida las cifras que reservó el documento anterior: tras uno de 101 páginas, «Página
-     * {page}» se vuelve a medir con dos cifras (45) y cabe en una línea de su caja de 48 (pruebas de mutación).
+     * A reused engine forgets the figures that the previous document reserved: after one of 101 pages, "Página
+     * {page}" is measured again with two figures (45) and fits on one line of its box of 48 (mutation testing).
      */
     @Test
     void aReusedEngineForgetsTheReservedDigits() {

@@ -22,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los {@link Limits} de una conversión: se aplican justo donde se dicen (un documento
- * que está en el límite pasa, uno por encima falla con {@code LIMIT} y la línea de la {@code Image}) y lo que el
- * motor acepta es lo que se puede dibujar.
+ * The {@link Limits} of a conversion: they apply exactly where they say (a document
+ * at the limit passes, one above it fails with {@code LIMIT} and the line of the {@code Image}) and what the
+ * engine accepts is what can be drawn.
  */
 class LimitsTest {
 
@@ -75,7 +75,7 @@ class LimitsTest {
         assertEquals(Limits.DEFAULT.maxImagePixels(), changed.maxImagePixels());
     }
 
-    /** Un bloque de 500 pt en páginas de 200 ocupa tres. */
+    /** A 500 pt block on 200 pt pages takes three. */
     @Test
     void thePageLimitIsExactlyTheNumberOfPages() throws IOException {
         InlineNode threePages = document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 500");
@@ -84,10 +84,10 @@ class LimitsTest {
                 () -> convert(converter(Limits.DEFAULT.withMaxPages(2)), threePages));
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals("PAGE_LIMIT", e.code());
-        assertTrue(e.getMessage().contains("más de 2 páginas"), e.getMessage());
+        assertTrue(e.getMessage().contains("more than 2 pages"), e.getMessage());
     }
 
-    /** El límite cuenta las páginas de todas las secciones: dos de 2 páginas son 4. */
+    /** The limit counts the pages of all the sections: two of 2 pages are 4. */
     @Test
     void thePageLimitCountsEverySection() throws IOException {
         InlineNode twoSections = document("\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300",
@@ -100,14 +100,14 @@ class LimitsTest {
 
     @Test
     void theDefaultPageLimitIsTwoThousand() {
-        // 2001 páginas de 200 pt de alto: se rechaza antes de pintar nada.
+        // 2001 pages 200 pt high: it is rejected before painting anything.
         InlineNode document = document("\tBlock:", "\t\tBox:", "\t\t\tHeight: " + (200 * 2_001));
         StxtPdfException e = assertThrows(StxtPdfException.class, () -> Converter.create().layOut(document));
         assertEquals("PAGE_LIMIT", e.code());
-        assertTrue(e.getMessage().contains("más de 2000 páginas"), e.getMessage());
+        assertTrue(e.getMessage().contains("more than 2000 pages"), e.getMessage());
     }
 
-    /** {@code test/wide.png} mide 200 × 100 píxeles. */
+    /** {@code test/wide.png} measures 200 × 100 pixels. */
     @Test
     void theImagePixelLimitIsExactlyWidthTimesHeight() throws IOException {
         InlineNode document = image("test/wide.png");
@@ -117,10 +117,10 @@ class LimitsTest {
         assertEquals(ErrorCode.IMAGE_TOO_LARGE, e.errorCode());
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals(8, e.line());
-        assertTrue(e.getMessage().contains("200 × 100 píxeles"), e.getMessage());
+        assertTrue(e.getMessage().contains("200 × 100 pixels"), e.getMessage());
     }
 
-    /** Los bytes del fichero de un PDF, antes de abrirlo: el límite es justo su tamaño. */
+    /** The bytes of a PDF file, before opening it: the limit is exactly its size. */
     @Test
     void thePdfLimitIsExactlyTheBytesOfTheFile() throws IOException {
         long bytes = Files.size(RESOURCES.root().resolve("images/test/pages.pdf"));
@@ -132,17 +132,17 @@ class LimitsTest {
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals(8, e.line());
         assertTrue(e.getMessage().contains("Limits.maxPdfBytes"), e.getMessage());
-        // Solo cuenta para los PDF: un PNG más grande que el límite no lo mira.
+        // It only counts for PDFs: a PNG larger than the limit is not checked.
         convert(converter(Limits.DEFAULT.withMaxPdfBytes(1)), image("test/wide.png"));
     }
 
-    /** Se mira en la cabecera: una imagen enorme se rechaza sin decodificarla ni dibujarla. */
+    /** It is checked in the header: a huge image is rejected without decoding or drawing it. */
     @Test
     void aHugeImageIsRejectedBeforeLayingOut() {
         long start = System.nanoTime();
         StxtPdfException e = assertThrows(StxtPdfException.class, () -> Converter.create().layOut(image("test/limit-huge.png")));
         assertEquals("IMAGE_TOO_LARGE", e.code());
-        assertTrue((System.nanoTime() - start) / 1_000_000 < 5_000, "tardó demasiado para mirar una cabecera");
+        assertTrue((System.nanoTime() - start) / 1_000_000 < 5_000, "took too long to read a header");
     }
 
     @Test
@@ -154,16 +154,16 @@ class LimitsTest {
         InvalidModelException elements = assertThrows(InvalidModelException.class,
                 () -> convert(converter(exact.withMaxSvgElements((int) shapes.svgElements() - 1)), document));
         assertEquals(ErrorCode.SVG_TOO_COMPLEX, elements.errorCode());
-        assertTrue(elements.getMessage().contains("elementos"), elements.getMessage());
+        assertTrue(elements.getMessage().contains("elements"), elements.getMessage());
         InvalidModelException depth = assertThrows(InvalidModelException.class,
                 () -> convert(converter(exact.withMaxSvgDepth(shapes.svgDepth() - 1)), document));
         assertEquals(ErrorCode.SVG_TOO_COMPLEX, depth.errorCode());
-        assertTrue(depth.getMessage().contains("niveles"), depth.getMessage());
+        assertTrue(depth.getMessage().contains("levels"), depth.getMessage());
     }
 
     /**
-     * Lo que se acepta se dibuja: JSVG trae sus propios límites (2000 elementos y 30 niveles) y el motor los iguala
-     * a los suyos, así que un SVG justo en el límite no falla al pintar con un error genérico.
+     * What is accepted is drawn: JSVG has its own limits (2000 elements and 30 levels) and the engine raises them to
+     * its own, so an SVG exactly at the limit does not fail with a generic error when painting.
      */
     @Test
     void anSvgAtItsLimitsIsDrawnByJsvg() throws IOException {
@@ -176,13 +176,13 @@ class LimitsTest {
         }
     }
 
-    /** Antes un SVG de 3000 rectángulos pasaba la validación y fallaba al dibujar con una IOException. */
+    /** An SVG of 3000 rectangles used to pass validation and fail with an IOException when drawn. */
     @Test
     void anSvgWithMoreThanJsvgsDefaultIsNowDrawn() throws IOException {
         java.nio.file.Path dir = java.nio.file.Files.createTempDirectory("limits");
         try {
             java.nio.file.Files.createDirectories(dir.resolve("images"));
-            // Una copia y no un enlace simbólico, que en Windows necesita privilegios.
+            // A copy and not a symbolic link, which needs privileges on Windows.
             java.nio.file.Path font = RESOURCES.fontsFolder().resolve("IBM Plex Sans/IBMPlexSans-Regular.ttf");
             java.nio.file.Files.createDirectories(dir.resolve("fonts"));
             java.nio.file.Files.copy(font, dir.resolve("fonts").resolve(font.getFileName()));
@@ -206,6 +206,6 @@ class LimitsTest {
     void theImageMessageGivesTheMegapixels() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> convert(converter(Limits.DEFAULT.withMaxImagePixels(1_000)), image("test/wide.png")));
-        assertTrue(e.getMessage().contains("(0.0 Mpx) y el máximo es 0.0 Mpx"), e.getMessage());
+        assertTrue(e.getMessage().contains("(0.0 Mpx) and the maximum is 0.0 Mpx"), e.getMessage());
     }
 }

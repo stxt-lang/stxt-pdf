@@ -1,13 +1,13 @@
-# Enlaces (reference/common/links.md). Área útil de 260 × 260 desde (20, 20); con FixedMetrics, cada
-# carácter mide 5 pt con Size: 10 y cada línea, 12. Un enlace no cambia el layout: lo que se
-# comprueba aquí son las posiciones, y que el PDF se escribe con sus anotaciones (el PNG no las
-# muestra; lo hacen PdfCanvasTest y StackingContextTest).
+# Links (reference/common/links.md). Page area of 260 × 260 from (20, 20); with FixedMetrics, each
+# character measures 5 pt at Size: 10 and each line, 12. A link does not change the layout: what is
+# checked here are the positions, and that the PDF is written with its annotations (the PNG does not
+# show them; PdfCanvasTest and StackingContextTest do).
 #
-# Página 1, de arriba abajo, cada caja con 8 pt de margen inferior: mail (Text con Link mailto:) en
-# 20, de 12; md (un Markdown con un enlace a una URL y otro a mail, «Visita la web o vuelve al
-# inicio.», 33 caracteres: una línea de 12) en 40; logo (una Image de 150 × 75 con Link a end) en
-# 60; card (un Block con Link a end, con relleno de 4 y dos líneas de texto: 12 + 12 + 8 = 32) en
-# 143. Página 2: end, el destino de logo y card, en 20; back, con Link a mail, en 32.
+# Page 1, from top to bottom, each box with a bottom margin of 8 pt: mail (Text with Link mailto:) at
+# 20, of 12; md (a Markdown with a link to a URL and another to mail, "Visita la web o vuelve al
+# inicio.", 33 characters: one line of 12) at 40; logo (an Image of 150 × 75 with Link to end) at
+# 60; card (a Block with Link to end, with a padding of 4 and two lines of text: 12 + 12 + 8 = 32) at
+# 143. Page 2: end, the target of logo and card, at 20; back, with Link to mail, at 32.
 Document (dev.stxt.pdf):
 	Page:
 		Width: 300

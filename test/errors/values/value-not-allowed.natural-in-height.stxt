@@ -1,0 +1,13 @@
+# Case: natural in Height
+# Code: VALUE_NOT_ALLOWED
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Height: natural

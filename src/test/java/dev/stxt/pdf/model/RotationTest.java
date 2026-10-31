@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@code Rotate} y {@code Rotate origin} (reference/common/layers-and-rotation.md). */
+/** {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md). */
 class RotationTest {
 
     private static final double E = 1e-9;
@@ -20,13 +20,13 @@ class RotationTest {
         assertOrigin(0, 0, "top left");
         assertOrigin(0, 0, "left top");
         assertOrigin(100, 100, "bottom   right");
-        // El eje que no se nombra queda en el centro.
+        // The axis that is not named stays at the center.
         assertOrigin(50, 100, "bottom");
         assertOrigin(100, 50, "right center");
         assertOrigin(50, 50, "center center");
     }
 
-    /** Dos medidas: la horizontal y la vertical, en puntos o en porcentaje, también negativas. */
+    /** Two measures: the horizontal and the vertical one, in points or as a percentage, negative too. */
     @Test
     void originMeasures() {
         assertArrayEquals(new Value[] {Value.pt(20), new Value.Percentage(30)}, Rotation.origin("20 30%"));
@@ -67,12 +67,12 @@ class RotationTest {
         assertEquals(20, r.pivotY(box), E);
     }
 
-    /** Con la y hacia abajo, 90 grados positivos giran en el sentido de las agujas del reloj. */
+    /** With y pointing down, 90 positive degrees turn clockwise. */
     @Test
     void positiveDegreesTurnClockwise() {
         Rect box = new Rect(100, 100, 100, 20);
         AffineTransform t = new Rotation(90, 0.5, 0.5).transform(box);
-        // La esquina de arriba a la izquierda pasa arriba a la derecha.
+        // The top left corner moves to the top right.
         double[] c = Rotation.corners(t, box);
         assertArrayEquals(new double[] {160, 60, 160, 160, 140, 160, 140, 60}, c, E);
         assertEquals(new Rect(140, 60, 20, 100).toString(), round(Rotation.envelope(t, box)).toString());
@@ -82,8 +82,8 @@ class RotationTest {
     void envelopeOfAQuarterTurnAroundACorner() {
         Rect box = new Rect(0, 0, 40, 10);
         AffineTransform t = new Rotation(-90, 0, 1).transform(box);
-        // Alrededor de abajo a la izquierda, en contra de las agujas del reloj: queda de pie sobre
-        // esa esquina, a su izquierda.
+        // Around the bottom left, counterclockwise: it ends up standing on
+        // that corner, to its left.
         assertEquals(new Rect(-10, -30, 10, 40).toString(), round(Rotation.envelope(t, box)).toString());
     }
 

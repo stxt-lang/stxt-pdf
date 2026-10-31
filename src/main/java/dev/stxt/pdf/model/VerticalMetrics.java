@@ -1,18 +1,18 @@
 package dev.stxt.pdf.model;
 
 /**
- * Ascendente y descendente de una fuente, en fracciones del cuerpo (los dos positivos). Colocan
- * la línea base dentro de una línea (reference/common/typography.md).
+ * Ascent and descent of a font, in fractions of the font size (both positive). They place
+ * the baseline within a line (reference/common/typography.md).
  */
 public record VerticalMetrics(double ascent, double descent) {
 
-    /** Aproximación sin fuente: el 80 % del cuerpo por encima de la línea base y el 20 % por debajo. */
+    /** Approximation without a font: 80% of the font size above the baseline and 20% below. */
     public static final VerticalMetrics APPROXIMATE = new VerticalMetrics(0.8, 0.2);
 
     /**
-     * Línea base de una línea que empieza en {@code lineTop} y mide {@code lineHeight}: la caja
-     * de la fuente (ascendente más descendente) queda centrada en la línea, como el
-     * <em>half-leading</em> de CSS.
+     * Baseline of a line that starts at {@code lineTop} and measures {@code lineHeight}: the box
+     * of the font (ascent plus descent) is centered in the line, like the CSS
+     * <em>half-leading</em>.
      */
     public double baseline(double lineTop, double lineHeight, double fontSize) {
         return lineTop + (lineHeight - (ascent + descent) * fontSize) / 2 + ascent * fontSize;

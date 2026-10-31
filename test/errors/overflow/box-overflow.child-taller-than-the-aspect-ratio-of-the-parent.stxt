@@ -1,0 +1,17 @@
+# Case: Child taller than the Aspect ratio of the parent
+# Code: BOX_OVERFLOW
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Width: 100
+				Aspect ratio: 2
+			Block:
+				Box:
+					Height: 80

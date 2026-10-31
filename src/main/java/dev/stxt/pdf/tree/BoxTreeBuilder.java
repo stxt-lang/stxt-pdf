@@ -40,70 +40,72 @@ import static dev.stxt.pdf.tree.ValueReader.enumValue;
 import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 
 /**
- * Construye el árbol de cajas a partir del documento (reference/common/structure.md): traduce cada
- * elemento a una caja con el {@link Layout} y la {@link Position} de su
- * {@link Element}, pasa las propiedades de {@code Item} y {@code Area} al elemento que envuelven,
- * aplica la herencia y las reglas de {@code Styles}, y comprueba las reglas que el schema no
- * puede expresar (reference/common/errors.md).
+ * Builds the box tree from the document (reference/common/structure.md): translates each
+ * element into a box with the {@link Layout} and the {@link Position} of its
+ * {@link Element}, passes the properties of {@code Item} and {@code Area} to the element they wrap,
+ * applies inheritance and the {@code Styles} rules, and checks the rules that the schema cannot
+ * express (reference/common/errors.md).
  *
- * <p>Es el orquestador: lee los valores con {@link ValueReader} y las propiedades con
- * {@link PropertyReader}, aplica las reglas con {@link StyleRules}, construye tablas y listas con
- * {@link TableBuilder} y {@link ListBuilder} y valida con {@link ModelValidator}.</p>
+ * <p>It is the orchestrator: it reads values with {@link ValueReader} and properties with
+ * {@link PropertyReader}, applies the rules with {@link StyleRules}, builds tables and lists with
+ * {@link TableBuilder} and {@link ListBuilder} and validates with {@link ModelValidator}.</p>
  *
- * <p>Prioridad de cada propiedad, de menos a más: el valor por defecto, lo heredado, la regla
- * {@code For element} del tipo, las reglas {@code For style} de sus clases, la regla {@code For id}
- * y lo que declara el propio elemento. Lo que aporta una regla se valida como si lo declarara
- * el elemento, y sus errores señalan la línea de la regla.</p>
+ * <p>Priority of each property, from lowest to highest: the default value, the inherited value, the
+ * {@code For element} rule of the type, the {@code For style} rules of its classes, the {@code For id} rule
+ * and what the element itself declares. What a rule contributes is validated as if the element declared
+ * it, and its errors point to the line of the rule.</p>
  *
- * <p>Los errores señalan la línea del nodo culpable: la de la propiedad, no la de su caja.
- * Son errores también las combinaciones que no tendrían efecto o se contradicen: el modelo las
- * rechaza en lugar de resolverlas con una regla por defecto.</p>
+ * <p>Errors point to the line of the offending node: that of the property, not that of its box.
+ * Combinations that would have no effect or contradict each other are errors too: the model rejects
+ * them instead of resolving them with a default rule.</p>
  *
- * <p>Trabaja sobre los nodos de {@code stxt-core} ({@link Nodes}). Antes de construir valida el
- * documento contra el schema ({@link DocumentSchema}), aunque ya venga validado de
- * {@code DocumentReader}: así la estructura (qué hijos admite cada nodo) solo está definida en el
- * schema, y el resto del código puede darla por buena. No guarda estado: cada llamada a
- * {@link #build} lleva el suyo en un {@link BuildContext}; por eso un mismo constructor se puede usar desde
- * varios hilos, aunque cada conversión suele crear el suyo.</p>
+ * <p>It works on the nodes of {@code stxt-core} ({@link Nodes}). Before building, it validates the
+ * document against the schema ({@link DocumentSchema}), even if it comes already validated from
+ * {@code DocumentReader}: this way the structure (which children each node accepts) is only defined in the
+ * schema, and the rest of the code can take it as correct. It keeps no state: each call to
+ * {@link #build} carries its own in a {@link BuildContext}; that is why the same builder can be used from
+ * several threads, although each conversion usually creates its own.</p>
  */
 public final class BoxTreeBuilder {
 
-    /** Etiqueta de idioma BCP 47: la lengua (2 o 3 letras) y subetiquetas de 1 a 8 letras o cifras. */
+    /** BCP 47 language tag: the language (2 or 3 letters) and subtags of 1 to 8 letters or digits. */
 
     /**
-     * Hijos de un elemento que no son propiedades suyas: los envoltorios y el texto, las clases
-     * (aplicadas ya con sus reglas), los grupos de filas y el {@code Span}, que lee {@link TableBuilder},
-     * y lo que lee {@link MarkdownBuilder}.
+     * Children of an element that are not its properties: the wrappers and the text, the classes
+     * (already applied with their rules), the row groups and the {@code Span}, which {@link TableBuilder} reads,
+     * and what {@link MarkdownBuilder} reads.
      */
     private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "header-rows", "body",
             "footer-rows", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
 
     /**
-     * Resultado: el medio del documento, la raíz anónima de la que cuelgan sus {@code Page overlay} y sus secciones
-     * (reference/components/document.md), las secciones en orden y el título y el idioma. Cada sección es la raíz de
-     * su layout y representa el área útil de sus páginas; la raíz del documento no se maqueta.
+     * Result: the medium of the document, the anonymous root from which its {@code Page overlay} and its sections hang
+     * (reference/components/document.md), the sections in order and the title and the language. Each section is the
+     * root of its layout and represents the page area of its pages; the root of the document is not laid out.
      */
     public record Result(PageSetup pageSetup, Box root, List<Section> sections, Metadata metadata) {
     }
 
     /**
-     * Construye el árbol de un documento, validado o no.
+     * Builds the tree of a document, validated or not.
      *
-     * @throws dev.stxt.exceptions.ValidationException si no cumple el schema (reference/common/structure.md)
-     * @throws InvalidModelException si incumple una regla del modelo (reference/common/errors.md)
+     * @throws dev.stxt.exceptions.ValidationException if it does not conform to the schema
+     *         (reference/common/structure.md)
+     * @throws InvalidModelException if it breaks a rule of the model (reference/common/errors.md)
      */
     public Result build(InlineNode document) {
         return build(document, null);
     }
 
     /**
-     * Como {@link #build(InlineNode)}, con un documento de estilos aparte (raíz {@code Styles},
-     * reference/common/styles.md) cuyas reglas valen menos que las del propio documento. {@code styles} puede ser
+     * Like {@link #build(InlineNode)}, with a separate styles document (root {@code Styles},
+     * reference/common/styles.md) whose rules weigh less than those of the document itself. {@code styles} can be
      * {@code null}.
      *
-     * @throws dev.stxt.exceptions.ValidationException si alguno no cumple el schema (reference/common/structure.md)
-     * @throws InvalidModelException si incumple una regla del modelo (reference/common/errors.md); la línea de un
-     *         error de las reglas del documento de estilos es la suya, y el mensaje lo dice
+     * @throws dev.stxt.exceptions.ValidationException if either does not conform to the schema
+     *         (reference/common/structure.md)
+     * @throws InvalidModelException if it breaks a rule of the model (reference/common/errors.md); the line of an
+     *         error in the rules of the styles document is its own, and the message says so
      */
     public Result build(InlineNode document, InlineNode styles) {
         return build(document, styles, root -> {
@@ -111,19 +113,19 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Como {@link #build(InlineNode, InlineNode)}, con {@code finish} sobre la raíz justo antes de cerrar el
-     * árbol: lo usan los tests del package para poner en él lo que el documento no puede escribir.
+     * Like {@link #build(InlineNode, InlineNode)}, with {@code finish} on the root right before the tree is
+     * closed: the tests of the package use it to put in it what the document cannot write.
      */
     Result build(InlineNode document, InlineNode styles, Consumer<Box> finish) {
-        // Sin el namespace, el schema no validaría nada.
+        // Without the namespace, the schema would validate nothing.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
-                    "El nodo raíz debe ser Document (" + DocumentSchema.NAMESPACE + "):");
+                    "The root node must be Document (" + DocumentSchema.NAMESPACE + "):");
         }
         DocumentSchema.validate(document);
         if (styles != null) {
             if (!is(styles, "styles") || !DocumentSchema.NAMESPACE.equals(styles.getNamespace())) {
-                throw error(styles, ErrorCode.DOCUMENT_ROOT, "El nodo raíz del documento de estilos debe ser Styles ("
+                throw error(styles, ErrorCode.DOCUMENT_ROOT, "The root node of the styles document must be Styles ("
                         + DocumentSchema.NAMESPACE + "):").inStylesDocument();
             }
             DocumentSchema.validate(styles, true);
@@ -133,7 +135,7 @@ public final class BoxTreeBuilder {
         Metadata metadata = PageSetupReader.metadata(document);
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
-        // La tipografía de For element: Document la heredan todas las cajas.
+        // The typography of For element: Document is inherited by all boxes.
         Style rootStyle = new Style();
         rootStyle.typography().setLocale(Locale.forLanguageTag(metadata.language()));
         ctx.rules.applyDocument(rootStyle);
@@ -146,7 +148,7 @@ public final class BoxTreeBuilder {
             } else if (h.getCanonicalName().equals("section")) {
                 Section section = section(ctx, inline(h), root, documentPageSetup, sections.isEmpty());
                 sections.add(section);
-                // Cuelga de la raíz sin ser su hija (sin padre): cada sección es la raíz de su layout.
+                // It hangs from the root without being its child (no parent): each section is the root of its layout.
                 root.addSection(section.box());
             }
         }
@@ -154,15 +156,15 @@ public final class BoxTreeBuilder {
         References.validate(root);
         LinkTargets.validate(root);
         finish.accept(root);
-        // Desde aquí el árbol no cambia: el layout, el pintado y otros hilos solo lo leen.
+        // From here on the tree does not change: the layout, the painting and other threads only read it.
         root.close();
         return new Result(pageSetup, root, List.copyOf(sections), metadata);
     }
 
     /**
-     * Una {@code Section} (reference/components/document.md): su caja, que es la raíz de su layout y tiene el alto de
-     * la página menos los márgenes (siempre definido), con su medio, su numeración y los {@code Page overlay} que
-     * lleva.
+     * A {@code Section} (reference/components/document.md): its box, which is the root of its layout and has the height
+     * of the page minus the margins (always definite), with its medium, its numbering and the {@code Page overlay} it
+     * carries.
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, PageSetupReader.Spec documentPageSetup,
                             boolean first) {
@@ -196,35 +198,35 @@ public final class BoxTreeBuilder {
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {
-                        // La primera página del documento ya es impar (reference/components/document.md).
-                        throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd no tiene efecto en la primera "
-                                + "sección, que ya empieza en la página 1: sobra");
+                        // The first page of the document is already odd (reference/components/document.md).
+                        throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd has no effect in the first "
+                                + "section, which already starts on page 1: it is not needed");
                     }
                 }
                 default -> {
                 }
             }
         }
-        // Lo que no tendría efecto (reference/components/document.md#numeración-de-las-páginas).
+        // What would have no effect (reference/components/document.md#page-numbering).
         if (startNode != null && numbering != Section.PageNumbering.RESTART) {
-            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start solo tiene efecto con Page numbering: "
-                    + "restart, que es cuando la numeración vuelve a empezar: falta restart o sobra Start");
+            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start only has an effect with Page numbering: "
+                    + "restart, which is when the numbering starts again: restart is missing or Start is not needed");
         }
         if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
-            throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format no tiene efecto con Page "
-                    + "numbering: none, porque las páginas de la sección no tienen número: sobra");
+            throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format has no effect with Page "
+                    + "numbering: none, because the pages of the section have no number: it is not needed");
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         buildContent(ctx, n, box);
         if (box.children().stream().allMatch(c -> c.style().position() == Position.PAGE_OVERLAY)) {
-            throw error(n, ErrorCode.SECTION_EMPTY, "La sección no tiene contenido: sin elementos (los Page overlay no "
-                    + "cuentan, no ocupan sitio) no tiene ninguna página");
+            throw error(n, ErrorCode.SECTION_EMPTY, "The section has no content: without elements (Page overlays do not "
+                    + "count, they take no space) it has no page");
         }
         return new Section(box, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays, beginOn);
     }
 
-    /** Elementos hijos en orden: cada uno es una caja; {@code Item} y {@code Area} envuelven a la suya. */
+    /** Child elements in order: each one is a box; {@code Item} and {@code Area} wrap theirs. */
     void buildContent(BuildContext ctx, InlineNode node, Box box) {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
@@ -235,7 +237,7 @@ public final class BoxTreeBuilder {
                 List<Node> elements = wrapper.getChildren().stream().filter(Nodes::isItemElement).toList();
                 if (elements.size() != 1) {
                     throw error(elements.isEmpty() ? wrapper : elements.get(1), ErrorCode.SINGLE_ELEMENT,
-                            "Un " + h.getName() + " contiene exactamente un elemento, y este tiene " + elements.size());
+                            "An " + h.getName() + " contains exactly one element, and this one has " + elements.size());
                 }
                 box.addChild(element(ctx, inline(elements.get(0)), box, wrapper, null));
             }
@@ -243,10 +245,10 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Un elemento de caja; {@code wrapper} es su {@code Item} o su {@code Area}, si es un ítem, o
-     * la {@code Row} de una {@code Cell}, y {@code position} es entonces el sitio de la celda en su tabla.
-     * El orden es el mismo para todos: el sitio, la herencia, las reglas, las propiedades y sus
-     * comprobaciones, la caja y el contenido; lo propio de cada elemento lo hace su {@link ElementReader}.
+     * A box element; {@code wrapper} is its {@code Item} or its {@code Area}, if it is an item, or
+     * the {@code Row} of a {@code Cell}, and {@code position} is then the place of the cell in its table.
+     * The order is the same for all: the place, inheritance, the rules, the properties and their
+     * checks, the box and the content; what is specific to each element is done by its {@link ElementReader}.
      */
     Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
         Element kind = ctx.codeBlocks.contains(n) ? Element.CODE_BLOCK : Element.of(n.getCanonicalName()).orElseThrow();
@@ -264,8 +266,8 @@ public final class BoxTreeBuilder {
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         if (kind.headingLevel() > 0) {
-            // El motor evita cortar dentro del encabezado y después de él (reference/components/heading.md); no se
-            // declara.
+            // The engine avoids breaking inside the heading and after it (reference/components/heading.md); it is not
+            // declared.
             s.breaks().setKeepWithNext(true);
             s.breaks().setKeepTogether(true);
         }
@@ -286,7 +288,7 @@ public final class BoxTreeBuilder {
         ctx.insidePageOverlay = outerPageOverlay;
         ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
-            // Los textos del encabezado ya están leídos: el número se escribe delante del primero.
+            // The texts of the heading are already read: the number is written before the first one.
             String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
                     s.typography().numberFormat());
             if (headingNumber != null) {
@@ -300,16 +302,16 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate margins} en un ítem de {@code Stack} o
-     * {@code Grid}, que ya aísla (reference/components/block.md), y un {@code Break} propio, o el de la {@code Row}
-     * de una celda, dentro de una caja que no se parte (reference/common/breaks.md). Lo que llega de una regla no se
-     * mira aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
+     * What the element declares that would have no effect because of its place: {@code Isolate margins} on an item of
+     * {@code Stack} or {@code Grid}, which already isolates (reference/components/block.md), and its own {@code Break},
+     * or that of the {@code Row} of a cell, inside a box that is not split (reference/common/breaks.md). What comes
+     * from a rule is not checked here: a rule by type would give an error on each element of that type in a footer.
      */
     private static void withoutEffect(BuildContext ctx, InlineNode n, InlineNode wrapper, Style s) {
         boolean item = wrapper != null && !is(wrapper, "row");
         if (item && s.isolateMargins()) {
-            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ITEM, "Isolate margins no tiene efecto en un ítem de "
-                    + "Stack o Grid, que ya corta la fusión de márgenes con sus hijos: sobra");
+            throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ITEM, "Isolate margins has no effect on an item of "
+                    + "Stack or Grid, which already stops margin merging with its children: it is not needed");
         }
         if (ctx.unbreakable == null) {
             return;
@@ -318,30 +320,30 @@ public final class BoxTreeBuilder {
             Optional<Node> group = child(owner, "break");
             if (group.isPresent() && !inline(group.get()).getChildren().isEmpty()) {
                 Node p = inline(group.get()).getChildren().get(0);
-                throw error(p, ErrorCode.BREAK_IN_UNBREAKABLE, p.getName() + " no tiene efecto dentro de "
-                        + ctx.unbreakable + ", que no se parte entre páginas: sobra");
+                throw error(p, ErrorCode.BREAK_IN_UNBREAKABLE, p.getName() + " has no effect inside "
+                        + ctx.unbreakable + ", which is not split across pages: it is not needed");
             }
         }
     }
 
-    /** Cómo se nombra la caja en los mensajes si no se parte entre páginas, o {@code null} si se parte. */
+    /** How the box is named in messages if it is not split across pages, or {@code null} if it is split. */
     private static String unbreakable(Style s) {
         return switch (s.position()) {
-            case OVERLAY -> "un Overlay";
-            case PAGE_OVERLAY -> "un Page overlay";
-            case FRAME -> s.rotation() != null ? "un Frame girado" : null;
-            default -> s.rotatesInFlow() ? "una caja girada" : null;
+            case OVERLAY -> "an Overlay";
+            case PAGE_OVERLAY -> "a Page overlay";
+            case FRAME -> s.rotation() != null ? "a rotated Frame" : null;
+            default -> s.rotatesInFlow() ? "a rotated box" : null;
         };
     }
 
     /**
-     * Comprueba que el elemento puede estar donde está: una caja fuera de flujo no va dentro de un {@code Columns}
-     * (reference/components/columns.md) y un encabezado respeta la jerarquía (reference/components/heading.md).
+     * Checks that the element can be where it is: an out-of-flow box does not go inside a {@code Columns}
+     * (reference/components/columns.md) and a heading respects the hierarchy (reference/components/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
         if (ctx.insideColumns && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
-            throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, "Un " + n.getName() + " no puede estar dentro de un "
-                    + "Columns: su posición no depende de las columnas, así que va fuera del Columns");
+            throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, n.getName() + " cannot be inside a "
+                    + "Columns: its position does not depend on the columns, so its place is outside the Columns");
         }
         if (kind.headingLevel() > 0) {
             heading(ctx, n, kind.headingLevel());
@@ -349,14 +351,14 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Un {@code List item} (reference/components/list.md): su número, que no puede ser de un ítem vacío, y la caja de
-     * su marcador, si la lista lo lleva.
+     * A {@code List item} (reference/components/list.md): its number, which cannot belong to an empty item, and the box
+     * of its marker, if the list has one.
      */
     private static void listItem(BuildContext ctx, InlineNode n, Box box, Box list, int number) {
         ctx.itemNumbers.put(box, number);
         if (n.getChildren().stream().noneMatch(Nodes::isElement)) {
-            throw error(n, ErrorCode.LIST_ITEM_EMPTY, "Un List item necesita al menos un elemento: "
-                    + "un Paragraph, un Text, un Block…");
+            throw error(n, ErrorCode.LIST_ITEM_EMPTY, "A List item needs at least one element: "
+                    + "a Paragraph, a Text, a Block...");
         }
         box.setNumber(ListMarkers.number(list.style().list().marker(), number));
         String marker = ListMarkers.text(list.style().list().marker(), number);
@@ -366,8 +368,9 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Stack}, {@code Grid} y
-     * {@code Table}, {@code Columns}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
+     * The properties the element declares, in order: the groups, those of its type ({@code Stack}, {@code Grid} and
+     * {@code Table}, {@code Columns}) and the single ones. It sets the rotation in the style and returns the
+     * {@code Id}.
      */
     private String properties(BuildContext ctx, InlineNode n, ElementReader reader, Style s, Box parent) {
         String id = null;
@@ -383,8 +386,8 @@ public final class BoxTreeBuilder {
                 case "typography" -> typography(inline(p), s);
                 case "break" -> {
                     if (parent.headingLevel() > 0) {
-                        throw error(p, ErrorCode.BREAK_IN_HEADING, "Un Text de un encabezado no admite Break: "
-                                + "el motor ya evita cortar dentro del encabezado y después de él");
+                        throw error(p, ErrorCode.BREAK_IN_HEADING, "A Text of a heading does not accept Break: "
+                                + "the engine already avoids breaking inside the heading and after it");
                     }
                     fragmentation(inline(p), s);
                 }
@@ -410,20 +413,20 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Comprueba que un encabezado está en su sitio (reference/components/heading.md): fuera de un {@code Page
-     * overlay} y sin saltos de nivel. En orden del documento, el primero es {@code Heading 1} y cada uno sube
-     * como mucho un nivel respecto al anterior.
+     * Checks that a heading is in its place (reference/components/heading.md): outside a {@code Page
+     * overlay} and without level skips. In document order, the first one is {@code Heading 1} and each one goes up
+     * at most one level from the previous one.
      */
     private static void heading(BuildContext ctx, InlineNode n, int level) {
         if (ctx.insidePageOverlay) {
-            throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "Un " + n.getName() + " no puede estar dentro de un Page overlay, "
-                    + "que se repite en cada página y no forma parte del contenido: ahí va un Text");
+            throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "A " + n.getName() + " cannot be inside a Page overlay, "
+                    + "which is repeated on every page and is not part of the content: a Text belongs there");
         }
         if (level > ctx.headingLevel + 1) {
             throw error(n, ErrorCode.HEADING_LEVEL, ctx.headingLevel == 0
-                    ? "El primer encabezado del documento debe ser Heading 1, no " + n.getName()
-                    : "Salto de nivel: " + n.getName() + " después de Heading " + ctx.headingLevel
-                            + "; como mucho, Heading " + (ctx.headingLevel + 1));
+                    ? "The first heading of the document must be Heading 1, not " + n.getName()
+                    : "Level skip: " + n.getName() + " after Heading " + ctx.headingLevel
+                            + "; at most, Heading " + (ctx.headingLevel + 1));
         }
         ctx.headingLevel = level;
     }

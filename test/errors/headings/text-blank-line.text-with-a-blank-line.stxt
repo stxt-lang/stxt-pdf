@@ -1,0 +1,20 @@
+# Case: Text with a blank line: a Text has no paragraphs
+# Code: TEXT_BLANK_LINE
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text:
+			Content >>
+				Primero.
+
+				Segundo.

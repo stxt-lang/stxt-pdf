@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Cada constante de {@link PropertyKey} es la clave de una propiedad que el schema admite en su sitio. */
+/** Each constant of {@link PropertyKey} is the key of a property that the schema allows in its place. */
 class PropertyKeyTest {
 
     @Test
@@ -24,7 +24,7 @@ class PropertyKeyTest {
         for (Field f : PropertyKey.class.getFields()) {
             if (Modifier.isStatic(f.getModifiers()) && f.getType() == String.class) {
                 String key = (String) f.get(null);
-                assertTrue(keys.contains(key), () -> f.getName() + " = \"" + key + "\" no es una clave del schema");
+                assertTrue(keys.contains(key), () -> f.getName() + " = \"" + key + "\" is not a key of the schema");
                 constants++;
             }
         }
@@ -42,7 +42,7 @@ class PropertyKeyTest {
         assertEquals(PropertyKey.STACK_GAP, PropertyKey.stack("gap"));
     }
 
-    /** Las claves que puede guardar el builder: las propiedades, con su nombre interno o su prefijo. */
+    /** The keys that the builder can store: the properties, with their internal name or their prefix. */
     private static Set<String> keys() {
         Map<String, List<String>> children = SchemaNodes.children();
         Set<String> keys = new HashSet<>();
@@ -68,7 +68,7 @@ class PropertyKeyTest {
                 }
             }
         }
-        // La colocación de un ítem de grid es el valor de Area, no un hijo.
+        // The placement of a grid item is the value of Area, not a child.
         assertFalse(keys.contains(PropertyKey.ITEM_AREA));
         keys.add(PropertyKey.ITEM_AREA);
         return keys;

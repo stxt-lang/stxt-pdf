@@ -16,29 +16,29 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Propiedades especificadas de una caja, con los valores por defecto de reference/common/structure.md.
+ * Specified properties of a box, with the default values of reference/common/structure.md.
  *
- * <p>Las propiedades van por grupos, cada uno en su clase: los del documento ({@link TypographyStyle},
- * {@link BoxStyle} y {@link BreakStyle}, reference/common/structure.md) y los de un tipo de elemento ({@link
- * StackStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle}, {@link ImageStyle} y
- * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.stack().direction()}, {@code
- * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
- * (reference/common/structure.md y reference/components/frame-and-overlays.md: el layout y la posición, que
- * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, el giro, {@code Link},
- * {@code Row header} e {@code In table of contents}) y la línea donde se declaró cada propiedad, con su documento
- * ({@link SourceLine}).</p>
+ * <p>The properties go in groups, each in its own class: the document ones ({@link TypographyStyle},
+ * {@link BoxStyle} and {@link BreakStyle}, reference/common/structure.md) and the ones of an element kind
+ * ({@link StackStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle},
+ * {@link ImageStyle} and {@link TableOfContentsStyle}). An algorithm reads only its own:
+ * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
+ * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
+ * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
+ * rotation, {@code Link}, {@code Row header} and {@code In table of contents}) and the line where each property was
+ * declared, with its document ({@link SourceLine}).</p>
  *
- * <p>No hay cascada: cada caja declara sus propiedades. Solo se <strong>hereda</strong> {@link TypographyStyle}:
- * cada caja empieza con una copia del de su padre ({@link #inheriting}), igual que en CSS.</p>
+ * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
+ * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link #inheriting}), as in CSS.</p>
  *
- * <p>Los valores de las propiedades con un conjunto cerrado son enums de {@code model} ({@link TextAlign},
- * {@link Marker}…): los nombres de sus constantes coinciden con los valores del documento en mayúsculas y con
- * el guion como guion bajo ({@code lower-alpha} es {@code LOWER_ALPHA}), que es como los interpreta
- * {@link PropertyReader}. {@link Layout} y {@link Position} no son valores del documento: salen del elemento
- * ({@code Text} es {@code INLINE}; {@code Overlay}, un {@code BLOCK} {@code OVERLAY}).</p>
+ * <p>The values of the properties with a closed set are enums of {@code model} ({@link TextAlign},
+ * {@link Marker}...): the names of their constants match the document values in uppercase and with the hyphen as an
+ * underscore ({@code lower-alpha} is {@code LOWER_ALPHA}), which is how {@link PropertyReader} parses them.
+ * {@link Layout} and {@link Position} are not document values: they come from the element ({@code Text} is
+ * {@code INLINE}; {@code Overlay}, a {@code BLOCK} {@code OVERLAY}).</p>
  *
- * <p>Solo {@code tree} escribe un estilo, mientras {@link BoxTreeBuilder} construye el árbol; al terminar se
- * cierra con su caja ({@link Box#close}) y ya solo se lee, también desde varios hilos.</p>
+ * <p>Only {@code tree} writes a style, while {@link BoxTreeBuilder} builds the tree; at the end it is closed with its
+ * box ({@link Box#close}) and from then on it is only read, also from several threads.</p>
  */
 public final class Style extends StyleGroup {
 
@@ -53,96 +53,96 @@ public final class Style extends StyleGroup {
     private final ImageStyle image = new ImageStyle();
     private final TableOfContentsStyle tableOfContents = new TableOfContentsStyle();
 
-    // --- Propiedades del elemento ------------------------------------------------------------------
+    // --- Properties of the element -----------------------------------------------------------------
     private Layout layout = Layout.BLOCK;
     private Position position = Position.STATIC;
     private Sides<Value> offset = Sides.all(Value.AUTO);
     /** {@code null} = auto. */
     private Integer layer;
-    /** Solo en un {@code Page overlay}: las páginas en que sale. */
+    /** Only in a {@code Page overlay}: the pages it appears on. */
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
     /**
-     * {@code Rotate} y {@code Rotate origin} (reference/common/layers-and-rotation.md), solo en {@code Frame}, {@code
-     * Overlay}, {@code Page overlay} e {@code Image}; {@code null} = sin giro. No se hereda.
+     * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), only in {@code Frame},
+     * {@code Overlay}, {@code Page overlay} and {@code Image}; {@code null} = no rotation. Not inherited.
      */
     private Rotation rotation;
     /**
-     * Destino del {@code Link} de la caja ({@link dev.stxt.pdf.model.Links}, reference/common/links.md); {@code
-     * null} = sin enlace. No se hereda: lo que hay dentro de una caja con enlace es clicable por ella, pero no lleva
-     * enlace propio.
+     * Target of the {@code Link} of the box ({@link dev.stxt.pdf.model.Links}, reference/common/links.md);
+     * {@code null} = no link. Not inherited: what is inside a box with a link is clickable through it, but does not
+     * carry a link of its own.
      */
     private String link;
     /**
-     * {@code Row header} de una {@code Cell}: es la cabecera de su fila (reference/components/table.md). No se
-     * hereda.
+     * {@code Row header} of a {@code Cell}: it is the header of its row (reference/components/table.md). Not
+     * inherited.
      */
     private boolean rowHeader;
     /**
-     * {@code In table of contents} de un encabezado: si tiene entrada en los índices
-     * (reference/components/table-of-contents.md). No se hereda.
+     * {@code In table of contents} of a heading: whether it has an entry in tables of contents
+     * (reference/components/table-of-contents.md). Not inherited.
      */
     private boolean inTableOfContents = true;
 
-    /** Solo lo crea {@code tree}: el estilo de cada caja sale de {@link BoxTreeBuilder}. */
+    /** Only {@code tree} creates it: the style of each box comes from {@link BoxTreeBuilder}. */
     Style() {
     }
 
-    // --- Grupos ------------------------------------------------------------------------------------
-    /** El grupo {@code Typography}: se hereda (reference/common/typography.md). */
+    // --- Groups ------------------------------------------------------------------------------------
+    /** The {@code Typography} group: it is inherited (reference/common/typography.md). */
     public TypographyStyle typography() {
         return typography;
     }
 
-    /** El grupo {@code Box}: el modelo de caja (reference/common/box.md). */
+    /** The {@code Box} group: the box model (reference/common/box.md). */
     public BoxStyle box() {
         return box;
     }
 
-    /** El grupo {@code Break}: los cortes (reference/common/breaks.md). */
+    /** The {@code Break} group: the breaks (reference/common/breaks.md). */
     public BreakStyle breaks() {
         return breaks;
     }
 
-    /** Las propiedades de {@code Stack} (reference/components/stack.md). */
+    /** The properties of {@code Stack} (reference/components/stack.md). */
     public StackStyle stack() {
         return stack;
     }
 
-    /** Las propiedades de {@code Grid} y {@code Table} (reference/components/grid.md). */
+    /** The properties of {@code Grid} and {@code Table} (reference/components/grid.md). */
     public GridStyle grid() {
         return grid;
     }
 
     /**
-     * Las de {@code Item} y {@code Area}, o la celda de una tabla (reference/components/stack.md y
+     * Those of {@code Item} and {@code Area}, or the cell of a table (reference/components/stack.md and
      * reference/components/grid.md).
      */
     public ItemStyle item() {
         return item;
     }
 
-    /** Las de {@code List} y {@code List item} (reference/components/list.md). */
+    /** Those of {@code List} and {@code List item} (reference/components/list.md). */
     public ListStyle list() {
         return list;
     }
 
-    /** Las de {@code Columns} (reference/components/columns.md). */
+    /** Those of {@code Columns} (reference/components/columns.md). */
     public ColumnsStyle columns() {
         return columns;
     }
 
-    /** Las de {@code Image} (reference/components/image.md). */
+    /** Those of {@code Image} (reference/components/image.md). */
     public ImageStyle image() {
         return image;
     }
 
-    /** Las de {@code Table of contents} (reference/components/table-of-contents.md). */
+    /** Those of {@code Table of contents} (reference/components/table-of-contents.md). */
     public TableOfContentsStyle tableOfContents() {
         return tableOfContents;
     }
 
-    // --- Propiedades del elemento ------------------------------------------------------------------
+    // --- Properties of the element -----------------------------------------------------------------
     public Layout layout() {
         return layout;
     }
@@ -202,8 +202,8 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * Si la caja gira en flujo (reference/common/layers-and-rotation.md): un {@code Block}, un {@code Text}, un {@code
-     * Paragraph} o una {@code Image} con {@code Rotate}, que ocupa el rectángulo que la envuelve girada.
+     * Whether the box rotates in flow (reference/common/layers-and-rotation.md): a {@code Block}, a {@code Text}, a
+     * {@code Paragraph} or an {@code Image} with {@code Rotate}, which takes up the rectangle that encloses it rotated.
      */
     public boolean rotatesInFlow() {
         return rotation != null && position == Position.STATIC;
@@ -241,27 +241,27 @@ public final class Style extends StyleGroup {
         inTableOfContents = v;
     }
 
-    // --- Líneas de las propiedades -------------------------------------------------------------------
+    // --- Lines of the properties --------------------------------------------------------------------
     /**
-     * Línea de cada propiedad declarada, por su clave ({@link PropertyKey}): el nombre canónico ({@code "height"}; las
-     * de {@code Stack}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.row-sizes"}). Es del documento o, si la
-     * propiedad llega de una regla suya, del documento de estilos aparte. Las de {@link #LINED_PROPERTIES} se heredan
-     * con su valor, para señalar dónde se declaró.
+     * Line of each declared property, by its key ({@link PropertyKey}): the canonical name ({@code "height"}; those of
+     * {@code Stack}, {@code Grid} and {@code Item}, with a prefix: {@code "grid.row-sizes"}). It is of the document or,
+     * if the property comes from one of its rules, of the separate styles document. Those of {@link #LINED_PROPERTIES}
+     * are inherited with their value, to point to where it was declared.
      */
     private final Map<String, SourceLine> lines = new HashMap<>();
-    /** Si lo que se lee ahora es una regla del documento de estilos aparte ({@link #readingStyles}). */
+    /** Whether what is being read now is a rule of the separate styles document ({@link #readingStyles}). */
     private boolean readingStyles;
 
     /**
-     * Propiedades que se heredan con su línea, para señalarla en los errores: las de la fuente
-     * (las de {@code Typography} que la eligen, también la del código), {@code Line height}, que fijan el alto de las
-     * líneas (reference/common/overflow.md), y {@code Color}, del contraste del texto (reference/common/pdf.md).
+     * Properties that are inherited with their line, to point to it in errors: those of the font (the ones of
+     * {@code Typography} that choose it, also the code one), {@code Line height}, which set the height of the lines
+     * (reference/common/overflow.md), and {@code Color}, for the contrast of the text (reference/common/pdf.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
             PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT,
             PropertyKey.COLOR);
 
-    /** Estilo nuevo con los valores por defecto y las propiedades heredables del padre. */
+    /** New style with the default values and the inheritable properties of the parent. */
     static Style inheriting(Style parent) {
         Style s = new Style();
         if (parent != null) {
@@ -276,39 +276,39 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * Las propiedades que se declaren mientras {@code reading} sea {@code true} vienen de una regla del documento de
-     * estilos aparte, y su línea es de ese documento.
+     * The properties declared while {@code reading} is {@code true} come from a rule of the separate styles document,
+     * and their line is of that document.
      */
     void readingStyles(boolean reading) {
         writable();
         readingStyles = reading;
     }
 
-    /** Apunta la línea donde se declara una propiedad: del documento de estilos si se lee una regla suya. */
+    /** Records the line where a property is declared: of the styles document if one of its rules is being read. */
     void declared(String property, int line) {
         declared(property, new SourceLine(line, readingStyles));
     }
 
-    /** Apunta la línea donde se declara una propiedad, con su documento. */
+    /** Records the line where a property is declared, with its document. */
     void declared(String property, SourceLine line) {
         writable();
         lines.put(property, line);
     }
 
-    /** Si la propiedad se declaró (en esta caja o, las de {@link #LINED_PROPERTIES}, en una antecesora). */
+    /** Whether the property was declared (in this box or, those of {@link #LINED_PROPERTIES}, in an ancestor). */
     public boolean isDeclared(String property) {
         return lines.containsKey(property);
     }
 
     /**
-     * Línea donde se declaró la propiedad, con su documento.
+     * Line where the property was declared, with its document.
      *
-     * @throws IllegalStateException si no se declaró
+     * @throws IllegalStateException if it was not declared
      */
     public SourceLine line(String property) {
         SourceLine line = lines.get(property);
         if (line == null) {
-            throw new IllegalStateException("Propiedad no declarada: " + property);
+            throw new IllegalStateException("Property not declared: " + property);
         }
         return line;
     }
@@ -321,7 +321,7 @@ public final class Style extends StyleGroup {
         return position == Position.OVERLAY || position == Position.PAGE_OVERLAY;
     }
 
-    /** Cierra el estilo con su caja ({@link Box#close}): ya no cambia. */
+    /** Closes the style with its box ({@link Box#close}): it no longer changes. */
     void close() {
         super.close();
         typography.close();

@@ -33,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Los errores de una conversión (reference/common/errors.md): todos son un {@link StxtPdfException} y su
- * {@link StxtPdfException#kind() kind} dice de quién es la culpa. Una sola {@code catch} basta en un servicio.
+ * The errors of a conversion (reference/common/errors.md): all of them are a {@link StxtPdfException} and its
+ * {@link StxtPdfException#kind() kind} says whose fault it is. A single {@code catch} is enough in a service.
  */
 class ConverterErrorsTest {
 
@@ -51,19 +51,19 @@ class ConverterErrorsTest {
         return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
     }
 
-    /** Lo que una {@code catch (StxtPdfException)} de un servicio vería de {@code conversion}. */
+    /** What a {@code catch (StxtPdfException)} in a service would see of {@code conversion}. */
     private static StxtPdfException failure(org.junit.jupiter.api.function.Executable conversion) {
         return assertThrows(StxtPdfException.class, conversion);
     }
 
     @Test
     void anInvalidDocumentIsTheDocumentsFaultAndSaysWhere() {
-        InlineNode document = document("\tText: Hola"); // sin la fuente de BASE
+        InlineNode document = document("\tText: Hola"); // without the font of BASE
         StxtPdfException e = failure(() -> Converter.create().toPdf(document, new ByteArrayOutputStream()));
         assertEquals(Kind.INVALID_DOCUMENT, e.kind());
         assertEquals("TEXT_WITHOUT_FONT", e.code());
         assertTrue(e.line() > 0);
-        assertTrue(e.getMessage().startsWith("línea " + e.line() + ": "), e.getMessage());
+        assertTrue(e.getMessage().startsWith("line " + e.line() + ": "), e.getMessage());
         assertEquals(ErrorCode.TEXT_WITHOUT_FONT, assertInstanceOf(InvalidModelException.class, e).errorCode());
     }
 
@@ -79,7 +79,7 @@ class ConverterErrorsTest {
         assertEquals(original.getLine(), e.line());
     }
 
-    /** Un documento anidado más de lo que admite la librería no es inválido: es demasiado. */
+    /** A document nested deeper than the library accepts is not invalid: it is too much. */
     @Test
     void aDocumentTheLibraryRefusesAsTooBigIsALimit() {
         StringBuilder deep = new StringBuilder("Document (dev.stxt.pdf):\n");
@@ -116,10 +116,10 @@ class ConverterErrorsTest {
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals("PAGE_LIMIT", e.code());
         assertEquals(StxtPdfException.NO_LINE, e.line());
-        assertTrue(e.getMessage().startsWith("El documento tiene más de"), e.getMessage());
+        assertTrue(e.getMessage().startsWith("The document has more than"), e.getMessage());
     }
 
-    /** Un error de ejecución que no es del motor sale como {@code INTERNAL}, con el original como causa. */
+    /** A runtime error that does not come from the engine comes out as {@code INTERNAL}, with the original as cause. */
     @Test
     void anUnexpectedFailureIsInternalAndKeepsItsCause() {
         Converter converter = converter();
@@ -133,11 +133,11 @@ class ConverterErrorsTest {
         assertInstanceOf(RuntimeException.class, e.getCause());
     }
 
-    /** Un destino que falla no es un error del documento ni del motor: es la {@link IOException} de quien escribe. */
+    /** A failing target is not an error of the document or of the engine: it is the writer's {@link IOException}. */
     @Test
     void aFailingTargetIsAnIOExceptionNotAnEngineError() {
         InlineNode document = document("\tText: Hola");
-        IOException broken = new IOException("disco lleno");
+        IOException broken = new IOException("disk full");
         OutputStream target = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
@@ -149,11 +149,11 @@ class ConverterErrorsTest {
 
     @Test
     void anErrorWithoutLineHasNoLinePrefixAndTheStylesDocumentKeepsItsLine() {
-        InvalidModelException withoutLine = new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT, "demasiado");
-        assertEquals("demasiado", withoutLine.getMessage());
+        InvalidModelException withoutLine = new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT, "too many");
+        assertEquals("too many", withoutLine.getMessage());
         assertFalse(withoutLine.inStyles());
-        InvalidModelException inStyles = new InvalidModelException(8, ErrorCode.VALUE_SYNTAX, "mal").inStylesDocument();
-        assertEquals("línea 8 de los estilos: mal", inStyles.getMessage());
+        InvalidModelException inStyles = new InvalidModelException(8, ErrorCode.VALUE_SYNTAX, "invalid").inStylesDocument();
+        assertEquals("line 8 of the styles: invalid", inStyles.getMessage());
         assertEquals(8, inStyles.line());
         assertTrue(inStyles.inStyles());
         assertEquals("VALUE_SYNTAX", inStyles.code());

@@ -1,0 +1,13 @@
+# Case: Preformatted with a value that does not exist
+# Code: INVALID_VALUE
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Typography:
+				Preformatted: nowrap

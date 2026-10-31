@@ -1,0 +1,21 @@
+# Case: Centered item that sticks out on the left
+# Code: BOX_OVERFLOW
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Box:
+				Width: 100
+			Horizontal: center
+			Item:
+				Shrink: 0
+				Block:
+					Block:
+						Box:
+							Width: 150
+							Height: 10

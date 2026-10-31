@@ -1,0 +1,14 @@
+# Case: Image taller than the page
+# Code: PAGE_OVERFLOW
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 200
+		Margin: 40
+	Section:
+		Image: test/tall.jpg
+			Box:
+				Width: 200

@@ -15,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** El árbol de cajas se escribe solo en {@code tree} y no cambia después de construirlo. */
+/** The box tree is written only in {@code tree} and does not change after it is built. */
 class BoxTest {
 
-    /** Un bloque con una lista numerada y una caja fuera de flujo. */
+    /** A block with a numbered list and an out-of-flow box. */
     private static final String[] BLOCK = {"\tBlock:", "\t\tList:", "\t\t\tMarker: decimal", "\t\t\tList item:",
             "\t\t\t\tParagraph: Uno", "\t\tOverlay:", "\t\t\tText: fuera"};
 
@@ -41,7 +41,7 @@ class BoxTest {
         assertThrows(IllegalStateException.class, () -> list.addChild(item));
         assertThrows(IllegalStateException.class, () -> text.setText("otro", 1, false));
         assertThrows(IllegalStateException.class, () -> text.prependText("1 "));
-        // El marcador no es un hijo y también se cierra.
+        // The marker is not a child and it is closed too.
         assertThrows(IllegalStateException.class, () -> item.marker().setText("2. ", 1, false));
         assertThrows(IllegalStateException.class, () -> tree.root().addSection(section));
     }
@@ -51,9 +51,9 @@ class BoxTest {
         Box section = build("\tBlock:", "\t\tId: main", "\tBlock:").sections().get(0).box();
         Box named = section.children().get(0);
         Box unnamed = section.children().get(1);
-        assertEquals("main (línea " + named.line() + ")", named.describe());
-        assertEquals("de la línea " + unnamed.line(), unnamed.describe());
-        assertEquals("(área útil)", new Box(null, Element.BLOCK, new Style(), true, 0).describe());
+        assertEquals("main (line " + named.line() + ")", named.describe());
+        assertEquals("at line " + unnamed.line(), unnamed.describe());
+        assertEquals("(page area)", new Box(null, Element.BLOCK, new Style(), true, 0).describe());
     }
 
     @Test
@@ -87,16 +87,16 @@ class BoxTest {
         assertThrows(IllegalStateException.class, () -> s.declared(PropertyKey.FONT_SIZE, 3));
         assertThrows(IllegalStateException.class, () -> s.list().setStart(4));
         assertThrows(IllegalStateException.class, () -> s.box().setHeight(Value.pt(10)));
-        // El grupo que hereda una caja es una copia suya, y también se cierra.
+        // The group that a box inherits is a copy of its own, and it is closed too.
         assertNotSame(s.typography(), text.style().typography());
         assertThrows(IllegalStateException.class, () -> text.style().typography().setFontSize(12));
         assertEquals(10, text.style().typography().fontSize());
     }
 
     /**
-     * Fuera de {@code tree}, {@code Box}, {@code Style} y sus grupos solo se leen: los campos de {@code Box} no son
-     * públicos (salvo las constantes) y los de {@code Style} y sus grupos son privados, que se escriben con un método
-     * que comprueba que el estilo no está cerrado.
+     * Outside {@code tree}, {@code Box}, {@code Style} and their groups are only read: the fields of {@code Box} are
+     * not public (except the constants) and those of {@code Style} and its groups are private, written through a
+     * method that checks that the style is not closed.
      */
     @Test
     void noFieldIsPublicButTheConstants() {

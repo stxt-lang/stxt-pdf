@@ -5,59 +5,59 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Dónde se cortó una caja y desde dónde hay que reanudar su layout en el siguiente
- * fragmentainer (reference/common/breaks.md). Un {@code null} en su lugar significa "la caja ha
- * terminado".
+ * Where a box was broken and where its layout has to resume in the next
+ * fragmentainer (reference/common/breaks.md). A {@code null} in its place means "the box has
+ * finished".
  *
- * <p>Son {@code record}: tienen {@code equals}, y por eso pueden formar parte de la clave de la
- * caché de layout y el paginador puede detectar que no hay progreso.</p>
+ * <p>They are {@code record}s: they have {@code equals}, and so they can be part of the key of the
+ * layout cache and the paginator can detect that there is no progress.</p>
  */
 public sealed interface BreakToken {
 
     /**
-     * La caja no cabe en lo que queda de página y no ha colocado nada: el padre debe cortar
-     * antes de ella. Solo se devuelve fuera del principio de página (garantía de progreso) y
-     * nunca se pasa como token de reanudación: la caja vuelve a empezar desde {@code null}.
+     * The box does not fit in what is left of the page and has placed nothing: the parent must break
+     * before it. It is only returned away from the top of the page (progress guarantee) and
+     * is never passed as a resume token: the box starts again from {@code null}.
      */
     BreakToken BEFORE = new Before();
 
-    /** Ver {@link #BEFORE}. */
+    /** See {@link #BEFORE}. */
     record Before() implements BreakToken {
     }
 
     /**
-     * Bloque: siguiente hijo a colocar y, si el corte fue dentro de él, su propio token.
+     * Block: next child to place and, if the break was inside it, its own token.
      *
-     * @param consumedHeight alto de caja de borde de los fragmentos anteriores de la caja (con
-     *                       {@code Edges: closed}, de su caja de contenido); un
-     *                       {@code Height} definido es el total de todos los fragmentos
+     * @param consumedHeight border box height of the previous fragments of the box (with
+     *                       {@code Edges: closed}, of its content box); a definite
+     *                       {@code Height} is the total of all the fragments
      */
     record Block(int nextChild, BreakToken childToken, double consumedHeight) implements BreakToken {
     }
 
-    /** Texto: siguiente línea a colocar y alto de los fragmentos anteriores (ver {@link Block}). */
+    /** Text: next line to place and height of the previous fragments (see {@link Block}). */
     record Line(int nextLine, double consumedHeight) implements BreakToken {
     }
 
     /**
-     * Stack o grid: siguiente línea o fila (en un stack vertical, siguiente ítem) y alto de los
-     * fragmentos anteriores.
+     * Stack or grid: next line or row (in a vertical stack, next item) and height of the
+     * previous fragments.
      *
-     * @param itemTokens vacía si el corte es antes de {@code nextLine}. Si es dentro (una fila que
-     *                   no cabe en una página y cuyos ítems se parten en paralelo), el token de
-     *                   cada ítem de la fila en orden del árbol, con {@code null} en los que ya
-     *                   han terminado
+     * @param itemTokens empty if the break is before {@code nextLine}. If it is inside (a row that
+     *                   does not fit on a page and whose items are broken in parallel), the token of
+     *                   each item of the row in tree order, with {@code null} for those that have
+     *                   already finished
      */
     record Container(int nextLine, List<BreakToken> itemTokens, double consumedHeight) implements BreakToken {
         public Container {
-            // List.copyOf no admite null.
+            // List.copyOf does not allow null.
             itemTokens = Collections.unmodifiableList(new ArrayList<>(itemTokens));
         }
     }
 
-    /** Alto consumido por los fragmentos anteriores de la caja que devolvió el token. */
+    /** Height consumed by the previous fragments of the box that returned the token. */
     static double consumed(BreakToken token) {
-        // Java 17 no tiene patrones en switch.
+        // Java 17 has no pattern matching in switch.
         if (token instanceof Block b) {
             return b.consumedHeight();
         }

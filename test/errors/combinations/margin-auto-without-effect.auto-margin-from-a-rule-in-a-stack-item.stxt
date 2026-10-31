@@ -1,0 +1,20 @@
+# Case: Auto margin from a rule in a Stack item
+# Code: MARGIN_AUTO_WITHOUT_EFFECT
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Block
+			Box:
+				Margin: auto
+				Width: 100
+	Section:
+		Stack:
+			Item:
+				Block:
+					Box:
+						Height: 10

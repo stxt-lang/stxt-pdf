@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Dependencias entre los packages de {@code dev.stxt.pdf}, leídas del código fuente: los
- * {@code import} y los nombres cualificados fuera de los comentarios. Cada package cuenta con sus
- * subpackages ({@code layout.grid} es {@code layout}).
+ * Dependencies between the packages of {@code dev.stxt.pdf}, read from the source code: the
+ * {@code import} statements and the qualified names outside comments. Each package counts with its
+ * subpackages ({@code layout.grid} is {@code layout}).
  *
- * <p>El flujo de datos va en un sentido (lectura → árbol → layout → páginas → pintado): un ciclo
- * o un árbol que depende del layout es un error de diseño, no de un documento.</p>
+ * <p>Data flows in one direction (reading → tree → layout → pages → painting): a cycle, or a tree
+ * that depends on the layout, is a design error, not a document error.</p>
  */
 class ArchitectureTest {
 
@@ -35,8 +35,8 @@ class ArchitectureTest {
     private static final Pattern STRING = Pattern.compile("\"(?:\\\\.|[^\"\\\\\\n])*\"");
 
     /**
-     * Lo que puede usar cada package: las dependencias de hoy, escritas a mano. Una nueva no es un
-     * accidente: se decide y se apunta aquí.
+     * What each package may use: today's dependencies, written by hand. A new one is not an
+     * accident: it is decided and recorded here.
      */
     private static final Map<String, Set<String>> ALLOWED = Map.of(
             "model", Set.of(),
@@ -50,9 +50,9 @@ class ArchitectureTest {
             "convert", Set.of("fragment", "layout", "model", "paint", "resources", "stxt"));
 
     /**
-     * Lo que puede usar cada algoritmo de {@code layout} de los demás: el bloque coloca marcadores de lista
-     * (texto) y cajas posicionadas, stack y grid colocan sus ítems posicionados y la tabla es un grid. Todos usan
-     * las piezas de {@code layout}, que no cuentan.
+     * What each {@code layout} algorithm may use from the others: the block places list markers (text) and
+     * positioned boxes, stack and grid place their positioned items, and the table is a grid. All of them use the
+     * pieces of {@code layout}, which do not count.
      */
     private static final Map<String, Set<String>> ALLOWED_IN_LAYOUT = Map.of(
             "block", Set.of("inline", "position"),
@@ -60,14 +60,14 @@ class ArchitectureTest {
             "grid", Set.of("position"),
             "table", Set.of("grid"));
 
-    /** Package → packages de los que depende. */
+    /** Package → packages it depends on. */
     private static Map<String, Set<String>> dependencies() {
         return dependencies(SOURCES, "dev.stxt.pdf");
     }
 
     /**
-     * Subpackage de {@code sources} → subpackages del mismo nivel de los que depende, buscando los nombres que
-     * empiezan por {@code prefix}. Los ficheros que están en {@code sources} y no en un subpackage no cuentan.
+     * Subpackage of {@code sources} → subpackages of the same level it depends on, looking for the names that
+     * start with {@code prefix}. The files that are in {@code sources} and not in a subpackage do not count.
      */
     private static Map<String, Set<String>> dependencies(Path sources, String prefix) {
         Pattern reference = Pattern.compile("\\b" + Pattern.quote(prefix) + "\\.([a-z]+)\\.");
@@ -93,7 +93,7 @@ class ArchitectureTest {
         return graph;
     }
 
-    /** El código de un fichero sin comentarios ni cadenas. */
+    /** The code of a file without comments or strings. */
     private static String code(Path file) throws IOException {
         return STRING.matcher(COMMENT.matcher(Files.readString(file)).replaceAll(" ")).replaceAll("\"\"");
     }
@@ -109,11 +109,11 @@ class ArchitectureTest {
         Map<String, Set<String>> graph = dependencies();
         for (String start : graph.keySet()) {
             List<String> cycle = cycle(graph, start, new ArrayList<>(List.of(start)));
-            assertTrue(cycle.isEmpty(), () -> "Ciclo de packages: " + String.join(" -> ", cycle));
+            assertTrue(cycle.isEmpty(), () -> "Package cycle: " + String.join(" -> ", cycle));
         }
     }
 
-    /** Un camino de {@code path} que vuelve a su primer package, o vacío si no hay. */
+    /** A path from {@code path} that returns to its first package, or empty if there is none. */
     private static List<String> cycle(Map<String, Set<String>> graph, String current, List<String> path) {
         for (String next : graph.getOrDefault(current, Set.of())) {
             if (next.equals(path.get(0))) {
@@ -133,49 +133,49 @@ class ArchitectureTest {
         return List.of();
     }
 
-    /** {@code model} son tipos puros: no depende de nada del motor. */
+    /** {@code model} holds pure types: it depends on nothing in the engine. */
     @Test
     void modelDependsOnNothing() {
         assertEquals(Set.of(), dependencies().get("model"));
     }
 
-    /** El árbol de cajas se construye y se valida sin saber nada del layout ni del pintado. */
+    /** The box tree is built and validated without knowing anything about layout or painting. */
     @Test
     void treeDependsOnlyOnModel() {
         assertEquals(Set.of("model"), dependencies().get("tree"));
     }
 
-    /** {@code convert} es la fachada: la usan los clientes y las pruebas, ninguna otra pieza del motor. */
+    /** {@code convert} is the facade: clients and tests use it, no other piece of the engine does. */
     @Test
     void nothingInTheEngineDependsOnTheFacade() {
         dependencies().forEach((from, to) ->
-                assertFalse(to.contains("convert"), () -> from + " depende de convert"));
+                assertFalse(to.contains("convert"), () -> from + " depends on convert"));
     }
 
-    /** Ningún package depende de otro que no tenga permitido ({@link #ALLOWED}). */
+    /** No package depends on another one it is not allowed to use ({@link #ALLOWED}). */
     @Test
     void everyDependencyIsAllowed() {
         assertEquals(ALLOWED.keySet(), dependencies().keySet());
         dependencies().forEach((from, to) -> {
             Set<String> extra = new TreeSet<>(to);
             extra.removeAll(ALLOWED.get(from));
-            assertTrue(extra.isEmpty(), () -> from + " depende de " + extra + ", que no tiene permitido");
+            assertTrue(extra.isEmpty(), () -> from + " depends on " + extra + ", which is not allowed");
         });
     }
 
-    /** Los algoritmos de {@code layout} no se usan entre sí salvo los casos de {@link #ALLOWED_IN_LAYOUT}. */
+    /** The {@code layout} algorithms do not use each other except in the cases of {@link #ALLOWED_IN_LAYOUT}. */
     @Test
     void layoutAlgorithmsOnlyUseTheAllowedOnes() {
         dependencies(SOURCES.resolve("layout"), "dev.stxt.pdf.layout").forEach((from, to) -> {
             Set<String> extra = new TreeSet<>(to);
             extra.removeAll(ALLOWED_IN_LAYOUT.getOrDefault(from, Set.of()));
-            assertTrue(extra.isEmpty(), () -> "layout." + from + " depende de " + extra + ", que no tiene permitido");
+            assertTrue(extra.isEmpty(), () -> "layout." + from + " depends on " + extra + ", which is not allowed");
         });
     }
 
     /**
-     * Los algoritmos dependen de {@code LayoutContext}, no del motor que los crea: nada de los subpackages
-     * de {@code layout} nombra {@code Engine} fuera de los comentarios.
+     * The algorithms depend on {@code LayoutContext}, not on the engine that creates them: nothing in the
+     * subpackages of {@code layout} names {@code Engine} outside comments.
      */
     @Test
     void noLayoutAlgorithmUsesTheEngine() throws IOException {
@@ -184,17 +184,16 @@ class ArchitectureTest {
         try (Stream<Path> files = Files.walk(layout)) {
             for (Path file : files.filter(f -> f.toString().endsWith(".java")).toList()) {
                 if (layout.relativize(file).getNameCount() > 1) {
-                    assertFalse(engine.matcher(code(file)).find(), () -> file + " usa Engine: usa LayoutContext");
+                    assertFalse(engine.matcher(code(file)).find(), () -> file + " uses Engine instead of LayoutContext");
                 }
             }
         }
     }
 
     /**
-     * El layout y el pintado preguntan a la caja lo que significa ({@code Box.role()}), no qué elemento es:
-     * fuera de {@code tree} no se nombra ninguna constante de {@code For element} salvo en el despacho de
-     * {@code Engine} (la tabla tiene su algoritmo). Un elemento nuevo con un papel que ya existe no toca nada fuera
-     * de {@code tree}.
+     * Layout and painting ask the box what it means ({@code Box.role()}), not which element it is: outside
+     * {@code tree} no {@code For element} constant is named except in the dispatch of {@code Engine} (the table
+     * has its own algorithm). A new element with a role that already exists touches nothing outside {@code tree}.
      */
     @Test
     void onlyTheDispatchNamesAnElement() throws IOException {

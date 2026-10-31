@@ -143,11 +143,11 @@ Styles (dev.stxt.pdf):
 - **Each source is strict on its own.** Two rules with the same selector are an error within one source
   (`STYLE_DUPLICATE`), but the same rule can be in both. A `Style` name can have its `For style` in either of the two.
 - **Errors.** A rule of the styles document is validated like one of the document, and its error carries the line **of
-  that file** and says so: `línea 8 de los estilos: ...`. A root that is not `Styles` is `DOCUMENT_ROOT`. A property that
+  that file** and says so: `line 8 of the styles: ...`. A root that is not `Styles` is `DOCUMENT_ROOT`. A property that
   comes from a rule of the styles document keeps its line in it, also the typography that is inherited, so the same holds
   for the errors seen when applying it or when laying out (a font that does not exist, an overflow). If a message names
-  another line, it also says which document it belongs to: `línea 8 de los estilos: Min width es mayor que Max width
-  (línea 10)`.
+  another line, it also says which document it belongs to: `line 8 of the styles: Min width is greater than Max width
+  (line 10)`.
 
 > **Decision:** the priority between the two sources is by level, so moving the `Styles` to a file changes nothing.
 > *Rejected alternative:* all the rules of the file being weaker than any rule of the document.

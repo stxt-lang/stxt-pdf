@@ -1,6 +1,6 @@
 package dev.stxt.pdf.model;
 
-/** Grosores ya resueltos, en puntos, de margen, borde o relleno. */
+/** Resolved widths, in points, of margin, border or padding. */
 public record Insets(double top, double right, double bottom, double left) {
 
     public static final Insets ZERO = new Insets(0, 0, 0, 0);
@@ -18,9 +18,9 @@ public record Insets(double top, double right, double bottom, double left) {
     }
 
     /**
-     * Resuelve cuatro valores contra el <strong>ancho</strong> del containing block. En CSS, los
-     * porcentajes de margen y relleno, también los verticales, se calculan sobre el ancho
-     * (reference/common/values.md). Un {@code auto} vale 0 aquí; los márgenes {@code auto} los reparte el layout.
+     * Resolves four values against the <strong>width</strong> of the reference container. In CSS, the
+     * percentages of margin and padding, the vertical ones too, are computed on the width
+     * (reference/common/values.md). An {@code auto} is 0 here; the layout distributes the {@code auto} margins.
      */
     public static Insets resolve(Sides<Value> sides, double containingBlockWidth) {
         return new Insets(

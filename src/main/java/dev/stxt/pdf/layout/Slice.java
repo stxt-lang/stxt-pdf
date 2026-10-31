@@ -6,43 +6,43 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Parte de una caja que cae en un fragmento (reference/common/breaks.md): su alto, su borde y su
- * relleno. Es la parte común de la fragmentación de todos los algoritmos.
+ * Part of a box that falls in a fragment (reference/common/breaks.md): its height, its border and its
+ * padding. It is the part of fragmentation common to all algorithms.
  *
  * <ul>
- *   <li>Con {@code Edges: open}, el primer fragmento no tiene borde ni relleno inferiores
- *       y los siguientes no tienen los superiores.</li>
- *   <li>Con {@code Edges: closed}, cada fragmento tiene borde y relleno completos: el
- *       contenido de cada página cabe entre ellos.</li>
- *   <li>Un {@code Height} definido es el total de todos los fragmentos: si el contenido termina
- *       y el alto propio de la caja no cabe en la página, lo que falta pasa al fragmento
- *       siguiente. Un fragmento cortado dentro del contenido llega hasta el final de la página,
- *       sin pasar del alto que le queda a la caja, pero solo consume lo que ocupa su contenido: el
- *       hueco del final de la página no se le quita al contenido que sigue. Con {@code closed}, el
- *       total es el del contenido: el alto menos un borde y un relleno.</li>
- *   <li>Con alto {@code auto}, el fragmento mide lo que su contenido; {@code Min height} y
- *       {@code Max height} se aplican al total.</li>
+ *   <li>With {@code Edges: open}, the first fragment has no bottom border or padding
+ *       and the following ones have no top ones.</li>
+ *   <li>With {@code Edges: closed}, each fragment has full border and padding: the
+ *       content of each page fits between them.</li>
+ *   <li>A definite {@code Height} is the total of all fragments: if the content ends
+ *       and the box's own height does not fit on the page, what is missing goes to the next
+ *       fragment. A fragment broken inside the content reaches the end of the page,
+ *       without exceeding the height left to the box, but it only consumes what its content takes up: the
+ *       gap at the end of the page is not taken away from the content that follows. With {@code closed}, the
+ *       total is that of the content: the height minus one border and one padding.</li>
+ *   <li>With {@code auto} height, the fragment measures what its content does; {@code Min height} and
+ *       {@code Max height} apply to the total.</li>
  * </ul>
  *
- * @param height   alto de la caja de borde en este fragmento
- * @param border   bordes de este fragmento
- * @param padding  relleno de este fragmento
- * @param finished la caja termina en este fragmento
- * @param consumed alto de caja de borde de este fragmento y de los anteriores; con
- *                 {@code closed}, alto de su caja de contenido
+ * @param height   height of the border box in this fragment
+ * @param border   borders of this fragment
+ * @param padding  padding of this fragment
+ * @param finished the box ends in this fragment
+ * @param consumed border box height of this fragment and the previous ones; with
+ *                 {@code closed}, height of its content box
  */
 public record Slice(double height, Insets border, Insets padding, boolean finished, double consumed) {
 
-    /** Borde y relleno superiores del fragmento: con {@code open}, solo los tiene el primero. */
+    /** Top border and padding of the fragment: with {@code open}, only the first one has them. */
     public static double top(BoxModel model, boolean first) {
         return first || model.clones() ? model.border().top() + model.padding().top() : 0;
     }
 
     /**
-     * Lo que queda de página para el contenido del fragmento: sin el borde y el relleno
-     * superiores y, con {@code closed}, tampoco los inferiores. Con {@code open}, los inferiores
-     * no se reservan aquí: solo hacen falta si la caja termina en esta página, y de eso se
-     * encarga {@link Engine#layout}.
+     * What is left of the page for the content of the fragment: without the top border and
+     * padding and, with {@code closed}, without the bottom ones either. With {@code open}, the bottom ones
+     * are not reserved here: they are only needed if the box ends on this page, and
+     * {@link Engine#layout} takes care of that.
      */
     public static double contentRemaining(BoxModel model, boolean first, ConstraintSpace space) {
         double bottom = model.clones() ? model.border().bottom() + model.padding().bottom() : 0;
@@ -50,13 +50,13 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
     }
 
     /**
-     * Alto, borde y relleno de un fragmento.
+     * Height, border and padding of a fragment.
      *
-     * @param first           es el primer fragmento de la caja
-     * @param consumed        alto consumido por los fragmentos anteriores (ver {@link #consumed()})
-     * @param content         alto del contenido colocado en este fragmento
-     * @param contentFinished el contenido termina en este fragmento
-     * @param space           espacio de la caja; sin fragmentación no hay límite
+     * @param first           it is the first fragment of the box
+     * @param consumed        height consumed by the previous fragments (see {@link #consumed()})
+     * @param content         height of the content placed in this fragment
+     * @param contentFinished the content ends in this fragment
+     * @param space           space of the box; without fragmentation there is no limit
      */
     public static Slice of(BoxModel model, boolean first, double consumed, double content,
                            boolean contentFinished, ConstraintSpace space) {
@@ -76,7 +76,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
                     : Sizing.constrain(consumed + natural, model.minHeight(), model.maxHeight());
             double need = Math.max(0, total - consumed);
             if (!fits(need, remaining) && !fits(need, natural)) {
-                // El contenido cabe, pero el alto propio de la caja no: el resto, a la página siguiente.
+                // The content fits, but the box's own height does not: the rest goes to the next page.
                 double h = Math.max(remaining, upToContent);
                 if (h < need - EPSILON) {
                     return open(model, first, h, consumed);
@@ -89,15 +89,15 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
         if (model.height().isPresent()) {
             h = Math.max(h, Math.min(remaining, model.height().getAsDouble() - consumed));
         }
-        // Llega hasta el final de la página, pero solo consume lo que ocupa su contenido: el hueco que dejan las
-        // líneas o los hijos al final de la página no se le quita al contenido que sigue.
+        // It reaches the end of the page, but only consumes what its content takes up: the gap that the lines or
+        // the children leave at the end of the page is not taken away from the content that follows.
         return new Slice(h, sides(model.border(), first, false), sides(model.padding(), first, false), false,
                 consumed + upToContent);
     }
 
     /**
-     * {@code Edges: closed}: el reparto se hace con el alto de la caja de contenido, y cada
-     * fragmento le suma el borde y el relleno completos.
+     * {@code Edges: closed}: the distribution is done with the height of the content box, and each
+     * fragment adds the full border and padding to it.
      */
     private static Slice cloned(BoxModel model, double consumed, double content, boolean contentFinished,
                                 ConstraintSpace space) {
@@ -109,7 +109,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             double total = Math.max(0, model.usedHeight(consumed + content) - decoration);
             h = Math.max(0, total - consumed);
             if (!fits(h, available) && !fits(h, content)) {
-                // El contenido cabe, pero el alto propio de la caja no: el resto, a la página siguiente.
+                // The content fits, but the box's own height does not: the rest goes to the next page.
                 double room = Math.max(available, content);
                 if (room < h - EPSILON) {
                     h = room;
@@ -118,14 +118,14 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             }
         } else if (model.height().isPresent()) {
             double total = Math.max(0, model.height().getAsDouble() - decoration);
-            // Como con open: hasta el final de la página, consumiendo solo el contenido.
+            // As with open: up to the end of the page, consuming only the content.
             h = Math.max(h, Math.min(available, total - consumed));
             return new Slice(decoration + h, model.border(), model.padding(), false, consumed + content);
         }
         return new Slice(decoration + h, model.border(), model.padding(), finished, consumed + h);
     }
 
-    /** Fragmento que no es el último: sin borde ni relleno inferiores. */
+    /** Fragment that is not the last one: without bottom border or padding. */
     private static Slice open(BoxModel model, boolean first, double height, double consumed) {
         return new Slice(height, sides(model.border(), first, false), sides(model.padding(), first, false),
                 false, consumed + height);
@@ -135,7 +135,7 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
         return new Insets(top ? all.top() : 0, all.right(), bottom ? all.bottom() : 0, all.left());
     }
 
-    /** Alto de la caja de contenido de este fragmento. */
+    /** Height of the content box of this fragment. */
     public double contentHeight() {
         return Math.max(0, height - border.vertical() - padding.vertical());
     }

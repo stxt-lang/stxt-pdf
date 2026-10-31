@@ -1,0 +1,12 @@
+# Case: Text as a block (the block goes in Content)
+# Code: BLOCK_FORM_NOT_ALLOWED
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Text >>
+			Primer párrafo.

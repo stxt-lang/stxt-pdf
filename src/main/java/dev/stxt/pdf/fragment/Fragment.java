@@ -8,36 +8,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * El trozo de una caja que cae en un fragmentainer (reference/common/breaks.md). Una caja que se
- * parte entre páginas produce varios.
+ * The piece of a box that falls in a fragmentainer (reference/common/breaks.md). A box that is
+ * broken across pages produces several.
  *
- * @param box      caja de origen (sus propiedades de pintado se leen de su estilo)
- * @param x        posición de la caja de borde, relativa a la caja de contenido del padre; en una caja girada en
- *                 flujo, la del rectángulo que la envuelve ({@code turned})
- * @param y        ídem
- * @param width    ancho de la caja de borde; en una caja girada en flujo, el del rectángulo que la envuelve, que es lo
- *                 que ocupa
- * @param height   alto de la caja de borde <em>en este fragmento</em>; en una caja girada en flujo, el del rectángulo
- *                 que la envuelve
- * @param margin   márgenes usados de la caja en el layout que produjo el fragmento
- *                 ({@code auto} = 0, como en {@link dev.stxt.pdf.layout.BoxModel}): los
- *                 porcentajes dependen de la base de ese layout, que solo conoce el algoritmo
- * @param border   bordes pintados en este fragmento (con {@code Edges: open}, el
- *                 primero no tiene borde inferior y los siguientes no tienen superior)
- * @param padding  relleno de este fragmento, con el mismo criterio que {@code border}; la caja
- *                 de contenido del fragmento, a la que se refieren hijos y líneas, es la caja de
- *                 borde menos {@code border} y {@code padding}
- * @param children fragmentos hijos, en orden del árbol
- * @param lines    líneas de texto, si la caja contiene texto
- * @param first    es el primer fragmento de la caja
- * @param last     es el último fragmento de la caja
- * @param offsetX  desplazamiento de un {@code Frame} (reference/components/frame-and-overlays.md), ya
- *                 sumado a {@code x}: su sitio en el flujo es {@code x - offsetX}. Lo pone el padre al colocarlo,
- *                 con la base de porcentajes de su layout; 0 en las demás cajas
- * @param offsetY  ídem en vertical
- * @param turned   en una caja girada en flujo (reference/common/layers-and-rotation.md), su caja de borde sin girar, relativa
- *                 a ({@code x}, {@code y}) y centrada en el rectángulo que la envuelve; sus hijos y sus líneas se
- *                 refieren a ella. {@code null} en las demás cajas
+ * @param box      source box (its painting properties are read from its style)
+ * @param x        position of the border box, relative to the content box of the parent; in a box rotated in
+ *                 flow, that of the rectangle that encloses it ({@code turned})
+ * @param y        likewise
+ * @param width    width of the border box; in a box rotated in flow, that of the rectangle that encloses it, which is
+ *                 what it takes up
+ * @param height   height of the border box <em>in this fragment</em>; in a box rotated in flow, that of the rectangle
+ *                 that encloses it
+ * @param margin   used margins of the box in the layout that produced the fragment
+ *                 ({@code auto} = 0, as in {@link dev.stxt.pdf.layout.BoxModel}): the
+ *                 percentages depend on the base of that layout, which only the algorithm knows
+ * @param border   borders painted in this fragment (with {@code Edges: open}, the
+ *                 first one has no bottom border and the following ones have no top border)
+ * @param padding  padding of this fragment, with the same criterion as {@code border}; the content
+ *                 box of the fragment, to which children and lines refer, is the border
+ *                 box minus {@code border} and {@code padding}
+ * @param children child fragments, in tree order
+ * @param lines    lines of text, if the box contains text
+ * @param first    it is the first fragment of the box
+ * @param last     it is the last fragment of the box
+ * @param offsetX  offset of a {@code Frame} (reference/components/frame-and-overlays.md), already
+ *                 added to {@code x}: its place in the flow is {@code x - offsetX}. The parent sets it when placing
+ *                 it, with the percentage base of its layout; 0 in the other boxes
+ * @param offsetY  likewise, vertically
+ * @param turned   in a box rotated in flow (reference/common/layers-and-rotation.md), its unrotated border box,
+ *                 relative to ({@code x}, {@code y}) and centered in the rectangle that encloses it; its children and
+ *                 its lines refer to it. {@code null} in the other boxes
  */
 public record Fragment(Box box, double x, double y, double width, double height, Insets margin,
                        Insets border, Insets padding, List<Fragment> children, List<TextLine> lines,
@@ -48,7 +48,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
         lines = List.copyOf(lines);
     }
 
-    /** Un fragmento que no es de una caja girada en flujo. */
+    /** A fragment that does not belong to a box rotated in flow. */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last,
                     double offsetX, double offsetY) {
@@ -56,39 +56,39 @@ public record Fragment(Box box, double x, double y, double width, double height,
                 null);
     }
 
-    /** Un fragmento sin desplazamiento de {@code Frame}: el que devuelve el layout de una caja. */
+    /** A fragment without {@code Frame} offset: the one the layout of a box returns. */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last) {
         this(box, x, y, width, height, margin, border, padding, children, lines, first, last, 0, 0);
     }
 
-    /** Fragmento vacío de una caja que no cabe en lo que queda de página ({@link BreakToken.Before}). */
+    /** Empty fragment of a box that does not fit in what is left of the page ({@link BreakToken.Before}). */
     public static Fragment empty(Box box) {
         return new Fragment(box, 0, 0, 0, 0, Insets.ZERO, Insets.ZERO, Insets.ZERO, List.of(), List.of(), false, false);
     }
 
     /**
-     * La caja de borde de este fragmento si ({@code absX}, {@code absY}) es la posición del fragmento: el rectángulo
-     * {@code x}, {@code y}, {@code width}, {@code height} o, en una caja girada en flujo, su caja sin girar.
+     * The border box of this fragment if ({@code absX}, {@code absY}) is the position of the fragment: the rectangle
+     * {@code x}, {@code y}, {@code width}, {@code height} or, in a box rotated in flow, its unrotated box.
      */
     public Rect borderBox(double absX, double absY) {
         return turned == null ? new Rect(absX, absY, width, height)
                 : new Rect(absX + turned.x(), absY + turned.y(), turned.width(), turned.height());
     }
 
-    /** Ancho de la caja de contenido de este fragmento: la de borde menos su borde y su relleno. */
+    /** Width of the content box of this fragment: the border box minus its border and its padding. */
     public double contentWidth() {
         return (turned == null ? width : turned.width()) - border.horizontal() - padding.horizontal();
     }
 
-    /** Alto de la caja de contenido de este fragmento. */
+    /** Height of the content box of this fragment. */
     public double contentHeight() {
         return (turned == null ? height : turned.height()) - border.vertical() - padding.vertical();
     }
 
     /**
-     * El fragmento de una caja girada en flujo: ocupa el rectángulo de {@code width} × {@code height} que envuelve su
-     * caja de borde girada, que es {@code box} dentro de él.
+     * The fragment of a box rotated in flow: it takes up the {@code width} × {@code height} rectangle that encloses its
+     * rotated border box, which is {@code box} inside it.
      */
     public Fragment turned(Rect box, double width, double height) {
         return new Fragment(this.box, x, y, width, height, margin, border, padding, children, lines, first, last,
@@ -100,15 +100,15 @@ public record Fragment(Box box, double x, double y, double width, double height,
     }
 
     /**
-     * El fragmento en ({@code newX}, {@code newY}), que ya incluye el desplazamiento de
-     * {@code Frame} ({@code dx}, {@code dy}).
+     * The fragment at ({@code newX}, {@code newY}), which already includes the {@code Frame}
+     * offset ({@code dx}, {@code dy}).
      */
     public Fragment moved(double newX, double newY, double dx, double dy) {
         return new Fragment(box, newX, newY, width, height, margin, border, padding, children, lines, first, last,
                 dx, dy, turned);
     }
 
-    /** El mismo fragmento con más hijos al final (las cajas absolutas que resuelve esta caja). */
+    /** The same fragment with more children at the end (the absolute boxes this box resolves). */
     public Fragment withMoreChildren(List<Fragment> more) {
         List<Fragment> all = new ArrayList<>(children);
         all.addAll(more);

@@ -33,24 +33,24 @@ import java.util.OptionalDouble;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
 
 /**
- * Layout {@code grid} (reference/components/grid.md). Pasos:
+ * Layout {@code grid} (reference/components/grid.md). Steps:
  * <ol>
- *   <li>Colocación: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} y {@link Placement}.</li>
- *   <li>Columnas: {@link TrackSizing} con los anchos más estrecho y natural.</li>
- *   <li>Filas: {@link TrackSizing} con la altura de cada ítem al ancho de sus columnas.</li>
- *   <li>Alinear cada ítem en su área ({@code Horizontal}, {@code Vertical}); estirar = re-layout.</li>
+ *   <li>Placement: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} and {@link Placement}.</li>
+ *   <li>Columns: {@link TrackSizing} with the narrowest and natural widths.</li>
+ *   <li>Rows: {@link TrackSizing} with the height of each item at the width of its columns.</li>
+ *   <li>Align each item in its area ({@code Horizontal}, {@code Vertical}); stretching = re-layout.</li>
  * </ol>
  *
- * <p>Los porcentajes de un ítem se resuelven contra su área: el ancho, desde el principio; el
- * alto, en el layout final, cuando las filas ya tienen tamaño. Los márgenes {@code auto} de los
- * ítems valen 0. Una pista en porcentaje sobre un tamaño indefinido vale 0.</p>
+ * <p>The percentages of an item resolve against its area: the width, from the start; the
+ * height, in the final layout, once the rows have a size. The {@code auto} margins of the
+ * items are 0. A percentage track over an indefinite size is 0.</p>
  *
- * <p>Los hijos {@code absolute} y {@code fixed} no son ítems: se devuelven como
- * {@link PendingOverlay} con la esquina de la caja de contenido como posición estática. Los
- * ítems {@code relative} se desplazan con {@link FrameOffset} después de alinearlos.</p>
+ * <p>The {@code absolute} and {@code fixed} children are not items: they are returned as
+ * {@link PendingOverlay} with the corner of the content box as static position. The
+ * {@code relative} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
- * <p>Entre páginas (reference/common/breaks.md) se corta entre filas con {@link UnitBreaker}; los ítems de una
- * fila que no cabe en una página se parten en paralelo.</p>
+ * <p>Across pages (reference/common/breaks.md) the break goes between rows with {@link UnitBreaker}; the items of a
+ * row that does not fit on a page are split in parallel.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
 
@@ -60,7 +60,7 @@ public final class GridLayout implements LayoutAlgorithm {
         this.context = context;
     }
 
-    /** Ítems en flujo, el área de cada uno y las pistas, explícitas e implícitas. */
+    /** In-flow items, the area of each one and the tracks, explicit and implicit. */
     private record Grid(List<Box> items, List<Area> areas, List<Track> columns, List<Track> rows) {
     }
 
@@ -85,20 +85,21 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * El ítem pide una fila (una columna, con {@code Flow: vertical}) en la que no queda hueco
+     * The item asks for a row (a column, with {@code Flow: vertical}) that has no room left
      * (reference/components/grid.md).
      */
     private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
         boolean row = flow == Direction.HORIZONTAL;
-        String track = row ? "fila" : "columna";
-        String across = row ? "columna" : "fila";
-        String hole = e.span() == 1 ? "1 " + across + " libre" : e.span() + " " + across + "s libres";
-        return new InvalidModelException(item.style().line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "En la " + track + " "
-                + e.track() + " no queda un hueco de " + hole + " para este ítem (la rejilla tiene " + e.tracks() + " "
-                + across + (e.tracks() == 1 ? "" : "s") + "): hay que elegir otra " + track + " o dejarla en auto");
+        String track = row ? "row" : "column";
+        String across = row ? "column" : "row";
+        String hole = e.span() == 1 ? "1 free " + across : e.span() + " free " + across + "s";
+        return new InvalidModelException(item.style().line(ITEM_AREA), ErrorCode.GRID_PLACEMENT, "In " + track + " "
+                + e.track() + " there is no room of " + hole + " left for this item (the grid has " + e.tracks() + " "
+                + across + (e.tracks() == 1 ? "" : "s") + "): another " + track + " has to be chosen or it has to be"
+                + " left as auto");
     }
 
-    /** Pistas declaradas y, detrás, las implícitas {@code auto}. */
+    /** Declared tracks and, after them, the implicit {@code auto} ones. */
     private static List<Track> tracks(List<Value> declared, int count) {
         List<Track> tracks = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -108,13 +109,13 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Suma de las columnas dimensionadas para el ancho más estrecho (sin espacio libre) y para el natural (espacio
-     * infinito y los ítems aportando su ancho natural), reference/common/box.md.
+     * Sum of the columns sized for the narrowest width (no free space) and for the natural one (infinite space and
+     * the items contributing their natural width), reference/common/box.md.
      */
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
         Grid g = grid(box);
-        // Sin containing block, un hueco en porcentaje cuenta como 0.
+        // Without a reference container, a percentage gap counts as 0.
         double gap = box.style().grid().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<ItemContribution> minContributions = new ArrayList<>();
         List<ItemContribution> maxContributions = new ArrayList<>();
@@ -125,7 +126,7 @@ public final class GridLayout implements LayoutAlgorithm {
             maxContributions.add(new ItemContribution(a.column() - 1, a.columns(), is.natural(), is.natural()));
         }
         double gaps = gap * Math.max(0, g.columns().size() - 1);
-        // Sin containing block, las columnas en porcentaje cuentan como auto (reference/common/values.md).
+        // Without a reference container, percentage columns count as auto (reference/common/values.md).
         List<Track> columns = g.columns().stream().map(Track::withoutPercentBase).toList();
         double min = Sizing.sum(TrackSizing.size(columns, minContributions, gaps, gap)) + gaps;
         double max = Sizing.sum(TrackSizing.size(columns, maxContributions, Double.POSITIVE_INFINITY, gap)) + gaps;
@@ -138,8 +139,8 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Coloca los ítems y dimensiona las pistas, sin fragmentar: las filas son las unidades. La
-     * tabla lo usa para cortar solo su cuerpo.
+     * Places the items and sizes the tracks, without fragmenting: the rows are the units. The
+     * table uses it to break only its body.
      */
     public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, context);
@@ -152,7 +153,7 @@ public final class GridLayout implements LayoutAlgorithm {
         Grid g = grid(box);
         int n = g.items().size();
 
-        // Columnas.
+        // Columns.
         List<ItemContribution> widths = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             IntrinsicSizes is = context.intrinsic(g.items().get(i));
@@ -162,7 +163,7 @@ public final class GridLayout implements LayoutAlgorithm {
         double[] columns = TrackSizing.size(g.columns(), widths, contentWidth, columnGap);
         double[] x = offsets(columns, columnGap);
 
-        // Ancho de cada ítem en su área y su altura con ese ancho.
+        // Width of each item in its area and its height at that width.
         Insets[] margins = new Insets[n];
         double[] itemWidths = new double[n];
         double[] areaWidths = new double[n];
@@ -182,11 +183,11 @@ public final class GridLayout implements LayoutAlgorithm {
             heights.add(new ItemContribution(a.row() - 1, a.rows(), h, h));
         }
 
-        // Filas.
+        // Rows.
         double[] rows = TrackSizing.size(g.rows(), heights, contentHeight.orElse(Double.POSITIVE_INFINITY), rowGap);
         double[] y = offsets(rows, rowGap);
 
-        // Alinear cada ítem en su área.
+        // Align each item in its area.
         List<UnitBreaker.Placed> placed = new ArrayList<>();
         List<PendingOverlay> pending = new ArrayList<>();
         for (Box child : box.children()) {
@@ -214,7 +215,7 @@ public final class GridLayout implements LayoutAlgorithm {
         }
 
         double extent = Sizing.sum(rows) + rowGap * Math.max(0, rows.length - 1);
-        // Las franjas de las filas de una tabla, de la primera columna a la última (reference/components/table.md).
+        // The bands of the rows of a table, from the first column to the last (reference/components/table.md).
         double width = Sizing.sum(columns) + columnGap * Math.max(0, columns.length - 1);
         List<UnitBreaker.Band> bands = box.rows().stream().map(r -> new UnitBreaker.Band(r,
                 r.style().item().area().row() - 1, 0, width, Insets.resolve(r.style().box().border(), contentWidth)))
@@ -223,9 +224,9 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Las filas como unidades de la fragmentación (reference/common/breaks.md). No se puede cortar entre dos filas que
-     * ocupa un mismo ítem; entre las demás, la calidad del corte sale de los ítems que acaban
-     * antes y de los que empiezan después.
+     * The rows as fragmentation units (reference/common/breaks.md). There can be no break between two rows that the
+     * same item spans; between the others, the quality of the break comes from the items that end
+     * before and the ones that start after.
      */
     private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
         List<Unit> units = new ArrayList<>();
@@ -235,7 +236,7 @@ public final class GridLayout implements LayoutAlgorithm {
         return new UnitBreaker.Units(units, extent, true);
     }
 
-    /** La fila de índice {@code r} (no la primera) como unidad, con la calidad del corte delante de ella. */
+    /** The row of index {@code r} (not the first) as a unit, with the quality of the break before it. */
     private static Unit rowUnit(Grid g, int r, double start, double end) {
         List<Box> before = new ArrayList<>();
         List<Box> after = new ArrayList<>();
@@ -257,7 +258,7 @@ public final class GridLayout implements LayoutAlgorithm {
         return new Unit(start, end, BreakRules.between(before, after), BreakRules.forcedBetween(before, after));
     }
 
-    /** Ancho de caja de borde del ítem: el declarado, el del área ({@code stretch}) o el ajuste al contenido. */
+    /** Border box width of the item: the declared one, the area's ({@code stretch}) or the fit to the content. */
     private double itemWidth(Box item, double areaWidth, Insets margin, Alignment horizontal, boolean atStart) {
         Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
@@ -272,9 +273,9 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Espacio del layout definitivo del ítem: con el alto del área como base de sus porcentajes
-     * y, con {@code stretch} y alto {@code auto}, estirado al área. Es el de la medida si el ítem
-     * no se estira ni declara su alto en porcentaje.
+     * Space of the final layout of the item: with the height of the area as the base of its percentages
+     * and, with {@code stretch} and {@code auto} height, stretched to the area. It is the measuring one if the item
+     * is not stretched and does not declare its height as a percentage.
      */
     private ConstraintSpace finalSpace(Box item, ConstraintSpace measureSpace, double width,
                                        double areaWidth, double areaHeight, Insets margin, Alignment vertical,
@@ -290,15 +291,15 @@ public final class GridLayout implements LayoutAlgorithm {
                         Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));
             }
         }
-        // Un ítem estirado se maqueta siempre con su alto fijado, aunque mida lo mismo: es la base
-        // definida de los porcentajes de sus hijos (reference/common/values.md).
+        // A stretched item is always laid out with its height fixed, even if it measures the same: it is the
+        // definite base of the percentages of its children (reference/common/values.md).
         if (fixedHeight.isEmpty() && !dependsOnHeightBase(is)) {
             return measureSpace;
         }
         return ConstraintSpace.fixed(width, fixedHeight, areaWidth, base, atStart);
     }
 
-    /** El alto del ítem se declara con un porcentaje (o una función que lo contiene). */
+    /** The height of the item is declared with a percentage (or a function that contains one). */
     private static boolean dependsOnHeightBase(Style s) {
         return dependsOnBase(s.box().height()) || dependsOnBase(s.box().minHeight()) || (s.box().maxHeight() != null && dependsOnBase(s.box().maxHeight()));
     }
@@ -317,7 +318,7 @@ public final class GridLayout implements LayoutAlgorithm {
         return own != null ? own : container.grid().vertical();
     }
 
-    /** Posición de cada pista desde el principio de la caja de contenido. */
+    /** Position of each track from the start of the content box. */
     private static double[] offsets(double[] sizes, double gap) {
         double[] r = new double[sizes.length];
         double pos = 0;
@@ -328,7 +329,7 @@ public final class GridLayout implements LayoutAlgorithm {
         return r;
     }
 
-    /** Tamaño de {@code count} pistas desde {@code from} con los huecos internos. */
+    /** Size of {@code count} tracks from {@code from} with the inner gaps. */
     private static double span(double[] sizes, int from, int count, double gap) {
         double r = gap * (count - 1);
         for (int i = from; i < from + count; i++) {

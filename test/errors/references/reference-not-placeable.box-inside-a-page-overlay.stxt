@@ -1,0 +1,19 @@
+# Case: Page of a box that is in a Page overlay
+# Code: REFERENCE_NOT_PLACEABLE
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Ver la página {page of: pie}
+		Page overlay:
+			Text: Pie
+				Id: pie

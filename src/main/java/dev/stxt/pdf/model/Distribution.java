@@ -1,4 +1,7 @@
 package dev.stxt.pdf.model;
 
-/** Reparto en un eje: el eje principal de un {@code Stack} ({@code Horizontal} o {@code Vertical}) y {@code Line distribution}. */
+/**
+ * Distribution along an axis: the main axis of a {@code Stack} ({@code Horizontal} or {@code Vertical}) and
+ * {@code Line distribution}.
+ */
 public enum Distribution { START, END, CENTER, JUSTIFY, AROUND, DISTRIBUTE, STRETCH }

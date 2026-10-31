@@ -1,13 +1,13 @@
-# Hito 7 (reference/common/breaks.md). Área útil de 260 × 160 desde (20, 20).
+# Milestone 7 (reference/common/breaks.md). Page area of 260 × 160 from (20, 20).
 #
-# Página 1: card (Edges: closed, borde 2 y relleno 3) deja 160 − 10 = 150 al contenido:
-#   caben 150 de los 200 de c1.
-# Página 2: card vuelve a tener borde y relleno arriba; los 50 que faltan de c1 (card mide 60).
-#   La fila de grid (200) no cabe en los 100 que quedan: grid pasa a la página siguiente.
-# Página 3: la fila tampoco cabe al principio de página: sus ítems se parten en paralelo.
-#   g1 coloca 160 y g2 cabe entero (50).
-# Página 4: sigue g1 desde arriba (40) y end va detrás.
-# El pie muestra "{page}/{pages}" con los valores de cada página.
+# Page 1: card (Edges: closed, border 2 and padding 3) leaves 160 − 10 = 150 to the content:
+#   150 of the 200 of c1 fit.
+# Page 2: card has border and padding at the top again; the remaining 50 of c1 (card measures 60).
+#   The grid row (200) does not fit in the remaining 100: grid moves to the next page.
+# Page 3: the row does not fit at the start of a page either: its items are split in parallel.
+#   g1 places 160 and g2 fits whole (50).
+# Page 4: g1 continues from the top (40) and end goes after it.
+# The footer shows "{page}/{pages}" with the values of each page.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

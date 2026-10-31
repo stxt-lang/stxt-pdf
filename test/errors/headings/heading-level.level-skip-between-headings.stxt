@@ -1,0 +1,20 @@
+# Case: Level skip between headings
+# Code: HEADING_LEVEL
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Heading 1:
+			Text: Uno
+		Block:
+			Heading 3:
+				Text: Tres

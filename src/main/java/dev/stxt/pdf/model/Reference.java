@@ -7,23 +7,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Una referencia a otra caja dentro de un texto (reference/common/references.md): {@code {page of: id}}
- * da la página en que empieza la caja con ese {@code Id} y {@code {number of: id}}, su número.
- * Es una pieza pura: busca las referencias de un texto y las sustituye, sin saber qué valen.
+ * A reference to another box inside a text (reference/common/references.md): {@code {page of: id}}
+ * gives the page on which the box with that {@code Id} starts and {@code {number of: id}}, its number.
+ * It is a pure piece: it finds the references of a text and replaces them, without knowing their values.
  *
- * @param kind  qué se pide de la caja
- * @param start posición del {@code {} de apertura en el texto
- * @param end   posición siguiente al {@code }} de cierre
- * @param id    el {@code Id} de la caja, sin espacios alrededor; puede estar vacío si el texto
- *              lo omite, y quien resuelve lo rechaza
+ * @param kind  what is requested of the box
+ * @param start position of the opening {@code {} in the text
+ * @param end   position after the closing {@code }}
+ * @param id    the {@code Id} of the box, without surrounding spaces; it can be empty if the text
+ *              omits it, and the resolver rejects it
  */
 public record Reference(Kind kind, int start, int end, String id) {
 
-    /** Qué se pide de la caja referida. */
+    /** What is requested of the referenced box. */
     public enum Kind {
-        /** El número de la página donde empieza. */
+        /** The number of the page where it starts. */
         PAGE("page"),
-        /** Su número en el documento: el de un ítem de lista o el de un encabezado. */
+        /** Its number in the document: that of a list item or of a heading. */
         NUMBER("number");
 
         private final String keyword;
@@ -32,7 +32,7 @@ public record Reference(Kind kind, int start, int end, String id) {
             this.keyword = keyword;
         }
 
-        /** La palabra que lo nombra en el texto ({@code page}, {@code number}). */
+        /** The word that names it in the text ({@code page}, {@code number}). */
         public String keyword() {
             return keyword;
         }
@@ -40,12 +40,12 @@ public record Reference(Kind kind, int start, int end, String id) {
 
     private static final Pattern PATTERN = Pattern.compile("\\{(page|number) of:([^{}]*)}");
 
-    /** Si el texto contiene alguna referencia. */
+    /** Whether the text contains any reference. */
     public static boolean contains(String text) {
         return text != null && text.contains(" of:") && PATTERN.matcher(text).find();
     }
 
-    /** Las referencias de un texto, en orden. */
+    /** The references of a text, in order. */
     public static List<Reference> find(String text) {
         List<Reference> found = new ArrayList<>();
         if (text == null || !text.contains(" of:")) {
@@ -58,7 +58,7 @@ public record Reference(Kind kind, int start, int end, String id) {
         return found;
     }
 
-    /** La referencia que empieza justo en {@code index}, si la hay. */
+    /** The reference that starts exactly at {@code index}, if there is one. */
     public static Reference at(String text, int index) {
         if (text.charAt(index) != '{') {
             return null;
@@ -68,8 +68,8 @@ public record Reference(Kind kind, int start, int end, String id) {
     }
 
     /**
-     * El texto con cada referencia sustituida por el valor que da {@code value} (el tipo y el
-     * {@code Id}); si da {@code null}, la referencia se deja como está.
+     * The text with each reference replaced by the value that {@code value} gives (from the kind and the
+     * {@code Id}); if it gives {@code null}, the reference is left as it is.
      */
     public static String replace(String text, BiFunction<Kind, String, String> value) {
         if (!contains(text)) {

@@ -1,0 +1,12 @@
+# Case: Percentage gap between rows without height
+# Code: INDEFINITE_PERCENTAGE
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Grid:
+			Gap: 5% 10

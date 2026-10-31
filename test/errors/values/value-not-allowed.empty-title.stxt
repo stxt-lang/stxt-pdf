@@ -1,0 +1,11 @@
+# Case: Empty title
+# Code: VALUE_NOT_ALLOWED
+# Line: 9
+Document (dev.stxt.pdf):
+	Language: es
+	Page:
+		Width: 595
+		Height: 842
+	Title:
+	Section:
+		Text: Hola

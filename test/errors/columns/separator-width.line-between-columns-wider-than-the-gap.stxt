@@ -1,0 +1,20 @@
+# Case: Line between columns wider than the gap
+# Code: SEPARATOR_WIDTH
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Count: 2
+			Gap: 4
+			Separator: 6
+			Text: Hola

@@ -2,22 +2,22 @@ package dev.stxt.pdf.tree;
 
 
 /**
- * Las propiedades de un {@code Columns} (reference/components/columns.md): cuántas columnas y de qué ancho, el
- * hueco y la línea entre ellas y cómo se llenan. No se heredan.
+ * The properties of a {@code Columns} (reference/components/columns.md): how many columns and how wide, the
+ * gap and the line between them and how they are filled. They are not inherited.
  */
 public final class ColumnsStyle extends StyleGroup {
 
-    /** {@code Count}; {@code null} = sin declarar ({@code Min column width} fija entonces las columnas). */
+    /** {@code Count}; {@code null} = not declared ({@code Min column width} then sets the columns). */
     private Integer count;
-    /** {@code Min column width}, en puntos; {@code null} = sin declarar. */
+    /** {@code Min column width}, in points; {@code null} = not declared. */
     private Double minColumnWidth;
-    /** {@code Gap}, en puntos. */
+    /** {@code Gap}, in points. */
     private double columnGap = 0;
-    /** Grosor de la línea entre columnas ({@code Separator}); 0 = sin línea. */
+    /** Thickness of the line between columns ({@code Separator}); 0 = no line. */
     private double separator = 0;
-    /** {@code Separator color}; {@code null} = el {@code Color} del texto. */
+    /** {@code Separator color}; {@code null} = the {@code Color} of the text. */
     private String separatorColor;
-    /** {@code Balance}: iguala las columnas del último fragmento. */
+    /** {@code Balance}: evens out the columns of the last fragment. */
     private boolean balance = true;
 
     ColumnsStyle() {

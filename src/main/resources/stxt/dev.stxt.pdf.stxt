@@ -1,16 +1,16 @@
-# Schema del modelo de cajas (reference/common/structure.md).
-# Primero los elementos, después las reglas reutilizables (Styles), los grupos (Box, Typography,
-# Break) y al final las propiedades.
-# Cada nombre tiene una única definición en todo el namespace: el Width de Page y el de Box son
-# el mismo nodo.
+# Schema of the box model (reference/common/structure.md).
+# First the elements, then the reusable rules (Styles), the groups (Box, Typography,
+# Break) and finally the properties.
+# Each name has a single definition in the whole namespace: the Width of Page and the one of Box are
+# the same node.
 Schema (@stxt.schema): dev.stxt.pdf
-	Description: Documentos de stxt-pdf, el motor de layout y generación de PDF. Manual en docs/es/manual y referencia completa en docs/es/reference.
+	Description: Documents of stxt-pdf, the layout and PDF generation engine. Manual in docs/en/manual and complete reference in docs/en/reference.
 
-	# Elementos
+	# Elements
 
 	Node: Document
 		Type: GROUP
-		Description: Documento de cajas: el medio (el de las secciones que no declaran el suyo), el título y el idioma (obligatorios), las reglas reutilizables (también la tipografía base, con For element: Document), los Page overlay de todas las secciones y una o más Section con el contenido, en orden.
+		Description: Box document: the medium (the one of the sections that do not declare their own), the title and the language (required), the reusable rules (also the base typography, with For element: Document), the Page overlay of all the sections and one or more Section with the content, in order.
 		Children:
 			Child: Page
 				Min: 1
@@ -28,7 +28,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Page
 		Type: GROUP
-		Description: La página: su tamaño, con Paper (y Orientation) o con Width y Height, y sus márgenes. Define el área útil, que es el containing block inicial.
+		Description: The page: its size, with Paper (and Orientation) or with Width and Height, and its margins. It defines the page area, which is the initial reference container.
 		Children:
 			Child: Paper
 				Max: 1
@@ -42,7 +42,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Section
 		Type: GROUP
-		Description: Parte independiente del documento: empieza una página nueva y tiene su propio Page (que hereda del documento por grupos), sus propios Page overlay y su numeración de páginas. Contiene los elementos en flujo y los posicionados.
+		Description: Independent part of the document: it starts a new page and has its own Page (which inherits from the document by groups), its own Page overlay and its own page numbering. It contains the in-flow elements and the positioned ones.
 		Children:
 			Child: Id
 				Max: 1
@@ -82,7 +82,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Block
 		Type: GROUP
-		Description: Caja que apila sus hijos en vertical (flujo de bloque).
+		Description: Box that stacks its children vertically (block flow).
 		Children:
 			Child: Id
 				Max: 1
@@ -122,7 +122,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Stack
 		Type: GROUP
-		Description: Coloca sus ítems (Item) uno tras otro, en horizontal o en vertical (Direction), y reparte entre ellos el espacio que sobra.
+		Description: Places its items (Item) one after another, horizontally or vertically (Direction), and distributes the leftover space among them.
 		Children:
 			Child: Id
 				Max: 1
@@ -153,7 +153,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Grid
 		Type: GROUP
-		Description: Contenedor grid: coloca sus ítems (Area) en una rejilla de filas y columnas.
+		Description: Grid container: places its items (Area) in a grid of rows and columns.
 		Children:
 			Child: Id
 				Max: 1
@@ -186,7 +186,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Text
 		Type: INLINE
-		Description: Texto suelto, que no es un párrafo del contenido: un rótulo, una cifra, una línea de una cabecera, los trozos de un encabezado. El texto va en el valor (una línea) o en Content (un bloque), sin líneas en blanco salvo si es preformateado.
+		Description: Standalone text, not a paragraph of the content: a label, a figure, a line of a header, the pieces of a heading. The text goes in the value (one line) or in Content (a block), without blank lines unless it is preformatted.
 		Children:
 			Child: Id
 				Max: 1
@@ -206,7 +206,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Paragraph
 		Type: INLINE
-		Description: Un párrafo del contenido, que las reglas For element: Paragraph estilan aparte de los textos sueltos. Un solo párrafo: sin líneas en blanco en Content.
+		Description: A paragraph of the content, which For element: Paragraph rules style separately from standalone texts. A single paragraph: no blank lines in Content.
 		Children:
 			Child: Id
 				Max: 1
@@ -226,7 +226,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Heading 1
 		Type: GROUP
-		Description: Encabezado de nivel 1: un bloque con uno o varios Text. Aparece en los marcadores del PDF y el motor evita cortar dentro y después.
+		Description: Level 1 heading: a block with one or more Text. It appears in the PDF bookmarks and the engine avoids breaking inside it and after it.
 		Children:
 			Child: Id
 				Max: 1
@@ -244,7 +244,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Heading 2
 		Type: GROUP
-		Description: Encabezado de nivel 2 (ver Heading 1).
+		Description: Level 2 heading (see Heading 1).
 		Children:
 			Child: Id
 				Max: 1
@@ -262,7 +262,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Heading 3
 		Type: GROUP
-		Description: Encabezado de nivel 3 (ver Heading 1).
+		Description: Level 3 heading (see Heading 1).
 		Children:
 			Child: Id
 				Max: 1
@@ -280,7 +280,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Heading 4
 		Type: GROUP
-		Description: Encabezado de nivel 4 (ver Heading 1).
+		Description: Level 4 heading (see Heading 1).
 		Children:
 			Child: Id
 				Max: 1
@@ -298,7 +298,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Heading 5
 		Type: GROUP
-		Description: Encabezado de nivel 5 (ver Heading 1).
+		Description: Level 5 heading (see Heading 1).
 		Children:
 			Child: Id
 				Max: 1
@@ -316,7 +316,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Heading 6
 		Type: GROUP
-		Description: Encabezado de nivel 6 (ver Heading 1).
+		Description: Level 6 heading (see Heading 1).
 		Children:
 			Child: Id
 				Max: 1
@@ -334,7 +334,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: List
 		Type: GROUP
-		Description: Lista: sus ítems (List item) apilados en vertical, cada uno con un marcador colgado en la sangría (el Padding izquierdo de la lista).
+		Description: List: its items (List item) stacked vertically, each with a marker hung in the indent (the left Padding of the list).
 		Children:
 			Child: Id
 				Max: 1
@@ -357,7 +357,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: List item
 		Type: GROUP
-		Description: Ítem de una List: un bloque con uno o varios elementos, sin encabezados. Su marcador se alinea con su primera línea.
+		Description: Item of a List: a block with one or more elements, without headings. Its marker is aligned with its first line.
 		Children:
 			Child: Id
 				Max: 1
@@ -389,7 +389,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Columns
 		Type: GROUP
-		Description: Bloque en columnas: su contenido llena la primera columna, sigue en la siguiente y, al acabar la página, continúa en la primera columna de la siguiente. Count, Min column width o los dos fijan las columnas.
+		Description: Block in columns: its content fills the first column, continues in the next one and, at the end of the page, continues in the first column of the next page. Count, Min column width or both set the columns.
 		Children:
 			Child: Id
 				Max: 1
@@ -435,7 +435,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Frame
 	Node: Frame
 		Type: GROUP
-		Description: Marco: un bloque en su sitio del flujo que se puede desplazar con Offset sin mover a sus hermanos. Es la referencia de los Overlay que contiene.
+		Description: Frame: a block in its place in the flow that can be shifted with Offset without moving its siblings. It is the reference of the Overlay it contains.
 		Children:
 			Child: Id
 				Max: 1
@@ -481,7 +481,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Overlay
 		Type: GROUP
-		Description: Bloque superpuesto, fuera de flujo: no ocupa espacio y se coloca con Offset en el Frame, Overlay o Page overlay que lo contiene (o, si no hay, en el área útil).
+		Description: Superimposed block, out of flow: it takes no space and is placed with Offset in the Frame, Overlay or Page overlay that contains it (or, if there is none, in the page area).
 		Children:
 			Child: Id
 				Max: 1
@@ -523,7 +523,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Page overlay
 		Type: GROUP
-		Description: Bloque superpuesto a las páginas, fuera de flujo: se coloca con Offset en el área útil y se repite en las páginas que dice Pages (todas por defecto). Cabeceras, pies y marcas de agua.
+		Description: Block superimposed on the pages, out of flow: it is placed with Offset in the page area and is repeated on the pages that Pages says (all by default). Headers, footers and watermarks.
 		Children:
 			Child: Id
 				Max: 1
@@ -567,7 +567,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Item
 		Type: GROUP
-		Description: Ítem de un Stack: cómo crece, encoge y se alinea en el eje cruzado. Contiene exactamente un elemento.
+		Description: Item of a Stack: how it grows, shrinks and is aligned on the cross axis. It contains exactly one element.
 		Children:
 			Child: Grow
 				Max: 1
@@ -618,7 +618,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Area
 		Type: INLINE
-		Description: Ítem de un Grid: el área que ocupa. El valor es la colocación: un nombre de área, o 'fila columna [filas columnas]' contando desde 1; sin valor, se coloca automáticamente. Contiene exactamente un elemento.
+		Description: Item of a Grid: the area it takes. The value is the placement: an area name, or 'row column [rows columns]' counting from 1; without a value, it is placed automatically. It contains exactly one element.
 		Children:
 			Child: Horizontal
 				Max: 1
@@ -663,7 +663,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table
 		Type: GROUP
-		Description: Tabla: sus filas (Row) en Header rows, Body y Footer rows, en ese orden, sobre las columnas de Column sizes. Al partirse, Header rows y Footer rows se repiten en cada página.
+		Description: Table: its rows (Row) in Header rows, Body and Footer rows, in that order, over the columns of Column sizes. When it breaks, Header rows and Footer rows are repeated on each page.
 		Children:
 			Child: Id
 				Max: 1
@@ -693,25 +693,25 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Header rows
 		Type: GROUP
-		Description: Filas de cabecera de una Table: van al principio de cada página de la tabla.
+		Description: Header rows of a Table: they go at the start of each page of the table.
 		Children:
 			Child: Row
 				Min: 1
 	Node: Body
 		Type: GROUP
-		Description: Filas del cuerpo de una Table.
+		Description: Body rows of a Table.
 		Children:
 			Child: Row
 				Min: 1
 	Node: Footer rows
 		Type: GROUP
-		Description: Filas de pie de una Table: van al final de cada página de la tabla.
+		Description: Footer rows of a Table: they go at the end of each page of the table.
 		Children:
 			Child: Row
 				Min: 1
 	Node: Row
 		Type: GROUP
-		Description: Fila de una tabla: sus celdas (Cell), de izquierda a derecha. No es una caja del layout: su Box solo admite el aspecto (Background, Border, Border color y Corner radius), que se pinta como una franja debajo de sus celdas, y su Id es destino de enlaces. Su Typography lo heredan sus celdas, y las reglas For style de su Style y For id de su Id se aplican a cada una de ellas.
+		Description: Row of a table: its cells (Cell), from left to right. It is not a layout box: its Box only accepts the appearance (Background, Border, Border color and Corner radius), which is painted as a band beneath its cells, and its Id is a link target. Its Typography is inherited by its cells, and the For style rules of its Style and For id rules of its Id apply to each of them.
 		Children:
 			Child: Id
 				Max: 1
@@ -727,7 +727,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Cell
 		Type: INLINE
-		Description: Celda de una tabla. Con valor, una caja de texto de una línea; sin valor, un bloque con sus elementos (o vacía).
+		Description: Cell of a table. With a value, a one-line text box; without a value, a block with its elements (or empty).
 		Children:
 			Child: Id
 				Max: 1
@@ -760,7 +760,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Markdown
 		Type: GROUP
-		Description: Contenido en Markdown (encabezados, párrafos, listas, tablas GFM, bloques de código y, dentro de la línea, **negrita**, *cursiva*, ++subrayado++, ~~tachado~~, `código` y [enlaces](destino)), que se traduce a Heading, Paragraph, List, Table y Text. Un bloque.
+		Description: Content in Markdown (headings, paragraphs, lists, GFM tables, code blocks and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, `code` and [links](target)), which is translated into Heading, Paragraph, List, Table and Text. A block.
 		Children:
 			Child: Id
 				Max: 1
@@ -783,7 +783,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table of contents
 		Type: GROUP
-		Description: Índice automático: una entrada por encabezado de los niveles de Levels, en orden del documento, con su título, una guía y la página. Un bloque; las entradas se estilan con las reglas For element 'TOC 1' a 'TOC 6'.
+		Description: Automatic table of contents: one entry per heading of the levels in Levels, in document order, with its title, a leader and the page. A block; the entries are styled with the For element rules 'TOC 1' to 'TOC 6'.
 		Children:
 			Child: Id
 				Max: 1
@@ -801,7 +801,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Image
 		Type: INLINE
-		Description: Imagen PNG, JPEG, SVG o PDF de la carpeta images/ de los recursos; el valor es su ruta, relativa a images/ (logos/acme.png). Una caja sin hijos con el tamaño y la proporción del fichero (de un PDF, de su página); no se parte entre páginas.
+		Description: PNG, JPEG, SVG or PDF image from the images/ folder of the resources; the value is its path, relative to images/ (logos/acme.png). A box without children with the size and proportions of the file (of a PDF, of its page); it does not break across pages.
 		Children:
 			Child: Id
 				Max: 1
@@ -822,11 +822,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate
 				Max: 1
 
-	# Reglas reutilizables
+	# Reusable rules
 
 	Node: Styles
 		Type: GROUP
-		Description: Reglas reutilizables: propiedades por defecto de los elementos de un tipo, con un estilo con nombre o con un Id. Es hijo de Document o la raíz de un documento de estilos aparte, que se pasa junto al documento y vale menos que él.
+		Description: Reusable rules: default properties of the elements of a type, with a named style or with an Id. It is a child of Document or the root of a separate styles document, which is passed along with the document and ranks below it.
 		Children:
 			Child: For element
 			Child: For style
@@ -834,7 +834,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: For element
 		Type: INLINE
-		Description: Regla para todos los elementos de un tipo; el valor es su nombre (Text, Block, Heading 1…), uno generado por el motor (Code block, el bloque de código de un Markdown; TOC 1 a 6, las entradas de un Table of contents), una posición dentro de una tabla (Header cell, Body cell, Footer cell, Odd row cell, Even row cell) o Document, que solo admite Typography y es la tipografía que heredan todas las cajas.
+		Description: Rule for all the elements of a type; the value is its name (Text, Block, Heading 1...), one generated by the engine (Code block, the code block of a Markdown; TOC 1 to 6, the entries of a Table of contents), a position within a table (Header cell, Body cell, Footer cell, Odd row cell, Even row cell) or Document, which only accepts Typography and is the typography that all boxes inherit.
 		Children:
 			Child: Box
 				Max: 1
@@ -844,7 +844,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: For style
 		Type: INLINE
-		Description: Regla para los elementos que tienen ese estilo en su Style.
+		Description: Rule for the elements that have that style in their Style.
 		Children:
 			Child: Box
 				Max: 1
@@ -854,7 +854,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: For id
 		Type: INLINE
-		Description: Regla para el elemento con ese Id.
+		Description: Rule for the element with that Id.
 		Children:
 			Child: Box
 				Max: 1
@@ -864,7 +864,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: For column
 		Type: INLINE
-		Description: Regla para las celdas de tabla que empiezan en esa columna (n) o en cualquiera de un rango (n m, ambas incluidas).
+		Description: Rule for the table cells that start in that column (n) or in any column of a range (n m, both included).
 		Children:
 			Child: Box
 				Max: 1
@@ -873,11 +873,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 
-	# Grupos
+	# Groups
 
 	Node: Box
 		Type: GROUP
-		Description: Modelo de caja: tamaño, márgenes, relleno, borde y fondo. No se hereda.
+		Description: Box model: size, margins, padding, border and background. Not inherited.
 		Children:
 			Child: Width
 				Max: 1
@@ -907,7 +907,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Fuente, fuente del código, tamaño, interlineado, alineación, color e idioma del texto, numeración de los encabezados, y viudas y huérfanas. Se hereda.
+		Description: Font, code font, size, line height, alignment, color and language of the text, heading numbering, and widows and orphans. Inherited.
 		Children:
 			Child: Font
 				Max: 1
@@ -955,7 +955,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Break
 		Type: GROUP
-		Description: Cortes de página: los saltos antes y después de la caja, lo que se mantiene junto y la decoración de la caja partida. No se hereda.
+		Description: Page breaks: the breaks before and after the box, what is kept together and the decoration of the broken box. Not inherited.
 		Children:
 			Child: Before
 				Max: 1
@@ -973,32 +973,32 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Document
 
 	Node: Title
-		Description: Título del documento: el que muestra el visor del PDF. Obligatorio.
+		Description: Title of the document: the one the PDF viewer shows. Required.
 	Node: Language
-		Description: Idioma, como etiqueta BCP 47 (es, en-US, ca…). En Document, el del contenido y el del PDF etiquetado (obligatorio). En Typography, el de una caja cuyo texto está en otro idioma (se hereda): lo lee un lector de pantalla (Lang del PDF etiquetado) y fija las reglas de las letras de Case. No vale en For element: Document, que usa el de Document.
+		Description: Language, as a BCP 47 tag (es, en-US, ca...). In Document, the one of the content and of the tagged PDF (required). In Typography, the one of a box whose text is in another language (inherited): a screen reader reads it (Lang of the tagged PDF) and it sets the letter rules of Case. Not valid in For element: Document, which uses the one of Document.
 
-	# Elemento
+	# Element
 
 	Node: Id
-		Description: Identificador para volcados, tests, mensajes y reglas For id. Único en el documento.
+		Description: Identifier for dumps, tests, messages and For id rules. Unique in the document.
 	Node: Style
-		Description: Estilos con nombre del elemento, separados por espacios: le aplican las reglas For style con esos nombres. En una Row, a cada una de sus celdas.
+		Description: Named styles of the element, separated by spaces: the For style rules with those names apply to it. In a Row, to each of its cells.
 	Node: Link
-		Description: Destino al que lleva la caja entera al pulsarla: https://…, http://…, mailto:… o #id (una caja del documento). No cambia su aspecto.
+		Description: Target the whole box leads to when clicked: https://..., http://..., mailto:... or #id (a box of the document). It does not change its appearance.
 	Node: In table of contents
 		Type: BOOLEAN
-		Description: Si el encabezado tiene entrada en los índices (Table of contents). Por defecto, true. Con false sigue siendo un encabezado (estructura, marcador y jerarquía) pero no se lista: el título de la portada o el del propio índice.
+		Description: Whether the heading has an entry in the tables of contents (Table of contents). By default, true. With false it is still a heading (structure, bookmark and hierarchy) but it is not listed: the title of the cover or the one of the table of contents itself.
 	Node: Isolate margins
 		Type: BOOLEAN
-		Description: Si la caja aísla los márgenes de sus hijos: con true, los del primero y el último quedan dentro y no se juntan con los suyos. Por defecto, false.
+		Description: Whether the box isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false.
 	Node: Offset
-		Description: Desplazamiento: arriba, derecha, abajo, izquierda (1 a 4 valores).
+		Description: Offset: top, right, bottom, left (1 to 4 values).
 	Node: Layer
 		Type: INTEGER
-		Description: Orden de apilamiento dentro de su contexto. Sin declarar = auto.
+		Description: Stacking order within its context. Not declared = auto.
 	Node: Pages
 		Type: ENUM
-		Description: Páginas en que sale un Page overlay, contando desde la 1 dentro de su alcance (las del documento si es un Page overlay de Document, las de la sección si es de una Section): all, todas; first, solo la primera; not-first, todas menos la primera; odd, las impares; even, las pares; last, solo la última.
+		Description: Pages on which a Page overlay appears, counting from 1 within its scope (those of the document if it is a Page overlay of Document, those of the section if it is of a Section): all, every page; first, only the first; not-first, all but the first; odd, the odd ones; even, the even ones; last, only the last.
 		Values:
 			Value: all
 			Value: first
@@ -1008,35 +1008,35 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: last
 	Node: Page numbering
 		Type: ENUM
-		Description: Cómo numera una Section sus páginas con {page} y {pages}: continue (por defecto) sigue el contador del documento, restart vuelve a 1 y none no las numera ni avanza el contador (una portada). {pages} es el último número de la tanda, la que empieza en cada restart.
+		Description: How a Section numbers its pages with {page} and {pages}: continue (by default) follows the document counter, restart goes back to 1 and none neither numbers them nor advances the counter (a cover). {pages} is the last number of the page sequence, which starts at each restart.
 		Values:
 			Value: continue
 			Value: restart
 			Value: none
 	Node: Page number format
 		Type: ENUM
-		Description: Cómo se escriben los números de las páginas de una Section: decimal (1, por defecto), lower-roman (i) o upper-roman (I), en {page}, {pages}, {page of: id}, los índices y el visor. No vale con Page numbering: none.
+		Description: How the page numbers of a Section are written: decimal (1, by default), lower-roman (i) or upper-roman (I), in {page}, {pages}, {page of: id}, the tables of contents and the viewer. Not valid with Page numbering: none.
 		Values:
 			Value: decimal
 			Value: lower-roman
 			Value: upper-roman
 	Node: Inherit page overlays
 		Type: BOOLEAN
-		Description: Si la Section lleva los Page overlay del Document. Por defecto, true; con false solo salen los suyos (una portada sin pie).
+		Description: Whether the Section carries the Page overlay of the Document. By default, true; with false only its own appear (a cover without a footer).
 	Node: Begin on
 		Type: ENUM
-		Description: En qué página física empieza una Section: any (por defecto), en la siguiente; odd, en una impar, la de la derecha al imprimir a doble cara. Si no le toca, la sección anterior acaba con una página en blanco, que cuenta para el número pero no lo imprime ni lleva los Page overlay. No vale en la primera sección.
+		Description: On which physical page a Section starts: any (by default), on the next one; odd, on an odd one, the right-hand one when printing double-sided. If it does not fall there, the previous section ends with a blank page, which counts for the number but does not print it or carry the Page overlay. Not valid in the first section.
 		Values:
 			Value: any
 			Value: odd
 	Node: Rotate
 		Type: NUMBER
-		Description: Giro de la caja, en grados en el sentido de las agujas del reloj (de -360 a 360, sin 0). En Block, Text, Paragraph e Image, que están en flujo, gira sobre su centro y la caja ocupa el rectángulo que la envuelve girada; sin Width, mide su contenido sin partir líneas. En Frame, Overlay y Page overlay gira al pintar, alrededor de Rotate origin, y no cambia el layout. Lo girado debe caber en la página y no se parte entre páginas.
+		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph and Image, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
-		Description: Punto alrededor del que gira la caja de borde con Rotate: una o dos palabras clave de top, bottom, left, right y center (top left, bottom…), o dos medidas desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto (20 50%). Por defecto, center.
+		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, in points or as a percentage of its width and its height (20 50%). By default, center.
 	Node: Paper
 		Type: ENUM
-		Description: Tamaño de papel con nombre del medio, en vertical: A3 (842 × 1191), A4 (595 × 842), A5 (420 × 595), A6 (298 × 420), B4 (709 × 1001), B5 (499 × 709), Letter (612 × 792) o Legal (612 × 1008). No se declara con Width ni Height.
+		Description: Named paper size of the medium, in portrait: A3 (842 × 1191), A4 (595 × 842), A5 (420 × 595), A6 (298 × 420), B4 (709 × 1001), B5 (499 × 709), Letter (612 × 792) or Legal (612 × 1008). It is not declared with Width or Height.
 		Values:
 			Value: A3
 			Value: A4
@@ -1048,113 +1048,113 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: Legal
 	Node: Orientation
 		Type: ENUM
-		Description: Orientación del papel de Paper: portrait (por defecto) o landscape, que cambia el ancho por el alto.
+		Description: Orientation of the paper of Paper: portrait (by default) or landscape, which swaps the width and the height.
 		Values:
 			Value: portrait
 			Value: landscape
 	Node: Content
 		Type: BLOCK
-		Description: Texto en bloque. Un salto de línea simple vale un espacio; una línea en blanco es un error, salvo en un Text preformateado (Preformatted: true o wrap).
+		Description: Block text. A single line break counts as a space; a blank line is an error, except in a preformatted Text (Preformatted: true or wrap).
 
 	# Box
 
 	Node: Width
-		Description: Ancho de la caja de borde (en Page, de la página).
+		Description: Width of the border box (in Page, of the page).
 	Node: Height
-		Description: Alto de la caja de borde (en Page, de la página).
+		Description: Height of the border box (in Page, of the page).
 	Node: Min width
-		Description: Ancho mínimo.
+		Description: Minimum width.
 	Node: Max width
-		Description: Ancho máximo.
+		Description: Maximum width.
 	Node: Min height
-		Description: Alto mínimo.
+		Description: Minimum height.
 	Node: Max height
-		Description: Alto máximo.
+		Description: Maximum height.
 	Node: Aspect ratio
-		Description: Proporción ancho/alto (16/9 o un número): deduce un eje auto del otro.
+		Description: Width/height ratio (16/9 or a number): derives an auto axis from the other.
 	Node: Margin
-		Description: Margen: arriba, derecha, abajo, izquierda (1 a 4 valores).
+		Description: Margin: top, right, bottom, left (1 to 4 values).
 	Node: Padding
-		Description: Relleno: arriba, derecha, abajo, izquierda (1 a 4 valores).
+		Description: Padding: top, right, bottom, left (1 to 4 values).
 	Node: Border
-		Description: Grosor del borde: arriba, derecha, abajo, izquierda (1 a 4 valores).
+		Description: Border width: top, right, bottom, left (1 to 4 values).
 	Node: Border color
-		Description: Color del borde: arriba, derecha, abajo, izquierda (1 a 4 colores). Por defecto, el Color del texto.
+		Description: Border color: top, right, bottom, left (1 to 4 colors). By default, the Color of the text.
 	Node: Corner radius
-		Description: Esquinas redondeadas: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda (1 a 4 valores, número o %). Solo pintado: redondea el fondo, el borde y el recorte de una Image.
+		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background, the border and the clipping of an Image.
 	Node: Background
-		Description: Fondo, pintado en la caja de relleno: un color o un degradado linear(ángulo, color, color…).
+		Description: Background, painted in the padding box: a color or a gradient linear(angle, color, color...).
 
 	# Typography
 
 	Node: Font
-		Description: Familia de la fuente, tal como la declara su fichero TTF de resources/fonts. Obligatoria en el texto, propia o heredada (también de Document).
+		Description: Font family, as declared by its TTF file in resources/fonts. Required in the text, own or inherited (also from Document).
 	Node: Code font
-		Description: Familia de la fuente del código (`código` en un texto con Markup: markdown o en un Markdown, y los bloques de código), tal como la declara su fichero TTF de resources/fonts; suele ser una monoespaciada. Obligatoria si hay código, propia o heredada.
+		Description: Font family of the code (`code` in a text with Markup: markdown or in a Markdown, and the code blocks), as declared by its TTF file in resources/fonts; usually a monospaced one. Required if there is code, own or inherited.
 	Node: Bold
 		Type: BOOLEAN
-		Description: Negrita: la variante de peso 700 de la fuente. Por defecto, false.
+		Description: Bold: the weight 700 variant of the font. By default, false.
 	Node: Italic
 		Type: BOOLEAN
-		Description: Cursiva: la variante cursiva de la fuente. Por defecto, false.
+		Description: Italic: the italic variant of the font. By default, false.
 	Node: Size
-		Description: Cuerpo de la fuente, en puntos. Obligatorio en el texto, propio o heredado (también de Document).
+		Description: Font size, in points. Required in the text, own or inherited (also from Document).
 	Node: Line height
-		Description: Altura de línea. Un número son puntos; usa un porcentaje (120%) para un valor relativo al Size.
+		Description: Line height. A number is points; a percentage (120%) gives a value relative to the Size.
 	Node: Align
 		Type: ENUM
-		Description: Alineación de las líneas.
+		Description: Alignment of the lines.
 		Values:
 			Value: left
 			Value: right
 			Value: center
 			Value: justify
 	Node: Color
-		Description: Color del texto.
+		Description: Color of the text.
 	Node: Line breaking
 		Type: ENUM
-		Description: Reparto del texto en líneas: simple (voraz, por defecto: cada línea se llena todo lo que puede) o balanced (Knuth-Plass, que equilibra las líneas del párrafo).
+		Description: Line breaking of the text: simple (greedy, by default: each line is filled as much as it can) or balanced (Knuth-Plass, which balances the lines of the paragraph).
 		Values:
 			Value: simple
 			Value: balanced
 	Node: Markup
 		Type: ENUM
-		Description: Formato dentro de la línea del texto: none (por defecto; el texto es literal) o markdown (interpreta **negrita**, *cursiva*, ++subrayado++, ~~tachado~~ y [enlaces](destino), con los escapes de CommonMark; no hace nada dentro de un Markdown).
+		Description: Inline formatting of the text: none (by default; the text is literal) or markdown (interprets **bold**, *italic*, ++underline++, ~~strikethrough~~ and [links](target), with the CommonMark escapes; it does nothing inside a Markdown).
 		Values:
 			Value: none
 			Value: markdown
 	Node: Case
 		Type: ENUM
-		Description: Mayúsculas del texto al pintarlo: none (por defecto), uppercase, lowercase o capitalize (la primera letra de cada palabra). El texto del documento y el de la estructura del PDF siguen siendo los escritos; las reglas de cada letra son las del idioma de Language.
+		Description: Letter case of the text when painting it: none (by default), uppercase, lowercase or capitalize (the first letter of each word). The text of the document and the one in the PDF structure remain as written; the rules for each letter are those of the language of Language.
 		Values:
 			Value: none
 			Value: uppercase
 			Value: lowercase
 			Value: capitalize
 	Node: Letter spacing
-		Description: Separación entre letras, en puntos, que se suma al avance de cada carácter (también en el reparto en líneas y en justify); el último carácter de la línea no la lleva. Puede ser negativa. Por defecto, 0.
+		Description: Spacing between letters, in points, added to the advance of each character (also in line breaking and in justify); the last character of the line does not get it. It can be negative. By default, 0.
 	Node: Small caps
 		Type: BOOLEAN
-		Description: Versalitas: las minúsculas se pintan como mayúsculas al 80 % del tamaño. Por defecto, false.
+		Description: Small caps: lowercase letters are painted as uppercase at 80 % of the size. By default, false.
 	Node: Ligatures
 		Type: BOOLEAN
-		Description: Si el texto se mide y se pinta con las ligaduras de la fuente (fi, fl, ffi…). Por defecto, false: un glifo por carácter. Se hereda. Con Letter spacing distinto de 0 no hay ligaduras. Solo importa en las fuentes que las tienen (IBM Plex Sans y Serif; Plex Mono no).
+		Description: Whether the text is measured and painted with the ligatures of the font (fi, fl, ffi...). By default, false: one glyph per character. Inherited. With Letter spacing other than 0 there are no ligatures. It only matters in the fonts that have them (IBM Plex Sans and Serif; Plex Mono does not).
 	Node: Preformatted
 		Type: ENUM
-		Description: Texto preformateado: false (por defecto; los espacios y los saltos de línea valen un espacio), true (conserva los espacios y los saltos de línea, y no parte las líneas: una más ancha que la caja es un error) o wrap (como true, pero parte las líneas demasiado anchas entre palabras). Las líneas preformateadas no se justifican.
+		Description: Preformatted text: false (by default; spaces and line breaks count as a space), true (keeps the spaces and line breaks, and does not break lines: one wider than the box is an error) or wrap (like true, but breaks lines that are too wide between words). Preformatted lines are not justified.
 		Values:
 			Value: false
 			Value: true
 			Value: wrap
 	Node: Tab size
 		Type: INTEGER
-		Description: Con Preformatted: true o wrap, el ancho de una tabulación: cada una lleva hasta la siguiente columna múltiplo de este número de caracteres. Por defecto, 4.
+		Description: With Preformatted: true or wrap, the width of a tab: each one leads to the next column that is a multiple of this number of characters. By default, 4.
 	Node: Numbered
 		Type: BOOLEAN
-		Description: Si los encabezados llevan número (1, 1.1, 1.1.1…), que se escribe delante del título y lo dan {number of: id}, los índices y los marcadores del PDF. Por defecto, false. Se hereda: For element: Document lo activa en todos, una regla For element en los de un nivel y, en la Typography de un encabezado, solo en él. Los encabezados cuyo Numbered es false no se numeran ni cuentan.
+		Description: Whether the headings carry a number (1, 1.1, 1.1.1...), which is written before the title and is given by {number of: id}, the tables of contents and the PDF bookmarks. By default, false. Inherited: For element: Document turns it on in all of them, a For element rule in those of one level and, in the Typography of a heading, only in that one. Headings whose Numbered is false are neither numbered nor counted.
 	Node: Number format
 		Type: ENUM
-		Description: Cómo se escribe el número del nivel de un encabezado numerado: decimal (1, por defecto), lower-alpha (a), upper-alpha (A), lower-roman (i) o upper-roman (I). Cada nivel del número completo se escribe con el de su encabezado (II.a). Se hereda.
+		Description: How the level number of a numbered heading is written: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i) or upper-roman (I). Each level of the full number is written with the one of its heading (II.a). Inherited.
 		Values:
 			Value: decimal
 			Value: lower-alpha
@@ -1162,42 +1162,42 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: lower-roman
 			Value: upper-roman
 	Node: Number label
-		Description: Lo que se escribe delante del título de un encabezado numerado, con {number} donde va el número (Number label: Anexo {number}.); sin él, el número. Se hereda.
+		Description: What is written before the title of a numbered heading, with {number} where the number goes (Number label: Annex {number}.); without it, the number. Inherited.
 	Node: Widows
 		Type: INTEGER
-		Description: Mínimo de líneas de un párrafo que pasan a la página siguiente. Por defecto, 2.
+		Description: Minimum number of lines of a paragraph that move to the next page. By default, 2.
 	Node: Orphans
 		Type: INTEGER
-		Description: Mínimo de líneas de un párrafo que quedan al final de una página. Por defecto, 2.
+		Description: Minimum number of lines of a paragraph that stay at the end of a page. By default, 2.
 
 	# Break
 
 	Node: Before
 		Type: ENUM
-		Description: Salto antes de la caja: auto (por defecto) no lo fuerza; page la lleva a una página nueva y column, dentro de un Columns, a la columna siguiente.
+		Description: Break before the box: auto (by default) does not force it; page takes it to a new page and column, inside a Columns, to the next column.
 		Values:
 			Value: auto
 			Value: page
 			Value: column
 	Node: After
 		Type: ENUM
-		Description: Salto después de la caja: auto (por defecto) no lo fuerza; page lleva lo siguiente a una página nueva y column, dentro de un Columns, a la columna siguiente.
+		Description: Break after the box: auto (by default) does not force it; page takes what follows to a new page and column, inside a Columns, to the next column.
 		Values:
 			Value: auto
 			Value: page
 			Value: column
 	Node: Keep with next
 		Type: BOOLEAN
-		Description: Si la caja se mantiene en la misma página que la siguiente: evita el corte entre las dos (títulos, rótulos). Por defecto, false. Con After: page o column, es una contradicción.
+		Description: Whether the box is kept on the same page as the next one: it avoids the break between the two (titles, labels). By default, false. With After: page or column, it is a contradiction.
 	Node: Keep with previous
 		Type: BOOLEAN
-		Description: Si la caja se mantiene en la misma página que la anterior: evita el corte entre las dos. Por defecto, false. Con Before: page o column, es una contradicción.
+		Description: Whether the box is kept on the same page as the previous one: it avoids the break between the two. By default, false. With Before: page or column, it is a contradiction.
 	Node: Keep together
 		Type: BOOLEAN
-		Description: Si la caja se mantiene entera: evita partirla entre páginas. Por defecto, false.
+		Description: Whether the box is kept whole: it avoids breaking it across pages. By default, false.
 	Node: Edges
 		Type: ENUM
-		Description: Borde y relleno de una caja partida entre páginas: open (por defecto) los deja abiertos en el corte; closed los cierra en cada fragmento, que lleva su borde y su relleno completos.
+		Description: Border and padding of a box broken across pages: open (by default) leaves them open at the break; closed closes them in each fragment, which carries its full border and padding.
 		Values:
 			Value: open
 			Value: closed
@@ -1206,18 +1206,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Direction
 		Type: ENUM
-		Description: Eje principal de un Stack, en el que van los ítems uno tras otro: horizontal (por defecto) o vertical.
+		Description: Main axis of a Stack, along which the items go one after another: horizontal (by default) or vertical.
 		Values:
 			Value: horizontal
 			Value: vertical
 	Node: Wrap
 		Type: BOOLEAN
-		Description: Permite repartir los ítems en varias líneas.
+		Description: Allows the items to be distributed over several lines.
 	Node: Gap
-		Description: Separación: en Stack y Grid, un valor, o dos (filas columnas); en Columns, un valor, el hueco entre columnas.
+		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
 	Node: Line distribution
 		Type: ENUM
-		Description: Reparto de las líneas en el contenedor: start, end, center, justify (la primera y la última en los bordes), around o stretch. Solo con Wrap: true.
+		Description: Distribution of the lines in the container: start, end, center, justify (the first and the last at the edges), around or stretch. Only with Wrap: true.
 		Values:
 			Value: start
 			Value: end
@@ -1226,30 +1226,30 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: around
 			Value: stretch
 	Node: Grow
-		Description: Parte del espacio sobrante que recibe el ítem.
+		Description: Share of the leftover space that the item receives.
 	Node: Shrink
-		Description: Parte del déficit que cede el ítem, ponderada por Base size.
+		Description: Share of the shortfall that the item gives up, weighted by Base size.
 	Node: Base size
-		Description: Tamaño de partida del ítem en el eje principal.
+		Description: Starting size of the item on the main axis.
 
 	# Grid
 
 	Node: Column sizes
-		Description: Tamaño de cada columna: una pista por columna.
+		Description: Size of each column: one track per column.
 	Node: Row sizes
-		Description: Tamaño de cada fila: una pista por fila.
+		Description: Size of each row: one track per row.
 	Node: Areas
 		Type: TEXT
-		Description: Una fila de la rejilla por línea; nombres separados por espacios y . para celdas vacías.
+		Description: One row of the grid per line; names separated by spaces and . for empty cells.
 	Node: Flow
 		Type: ENUM
-		Description: Dirección de la colocación automática de un Grid: horizontal (por defecto) llena las filas una a una; vertical, las columnas.
+		Description: Direction of the automatic placement of a Grid: horizontal (by default) fills the rows one by one; vertical, the columns.
 		Values:
 			Value: horizontal
 			Value: vertical
 	Node: Horizontal
 		Type: ENUM
-		Description: Alineación o reparto en horizontal. En un Grid, la alineación de todos los ítems en su área, y en un Area, la de uno (start, end, center o stretch). En un Stack, si su eje principal es el horizontal, el reparto del espacio sobrante (start, end, center, justify, around o distribute); si no, la alineación de todos los ítems (start, end, center o stretch). En un Item, la alineación de uno, solo si es el eje cruzado de su Stack.
+		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (start, end, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (start, end, center, justify, around or distribute); if not, the alignment of all the items (start, end, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
 		Values:
 			Value: start
 			Value: end
@@ -1260,7 +1260,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Alineación o reparto en vertical, como Horizontal: en un Grid y en un Area, la alineación en el área; en un Stack, el reparto si su eje principal es el vertical y, si no, la alineación de los ítems; en un Item, la alineación de uno, solo si es el eje cruzado de su Stack.
+		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack.
 		Values:
 			Value: start
 			Value: end
@@ -1274,7 +1274,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Marker
 		Type: ENUM
-		Description: Marcador de los ítems: bullet (•), dash (–) o none, o una numeración (1., a., A., i., I.).
+		Description: Marker of the items: bullet (•), dash (–) or none, or a numbering (1., a., A., i., I.).
 		Values:
 			Value: bullet
 			Value: dash
@@ -1286,60 +1286,60 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: upper-roman
 	Node: Start
 		Type: INTEGER
-		Description: Número con que empieza una numeración: el del primer ítem de una lista numerada o, en una Section con Page numbering: restart, el de su primera página. Por defecto, 1.
+		Description: Number a numbering starts with: that of the first item of a numbered list or, in a Section with Page numbering: restart, that of its first page. By default, 1.
 	Node: Number
 		Type: INTEGER
-		Description: Número de este ítem de una lista numerada; los siguientes continúan desde él.
+		Description: Number of this item of a numbered list; the following ones continue from it.
 
 	# Table
 
 	Node: Span
-		Description: Filas y columnas que ocupa la celda, en ese orden (1 1 por defecto): 1 3 ocupa tres columnas de su fila.
+		Description: Rows and columns the cell spans, in that order (1 1 by default): 1 3 spans three columns of its row.
 	Node: Row header
 		Type: BOOLEAN
-		Description: La celda es la cabecera de su fila (el concepto de una factura, la hora de un horario): en el PDF etiquetado es una TH con Scope Row, y un lector de pantalla la anuncia con cada celda de la fila. Por defecto, false. No vale en Header rows, cuyas celdas ya son cabeceras de columna.
+		Description: The cell is the header of its row (the item of an invoice, the time of a timetable): in the tagged PDF it is a TH with Scope Row, and a screen reader announces it with each cell of the row. By default, false. Not valid in Header rows, whose cells are already column headers.
 
 	# Columns
 
 	Node: Count
 		Type: INTEGER
-		Description: Número de columnas de un Columns (al menos 1); con Min column width, el máximo.
+		Description: Number of columns of a Columns (at least 1); with Min column width, the maximum.
 	Node: Min column width
-		Description: Ancho mínimo de las columnas, en puntos: caben tantas como permita el ancho, hasta Count si se declara.
+		Description: Minimum width of the columns, in points: as many fit as the width allows, up to Count if it is declared.
 	Node: Separator
-		Description: Grosor de la línea entre las columnas de un Columns, centrada en Gap, que debe ser al menos igual de ancho.
+		Description: Width of the line between the columns of a Columns, centered in Gap, which must be at least as wide.
 	Node: Separator color
-		Description: Color de la línea entre columnas. Por defecto, el Color del texto.
+		Description: Color of the line between columns. By default, the Color of the text.
 	Node: Balance
 		Type: BOOLEAN
-		Description: Reparto entre las columnas de un Columns: con true (por defecto) se igualan las columnas del último fragmento; con false se llenan en orden.
+		Description: Distribution among the columns of a Columns: with true (by default) the columns of the last fragment are balanced; with false they are filled in order.
 
 	# Image
 
 	Node: Alt
-		Description: Texto alternativo de una Image: con él, la imagen es una figura (Figure) del PDF etiquetado; sin él, es decorativa.
+		Description: Alternative text of an Image: with it, the image is a figure (Figure) of the tagged PDF; without it, it is decorative.
 	Node: Fit
 		Type: ENUM
-		Description: Cómo llena una Image su caja si tienen proporciones distintas: inside (por defecto) cabe entera y centrada; fill llena la caja, centrada y recortada; stretch la estira a la caja y la deforma.
+		Description: How an Image fills its box if they have different proportions: inside (by default) fits whole and centered; fill fills the box, centered and clipped; stretch stretches it to the box and distorts it.
 		Values:
 			Value: inside
 			Value: fill
 			Value: stretch
 	Node: Pdf page
 		Type: INTEGER
-		Description: Página que dibuja una Image de un PDF, desde 1 (por defecto, la primera). En una imagen que no es un PDF, o una página que el PDF no tiene, es un error.
+		Description: Page drawn by an Image of a PDF, from 1 (by default, the first). In an image that is not a PDF, or a page the PDF does not have, it is an error.
 
 	# Markdown
 
 	Node: Bullet markers
-		Description: Marcadores de las listas con viñetas (-, *, +) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): bullet, dash o none.
+		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none.
 	Node: Number markers
-		Description: Marcadores de las listas numeradas (1., 1)) de un Markdown, uno por nivel de anidamiento (el último sirve para los niveles más profundos): decimal, lower-alpha, upper-alpha, lower-roman o upper-roman.
+		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman.
 	Node: Column align
-		Description: Alineación de cada columna de una Table (left, center, right o justify), una por columna: es el valor por defecto de sus celdas, que sobrescriben las reglas de Styles y lo que declara la celda.
+		Description: Alignment of each column of a Table (left, center, right or justify), one per column: it is the default value of its cells, which the Styles rules and what the cell declares override.
 	Node: Table columns
 		Type: ENUM
-		Description: Columnas de las tablas de un Markdown: equal, todas del mismo ancho (repeat(n, *)); auto, cada una según su contenido (repeat(n, auto)).
+		Description: Columns of the tables of a Markdown: equal, all of the same width (repeat(n, *)); auto, each according to its content (repeat(n, auto)).
 		Values:
 			Value: equal
 			Value: auto
@@ -1347,10 +1347,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Table of contents
 
 	Node: Levels
-		Description: Niveles de encabezado que lista un Table of contents: el primero y el último, de 1 a 6 (por defecto, 1 3).
+		Description: Heading levels listed by a Table of contents: the first and the last, from 1 to 6 (by default, 1 3).
 	Node: Leader
 		Type: ENUM
-		Description: Guía entre el título y la página de las entradas de un Table of contents: dots (puntos, por defecto), line (una línea) o none.
+		Description: Leader between the title and the page of the entries of a Table of contents: dots (by default), line (a line) or none.
 		Values:
 			Value: dots
 			Value: line

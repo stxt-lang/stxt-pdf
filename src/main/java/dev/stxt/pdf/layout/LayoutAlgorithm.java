@@ -4,21 +4,21 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Interfaz común de los algoritmos de layout: bloque, línea, stack y grid (módulos 7 y 8).
+ * Common interface of the layout algorithms: block, line, stack and grid (modules 7 and 8).
  */
 public interface LayoutAlgorithm {
 
     /**
-     * Ancho más estrecho y ancho natural del contenido de la caja, sin su borde, su relleno, su margen ni
-     * su {@code Width}. No depende del espacio disponible. Los de la caja de margen los da
-     * {@link Engine#intrinsic} con {@link BoxModel#intrinsic}.
+     * Narrowest width and natural width of the box's content, without its border, padding, margin or
+     * {@code Width}. It does not depend on the available space. Those of the margin box are given by
+     * {@link Engine#intrinsic} with {@link BoxModel#intrinsic}.
      */
     IntrinsicSizes contentIntrinsic(Box box);
 
     /**
-     * Calcula la geometría de la caja y de sus descendientes.
+     * Computes the geometry of the box and its descendants.
      *
-     * @param from token desde el que reanudar, o {@code null} para empezar
+     * @param from token to resume from, or {@code null} to start
      */
     LayoutResult layout(Box box, ConstraintSpace space, BreakToken from);
 }

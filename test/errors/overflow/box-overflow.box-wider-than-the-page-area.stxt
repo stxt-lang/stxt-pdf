@@ -1,0 +1,14 @@
+# Case: Box wider than the page area
+# Code: BOX_OVERFLOW
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Width: 600
+				Height: 10

@@ -1,0 +1,23 @@
+# Case: Line taller than the page inside a list
+# Code: PAGE_OVERFLOW
+# Line: 23
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: decimal
+			Box:
+				Padding: 0 0 0 20
+			List item:
+				Text: a
+					Typography:
+						Line height: 900

@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * Páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde (40, 40). Con
- * {@code Width: 30} cada palabra de 5 letras (25 pt) ocupa una línea de 12 pt: caben 8 por página.
+ * Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). With
+ * {@code Width: 30} each word of 5 letters (25 pt) takes up a line of 12 pt: 8 fit per page.
  */
 class InlineFragmentationTest {
 
@@ -50,7 +50,7 @@ class InlineFragmentationTest {
 
     @Test
     void widowsTakeALineToTheNextPage() {
-        // 8 + 1 dejaría una viuda: 7 + 2.
+        // 8 + 1 would leave a widow: 7 + 2.
         LayoutFixture l = layOutPaged(PAGE, "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(7, lines(l, 1, "P"));
         assertEquals(2, lines(l, 2, "P"));
@@ -58,7 +58,7 @@ class InlineFragmentationTest {
 
     @Test
     void orphanMovesTheWholeParagraph() {
-        // Solo cabe una línea: quedaría huérfana, y cortar antes del párrafo no incumple nada.
+        // Only one line fits: it would be an orphan, and breaking before the paragraph violates nothing.
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
@@ -70,7 +70,7 @@ class InlineFragmentationTest {
 
     @Test
     void orphansAreRelaxedBeforeKeeps() {
-        // Cortar antes de P incumpliría el Keep with next de T; dejar una huérfana es menos grave
+        // Breaking before P would violate the Keep with next of T; leaving an orphan is less serious
         // (reference/common/breaks.md).
         LayoutFixture l = layOutPaged(PAGE,
                 "\tBlock:", "\t\tId: T", "\t\tBox:", "\t\t\tHeight: 80", "\t\tBreak:", "\t\t\tKeep with next: true",
@@ -91,11 +91,11 @@ class InlineFragmentationTest {
         assertRect(40, 40, 30, 60, l.rect(2, "P"));
     }
 
-    // Una línea más alta que la página no se puede partir: es un error (catálogo de errores).
+    // A line taller than the page cannot be split: it is an error (error catalog).
 
     @Test
     void runsContinueOnTheNextPage() {
-        // La novena palabra, en negrita, abre la página 2.
+        // The ninth word, in bold, opens page 2.
         LayoutFixture l = layOutPagedRuns(PAGE,
                 Map.of("P", List.of(run(words(8) + " "), run("aaaaa", "b"), run(" aaaaa"))),
                 "\tText: " + words(10), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
@@ -106,8 +106,8 @@ class InlineFragmentationTest {
     }
 
     /**
-     * Un texto con Height: 150 llega al final de la página 1 (100), pero sus 8 líneas solo consumen 96: en la 2 le
-     * quedan 54 para las 2 líneas que siguen (reference/common/breaks.md).
+     * A text with Height: 150 reaches the end of page 1 (100), but its 8 lines only consume 96: on page 2 it has
+     * 54 left for the 2 lines that follow (reference/common/breaks.md).
      */
     @Test
     void theHeightOfATextIsTheTotal() {
@@ -119,9 +119,9 @@ class InlineFragmentationTest {
     }
 
     /**
-     * Height igual al contenido (20 líneas, 240) en páginas de 100: cada página tiene 8 líneas (96) y el hueco de 4
-     * del final no se le quita al texto, así que las 4 últimas caben en la página 3. Antes era BOX_OVERFLOW: la caja
-     * consumía 100 por página y le quedaban 40 para 48 de líneas.
+     * Height equal to the content (20 lines, 240) on pages of 100: each page has 8 lines (96) and the gap of 4
+     * at the end is not taken from the text, so the last 4 fit on page 3. It used to be BOX_OVERFLOW: the box
+     * consumed 100 per page and had 40 left for 48 of lines.
      */
     @Test
     void aHeightEqualToTheContentIsNotAnOverflowWhenItBreaks() {
@@ -133,8 +133,8 @@ class InlineFragmentationTest {
         assertRect(40, 40, 30, 100, l.rect(2, "P"));
         assertRect(40, 40, 30, 48, l.rect(3, "P"));
         assertEquals(4, lines(l, 3, "P"));
-        // Un Block con el mismo alto y el texto dentro, detrás (empieza en la página 3): tampoco desborda, y sus 20
-        // líneas están en sus fragmentos.
+        // A Block with the same height and the text inside, after it (it starts on page 3): it does not overflow
+        // either, and its 20 lines are in its fragments.
         int total = 0;
         for (int page = 3; page <= l.pages(); page++) {
             total += l.has(page, "Q") ? lines(l, page, "Q") : 0;

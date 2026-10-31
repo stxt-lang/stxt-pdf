@@ -11,23 +11,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Una caja del árbol de cajas (reference/common/structure.md): cada elemento de caja del documento
- * ({@code Block}, {@code Stack}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
- * {@code Text} guarda su texto directamente.
+ * A box of the box tree (reference/common/structure.md): each box element of the document
+ * ({@code Block}, {@code Stack}, {@code Text}...) is one; the root, anonymous, is the page area. A
+ * {@code Text} holds its text directly.
  *
- * <p>No guarda geometría: el resultado del layout, por páginas, son los
- * {@link dev.stxt.pdf.fragment.Fragment}.</p>
+ * <p>It holds no geometry: the result of the layout, by pages, is the
+ * {@link dev.stxt.pdf.fragment.Fragment}s.</p>
  *
- * <p>La igualdad es por identidad: la caché de layout usa la caja como clave.</p>
+ * <p>Equality is by identity: the layout cache uses the box as a key.</p>
  *
- * <p><strong>Escritura:</strong> los campos son privados y solo el package {@code tree} los escribe, con los
- * métodos {@code set…} y {@link #addChild}, mientras {@link BoxTreeBuilder} construye el árbol. Al terminar,
- * {@link #close()} lo cierra entero: los hijos pasan a una lista inmutable, los que están en flujo se calculan
- * una vez y cualquier escritura posterior es un {@link IllegalStateException}. Fuera de {@code tree} una caja
- * solo se lee.</p>
+ * <p><strong>Writing:</strong> the fields are private and only the {@code tree} package writes them, with the
+ * {@code set...} methods and {@link #addChild}, while {@link BoxTreeBuilder} builds the tree. When it finishes,
+ * {@link #close()} closes it entirely: the children become an immutable list, the in-flow ones are computed
+ * once and any later write is an {@link IllegalStateException}. Outside {@code tree} a box is only
+ * read.</p>
  *
- * <p><strong>Hilos:</strong> un árbol cerrado no cambia. Se puede leer desde varios hilos si se entrega de forma
- * segura (un {@code Future}, un ejecutor, un campo {@code volatile}…).</p>
+ * <p><strong>Threads:</strong> a closed tree does not change. It can be read from several threads if it is handed
+ * over safely (a {@code Future}, an executor, a {@code volatile} field...).</p>
  */
 public final class Box {
 
@@ -36,9 +36,9 @@ public final class Box {
     private final Style style;
     private final boolean anonymous;
     private final int line;
-    /** Una {@code ArrayList} mientras se construye; al cerrar, una lista inmutable. */
+    /** An {@code ArrayList} while it is built; on closing, an immutable list. */
     private List<Box> children = new ArrayList<>();
-    /** Los hijos en flujo, calculados al cerrar; {@code null} antes. */
+    /** The in-flow children, computed on closing; {@code null} before. */
     private List<Box> inFlowChildren;
     private Box parent;
     private String text;
@@ -62,16 +62,16 @@ public final class Box {
         this.line = line;
     }
 
-    // --- Lectura ---------------------------------------------------------------------------------------
+    // --- Reading ---------------------------------------------------------------------------------------
 
-    /** El {@code Id} de la caja; {@code null} si no tiene. */
+    /** The {@code Id} of the box; {@code null} if it has none. */
     public String id() {
         return id;
     }
 
     /**
-     * Elemento del que procede; {@code null} en la raíz. Da el significado: reglas
-     * {@code For element}, marcadores y etiquetas del PDF.
+     * Element it comes from; {@code null} in the root. It gives the meaning: {@code For element}
+     * rules, bookmarks and PDF tags.
      */
     public Element element() {
         return element;
@@ -81,112 +81,112 @@ public final class Box {
         return style;
     }
 
-    /** Si es la raíz anónima, que representa el área útil. */
+    /** Whether it is the anonymous root, which represents the page area. */
     public boolean anonymous() {
         return anonymous;
     }
 
-    /** Línea del documento de la que procede, para mensajes de error. */
+    /** Line of the document it comes from, for error messages. */
     public int line() {
         return line;
     }
 
     /**
-     * Los hijos, en orden del documento; la lista no se puede cambiar. En la raíz del documento, también las
-     * secciones, que cuelgan de ella sin ser sus hijas (reference/components/document.md).
+     * The children, in document order; the list cannot be changed. In the root of the document, also the
+     * sections, which hang from it without being its children (reference/components/document.md).
      */
     public List<Box> children() {
         return closed ? children : Collections.unmodifiableList(children);
     }
 
-    /** La caja padre; {@code null} en la raíz y en la caja de una sección, que es la raíz de su layout. */
+    /** The parent box; {@code null} in the root and in the box of a section, which is the root of its layout. */
     public Box parent() {
         return parent;
     }
 
-    /** Contenido en línea, si la caja contiene texto directamente; {@code null} si no. */
+    /** Inline content, if the box contains text directly; {@code null} otherwise. */
     public String text() {
         return text;
     }
 
     /**
-     * Tramos del texto con su formato (reference/common/text-formatting.md), cuyo texto seguido es
-     * {@link #text()}; {@code null} si el texto no tiene formato. Ver {@link #runs()}.
+     * Runs of the text with their format (reference/common/text-formatting.md), whose joined text is
+     * {@link #text()}; {@code null} if the text has no formatting. See {@link #runs()}.
      */
     public List<TextRun> formattedRuns() {
         return runs;
     }
 
     /**
-     * Ruta de la imagen de una {@code Image} (reference/components/image.md), relativa a la carpeta
-     * {@code images/} de los recursos; {@code null} en el resto de cajas.
+     * Path of the image of an {@code Image} (reference/components/image.md), relative to the
+     * {@code images/} folder of the resources; {@code null} in the other boxes.
      */
     public String image() {
         return image;
     }
 
     /**
-     * Nombre con que se refiere a la caja un índice (reference/components/table-of-contents.md) cuando no tiene
-     * {@code Id}: el de un encabezado que lista un {@code Table of contents}. {@code null} en el resto.
+     * Name by which a table of contents (reference/components/table-of-contents.md) refers to the box when it has
+     * no {@code Id}: that of a heading listed by a {@code Table of contents}. {@code null} in the rest.
      */
     public String anchor() {
         return anchor;
     }
 
     /**
-     * Número de la caja en el documento, tal como lo da {@code {number of: id}}
-     * (reference/common/references.md); {@code null} si no tiene.
+     * Number of the box in the document, as {@code {number of: id}} gives it
+     * (reference/common/references.md); {@code null} if it has none.
      */
     public String number() {
         return number;
     }
 
-    /** Línea del nodo {@code Text}. */
+    /** Line of the {@code Text} node. */
     public int textLine() {
         return textLine;
     }
 
-    /** El texto es un bloque ({@code Text >>}): su contenido empieza en la línea siguiente. */
+    /** The text is a block ({@code Text >>}): its content starts on the next line. */
     public boolean textBlock() {
         return textBlock;
     }
 
     /**
-     * Caja del marcador de un {@code List item} (reference/components/list.md), generada por el motor:
-     * una caja de texto ({@link Element#MARKER}) con la tipografía del ítem y el texto del
-     * marcador más el espacio que lo separa del contenido ({@code "3. "}, {@code "• "}). No está
-     * entre los hijos: el layout del ítem la cuelga a su izquierda. {@code null} si la caja no
-     * lleva marcador.
+     * Box of the marker of a {@code List item} (reference/components/list.md), generated by the engine:
+     * a text box ({@link Element#MARKER}) with the typography of the item and the text of the
+     * marker plus the space that separates it from the content ({@code "3. "}, {@code "• "}). It is not
+     * among the children: the layout of the item hangs it on its left. {@code null} if the box has
+     * no marker.
      */
     public Box marker() {
         return marker;
     }
 
     /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Header rows} (reference/components/table.md): las
-     * primeras. 0 en el resto de cajas.
+     * Rows of the grid of a {@code Table} that belong to its {@code Header rows} (reference/components/table.md): the
+     * first ones. 0 in the other boxes.
      */
     public int headerRows() {
         return headerRows;
     }
 
     /**
-     * Filas de la rejilla de una {@code Table} que son de su {@code Footer rows}: las últimas. 0 en el resto de cajas.
+     * Rows of the grid of a {@code Table} that belong to its {@code Footer rows}: the last ones. 0 in the other boxes.
      */
     public int footerRows() {
         return footerRows;
     }
 
     /**
-     * Las cajas de las filas de una {@code Table} que tienen {@code Id} o {@code Box}
-     * (reference/components/table.md), en orden; la fila de cada una es la de su {@code Area}. No son hijas de la
-     * tabla, que solo tiene celdas, pero la tienen de padre. Vacía en el resto de cajas.
+     * The boxes of the rows of a {@code Table} that have {@code Id} or {@code Box}
+     * (reference/components/table.md), in order; the row of each one is that of its {@code Area}. They are not
+     * children of the table, which only has cells, but they have it as parent. Empty in the other boxes.
      */
     public List<Box> rows() {
         return rows;
     }
 
-    // --- Escritura, solo en tree mientras se construye -------------------------------------------------
+    // --- Writing, only in tree while it is built ------------------------------------------------------
 
     void addChild(Box child) {
         writable();
@@ -195,7 +195,7 @@ public final class Box {
     }
 
     /**
-     * Cuelga la caja de una sección de la raíz del documento sin ser su hija: no le pone padre
+     * Hangs the box of a section from the root of the document without being its child: it sets no parent
      * (reference/components/document.md).
      */
     void addSection(Box section) {
@@ -210,13 +210,13 @@ public final class Box {
         this.textBlock = block;
     }
 
-    /** Pone los tramos con formato del texto; {@code null} si no tiene formato. */
+    /** Sets the formatted runs of the text; {@code null} if it has no formatting. */
     void setRuns(List<TextRun> runs) {
         writable();
         this.runs = runs;
     }
 
-    /** Escribe {@code prefix} delante del texto; si el texto tiene formato, como un tramo sin formato. */
+    /** Writes {@code prefix} before the text; if the text has formatting, as a run without formatting. */
     void prependText(String prefix) {
         writable();
         text = prefix + text;
@@ -243,7 +243,7 @@ public final class Box {
         this.number = number;
     }
 
-    /** Pone el marcador del ítem, que tiene la caja por padre sin ser su hijo. */
+    /** Sets the marker of the item, which has the box as parent without being its child. */
     void setMarker(Box marker) {
         writable();
         marker.parent = this;
@@ -267,8 +267,8 @@ public final class Box {
     }
 
     /**
-     * Cierra la caja, su marcador y todo su subárbol: los hijos pasan a una lista inmutable, los que están en
-     * flujo se calculan una vez y ya no se puede escribir en ellos.
+     * Closes the box, its marker and its whole subtree: the children become an immutable list, the in-flow
+     * ones are computed once and they can no longer be written.
      */
     void close() {
         if (closed) {
@@ -288,33 +288,33 @@ public final class Box {
 
     private void writable() {
         if (closed) {
-            throw new IllegalStateException("La caja ya está cerrada: el árbol no cambia después de construirlo ("
+            throw new IllegalStateException("The box is already closed: the tree does not change after it is built ("
                     + describe() + ")");
         }
     }
 
-    // --- Consultas -------------------------------------------------------------------------------------
+    // --- Queries ---------------------------------------------------------------------------------------
 
     /**
-     * Cómo la nombra una referencia (reference/common/references.md): su {@code Id} o, si no tiene, su {@link
-     * #anchor}; puede ser {@code null}.
+     * How a reference names it (reference/common/references.md): its {@code Id} or, if it has none, its {@link
+     * #anchor}; it can be {@code null}.
      */
     public String key() {
         return id != null ? id : anchor;
     }
 
-    /** Nivel de un encabezado ({@code Heading 1} … {@code Heading 6}); 0 si no lo es. */
+    /** Level of a heading ({@code Heading 1} ... {@code Heading 6}); 0 if it is not one. */
     public int headingLevel() {
         return element == null ? 0 : element.headingLevel();
     }
 
-    /** Texto de un encabezado para el índice: el de sus {@code Text}, unido y con los espacios normalizados. */
+    /** Text of a heading for the table of contents: that of its {@code Text}, joined and with spaces normalized. */
     public String headingText() {
         return children.stream().filter(Box::hasText).map(b -> b.text.strip())
                 .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");
     }
 
-    /** Hijos que participan en el flujo del padre ({@code static} y {@code relative}). */
+    /** Children that take part in the flow of the parent ({@code static} and {@code relative}). */
     public List<Box> inFlowChildren() {
         if (inFlowChildren != null) {
             return inFlowChildren;
@@ -323,9 +323,9 @@ public final class Box {
     }
 
     /**
-     * Si la caja aísla los márgenes, es decir, si corta su fusión (reference/components/block.md): el área útil
-     * (la raíz), los {@code Overlay} y {@code Page overlay}, los ítems de stack y grid, las cajas con
-     * {@code Isolate margins: true} y las giradas en flujo.
+     * Whether the box isolates margins, that is, whether it stops their merging (reference/components/block.md): the
+     * page area (the root), the {@code Overlay} and {@code Page overlay}, the items of stack and grid, the boxes with
+     * {@code Isolate margins: true} and the rotated ones in flow.
      */
     public boolean isolatesMargins() {
         if (parent == null || style.isolateMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
@@ -336,21 +336,21 @@ public final class Box {
     }
 
     /**
-     * Containing block de una caja fuera de flujo (reference/common/box.md): para {@code absolute},
-     * el ancestro más cercano con {@code Position} distinta de {@code static}; si no hay ninguno,
-     * o si la caja es {@code fixed}, la raíz, que representa el área útil.
+     * Reference container of an out-of-flow box (reference/common/box.md): for {@code absolute},
+     * the closest ancestor with a {@code Position} other than {@code static}; if there is none,
+     * or if the box is {@code fixed}, the root, which represents the page area.
      */
     public Box outOfFlowContainingBlock() {
         Box b = parent;
         boolean fixed = style.position() == Position.PAGE_OVERLAY;
-        // Una caja girada en flujo también lo es, como las posicionadas (reference/common/layers-and-rotation.md).
+        // A box rotated in flow is one too, like the positioned ones (reference/common/layers-and-rotation.md).
         while (b.parent != null && (fixed || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;
         }
         return b;
     }
 
-    /** Línea del documento donde está el carácter {@code index} del texto. */
+    /** Line of the document where character {@code index} of the text is. */
     public int textLineAt(int index) {
         if (!textBlock) {
             return textLine;
@@ -364,22 +364,25 @@ public final class Box {
         return line;
     }
 
-    /** Lo que significa la caja ({@link Element#role()}); la raíz anónima del documento es {@link Element.Role#DOCUMENT}. */
+    /**
+     * What the box means ({@link Element#role()}); the anonymous root of the document is
+     * {@link Element.Role#DOCUMENT}.
+     */
     public Element.Role role() {
         return element == null ? Element.Role.DOCUMENT : element.role();
     }
 
-    /** Si es una {@code Image}. */
+    /** Whether it is an {@code Image}. */
     public boolean isImage() {
         return element == Element.IMAGE;
     }
 
-    /** Si es la caja generada del marcador de un {@code List item}. */
+    /** Whether it is the generated box of the marker of a {@code List item}. */
     public boolean isMarker() {
         return element == Element.MARKER;
     }
 
-    /** Tramos del texto: los de {@link #formattedRuns()} o, sin formato, un único tramo con todo el texto. */
+    /** Runs of the text: those of {@link #formattedRuns()} or, without formatting, a single run with all the text. */
     public List<TextRun> runs() {
         return runs != null ? runs : TextRun.plain(text);
     }
@@ -389,14 +392,14 @@ public final class Box {
     }
 
     /**
-     * La caja en un mensaje, la única forma de nombrarla: {@code main (línea 12)} si tiene {@code Id},
-     * {@code de la línea 12} si no y {@code (área útil)} la raíz anónima.
+     * The box in a message, the only way to name it: {@code main (line 12)} if it has an {@code Id},
+     * {@code at line 12} if not, and {@code (page area)} the anonymous root.
      */
     public String describe() {
         if (anonymous) {
-            return "(área útil)";
+            return "(page area)";
         }
-        return id != null ? id + " (línea " + line + ")" : "de la línea " + line;
+        return id != null ? id + " (line " + line + ")" : "at line " + line;
     }
 
     @Override

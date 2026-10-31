@@ -28,38 +28,38 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
- * Layout {@code block}: apila los hijos en flujo en vertical (reference/components/block.md).
+ * Layout {@code block}: stacks the in-flow children vertically (reference/components/block.md).
  *
  * <pre>
- * cursor = 0; strut = vacío
- * para cada hijo:
- *     si es absolute/fixed: anotar PendingOverlay con la posición estática; continuar
- *     r = context.layout(hijo, caja de contenido como containing block)
- *     strut += margen superior del hijo + los que salen de él por arriba
- *     si aún no hay nada entre el borde superior de la caja y el hijo: el strut sale de la caja
- *     si no: cursor += strut                                           // fusión
- *     colocar el fragmento en (margen izquierdo, cursor)               // márgenes auto = centrar
- *     si es relative: desplazar el fragmento según Offset
- *     cursor += alto; strut = margen inferior del hijo + los que salen de él por abajo
- * Height auto = cursor (+ strut si no sale por abajo) + relleno + borde
+ * cursor = 0; strut = empty
+ * for each child:
+ *     if absolute/fixed: record PendingOverlay with the static position; continue
+ *     r = context.layout(child, content box as reference container)
+ *     strut += top margin of the child + those that come out of it at the top
+ *     if nothing yet between the top border of the box and the child: the strut comes out of the box
+ *     else: cursor += strut                                            // merging
+ *     place the fragment at (left margin, cursor)                      // auto margins = center
+ *     if relative: shift the fragment by Offset
+ *     cursor += height; strut = bottom margin of the child + those that come out of it at the bottom
+ * Height auto = cursor (+ strut if it does not come out at the bottom) + padding + border
  * </pre>
  *
- * <p>Los márgenes que salen de la caja se devuelven en {@link AdjoiningMargins}: el padre los
- * fusiona con los márgenes propios de la caja. Un hijo vacío deja pasar sus márgenes.</p>
+ * <p>The margins that come out of the box are returned in {@link AdjoiningMargins}: the parent merges them
+ * with the box's own margins. An empty child lets its margins through.</p>
  *
- * <p><strong>Fragmentación</strong> (reference/common/breaks.md). Cada hijo recibe lo que queda de página desde su
- * borde superior. Delante de cada hijo, si ya se ha colocado algo en este fragmento, hay un corte
- * posible con su calidad ({@link BreakRules#between}); se guarda el estado para poder volver a él.
- * Cuando un hijo no cabe (no coloca nada, se parte por dentro o desborda sin partirse), se elige
- * el último corte de mayor calidad entre los anteriores y el de dentro del hijo. Los cortes
- * forzados se aplican en cuanto aparecen. En un corte no forzado, los márgenes que lo tocan se
- * truncan; en uno forzado, se conserva el margen superior del hijo que empieza la página.</p>
+ * <p><strong>Fragmentation</strong> (reference/common/breaks.md). Each child receives what is left of the page
+ * from its top border. Before each child, if something has already been placed in this fragment, there is a
+ * possible break with its quality ({@link BreakRules#between}); the state is saved to be able to go back to it.
+ * When a child does not fit (it places nothing, it is broken inside or it overflows without being broken), the
+ * last break of highest quality among the previous ones and the one inside the child is chosen. Forced breaks
+ * apply as soon as they appear. In a non-forced break, the margins that touch it are truncated; in a forced one,
+ * the top margin of the child that starts the page is kept.</p>
  *
- * <p>Un {@code List item} lleva además su marcador en el primer fragmento, colgado a su
- * izquierda ({@link MarkerLayout}).</p>
+ * <p>A {@code List item} also carries its marker in the first fragment, hanging to its
+ * left ({@link MarkerLayout}).</p>
  *
- * <p>Simplificación: solo se vuelve atrás a cortes <em>entre</em> hijos; nunca se repite el
- * layout de un hijo anterior con menos espacio para cortarlo por dentro.</p>
+ * <p>Simplification: it only goes back to breaks <em>between</em> children; the layout of a previous child is
+ * never repeated with less space to break it inside.</p>
  */
 public final class BlockLayout implements LayoutAlgorithm {
 
@@ -88,19 +88,19 @@ public final class BlockLayout implements LayoutAlgorithm {
     }
 
     /**
-     * Un corte posible y el estado del fragmento en ese punto, para volver a él.
+     * A possible break and the state of the fragment at that point, to go back to it.
      *
-     * @param index      siguiente hijo a colocar
-     * @param childToken token del hijo {@code index} si el corte es dentro de él; {@code null}
-     *                   si el corte es antes de él
-     * @param cursor     alto del contenido hasta el corte, sin los márgenes que lo tocan
-     * @param fragments  fragmentos hijos que se conservan
-     * @param pending    cajas absolutas que se conservan
+     * @param index      next child to place
+     * @param childToken token of the child {@code index} if the break is inside it; {@code null}
+     *                   if the break is before it
+     * @param cursor     height of the content up to the break, without the margins that touch it
+     * @param fragments  child fragments that are kept
+     * @param pending    absolute boxes that are kept
      */
     private record Mark(int index, BreakToken childToken, int appeal, double cursor, int fragments, int pending) {
     }
 
-    /** Layout de un fragmento de una caja. */
+    /** Layout of one fragment of a box. */
     private final class Run {
         final Box box;
         final BoxModel model;
@@ -112,7 +112,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         final boolean fragmenting;
         final ConstraintSpace childSpace;
         final double contentWidth;
-        /** Lo que queda de página desde el principio de la caja de contenido. */
+        /** What is left of the page from the start of the content box. */
         final double contentRemaining;
 
         final List<Fragment> fragments = new ArrayList<>();
@@ -120,12 +120,12 @@ public final class BlockLayout implements LayoutAlgorithm {
         final List<Mark> marks = new ArrayList<>();
         MarginStrut strut = MarginStrut.EMPTY;
         MarginStrut topOut = MarginStrut.EMPTY;
-        /** Mientras sea cierto, nada separa el borde superior de la caja del hijo actual. */
+        /** While it is true, nothing separates the top border of the box from the current child. */
         boolean atTop;
         double cursor;
-        /** Ya hay en este fragmento un hijo en flujo con contenido (que no deja pasar sus márgenes). */
+        /** There is already an in-flow child with content in this fragment (it does not let its margins through). */
         boolean progress;
-        /** Último hijo en flujo colocado en este fragmento, para la calidad del corte siguiente. */
+        /** Last in-flow child placed in this fragment, for the quality of the next break. */
         Box previous;
 
         Run(Box box, BoxModel model, ConstraintSpace space, BreakToken.Block from) {
@@ -141,7 +141,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             this.contentWidth = model.contentWidth();
             this.contentRemaining = fragmenting
                     ? childSpace.fragmentainerRemaining().getAsDouble() : Double.POSITIVE_INFINITY;
-            // En un fragmento que continúa la caja no sale ningún margen por arriba.
+            // In a fragment that continues the box no margin comes out at the top.
             this.atTop = first && !box.isolatesMargins() && model.openAtTop();
         }
 
@@ -149,8 +149,8 @@ public final class BlockLayout implements LayoutAlgorithm {
             for (int i = start; i < box.children().size(); i++) {
                 Box child = box.children().get(i);
                 if (child.style().isOutOfFlow()) {
-                    // Posición estática: donde empezaría si estuviera en flujo
-                    // (reference/components/frame-and-overlays.md). La caja se resuelve en su containing block
+                    // Static position: where it would start if it were in flow
+                    // (reference/components/frame-and-overlays.md). The box is resolved in its reference container
                     // (OverlayLayout).
                     pending.add(new PendingOverlay(child, 0, atTop ? 0 : cursor + strut.resolve()));
                     continue;
@@ -170,12 +170,12 @@ public final class BlockLayout implements LayoutAlgorithm {
             return finished();
         }
 
-        /** Coloca un hijo en flujo; devuelve el resultado de la caja si hay que cortar aquí. */
+        /** Places an in-flow child; returns the result of the box if it has to break here. */
         LayoutResult place(int i, Box child) {
             BreakToken childToken = i == start ? resume : null;
             Insets margin = Insets.resolve(child.style().box().margin(), contentWidth);
-            // El hijo que empieza un fragmento de continuación toca el corte: sus márgenes se
-            // truncan, salvo si el corte fue forzado. Un hijo reanudado ya no tiene margen superior.
+            // The child that starts a continuation fragment touches the break: its margins are
+            // truncated, unless the break was forced. A resumed child no longer has a top margin.
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
 
             double y = top(MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top()));
@@ -188,12 +188,13 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             AdjoiningMargins adjoining = r.adjoining();
             MarginStrut childTop = noTopMargin ? MarginStrut.EMPTY : adjoining.top().add(margin.top());
-            // Una caja vacía deja fusionar también su margen inferior con los de alrededor.
+            // An empty box also lets its bottom margin merge with those around it.
             double flowY = adjoining.collapsesThrough()
                     ? top(childTop.add(margin.bottom()))
                     : top(childTop);
             if (fragmenting && !same(flowY, y)) {
-                // Los márgenes que salen del hijo por arriba lo han bajado: lo que le queda de página cambia.
+                // The margins that come out of the child at the top have moved it down: what is left of the page
+                // for it changes.
                 r = layOutChild(child, flowY, childToken);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return progress ? broken(BreakRules.best(marks, Mark::appeal)) : LayoutResult.before(box);
@@ -202,7 +203,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             Fragment f = r.fragment();
 
             if (adjoining.collapsesThrough()) {
-                // Caja vacía: sus dos márgenes se fusionan con los de alrededor y el cursor no avanza.
+                // Empty box: its two margins merge with those around it and the cursor does not advance.
                 strut = strut.add(childTop).add(margin.bottom());
             } else {
                 strut = strut.add(childTop);
@@ -218,7 +219,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
             double x = Sizing.horizontalMargins(contentWidth, f.width(),
                     child.style().box().margin().left(), child.style().box().margin().right())[0];
-            // Una caja relative se desplaza después de colocarla; el cursor no se entera
+            // A relative box is shifted after it is placed; the cursor is not affected
             // (reference/components/frame-and-overlays.md).
             FrameOffset offset = FrameOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
             double childX = x + offset.dx();
@@ -235,22 +236,22 @@ public final class BlockLayout implements LayoutAlgorithm {
                 return null;
             }
             if (r.breakToken() != null) {
-                // Corte dentro del hijo: compite con los cortes anteriores entre hijos.
+                // Break inside the child: it competes with the previous breaks between children.
                 marks.add(new Mark(i, r.breakToken(), BreakRules.inside(child, r.breakAppeal()),
                         cursor, fragments.size(), pending.size()));
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
             if (hadProgress && !fits(flowY + f.height(), contentRemaining)) {
-                // El hijo no se parte y no cabe: se corta antes de él (o antes, si es mejor).
+                // The child is not broken and does not fit: the break goes before it (or earlier, if that is better).
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
             return null;
         }
 
         /**
-         * Posición del borde superior de un hijo con estos márgenes superiores, fusionados con el
-         * strut actual. Si nada lo separa del borde superior de la caja, sus márgenes salen y
-         * empieza en 0.
+         * Position of the top border of a child with these top margins, merged with the
+         * current strut. If nothing separates it from the top border of the box, its margins come out and
+         * it starts at 0.
          */
         double top(MarginStrut childTop) {
             return atTop ? 0 : cursor + strut.add(childTop).resolve();
@@ -263,7 +264,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             return context.layout(child, s, childToken);
         }
 
-        /** El corte que abre este fragmento de continuación fue forzado. */
+        /** The break that opens this continuation fragment was forced. */
         boolean forcedBeforeStart() {
             Box next = box.children().get(start);
             for (int j = start - 1; j >= 0; j--) {
@@ -279,11 +280,11 @@ public final class BlockLayout implements LayoutAlgorithm {
             return new Mark(index, null, appeal, cursor, fragments.size(), pending.size());
         }
 
-        /** Corta la caja en {@code m}: lo posterior pasa al fragmento siguiente. */
+        /** Breaks the box at {@code m}: what follows goes to the next fragment. */
         LayoutResult broken(Mark m) {
             List<Fragment> kept = fragments.subList(0, m.fragments());
             List<PendingOverlay> keptPending = pending.subList(0, m.pending());
-            // Los márgenes que tocan el corte se truncan: el contenido acaba en el cursor.
+            // The margins that touch the break are truncated: the content ends at the cursor.
             Slice slice = Slice.of(model, first, consumed, m.cursor(), false, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), withMarker(kept, slice), List.of(), first, false);
@@ -293,8 +294,9 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Los fragmentos hijos y, en el primer fragmento de un {@code List item}, su marcador
-         * delante (reference/components/list.md): va con la primera línea, que está en este fragmento si hay alguno.
+         * The child fragments and, in the first fragment of a {@code List item}, its marker
+         * before them (reference/components/list.md): it goes with the first line, which is in this fragment if there
+         * is any.
          */
         List<Fragment> withMarker(List<Fragment> children, Slice slice) {
             if (box.marker() == null || !first) {
@@ -309,13 +311,13 @@ public final class BlockLayout implements LayoutAlgorithm {
                     .orElse(children);
         }
 
-        /** Todos los hijos colocados. */
+        /** All children placed. */
         LayoutResult finished() {
             boolean openAtBottom = !box.isolatesMargins() && model.openAtBottom();
             double contentHeight;
             AdjoiningMargins out;
             if (atTop) {
-                // Ningún hijo con contenido: los márgenes de los hijos vacíos salen por arriba.
+                // No child with content: the margins of the empty children come out at the top.
                 contentHeight = 0;
                 boolean empty = openAtBottom && model.usedHeight(0) == 0;
                 out = new AdjoiningMargins(strut, MarginStrut.EMPTY, empty);
@@ -323,7 +325,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 contentHeight = cursor;
                 out = new AdjoiningMargins(topOut, strut, false);
             } else {
-                // El borde, el relleno, un alto fijo o un contexto propio contienen el último margen.
+                // The border, the padding, a fixed height or an own context contain the last margin.
                 contentHeight = cursor + strut.resolve();
                 out = new AdjoiningMargins(topOut, MarginStrut.EMPTY, false);
             }
@@ -334,7 +336,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, out);
             }
-            // El contenido ha terminado, pero el alto propio de la caja sigue en la página siguiente.
+            // The content has finished, but the box's own height continues on the next page.
             BreakToken token = new BreakToken.Block(box.children().size(), null, slice.consumed());
             return new LayoutResult(fragment, token, BreakAppeal.PERFECT_BREAK, pending,
                     new AdjoiningMargins(out.top(), MarginStrut.EMPTY, false));

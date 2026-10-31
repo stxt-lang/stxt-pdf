@@ -1,6 +1,6 @@
-# Informe de ejemplo (reference/common/complete-example.md): A4 paginado con cabecera y pie repetidos,
-# título que no se separa del cuerpo, cuerpo en dos columnas y un sello superpuesto. El estilo
-# va en las reglas de Styles; los elementos solo declaran lo que es suyo.
+# Example report (reference/common/complete-example.md): paginated A4 with repeated header and footer,
+# a title that is not separated from the body, a two-column body and an overlaid stamp. The styling
+# goes in the Styles rules; the elements declare only what is their own.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Informe

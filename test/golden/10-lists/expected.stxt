@@ -1,11 +1,11 @@
-# Página 1: num desde y = 40, con contenido desde x = 60 (Padding 20). n9 (40) y n10 (52), de
-# una línea; marcadores "9. " (15, en x = 45) y "10. " (20, en x = 40). n11 (64) contiene sub,
-# cuyos ítems empiezan en x = 80: sa (64) y sb (76), con "a. " y "d. " (Number: 4) en x = 65;
-# el marcador "11. " se alinea con la primera línea de sa. num mide 48 y acaba en 88.
-# fill (100) acaba en 188 y deja 72 (6 líneas). r1 (3 líneas) acaba en 224; r2 tiene 5
-# líneas y le quedan 36 (3): cortar 3 + 2 respeta orphans y widows, y es el último corte de
-# mayor calidad. "I. " mide 15 y "II. " 20.
-# Página 2: las 2 líneas que faltan de r2, sin marcador, y after.
+# Page 1: num from y = 40, with content from x = 60 (Padding 20). n9 (40) and n10 (52), of
+# one line; markers "9. " (15, at x = 45) and "10. " (20, at x = 40). n11 (64) contains sub,
+# whose items start at x = 80: sa (64) and sb (76), with "a. " and "d. " (Number: 4) at x = 65;
+# the marker "11. " aligns with the first line of sa. num measures 48 and ends at 88.
+# fill (100) ends at 188 and leaves 72 (6 lines). r1 (3 lines) ends at 224; r2 has 5
+# lines and 36 (3) remain for it: breaking 3 + 2 respects orphans and widows, and it is the last break of
+# highest quality. "I. " measures 15 and "II. " 20.
+# Page 2: the 2 remaining lines of r2, without a marker, and after.
 Result:
 	Page: 1
 		Fragment: num

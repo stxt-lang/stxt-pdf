@@ -1,0 +1,19 @@
+# Case: For column with a reversed range
+# Code: VALUE_NOT_ALLOWED
+# Line: 15
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For column: 3 2
+			Typography:
+				Align: right
+	Section:
+		Text: Hola

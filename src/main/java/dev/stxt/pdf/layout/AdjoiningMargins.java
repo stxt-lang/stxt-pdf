@@ -1,21 +1,20 @@
 package dev.stxt.pdf.layout;
 
 /**
- * Márgenes de los descendientes que tocan el borde superior o inferior de una caja y por eso
- * se fusionan con los márgenes propios de la caja, fuera de ella (reference/components/block.md: el margen
- * del hijo "sale" del padre). No incluyen los márgenes propios de la caja: los resuelve el padre,
- * que es quien la coloca.
+ * Margins of the descendants that touch the top or bottom border of a box and therefore merge with the
+ * box's own margins, outside it (reference/components/block.md: the child's margin "comes out" of the parent).
+ * They do not include the box's own margins: the parent resolves those, since it places the box.
  *
- * @param top              márgenes que salen por arriba (primer hijo, y los vacíos anteriores)
- * @param bottom           márgenes que salen por abajo (último hijo)
- * @param collapsesThrough la caja está vacía y sus márgenes superior e inferior se fusionan entre sí;
- *                         entonces todo va en {@code top} y {@code bottom} está vacío
+ * @param top              margins that come out at the top (first child, and the empty ones before it)
+ * @param bottom           margins that come out at the bottom (last child)
+ * @param collapsesThrough the box is empty and its top and bottom margins merge with each other;
+ *                         then everything goes in {@code top} and {@code bottom} is empty
  */
 public record AdjoiningMargins(MarginStrut top, MarginStrut bottom, boolean collapsesThrough) {
 
-    /** Nada sale de la caja: cajas que aíslan los márgenes, cajas con borde o relleno… */
+    /** Nothing comes out of the box: boxes that isolate margins, boxes with border or padding... */
     public static final AdjoiningMargins NONE = new AdjoiningMargins(MarginStrut.EMPTY, MarginStrut.EMPTY, false);
 
-    /** Caja vacía que no aporta márgenes de descendientes, pero deja fusionar los suyos. */
+    /** Empty box that contributes no descendant margins, but lets its own merge. */
     public static final AdjoiningMargins EMPTY_BOX = new AdjoiningMargins(MarginStrut.EMPTY, MarginStrut.EMPTY, true);
 }

@@ -1,0 +1,17 @@
+# Case: A Link with a scheme that is not https, http, mailto or #id
+# Code: LINK_SCHEME
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Pulsa aquí
+			Link: javascript:alert(1)

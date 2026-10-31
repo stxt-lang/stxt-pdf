@@ -1,14 +1,14 @@
-# Hito 11: reglas reutilizables (reference/common/styles.md). Área útil de 515 pt desde (40, 40).
+# Milestone 11: reusable rules (reference/common/styles.md). Page area of 515 pt from (40, 40).
 #
-# For element: Block da a cada Block 40 de alto y 10 de margen inferior.
-# a: solo la regla del tipo.
-# b: half (50 %) y tall (60), que no chocan: se suman.
-# c: short y tall declaran Height; gana short, que va después en Styles, no el orden de Style.
-# d: solo el estilo tall (60), que gana a la regla del tipo.
-# last: For id: last (20) gana a el estilo tall.
-# e: su propio Height (30) gana a todas las reglas.
-# t: For element: Text da Size 12, línea de 14.4. For element: Block no se aplica a un Text: sin margen.
-# p: Block con Size 20; su Text u mide 12 porque la regla gana a la herencia.
+# For element: Block gives each Block a height of 40 and a bottom margin of 10.
+# a: only the element rule.
+# b: half (50 %) and tall (60), which do not clash: they add up.
+# c: short and tall declare Height; short wins because it comes later in Styles, not because of the order in Style.
+# d: only the tall style (60), which wins over the element rule.
+# last: For id: last (20) wins over the tall style.
+# e: its own Height (30) wins over all the rules.
+# t: For element: Text gives Size 12, line of 14.4. For element: Block does not apply to a Text: no margin.
+# p: Block with Size 20; its Text u measures 12 because the rule wins over inheritance.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

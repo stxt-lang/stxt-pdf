@@ -1,7 +1,7 @@
-# Página 1: title en 20; art en 40, de 150 × 75; scaled en 40 + 75 + 8 = 123, de 260 × 130.
-#   logo en x = 20 + 260 − 12 e y = 20 − 16, de 12 × 6.
-# Página 2: label en 20, de 120 × 36; row en 20 + 36 + 8 = 64, de 30, con mini de 60 × 30 y
-#   banner desde x = 20 + 60 + 10 = 90, de 190 × 30; md en 64 + 30 + 8 = 102, de 75 + 12 = 87.
+# Page 1: title at 20; art at 40, of 150 × 75; scaled at 40 + 75 + 8 = 123, of 260 × 130.
+#   logo at x = 20 + 260 − 12 and y = 20 − 16, of 12 × 6.
+# Page 2: label at 20, of 120 × 36; row at 20 + 36 + 8 = 64, of 30, with mini of 60 × 30 and
+#   banner from x = 20 + 60 + 10 = 90, of 190 × 30; md at 64 + 30 + 8 = 102, of 75 + 12 = 87.
 Result:
 	Page: 1
 		Fragment: title

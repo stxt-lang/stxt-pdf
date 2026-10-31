@@ -1,0 +1,17 @@
+# Case: Overlay that fits on the page unrotated and sticks out rotated
+# Code: BOX_OVERFLOW
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Section:
+		Overlay:
+			Offset: 0 auto auto 0
+			Rotate: 45
+			Box:
+				Width: 515
+				Height: 100

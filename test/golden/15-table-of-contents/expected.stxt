@@ -1,6 +1,6 @@
-# Página 1: toc en 20, de 4 entradas de 12; intro en 20 + 48 + 8 = 76; ref en 88.
-# Página 2: method en 20; data en 32 y fine en 44, de 12 cada uno.
-# Página 3: results en 20.
+# Page 1: toc at 20, of 4 entries of 12; intro at 20 + 48 + 8 = 76; ref at 88.
+# Page 2: method at 20; data at 32 and fine at 44, of 12 each.
+# Page 3: results at 20.
 Result:
 	Page: 1
 		Fragment: toc

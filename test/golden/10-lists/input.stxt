@@ -1,12 +1,12 @@
-# Hito 13: listas (reference/components/list.md). Páginas de 595 × 300 con márgenes de 40: área
-# útil de 515 × 220 desde (40, 40), que acaba en y = 260. Líneas de 12 (Size 10).
+# Milestone 13: lists (reference/components/list.md). Pages of 595 × 300 with margins of 40: page
+# area of 515 × 220 from (40, 40), which ends at y = 260. Lines of 12 (Size 10).
 #
-# La sangría de todas las listas es su Padding izquierdo de 20, declarado en Styles. Cada
-# marcador cuelga a la izquierda de su ítem, con su espacio final: con 5 pt por carácter,
-# "9. " mide 15 y "10. " mide 20, alineados a la derecha contra el ítem.
-# El ítem n11 empieza con una lista anidada: su marcador y el de sa comparten la línea.
-# La lista long (Width 200: ítems de 180, 36 caracteres por línea y 4 palabras de 7) se parte:
-# r2 tiene 5 líneas y caben 3; su marcador solo está en el primer fragmento.
+# The indent of all the lists is their left Padding of 20, declared in Styles. Each
+# marker hangs to the left of its item, with its trailing space: at 5 pt per character,
+# "9. " measures 15 and "10. " measures 20, right-aligned against the item.
+# Item n11 starts with a nested list: its marker and that of sa share the line.
+# The list long (Width 200: items of 180, 36 characters per line and 4 words of 7) is split:
+# r2 has 5 lines and 3 fit; its marker is only in the first fragment.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

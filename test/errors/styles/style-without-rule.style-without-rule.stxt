@@ -1,0 +1,16 @@
+# Case: Style without a rule
+# Code: STYLE_WITHOUT_RULE
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For style: note
+			Box:
+				Padding: 4
+	Section:
+		Block:
+			Style: note aside

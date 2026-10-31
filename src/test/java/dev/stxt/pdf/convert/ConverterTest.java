@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** {@link Converter}: la configuración de una conversión en un objeto inmutable. */
+/** {@link Converter}: the configuration of a conversion in an immutable object. */
 class ConverterTest {
 
     private static final DocumentReader READER = new DocumentReader();
@@ -37,7 +37,7 @@ class ConverterTest {
     private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
             + "\t\t\tSize: 10\n";
 
-    /** Un documento de una sola caja con texto, que necesita la tipografía de {@link #BASE}. */
+    /** A document with a single box of text, which needs the typography of {@link #BASE}. */
     private static InlineNode document() {
         return READER.read(Docs.sectioned(HEADER + "\tText: Hola"));
     }
@@ -56,7 +56,7 @@ class ConverterTest {
         assertEquals("%PDF-", new String(out.toByteArray(), 0, 5, StandardCharsets.ISO_8859_1));
     }
 
-    /** Sin la fuente base no hay texto que maquetar: el documento solo no basta. */
+    /** Without the base font there is no text to lay out: the document alone is not enough. */
     @Test
     void withoutStylesTheDocumentMustCarryItsOwn() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
@@ -73,7 +73,7 @@ class ConverterTest {
         assertArrayEquals(fromText, pdf(Converter.builder().styles(file).build(), document()));
     }
 
-    /** Las fuentes se leen al indexar la carpeta: el PDF no cambia aunque después desaparezca el fichero. */
+    /** The fonts are read when the folder is indexed: the PDF does not change even if the file disappears later. */
     @Test
     void theFontsAreReadOnce(@org.junit.jupiter.api.io.TempDir Path folder) throws IOException {
         Path fonts = Files.createDirectories(folder.resolve("fonts"));
@@ -121,7 +121,7 @@ class ConverterTest {
         Resources resources = new Resources(empty);
         Converter converter = Converter.builder().resources(resources).styles(BASE).build();
         assertEquals(resources, converter.resources());
-        // Una carpeta de recursos sin fuentes no puede maquetar el texto, y lo dice en lugar de sustituir la fuente.
+        // A resources folder without fonts cannot lay out the text, and says so instead of substituting the font.
         assertThrows(ResourceException.class, () -> converter.toPdf(document(), new ByteArrayOutputStream()));
     }
 
@@ -137,7 +137,7 @@ class ConverterTest {
         assertThrows(NullPointerException.class, () -> converter.toSvg(null));
     }
 
-    /** Cambiar el constructor después de construir no cambia el conversor ya creado. */
+    /** Changing the builder after building does not change the converter already created. */
     @Test
     void aBuiltConverterDoesNotChangeWithItsBuilder() throws IOException {
         Converter.Builder builder = Converter.builder().styles(BASE);
@@ -147,7 +147,7 @@ class ConverterTest {
         assertFalse(converter.toSvg(converter.layOut(document())).isEmpty());
     }
 
-    /** Por defecto se hacen todas las comprobaciones; {@code exclude} quita las que se le dicen, y se acumulan. */
+    /** By default all the checks are done; {@code exclude} removes the ones it is given, and they accumulate. */
     @Test
     void everyCheckIsDoneUnlessExcluded() {
         assertEquals(Set.of(), Converter.create().excluded());
@@ -156,23 +156,23 @@ class ConverterTest {
         assertThrows(UnsupportedOperationException.class, () -> converter.excluded().add(Check.PDF_IMAGE_ANNOTATIONS));
     }
 
-    /** Una fuente sin incrustar en la página de un PDF es un error, salvo que se quite {@link Check#PDF_IMAGE_FONTS}. */
+    /** A font not embedded in the page of a PDF is an error, unless {@link Check#PDF_IMAGE_FONTS} is removed. */
     @Test
     void theFontsOfAPdfImageAreCheckedUnlessExcluded() throws IOException {
         InlineNode document = READER.read(Docs.sectioned(HEADER + "\tImage: test/standard-font.pdf"));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> Converter.create().layOut(document));
         assertEquals(ErrorCode.IMAGE_FORMAT, e.errorCode());
-        assertTrue(e.getMessage().contains("Helvetica sin incrustar"), e.getMessage());
+        assertTrue(e.getMessage().contains("Helvetica not embedded"), e.getMessage());
         assertTrue(e.getMessage().contains("PDF_IMAGE_FONTS"), e.getMessage());
-        // Quitar la otra no basta.
+        // Removing the other one is not enough.
         assertThrows(InvalidModelException.class,
                 () -> Converter.builder().exclude(Check.PDF_IMAGE_ANNOTATIONS).build().layOut(document));
         assertFalse(pdf(Converter.builder().exclude(Check.PDF_IMAGE_FONTS).build(), document).length == 0);
     }
 
     /**
-     * Un campo de formulario que se ve en la página de un PDF es un error, salvo que se quite
-     * {@link Check#PDF_IMAGE_ANNOTATIONS}: entonces la página se dibuja sin él.
+     * A form field visible on the page of a PDF is an error, unless {@link Check#PDF_IMAGE_ANNOTATIONS} is
+     * removed: then the page is drawn without it.
      */
     @Test
     void theAnnotationsOfAPdfImageAreCheckedUnlessExcluded() throws IOException {

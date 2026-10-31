@@ -23,36 +23,37 @@ import java.io.IOException;
 import static dev.stxt.pdf.paint.PdfContent.io;
 
 /**
- * El lienzo de una página PDF, con PDFBox: las primitivas del dibujo y, con su {@link PdfTagging}, el
- * contenido marcado del PDF etiquetado y las anotaciones de los enlaces. El documento lo crea y lo guarda
- * {@link PdfDocumentWriter}; las fuentes son de {@link PdfFonts}, las imágenes de {@link PdfImages}, los
- * degradados de {@link PdfGradients} y la estructura de {@link PdfStructure}, todos del documento y compartidos
- * por sus páginas. PDF tiene el origen abajo a la izquierda: las coordenadas verticales se invierten al pintar.
+ * The canvas of a PDF page, with PDFBox: the drawing primitives and, with its {@link PdfTagging}, the marked
+ * content of the tagged PDF and the link annotations. The document is created and saved by
+ * {@link PdfDocumentWriter}; the fonts come from {@link PdfFonts}, the images from {@link PdfImages}, the
+ * gradients from {@link PdfGradients} and the structure from {@link PdfStructure}, all of them belonging to the
+ * document and shared by its pages. PDF has the origin at the bottom left: vertical coordinates are inverted when
+ * painting.
  *
- * <p>El texto se pinta con las fuentes TTF de la carpeta de recursos (reference/common/resources.md). Para que las
- * líneas midan lo mismo que al maquetar, el layout debe usar las mismas métricas:
+ * <p>Text is painted with the TTF fonts of the resources folder (reference/common/resources.md). For the lines to
+ * measure the same as during layout, the layout must use the same metrics:
  * {@code new Engine(new PdfMetrics(resources))}.</p>
  *
- * <p>Cada imagen (reference/components/image.md) se incrusta una sola vez aunque se use en varias
- * páginas, sin remuestrear: el JPEG tal cual y el PNG sin pérdida, con su transparencia; el SVG,
- * como dibujo vectorial ({@link PdfImages}).</p>
+ * <p>Each image (reference/components/image.md) is embedded only once even if it is used on several
+ * pages, without resampling: the JPEG as is and the PNG lossless, with its transparency; the SVG,
+ * as a vector drawing ({@link PdfImages}).</p>
  *
- * <p>Con {@code debug}, como {@link SvgCanvas}, dibuja además el contorno de cada caja de borde
- * (lo usan las imágenes de los tests de referencia).</p>
+ * <p>With {@code debug}, like {@link SvgCanvas}, it also draws the outline of each border box
+ * (used by the images of the reference tests).</p>
  *
- * <p><strong>Hilos:</strong> una instancia es de una página y no se comparte.</p>
+ * <p><strong>Threads:</strong> an instance belongs to one page and is not shared.</p>
  */
 public final class PdfCanvas implements Canvas {
 
     private final PDDocument doc;
-    /** El contenido de la página: el flujo, los caminos, el color y los giros. */
+    /** The content of the page: the stream, the paths, the color and the rotations. */
     private final PdfContent page;
     private final PDPageContentStream out;
     private final double pageHeight;
     private final Resources resources;
-    /** Fuentes incrustadas en el documento, compartidas por todas sus páginas. */
+    /** Fonts embedded in the document, shared by all its pages. */
     private final PdfFonts fonts;
-    /** Imágenes incrustadas en el documento, por fichero, compartidas por todas sus páginas. */
+    /** Images embedded in the document, by file, shared by all its pages. */
     private final PdfImages images;
     private final PdfTagging tagging;
     private final boolean debug;
@@ -70,7 +71,7 @@ public final class PdfCanvas implements Canvas {
         this.debug = debug;
     }
 
-    /** El contenido marcado del PDF etiquetado y las anotaciones de los enlaces de la página. */
+    /** The marked content of the tagged PDF and the link annotations of the page. */
     @Override
     public PdfTagging tagging() {
         return tagging;
@@ -82,7 +83,7 @@ public final class PdfCanvas implements Canvas {
             return;
         }
         io(() -> {
-            // Fondos y bordes no son contenido: artifacts del PDF etiquetado.
+            // Backgrounds and borders are not content: artifacts of the tagged PDF.
             out.beginMarkedContent(COSName.ARTIFACT);
             page.painting(color, () -> {
                 out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
@@ -95,10 +96,10 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Un color liso se rellena con su opacidad; un degradado es un sombreado axial recortado a
-     * la forma. Si algún color del degradado no es opaco, las opacidades van en una máscara
-     * suave de luminosidad con el mismo degradado en grises: PDF no tiene opacidad por color en
-     * un sombreado.</p>
+     * <p>A plain color is filled with its opacity; a gradient is an axial shading clipped to
+     * the shape. If some color of the gradient is not opaque, the opacities go in a luminosity
+     * soft mask with the same gradient in grays: PDF has no per-color opacity in a
+     * shading.</p>
      */
     @Override
     public void fill(Rect r, Radii radii, Paint paint) {
@@ -135,8 +136,8 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>El anillo entre la caja de borde y la de relleno, rellenado con regla par-impar; con
-     * colores distintos por lado, una vez por lado y recortado a su trapecio.</p>
+     * <p>The ring between the border box and the padding box, filled with the even-odd rule; with
+     * different colors per side, once per side and clipped to its trapezoid.</p>
      */
     @Override
     public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
@@ -161,8 +162,8 @@ public final class PdfCanvas implements Canvas {
     }
 
     /**
-     * El anillo del borde: de un color ({@code color}) o, si es {@code null}, una vez por lado con ancho,
-     * recortado a su trapecio y con su color.
+     * The ring of the border: in one color ({@code color}) or, if it is {@code null}, once per side with a width,
+     * clipped to its trapezoid and with its color.
      */
     private void ringBorder(Rect r, Insets w, Radii radii, String color, double[] widths, String[] sideColors)
             throws IOException {
@@ -185,9 +186,9 @@ public final class PdfCanvas implements Canvas {
     }
 
     /**
-     * Un borde liso y opaco de esquinas cuadradas: un rectángulo por lado con ancho, los de los
-     * lados verticales encima de los otros. Los rectángulos solapados no dejan costuras en los
-     * píxeles de borde, que el anillo par-impar sí deja, y es como se pintaba antes de
+     * A plain, opaque border with square corners: one rectangle per side with a width, those of the
+     * vertical sides on top of the others. Overlapping rectangles leave no seams in the edge
+     * pixels, which the even-odd ring does leave, and it is how it was painted before
      * {@code Corner radius}.
      */
     private void squareBorder(Rect r, Insets w, String color) {
@@ -205,7 +206,7 @@ public final class PdfCanvas implements Canvas {
         }
     }
 
-    /** Rellena el anillo del borde: la caja de borde menos la de relleno, que si no queda nada no se resta. */
+    /** Fills the ring of the border: the border box minus the padding box, not subtracted if nothing is left of it. */
     private void ring(Rect r, Insets w, Radii radii) throws IOException {
         Shapes.roundedRect(page.path(), r, radii);
         Rect inner = r.shrink(w);
@@ -218,7 +219,7 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Con {@code Alt}, la imagen es el contenido de su {@code Figure}; sin él, un
+     * <p>With {@code Alt}, the image is the content of its {@code Figure}; without it, an
      * <em>artifact</em> ({@link PdfStructure}).</p>
      */
     @Override
@@ -237,10 +238,10 @@ public final class PdfCanvas implements Canvas {
             Shapes.roundedRect(page.path(), content, radii);
             out.clip();
             if (file.isVector()) {
-                // El dibujo mide lo que el SVG o la página: se escala a donde va (Fit) y sigue siendo vectorial.
+                // The drawing has the size of the SVG or the page: it is scaled to its place (Fit) and stays vector.
                 out.transform(new Matrix((float) (target.width() / width), 0, 0, (float) (target.height() / height),
                         (float) target.x(), (float) (pageHeight - target.bottom())));
-                // Un formulario hereda el estado gráfico y el dibujo no fija los guiones: sin guiones.
+                // A form inherits the graphics state and the drawing does not set the dashes: no dashes.
                 out.setLineDashPattern(new float[0], 0);
                 out.drawForm(file.format() == ImageFile.Format.PDF ? images.page(file, number) : images.drawing(file));
             } else {
@@ -255,8 +256,8 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
-     * <p>Una matriz {@code cm} dentro de un {@code q}/{@code Q}. Con el origen abajo, el giro en el
-     * sentido de las agujas del reloj es un ángulo negativo.</p>
+     * <p>A {@code cm} matrix inside a {@code q}/{@code Q}. With the origin at the bottom, a clockwise
+     * rotation is a negative angle.</p>
      */
     @Override
     public void beginRotation(double degrees, double x, double y) {
@@ -268,7 +269,7 @@ public final class PdfCanvas implements Canvas {
         io(page::unrotate);
     }
 
-    /** Un recorte dentro de un estado gráfico propio ({@code q}/{@code Q}), con el camino de la forma ({@code W n}). */
+    /** A clip inside its own graphics state ({@code q}/{@code Q}), with the path of the shape ({@code W n}). */
     @Override
     public void beginClip(Rect r, Radii radii) {
         io(() -> {
@@ -331,7 +332,7 @@ public final class PdfCanvas implements Canvas {
         return resources.fonts().find(font).decoration();
     }
 
-    /** {@code #RGB}, {@code #RGBA}, {@code #RRGGBB} o {@code #RRGGBBAA} (ya validado) en componentes de 0 a 1. */
+    /** {@code #RGB}, {@code #RGBA}, {@code #RRGGBB} or {@code #RRGGBBAA} (already validated) as components 0 to 1. */
     static float[] rgb(String color) {
         float[] rgba = Colors.rgba(color);
         return new float[]{rgba[0], rgba[1], rgba[2]};

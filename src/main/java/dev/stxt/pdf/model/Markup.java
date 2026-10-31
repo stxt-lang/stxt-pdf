@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * {@code Markup}, el formato dentro de la línea: el texto literal ({@code none}) o escrito en Markdown ({@code
+ * {@code Markup}, the inline formatting: literal text ({@code none}) or text written in Markdown ({@code
  * markdown}).
  */
 public enum Markup { NONE, MARKDOWN }

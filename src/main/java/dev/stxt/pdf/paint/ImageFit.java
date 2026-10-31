@@ -4,8 +4,8 @@ import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.Rect;
 
 /**
- * Dónde se dibuja una imagen en su caja de contenido según {@code Fit}
- * (reference/components/image.md). Con proporciones iguales, las tres formas dan la caja de contenido.
+ * Where an image is drawn in its content box according to {@code Fit}
+ * (reference/components/image.md). With equal proportions, the three modes give the content box.
  */
 final class ImageFit {
 
@@ -13,12 +13,12 @@ final class ImageFit {
     }
 
     /**
-     * Rectángulo de la imagen, en las coordenadas de {@code content}: con {@code inside} cabe
-     * entera y centrada; con {@code fill} la cubre, centrada, y se recorta a la caja de
-     * contenido; con {@code fill} es la caja de contenido.
+     * Rectangle of the image, in the coordinates of {@code content}: with {@code inside} it fits
+     * whole and centered; with {@code fill} it covers it, centered, and is clipped to the content
+     * box; with {@code stretch} it is the content box.
      *
-     * @param width  ancho natural de la imagen (solo cuenta su proporción)
-     * @param height alto natural de la imagen
+     * @param width  natural width of the image (only its proportion counts)
+     * @param height natural height of the image
      */
     static Rect place(Fit fit, Rect content, double width, double height) {
         if (fit == Fit.STRETCH) {

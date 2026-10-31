@@ -1,7 +1,7 @@
 package dev.stxt.pdf.model;
 
 /**
- * Peso de una fuente: {@code Bold} de {@code Typography} (reference/common/typography.md). Las
- * constantes se llaman como el valor del documento, en mayúsculas.
+ * Weight of a font: {@code Bold} of {@code Typography} (reference/common/typography.md). The
+ * constants are named after the document value, in upper case.
  */
 public enum FontWeight { NORMAL, BOLD }

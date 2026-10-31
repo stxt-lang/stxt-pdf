@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * El texto de un SVG se dibuja con el fichero de {@code fonts/} que se comprobó al leerlo
- * (reference/components/image.md), sin estado de la JVM: ni el idioma por defecto ni otra carpeta de recursos con la
- * misma familia lo cambian.
+ * The text of an SVG is drawn with the file from {@code fonts/} that was checked when reading it
+ * (reference/components/image.md), without JVM state: neither the default language nor another resources folder with
+ * the same family changes it.
  */
 class PdfImagesTest {
 
@@ -36,7 +36,7 @@ class PdfImagesTest {
         System.setProperty("java.awt.headless", "true");
     }
 
-    /** El contenido del formulario en que se dibuja el SVG {@code images/name} de los recursos. */
+    /** The content of the form in which the SVG {@code images/name} of the resources is drawn. */
     private static byte[] draw(Resources resources, String name) throws IOException {
         try (PDDocument doc = new PDDocument()) {
             return new PdfImages(doc, Limits.DEFAULT).drawing(resources.images().find(name))
@@ -44,7 +44,7 @@ class PdfImagesTest {
         }
     }
 
-    /** Una carpeta de recursos con esas fuentes de {@code resources/fonts/} y un SVG {@code image.svg}. */
+    /** A resources folder with those fonts from {@code resources/fonts/} and an SVG {@code image.svg}. */
     private Resources folder(String name, String svg, String... fonts) throws IOException {
         Path root = dir.resolve(name);
         Files.createDirectories(root.resolve("fonts/f"));
@@ -64,12 +64,12 @@ class PdfImagesTest {
 
     @Test
     void theLanguageOfTheJvmDoesNotChangeTheText() throws Exception {
-        // En una JVM que arranca en turco, AWT no encuentra «IBM Plex Sans» por su nombre (la I mayúscula pasa a ı) y
-        // JSVG dibujaba con Dialog. Cambiar el Locale en caliente no lo reproduce: cada dibujo va en su JVM.
+        // In a JVM that starts in Turkish, AWT does not find "IBM Plex Sans" by its name (the capital I becomes ı) and
+        // JSVG drew with Dialog. Changing the Locale at runtime does not reproduce it: each drawing runs in its JVM.
         assertEquals(drawIn("en", "US"), drawIn("tr", "TR"));
     }
 
-    /** La huella del dibujo de {@code test/label.svg} en una JVM nueva con ese idioma. */
+    /** The fingerprint of the drawing of {@code test/label.svg} in a new JVM with that language. */
     private static String drawIn(String language, String country) throws Exception {
         Path java = Path.of(System.getProperty("java.home"), "bin", "java");
         Process process = new ProcessBuilder(java.toString(), "-Djava.awt.headless=true",
@@ -81,7 +81,7 @@ class PdfImagesTest {
         return out.lines().filter(l -> l.startsWith("sha-256 ")).findFirst().orElseThrow(() -> new AssertionError(out));
     }
 
-    /** Dibuja un SVG de {@code resources/images/} y escribe la huella del formulario. */
+    /** Draws an SVG from {@code resources/images/} and prints the fingerprint of the form. */
     static final class Draw {
         public static void main(String[] args) throws Exception {
             byte[] content = draw(new Resources(), args[0]);
@@ -93,7 +93,7 @@ class PdfImagesTest {
     @Test
     void twoFoldersWithTheSameFamilyDrawEachItsOwnFile() throws IOException {
         Resources sans = folder("sans", text("IBM Plex Sans"), "IBM Plex Sans/IBMPlexSans-Regular.ttf");
-        // Otra carpeta con una «IBM Plex Sans» que en realidad es IBM Plex Serif con la tabla name cambiada.
+        // Another folder with an "IBM Plex Sans" that is actually IBM Plex Serif with the name table changed.
         Resources fake = folder("fake", text("IBM Plex Sans"));
         Path serif = FONTS.resolve("IBM Plex Serif/IBMPlexSerif-Regular.ttf");
         Files.write(dir.resolve("fake/fonts/f/Fake-Regular.ttf"), renamed(Files.readAllBytes(serif), "IBM Plex Sans"));
@@ -101,7 +101,7 @@ class PdfImagesTest {
 
         byte[] first = draw(sans, "image.svg");
         byte[] second = draw(fake, "image.svg");
-        assertFalse(java.util.Arrays.equals(first, second), "la segunda carpeta se dibuja con la fuente de la primera");
+        assertFalse(java.util.Arrays.equals(first, second), "the second folder is drawn with the font of the first");
         assertArrayEquals(draw(real, "image.svg"), second);
         assertArrayEquals(first, draw(sans, "image.svg"));
     }
@@ -123,13 +123,13 @@ class PdfImagesTest {
         byte[] a = draw(folder("declared", declared, fonts), "image.svg");
         byte[] b = draw(folder("explicit", explicit, fonts), "image.svg");
         assertArrayEquals(b, a);
-        assertTrue(a.length > 1000, "el texto se dibuja como contornos");
+        assertTrue(a.length > 1000, "the text is drawn as outlines");
     }
 
     @Test
     void aTextRepeatedByAUseKeepsTheFontOfItsPlaceInTheFile() throws IOException {
-        // El texto se comprueba con la fuente de su sitio en el fichero (Regular), y esa es la que se dibuja aunque
-        // el <use> esté dentro de un grupo en negrita (reference/components/image.md).
+        // The text is checked with the font of its place in the file (Regular), and that is the one drawn even though
+        // the <use> is inside a bold group (reference/components/image.md).
         String used = "<svg " + NS + " viewBox=\"0 0 120 30\"><defs><text id=\"t\" x=\"4\" y=\"20\" "
                 + "font-family=\"IBM Plex Sans\" font-size=\"16\">Nogal</text></defs>"
                 + "<g font-weight=\"bold\"><use href=\"#t\"/></g></svg>";
@@ -140,8 +140,9 @@ class PdfImagesTest {
     }
 
     /**
-     * Una copia de la fuente cuya tabla {@code name} dice que es de otra familia (Regular): la tabla nueva va al final
-     * del fichero y la entrada del directorio apunta a ella. No recalcula las sumas de control, que no se comprueban.
+     * A copy of the font whose {@code name} table says it belongs to another family (Regular): the new table goes at
+     * the end of the file and the directory entry points to it. It does not recompute the checksums, which are not
+     * checked.
      */
     static byte[] renamed(byte[] ttf, String family) {
         String[][] names = {{"1", family}, {"2", "Regular"}, {"4", family + " Regular"},

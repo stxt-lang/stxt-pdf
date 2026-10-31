@@ -1,0 +1,19 @@
+# Case: Levels asks for levels that no heading has
+# Code: TABLE_OF_CONTENTS_EMPTY
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Heading 1:
+			Text: Uno
+		Table of contents:
+			Levels: 2 3

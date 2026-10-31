@@ -1,5 +1,5 @@
-# Los bloques del flujo, en (20, 20) y con todo el ancho: lit 24, fmt 12, escaped 24, blocks 24,
-# tab 12 y md 24 (ver input.stxt).
+# The flow blocks, at (20, 20) and full width: lit 24, fmt 12, escaped 24, blocks 24,
+# tab 12 and md 24 (see input.stxt).
 Result:
 	Page: 1
 		Fragment: lit

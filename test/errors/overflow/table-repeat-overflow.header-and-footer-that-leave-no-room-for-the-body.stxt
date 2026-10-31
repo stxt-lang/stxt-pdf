@@ -1,0 +1,30 @@
+# Case: Header and footer that leave no room for the body
+# Code: TABLE_REPEAT_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: *
+			Header rows:
+				Row:
+					Cell:
+						Box:
+							Height: 600
+			Body:
+				Row:
+					Cell: a
+			Footer rows:
+				Row:
+					Cell:
+						Box:
+							Height: 300

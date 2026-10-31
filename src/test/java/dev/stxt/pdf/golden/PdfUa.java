@@ -12,9 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Validación de accesibilidad de un PDF contra PDF/UA-1 o PDF/UA-2 con veraPDF (solo para los tests). Da las
- * reglas que incumple, cada una con el número de veces y su mensaje. PDF/UA-2 se valida con el perfil de veraPDF que
- * añade las reglas de ISO/TS 32005 (qué elemento puede contener a cuál).
+ * Accessibility validation of a PDF against PDF/UA-1 or PDF/UA-2 with veraPDF (for the tests only). It gives the
+ * rules the PDF fails, each with the number of times and its message. PDF/UA-2 is validated with the veraPDF profile
+ * that adds the rules of ISO/TS 32005 (which element can contain which).
  */
 public final class PdfUa {
 
@@ -25,12 +25,12 @@ public final class PdfUa {
     private PdfUa() {
     }
 
-    /** Las reglas de PDF/UA-1 que incumple el PDF, por cláusula y número ({@code 7.18.5-1}), con su mensaje. */
+    /** The PDF/UA-1 rules the PDF fails, by clause and number ({@code 7.18.5-1}), with their message. */
     public static Map<String, String> failedRules(byte[] pdf) {
         return failedRules(pdf, 1);
     }
 
-    /** Las reglas de la parte {@code part} de PDF/UA (1 o 2) que incumple el PDF. */
+    /** The rules of part {@code part} of PDF/UA (1 or 2) that the PDF fails. */
     public static Map<String, String> failedRules(byte[] pdf, int part) {
         PDFAFlavour flavour = part == 2 ? PDFAFlavour.PDFUA_2 : PDFAFlavour.PDFUA_1;
         try (PDFAParser parser = Foundries.defaultInstance().createParser(new ByteArrayInputStream(pdf), flavour)) {
@@ -45,7 +45,7 @@ public final class PdfUa {
             count.forEach((rule, times) -> failed.computeIfPresent(rule, (r, message) -> message + " (x" + times + ")"));
             return failed;
         } catch (Exception e) {
-            throw new IllegalStateException("veraPDF no pudo validar el PDF", e);
+            throw new IllegalStateException("veraPDF could not validate the PDF", e);
         }
     }
 }

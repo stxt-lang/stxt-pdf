@@ -16,7 +16,7 @@ class LeadersTest {
     @Test
     void dotsStickToTheRightAndSitOnTheBaseline() {
         List<Rect> dots = Leaders.shapes(Leader.DOTS, CONTENT, 29, 10);
-        // Cuerpo 10: puntos de 0,9 pt cada 5 pt, desde el borde derecho.
+        // Size 10: dots of 0.9 pt every 5 pt, from the right edge.
         assertEquals(10, dots.size());
         Rect last = dots.get(0);
         assertEquals(150 - 0.9, last.x(), 1e-9);

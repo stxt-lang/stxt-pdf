@@ -1,5 +1,5 @@
-# Los valores de la explicación de reference/common/complete-example.md. Las alturas de side y main salen
-# de FixedMetrics: side, dos líneas en 130 pt más el relleno (44); main se estira a la fila.
+# The values of the explanation in reference/common/complete-example.md. The heights of side and main come
+# from FixedMetrics: side, two lines in 130 pt plus the padding (44); main stretches to the row.
 Result:
 	Page: 1
 		Fragment: title

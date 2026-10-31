@@ -3,40 +3,40 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.NumberFormat;
 
 /**
- * Una sección del documento (reference/components/document.md): su caja, que es la raíz de su layout (una
- * {@code Box} sin padre, como la raíz anónima de un documento de una sola sección), su medio y lo
- * que dice de las páginas que ocupa.
+ * A section of the document (reference/components/document.md): its box, which is the root of its layout (a
+ * {@code Box} without a parent, like the anonymous root of a document with a single section), its medium and what it
+ * says about the pages it takes up.
  *
- * @param box          la caja: el área útil de cada una de sus páginas; es {@link Element#SECTION}
- * @param pageSetup        su medio: el del documento con lo que ella declara encima
- * @param numbering    cómo numera sus páginas
- * @param pageNumberFormat    cómo se escriben sus números de página ({@code Page number format})
- * @param start        el número de su primera página con {@code Page numbering: restart} ({@code Start}); 1 si no lo
- *                     declara
- * @param inheritPageOverlays si lleva los {@code Page overlay} del documento
- * @param beginOn      en qué página física empieza ({@code Begin on})
+ * @param box          the box: the page area of each of its pages; it is {@link Element#SECTION}
+ * @param pageSetup        its medium: the one of the document with what the section declares on top
+ * @param numbering    how it numbers its pages
+ * @param pageNumberFormat    how its page numbers are written ({@code Page number format})
+ * @param start        the number of its first page with {@code Page numbering: restart} ({@code Start}); 1 if it does
+ *                     not declare it
+ * @param inheritPageOverlays whether it carries the {@code Page overlay} elements of the document
+ * @param beginOn      on which physical page it begins ({@code Begin on})
  */
 public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, NumberFormat pageNumberFormat, int start,
                       boolean inheritPageOverlays, BeginOn beginOn) {
 
     /**
-     * {@code Begin on} (reference/components/document.md): en qué página física empieza la sección. Si no le toca, la
-     * anterior acaba con una página en blanco.
+     * {@code Begin on} (reference/components/document.md): on which physical page the section begins. If the next page
+     * is not the right one, the previous section ends with a blank page.
      */
     public enum BeginOn {
-        /** En la página siguiente, sea cual sea. */
+        /** On the next page, whichever it is. */
         ANY,
-        /** En una página impar: a la derecha, al imprimir a doble cara. */
+        /** On an odd page: on the right, when printing double-sided. */
         ODD
     }
 
-    /** {@code Page numbering} (reference/components/document.md): qué hace la sección con el contador de páginas. */
+    /** {@code Page numbering} (reference/components/document.md): what the section does with the page counter. */
     public enum PageNumbering {
-        /** Sus páginas siguen el contador del documento. */
+        /** Its pages follow the counter of the document. */
         CONTINUE,
-        /** Su primera página vuelve a ser la 1. */
+        /** Its first page is page 1 again. */
         RESTART,
-        /** Sus páginas no tienen número y no avanzan el contador. */
+        /** Its pages have no number and do not advance the counter. */
         NONE
     }
 }

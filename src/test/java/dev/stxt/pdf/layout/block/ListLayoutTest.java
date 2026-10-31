@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Marcadores de las listas (reference/components/list.md). Con {@code FixedMetrics}, cada carácter
- * mide 5 pt con {@code Size: 10}, así que {@code "1. "} mide 15; la línea mide 12, y la línea
- * base, con la aproximación 0,8/0,2, queda 9 pt por debajo de su parte superior.
+ * Markers of lists (reference/components/list.md). With {@code FixedMetrics}, each character
+ * measures 5 pt with {@code Size: 10}, so {@code "1. "} measures 15; the line measures 12, and the
+ * baseline, with the 0.8/0.2 approximation, is 9 pt below its top.
  */
 class ListLayoutTest {
 
@@ -37,7 +37,7 @@ class ListLayoutTest {
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno",
                 "\t\tList item:", "\t\t\tId: B", "\t\t\tText: Dos"));
-        // La sangría (20) está en el relleno de la lista: los ítems empiezan en 60.
+        // The indent (20) is in the padding of the list: the items start at 60.
         assertRect(f.rect("A"), 60, 40, 495, 12);
         assertRect(f.marker("A"), 45, 40, 15, 12);
         assertRect(f.marker("B"), 45, 52, 15, 12);
@@ -54,8 +54,8 @@ class ListLayoutTest {
 
     @Test
     void markerSharesTheBaselineOfABiggerFirstLine() {
-        // Paragraph de 20 pt: línea de 24 y línea base en 40 + 2 + 16 = 58. El marcador, de
-        // 10 pt, tiene su línea base 9 pt por debajo de su parte superior: empieza en 49.
+        // Paragraph of 20 pt: line of 24 and baseline at 40 + 2 + 16 = 58. The marker, of
+        // 10 pt, has its baseline 9 pt below its top: it starts at 49.
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: bullet",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tParagraph: Grande",
                 "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20"));
@@ -68,8 +68,8 @@ class ListLayoutTest {
                 "\t\tList item:", "\t\t\tId: A",
                 "\t\t\tTypography:", "\t\t\t\tSize: 8", "\t\t\t\tLine height: 12",
                 "\t\t\tText: Uno"));
-        // "– " a 8 pt mide 8; con la línea de 12, la línea base va a 12/2 − 4 + 6.4 = 8.4 de
-        // la parte superior en las dos, así que el marcador empieza a la altura de la línea.
+        // "– " at 8 pt measures 8; with the line of 12, the baseline goes at 12/2 − 4 + 6.4 = 8.4 from
+        // the top in both, so the marker starts at the height of the line.
         assertRect(f.marker("A"), 52, 40, 8, 12);
     }
 
@@ -78,7 +78,7 @@ class ListLayoutTest {
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tBorder: 1", "\t\t\t\tPadding: 3",
                 "\t\t\tText: Uno"));
-        // Pegado a la caja de borde del ítem; la primera línea empieza en 40 + 1 + 3.
+        // Against the border box of the item; the first line starts at 40 + 1 + 3.
         assertRect(f.marker("A"), 45, 44, 15, 12);
     }
 
@@ -111,7 +111,7 @@ class ListLayoutTest {
 
     @Test
     void markerMovesWithTheFirstLineToTheNextPage() {
-        // Área útil de 100: tras el bloque de 90 no cabe ninguna línea del ítem.
+        // Page area of 100: after the block of 90 no line of the item fits.
         LayoutFixture f = LayoutFixture.layOutPaged(180, doc("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
                 "\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
@@ -121,8 +121,8 @@ class ListLayoutTest {
 
     @Test
     void aSplitItemHasItsMarkerOnlyInTheFirstFragment() {
-        // Ítem de 100 − 20 = 80 pt: 16 caracteres por línea, 3 palabras de 4; 15 palabras son
-        // 5 líneas. Tras el bloque de 60 caben 3 (orphans y widows 2).
+        // Item of 100 − 20 = 80 pt: 16 characters per line, 3 words of 4; 15 words are
+        // 5 lines. After the block of 60, 3 fit (orphans and widows 2).
         LayoutFixture f = LayoutFixture.layOutPaged(180, doc("\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tList:", "\t\tMarker: decimal", "\t\tBox:", "\t\t\tWidth: 100",
                 "\t\tList item:", "\t\t\tId: A",
@@ -135,7 +135,7 @@ class ListLayoutTest {
 
     @Test
     void markerFollowsTheFirstLineInsideABorderedChild() {
-        // La primera línea está en el contenido de un bloque con 3 de borde y 5 de relleno: en 40 + 8.
+        // The first line is in the content of a block with a border of 3 and padding of 5: at 40 + 8.
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 3",
                 "\t\t\t\t\tPadding: 5", "\t\t\t\tText: Uno"));

@@ -1,0 +1,18 @@
+# Case: A section rotates a page that has no paper
+# Code: PAGE_SIZE
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page:
+			Orientation: landscape
+		Text: Hola

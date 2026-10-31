@@ -1,0 +1,20 @@
+# Case: Markdown table without rows below the header
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Markdown:
+			Table columns: auto
+			Content >>
+				| A | B |
+				|---|---|

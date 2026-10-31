@@ -20,54 +20,54 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Lee un documento de cajas con la librería oficial {@code dev.stxt:stxt-core} y lo valida
- * contra el schema ({@link DocumentSchema}) mientras lo lee. Así los errores de sintaxis,
- * estructura (qué hijos admite cada elemento, cardinalidades) y tipos (ENUM, INTEGER, BOOLEAN)
- * los detecta la librería con sus códigos estándar ({@link dev.stxt.exceptions.ParseException}),
- * y el motor solo tiene que comprobar las reglas que el schema no puede expresar
+ * Reads a document of boxes with the official {@code dev.stxt:stxt-core} library and validates it
+ * against the schema ({@link DocumentSchema}) while reading it. This way the errors of syntax,
+ * structure (which children each element allows, cardinalities) and types (ENUM, INTEGER, BOOLEAN)
+ * are detected by the library with its standard codes ({@link dev.stxt.exceptions.ParseException}),
+ * and the engine only has to check the rules the schema cannot express
  * (reference/common/errors.md).
  *
- * <p>La librería solo valida los nodos que tienen namespace, así que el documento debe tener un
- * único nodo raíz {@code Document} que declare {@code (dev.stxt.pdf)}: sin el namespace pasaría
- * sin validar, y el schema admite cualquier elemento como raíz.</p>
+ * <p>The library only validates the nodes that have a namespace, so the document must have a
+ * single root node {@code Document} that declares {@code (dev.stxt.pdf)}: without the namespace it would pass
+ * unvalidated, and the schema accepts any element as root.</p>
  *
- * <p>Los errores de la librería salen con el tipo del motor ({@link dev.stxt.pdf.model.StxtPdfException}):
- * {@link DocumentSyntaxException} con su código y su línea si el documento no es válido, y
- * {@link ResourceException} si el fichero no se puede leer.</p>
+ * <p>The errors of the library come out with the type of the engine ({@link dev.stxt.pdf.model.StxtPdfException}):
+ * {@link DocumentSyntaxException} with its code and its line if the document is not valid, and
+ * {@link ResourceException} if the file cannot be read.</p>
  *
- * <p>Es reutilizable y seguro entre hilos: cada lectura crea su propio {@link Parser}.</p>
+ * <p>It is reusable and thread-safe: each read creates its own {@link Parser}.</p>
  */
 public final class DocumentReader {
 
-    /** Namespace del modelo de cajas, el mismo que define el schema. */
+    /** Namespace of the box model, the same one the schema defines. */
     public static final String NAMESPACE = DocumentSchema.NAMESPACE;
 
-    /** Lee y valida un documento; devuelve su nodo raíz. */
+    /** Reads and validates a document; returns its root node. */
     public InlineNode read(String content) {
         return root(parse(() -> parser().parse(content), false));
     }
 
-    /** Lee y valida un documento desde un fichero UTF-8; devuelve su nodo raíz. */
+    /** Reads and validates a document from a UTF-8 file; returns its root node. */
     public InlineNode read(Path file) {
         return root(parse(() -> parser().parseFile(file.toFile()), false));
     }
 
     /**
-     * Lee y valida un documento de estilos aparte (raíz {@code Styles}, reference/common/styles.md), que se
-     * pasa junto al documento al maquetarlo; devuelve su nodo raíz.
+     * Reads and validates a separate styles document (root {@code Styles}, reference/common/styles.md), which is
+     * passed along with the document when laying it out; returns its root node.
      */
     public InlineNode readStyles(String content) {
         return styles(parse(() -> parser().parse(content), true));
     }
 
-    /** Lee y valida un documento de estilos aparte desde un fichero UTF-8; devuelve su nodo raíz. */
+    /** Reads and validates a separate styles document from a UTF-8 file; returns its root node. */
     public InlineNode readStyles(Path file) {
         return styles(parse(() -> parser().parseFile(file.toFile()), true));
     }
 
     /**
-     * Lo que lee la librería, con los errores de la librería convertidos a los del motor; {@code inStyles}, si lo que
-     * se lee es un documento de estilos aparte.
+     * What the library reads, with the errors of the library turned into those of the engine; {@code inStyles}, if
+     * what is read is a separate styles document.
      */
     private static List<Node> parse(Supplier<List<Node>> parsing, boolean inStyles) {
         try {
@@ -75,9 +75,9 @@ public final class DocumentReader {
         } catch (ParseException e) {
             throw new DocumentSyntaxException(e, inStyles);
         } catch (STXTIOException e) {
-            throw new ResourceException("No se puede leer el documento: " + e.getMessage(), e);
+            throw new ResourceException("The document cannot be read: " + e.getMessage(), e);
         } catch (STXTException e) {
-            throw new InternalException("Fallo de la librería STXT: " + e.getMessage(), e);
+            throw new InternalException("Failure of the STXT library: " + e.getMessage(), e);
         }
     }
 
@@ -90,14 +90,14 @@ public final class DocumentReader {
     private static InlineNode styles(List<Node> roots) {
         if (roots.size() != 1) {
             int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
-            throw new InvalidModelException(SourceLine.inStyles(line), ErrorCode.DOCUMENT_ROOT, "El documento de "
-                    + "estilos debe tener exactamente un nodo raíz y tiene " + roots.size());
+            throw new InvalidModelException(SourceLine.inStyles(line), ErrorCode.DOCUMENT_ROOT, "The styles "
+                    + "document must have exactly one root node and has " + roots.size());
         }
         Node root = roots.get(0);
         if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("styles")
                 || !(root instanceof InlineNode styles)) {
             throw new InvalidModelException(SourceLine.inStyles(root.getLine()), ErrorCode.DOCUMENT_ROOT,
-                    "El nodo raíz del documento de estilos debe ser Styles (" + NAMESPACE + "):");
+                    "The root node of the styles document must be Styles (" + NAMESPACE + "):");
         }
         return styles;
     }
@@ -106,13 +106,13 @@ public final class DocumentReader {
         if (roots.size() != 1) {
             int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
             throw new InvalidModelException(line, ErrorCode.DOCUMENT_ROOT,
-                    "El documento debe tener exactamente un nodo raíz y tiene " + roots.size());
+                    "The document must have exactly one root node and has " + roots.size());
         }
         Node root = roots.get(0);
         if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("document")
                 || !(root instanceof InlineNode document)) {
             throw new InvalidModelException(root.getLine(), ErrorCode.DOCUMENT_ROOT,
-                    "El nodo raíz debe ser Document (" + NAMESPACE + "):");
+                    "The root node must be Document (" + NAMESPACE + "):");
         }
         return document;
     }

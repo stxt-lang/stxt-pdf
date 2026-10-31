@@ -1,6 +1,6 @@
-# page: columnas 150 y 515 - 20 - 150 = 345; filas 30, 60 (main) y 20, con huecos de 10.
-# side se estira a su fila (60). cards: tres fracciones de (515 - 20) / 3 = 165 y una fila
-# implícita para c4; empieza en y = 40 + 130 + 20.
+# page: columns 150 and 515 - 20 - 150 = 345; rows 30, 60 (main) and 20, with gaps of 10.
+# side stretches to its row (60). cards: three fractions of (515 - 20) / 3 = 165 and an implicit
+# row for c4; it starts at y = 40 + 130 + 20.
 Result:
 	Page: 1
 		Fragment: page

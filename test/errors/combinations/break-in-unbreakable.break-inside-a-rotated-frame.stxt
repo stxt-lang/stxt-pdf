@@ -1,0 +1,21 @@
+# Case: Keep together: true in a block inside a rotated Frame, which does not break
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Frame:
+			Rotate: 10
+			Block:
+				Break:
+					Keep together: true
+				Text: Sello

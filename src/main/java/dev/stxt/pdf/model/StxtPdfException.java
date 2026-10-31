@@ -1,27 +1,27 @@
 package dev.stxt.pdf.model;
 
 /**
- * Raíz de todos los errores que el motor da a quien lo usa (reference/common/errors.md): con una sola
- * {@code catch (StxtPdfException)} basta para tratar cualquier fallo de una conversión, y {@link #kind()} dice
- * de quién es la culpa, que es lo que un servicio necesita para contestar (un 4xx o un 5xx).
+ * Root of all the errors the engine gives to its user (reference/common/errors.md): a single
+ * {@code catch (StxtPdfException)} is enough to handle any failure of a conversion, and {@link #kind()} says
+ * whose fault it is, which is what a service needs to answer (a 4xx or a 5xx).
  *
  * <ul>
- *   <li>{@link Kind#INVALID_DOCUMENT}: el documento o sus estilos no son válidos (sintaxis, schema, una regla
- *       del modelo, un desbordamiento, un recurso que el documento nombra y no existe). Arreglarlo es cosa de
- *       quien lo escribió, y casi siempre trae {@link #line()}.</li>
- *   <li>{@link Kind#RESOURCE}: la carpeta de recursos no es utilizable (no existe, una fuente o una imagen
- *       estropeada) o no se puede leer el fichero. Es del entorno de quien convierte.</li>
- *   <li>{@link Kind#LIMIT}: el documento es válido pero pide más de lo que se admite (demasiadas páginas…).</li>
- *   <li>{@link Kind#INTERNAL}: un fallo del motor, no del documento ni del entorno. Se informa como un
- *       defecto; {@link #getCause()} guarda el original.</li>
+ *   <li>{@link Kind#INVALID_DOCUMENT}: the document or its styles are not valid (syntax, schema, a rule
+ *       of the model, an overflow, a resource the document names that does not exist). Fixing it is up to
+ *       the author, and it almost always carries {@link #line()}.</li>
+ *   <li>{@link Kind#RESOURCE}: the resources folder is not usable (it does not exist, a font or an image is
+ *       damaged) or the file cannot be read. It belongs to the environment of the caller.</li>
+ *   <li>{@link Kind#LIMIT}: the document is valid but asks for more than is allowed (too many pages...).</li>
+ *   <li>{@link Kind#INTERNAL}: a failure of the engine, not of the document or the environment. It is reported as a
+ *       defect; {@link #getCause()} keeps the original.</li>
  * </ul>
  *
- * <p>Los errores de entrada y salida al escribir en el destino no son de esta familia: son la
- * {@link java.io.IOException} que declaran los métodos que escriben.</p>
+ * <p>Input and output errors when writing to the destination are not part of this family: they are the
+ * {@link java.io.IOException} that the writing methods declare.</p>
  */
 public abstract class StxtPdfException extends RuntimeException {
 
-    /** De quién es la culpa de un error. */
+    /** Whose fault an error is. */
     public enum Kind {
         INVALID_DOCUMENT,
         RESOURCE,
@@ -29,7 +29,7 @@ public abstract class StxtPdfException extends RuntimeException {
         INTERNAL
     }
 
-    /** El valor de {@link #line()} cuando el error no es de ninguna línea del documento. */
+    /** The value of {@link #line()} when the error does not belong to any line of the document. */
     public static final int NO_LINE = 0;
 
     private final Kind kind;
@@ -41,7 +41,7 @@ public abstract class StxtPdfException extends RuntimeException {
         this(kind, line, false, code, message, cause);
     }
 
-    /** {@code inStyles}: la línea es del documento de estilos aparte, no del documento. */
+    /** {@code inStyles}: the line belongs to the separate styles document, not to the document. */
     protected StxtPdfException(Kind kind, int line, boolean inStyles, String code, String message, Throwable cause) {
         super(message, cause);
         this.kind = kind;
@@ -55,21 +55,22 @@ public abstract class StxtPdfException extends RuntimeException {
     }
 
     /**
-     * La línea donde está el nodo culpable, o {@link #NO_LINE} si el error no es de una línea. Es del documento, o
-     * del documento de estilos aparte si {@link #inStyles()}.
+     * The line of the offending node, or {@link #NO_LINE} if the error does not belong to a line. It is a line of the
+     * document, or of the separate styles document if {@link #inStyles()}.
      */
     public int line() {
         return line;
     }
 
-    /** Si {@link #line()} es del documento de estilos aparte (reference/common/styles.md) y no del documento. */
+    /** Whether {@link #line()} is a line of the separate styles document (reference/common/styles.md). */
     public boolean inStyles() {
         return inStyles;
     }
 
     /**
-     * Código estable del error, en texto: el de {@code ErrorCode} ({@code BOX_OVERFLOW}), el de la librería
-     * {@code stxt-core} ({@code CHILD_NOT_DECLARED}), {@code RESOURCE}, {@code IMAGE_FORMAT} o {@code INTERNAL}.
+     * Stable code of the error, as text: that of {@code ErrorCode} ({@code BOX_OVERFLOW}), that of the
+     * {@code stxt-core} library ({@code CHILD_NOT_DECLARED}), {@code RESOURCE}, {@code IMAGE_FORMAT} or
+     * {@code INTERNAL}.
      */
     public String code() {
         return code;

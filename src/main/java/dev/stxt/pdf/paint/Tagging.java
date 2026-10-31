@@ -4,14 +4,14 @@ import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Lo que un lienzo hace con el significado de lo que pinta, aparte de dibujarlo: las secuencias de texto del PDF
- * etiquetado (reference/implementation/pdf.md) y las zonas de los enlaces (reference/common/links.md). Cada {@link
- * Canvas} da la suya ({@link Canvas#tagging()}): la de {@link PdfCanvas} es {@link PdfTagging}; la de un lienzo que
- * solo dibuja, {@link #NONE}, que no hace nada. No cambia lo que se ve.
+ * What a canvas does with the meaning of what it paints, apart from drawing it: the text sequences of the tagged PDF
+ * (reference/implementation/pdf.md) and the areas of the links (reference/common/links.md). Each {@link Canvas} gives
+ * its own ({@link Canvas#tagging()}): that of {@link PdfCanvas} is {@link PdfTagging}; that of a canvas that only
+ * draws, {@link #NONE}, which does nothing. It does not change what is seen.
  */
 public interface Tagging {
 
-    /** La de un lienzo que solo dibuja: no marca el texto ni crea enlaces. */
+    /** That of a canvas that only draws: it neither marks the text nor creates links. */
     Tagging NONE = new Tagging() {
         @Override
         public void beginText(Box box) {
@@ -39,36 +39,37 @@ public interface Tagging {
     };
 
     /**
-     * Empieza el texto de un fragmento de la caja: las líneas que siguen, hasta {@link #endText()},
-     * son su contenido (el PDF etiquetado lo marca, reference/implementation/pdf.md).
+     * Starts the text of a fragment of the box: the lines that follow, until {@link #endText()},
+     * are its content (the tagged PDF marks it, reference/implementation/pdf.md).
      */
     void beginText(Box box);
 
     /**
-     * Empieza el texto de un enlace dentro del texto de la caja (reference/implementation/pdf.md): como
-     * {@link #beginText(Box)}, pero lo que sigue, hasta {@link #endText()}, es el contenido de un
-     * {@code Link} del PDF etiquetado. Las zonas clicables de ese texto ({@link #link}) se piden
-     * después de empezarlo.
+     * Starts the text of a link inside the text of the box (reference/implementation/pdf.md): like
+     * {@link #beginText(Box)}, but what follows, until {@link #endText()}, is the content of a
+     * {@code Link} of the tagged PDF. The clickable areas of that text ({@link #link}) are requested
+     * after starting it.
      */
     void beginLinkText(Box box);
 
-    /** Termina el texto empezado con {@link #beginText(Box)} o {@link #beginLinkText(Box)}. */
+    /** Ends the text started with {@link #beginText(Box)} or {@link #beginLinkText(Box)}. */
     void endText();
 
     /**
-     * Lo que se pinta hasta {@link #endActualText()}, dentro de un texto empezado, se extrae como {@code text}
-     * (reference/implementation/pdf.md): el texto con interletraje, cuyas letras separadas harían adivinar espacios.
+     * What is painted until {@link #endActualText()}, inside a started text, is extracted as {@code text}
+     * (reference/implementation/pdf.md): text with letter spacing, whose separated letters would make extractors guess
+     * spaces.
      */
     void beginActualText(String text);
 
-    /** Termina lo empezado con {@link #beginActualText(String)}. */
+    /** Ends what was started with {@link #beginActualText(String)}. */
     void endActualText();
 
     /**
-     * Una zona clicable (reference/common/links.md): el área {@code area} de la página lleva a
-     * {@code destination} ({@link dev.stxt.pdf.model.Links}). {@code box} es la caja a la que
-     * pertenece (el PDF etiquetado cuelga el enlace de ella) y {@code description} el texto que
-     * se lee en su lugar, que puede ser {@code null}.
+     * A clickable area (reference/common/links.md): the area {@code area} of the page leads to
+     * {@code destination} ({@link dev.stxt.pdf.model.Links}). {@code box} is the box it belongs to
+     * (the tagged PDF hangs the link from it) and {@code description} the text read in its place,
+     * which may be {@code null}.
      */
     void link(Box box, Rect area, String destination, String description);
 }

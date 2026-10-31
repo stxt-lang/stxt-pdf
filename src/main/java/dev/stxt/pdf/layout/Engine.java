@@ -40,21 +40,20 @@ import java.util.Set;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Maquetador y despachador de algoritmos por {@code Layout}. Todas las llamadas recursivas de layout
- * pasan por aquí para usar la caché: los algoritmos lo ven como su {@link LayoutContext}, sin depender del
- * motor. Quien solo quiere convertir un documento usa
- * {@link dev.stxt.pdf.convert.Converter}, que lo crea y lo configura.
+ * Layout engine and dispatcher of algorithms by {@code Layout}. All recursive layout calls go through here to use
+ * the cache: the algorithms see it as their {@link LayoutContext}, without depending on the engine. A caller that
+ * only wants to convert a document uses {@link dev.stxt.pdf.convert.Converter}, which creates and configures it.
  *
- * <p><strong>Hilos: un {@code Engine} no es seguro entre hilos y no se comparte.</strong> Guarda la caché del
- * layout (mapas sin sincronizar), el reparto en líneas memorizado y las páginas supuestas de las referencias
- * ({@link dev.stxt.pdf.layout.inline.InlineLayout}). Dos conversiones a la vez necesitan un motor cada una,
- * que es lo que hace el {@code Converter}; lo que se puede compartir es lo que no cambia:
- * {@link Resources}, {@link dev.stxt.pdf.stxt.DocumentReader} y el {@link LaidOutDocument} ya maquetado.
- * Sí se puede reutilizar en secuencia: {@link #layOutDocument(BoxTreeBuilder.Result)} vacía la caché y el
- * estado al terminar, de modo que un motor guardado no retiene el árbol de cajas del último documento.</p>
+ * <p><strong>Threads: an {@code Engine} is not thread-safe and is not shared.</strong> It keeps the layout cache
+ * (unsynchronized maps), the memoized line breaking and the assumed pages of the references
+ * ({@link dev.stxt.pdf.layout.inline.InlineLayout}). Two conversions at once need one engine each, which is what
+ * the {@code Converter} does; what can be shared is what does not change:
+ * {@link Resources}, {@link dev.stxt.pdf.stxt.DocumentReader} and the already laid out {@link LaidOutDocument}.
+ * It can be reused in sequence: {@link #layOutDocument(BoxTreeBuilder.Result)} empties the cache and the
+ * state when it finishes, so that a stored engine does not retain the box tree of the last document.</p>
  *
- * <p>El protocolo con el {@link Paginator} (cifras reservadas, páginas supuestas, numeración y cajas fuera de
- * flujo) no es público: solo se usa desde este package.</p>
+ * <p>The protocol with the {@link Paginator} (reserved digits, assumed pages, numbering and out-of-flow boxes)
+ * is not public: it is only used from this package.</p>
  */
 public final class Engine implements LayoutContext {
 
@@ -65,40 +64,40 @@ public final class Engine implements LayoutContext {
     private final InlineLayout inline;
     private final TableLayout table;
     private final OverlayLayout absolute;
-    /** El algoritmo de cada {@code Layout}; una tabla, que es un grid, tiene el suyo ({@link #algorithm}). */
+    /** The algorithm of each {@code Layout}; a table, which is a grid, has its own ({@link #algorithm}). */
     private final Map<Layout, LayoutAlgorithm> algorithms = new EnumMap<>(Layout.class);
 
     /**
-     * Motor con {@link FixedMetrics}, para que los tests y los casos golden sean deterministas y
-     * calculables a mano. No necesita la carpeta de fuentes; las imágenes, si las hay, son las
-     * de la carpeta de recursos por defecto. El PDF se maqueta con
+     * Engine with {@link FixedMetrics}, so that the tests and the golden cases are deterministic and
+     * computable by hand. It does not need the fonts folder; the images, if any, are those
+     * of the default resources folder. The PDF is laid out with
      * {@code new Engine(new PdfMetrics(resources), resources)}.
      */
     public Engine() {
         this(new FixedMetrics());
     }
 
-    /** Motor con esas métricas del texto y las imágenes de la carpeta de recursos por defecto. */
+    /** Engine with those text metrics and the images of the default resources folder. */
     public Engine(TextMeasurer measurer) {
         this(measurer, new Resources());
     }
 
     /**
-     * Motor con esas métricas del texto y las imágenes de {@code resources} (reference/components/image.md), con los
+     * Engine with those text metrics and the images of {@code resources} (reference/components/image.md), with the
      * {@link Limits#DEFAULT}.
      */
     public Engine(TextMeasurer measurer, Resources resources) {
         this(measurer, resources, Limits.DEFAULT);
     }
 
-    /** Motor con esas métricas, esas imágenes y esos {@link Limits} (reference/common/limits.md). */
+    /** Engine with those metrics, those images and those {@link Limits} (reference/common/limits.md). */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits) {
         this(measurer, resources, limits, Set.of());
     }
 
     /**
-     * Motor con esas métricas, esas imágenes y esos {@link Limits}, sin las comprobaciones de {@code excluded} que
-     * se hacen al maquetar (las de las imágenes de PDF, {@link Check}).
+     * Engine with those metrics, those images and those {@link Limits}, without the checks in {@code excluded} that
+     * are made during layout (those of the PDF images, {@link Check}).
      */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded) {
         this.measurer = measurer;
@@ -117,29 +116,29 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Documento STXT → páginas, con el medio y los metadatos. Lo normal es leerlo con
-     * {@link dev.stxt.pdf.stxt.DocumentReader}; si no está validado, {@link BoxTreeBuilder} lo
-     * valida contra el schema. Antes de maquetar comprueba con el {@link TextMeasurer} que se
-     * puede medir todo el texto (las fuentes, en la salida PDF) y que existen todas las imágenes,
-     * y después que nada desborda ({@link Overflow}).
+     * STXT document → pages, with the medium and the metadata. The usual way is to read it with
+     * {@link dev.stxt.pdf.stxt.DocumentReader}; if it is not validated, {@link BoxTreeBuilder}
+     * validates it against the schema. Before laying out it checks with the {@link TextMeasurer} that
+     * all the text can be measured (the fonts, in the PDF output) and that all the images exist,
+     * and afterwards that nothing overflows ({@link Overflow}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
         return layOutDocument(new BoxTreeBuilder().build(document));
     }
 
     /**
-     * Como {@link #layOutDocument(InlineNode)}, con un documento de estilos aparte
-     * ({@link dev.stxt.pdf.stxt.DocumentReader#readStyles}), cuyas reglas valen menos que las del
-     * propio documento (reference/common/styles.md). {@code styles} puede ser {@code null}.
+     * Like {@link #layOutDocument(InlineNode)}, with a separate styles document
+     * ({@link dev.stxt.pdf.stxt.DocumentReader#readStyles}), whose rules weigh less than those of the
+     * document itself (reference/common/styles.md). {@code styles} can be {@code null}.
      */
     public LaidOutDocument layOutDocument(InlineNode document, InlineNode styles) {
         return layOutDocument(new BoxTreeBuilder().build(document, styles));
     }
 
     /**
-     * Como {@link #layOutDocument(InlineNode)}, con el árbol ya construido. Sirve para retocar el árbol antes de
-     * maquetarlo (los tests ponen así tramos con formato en un texto, reference/common/text-formatting.md); el árbol
-     * no se puede cambiar después.
+     * Like {@link #layOutDocument(InlineNode)}, with the tree already built. It serves to adjust the tree before
+     * laying it out (this is how the tests put formatted runs in a text, reference/common/text-formatting.md); the
+     * tree cannot be changed afterwards.
      */
     public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
         measurer.validate(tree.root());
@@ -155,33 +154,33 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Suelta lo que el motor memoriza de un documento: la caché, el reparto en líneas, las cifras reservadas y las
-     * páginas supuestas.
+     * Releases what the engine memoizes of a document: the cache, the line breaking, the reserved digits and the
+     * assumed pages.
      */
     private void release() {
         cache.clear();
         inline.reset();
     }
 
-    /** Los límites de este motor, que el {@link Paginator} aplica al número de páginas. */
+    /** The limits of this engine, which the {@link Paginator} applies to the number of pages. */
     Limits limits() {
         return limits;
     }
 
-    /** Layouts que ha calculado este motor desde que se creó, para medir lo que ahorra la caché. */
+    /** Layouts this engine has computed since it was created, to measure what the cache saves. */
     int cacheMisses() {
         return cache.misses();
     }
 
-    /** Entradas de la caché ahora mismo, para comprobar que {@link #release} la vacía. */
+    /** Entries of the cache right now, to check that {@link #release} empties it. */
     int cachedEntries() {
         return cache.entries();
     }
 
     /**
-     * Cifras que reservan {@code {page}} y {@code {pages}} al maquetar ({@link PageNumbers}). Cambian las medidas
-     * de {@code changed}, los textos con esos marcadores: se olvida lo que la caché guarda de ellos y de sus
-     * antepasados ({@link #forget}).
+     * Digits that {@code {page}} and {@code {pages}} reserve during layout ({@link PageNumbers}). The measurements
+     * of {@code changed}, the texts with those markers, change: what the cache stores of them and of their
+     * ancestors is forgotten ({@link #forget}).
      */
     void reservePageNumbers(String probe, Collection<Box> changed) {
         inline.reservePageNumbers(probe);
@@ -189,10 +188,10 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Lo que valen las referencias a otras cajas en los textos (reference/common/references.md): la página de cada
-     * caja referida con {@code {page of: id}}, que el {@link Paginator} supone y comprueba, y su número con {@code
-     * {number of: id}}. Cambian las medidas de {@code changed}, los textos cuyas referencias valen otra cosa que en la
-     * pasada anterior: se olvida lo que la caché guarda de ellos y de sus antepasados.
+     * What the references to other boxes in the texts are worth (reference/common/references.md): the page of each
+     * box referred to with {@code {page of: id}}, which the {@link Paginator} assumes and checks, and its number with
+     * {@code {number of: id}}. The measurements of {@code changed}, the texts whose references are worth something
+     * different from the previous pass, change: what the cache stores of them and of their ancestors is forgotten.
      */
     void assume(Map<String, String> pages, Map<String, String> numbers, Collection<Box> changed) {
         inline.assume(pages, numbers);
@@ -200,15 +199,15 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Olvida lo que la caché y el reparto en líneas guardan de esos textos y de sus antepasados, cuyo layout depende
-     * de lo que miden. Lo demás sigue valiendo: el resultado de una caja solo depende de su subárbol, así que
-     * el cuerpo de un documento no se vuelve a maquetar porque cambie el número de su pie de página.
+     * Forgets what the cache and the line breaking store of those texts and of their ancestors, whose layout depends
+     * on what they measure. The rest is still valid: the result of a box only depends on its subtree, so
+     * the body of a document is not laid out again because the number in its footer changes.
      */
     private void forget(Collection<Box> changed) {
         Set<Box> stale = Collections.newSetFromMap(new IdentityHashMap<>());
         for (Box box : changed) {
             for (Box b = box; b != null && stale.add(b); b = b.parent()) {
-                // Sube hasta la raíz, o hasta un antepasado ya apuntado.
+                // Goes up to the root, or to an ancestor already noted.
             }
         }
         if (!stale.isEmpty()) {
@@ -230,9 +229,9 @@ public final class Engine implements LayoutContext {
     /**
      * {@inheritDoc}
      *
-     * <p>Una caja girada en flujo aporta el ancho del rectángulo que la envuelve, maquetada con el ancho que tendría
-     * sin contenedor: su {@code Width} o, si no lo tiene, su ancho natural (reference/common/layers-and-rotation.md). Los
-     * porcentajes cuentan como en cualquier caja ({@link BoxModel#intrinsic}).</p>
+     * <p>A rotated box in flow contributes the width of the rectangle that encloses it, laid out with the width it
+     * would have without a container: its {@code Width} or, if it has none, its natural width
+     * (reference/common/layers-and-rotation.md). Percentages count as in any box ({@link BoxModel#intrinsic}).</p>
      */
     @Override
     public IntrinsicSizes intrinsic(Box box) {
@@ -255,16 +254,16 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Layout de una caja con su algoritmo. Si la caja es el containing block de cajas
-     * {@code absolute} de su interior, las resuelve al terminar (reference/components/frame-and-overlays.md).
+     * Layout of a box with its algorithm. If the box is the reference container of {@code absolute} boxes
+     * inside it, it resolves them when it finishes (reference/components/frame-and-overlays.md).
      *
-     * <p>Si la caja termina en esta página y solo se salen de ella su borde y su relleno
-     * inferiores, se repite el layout con ese espacio reservado (reference/common/breaks.md): la caja termina dentro
-     * de la página o se corta antes, y el final pasa a la siguiente con el borde y el relleno.</p>
+     * <p>If the box ends on this page and only its bottom border and padding stick out of it, the layout is
+     * repeated with that space reserved (reference/common/breaks.md): the box ends inside the page or is broken
+     * before, and the end goes to the next one with the border and the padding.</p>
      *
-     * <p>Una caja con {@code Rotate} no se parte, como una imagen: se maqueta sin fragmentación y,
-     * si no cabe en lo que queda de página, devuelve {@code BEFORE}; al principio de una página se
-     * coloca aunque no quepa, y el desbordamiento lo señala {@link Overflow}.</p>
+     * <p>A box with {@code Rotate} is not broken, like an image: it is laid out without fragmentation and,
+     * if it does not fit in what is left of the page, it returns {@code BEFORE}; at the start of a page it is
+     * placed even if it does not fit, and {@link Overflow} reports the overflow.</p>
      */
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
@@ -272,7 +271,7 @@ public final class Engine implements LayoutContext {
             return rotatedInFlow(box, space);
         }
         if (space.fragmenting() && box.style().rotation() != null) {
-            // Una caja girada no se parte (reference/common/breaks.md): entera o, si no cabe, en la página siguiente.
+            // A rotated box is not broken (reference/common/breaks.md): whole or, if it does not fit, on the next page.
             LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
             if (!space.atFragmentainerStart()
                     && !fits(whole.fragment().height(), space.fragmentainerRemaining().getAsDouble())) {
@@ -294,10 +293,10 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Una caja girada en flujo (reference/common/layers-and-rotation.md): se maqueta sin girar con su ancho, que no depende
-     * del contenedor ({@link #turnedWidth}), y ocupa el rectángulo que envuelve su caja de borde girada sobre su
-     * centro. No se parte: entera o, si no cabe en lo que queda de página, en la siguiente. Aísla los márgenes: no
-     * salen de ella los de sus hijos.
+     * A rotated box in flow (reference/common/layers-and-rotation.md): it is laid out unrotated with its width, which
+     * does not depend on the container ({@link #turnedWidth}), and takes up the rectangle that encloses its border
+     * box rotated about its center. It is not broken: whole or, if it does not fit in what is left of the page, on
+     * the next one. It isolates margins: those of its children do not come out of it.
      */
     private LayoutResult rotatedInFlow(Box box, ConstraintSpace space) {
         ConstraintSpace own = ConstraintSpace.fixed(turnedWidth(box, space), OptionalDouble.empty(),
@@ -308,16 +307,16 @@ public final class Engine implements LayoutContext {
                 && !fits(f.height(), space.fragmentainerRemaining().getAsDouble())) {
             return LayoutResult.before(box);
         }
-        // Lo que sube de dentro (los Page overlay) tiene su posición estática en la caja sin girar.
+        // What comes up from inside (the Page overlay) has its static position in the unrotated box.
         List<PendingOverlay> pending = r.pending().stream()
                 .map(p -> p.translated(f.turned().x(), f.turned().y())).toList();
         return LayoutResult.finished(f, pending, AdjoiningMargins.NONE);
     }
 
     /**
-     * El ancho de la caja de borde de una caja girada en flujo: el que da su {@code Width} o, si es {@code auto}, su
-     * ancho natural, sin estirarse ni partir sus líneas por el ancho del contenedor; una {@code Image}, el suyo de
-     * siempre.
+     * The border box width of a rotated box in flow: the one given by its {@code Width} or, if it is {@code auto},
+     * its natural width, without stretching or breaking its lines at the width of the container; an {@code Image},
+     * its usual one.
      */
     private double turnedWidth(Box box, ConstraintSpace space) {
         if (box.isImage() || !box.style().box().width().isAuto()) {
@@ -331,7 +330,8 @@ public final class Engine implements LayoutContext {
                 space.percentBaseWidth());
     }
 
-    /** El fragmento sin girar de una caja girada en flujo, con el rectángulo que la envuelve girada sobre su centro. */
+    /** The unrotated fragment of a rotated box in flow, with the rectangle that encloses it rotated about its center.
+     */
     private static Fragment turned(Box box, Fragment f) {
         Rect border = new Rect(0, 0, f.width(), f.height());
         Rotation rotation = box.style().rotation();
@@ -346,21 +346,21 @@ public final class Engine implements LayoutContext {
     }
 
     /**
-     * Sustituye {@code {page}} y {@code {pages}} en las líneas de un fragmento ya maquetado y en
-     * las de sus descendientes; el {@link Paginator} lo usa al terminar de paginar.
+     * Replaces {@code {page}} and {@code {pages}} in the lines of an already laid out fragment and in
+     * those of its descendants; the {@link Paginator} uses it when it finishes paginating.
      */
     Fragment number(Fragment fragment, String page, String pages) {
         return inline.number(fragment, page, pages);
     }
 
-    /** Layout de las cajas fuera de flujo; el {@link Paginator} lo usa para las {@code fixed}. */
+    /** Layout of the out-of-flow boxes; the {@link Paginator} uses it for the {@code fixed} ones. */
     OverlayLayout absolute() {
         return absolute;
     }
 
-    /** El algoritmo de la caja: el de su {@code Layout} o, si es una tabla, el de las tablas. */
+    /** The algorithm of the box: that of its {@code Layout} or, if it is a table, that of tables. */
     private LayoutAlgorithm algorithm(Box box) {
-        // Una tabla es un grid que repite su cabecera y su pie en cada página (reference/components/table.md).
+        // A table is a grid that repeats its header and footer on each page (reference/components/table.md).
         return box.element() == Element.TABLE ? table : algorithms.get(box.style().layout());
     }
 

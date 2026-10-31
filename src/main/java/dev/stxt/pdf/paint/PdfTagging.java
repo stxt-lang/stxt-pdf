@@ -16,21 +16,21 @@ import java.util.List;
 import static dev.stxt.pdf.paint.PdfContent.io;
 
 /**
- * El etiquetado de una página PDF: el contenido marcado del PDF etiquetado, que {@link PdfStructure} cuelga de su
- * elemento, y las anotaciones de los enlaces (reference/implementation/pdf.md), que crea {@link
- * PdfLinks} y se ponen en la página al terminar de pintarla ({@link #annotations}).
+ * The tagging of a PDF page: the marked content of the tagged PDF, which {@link PdfStructure} hangs from its
+ * element, and the link annotations (reference/implementation/pdf.md), which {@link PdfLinks} creates and
+ * which are set on the page when its painting ends ({@link #annotations}).
  */
 final class PdfTagging implements Tagging {
 
     private final PdfContent content;
     private final PDPageContentStream out;
-    /** Árbol de estructura del documento, compartido por todas sus páginas. */
+    /** Structure tree of the document, shared by all its pages. */
     private final PdfStructure structure;
-    /** Anotaciones de enlace del documento, compartidas por todas sus páginas. */
+    /** Link annotations of the document, shared by all its pages. */
     private final PdfLinks links;
-    /** Las anotaciones de esta página, que se le ponen al terminar de pintarla. */
+    /** The annotations of this page, set on it when its painting ends. */
     private final List<PDAnnotation> annotations = new ArrayList<>();
-    /** Si lo que se pinta es el texto de un enlace ({@link #beginLinkText}): sus zonas cuelgan de su {@code Link}. */
+    /** Whether what is painted is the text of a link ({@link #beginLinkText}): its areas hang from its {@code Link}. */
     private boolean linkText;
 
     PdfTagging(PdfContent content, PdfStructure structure, PdfLinks links) {
@@ -40,7 +40,7 @@ final class PdfTagging implements Tagging {
         this.links = links;
     }
 
-    /** Las anotaciones de enlace de la página, que {@link PdfDocumentWriter} le pone al terminar de pintarla. */
+    /** The link annotations of the page, which {@link PdfDocumentWriter} sets on it when its painting ends. */
     List<PDAnnotation> annotations() {
         return annotations;
     }
@@ -71,9 +71,9 @@ final class PdfTagging implements Tagging {
     }
 
     /**
-     * Empieza la imagen de una {@code Image}, que termina con {@link #endText()}: con {@code Alt}, el contenido de
-     * su {@code Figure}, cuyo {@code BBox} es su caja de contenido {@code area} (girada, la que la envuelve); sin
-     * él, un <em>artifact</em>.
+     * Starts the image of an {@code Image}, which ends with {@link #endText()}: with {@code Alt}, the content of
+     * its {@code Figure}, whose {@code BBox} is its content box {@code area} (when rotated, the one enclosing it);
+     * without it, an <em>artifact</em>.
      */
     void beginImage(Box box, Rect area) {
         io(() -> {
@@ -90,15 +90,15 @@ final class PdfTagging implements Tagging {
     /**
      * {@inheritDoc}
      *
-     * <p>Una anotación {@code Link} sin borde; la estructura la cuelga de la caja ({@link PdfStructure#link}).
-     * Girada, su rectángulo es el que envuelve la zona y sus {@code QuadPoints}, la zona girada: un
-     * visor que no los entiende la hace clicable entera.</p>
+     * <p>A {@code Link} annotation without a border; the structure hangs it from the box ({@link PdfStructure#link}).
+     * When rotated, its rectangle is the one enclosing the area and its {@code QuadPoints}, the rotated area: a
+     * viewer that does not understand them makes the whole rectangle clickable.</p>
      */
     @Override
     public void link(Box box, Rect area, String destination, String description) {
         PDAnnotationLink annotation = links.create(content.turnedRect(area), destination, description);
         if (!content.turn().isIdentity()) {
-            // Las cuatro esquinas en sentido antihorario desde abajo a la izquierda, con el origen abajo.
+            // The four corners counterclockwise from the bottom left, with the origin at the bottom.
             double[] c = Rotation.corners(content.turn(), area);
             float[] quad = new float[8];
             int[] order = {3, 2, 1, 0};

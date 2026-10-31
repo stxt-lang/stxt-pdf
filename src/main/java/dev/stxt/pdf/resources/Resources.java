@@ -7,32 +7,32 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 /**
- * Carpeta de recursos (reference/common/resources.md): fuentes en {@code fonts/} e imágenes en
- * {@code images/}. Por defecto es {@code resources/}, relativa al directorio de trabajo; este
- * objeto solo sirve para cambiarla.
+ * Resources folder (reference/common/resources.md): fonts in {@code fonts/} and images in
+ * {@code images/}. By default it is {@code resources/}, relative to the working directory; this
+ * object only serves to change it.
  *
- * <p>Los recursos se buscan siempre <strong>hacia abajo</strong>: {@link #resolve(String)}
- * rechaza las rutas absolutas, los segmentos {@code ..} y los enlaces simbólicos que apuntan
- * fuera de la carpeta.</p>
+ * <p>Resources are always looked up <strong>downward</strong>: {@link #resolve(String)}
+ * rejects absolute paths, {@code ..} segments and symbolic links that point
+ * outside the folder.</p>
  *
- * <p><strong>Hilos:</strong> se puede compartir entre todas las conversiones y todos los hilos. Las fuentes y
- * las imágenes se leen la primera vez que se piden, con una comprobación doble, y después se consultan sin
- * cerrojo; la carpeta se explora una sola vez, así que los ficheros que se añadan después no se ven.</p>
+ * <p><strong>Threads:</strong> it can be shared among all conversions and all threads. Fonts and
+ * images are read the first time they are requested, with double-checked locking, and are then read without a
+ * lock; the folder is scanned only once, so files added later are not seen.</p>
  */
 public final class Resources {
 
-    /** Raíz por defecto, relativa al directorio de trabajo. */
+    /** Default root, relative to the working directory. */
     public static final Path DEFAULT_ROOT = Path.of("resources");
 
-    /** {@code C:}, {@code d:}…: unidad de Windows. */
+    /** {@code C:}, {@code d:}...: Windows drive. */
     private static final Pattern DRIVE = Pattern.compile("^[A-Za-z]:");
 
     private final Path root;
-    /** Se crean la primera vez que se piden y se leen sin cerrojo (comprobación doble). */
+    /** Created the first time they are requested and read without a lock (double-checked locking). */
     private volatile FontLibrary fonts;
     private volatile ImageLibrary images;
 
-    /** Recursos en {@link #DEFAULT_ROOT}. */
+    /** Resources in {@link #DEFAULT_ROOT}. */
     public Resources() {
         this(DEFAULT_ROOT);
     }
@@ -45,20 +45,20 @@ public final class Resources {
         return root;
     }
 
-    /** Carpeta de las fuentes. */
+    /** Folder of the fonts. */
     public Path fontsFolder() {
         return root.resolve("fonts");
     }
 
-    /** Carpeta de las imágenes. */
+    /** Folder of the images. */
     public Path imagesFolder() {
         return root.resolve("images");
     }
 
     /**
-     * Fuentes de {@code fonts/}. Se exploran la primera vez que se piden.
+     * Fonts of {@code fonts/}. They are scanned the first time they are requested.
      *
-     * @throws ResourceException si la carpeta no existe o alguna fuente no es válida
+     * @throws ResourceException if the folder does not exist or some font is not valid
      */
     public FontLibrary fonts() {
         FontLibrary library = fonts;
@@ -74,7 +74,7 @@ public final class Resources {
         return library;
     }
 
-    /** Imágenes de {@code images/}, que se leen la primera vez que se piden. */
+    /** Images of {@code images/}, read the first time they are requested. */
     public ImageLibrary images() {
         ImageLibrary library = images;
         if (library == null) {
@@ -90,66 +90,66 @@ public final class Resources {
     }
 
     /**
-     * Fichero existente de la carpeta de recursos, a partir de una ruta relativa a ella
-     * ({@code images/logo.png}). Admite {@code /} y {@code \} como separadores.
+     * Existing file of the resources folder, from a path relative to it
+     * ({@code images/logo.png}). Accepts {@code /} and {@code \} as separators.
      *
-     * @throws ResourceException si la ruta es absoluta, contiene {@code ..}, sale de la carpeta
-     *                           por un enlace o no existe
+     * @throws ResourceException if the path is absolute, contains {@code ..}, leaves the folder
+     *                           through a link or does not exist
      */
     public Path resolve(String relative) {
         return resolve("", relative);
     }
 
     /**
-     * Fichero existente de una subcarpeta de los recursos ({@code images}), a partir de una ruta
-     * relativa a ella ({@code logos/acme.png}), con las mismas comprobaciones que
-     * {@link #resolve(String)}: la ruta no puede salir de la subcarpeta.
+     * Existing file of a subfolder of the resources ({@code images}), from a path
+     * relative to it ({@code logos/acme.png}), with the same checks as
+     * {@link #resolve(String)}: the path cannot leave the subfolder.
      *
-     * @throws ResourceException si la ruta es absoluta, contiene {@code ..}, sale de la
-     *                           subcarpeta (también por un enlace) o no existe
+     * @throws ResourceException if the path is absolute, contains {@code ..}, leaves the
+     *                           subfolder (also through a link) or does not exist
      */
     public Path resolve(String folder, String relative) {
         if (relative.isBlank()) {
-            throw new ResourceException("Ruta de recurso vacía");
+            throw new ResourceException("Empty resource path");
         }
         if (relative.startsWith("/") || relative.startsWith("\\") || relative.startsWith("~")
                 || DRIVE.matcher(relative).lookingAt()) {
-            throw new ResourceException("Ruta de recurso absoluta: " + relative
-                    + " (las rutas son relativas a la carpeta de recursos)");
+            throw new ResourceException("Absolute resource path: " + relative
+                    + " (paths are relative to the resources folder)");
         }
         for (String segment : relative.split("[/\\\\]")) {
             if (segment.equals("..")) {
-                throw new ResourceException("Ruta de recurso hacia atrás: " + relative
-                        + " (no se admite '..')");
+                throw new ResourceException("Backward resource path: " + relative
+                        + " ('..' is not allowed)");
             }
         }
         Path base = root.resolve(folder).normalize();
         Path path = base.resolve(relative.replace('\\', '/')).normalize();
         if (!path.startsWith(base)) {
-            throw new ResourceException("La ruta " + relative + " sale de la carpeta " + base);
+            throw new ResourceException("The path " + relative + " leaves the folder " + base);
         }
         if (!Files.exists(path)) {
-            throw new ResourceException("No existe el recurso " + relative + " en " + base);
+            throw new ResourceException("The resource " + relative + " does not exist in " + base);
         }
         return checkInside(path, base);
     }
 
     /**
-     * Comprueba que un fichero de la carpeta, una vez resueltos los enlaces simbólicos, sigue
-     * dentro de ella.
+     * Checks that a file of the folder, once symbolic links are resolved, is still
+     * inside it.
      *
-     * @throws ResourceException si es un enlace que sale de la carpeta
+     * @throws ResourceException if it is a link that leaves the folder
      */
     Path checkInside(Path path) {
         return checkInside(path, root);
     }
 
-    /** Como {@link #checkInside(Path)}, dentro de una subcarpeta de los recursos. */
+    /** Like {@link #checkInside(Path)}, inside a subfolder of the resources. */
     private Path checkInside(Path path, Path base) {
         try {
             if (!path.toRealPath().startsWith(base.toRealPath())) {
-                throw new ResourceException("El recurso " + root.relativize(path)
-                        + " es un enlace que sale de la carpeta " + (base.equals(root) ? "de recursos" : base.getFileName())
+                throw new ResourceException("The resource " + root.relativize(path)
+                        + " is a link that leaves the " + (base.equals(root) ? "resources folder" : "folder " + base.getFileName())
                         + " (" + base + ")");
             }
             return path;

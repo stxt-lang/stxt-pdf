@@ -11,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Table of contents} (reference/components/table-of-contents.md). Páginas de 180 pt con márgenes de 40: área
- * útil de 515 × 100; con {@code FixedMetrics} y {@code Size: 10}, cada carácter mide 5 pt y cada línea, 12.
+ * {@code Table of contents} (reference/components/table-of-contents.md). Pages of 180 pt with margins of 40: page
+ * area of 515 × 100; with {@code FixedMetrics} and {@code Size: 10}, each character measures 5 pt and each line, 12.
  */
 class TableOfContentsTest {
 
     private static final double PAGE = 180;
 
-    /** El índice y, detrás, tres encabezados separados por 100 pt: caen en las páginas 1, 2 y 3. */
+    /** The table of contents and, after it, three headings separated by 100 pt: they fall on pages 1, 2 and 3. */
     private static String[] document(String contents, String... before) {
         String[] body = {
                 "\tTable of contents:", "\t\tId: toc", contents,
@@ -40,8 +40,8 @@ class TableOfContentsTest {
     }
 
     /**
-     * Un encabezado con {@code In table of contents: false} sigue siendo un encabezado (el índice lo ve en su sitio y
-     * las páginas no cambian) pero no tiene entrada (reference/components/table-of-contents.md).
+     * A heading with {@code In table of contents: false} is still a heading (the table of contents sees it in its place
+     * and the pages do not change) but it has no entry (reference/components/table-of-contents.md).
      */
     @Test
     void aHeadingWithInTableOfContentsFalseHasNoEntry() {
@@ -71,7 +71,7 @@ class TableOfContentsTest {
             assertEquals(titles[i], text(title));
             assertEquals(pages[i], text(page));
             assertEquals(Element.TOC_LEADER, leader.box().element());
-            // El título y el número miden lo que escriben; la guía llena el hueco, con 4 pt a cada lado.
+            // The title and the number measure what they write; the leader fills the gap, with 4 pt on each side.
             double titleWidth = 5 * titles[i].length();
             assertEquals(0, title.x(), 1e-9);
             assertEquals(titleWidth, title.width(), 1e-9);
@@ -101,7 +101,7 @@ class TableOfContentsTest {
     @Test
     void aHeadingWithoutIdIsReferredWithAGeneratedName() {
         LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2"));
-        // El último tiene Id (last): su entrada lo usa; los demás, un nombre generado.
+        // The last one has an Id (last): its entry uses it; the others, a generated name.
         assertEquals("(heading 1)", l.fragment("toc").box().children().get(0).children().get(2).text()
                 .replace("{page of: ", "").replace("}", ""));
         assertEquals("{page of: last}", l.fragment("toc").box().children().get(2).children().get(2).text());
@@ -113,8 +113,8 @@ class TableOfContentsTest {
                 "\tStyles:", "\t\tFor element: TOC 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
                 "\t\t\tTypography:", "\t\t\t\tSize: 10"));
         List<Fragment> entries = entries(l);
-        // Solo el nivel 2 lleva sangría: sus hijos, relativos a su caja de contenido, quedan 20 pt más
-        // estrechos y el número sigue pegado al borde derecho.
+        // Only level 2 has an indent: its children, relative to its content box, are 20 pt
+        // narrower and the number stays against the right edge.
         assertEquals(20, entries.get(1).padding().left(), 1e-9);
         assertEquals(0, entries.get(0).padding().left(), 1e-9);
         assertEquals(510, entries.get(0).children().get(2).x(), 1e-9);
@@ -127,7 +127,7 @@ class TableOfContentsTest {
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tTable of contents:", "\t\tId: toc");
-        // El encabezado está en la página 1; el índice, que no cabe, en la 2.
+        // The heading is on page 1; the table of contents, which does not fit, on page 2.
         assertTrue(l.has(2, "toc"));
         assertEquals("1", text(l.fragment(2, "toc").children().get(0).children().get(2)));
     }

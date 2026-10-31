@@ -6,16 +6,16 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * Los nombres de posición que una regla {@code For element} de {@code Styles} puede dar a una celda de tabla
- * (reference/common/styles.md y reference/components/table.md). No son elementos: el elemento de la caja sigue
- * siendo {@code Cell}, y estas reglas se aplican además de la de {@code Cell}.
+ * The position names that a {@code For element} rule of {@code Styles} can give to a table cell
+ * (reference/common/styles.md and reference/components/table.md). They are not elements: the element of the box is
+ * still {@code Cell}, and these rules apply in addition to that of {@code Cell}.
  */
 enum CellSelector {
 
     HEADER_CELL("Header cell", p -> p.group() == CellPosition.HEADER),
     BODY_CELL("Body cell", p -> p.group() == CellPosition.BODY),
     FOOTER_CELL("Footer cell", p -> p.group() == CellPosition.FOOTER),
-    /** Filas impares del cuerpo: la primera fila de {@code Body} es la 1. */
+    /** Odd rows of the body: the first row of {@code Body} is row 1. */
     ODD_ROW_CELL("Odd row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 1),
     EVEN_ROW_CELL("Even row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 0);
 
@@ -27,12 +27,12 @@ enum CellSelector {
         this.matches = matches;
     }
 
-    /** El selector con ese nombre canónico ({@code header-cell}); vacío si no es uno. */
+    /** The selector with that canonical name ({@code header-cell}); empty if it is not one. */
     static Optional<CellSelector> of(String canonicalName) {
         return Arrays.stream(values()).filter(s -> s.canonicalName().equals(canonicalName)).findFirst();
     }
 
-    /** El nombre como se escribe ({@code Header cell}). */
+    /** The name as it is written ({@code Header cell}). */
     String label() {
         return label;
     }

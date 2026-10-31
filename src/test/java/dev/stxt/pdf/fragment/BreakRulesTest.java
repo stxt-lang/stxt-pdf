@@ -15,7 +15,7 @@ class BreakRulesTest {
 
     @Test
     void module8Exercise() {
-        // Área útil 762, interlineado 15, párrafo de 53 líneas que empieza en y = 720.
+        // Page area 762, line height 15, paragraph of 53 lines that starts at y = 720.
         int capacity1 = BreakRules.capacity(762 - 720, 15);
         assertEquals(2, capacity1);
         int p1 = BreakRules.linesThatFit(53, capacity1, 2, 2, false);
@@ -49,9 +49,9 @@ class BreakRulesTest {
     @Test
     void relaxedLinesKeepWidowsIfPossible() {
         assertEquals(1, BreakRules.relaxedLines(9, 1, 2));
-        // 3 pendientes y 2 viudas: solo puede quedar 1 aquí.
+        // 3 pending and 2 widows: only 1 can stay here.
         assertEquals(1, BreakRules.relaxedLines(3, 2, 2));
-        // Con 2 pendientes cualquier corte deja una viuda: se llena el espacio.
+        // With 2 pending any break leaves a widow: the space is filled.
         assertEquals(1, BreakRules.relaxedLines(2, 1, 2));
     }
 
@@ -63,7 +63,7 @@ class BreakRulesTest {
 
     @Test
     void cutLinesKeepsTheWidows() {
-        // Caben 9 de 10, pero entonces pasaría una sola línea: pasan 2.
+        // 9 of 10 fit, but then a single line would move on: 2 move on.
         assertEquals(new BreakRules.Cut(8, BreakAppeal.PERFECT_BREAK), BreakRules.cutLines(10, 0, 9, 2, 2, false));
     }
 
@@ -92,7 +92,7 @@ class BreakRulesTest {
         assertNull(BreakRules.best(List.<int[]>of(), c -> c[1]));
     }
 
-    /** Tres unidades de 40 separadas por huecos de 10, con la calidad del corte delante de cada una. */
+    /** Three units of 40 separated by gaps of 10, with the appeal of the break before each one. */
     private static List<Unit> units(int... appeal) {
         return List.of(new Unit(0, 40, appeal[0], Break.AUTO), new Unit(50, 90, appeal[1], Break.AUTO),
                 new Unit(100, 140, appeal[2], Break.AUTO));
@@ -124,7 +124,7 @@ class BreakRulesTest {
 
     @Test
     void cutUnitsSkipsUnbreakablePoints() {
-        // Entre 1 y 2 no se puede cortar: 1 y 2 van juntas a la página siguiente.
+        // There can be no break between 1 and 2: 1 and 2 go together to the next page.
         assertEquals(new BreakRules.Cut(1, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(units(0, 3, -1), 0, 100, false));
     }
@@ -138,12 +138,12 @@ class BreakRulesTest {
 
     @Test
     void cutUnitsResumesFromTheFirstUnitOfTheFragment() {
-        // Desde la unidad 1, el espacio se mide desde su principio (50): caben 1 y 2.
+        // From unit 1, the space is measured from its start (50): 1 and 2 fit.
         assertEquals(new BreakRules.Cut(3, BreakAppeal.PERFECT_BREAK),
                 BreakRules.cutUnits(units(0, 3, 3), 1, 100, true));
     }
 
-    // --- Cortes forzados de página y de columna ----------------------------------------------------
+    // --- Forced page and column breaks -------------------------------------------------------------
 
     private static Box box(Element element, Break before, Break after) {
         return new StyleEditor().layout(element.layout()).breakBefore(before).breakAfter(after).box(null, element);
@@ -162,7 +162,7 @@ class BreakRulesTest {
     }
 
     /**
-     * De un {@code Columns} solo sale el corte de página de su primer o su último hijo: el de columna se queda en él.
+     * Only the page break of its first or last child comes out of a {@code Columns}: the column break stays in it.
      */
     @Test
     void aColumnsOnlyPropagatesPageBreaks() {

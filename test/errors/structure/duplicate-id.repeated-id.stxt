@@ -1,0 +1,18 @@
+# Case: Repeated Id
+# Code: DUPLICATE_ID
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Id: a
+			Box:
+				Height: 10
+		Block:
+			Id: a
+			Box:
+				Height: 10

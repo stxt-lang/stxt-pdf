@@ -1,17 +1,17 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las esquinas redondeadas de una caja ya resueltas, en puntos (reference/common/box.md): un cuarto
- * de elipse por esquina, con su radio horizontal y su radio vertical. Es solo pintado.
+ * The resolved rounded corners of a box, in points (reference/common/box.md): a quarter
+ * of an ellipse per corner, with its horizontal and its vertical radius. It is painting only.
  */
 public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner bottomLeft) {
 
-    /** El cuarto de elipse de una esquina; los dos radios valen 0 si no es redonda. */
+    /** The quarter ellipse of a corner; both radii are 0 if it is not rounded. */
     public record Corner(double rx, double ry) {
 
         public static final Corner SQUARE = new Corner(0, 0);
 
-        /** Una esquina con algún radio nulo es cuadrada. */
+        /** A corner with a zero radius is square. */
         public static Corner of(double rx, double ry) {
             return rx > 0 && ry > 0 ? new Corner(rx, ry) : SQUARE;
         }
@@ -24,10 +24,10 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     public static final Radii NONE = new Radii(Corner.SQUARE, Corner.SQUARE, Corner.SQUARE, Corner.SQUARE);
 
     /**
-     * Resuelve {@code Corner radius} contra la caja de borde: un porcentaje horizontal es del ancho y uno
-     * vertical, del alto, así que {@code 50%} en una caja que no es cuadrada es una elipse. Como en
-     * CSS, si dos radios seguidos de un lado suman más que el lado, todos se reducen por el mismo
-     * factor hasta que caben.
+     * Resolves {@code Corner radius} against the border box: a horizontal percentage is of the width and a
+     * vertical one, of the height, so {@code 50%} on a box that is not square is an ellipse. As in
+     * CSS, if two adjacent radii of a side add up to more than the side, all of them are reduced by the same
+     * factor until they fit.
      */
     public static Radii resolve(Corners<Value> radius, double width, double height) {
         Radii r = new Radii(corner(radius.topLeft(), width, height), corner(radius.topRight(), width, height),
@@ -56,9 +56,9 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     }
 
     /**
-     * Los radios de la caja que queda al quitar {@code i} por dentro (el borde para pasar a la
-     * caja de relleno, el borde y el relleno para la de contenido): cada radio pierde el grosor del
-     * lado que toca, y una esquina que se queda sin radio es cuadrada.
+     * The radii of the box that remains after removing {@code i} on the inside (the border to get the
+     * padding box, the border and the padding to get the content box): each radius loses the width of the
+     * side it touches, and a corner left without radius is square.
      */
     public Radii inset(Insets i) {
         return new Radii(
@@ -69,8 +69,8 @@ public record Radii(Corner topLeft, Corner topRight, Corner bottomRight, Corner 
     }
 
     /**
-     * Las esquinas de un fragmento de una caja partida (reference/common/breaks.md): con {@code Edges: open},
-     * solo el primer fragmento tiene las de arriba y solo el último las de abajo.
+     * The corners of a fragment of a broken box (reference/common/breaks.md): with {@code Edges: open},
+     * only the first fragment has the top ones and only the last one the bottom ones.
      */
     public Radii forFragment(boolean topEdge, boolean bottomEdge) {
         return new Radii(topEdge ? topLeft : Corner.SQUARE, topEdge ? topRight : Corner.SQUARE,

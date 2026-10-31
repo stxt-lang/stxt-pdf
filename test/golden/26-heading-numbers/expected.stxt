@@ -1,5 +1,5 @@
-# Página 1: cover en 20; toc en 32, de 4 entradas de 12; intro en 32 + 48 + 8 = 88; method, data, fine y
-# ref cada 12 desde 100; results en 148, de 2 líneas por el número que lleva delante.
+# Page 1: cover at 20; toc at 32, of 4 entries of 12; intro at 32 + 48 + 8 = 88; method, data, fine and
+# ref every 12 from 100; results at 148, of 2 lines because of the number in front of it.
 Result:
 	Page: 1
 		Fragment: cover

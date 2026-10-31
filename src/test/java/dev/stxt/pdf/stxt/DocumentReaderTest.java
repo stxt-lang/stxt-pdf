@@ -94,7 +94,7 @@ class DocumentReaderTest {
                 () -> reader.read(doc("\tBlock:", "\t\tColour: #fff")));
         assertEquals(9, unknown.line());
 
-        // Una propiedad fuera de su elemento es un error de estructura.
+        // A property outside its element is a structure error.
         DocumentSyntaxException misplaced = assertThrows(DocumentSyntaxException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tOffset: 10")));
         assertEquals("CHILD_NOT_DECLARED", misplaced.code());
@@ -120,7 +120,7 @@ class DocumentReaderTest {
         }
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
 
-        // Columns y Body son obligatorios; las filas van en su grupo y Span solo en Cell.
+        // Columns and Body are required; the rows go in their group and Span only in Cell.
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
@@ -147,7 +147,7 @@ class DocumentReaderTest {
         InvalidModelException twoRoots = assertThrows(InvalidModelException.class,
                 () -> reader.read(doc("\tBlock:", "\t\tId: a") + "\nOther:"));
         assertEquals(10, twoRoots.line());
-        // El schema admite cualquier elemento como raíz; el motor, solo Document.
+        // The schema accepts any element as root; the engine, only Document.
         InvalidModelException block = assertThrows(InvalidModelException.class,
                 () -> reader.read("Block (dev.stxt.pdf):\n\tId: a"));
         assertEquals(ErrorCode.DOCUMENT_ROOT, block.errorCode());

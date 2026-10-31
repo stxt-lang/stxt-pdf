@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Encabezados y párrafos al construir el árbol (reference/components/heading.md). */
+/** Headings and paragraphs when building the tree (reference/components/heading.md). */
 class HeadingsTest {
 
     private static Box root(String... lines) {
@@ -76,7 +76,7 @@ class HeadingsTest {
                 "\tParagraph: C");
         Box h2 = root.children().get(1);
         assertEquals(14, h2.style().typography().fontSize(), 1e-9);
-        // El Typography del encabezado lo heredan sus Text.
+        // The Typography of the heading is inherited by its Text elements.
         assertEquals(14, h2.children().get(0).style().typography().fontSize(), 1e-9);
         assertEquals(10, root.children().get(0).style().typography().fontSize(), 1e-9);
         assertEquals(TextAlign.JUSTIFY, root.children().get(2).style().typography().textAlign());

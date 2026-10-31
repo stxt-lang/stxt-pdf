@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@code Case}, {@code Letter spacing} y {@code Small caps} en el árbol (reference/common/text-formatting.md).
+ * {@code Case}, {@code Letter spacing} and {@code Small caps} in the tree (reference/common/text-formatting.md).
  */
 class TextCaseTest {
 
@@ -73,7 +73,7 @@ class TextCaseTest {
     }
 
     /**
-     * {@code Language} en {@code Typography} cambia el idioma de la caja y de lo que hay dentro
+     * {@code Language} in {@code Typography} changes the language of the box and of what is inside it
      * (reference/common/typography.md).
      */
     @Test
@@ -86,7 +86,7 @@ class TextCaseTest {
         assertEquals(15, turkish.style().line("language").number());
     }
 
-    /** También en una regla de {@code Styles}: una clase para las palabras de otro idioma. */
+    /** Also in a {@code Styles} rule: a class for the words in another language. */
     @Test
     void aStylesRuleCanDeclareTheLanguage() {
         Box root = build("\tStyles:", "\t\tFor style: english", "\t\t\tTypography:", "\t\t\t\tLanguage: en-GB",
@@ -104,8 +104,8 @@ class TextCaseTest {
     }
 
     /**
-     * El idioma del documento es el {@code Language} de {@code Document}; la regla {@code For element: Document} no lo
-     * cambia.
+     * The language of the document is the {@code Language} of {@code Document}; the rule
+     * {@code For element: Document} does not change it.
      */
     @Test
     void elementDocumentCannotChangeTheLanguage() {

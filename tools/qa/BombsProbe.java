@@ -1,10 +1,10 @@
-// Sonda de QA: imágenes y SVG pequeños en bytes pero enormes al dibujarlos
-// («bombas de descompresión»). Dos modos, para repetir la medición con la memoria limitada de una JVM aparte:
+// QA probe: images and SVGs small in bytes but huge when drawn
+// ("decompression bombs"). Two modes, to repeat the measurement with the limited memory of a separate JVM:
 //
-//   java BombsProbe gen <carpeta>            crea <carpeta>/{fonts -> resources/fonts, images/*} con cada caso
-//   java -Xmx512m BombsProbe run <carpeta> <imagen>   convierte un documento con esa Image y cuenta tiempo y resultado
+//   java BombsProbe gen <folder>            creates <folder>/{fonts -> resources/fonts, images/*} with each case
+//   java -Xmx512m BombsProbe run <folder> <image>   converts a document with that Image and reports time and result
 //
-// Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
+// It runs from the root of the repository; see tools/qa/README.md.
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.resources.Resources;
@@ -29,7 +29,7 @@ public class BombsProbe {
         ImageIO.write(image, "jpg", out.toFile());
     }
 
-    /** n rectángulos. */
+    /** n rectangles. */
     static String manyRects(int n) {
         StringBuilder sb = new StringBuilder("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n");
         for (int i = 0; i < n; i++) sb.append("<rect x=\"").append(i % 100).append("\" y=\"").append(i % 97)
@@ -37,7 +37,7 @@ public class BombsProbe {
         return sb.append("</svg>\n").toString();
     }
 
-    /** n grupos anidados. */
+    /** n nested groups. */
     static String deepGroups(int n) {
         StringBuilder sb = new StringBuilder("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\">\n");
         for (int i = 0; i < n; i++) sb.append("<g>");
@@ -46,7 +46,7 @@ public class BombsProbe {
         return sb.append("\n</svg>\n").toString();
     }
 
-    /** `use` en cadena: nivel k usa diez veces el nivel k-1, así que dibuja 10^levels rectángulos. */
+    /** Chained `use`: level k uses level k-1 ten times, so it draws 10^levels rectangles. */
     static String useChain(int levels, int fan) {
         StringBuilder sb = new StringBuilder("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\""
                 + " width=\"100\" height=\"100\">\n<defs>\n<g id=\"l0\"><rect width=\"1\" height=\"1\"/></g>\n");
@@ -66,17 +66,17 @@ public class BombsProbe {
         png(images.resolve("gray-4000.png"), 4000, 4000, BufferedImage.TYPE_BYTE_GRAY);            // 16 Mpx
         png(images.resolve("gray-12000.png"), 12000, 12000, BufferedImage.TYPE_BYTE_GRAY);         // 144 Mpx
         png(images.resolve("rgb-8000.png"), 8000, 8000, BufferedImage.TYPE_INT_RGB);               // 64 Mpx
-        png(images.resolve("argb-4000.png"), 4000, 4000, BufferedImage.TYPE_INT_ARGB);             // 16 Mpx con transparencia
-        png(images.resolve("argb-8000.png"), 8000, 8000, BufferedImage.TYPE_INT_ARGB);             // 64 Mpx con transparencia
-        png(images.resolve("argb-12000.png"), 12000, 12000, BufferedImage.TYPE_INT_ARGB);          // 144 Mpx con transparencia
+        png(images.resolve("argb-4000.png"), 4000, 4000, BufferedImage.TYPE_INT_ARGB);             // 16 Mpx with transparency
+        png(images.resolve("argb-8000.png"), 8000, 8000, BufferedImage.TYPE_INT_ARGB);             // 64 Mpx with transparency
+        png(images.resolve("argb-12000.png"), 12000, 12000, BufferedImage.TYPE_INT_ARGB);          // 144 Mpx with transparency
         png(images.resolve("binary-30000.png"), 30000, 30000, BufferedImage.TYPE_BYTE_BINARY);     // 900 Mpx
         jpeg(images.resolve("jpeg-20000.jpg"), 20000, 20000);                                      // 400 Mpx
         Files.writeString(images.resolve("rects-300k.svg"), manyRects(300_000));
         Files.writeString(images.resolve("rects-3k.svg"), manyRects(3_000));
         Files.writeString(images.resolve("deep-2000.svg"), deepGroups(2_000));
         Files.writeString(images.resolve("deep-20000.svg"), deepGroups(20_000));
-        Files.writeString(images.resolve("use-5x10.svg"), useChain(5, 10));      // 10^5 rectángulos
-        Files.writeString(images.resolve("use-9x10.svg"), useChain(9, 10));      // 10^9 rectángulos
+        Files.writeString(images.resolve("use-5x10.svg"), useChain(5, 10));      // 10^5 rectangles
+        Files.writeString(images.resolve("use-9x10.svg"), useChain(9, 10));      // 10^9 rectangles
         try (var list = Files.list(images)) {
             list.sorted().forEach(f -> System.out.printf("%-20s %8d KB%n", f.getFileName(), f.toFile().length() / 1024));
         }

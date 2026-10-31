@@ -3,26 +3,26 @@ package dev.stxt.pdf.fragment;
 import dev.stxt.pdf.model.Break;
 
 /**
- * Una unidad de la fragmentación de un contenedor (reference/common/breaks.md): una línea de un
- * contenedor stack en {@code row}, un ítem de uno en {@code column} o una fila de una rejilla. Se
- * corta entre unidades, nunca dentro de una (salvo partiendo sus ítems en paralelo).
+ * A unit of the fragmentation of a container (reference/common/breaks.md): a line of a
+ * stack container in {@code row}, an item of one in {@code column} or a row of a grid. Breaks
+ * happen between units, never inside one (except by breaking its items in parallel).
  *
- * @param start        principio de la unidad, desde la caja de contenido del contenedor
- * @param end          final de la unidad
- * @param appealBefore calidad del corte delante de la unidad ({@link BreakAppeal}); negativa si
- *                     ahí no se puede cortar (un ítem de grid que ocupa esta fila y la anterior).
- *                     La de la primera unidad no se usa
- * @param forcedBefore corte forzado delante de la unidad: {@code PAGE}, {@code COLUMN} o {@code AUTO}
- *                     si no hay ({@link BreakRules#forcedBetween(java.util.List, java.util.List)})
+ * @param start        start of the unit, from the content box of the container
+ * @param end          end of the unit
+ * @param appealBefore quality of the break before the unit ({@link BreakAppeal}); negative if
+ *                     no break is possible there (a grid item that spans this row and the previous one).
+ *                     That of the first unit is not used
+ * @param forcedBefore forced break before the unit: {@code PAGE}, {@code COLUMN} or {@code AUTO}
+ *                     if there is none ({@link BreakRules#forcedBetween(java.util.List, java.util.List)})
  */
 public record Unit(double start, double end, int appealBefore, Break forcedBefore) {
 
-    /** Si se puede cortar delante de la unidad. */
+    /** Whether a break is possible before the unit. */
     public boolean breakableBefore() {
         return appealBefore >= 0;
     }
 
-    /** La misma unidad con las posiciones desde {@code origin}. */
+    /** The same unit with the positions measured from {@code origin}. */
     public Unit shifted(double origin) {
         return new Unit(start - origin, end - origin, appealBefore, forcedBefore);
     }

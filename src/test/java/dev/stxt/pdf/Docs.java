@@ -4,23 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Ayudas para escribir documentos de test. La tipografía base del documento va en
- * {@code Styles} (reference/common/styles.md), en la regla {@code For element: Document}; los tests la
- * escriben aparte del cuerpo, que a veces trae su propio {@code Styles}.
+ * Helpers for writing test documents. The base typography of the document goes in
+ * {@code Styles} (reference/common/styles.md), in the rule {@code For element: Document}; the tests write it
+ * apart from the body, which sometimes brings its own {@code Styles}.
  */
 public final class Docs {
 
     private Docs() {
     }
 
-    /** Los hijos de {@code Document} que no van dentro de una {@code Section}. */
+    /** The children of {@code Document} that do not go inside a {@code Section}. */
     private static final java.util.Set<String> DOCUMENT_LEVEL = java.util.Set.of("page", "title", "language", "styles");
 
     /**
-     * Envuelve en una {@code Section} todo lo que {@code Document} no admite suelto
-     * (reference/components/document.md): lo que sigue a {@code Page}, {@code Title}, {@code Language} y {@code
-     * Styles}, que quedan donde estaban. No cambia un texto que ya tiene una {@code Section}, que no es un {@code
-     * Document} o que no tiene contenido.
+     * Wraps in a {@code Section} everything that {@code Document} does not accept directly
+     * (reference/components/document.md): what follows {@code Page}, {@code Title}, {@code Language} and {@code
+     * Styles}, which stay where they were. It does not change a text that already has a {@code Section}, that is not
+     * a {@code Document} or that has no content.
      */
     public static String sectioned(String document) {
         String[] lines = document.split("\n", -1);
@@ -64,9 +64,9 @@ public final class Docs {
     }
 
     /**
-     * Junta en el primero todos los {@code Styles} de primer nivel del documento: las reglas de los
-     * demás pasan al final del primero y se quita su cabecera. Un documento con un solo
-     * {@code Styles}, o con ninguno, queda igual. Además lo pasa por {@link #sectioned}.
+     * Merges into the first one all the top-level {@code Styles} of the document: the rules of the
+     * others move to the end of the first one and their header is removed. A document with a single
+     * {@code Styles}, or with none, stays the same. It also passes it through {@link #sectioned}.
      */
     public static String mergeStyles(String document) {
         String[] lines = document.split("\n", -1);
@@ -83,7 +83,7 @@ public final class Docs {
                 out.add(lines[i]);
                 continue;
             }
-            // Un Styles posterior: sus reglas pasan al primero.
+            // A later Styles: its rules move to the first one.
             while (i + 1 < lines.length && lines[i + 1].startsWith("\t\t")) {
                 moved.add(lines[++i]);
             }

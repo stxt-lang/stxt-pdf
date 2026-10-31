@@ -67,7 +67,7 @@ Si el documento tiene un error, la conversión se para con un mensaje que dice q
 ([Errores](errors.md)):
 
 ```
-línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width o Max width
+line 18: Margin auto does not center a box that takes up the whole width: Width or Max width is missing
 ```
 
 ## Qué tiene el PDF

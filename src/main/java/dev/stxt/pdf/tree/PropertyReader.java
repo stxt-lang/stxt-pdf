@@ -60,33 +60,33 @@ import static dev.stxt.pdf.tree.ValueReader.tracks;
 import static dev.stxt.pdf.tree.ValueReader.value;
 
 /**
- * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
- * y {@code Break} (reference/common/structure.md), que comparten los elementos y las reglas de
- * {@code Styles}, las propiedades de {@code Stack}, {@code Grid} y {@code Columns} y las de los envoltorios
- * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
+ * Reads the properties of a box into its {@link Style}: the {@code Box}, {@code Typography} and {@code Break} groups
+ * (reference/common/structure.md), shared by the elements and the rules of {@code Styles}, the properties of
+ * {@code Stack}, {@code Grid} and {@code Columns} and those of the {@code Item} and {@code Area} wrappers. Each
+ * property keeps its line ({@link Style#declared}).
  *
- * <p>Los {@code switch} no tienen una rama {@code default} que asigne, y las tablas
- * ({@code Typography} y las propiedades sueltas) no tienen entrada por defecto: lo que el schema admite
- * y no se lee es un error del motor ({@code SchemaCoverageTest}).</p>
+ * <p>The {@code switch} statements have no {@code default} branch that assigns, and the tables ({@code Typography} and
+ * the standalone properties) have no default entry: what the schema allows and is not read is an error of the engine
+ * ({@code SchemaCoverageTest}).</p>
  */
 final class PropertyReader {
 
     /**
-     * Propiedades del elemento {@code Stack} (la estructura completa está en el schema, reference/common/structure.md).
+     * Properties of the {@code Stack} element (the full structure is in the schema, reference/common/structure.md).
      */
     static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution");
-    /** Propiedades de los elementos {@code Grid} y {@code Table}. */
+    /** Properties of the {@code Grid} and {@code Table} elements. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
-    /** Propiedades del elemento {@code Columns}. */
+    /** Properties of the {@code Columns} element. */
     static final Set<String> COLUMNS = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
-    /** Lee una propiedad en el estilo; su línea ya está apuntada. */
+    /** Reads a property into the style; its line is already recorded. */
     @FunctionalInterface
     private interface Property {
         void read(Node p, Style s);
     }
 
-    /** Grupo {@code Typography}, por nombre canónico. */
+    /** {@code Typography} group, by canonical name. */
     private static final Map<String, Property> TYPOGRAPHY = Map.ofEntries(
             entry("font", (p, s) -> s.typography().setFont(fontFamily(p))),
             entry("code-font", (p, s) -> s.typography().setCodeFont(fontFamily(p))),
@@ -111,7 +111,7 @@ final class PropertyReader {
             entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
             entry("language", (p, s) -> s.typography().setLocale(Locale.forLanguageTag(language(p)))));
 
-    /** Propiedades sueltas de los elementos ({@link #single}), por nombre canónico. */
+    /** Standalone properties of the elements ({@link #single}), by canonical name. */
     private static final Map<String, Property> SINGLE = Map.ofEntries(
             entry("offset", (p, s) -> s.setOffset(sides(p, LENGTH_OR_AUTO, true))),
             entry("layer", (p, s) -> s.setLayer(integer(p))),
@@ -132,13 +132,14 @@ final class PropertyReader {
     private PropertyReader() {
     }
 
-    /** Grupo {@code Box}: el modelo de caja, que no se hereda. */
+    /** {@code Box} group: the box model, which is not inherited. */
     static void box(InlineNode group, Style s) {
         for (Node p : group.getChildren()) {
             s.declared(p.getCanonicalName(), p.getLine());
             switch (p.getCanonicalName()) {
                 case "width" -> s.box().setWidth(value(p, SIZE, false));
-                // Las palabras del contenido solo miden anchos: en un alto serían otra forma de escribir auto (reference/common/box.md).
+                // The content keywords only measure widths: in a height they would be another way of writing auto
+                // (reference/common/box.md).
                 case "height" -> s.box().setHeight(value(p, LENGTH_OR_AUTO, false));
                 case "min-width" -> s.box().setMinWidth(value(p, LENGTH_OR_AUTO, false));
                 case "max-width" -> s.box().setMaxWidth(value(p, LENGTH, false));
@@ -157,8 +158,8 @@ final class PropertyReader {
     }
 
     /**
-     * Grupo {@code Typography}, en un elemento o en {@code Document}: se hereda. Las líneas se
-     * guardan con el nombre interno ({@code Size} es {@code font-size}).
+     * {@code Typography} group, in an element or in {@code Document}: it is inherited. The lines are kept with the
+     * internal name ({@code Size} is {@code font-size}).
      */
     static void typography(InlineNode group, Style s) {
         for (Node p : group.getChildren()) {
@@ -169,16 +170,17 @@ final class PropertyReader {
     }
 
     /**
-     * Una propiedad suelta de un elemento, fuera de los grupos (reference/common/structure.md y siguientes): {@code
-     * Offset}, {@code Marker}, {@code Link}, {@code Alt}… Su línea se guarda con su nombre. {@code Id}, {@code Rotate}
-     * y {@code Rotate origin} no van en el estilo de la misma forma y los lee {@link BoxTreeBuilder}.
+     * A standalone property of an element, outside the groups (reference/common/structure.md and following):
+     * {@code Offset}, {@code Marker}, {@code Link}, {@code Alt}... Its line is kept with its name. {@code Id},
+     * {@code Rotate} and {@code Rotate origin} do not go in the style the same way and {@link BoxTreeBuilder} reads
+     * them.
      */
     static void single(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
         read(SINGLE, p, s);
     }
 
-    /** Lee la propiedad con su entrada de la tabla; si no la tiene, es una propiedad del schema que no se lee. */
+    /** Reads the property with its table entry; if it has none, it is a schema property that is not read. */
     private static void read(Map<String, Property> table, Node p, Style s) {
         Property property = table.get(p.getCanonicalName());
         if (property == null) {
@@ -188,8 +190,8 @@ final class PropertyReader {
     }
 
     /**
-     * El destino de un {@code Link} (reference/common/links.md): una URL admitida o {@code #id}; que el {@code Id}
-     * exista se comprueba al final.
+     * The target of a {@code Link} (reference/common/links.md): an allowed URL or {@code #id}; that the {@code Id}
+     * exists is checked at the end.
      */
     private static String link(Node p) {
         String destination = p.getText().trim();
@@ -199,17 +201,17 @@ final class PropertyReader {
         return destination;
     }
 
-    /** El texto alternativo de una {@code Image}: no vacío; para una imagen decorativa, no se declara. */
+    /** The alternative text of an {@code Image}: not empty; for a decorative image, it is not declared. */
     private static String alt(Node p) {
         String alt = p.getText().trim();
         if (alt.isEmpty()) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt necesita un texto. Una imagen decorativa no "
-                    + "lleva Alt");
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Alt needs a text. A decorative image does not "
+                    + "carry Alt");
         }
         return alt;
     }
 
-    /** Grupo {@code Break}: los cortes de página, que no se heredan. */
+    /** {@code Break} group: the page breaks, which are not inherited. */
     static void fragmentation(InlineNode group, Style s) {
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
@@ -226,7 +228,7 @@ final class PropertyReader {
         }
     }
 
-    /** Propiedades de stack, hijas del elemento {@code Stack}; su línea se guarda con prefijo ({@code stack.gap}). */
+    /** Stack properties, children of {@code Stack}; their line is kept with a prefix ({@code stack.gap}). */
     static void stack(Node p, Style s) {
         s.declared(PropertyKey.stack(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
@@ -243,7 +245,7 @@ final class PropertyReader {
         }
     }
 
-    /** Propiedades de grid, hijas del elemento {@code Grid}; su línea se guarda con prefijo ({@code grid.rows}). */
+    /** Grid properties, children of the {@code Grid} element; their line is kept with a prefix ({@code grid.rows}). */
     static void grid(Node p, Style s) {
         s.declared(PropertyKey.grid(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
@@ -262,8 +264,9 @@ final class PropertyReader {
     }
 
     /**
-     * Propiedades de {@code Columns}, hijas del elemento (reference/components/columns.md); su línea se guarda sin
-     * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Stack} y {@code Grid} lo lleva.
+     * Properties of {@code Columns}, children of the element (reference/components/columns.md); their line is kept
+     * without a prefix ({@code separator}, {@code gap}): the {@code Gap} of {@code Stack} and {@code Grid} carries
+     * one.
      */
     static void columns(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
@@ -279,10 +282,9 @@ final class PropertyReader {
     }
 
     /**
-     * Propiedades de {@code Item} o {@code Area}, que pasan al elemento que envuelven; su línea se
-     * guarda con prefijo ({@code item.grow}), salvo {@code Layer}. El valor de {@code Area} es la
-     * colocación ({@code item.area}, con la línea del {@code Area}), con los nombres buscados en
-     * {@code areas}, las del grid padre.
+     * Properties of {@code Item} or {@code Area}, which pass to the element they wrap; their line is kept with a prefix
+     * ({@code item.grow}), except {@code Layer}. The value of {@code Area} is the placement ({@code item.area}, with
+     * the line of the {@code Area}), with the names looked up in {@code areas}, those of the parent grid.
      */
     static void item(InlineNode w, Style s, GridAreas areas) {
         if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
@@ -312,46 +314,47 @@ final class PropertyReader {
     }
 
     /**
-     * {@code Horizontal} o {@code Vertical} de un {@code Grid}, un {@code Area} o un {@code Item}: una alineación.
-     * {@code justify}, {@code around} y {@code distribute} reparten el eje principal de un {@code Stack} y solo valen en él.
+     * {@code Horizontal} or {@code Vertical} of a {@code Grid}, an {@code Area} or an {@code Item}: an alignment.
+     * {@code justify}, {@code around} and {@code distribute} distribute the main axis of a {@code Stack} and are only
+     * valid there.
      */
     private static Alignment alignment(Node p) {
         Distribution d = enumValue(Distribution.class, p);
         if (d == Distribution.JUSTIFY || d == Distribution.AROUND || d == Distribution.DISTRIBUTE) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " alinea en su sitio: admite start, end, center o "
-                    + "stretch, y " + p.getText().trim() + " reparte el eje principal de un Stack y solo vale en él");
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " aligns in place: it allows start, end, center or "
+                    + "stretch, and " + p.getText().trim() + " distributes the main axis of a Stack and is only valid there");
         }
         return Alignment.valueOf(d.name());
     }
 
-    /** {@code Number label}: una plantilla con {@code {number}} una sola vez (reference/components/heading.md). */
+    /** {@code Number label}: a template with {@code {number}} exactly once (reference/components/heading.md). */
     private static String numberLabel(Node p) {
         String label = p.getText().strip();
         int at = label.indexOf(HeadingNumbers.NUMBER);
         if (at < 0 || label.indexOf(HeadingNumbers.NUMBER, at + 1) >= 0) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Number label lleva {number} una vez, donde va el número, "
-                    + "como en Number label: Anexo {number}.");
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Number label carries {number} once, where the number goes, "
+                    + "as in Number label: Appendix {number}.");
         }
         return label;
     }
 
-    /** {@code Gap} de {@code Columns}: un solo valor, el hueco entre columnas, en puntos. */
+    /** {@code Gap} of {@code Columns}: a single value, the gap between columns, in points. */
     private static double columnGap(Node p) {
         if (p.getText().trim().split("\\s+").length > 1) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap de un Columns admite un solo valor, el hueco entre "
-                    + "columnas: " + p.getText().trim());
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap of a Columns allows a single value, the gap between "
+                    + "columns: " + p.getText().trim());
         }
         return nonNegative(p);
     }
 
     /**
-     * {@code Gap} de {@code Stack} o {@code Grid}, como se escribió: un valor para los dos ejes, o el hueco entre filas
-     * y el hueco entre columnas.
+     * {@code Gap} of {@code Stack} or {@code Grid}, as it was written: one value for both axes, or the gap between rows
+     * and the gap between columns.
      */
     private static List<Value> gap(Node p) {
         List<Value> v = parse(p, () -> ValueParser.list(p.getText()));
         if (v.size() > 2) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap admite 1 o 2 valores (filas columnas): " + p.getText().trim());
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap allows 1 or 2 values (rows columns): " + p.getText().trim());
         }
         v.forEach(x -> check(p, x, LENGTH, false));
         return v;

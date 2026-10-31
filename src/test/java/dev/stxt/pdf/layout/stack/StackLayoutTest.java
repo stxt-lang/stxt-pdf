@@ -36,7 +36,7 @@ class StackLayoutTest {
 
     @Test
     void shrinkFreezesAtMinWidth() {
-        // Faltan 85: cada uno cedería 42.5, pero A no baja de 280 y B absorbe el resto.
+        // 85 are missing: each one would give up 42.5, but A does not go below 280 and B absorbs the rest.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tItem:", "\t\t\tBase size: 300",
                 "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tMin width: 280", "\t\t\t\t\tHeight: 10",
@@ -48,7 +48,7 @@ class StackLayoutTest {
 
     @Test
     void autoMinWidthIsTheNarrowest() {
-        // La palabra de A mide 300: A no encoge por debajo y B cede el resto.
+        // The word of A measures 300: A does not shrink below it and B gives up the rest.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tItem:", "\t\t\tBase size: 500",
                 "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A",
@@ -60,7 +60,7 @@ class StackLayoutTest {
 
     @Test
     void itemWithWidthShrinksToItsContent() {
-        // Faltan 285: los dos ceden 142.5. Su contenido mide 10, así que Width no los frena.
+        // 285 are missing: both give up 142.5. Their content measures 10, so Width does not stop them.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400",
                 "\t\tItem:", "\t\t\tText: bb", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400");
@@ -70,7 +70,7 @@ class StackLayoutTest {
 
     @Test
     void itemWithWidthDoesNotShrinkBelowItsContent() {
-        // A cedería 142.5, pero su palabra mide 300: se congela ahí y B cede el resto.
+        // A would give up 142.5, but its word measures 300: it freezes there and B gives up the rest.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tItem:", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 400",
@@ -81,7 +81,7 @@ class StackLayoutTest {
 
     @Test
     void columnItemWithHeightShrinksToItsContent() {
-        // En 100 de alto faltan 60: los dos ceden 30. Su contenido mide 12 (una línea).
+        // In 100 of height 60 are missing: both give up 30. Their content measures 12 (one line).
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: a", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 80",
@@ -92,7 +92,7 @@ class StackLayoutTest {
 
     @Test
     void columnItemWithHeightDoesNotShrinkBelowItsContent() {
-        // A cedería 30, pero sus tres líneas miden 36 (con 10 de ancho, una palabra por línea).
+        // A would give up 30, but its three lines measure 36 (with a width of 10, one word per line).
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 50", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: aa bb cc", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40",
@@ -110,13 +110,13 @@ class StackLayoutTest {
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10");
         assertRect(50, 50, 100, 10, l.rect("A"));
-        // B declara Height: no se estira a la línea (30).
+        // B declares Height: it does not stretch to the line (30).
         assertRect(160, 40, 100, 10, l.rect("B"));
     }
 
     @Test
     void mainAxisDistribution() {
-        // Dos ítems de 100 en 515: sobran 315.
+        // Two items of 100 in 515: 315 are left over.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tHorizontal: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: c1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
@@ -143,7 +143,7 @@ class StackLayoutTest {
 
     @Test
     void crossAxisAlignmentInADefiniteContainer() {
-        // Una sola línea con alto definido: la línea mide lo que el contenedor (100).
+        // A single line with a definite height: the line measures what the container does (100).
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
@@ -175,7 +175,7 @@ class StackLayoutTest {
 
     @Test
     void wrapBreaksIntoLines() {
-        // 200 + 10 + 200 caben en 515; el tercero pasa a la segunda línea.
+        // 200 + 10 + 200 fit in 515; the third one moves to the second line.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 200",
@@ -191,7 +191,7 @@ class StackLayoutTest {
 
     @Test
     void linesDistributionInADefiniteContainer() {
-        // Líneas de 20 + hueco 10 + 20 en 100: sobran 50, centradas.
+        // Lines of 20 + gap 10 + 20 in 100: 50 left over, centered.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
@@ -204,7 +204,7 @@ class StackLayoutTest {
 
     @Test
     void linesStretchByDefault() {
-        // Líneas de 0 y 20 en 100 con un hueco de 10: sobran 70, 35 para cada línea.
+        // Lines of 0 and 20 in 100 with a gap of 10: 70 left over, 35 for each line.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
@@ -231,7 +231,7 @@ class StackLayoutTest {
 
     @Test
     void columnGrowsWithADefiniteHeight() {
-        // Sin Height en el contenedor, Grow es un error (catálogo de errores).
+        // Without Height on the container, Grow is an error (error catalog).
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 20",
@@ -242,7 +242,7 @@ class StackLayoutTest {
 
     @Test
     void intrinsicWidths() {
-        // A: min 10, max 25. B: min y max 15. Hueco 10.
+        // A: min 10, max 25. B: min and max 15. Gap 10.
         String a = "\t\tItem:\n\t\t\tText: aa aa\n\t\t\t\tId: %s";
         String b = "\t\tItem:\n\t\t\tText: bbb\n\t\t\t\tId: %s";
         LayoutFixture l = layOut(
@@ -255,7 +255,8 @@ class StackLayoutTest {
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(35, l.rect("min").width(), 1e-9);
         assertEquals(15, l.rect("wrap").width(), 1e-9);
-        // En su ancho más estrecho falta sitio: B se congela en su mínimo (15) y A baja al suyo (10).
+        // At its narrowest width there is not enough room: B freezes at its minimum (15) and A goes down to its own
+        // (10).
         assertEquals(10, l.rect("minA").width(), 1e-9);
         assertEquals(15, l.rect("minB").width(), 1e-9);
     }
@@ -272,7 +273,7 @@ class StackLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                // Un stack posicionado: Frame con el relleno y, dentro, el Stack con el alto.
+                // A positioned stack: Frame with the padding and, inside, the Stack with the height.
                 "\tFrame:", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tStack:", "\t\t\tBox:", "\t\t\t\tHeight: 40",
                 "\t\t\tItem:", "\t\t\t\tFrame:", "\t\t\t\t\tId: R", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100",
@@ -281,7 +282,7 @@ class StackLayoutTest {
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tHeight: 10",
                 "\t\t\tItem:", "\t\t\t\tBlock:", "\t\t\t\t\tId: B", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100");
         assertRect(49, 48, 100, 40, l.rect("R"));
-        // B no se mueve con R; A no ocupa sitio en la línea.
+        // B does not move with R; A takes up no room in the line.
         assertRect(145, 45, 100, 40, l.rect("B"));
         assertRect(545, 80, 10, 10, l.rect("A"));
     }
@@ -293,13 +294,13 @@ class StackLayoutTest {
         assertArrayEquals(new double[]{0, 15}, StackLayout.distribute(Distribution.JUSTIFY, 30, 3), 1e-9);
         assertArrayEquals(new double[]{5, 10}, StackLayout.distribute(Distribution.AROUND, 30, 3), 1e-9);
         assertArrayEquals(new double[]{7.5, 7.5}, StackLayout.distribute(Distribution.DISTRIBUTE, 30, 3), 1e-9);
-        // Sin sitio: justify al principio, distribute centrado.
+        // Without room: justify at the start, distribute centered.
         assertArrayEquals(new double[]{0, 0}, StackLayout.distribute(Distribution.JUSTIFY, -30, 3), 1e-9);
         assertArrayEquals(new double[]{-15, 0}, StackLayout.distribute(Distribution.DISTRIBUTE, -30, 3), 1e-9);
     }
 
-    // Casos que faltaban según las pruebas de mutación: huecos distintos en cada eje,
-    // tamaños intrínsecos con más de dos ítems y márgenes en los ítems.
+    // Cases that were missing according to mutation testing: different gaps on each axis,
+    // intrinsic sizes with more than two items and margins on the items.
 
     private static String block(String id, String... box) {
         StringBuilder sb = new StringBuilder("\t\t\tBlock:\n\t\t\t\tId: " + id + (box.length > 0 ? "\n\t\t\t\tBox:" : ""));
@@ -311,7 +312,7 @@ class StackLayoutTest {
 
     @Test
     void rowAndColumnGapsInARow() {
-        // Gap: filas 7, columnas 13. 200 + 13 + 200 = 413 caben en 515; el tercero pasa a otra línea, 7 más abajo.
+        // Gap: rows 7, columns 13. 200 + 13 + 200 = 413 fit in 515; the third one moves to another line, 7 lower.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
@@ -324,8 +325,8 @@ class StackLayoutTest {
 
     @Test
     void rowAndColumnGapsInAColumn() {
-        // En columna, el hueco entre ítems es el de las filas (7) y entre líneas, el de las columnas (13): 40 + 7 + 40
-        // = 87 caben en 100; el tercero pasa a la línea siguiente, 100 + 13 a la derecha.
+        // In a column, the gap between items is that of the rows (7) and between lines, that of the columns (13):
+        // 40 + 7 + 40 = 87 fit in 100; the third one moves to the next line, 100 + 13 to the right.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
                 "\t\tLine distribution: start", "\t\tGap: 7 13",
@@ -339,7 +340,8 @@ class StackLayoutTest {
 
     @Test
     void intrinsicWidthsWithThreeItems() {
-        // Ancho natural de 5 + 10 + 15 y dos huecos de 10, con y sin Wrap; ancho más estrecho sin Wrap, igual con 5 + 10 + 15.
+        // Natural width of 5 + 10 + 15 and two gaps of 10, with and without Wrap; narrowest width without Wrap, the
+        // same with 5 + 10 + 15.
         String items = "\t\tItem:\n\t\t\tText: a\n\t\tItem:\n\t\t\tText: bb\n\t\tItem:\n\t\t\tText: ccc";
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", items,
@@ -353,7 +355,7 @@ class StackLayoutTest {
 
     @Test
     void basisCountsTheMargins() {
-        // Tamaños hipotéticos exteriores 100 + 20 y 100: sobran 295, 147.5 para cada uno.
+        // Hypothetical outer sizes 100 + 20 and 100: 295 left over, 147.5 for each one.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("A", "Height: 10", "Margin: 0 10"),
@@ -364,7 +366,7 @@ class StackLayoutTest {
 
     @Test
     void shrinkingStopsAtTheMinimumWithItsMargins() {
-        // Exteriores 320 y 300 en 515: faltan 105. A no baja de 280 (300 con márgenes) y B se queda con 215.
+        // Outer sizes 320 and 300 in 515: 105 missing. A does not go below 280 (300 with margins) and B keeps 215.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 300", block("A", "Min width: 280", "Height: 10", "Margin: 0 10"),
@@ -375,7 +377,7 @@ class StackLayoutTest {
 
     @Test
     void automaticMinimumWithMargins() {
-        // La palabra de A mide 300 y sus márgenes 20: no baja de 320 exteriores, y B se queda con 195.
+        // The word of A measures 300 and its margins 20: it does not go below 320 outer, and B keeps 195.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
@@ -387,8 +389,8 @@ class StackLayoutTest {
 
     @Test
     void shrinkIsWeightedByTheBasisWithoutMargins() {
-        // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Base size (300 y 300), no por los
-        // tamaños con márgenes (reference/components/stack.md): 52.5 cada uno.
+        // Outer sizes 320 and 300 in 515: 105 missing, distributed by Shrink × Base size (300 and 300), not by the
+        // sizes with margins (reference/components/stack.md): 52.5 each.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 300", block("A", "Height: 10", "Margin: 0 10"),
@@ -399,8 +401,8 @@ class StackLayoutTest {
 
     @Test
     void stretchingLeavesTheMargins() {
-        // Fila: la línea mide 30 y A, con 5 de margen arriba y abajo, se estira a 20.
-        // Columna: el ancho es 515 menos los márgenes de C (505).
+        // Row: the line measures 30 and A, with a margin of 5 at the top and bottom, stretches to 20.
+        // Column: the width is 515 minus the margins of C (505).
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", block("A", "Width: 50", "Margin: 5"),
@@ -413,7 +415,7 @@ class StackLayoutTest {
 
     @Test
     void threeLinesWithLinesBetween() {
-        // Tres líneas de 20 con huecos de 10 en 100: sobran 20, 10 entre cada dos líneas.
+        // Three lines of 20 with gaps of 10 in 100: 20 left over, 10 between every two lines.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: justify",
                 "\t\tItem:", block("A", "Width: 300", "Height: 20"),
@@ -426,7 +428,7 @@ class StackLayoutTest {
 
     @Test
     void wrapCountsTheGapsExactly() {
-        // 200 + 10 + 200 + 10 + 95 = 515: una línea. Con 110, el tercero pasa a otra.
+        // 200 + 10 + 200 + 10 + 95 = 515: one line. With 110, the third one moves to another.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
@@ -442,7 +444,7 @@ class StackLayoutTest {
 
     @Test
     void automaticMinimumCountsBorderAndPadding() {
-        // La palabra de A mide 300, más 2 + 2 de borde y 10 + 10 de relleno: no baja de 324.
+        // The word of A measures 300, plus 2 + 2 of border and 10 + 10 of padding: it does not go below 324.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
@@ -454,7 +456,7 @@ class StackLayoutTest {
 
     @Test
     void maxWidthCountsTheMargins() {
-        // Crecerían 147.5 cada uno, pero A no pasa de 150 (170 con márgenes): B se queda con 345.
+        // Each would grow 147.5, but A does not exceed 150 (170 with margins): B keeps 345.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("A", "Max width: 150", "Height: 10", "Margin: 0 10"),
@@ -465,8 +467,8 @@ class StackLayoutTest {
 
     @Test
     void columnLimitsCountTheMargins() {
-        // Columnas de 100. Max height 30 (40 con márgenes): B se queda con 60. Min height 70 (80): D, con 20.
-        // Mínimo automático: el texto de E, en cuatro líneas, mide 48 (58 con márgenes): F, con 42.
+        // Columns of 100. Max height 30 (40 with margins): B keeps 60. Min height 70 (80): D, with 20.
+        // Automatic minimum: the text of E, in four lines, measures 48 (58 with margins): F, with 42.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBase size: 20", "\t\t\tGrow: 1", block("A", "Max height: 30", "Margin: 5 0"),
@@ -497,8 +499,8 @@ class StackLayoutTest {
 
     @Test
     void columnLinesMeasureTheirItemsWithMargins() {
-        // Columna con Wrap en 60 de alto: A (50 de ancho y 5 de margen a cada lado) y B, en otra línea. La primera
-        // línea mide 60, así que B empieza en 40 + 60.
+        // Column with Wrap in 60 of height: A (50 wide and a margin of 5 on each side) and B, on another line. The
+        // first line measures 60, so B starts at 40 + 60.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLine distribution: start",
                 "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
@@ -509,7 +511,8 @@ class StackLayoutTest {
 
     @Test
     void stretchingWithDifferentMarginsInEachAxis() {
-        // La línea mide 40 (B). A tiene 10 de margen arriba y abajo y 5 a los lados: se estira a 40 − 20.
+        // The line measures 40 (B). A has a margin of 10 at the top and bottom and 5 at the sides: it stretches to
+        // 40 − 20.
         LayoutFixture l = layOut(
                 "\tStack:",
                 "\t\tItem:", block("A", "Width: 50", "Padding: 5 0", "Margin: 10 5"),
@@ -519,7 +522,7 @@ class StackLayoutTest {
 
     @Test
     void wrapCountsOneGapLessThanItems() {
-        // 100 + 10 + 100 + 10 + 100 = 320; con el cuarto (190) y su hueco, 520: pasa a otra línea.
+        // 100 + 10 + 100 + 10 + 100 = 320; with the fourth one (190) and its gap, 520: it moves to another line.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 100", "Height: 20"),

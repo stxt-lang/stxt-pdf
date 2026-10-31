@@ -1,0 +1,14 @@
+# Case: Page margins that leave no page area
+# Code: PAGE_SIZE
+# Line: 10
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 300
+	Section:
+		Block:
+			Box:
+				Height: 10

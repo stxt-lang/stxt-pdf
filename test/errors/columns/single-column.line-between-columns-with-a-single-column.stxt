@@ -1,0 +1,19 @@
+# Case: Separator with Count: 1, without columns to paint the line between
+# Code: SINGLE_COLUMN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Count: 1
+			Separator: 0.5
+			Text: Hola

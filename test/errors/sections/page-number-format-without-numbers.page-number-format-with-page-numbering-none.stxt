@@ -1,0 +1,18 @@
+# Case: Page number format in a section without page numbers
+# Code: PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page numbering: none
+		Page number format: lower-roman
+		Paragraph: Uno

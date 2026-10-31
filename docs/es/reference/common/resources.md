@@ -35,7 +35,7 @@ Cada fichero se identifica por lo que declara su interior y no por su nombre
 
 - **familia:** la que muestran los programas de fuentes (`IBM Plex Sans` y no `IBM Plex Sans Bold`). Se compara
   exactamente, con mayúsculas y espacios. Si solo difiere en mayúsculas, el error lo sugiere
-  (`¿Querías decir 'IBM Plex Sans'?`);
+  (`The closest name is 'IBM Plex Sans'.`);
 - **peso:** 400 es el normal y 700 la negrita (`Bold: true`), y los ficheros de otros pesos (como 300 o 500) se ignoran;
 - **estilo:** normal o cursiva.
 

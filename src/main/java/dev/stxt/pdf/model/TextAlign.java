@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** {@code Align} de {@code Typography} (reference/common/typography.md): alineación de las líneas del texto. */
+/** {@code Align} of {@code Typography} (reference/common/typography.md): alignment of the lines of the text. */
 public enum TextAlign { LEFT, RIGHT, CENTER, JUSTIFY }

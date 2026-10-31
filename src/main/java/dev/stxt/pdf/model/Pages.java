@@ -1,13 +1,13 @@
 package dev.stxt.pdf.model;
 
 /**
- * Las páginas en que sale un {@code Page overlay} (reference/components/frame-and-overlays.md); la página 1 es la
- * primera del documento.
+ * The pages on which a {@code Page overlay} appears (reference/components/frame-and-overlays.md); page 1 is the
+ * first page of the document.
  */
 public enum Pages {
     ALL, FIRST, NOT_FIRST, ODD, EVEN, LAST;
 
-    /** Si un {@code Page overlay} con este valor sale en la página {@code page} de un documento de {@code total}. */
+    /** Whether a {@code Page overlay} with this value appears on page {@code page} of a document of {@code total}. */
     public boolean includes(int page, int total) {
         return switch (this) {
             case ALL -> true;

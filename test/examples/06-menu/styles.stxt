@@ -1,5 +1,5 @@
-# Estilos del ejemplo «menu»: las reglas reutilizables y la tipografía base. Se pasan junto a
-# input.stxt al maquetar y valen menos que las reglas que el propio documento lleve en su Styles.
+# Styles of the "menu" example: the reusable rules and the base typography. They are passed along with
+# input.stxt when laying out and rank below the rules that the document itself carries in its Styles.
 Styles (dev.stxt.pdf):
 	For element: Document
 		Typography:

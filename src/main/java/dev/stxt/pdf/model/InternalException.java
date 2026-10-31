@@ -1,8 +1,8 @@
 package dev.stxt.pdf.model;
 
 /**
- * Un fallo del motor, no del documento ni del entorno: una garantía interna que no se cumple, o un error
- * inesperado de una librería. {@link #getCause()} guarda el original cuando lo hay.
+ * A failure of the engine, not of the document or the environment: an internal guarantee that does not hold, or an
+ * unexpected error of a library. {@link #getCause()} keeps the original when there is one.
  */
 public class InternalException extends StxtPdfException {
 

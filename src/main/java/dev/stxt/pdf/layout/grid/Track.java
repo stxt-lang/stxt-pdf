@@ -3,9 +3,9 @@ package dev.stxt.pdf.layout.grid;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Pista de grid con su función mínima y máxima (reference/components/grid.md). {@code auto} equivale a
- * {@code between(auto, auto)} y {@code *} a {@code between(auto, *)}: una fracción nunca baja
- * del ancho más estrecho de su contenido.
+ * Grid track with its minimum and maximum functions (reference/components/grid.md). {@code auto} is equivalent to
+ * {@code between(auto, auto)} and {@code *} to {@code between(auto, *)}: a fraction never goes below
+ * the narrowest width of its content.
  */
 public record Track(Value min, Value max) {
 
@@ -28,7 +28,7 @@ public record Track(Value min, Value max) {
     }
 
     /**
-     * La misma pista sin base para los porcentajes: los porcentajes se comportan como {@code auto}
+     * The same track without a base for percentages: percentages behave as {@code auto}
      * (reference/components/grid.md).
      */
     Track withoutPercentBase() {
@@ -39,12 +39,12 @@ public record Track(Value min, Value max) {
         return v instanceof Value.Percentage ? Value.AUTO : v;
     }
 
-    /** La función mínima depende del contenido. */
+    /** The minimum function depends on the content. */
     boolean minIntrinsic() {
         return min.isAuto() || min.isIntrinsic();
     }
 
-    /** La función máxima depende del contenido. */
+    /** The maximum function depends on the content. */
     boolean maxIntrinsic() {
         return max.isAuto() || max.isIntrinsic();
     }

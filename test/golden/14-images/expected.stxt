@@ -1,7 +1,7 @@
-# Página 1: title en 20; hero en 40, de 260 × 130; row en 40 + 130 + 8 = 178, de 60; portrait de
-#   45 × 60 y caption desde x = 20 + 45 + 10. logo en x = 20 + 260 − 12 e y = 20 − 16.
-# Página 2: moved en 20, de 60 × 80; fits en 20 + 80 + 8 = 108, de 50; md en 108 + 50 + 8 = 166,
-#   de 42.
+# Page 1: title at 20; hero at 40, of 260 × 130; row at 40 + 130 + 8 = 178, of 60; portrait of
+#   45 × 60 and caption from x = 20 + 45 + 10. logo at x = 20 + 260 − 12 and y = 20 − 16.
+# Page 2: moved at 20, of 60 × 80; fits at 20 + 80 + 8 = 108, of 50; md at 108 + 50 + 8 = 166,
+#   of 42.
 Result:
 	Page: 1
 		Fragment: title

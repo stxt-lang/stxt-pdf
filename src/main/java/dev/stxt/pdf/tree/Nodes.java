@@ -9,61 +9,60 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Acceso a los nodos de {@code stxt-core} y errores del builder: lo comparten
- * {@link BoxTreeBuilder} y las clases en que se apoya.
+ * Access to the {@code stxt-core} nodes and builder errors: shared by {@link BoxTreeBuilder} and the classes it
+ * relies on.
  *
- * <p>Los nombres se comparan por su nombre canónico ({@link Node#getCanonicalName()}:
- * minúsculas y los espacios convertidos en guiones, de modo que {@code Min width} es
- * {@code min-width}). La estructura ya está validada contra el schema, así que los nodos
- * obligatorios existen y los que tienen hijos no son bloques de texto.</p>
+ * <p>Names are compared by their canonical name ({@link Node#getCanonicalName()}: lowercase, with spaces turned into
+ * hyphens, so {@code Min width} is {@code min-width}). The structure is already validated against the schema, so the
+ * required nodes exist and the ones with children are not text blocks.</p>
  */
 final class Nodes {
 
     private Nodes() {
     }
 
-    /** Compara con un nombre ya canónico ({@code "min-width"}). */
+    /** Compares with a name that is already canonical ({@code "min-width"}). */
     static boolean is(Node n, String canonicalName) {
         return n.getCanonicalName().equals(canonicalName);
     }
 
-    /** Si el nodo es un elemento de caja. */
+    /** Whether the node is a box element. */
     static boolean isElement(Node n) {
         return Element.of(n.getCanonicalName()).filter(Element::isWritten).isPresent();
     }
 
-    /** Si el nodo es el elemento de un {@code Item} o un {@code Area}. */
+    /** Whether the node is the element of an {@code Item} or an {@code Area}. */
     static boolean isItemElement(Node n) {
         return Element.of(n.getCanonicalName()).filter(Element::isWritten).filter(Element::canBeItem).isPresent();
     }
 
-    /** Primer hijo con ese nombre canónico. */
+    /** First child with that canonical name. */
     static Optional<Node> child(InlineNode n, String canonicalName) {
         return n.getChildren().stream().filter(h -> is(h, canonicalName)).findFirst();
     }
 
-    /** Un nodo con hijos: el schema no admite que se escriba como bloque de texto ({@code >>}). */
+    /** A node with children: the schema does not allow it to be written as a text block ({@code >>}). */
     static InlineNode inline(Node n) {
         return (InlineNode) n;
     }
 
-    /** Hijo obligatorio ({@code "Type"}), que el schema garantiza. */
+    /** Required child ({@code "Type"}), guaranteed by the schema. */
     static Node required(InlineNode n, String child) {
         return child(n, child.toLowerCase(Locale.ROOT)).orElseThrow();
     }
 
-    /** Nombre de una propiedad para los mensajes: {@code min-width} → {@code Min width}. */
+    /** Name of a property for messages: {@code min-width} → {@code Min width}. */
     static String label(String property) {
         String s = property.replace('-', ' ');
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
-    /** Nombre del elemento posicionado: {@code Overlay} o {@code Page overlay}. */
+    /** Name of the positioned element: {@code Overlay} or {@code Page overlay}. */
     static String position(Style s) {
         return s.position() == Position.PAGE_OVERLAY ? "Page overlay" : "Overlay";
     }
 
-    /** Interpreta un valor; los errores de sintaxis llevan la línea del nodo. */
+    /** Parses a value; syntax errors carry the line of the node. */
     static <T> T parse(Node n, Supplier<T> parser) {
         try {
             return parser.get();
@@ -72,7 +71,7 @@ final class Nodes {
         }
     }
 
-    /** Interpreta {@code Areas} o {@code Area}: sus errores son de colocación y llevan la línea del nodo. */
+    /** Parses {@code Areas} or {@code Area}: its errors are placement errors and carry the line of the node. */
     static <T> T placement(Node n, Supplier<T> parser) {
         try {
             return parser.get();
@@ -82,13 +81,13 @@ final class Nodes {
     }
 
     /**
-     * Un nodo que el schema admite y el builder no lee: un error del motor, no del documento.
-     * Al añadir una propiedad al schema hay que leerla en {@link PropertyReader} o en
-     * {@link BoxTreeBuilder} (lo comprueba {@code SchemaCoverageTest}).
+     * A node that the schema allows and the builder does not read: an error of the engine, not of the document. A
+     * property added to the schema has to be read in {@link PropertyReader} or in {@link BoxTreeBuilder} (checked by
+     * {@code SchemaCoverageTest}).
      */
     static IllegalStateException unread(Node n) {
-        return new IllegalStateException("El schema admite " + n.getName() + " (línea " + n.getLine()
-                + "), pero el builder no lo lee");
+        return new IllegalStateException("The schema allows " + n.getName() + " (line " + n.getLine()
+                + "), but the builder does not read it");
     }
 
     static InvalidModelException error(Node n, ErrorCode code, String message) {
@@ -99,7 +98,7 @@ final class Nodes {
         return new InvalidModelException(line, code, message);
     }
 
-    /** Un error de la línea de una propiedad, que puede ser del documento de estilos aparte. */
+    /** An error on the line of a property, which can be in the separate styles document. */
     static InvalidModelException error(SourceLine line, ErrorCode code, String message) {
         return new InvalidModelException(line, code, message);
     }

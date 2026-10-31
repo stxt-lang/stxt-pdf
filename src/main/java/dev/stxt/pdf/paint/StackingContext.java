@@ -25,45 +25,45 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Árbol de contextos de apilamiento (reference/common/layers-and-rotation.md), construido sobre los
- * fragmentos de una página. Es independiente del árbol de cajas.
+ * Tree of stacking contexts (reference/common/layers-and-rotation.md), built on the
+ * fragments of a page. It is independent of the box tree.
  *
- * <p>Orden de pintado dentro de un contexto, de abajo arriba:</p>
+ * <p>Painting order inside a context, from bottom to top:</p>
  * <ol>
- *   <li>Fondo y borde de la caja que crea el contexto (y, en un {@code Columns}, la línea entre
- *       columnas).</li>
- *   <li>Contextos hijos con {@code Layer} negativa, de menor a mayor.</li>
- *   <li>Cajas en flujo en orden del árbol: primero fondos y bordes, después el texto y las
- *       imágenes.</li>
- *   <li>Posicionadas sin {@code Layer} (o con 0), en orden del árbol.</li>
- *   <li>Contextos hijos con {@code Layer} positiva, de menor a mayor.</li>
+ *   <li>Background and border of the box that creates the context (and, in a {@code Columns}, the line between
+ *       columns).</li>
+ *   <li>Child contexts with a negative {@code Layer}, from lowest to highest.</li>
+ *   <li>In-flow boxes in tree order: first backgrounds and borders, then the text and the
+ *       images.</li>
+ *   <li>Positioned boxes without {@code Layer} (or with 0), in tree order.</li>
+ *   <li>Child contexts with a positive {@code Layer}, from lowest to highest.</li>
  * </ol>
  *
- * <p>Simplificación: una caja posicionada sin {@code Layer} se pinta completa en el paso 4, con
- * sus descendientes; CSS promovería al contexto padre los descendientes que crean contexto.</p>
+ * <p>Simplification: a positioned box without {@code Layer} is painted complete in step 4, with
+ * its descendants; CSS would promote to the parent context the descendants that create a context.</p>
  *
- * <p>Una caja con {@code Rotate} (reference/common/layers-and-rotation.md) se pinta girada con todo lo que contiene, y una
- * caja con {@code Corner radius} recorta por su curva los fondos, los bordes y las imágenes de lo que tiene en flujo
- * (reference/common/box.md). Cada pieza lleva la cadena de giros y recortes de sus ancestros, de la página hacia
- * dentro ({@code Piece.frames}), y cada paso del pintado se la aplica: el fondo, el borde y la imagen, entera; el
- * texto, solo los giros.</p>
+ * <p>A box with {@code Rotate} (reference/common/layers-and-rotation.md) is painted rotated with everything it
+ * contains, and a box with {@code Corner radius} clips by its curve the backgrounds, borders and images of what it has
+ * in flow (reference/common/box.md). Each piece carries the chain of rotations and clips of its ancestors, from the
+ * page inwards ({@code Piece.frames}), and each painting step applies it: background, border and image, the whole
+ * chain; text, only the rotations.</p>
  *
- * <p>El "orden del árbol" es el del documento, no el de los fragmentos: las cajas
- * {@code absolute} cuelgan del fragmento de su containing block, detrás de sus hijos en flujo, y
- * las {@code fixed} se añaden al final, así que los contextos se ordenan por su caja.</p>
+ * <p>The "tree order" is that of the document, not that of the fragments: {@code absolute}
+ * boxes hang from the fragment of their reference container, after its in-flow children, and
+ * {@code fixed} boxes are added at the end, so contexts are sorted by their box.</p>
  */
 public final class StackingContext {
 
     /**
-     * Fragmento con su origen absoluto ya calculado y los giros y recortes de sus ancestros, de la página hacia dentro,
-     * que se le aplican al pintarlo. Su propio giro no está: se aplica después.
+     * Fragment with its absolute origin already computed and the rotations and clips of its ancestors, from the page
+     * inwards, applied to it when painting it. Its own rotation is not included: it is applied afterwards.
      */
     private record Piece(Fragment f, double x, double y, List<Frame> frames) {
         Rect borderBox() {
             return f.borderBox(x, y);
         }
 
-        /** Los marcos de lo que contiene: los suyos, su giro y, si tiene esquinas redondeadas, su recorte. */
+        /** The frames of what it contains: its own, its rotation and, if it has rounded corners, its clip. */
         List<Frame> inner() {
             List<Frame> inner = new ArrayList<>(frames);
             if (f.box().style().rotation() != null) {
@@ -76,11 +76,11 @@ public final class StackingContext {
         }
     }
 
-    /** El giro ({@code clip} falso) o el recorte por la curva de su caja de relleno de la pieza de un ancestro. */
+    /** The rotation ({@code clip} false) or the clip by the curve of its padding box of the piece of an ancestor. */
     private record Frame(Piece piece, boolean clip) {
     }
 
-    /** Los marcos sin los recortes: lo que hereda un {@code Overlay}, que no recortan las cajas de fuera. */
+    /** The frames without the clips: what an {@code Overlay} inherits, which the outer boxes do not clip. */
     private static List<Frame> turnsOnly(List<Frame> frames) {
         return frames.stream().filter(f -> !f.clip()).toList();
     }
@@ -97,14 +97,14 @@ public final class StackingContext {
         this.layer = layer;
     }
 
-    /** Contexto raíz de una página; {@code originX/Y} es la esquina del área útil. */
+    /** Root context of a page; {@code originX/Y} is the corner of the page area. */
     public static StackingContext build(Fragment root, double originX, double originY) {
         return build(root, List.of(), originX, originY);
     }
 
     /**
-     * Contexto raíz de una página con sus cajas {@code fixed}, que crean contextos hijos del
-     * raíz; sus posiciones son relativas al área útil.
+     * Root context of a page with its {@code fixed} boxes, which create child contexts of the
+     * root; their positions are relative to the page area.
      */
     public static StackingContext build(Fragment root, List<Fragment> fixed, double originX, double originY) {
         StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
@@ -131,8 +131,9 @@ public final class StackingContext {
     }
 
     /**
-     * Reparte los descendientes de {@code parent}. Los de su flujo, también un {@code Frame} o un ítem con {@code
-     * Layer}, heredan sus giros y sus recortes; un {@code Overlay}, solo sus giros; un {@code Page overlay}, nada.
+     * Distributes the descendants of {@code parent}. Those of its flow, a {@code Frame} or an item with {@code
+     * Layer} included, inherit its rotations and its clips; an {@code Overlay}, only its rotations; a
+     * {@code Page overlay}, nothing.
      */
     private void walkChildren(Piece parent) {
         Rect content = parent.borderBox().shrink(parent.f().border()).shrink(parent.f().padding());
@@ -170,7 +171,7 @@ public final class StackingContext {
     }
 
     private void sort() {
-        // A igual Layer, en orden del documento.
+        // With equal Layer, in document order.
         Comparator<StackingContext> byLayer =
                 Comparator.<StackingContext>comparingInt(s -> s.layer).thenComparing(TREE_ORDER);
         negative.sort(byLayer);
@@ -181,7 +182,7 @@ public final class StackingContext {
     private static final Comparator<StackingContext> TREE_ORDER =
             (a, b) -> compareTreeOrder(a.root.f().box(), b.root.f().box());
 
-    /** Orden del documento (recorrido en preorden del árbol de cajas): un ancestro va antes. */
+    /** Document order (preorder traversal of the box tree): an ancestor goes first. */
     static int compareTreeOrder(Box a, Box b) {
         List<Box> pathA = ancestry(a);
         List<Box> pathB = ancestry(b);
@@ -190,8 +191,8 @@ public final class StackingContext {
             i++;
         }
         if (i == 0) {
-            // Raíces distintas: un Page overlay del documento y uno de una sección, que es la raíz de su layout
-            // (reference/components/document.md). Los del documento van antes.
+            // Different roots: a Page overlay of the document and one of a section, which is the root of its layout
+            // (reference/components/document.md). Those of the document go first.
             return Boolean.compare(pathA.get(0).element() != null, pathB.get(0).element() != null);
         }
         if (i == pathA.size() || i == pathB.size()) {
@@ -201,7 +202,7 @@ public final class StackingContext {
         return Integer.compare(siblings.indexOf(pathA.get(i)), siblings.indexOf(pathB.get(i)));
     }
 
-    /** La caja y sus ancestros, desde la raíz. */
+    /** The box and its ancestors, from the root. */
     private static List<Box> ancestry(Box box) {
         List<Box> path = new ArrayList<>();
         for (Box b = box; b != null; b = b.parent()) {
@@ -212,9 +213,9 @@ public final class StackingContext {
     }
 
     /**
-     * Pinta el contexto. Cada paso se pinta con los giros y los recortes de su pieza ({@link #framed}): una caja girada
-     * ({@code Rotate}, reference/common/layers-and-rotation.md) se pinta girada con todo lo que contiene, y una caja con
-     * esquinas redondeadas recorta los fondos, los bordes y las imágenes de su flujo (reference/common/box.md).
+     * Paints the context. Each step is painted with the rotations and clips of its piece ({@link #framed}): a rotated
+     * box ({@code Rotate}, reference/common/layers-and-rotation.md) is painted rotated with everything it contains,
+     * and a box with rounded corners clips the backgrounds, borders and images of its flow (reference/common/box.md).
      */
     public void paint(Canvas canvas) {
         box(canvas, root);
@@ -226,7 +227,7 @@ public final class StackingContext {
         positive.forEach(s -> s.paint(canvas));
     }
 
-    /** El fondo y el borde de la pieza, con sus recortes, y su contorno de depuración, sin ellos. */
+    /** The background and the border of the piece, with its clips, and its debugging outline, without them. */
     private static void box(Canvas canvas, Piece p) {
         framed(canvas, p, paintsBox(p), () -> paintBackgroundAndBorder(canvas, p));
         if (canvas.outlines()) {
@@ -234,7 +235,7 @@ public final class StackingContext {
         }
     }
 
-    /** Si la caja pinta algo en el paso de los fondos: su fondo, su borde o la línea entre columnas. */
+    /** Whether the box paints something in the backgrounds step: its background, its border or the column rule. */
     private static boolean paintsBox(Piece p) {
         Style s = p.f().box().style();
         Insets border = p.f().border();
@@ -243,8 +244,8 @@ public final class StackingContext {
     }
 
     /**
-     * Pinta {@code body} con los giros de los ancestros de {@code p} y el suyo, si tiene {@code Rotate}, y, si {@code
-     * clipped}, con los recortes de sus ancestros redondeados; el texto se pinta sin recortes.
+     * Paints {@code body} with the rotations of the ancestors of {@code p} and its own, if it has {@code Rotate}, and,
+     * if {@code clipped}, with the clips of its rounded ancestors; text is painted without clips.
      */
     private static void framed(Canvas canvas, Piece p, boolean clipped, Runnable body) {
         List<Runnable> ends = new ArrayList<>();
@@ -268,7 +269,7 @@ public final class StackingContext {
         }
     }
 
-    /** Empieza el giro de la caja de {@code p}, si tiene {@code Rotate}; devuelve cuántos giros ha empezado. */
+    /** Starts the rotation of the box of {@code p}, if it has {@code Rotate}; returns how many rotations it started. */
     private static int beginRotation(Canvas canvas, Piece p) {
         Rotation rotation = p.f().box().style().rotation();
         if (rotation == null) {
@@ -293,9 +294,9 @@ public final class StackingContext {
     }
 
     /**
-     * Las esquinas de la caja de borde del fragmento (reference/common/box.md): {@code Corner radius} resuelto contra
-     * su tamaño y, en una caja partida entre páginas con {@code Edges: open}, solo las de
-     * arriba en el primer fragmento y las de abajo en el último.
+     * The corners of the border box of the fragment (reference/common/box.md): {@code Corner radius} resolved against
+     * its size and, in a box broken across pages with {@code Edges: open}, only the top ones
+     * in the first fragment and the bottom ones in the last.
      */
     private static Radii radii(Piece p) {
         Style s = p.f().box().style();
@@ -306,7 +307,7 @@ public final class StackingContext {
         return radii.forFragment(p.f().first(), p.f().last());
     }
 
-    /** El color de cada lado del borde: el suyo o, si no lo declara, el del texto. */
+    /** The color of each side of the border: its own or, if it does not declare one, that of the text. */
     private static Sides<String> borderColors(Style s) {
         if (s.box().borderColor() == null) {
             return Sides.all(s.typography().color());
@@ -320,9 +321,9 @@ public final class StackingContext {
     }
 
     /**
-     * La línea entre cada dos columnas con contenido de un fragmento de un {@code Columns}
-     * (reference/components/columns.md): centrada en el hueco, desde arriba de la caja de contenido y con el alto de
-     * la columna más alta. Sus hijos son las columnas, en orden.
+     * The line between each two columns with content of a fragment of a {@code Columns}
+     * (reference/components/columns.md): centered in the gap, from the top of the content box and with the height of
+     * the tallest column. Its children are the columns, in order.
      */
     private static void paintRules(Canvas canvas, Piece p) {
         Style s = p.f().box().style();
@@ -339,8 +340,8 @@ public final class StackingContext {
     }
 
     /**
-     * El contenido de una caja: sus líneas de texto o, en una {@code Image}, la imagen
-     * (reference/components/image.md), y después su enlace.
+     * The content of a box: its text lines or, in an {@code Image}, the image
+     * (reference/components/image.md), and then its link.
      */
     private static void paintContent(Canvas canvas, Piece p) {
         if (p.f().box().isImage()) {
@@ -358,9 +359,9 @@ public final class StackingContext {
     }
 
     /**
-     * La zona clicable de la caja entera (reference/common/links.md): su caja de borde si la caja tiene {@code Link}.
-     * Las de los tramos con enlace de sus líneas de texto las pinta {@link #paintText}, dentro del contenido del
-     * enlace. Una caja partida entre páginas tiene una zona por fragmento.
+     * The clickable area of the whole box (reference/common/links.md): its border box if the box has {@code Link}.
+     * Those of the runs with a link in its text lines are painted by {@link #paintText}, inside the content of the
+     * link. A box broken across pages has one area per fragment.
      */
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
@@ -370,9 +371,9 @@ public final class StackingContext {
     }
 
     /**
-     * Lo que dice la caja con enlace, para quien no la ve: el texto alternativo de una imagen o el
-     * texto de la caja y de lo que contiene (sin el número de página de las entradas de un
-     * índice); {@code null} si no tiene texto.
+     * What the box with a link says, for whoever cannot see it: the alternative text of an image or the
+     * text of the box and of what it contains (without the page number of the entries of a
+     * table of contents); {@code null} if it has no text.
      */
     private static String describe(Box box) {
         if (box.style().image().alt() != null) {
@@ -394,14 +395,14 @@ public final class StackingContext {
         box.children().forEach(child -> collectText(child, out));
     }
 
-    /** Zona de un tramo de la línea {@code l}, desde {@code from} hasta {@code to} (relativos a la línea). */
+    /** Area of a run of the line {@code l}, from {@code from} to {@code to} (relative to the line). */
     private static Rect linkArea(Rect content, TextLine l, double from, double to) {
         return new Rect(content.x() + l.x() + from, content.y() + l.y(), to - from, l.height());
     }
 
     /**
-     * La guía de una entrada de índice (reference/components/table-of-contents.md): puntos o una línea sobre la línea
-     * base del texto de su entrada, con su color. Como los fondos, no es contenido del PDF etiquetado.
+     * The leader of a table of contents entry (reference/components/table-of-contents.md): dots or a line on the
+     * baseline of the text of its entry, with its color. Like backgrounds, it is not content of the tagged PDF.
      */
     private static void paintLeader(Canvas canvas, Piece p) {
         Style s = p.f().box().style();
@@ -413,14 +414,14 @@ public final class StackingContext {
     }
 
     /**
-     * Las líneas de texto, cada tramo con su fuente (reference/common/text-formatting.md). Como en CSS, el subrayado
-     * se pinta antes que el texto y el tachado después; los dos fuera del contenido marcado, porque no son texto (en el
-     * PDF etiquetado, <em>artifacts</em>).
+     * The text lines, each run with its font (reference/common/text-formatting.md). As in CSS, the underline
+     * is painted before the text and the strikethrough after it; both outside the marked content, because they are not
+     * text (in the tagged PDF, <em>artifacts</em>).
      *
-     * <p>El texto se pinta en secuencias de tramos seguidos con el mismo enlace, también de una línea
-     * a la siguiente ({@link Canvas#beginText} si no tienen, {@link Canvas#beginLinkText} si lo tienen): cada secuencia
-     * es un contenido marcado aparte, y el de un enlace cuelga del {@code Link} del PDF etiquetado
-     * (reference/common/links.md). Dentro de cada una de enlace, una zona clicable por línea ({@link
+     * <p>Text is painted in sequences of consecutive runs with the same link, also from one line
+     * to the next ({@link Canvas#beginText} if they have none, {@link Canvas#beginLinkText} if they have one): each
+     * sequence is a separate marked content, and that of a link hangs from the {@code Link} of the tagged PDF
+     * (reference/common/links.md). Inside each link sequence, one clickable area per line ({@link
      * #paintLinkZone}).</p>
      */
     private static void paintText(Canvas canvas, Piece p) {
@@ -434,16 +435,16 @@ public final class StackingContext {
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         paintDecorations(canvas, p, content, metrics, true);
         Tagging tags = canvas.tagging();
-        // Con interletraje, quien extrae el texto adivina espacios entre las letras: cada secuencia de tramos de una
-        // línea lleva su texto aparte (reference/implementation/pdf.md).
+        // With letter spacing, whoever extracts the text guesses spaces between the letters: each sequence of runs of
+        // a line carries its text separately (reference/implementation/pdf.md).
         boolean spaced = s.typography().letterSpacing() != 0;
         boolean open = false;
         String current = null;
         List<TextLine> lines = p.f().lines();
         for (int n = 0; n < lines.size(); n++) {
             TextLine l = lines.get(n);
-            // El corte de línea se come el espacio: se escribe invisible tras la última palabra, para que quien
-            // une el texto de las líneas (lector de pantalla, extracción, búsqueda) no pegue las palabras.
+            // The line break swallows the space: it is written invisible after the last word, so that whoever
+            // joins the text of the lines (screen reader, extraction, search) does not run the words together.
             boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE;
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
             List<TextLine.Run> runs = l.runs();
@@ -484,8 +485,8 @@ public final class StackingContext {
     }
 
     /**
-     * El texto de los tramos de una línea que empiezan en {@code first} y van seguidos con el mismo enlace, con el
-     * espacio invisible del final si llegan al final de la línea y lo lleva ({@code spaceAfter}).
+     * The text of the runs of a line that start at {@code first} and follow one another with the same link, with the
+     * invisible trailing space if they reach the end of the line and it has one ({@code spaceAfter}).
      */
     private static String sameLinkText(List<TextLine.Run> runs, int first, boolean spaceAfter) {
         StringBuilder text = new StringBuilder();
@@ -499,8 +500,8 @@ public final class StackingContext {
     }
 
     /**
-     * La zona clicable (reference/common/links.md) de los tramos de la línea {@code l} que empiezan en {@code first}
-     * y van seguidos con el mismo destino (una parte en negrita dentro de un enlace es una sola zona).
+     * The clickable area (reference/common/links.md) of the runs of the line {@code l} that start at {@code first}
+     * and follow one another with the same destination (a bold part inside a link is a single area).
      */
     private static void paintLinkZone(Tagging tags, Box box, Rect content, TextLine l, int first,
                                       String destination) {
@@ -516,7 +517,7 @@ public final class StackingContext {
                 text.toString());
     }
 
-    /** Rayas de subrayado ({@code underline}) o de tachado de los tramos, con el color del texto. */
+    /** Underline ({@code underline}) or strikethrough lines of the runs, with the color of the text. */
     private static void paintDecorations(Canvas canvas, Piece p, Rect content, VerticalMetrics metrics,
                                          boolean underline) {
         Style s = p.f().box().style();

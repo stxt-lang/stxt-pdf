@@ -12,14 +12,14 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 
 /**
- * Marcador de un {@code List item} (reference/components/list.md): un fragmento de una línea que
- * cuelga a la izquierda de la caja de borde del ítem, con su línea base en la de la primera línea
- * del ítem.
+ * Marker of a {@code List item} (reference/components/list.md): a one-line fragment that
+ * hangs to the left of the border box of the item, with its baseline on that of the first line
+ * of the item.
  *
- * <p>La primera línea es la que se encuentra bajando por el primer hijo en flujo de cada
- * fragmento hasta uno con líneas; el árbol ya garantiza que existe ({@code LIST_ITEM_WITHOUT_LINE}).
- * Solo se busca en los primeros fragmentos: si el ítem se parte, el marcador va en el fragmento
- * con la primera línea, que es el primero del ítem.</p>
+ * <p>The first line is the one found by going down through the first in-flow child of each
+ * fragment until one with lines; the tree already guarantees that it exists ({@code LIST_ITEM_WITHOUT_LINE}).
+ * It is only searched for in the first fragments: if the item is broken, the marker goes in the fragment
+ * with the first line, which is the first one of the item.</p>
  */
 final class MarkerLayout {
 
@@ -27,12 +27,12 @@ final class MarkerLayout {
     }
 
     /**
-     * El fragmento del marcador, relativo a la caja de contenido del ítem; vacío si los
-     * fragmentos hijos no contienen la primera línea.
+     * The fragment of the marker, relative to the content box of the item; empty if the
+     * child fragments do not contain the first line.
      *
-     * @param children fragmentos hijos del primer fragmento del ítem, ya colocados
-     * @param border   borde del fragmento del ítem
-     * @param padding  relleno del fragmento del ítem
+     * @param children child fragments of the first fragment of the item, already placed
+     * @param border   border of the fragment of the item
+     * @param padding  padding of the fragment of the item
      */
     static Optional<Fragment> place(Box item, List<Fragment> children, Insets border, Insets padding,
                                     TextMeasurer measurer) {
@@ -44,17 +44,17 @@ final class MarkerLayout {
         Style s = marker.style();
         double width = measurer.width(marker.text(), s.typography().fontFace(), s.typography().fontSize());
         double height = s.typography().usedLineHeight();
-        // Su borde derecho, con el espacio final, toca la caja de borde del ítem.
+        // Its right edge, with the trailing space, touches the border box of the item.
         double x = -border.left() - padding.left() - width;
         double y = baseline.getAsDouble() - measurer.vertical(s.typography().fontFace()).baseline(0, height, s.typography().fontSize());
-        // La caja del marcador es generada: sin margen, borde ni relleno.
+        // The marker box is generated: without margin, border or padding.
         return Optional.of(new Fragment(marker, x, y, width, height, Insets.ZERO, Insets.ZERO, Insets.ZERO,
                 List.of(), List.of(new TextLine(0, 0, width, height, marker.text())), true, true));
     }
 
     /**
-     * Línea base de la primera línea de unos fragmentos hijos, relativa a la caja de contenido de
-     * su padre: la del primer hijo en flujo, bajando hasta un fragmento con líneas.
+     * Baseline of the first line of some child fragments, relative to the content box of
+     * their parent: that of the first in-flow child, going down to a fragment with lines.
      */
     static OptionalDouble firstBaseline(List<Fragment> children, TextMeasurer measurer) {
         double top = 0;
@@ -74,7 +74,7 @@ final class MarkerLayout {
         return OptionalDouble.empty();
     }
 
-    /** El primer fragmento en flujo, sin contar los marcadores. */
+    /** The first in-flow fragment, not counting the markers. */
     private static Optional<Fragment> firstInFlow(List<Fragment> fragments) {
         return fragments.stream()
                 .filter(f -> !f.box().style().isOutOfFlow() && !f.box().isMarker())

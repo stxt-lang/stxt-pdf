@@ -7,54 +7,52 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * El giro de una caja al pintarla (reference/common/layers-and-rotation.md): {@code Rotate}, en grados en el
- * sentido de las agujas del reloj, alrededor de {@code Rotate origin}, un punto de la caja de
- * borde medido desde su esquina de arriba a la izquierda, en puntos o en porcentaje de su ancho y de su alto
- * ({@code center} es 50 % 50 %).
+ * The rotation of a box when it is painted (reference/common/layers-and-rotation.md): {@code Rotate}, in degrees
+ * clockwise, around {@code Rotate origin}, a point of the border box measured from its top left corner, in points or
+ * as a percentage of its width and its height ({@code center} is 50% 50%).
  *
- * <p>Las coordenadas son las de la página, con la y hacia abajo: un ángulo positivo de
- * {@link AffineTransform#getRotateInstance(double, double, double)} gira, a la vista, en el sentido
- * de las agujas del reloj.</p>
+ * <p>The coordinates are those of the page, with y pointing down: a positive angle of
+ * {@link AffineTransform#getRotateInstance(double, double, double)} rotates, as seen, clockwise.</p>
  *
- * @param degrees ángulo, de −360 a 360 y distinto de 0
- * @param originX distancia desde el borde izquierdo de la caja de borde hasta el centro del giro: puntos o porcentaje
- *                de su ancho
- * @param originY distancia desde el borde de arriba: puntos o porcentaje de su alto
+ * @param degrees angle, from −360 to 360 and other than 0
+ * @param originX distance from the left edge of the border box to the center of the rotation: points or percentage
+ *                of its width
+ * @param originY distance from the top edge: points or percentage of its height
  */
 public record Rotation(double degrees, Value originX, Value originY) {
 
-    /** El origen por defecto, en los dos ejes: el centro de la caja de borde. */
+    /** The default origin, on both axes: the center of the border box. */
     public static final Value CENTER = new Value.Percentage(50);
 
     private static final Set<String> KEYWORDS = Set.of("top", "bottom", "left", "right", "center");
 
-    /** Un giro con el origen en fracciones del ancho y del alto de la caja de borde ({@code 0.5} es el centro). */
+    /** A rotation with the origin in fractions of the width and height of the border box ({@code 0.5}: center). */
     public Rotation(double degrees, double fractionX, double fractionY) {
         this(degrees, new Value.Percentage(fractionX * 100), new Value.Percentage(fractionY * 100));
     }
 
     /**
-     * Interpreta {@code Rotate origin}: una o dos palabras clave de {@code top}, {@code bottom},
-     * {@code left}, {@code right} y {@code center}, en cualquier orden ({@code top left} y
-     * {@code left top} son lo mismo; el eje que no se nombra es {@code center}), o dos medidas, la horizontal y la
-     * vertical, en puntos o en porcentaje ({@code 20 50%}).
+     * Parses {@code Rotate origin}: one or two keywords out of {@code top}, {@code bottom},
+     * {@code left}, {@code right} and {@code center}, in any order ({@code top left} and
+     * {@code left top} are the same; the axis that is not named is {@code center}), or two measurements, the horizontal
+     * and the vertical one, in points or as a percentage ({@code 20 50%}).
      *
-     * @return el origen horizontal y el vertical
-     * @throws IllegalArgumentException si no son palabras clave ni dos medidas, si mezcla las dos formas o si dos
-     *                                  palabras señalan el mismo eje
+     * @return the horizontal and the vertical origin
+     * @throws IllegalArgumentException if they are neither keywords nor two measurements, if both forms are mixed or if
+     *                                  two words point to the same axis
      */
     public static Value[] origin(String text) {
         String[] words = text.trim().toLowerCase(Locale.ROOT).split("\\s+");
         if (words.length > 2 || words[0].isEmpty()) {
-            throw new IllegalArgumentException("Rotate origin espera una o dos palabras clave (top, bottom, left, "
-                    + "right, center) o dos medidas: " + text.trim());
+            throw new IllegalArgumentException("Rotate origin expects one or two keywords (top, bottom, left, "
+                    + "right, center) or two measurements: " + text.trim());
         }
         long keywords = Arrays.stream(words).filter(KEYWORDS::contains).count();
         if (keywords == 0) {
             return measures(words, text);
         }
         if (keywords < words.length) {
-            throw new IllegalArgumentException("Rotate origin son palabras clave o dos medidas, sin mezclarlas: "
+            throw new IllegalArgumentException("Rotate origin is keywords or two measurements, not a mix of both: "
                     + text.trim());
         }
         Double x = null;
@@ -63,18 +61,18 @@ public record Rotation(double degrees, Value originX, Value originY) {
             switch (w) {
                 case "left", "right" -> {
                     if (x != null) {
-                        throw new IllegalArgumentException("Rotate origin tiene dos posiciones horizontales: " + text.trim());
+                        throw new IllegalArgumentException("Rotate origin has two horizontal positions: " + text.trim());
                     }
                     x = w.equals("left") ? 0.0 : 100.0;
                 }
                 case "top", "bottom" -> {
                     if (y != null) {
-                        throw new IllegalArgumentException("Rotate origin tiene dos posiciones verticales: " + text.trim());
+                        throw new IllegalArgumentException("Rotate origin has two vertical positions: " + text.trim());
                     }
                     y = w.equals("top") ? 0.0 : 100.0;
                 }
                 case "center" -> {
-                    // El eje que no se nombre queda en el centro.
+                    // The axis that is not named stays at the center.
                 }
                 default -> throw new IllegalStateException(w);
             }
@@ -82,10 +80,10 @@ public record Rotation(double degrees, Value originX, Value originY) {
         return new Value[] {x != null ? new Value.Percentage(x) : CENTER, y != null ? new Value.Percentage(y) : CENTER};
     }
 
-    /** Dos medidas, en puntos o en porcentaje. */
+    /** Two measurements, in points or as a percentage. */
     private static Value[] measures(String[] words, String text) {
         if (words.length != 2) {
-            throw new IllegalArgumentException("Rotate origin con medidas necesita dos, la horizontal y la vertical: "
+            throw new IllegalArgumentException("Rotate origin needs two measurements, horizontal and vertical: "
                     + text.trim());
         }
         Value[] origin = new Value[2];
@@ -97,32 +95,32 @@ public record Rotation(double degrees, Value originX, Value originY) {
                 v = null;
             }
             if (!(v instanceof Value.Points) && !(v instanceof Value.Percentage)) {
-                throw new IllegalArgumentException("Rotate origin no admite '" + words[i] + "': admite top, bottom, left, "
-                        + "right o center, o dos medidas en puntos o en porcentaje");
+                throw new IllegalArgumentException("Rotate origin does not allow '" + words[i] + "': it allows top, bottom, "
+                        + "left, right or center, or two measurements in points or as a percentage");
             }
             origin[i] = v;
         }
         return origin;
     }
 
-    /** El giro de la caja de borde {@code r}, alrededor de su origen. */
+    /** The rotation of the border box {@code r}, around its origin. */
     public AffineTransform transform(Rect r) {
         return AffineTransform.getRotateInstance(Math.toRadians(degrees), pivotX(r), pivotY(r));
     }
 
-    /** La x del centro del giro de la caja de borde {@code r}. */
+    /** The x of the center of the rotation of the border box {@code r}. */
     public double pivotX(Rect r) {
         return r.x() + originX.resolve(r.width()).orElseThrow();
     }
 
-    /** La y del centro del giro de la caja de borde {@code r}. */
+    /** The y of the center of the rotation of the border box {@code r}. */
     public double pivotY(Rect r) {
         return r.y() + originY.resolve(r.height()).orElseThrow();
     }
 
     /**
-     * Las cuatro esquinas del rectángulo {@code r} después de aplicarle {@code t}, en el orden
-     * arriba izquierda, arriba derecha, abajo derecha, abajo izquierda: x0, y0, x1, y1…
+     * The four corners of the rectangle {@code r} after applying {@code t} to it, in the order
+     * top left, top right, bottom right, bottom left: x0, y0, x1, y1...
      */
     public static double[] corners(AffineTransform t, Rect r) {
         double[] points = {r.x(), r.y(), r.right(), r.y(), r.right(), r.bottom(), r.x(), r.bottom()};
@@ -130,7 +128,7 @@ public record Rotation(double degrees, Value originX, Value originY) {
         return points;
     }
 
-    /** El rectángulo que envuelve {@code r} después de aplicarle {@code t}. */
+    /** The rectangle that encloses {@code r} after applying {@code t} to it. */
     public static Rect envelope(AffineTransform t, Rect r) {
         double[] p = corners(t, r);
         double minX = Math.min(Math.min(p[0], p[2]), Math.min(p[4], p[6]));
@@ -140,7 +138,7 @@ public record Rotation(double degrees, Value originX, Value originY) {
         return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
 
-    /** El punto ({@code x}, {@code y}) después de aplicarle {@code t}. */
+    /** The point ({@code x}, {@code y}) after applying {@code t} to it. */
     public static Point2D point(AffineTransform t, double x, double y) {
         return t.transform(new Point2D.Double(x, y), null);
     }

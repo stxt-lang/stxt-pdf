@@ -29,26 +29,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Catálogo de errores ({@code test/errors/<grupo>/*.stxt}): cada fichero es un documento que debe
- * fallar con un código en una línea (reference/common/errors.md). Empieza con tres líneas de comentario
- * ({@code # Case:}, {@code # Code:} y {@code # Line:}) y la línea esperada es la del propio
- * fichero, cabecera incluida. Se lee y se maqueta con el {@link Converter} por defecto, con las métricas reales, de
- * modo que entran todos los errores: los de sintaxis y schema ({@code stxt-core}), los del modelo, los de las fuentes y
- * el del contraste.
+ * Error catalog ({@code test/errors/<group>/*.stxt}): each file is a document that must
+ * fail with a code on a line (reference/common/errors.md). It starts with three comment lines
+ * ({@code # Case:}, {@code # Code:} and {@code # Line:}) and the expected line is the one in the file
+ * itself, header included. It is read and laid out with the default {@link Converter}, with the real metrics, so
+ * that every error is covered: syntax and schema errors ({@code stxt-core}), model errors, font errors and the
+ * contrast error.
  */
 class ErrorCatalogTest {
 
     private static final Path CATALOG = Path.of("test", "errors");
     private static final Pattern HEADER = Pattern.compile("# (Case|Code|Line): (.+)");
 
-    /** Códigos sin caso en el catálogo, con el motivo. */
+    /** Codes without a case in the catalog, with the reason. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
-            // Las fuentes del repositorio tienen las cuatro variantes: lo prueba PdfMetricsTest.
+            // The fonts of the repository have the four variants: PdfMetricsTest tests it.
             ErrorCode.FONT_VARIANT_MISSING,
-            // Con las mismas métricas para cualquier cifra la paginación siempre converge: es una red
-            // de seguridad que prueba PageReferencesTest con un medidor que la fuerza.
+            // With the same metrics for every digit, pagination always converges: it is a safety
+            // net that PageReferencesTest tests with a measurer that forces it.
             ErrorCode.REFERENCE_UNSTABLE,
-            // Un PDF de más de 20 MB no cabe en el repositorio: lo prueba LimitsTest con un límite más bajo.
+            // A PDF of more than 20 MB does not fit in the repository: LimitsTest tests it with a lower limit.
             ErrorCode.PDF_TOO_LARGE);
 
     private final DocumentReader reader = new DocumentReader();
@@ -78,7 +78,7 @@ class ErrorCatalogTest {
         }
         for (String key : List.of("Case", "Code", "Line")) {
             if (!header.containsKey(key)) {
-                throw new IllegalStateException("Falta '# " + key + ":' en las tres primeras líneas de " + file);
+                throw new IllegalStateException("'# " + key + ":' is missing in the first three lines of " + file);
             }
         }
         return new Case(file, header.get("Case"), header.get("Code"), Integer.parseInt(header.get("Line")));
@@ -94,11 +94,11 @@ class ErrorCatalogTest {
             InlineNode document = reader.read(c.file());
             Converter.create().layOut(document);
         } catch (StxtPdfException e) {
-            // Cualquier error del motor: los del modelo y los de la librería, con su código y su línea.
-            assertEquals(c.code() + " en la línea " + c.line(), e.code() + " en la línea " + e.line(), e.getMessage());
+            // Any engine error: those of the model and those of the library, with their code and line.
+            assertEquals(c.code() + " on line " + c.line(), e.code() + " on line " + e.line(), e.getMessage());
             return;
         }
-        fail("Se esperaba " + c.code() + " en la línea " + c.line() + " y el documento es válido");
+        fail("Expected " + c.code() + " on line " + c.line() + " and the document is valid");
     }
 
     @Test
@@ -107,6 +107,6 @@ class ErrorCatalogTest {
         List<ErrorCode> missing = Arrays.stream(ErrorCode.values())
                 .filter(code -> !used.contains(code.name()) && !UNCOVERED.contains(code))
                 .toList();
-        assertTrue(missing.isEmpty(), "Códigos sin caso en el catálogo: " + missing);
+        assertTrue(missing.isEmpty(), "Codes without a case in the catalog: " + missing);
     }
 }

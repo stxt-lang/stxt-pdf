@@ -27,23 +27,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Lee un PDF de {@code images/} (reference/components/image.md): el tamaño de cada página, en puntos y ya girado,
- * y lo que impide dibujarla igual dentro del documento, en dos grupos que quien convierte puede no comprobar
- * ({@link dev.stxt.pdf.model.Check}). Una página se dibuja con su contenido, no con sus anotaciones, así que una
- * anotación que se ve (un campo de formulario, un comentario, un sello) es un problema; un enlace, no, porque no se ve.
- * Una fuente sin incrustar, o que no dice qué carácter es cada glifo, también: el visor la sustituiría por otra, o su
- * texto no se podría copiar ni leer en voz alta, y el documento no sería accesible. Un PDF cifrado, sin páginas o que
- * no se puede leer es un error del fichero.
+ * Reads a PDF of {@code images/} (reference/components/image.md): the size of each page, in points and already
+ * rotated, and whatever prevents it from being drawn faithfully inside the document, in two groups that the caller may
+ * choose not to check ({@link dev.stxt.pdf.model.Check}). A page is drawn with its content, not with its annotations,
+ * so a visible annotation (a form field, a comment, a stamp) is a problem; a link is not, because it is not visible.
+ * So is a font that is not embedded, or that does not say which character each glyph is: the viewer would replace it
+ * with another, or its text could not be copied or read aloud, and the document would not be accessible. An encrypted
+ * PDF, one without pages or one that cannot be read is an error of the file.
  */
 public final class PdfInspector {
 
     /**
-     * Una página del PDF.
+     * A page of the PDF.
      *
-     * @param width       ancho en puntos, el del recorte de la página ({@code CropBox}) ya girado
-     * @param height      alto en puntos, igual
-     * @param annotations por qué sus anotaciones impiden dibujarla igual, para el mensaje; {@code null} si no
-     * @param fonts       por qué sus fuentes impiden dibujarla igual, para el mensaje; {@code null} si no
+     * @param width       width in points, that of the crop box of the page ({@code CropBox}), already rotated
+     * @param height      height in points, likewise
+     * @param annotations why its annotations prevent drawing it faithfully, for the message; {@code null} otherwise
+     * @param fonts       why its fonts prevent drawing it faithfully, for the message; {@code null} otherwise
      */
     record PdfPage(double width, double height, String annotations, String fonts) {
     }
@@ -52,17 +52,17 @@ public final class PdfInspector {
     }
 
     /**
-     * Las páginas del PDF; {@code name} es su ruta en el documento, para los mensajes.
+     * The pages of the PDF; {@code name} is its path in the document, for the messages.
      *
-     * @throws ImageFormatException si está cifrado, no tiene páginas o no se puede leer
+     * @throws ImageFormatException if it is encrypted, has no pages or cannot be read
      */
     static List<PdfPage> inspect(Path path, String name) {
         try (PDDocument doc = Loader.loadPDF(path.toFile())) {
             if (doc.isEncrypted()) {
-                throw new ImageFormatException("El PDF " + name + " está cifrado: guárdalo sin protección");
+                throw new ImageFormatException("The PDF " + name + " is encrypted: it has to be saved without protection");
             }
             if (doc.getNumberOfPages() == 0) {
-                throw new ImageFormatException("El PDF " + name + " no tiene páginas");
+                throw new ImageFormatException("The PDF " + name + " has no pages");
             }
             List<PdfPage> pages = new ArrayList<>();
             for (PDPage page : doc.getPages()) {
@@ -74,41 +74,41 @@ public final class PdfInspector {
             }
             return Collections.unmodifiableList(pages);
         } catch (InvalidPasswordException e) {
-            throw new ImageFormatException("El PDF " + name + " está cifrado: guárdalo sin protección", e);
+            throw new ImageFormatException("The PDF " + name + " is encrypted: it has to be saved without protection", e);
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
             }
-            throw new ImageFormatException("No se puede leer la imagen " + name + ", que parece PDF pero está dañada: "
+            throw new ImageFormatException("Cannot read the image " + name + ", which looks like a PDF but is damaged: "
                     + e.getMessage(), e);
         }
     }
 
     /**
-     * El giro de la página ({@code Rotate}) en grados, de 0 a 270, en el sentido de las agujas del reloj; uno que no es
-     * múltiplo de 90 no gira. Es el que da el tamaño de la página y el que aplica quien la dibuja.
+     * The rotation of the page ({@code Rotate}) in degrees, from 0 to 270, clockwise; one that is not a multiple of 90
+     * does not rotate. It is the one that gives the size of the page and the one applied by whoever draws it.
      */
     public static int rotation(PDPage page) {
         int degrees = Math.floorMod(page.getRotation(), 360);
         return degrees % 90 == 0 ? degrees : 0;
     }
 
-    /** La primera anotación que se ve y no se dibujaría, o {@code null}. */
+    /** The first visible annotation that would not be drawn, or {@code null}. */
     private static String annotations(PDPage page) throws IOException {
         for (PDAnnotation annotation : page.getAnnotations()) {
             if (!(annotation instanceof PDAnnotationLink) && !annotation.isHidden() && !annotation.isNoView()
                     && annotation.getNormalAppearanceStream() != null) {
-                return "tiene una anotación que se ve (" + annotation.getSubtype() + ", como un campo de formulario o "
-                        + "un comentario), que no se dibujaría: hay que aplanar el PDF antes de usarlo";
+                return "has a visible annotation (" + annotation.getSubtype() + ", such as a form field or "
+                        + "a comment), which would not be drawn: the PDF has to be flattened before it is used";
             }
         }
         return null;
     }
 
     /**
-     * La primera fuente de unos recursos, de los formularios y de los patrones que usan, que no está incrustada o no
-     * dice qué carácter es cada glifo, o {@code null}. {@code seen} evita recorrer dos veces unos recursos compartidos
-     * (o un formulario que se usa a sí mismo).
+     * The first font of some resources, of the forms and of the patterns they use, that is not embedded or does not
+     * say which character each glyph is, or {@code null}. {@code seen} avoids walking shared resources twice (or a form
+     * that uses itself).
      */
     private static String fonts(PDResources resources, Set<COSBase> seen) throws IOException {
         if (resources == null || !seen.add(resources.getCOSObject())) {
@@ -120,12 +120,13 @@ public final class PdfInspector {
                 continue;
             }
             if (!font.isEmbedded()) {
-                return "usa la fuente " + font.getName() + " sin incrustar, que el visor sustituiría por otra: hay que crear "
-                        + "el PDF con las fuentes incrustadas";
+                return "uses the font " + font.getName() + " not embedded, which the viewer would replace "
+                        + "with another: the PDF has to be created with the fonts embedded";
             }
             if (!hasUnicode(font)) {
-                return "usa la fuente " + font.getName() + " sin ToUnicode, que dice qué carácter es cada glifo: su "
-                        + "texto no se podría copiar ni leer en voz alta. Hay que crear el PDF de nuevo, por ejemplo como PDF/A";
+                return "uses the font " + font.getName() + " without ToUnicode, which says which character "
+                        + "each glyph is: its text could not be copied or read aloud. The PDF has to be created again, "
+                        + "for example as PDF/A";
             }
         }
         for (COSName name : resources.getXObjectNames()) {
@@ -150,8 +151,8 @@ public final class PdfInspector {
     }
 
     /**
-     * Si la fuente dice qué carácter es cada glifo: con un {@code ToUnicode} o, una fuente simple que no es simbólica,
-     * con los nombres de los glifos de su codificación (ISO 32000-1, 9.10.2).
+     * Whether the font says which character each glyph is: with a {@code ToUnicode} or, for a simple font that is not
+     * symbolic, with the glyph names of its encoding (ISO 32000-1, 9.10.2).
      */
     private static boolean hasUnicode(PDFont font) {
         return font.getCOSObject().containsKey(COSName.TO_UNICODE)

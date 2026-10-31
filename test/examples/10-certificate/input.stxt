@@ -1,11 +1,11 @@
-# Certificado de un curso, en una página A4 apaisada (Paper y Orientation: 842 × 595). Un fondo crema y tres marcos
-# concéntricos con cuatro adornos en las esquinas, todos Page overlay con Layer negativa; el contenido
-# centrado, con el nombre de la persona como protagonista; y abajo, dos firmas escaneadas a los
-# lados de un sello con cintas, ligeramente girado (una Image con Rotate, que ocupa el cuadrado que la
-# envuelve). El número del certificado va en vertical en el margen izquierdo: un Page overlay girado −90 grados
-# alrededor de su esquina de arriba a la izquierda.
-# El nombre de la escuela se escribe en minúscula y la regla de su estilo lo pone en mayúsculas,
-# separadas (Case y Letter spacing).
+# Course certificate, on one landscape A4 page (Paper and Orientation: 842 × 595). A cream background and three
+# concentric frames with four ornaments in the corners, all Page overlay with a negative Layer; the content
+# centered, with the person's name as the protagonist; and at the bottom, two scanned signatures on either
+# side of a seal with ribbons, slightly rotated (an Image with Rotate, which takes up the square that
+# encloses it). The certificate number runs vertically in the left margin: a Page overlay rotated −90 degrees
+# around its top left corner.
+# The name of the school is written in lowercase and the rule of its style puts it in uppercase,
+# spaced out (Case and Letter spacing).
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

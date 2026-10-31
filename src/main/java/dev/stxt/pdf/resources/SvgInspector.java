@@ -28,17 +28,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Lee un SVG de {@code images/} y comprueba que está en el subconjunto que admite el motor
- * (reference/components/image.md): formas básicas, rutas, grupos, transformaciones, degradados,
- * recortes, trazos y texto. Todo lo demás (scripts, animación, filtros, máscaras, patrones,
- * marcadores, imágenes incrustadas, estilos CSS) es un error, y también cualquier referencia
- * fuera del propio fichero ({@code href} y {@code url(…)} que no empiecen por {@code #}) y los
- * DTD y entidades. Nada se ignora en silencio.
+ * Reads an SVG of {@code images/} and checks that it is in the subset the engine supports
+ * (reference/components/image.md): basic shapes, paths, groups, transformations, gradients,
+ * clipping, strokes and text. Everything else (scripts, animation, filters, masks, patterns,
+ * markers, embedded images, CSS styles) is an error, and so is any reference
+ * outside the file itself ({@code href} and {@code url(...)} that do not start with {@code #}) and
+ * DTDs and entities. Nothing is silently ignored.
  *
- * <p>Del SVG sale su tamaño natural en píxeles CSS ({@code width} y {@code height}, o el
- * {@code viewBox}) y los textos con su fuente, que {@link ImageFile} comprueba contra
- * {@code fonts/}, y la fuente de cada {@code <text>} y {@code <tspan>}, que es la que se dibuja. Los errores
- * llevan la línea del SVG.</p>
+ * <p>From the SVG come its natural size in CSS pixels ({@code width} and {@code height}, or the
+ * {@code viewBox}), the texts with their font, which {@link ImageFile} checks against
+ * {@code fonts/}, and the font of each {@code <text>} and {@code <tspan>}, which is the one that draws it. The errors
+ * carry the line of the SVG.</p>
  */
 final class SvgInspector {
 
@@ -46,12 +46,12 @@ final class SvgInspector {
     private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
     private static final String XML_NS = XMLConstants.XML_NS_URI;
 
-    /** Elementos admitidos. {@code title} y {@code desc} no se pintan. */
+    /** Supported elements. {@code title} and {@code desc} are not painted. */
     private static final Set<String> ELEMENTS = Set.of("svg", "g", "defs", "title", "desc", "rect", "circle",
             "ellipse", "line", "polyline", "polygon", "path", "linearGradient", "radialGradient", "stop",
             "clipPath", "use", "text", "tspan");
 
-    /** Propiedades que cambian lo que se ve con algo fuera del subconjunto. */
+    /** Properties that change what is seen with something outside the subset. */
     private static final Set<String> FORBIDDEN_PROPERTIES = Set.of("filter", "mask", "marker", "marker-start",
             "marker-mid", "marker-end");
 
@@ -62,32 +62,33 @@ final class SvgInspector {
     private static final Pattern URL = Pattern.compile("url\\(\\s*(['\"]?)\\s*([^)'\"]*)");
     private static final Pattern LENGTH = Pattern.compile("([+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][+-]?\\d+)?)([a-z%]*)");
 
-    /** Un texto del SVG con la fuente que lo dibuja. */
+    /** A text of the SVG with the font that draws it. */
     record TextUse(int line, String family, boolean bold, boolean italic, String text) {
     }
 
     /**
-     * Lo que se necesita saber de un SVG fuera de su dibujo.
+     * What needs to be known about an SVG apart from its drawing.
      *
-     * @param elements los que dibuja: todos los del fichero y, además, cada vez que un {@code <use>} repite un
-     *                 trozo, los de ese trozo; es un tope de lo que cuenta el dibujo, saturado en {@link #SATURATED}
-     * @param depth    los niveles de anidado, contando el {@code <svg>} de la raíz
-     * @param fonts    la fuente de cada {@code <text>} y {@code <tspan>}, en orden del documento, con la herencia de
-     *                 sus antepasados en el fichero (no la del {@code <use>} que lo repite); {@code null} si no
-     *                 declara {@code font-family} ni la hereda
+     * @param elements those it draws: all those of the file and, in addition, each time a {@code <use>} repeats a
+     *                 piece, those of that piece; it is an upper bound of what the drawing counts, saturated at
+     *                 {@link #SATURATED}
+     * @param depth    the nesting levels, counting the root {@code <svg>}
+     * @param fonts    the font of each {@code <text>} and {@code <tspan>}, in document order, with the inheritance of
+     *                 its ancestors in the file (not that of the {@code <use>} that repeats it); {@code null} if it
+     *                 neither declares {@code font-family} nor inherits it
      */
     record Info(double widthPx, double heightPx, List<TextUse> texts, long elements, int depth, List<FontFace> fonts) {
     }
 
-    /** Tope del recuento de elementos dibujados, para que las repeticiones de los {@code <use>} no desborden. */
+    /** Cap of the count of drawn elements, so that the repetitions of {@code <use>} do not overflow. */
     static final long SATURATED = 1L << 50;
 
     private SvgInspector() {
     }
 
     /**
-     * @param name ruta de la imagen en el documento, para los mensajes
-     * @throws ImageFormatException si no es un SVG válido del subconjunto
+     * @param name path of the image in the document, for the messages
+     * @throws ImageFormatException if it is not a valid SVG of the subset
      */
     static Info inspect(byte[] content, String name) {
         Handler handler = new Handler(name);
@@ -103,19 +104,19 @@ final class SvgInspector {
         } catch (SAXParseException e) {
             String why = e.getMessage();
             if (why != null && why.contains("DOCTYPE")) {
-                why = "no se admiten DTD ni entidades";
+                why = "DTDs and entities are not supported";
             }
-            throw new ImageFormatException("La imagen " + name + " no es un SVG bien formado (línea "
+            throw new ImageFormatException("The image " + name + " is not a well-formed SVG (line "
                     + e.getLineNumber() + "): " + why, e);
         } catch (ImageFormatException e) {
             throw e;
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new ImageFormatException("No se puede leer el SVG " + name + ": " + e.getMessage(), e);
+            throw new ImageFormatException("Cannot read the SVG " + name + ": " + e.getMessage(), e);
         }
         return handler.result();
     }
 
-    /** Las propiedades de una fuente que se heredan. */
+    /** The properties of a font that are inherited. */
     private record FontState(String family, String weight, String style) {
         FontState with(String family, String weight, String style) {
             return new FontState(family != null ? family : this.family, weight != null ? weight : this.weight,
@@ -130,7 +131,7 @@ final class SvgInspector {
             return style.equals("italic");
         }
 
-        /** La fuente de {@code fonts/} que pide, o {@code null} si no tiene familia. */
+        /** The font of {@code fonts/} it requests, or {@code null} if it has no family. */
         FontFace face() {
             return family == null ? null : new FontFace(firstFamily(family), bold() ? FontWeight.BOLD
                     : FontWeight.NORMAL, italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
@@ -173,7 +174,7 @@ final class SvgInspector {
         }
 
         private ImageFormatException error(String message) {
-            return new ImageFormatException("El SVG " + name + " no se puede usar (línea " + line() + "): "
+            return new ImageFormatException("The SVG " + name + " cannot be used (line " + line() + "): "
                     + message);
         }
 
@@ -182,20 +183,20 @@ final class SvgInspector {
             if (!sawRoot) {
                 sawRoot = true;
                 if (!SVG_NS.equals(uri) || !local.equals("svg")) {
-                    throw new ImageFormatException("La imagen " + name + " no es un SVG: su raíz es <" + qName
-                            + ">" + (SVG_NS.equals(uri) ? "" : " y no está en el espacio de nombres " + SVG_NS));
+                    throw new ImageFormatException("The image " + name + " is not an SVG: its root is <" + qName
+                            + ">" + (SVG_NS.equals(uri) ? "" : " and is not in the namespace " + SVG_NS));
                 }
             }
             if (!SVG_NS.equals(uri)) {
-                throw error("el elemento <" + qName + "> no es de SVG (espacio de nombres " + (uri.isEmpty()
-                        ? "vacío" : uri) + ")");
+                throw error("the element <" + qName + "> is not SVG (namespace " + (uri.isEmpty()
+                        ? "empty" : uri) + ")");
             }
             if (!ELEMENTS.contains(local)) {
-                throw error("el elemento <" + local + "> no está en el subconjunto de SVG que se admite ("
+                throw error("the element <" + local + "> is not in the subset of SVG that is supported ("
                         + String.join(", ", ELEMENTS.stream().sorted().toList()) + ")");
             }
             if (local.equals("svg") && depth > 0) {
-                throw error("un <svg> dentro de otro no está en el subconjunto que se admite");
+                throw error("an <svg> inside another one is not in the subset that is supported");
             }
             depth++;
             maxDepth = Math.max(maxDepth, depth);
@@ -223,16 +224,16 @@ final class SvgInspector {
                 String attrName = attrs.getLocalName(i);
                 String value = attrs.getValue(i);
                 if (!attrUri.isEmpty() && !attrUri.equals(XLINK_NS) && !attrUri.equals(XML_NS)) {
-                    throw error("el atributo " + attrs.getQName(i) + " es de otro espacio de nombres (" + attrUri
+                    throw error("the attribute " + attrs.getQName(i) + " is from another namespace (" + attrUri
                             + ")");
                 }
                 if (attrName.toLowerCase(Locale.ROOT).startsWith("on")) {
-                    throw error("el atributo " + attrName + " es un manejador de eventos (scripts)");
+                    throw error("the attribute " + attrName + " is an event handler (scripts)");
                 }
                 if (attrName.equals("href")) {
                     checkReference(value, "href");
                     if (!local.equals("use") && !local.endsWith("Gradient")) {
-                        throw error("href no tiene sentido en <" + local + ">");
+                        throw error("href has no meaning in <" + local + ">");
                     }
                     continue;
                 }
@@ -276,7 +277,7 @@ final class SvgInspector {
                 textDepth++;
             } else if (local.equals("tspan")) {
                 if (textDepth == 0) {
-                    throw error("un <tspan> solo va dentro de un <text>");
+                    throw error("a <tspan> only goes inside a <text>");
                 }
                 flushText();
                 textDepth++;
@@ -301,7 +302,7 @@ final class SvgInspector {
                 flushText();
                 textDepth--;
                 if (textDepth > 0) {
-                    // El texto que sigue al <tspan> vuelve a la fuente del que lo contiene.
+                    // The text that follows the <tspan> returns to the font of the one that contains it.
                     textFont = fonts.peek();
                     textLine = line();
                 }
@@ -312,15 +313,15 @@ final class SvgInspector {
             if (textFont != null && !text.toString().isBlank()) {
                 String weight = textFont.weight();
                 if (!Set.of("normal", "400", "bold", "700").contains(weight)) {
-                    throw new ImageFormatException("El texto \"" + text.toString().strip() + "\" del SVG " + name
-                            + " (línea " + textLine + ") tiene font-weight " + weight
-                            + ": solo se admiten normal (400) y bold (700)");
+                    throw new ImageFormatException("The text \"" + text.toString().strip() + "\" of the SVG " + name
+                            + " (line " + textLine + ") has font-weight " + weight
+                            + ": only normal (400) and bold (700) are supported");
                 }
                 String style = textFont.style();
                 if (!Set.of("normal", "italic").contains(style)) {
-                    throw new ImageFormatException("El texto \"" + text.toString().strip() + "\" del SVG " + name
-                            + " (línea " + textLine + ") tiene font-style " + style
-                            + ": solo se admiten normal e italic");
+                    throw new ImageFormatException("The text \"" + text.toString().strip() + "\" of the SVG " + name
+                            + " (line " + textLine + ") has font-style " + style
+                            + ": only normal and italic are supported");
                 }
                 texts.add(new TextUse(textLine, textFont.family(), textFont.bold(), textFont.italic(),
                         text.toString()));
@@ -328,10 +329,10 @@ final class SvgInspector {
             text.setLength(0);
         }
 
-        /** Las propiedades con efecto fuera del subconjunto, y las referencias de un valor. */
+        /** The properties with an effect outside the subset, and the references of a value. */
         private void checkProperty(String property, String value) {
             if (FORBIDDEN_PROPERTIES.contains(property)) {
-                throw error(property + " (filtros, máscaras y marcadores) no está en el subconjunto que se admite");
+                throw error(property + " (filters, masks and markers) is not in the subset that is supported");
             }
             Matcher m = URL.matcher(value);
             while (m.find()) {
@@ -341,12 +342,12 @@ final class SvgInspector {
 
         private void checkReference(String value, String where) {
             if (!value.startsWith("#")) {
-                throw error("la referencia '" + value + "' de " + where + " sale del fichero: solo se admiten "
-                        + "referencias internas (#id)");
+                throw error("the reference '" + value + "' of " + where + " leaves the file: only internal "
+                        + "references (#id) are supported");
             }
         }
 
-        /** Las declaraciones de un atributo {@code style}, con la propiedad en minúsculas. */
+        /** The declarations of a {@code style} attribute, with the property in lower case. */
         private Map<String, String> declarations(String style) {
             Map<String, String> out = new java.util.LinkedHashMap<>();
             for (String declaration : style.split(";")) {
@@ -355,7 +356,7 @@ final class SvgInspector {
                     if (declaration.isBlank()) {
                         continue;
                     }
-                    throw error("la declaración '" + declaration.strip() + "' de style no es propiedad: valor");
+                    throw error("the declaration '" + declaration.strip() + "' of style is not property: value");
                 }
                 out.put(declaration.substring(0, colon).strip().toLowerCase(Locale.ROOT),
                         declaration.substring(colon + 1).strip());
@@ -378,22 +379,22 @@ final class SvgInspector {
                         viewBox[i] = Double.parseDouble(parts[i]);
                     }
                 } catch (NumberFormatException e) {
-                    throw error("viewBox '" + box + "' no son cuatro números");
+                    throw error("viewBox '" + box + "' is not four numbers");
                 }
                 if (viewBox[2] <= 0 || viewBox[3] <= 0) {
-                    throw error("viewBox '" + box + "' no tiene ancho y alto positivos");
+                    throw error("viewBox '" + box + "' does not have a positive width and height");
                 }
             }
         }
 
-        /** Una longitud absoluta en píxeles CSS, o NaN si falta. */
+        /** An absolute length in CSS pixels, or NaN if it is missing. */
         private double length(String value, String attribute) {
             if (value == null) {
                 return Double.NaN;
             }
             Matcher m = LENGTH.matcher(value.strip());
             if (!m.matches()) {
-                throw error(attribute + " '" + value + "' no es una longitud");
+                throw error(attribute + " '" + value + "' is not a length");
             }
             double number = Double.parseDouble(m.group(1));
             double px = switch (m.group(2)) {
@@ -403,18 +404,18 @@ final class SvgInspector {
                 case "in" -> number * 96;
                 case "cm" -> number * 96 / 2.54;
                 case "mm" -> number * 96 / 25.4;
-                default -> throw error(attribute + " '" + value + "' no es una medida absoluta (px, pt, pc, in, cm "
-                        + "o mm): con % o em no hay tamaño natural");
+                default -> throw error(attribute + " '" + value + "' is not an absolute length (px, pt, pc, in, cm "
+                        + "or mm): with % or em there is no natural size");
             };
             if (px <= 0) {
-                throw error(attribute + " '" + value + "' debe ser positivo");
+                throw error(attribute + " '" + value + "' must be positive");
             }
             return px;
         }
 
         /**
-         * Los elementos que dibuja el SVG: cada uno cuenta 1, y un {@code <use>} cuenta además todo lo que repite.
-         * Se calcula sin recursión, porque un SVG hostil puede anidar o encadenar decenas de miles de niveles.
+         * The elements the SVG draws: each one counts 1, and a {@code <use>} also counts everything it repeats.
+         * It is computed without recursion, because a hostile SVG can nest or chain tens of thousands of levels.
          */
         private long drawn() {
             Deque<Element> stack = new ArrayDeque<>();
@@ -451,8 +452,8 @@ final class SvgInspector {
 
         private void visit(Element e, Deque<Element> stack) {
             if (e.state == Element.State.ACTIVE) {
-                throw new ImageFormatException("El SVG " + name + " se repite a sí mismo: un <use> apunta a un "
-                        + "elemento que lo contiene");
+                throw new ImageFormatException("The SVG " + name + " repeats itself: a <use> points to an "
+                        + "element that contains it");
             }
             if (e.state == Element.State.NEW) {
                 stack.push(e);
@@ -464,15 +465,15 @@ final class SvgInspector {
             double h = height;
             if (Double.isNaN(w) && Double.isNaN(h)) {
                 if (viewBox == null) {
-                    throw new ImageFormatException("El SVG " + name + " no tiene tamaño: le faltan width y height, o "
-                            + "un viewBox, en su <svg>");
+                    throw new ImageFormatException("The SVG " + name + " has no size: its <svg> lacks width and "
+                            + "height, or a viewBox");
                 }
                 w = viewBox[2];
                 h = viewBox[3];
             } else if (Double.isNaN(w) || Double.isNaN(h)) {
                 if (viewBox == null) {
-                    throw new ImageFormatException("El SVG " + name + " solo tiene " + (Double.isNaN(w) ? "height"
-                            : "width") + " y no tiene viewBox: no se puede deducir el otro lado");
+                    throw new ImageFormatException("The SVG " + name + " only has " + (Double.isNaN(w) ? "height"
+                            : "width") + " and has no viewBox: the other side cannot be deduced");
                 }
                 if (Double.isNaN(w)) {
                     w = h * viewBox[2] / viewBox[3];
@@ -485,12 +486,15 @@ final class SvgInspector {
         }
     }
 
-    /** Un elemento del SVG, para contar cuántos elementos dibuja: lo que contiene y, si es un {@code <use>}, lo que repite. */
+    /**
+     * An element of the SVG, to count how many elements it draws: what it contains and, for a {@code <use>}, what it
+     * repeats.
+     */
     private static final class Element {
         enum State { NEW, ACTIVE, DONE }
 
         final String id;
-        /** El {@code id} al que apunta el {@code href} de un {@code <use>}, sin la almohadilla; si no, {@code null}. */
+        /** The {@code id} the {@code href} of a {@code <use>} points to, without the {@code #}; or {@code null}. */
         String ref;
         final List<Element> children = new ArrayList<>();
         State state = State.NEW;
@@ -502,12 +506,12 @@ final class SvgInspector {
         }
     }
 
-    /** Si el nombre es una familia genérica de CSS (sans-serif…), que necesitaría sustituirla. */
+    /** Whether the name is a generic CSS family (sans-serif...), which would need to be substituted. */
     static boolean isGeneric(String family) {
         return GENERIC_FAMILIES.contains(family.toLowerCase(Locale.ROOT));
     }
 
-    /** La primera familia de un {@code font-family}, sin comillas. */
+    /** The first family of a {@code font-family}, without quotes. */
     static String firstFamily(String list) {
         String first = list.split(",")[0].strip();
         if (first.length() >= 2 && (first.startsWith("'") && first.endsWith("'")

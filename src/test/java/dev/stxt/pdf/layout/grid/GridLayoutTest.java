@@ -23,7 +23,7 @@ class GridLayoutTest {
 
     @Test
     void columnsAndRowsSizing() {
-        // auto llega al ancho natural de B (45) y la fracción recibe el resto: 515 - 100 - 45.
+        // auto reaches the natural width of B (45) and the fraction receives the rest: 515 - 100 - 45.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 100 auto *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
@@ -36,8 +36,8 @@ class GridLayoutTest {
 
     @Test
     void tableCellsAreGridItems() {
-        // Columnas 100 y * con 5 de hueco: 515 - 100 - 5 = 410. La fila del cuerpo mide lo que
-        // la celda con relleno (12 + 8) y estira a la otra.
+        // Columns 100 and * with a gap of 5: 515 - 100 - 5 = 410. The row of the body measures what
+        // the cell with padding does (12 + 8) and stretches the other.
         LayoutFixture l = layOut(
                 "\tTable:", "\t\tColumn sizes: 100 *", "\t\tGap: 0 5",
                 "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: aaa", "\t\t\t\t\tId: H1", "\t\t\t\tCell: bbb", "\t\t\t\t\tId: H2",
@@ -60,13 +60,13 @@ class GridLayoutTest {
                 "\t\tArea:", "\t\t\tText: aaa", "\t\t\t\tId: T");
         assertRect(40, 40, 200, 100, l.rect("S"));
         assertRect(390, 80, 50, 20, l.rect("E"));
-        // Sin stretch, el ítem conserva su ajuste al contenido.
+        // Without stretch, the item keeps its fit to the content.
         assertRect(40, 140, 15, 12, l.rect("T"));
     }
 
     @Test
     void explicitCellsAndAutoPlacement() {
-        // A ocupa las columnas 2 y 3 de la fila 1; C no cabe detrás de B y pasa a la fila 2.
+        // A spans columns 2 and 3 of row 1; C does not fit after B and moves to row 2.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 100 100 100",
                 "\t\tArea: 1 2 1 2", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
@@ -129,7 +129,7 @@ class GridLayoutTest {
 
     @Test
     void percentageRowsOfADefiniteHeight() {
-        // Con Height: auto en el contenedor, las filas en porcentaje son un error (catálogo de errores).
+        // With Height: auto on the container, rows in percentages are an error (error catalog).
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tHeight: 100", "\t\tRow sizes: 50% 50%",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
@@ -141,16 +141,16 @@ class GridLayoutTest {
 
     @Test
     void percentageColumnsInIntrinsicWidthsAreAuto() {
-        // A: min 10, max 25. B: min y max 15. Sin containing block, 50% cuenta como auto. Con
-        // ancho más estrecho (25) cada columna mediría 12.5 y B desbordaría: es un error.
+        // A: min 10, max 25. B: min and max 15. Without a reference container, 50% counts as auto. With
+        // the narrowest width (25) each column would measure 12.5 and B would overflow: it is an error.
         String items = "\t\tArea:\n\t\t\tText: aa aa\n\t\tArea:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: 50% 50%", items);
         assertEquals(40, l.rect("max").width(), 1e-9);
     }
 
-    // Un ítem que cruza fracciones y no cabe en el contenedor (las columnas no bajan de su
-    // ancho más estrecho) es un desbordamiento: está en el catálogo de errores.
+    // An item that spans fractions and does not fit in the container (the columns do not go below their
+    // narrowest width) is an overflow: it is in the error catalog.
 
     @Test
     void itemCrossingFractionsInIntrinsicWidths() {
@@ -162,7 +162,7 @@ class GridLayoutTest {
 
     @Test
     void intrinsicWidths() {
-        // A: min 10, max 25. B: min y max 15. Hueco 10.
+        // A: min 10, max 25. B: min and max 15. Gap 10.
         String items = "\t\tArea:\n\t\t\tText: aa aa\n\t\tArea:\n\t\t\tText: bbb";
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: auto auto",
@@ -180,7 +180,7 @@ class GridLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                // Un grid posicionado: Frame y, dentro, el Grid con el alto.
+                // A positioned grid: Frame and, inside, the Grid with the height.
                 "\tFrame:", "\t\tGrid:", "\t\t\tBox:", "\t\t\t\tHeight: 50", "\t\t\tColumn sizes: 100 100",
                 "\t\t\tArea:", "\t\t\t\tFrame:", "\t\t\t\t\tId: R", "\t\t\t\t\tOffset: 3 auto auto 4",
                 "\t\t\tOverlay:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
@@ -193,8 +193,8 @@ class GridLayoutTest {
 
     @Test
     void itemMarginsUseTheAreaWidth() {
-        // El 10 % es del área (200), no del contenedor (515): 20 por lado. El fragmento lleva el
-        // margen usado, que es el que comprueba Overflow.
+        // The 10 % is of the area (200), not of the container (515): 20 per side. The fragment carries the
+        // used margin, which is the one Overflow checks.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10%",
@@ -203,13 +203,13 @@ class GridLayoutTest {
         assertEquals(Insets.all(20), l.fragment("M").margin());
     }
 
-    // Casos que faltaban según las pruebas de mutación: ítems con márgenes y tamaños
-    // intrínsecos con más de dos columnas.
+    // Cases that were missing according to mutation testing: items with margins and intrinsic
+    // sizes with more than two columns.
 
     @Test
     void alignmentAndStretchKeepTheItemMargins() {
-        // Áreas de 200 × 100. E (50 × 20, margen 10) al final y centrado: x = 40 + 200 − 10 − 50, y = 40 + 30 + 10.
-        // S, sin tamaño, se estira dentro de sus márgenes: 180 × 80 desde (250, 50).
+        // Areas of 200 × 100. E (50 × 20, margin 10) at the end and centered: x = 40 + 200 − 10 − 50, y = 40 + 30 + 10.
+        // S, without a size, stretches inside its margins: 180 × 80 from (250, 50).
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",
                 "\t\tArea:", "\t\t\tHorizontal: end", "\t\t\tVertical: center",
@@ -222,7 +222,7 @@ class GridLayoutTest {
 
     @Test
     void notStretchedItemsFitTheirContentInsideTheirMargins() {
-        // Horizontal: start: el texto (15) en un área de 200 con 10 de margen a cada lado.
+        // Horizontal: start: the text (15) in an area of 200 with a margin of 10 on each side.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200", "\t\tHorizontal: start",
                 "\t\tArea:", "\t\t\tText: aaa", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10");
@@ -231,7 +231,7 @@ class GridLayoutTest {
 
     @Test
     void intrinsicWidthsWithThreeColumns() {
-        // 5 + 10 + 15 y dos huecos de 10.
+        // 5 + 10 + 15 and two gaps of 10.
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tId: G", "\t\tBox:", "\t\t\tWidth: natural", "\t\tColumn sizes: auto auto auto",
                 "\t\tGap: 10", "\t\tArea:", "\t\t\tText: a", "\t\tArea:", "\t\t\tText: bb", "\t\tArea:", "\t\t\tText: ccc");
@@ -240,7 +240,7 @@ class GridLayoutTest {
 
     @Test
     void percentageLimitsOfAnItemThatDoesNotStretch() {
-        // Áreas de 200 × 100 sin estirar: Min height: 50% da 50 a M, y Max height: 50% deja a X en 50 (no en 80).
+        // Areas of 200 × 100 unstretched: Min height: 50% gives 50 to M, and Max height: 50% leaves X at 50 (not 80).
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",
                 "\t\tArea:", "\t\t\tVertical: start", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:",
@@ -257,18 +257,18 @@ class GridLayoutTest {
                 "\tGrid:", "\t\tColumn sizes: 100 100",
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: 1 auto 1 2", "\t\t\tBlock:")).getMessage();
-        assertTrue(two.contains("En la fila 1 no queda un hueco de 2 columnas libres para este ítem (la rejilla tiene "
-                + "2 columnas): hay que elegir otra fila"), two);
+        assertTrue(two.contains("In row 1 there is no room of 2 free columns left for this item (the grid has "
+                + "2 columns): another row has to be chosen"), two);
         String one = assertThrows(InvalidModelException.class, () -> layOut(
                 "\tGrid:", "\t\tColumn sizes: 100",
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: 1 auto", "\t\t\tBlock:")).getMessage();
-        assertTrue(one.contains("no queda un hueco de 1 columna libre para este ítem (la rejilla tiene 1 columna)"), one);
+        assertTrue(one.contains("there is no room of 1 free column left for this item (the grid has 1 column)"), one);
         String column = assertThrows(InvalidModelException.class, () -> layOut(
                 "\tGrid:", "\t\tFlow: vertical", "\t\tRow sizes: 100", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tArea: 1 1", "\t\t\tBlock:",
                 "\t\tArea: auto 1", "\t\t\tBlock:")).getMessage();
-        assertTrue(column.contains("En la columna 1 no queda un hueco de 1 fila libre para este ítem (la rejilla tiene "
-                + "1 fila): hay que elegir otra columna"), column);
+        assertTrue(column.contains("In column 1 there is no room of 1 free row left for this item (the grid has "
+                + "1 row): another column has to be chosen"), column);
     }
 }

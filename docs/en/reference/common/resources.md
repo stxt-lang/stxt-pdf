@@ -35,7 +35,7 @@ Each file is identified by what its contents declare and not by its name
 
 - **family:** the one that font programs show (`IBM Plex Sans` and not `IBM Plex Sans Bold`). It is compared exactly,
   with uppercase and spaces. If it only differs in case, the error suggests it
-  (`¿Querías decir 'IBM Plex Sans'?`);
+  (`The closest name is 'IBM Plex Sans'.`);
 - **weight:** 400 is regular and 700 is bold (`Bold: true`), and files of other weights (such as 300 or 500) are ignored;
 - **style:** normal or italic.
 

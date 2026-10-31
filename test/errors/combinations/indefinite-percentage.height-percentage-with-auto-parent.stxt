@@ -1,0 +1,14 @@
+# Case: Height percentage with the parent at auto
+# Code: INDEFINITE_PERCENTAGE
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Block:
+				Box:
+					Height: 50%

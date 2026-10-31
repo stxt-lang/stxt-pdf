@@ -1,6 +1,6 @@
-// Sonda de QA: de qué se compone el arranque en frío y cuánto cuesta cargar las fuentes
-// del PDF en cada conversión. Hay que ejecutarla en una JVM recién arrancada (la primera fase es el frío).
-// Se ejecuta desde la raíz del repositorio; ver tools/qa/README.md.
+// QA probe: what the cold start is made of and how much it costs to load the fonts
+// of the PDF in each conversion. It has to run in a freshly started JVM (the first phase is the cold one).
+// It runs from the root of the repository; see tools/qa/README.md.
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.layout.LaidOutDocument;
@@ -31,34 +31,34 @@ public class ColdStartProbe {
         }
         ins.sort(Comparator.comparing(In::name));
 
-        // 1. Frío, por fases: cada una carga las clases y calienta lo suyo por primera vez.
+        // 1. Cold, by phases: each one loads the classes and warms up its own part for the first time.
         long t0 = System.nanoTime();
         DocumentReader reader = new DocumentReader();
         InlineNode first = reader.read(ins.get(0).input());
-        System.out.printf("frío · leer el primer documento (schema, stxt-core): %d ms%n", ms(t0));
+        System.out.printf("cold · read the first document (schema, stxt-core): %d ms%n", ms(t0));
         t0 = System.nanoTime();
         Resources resources = new Resources();
         resources.fonts();
-        System.out.printf("frío · escanear fonts/ (FontLibrary, %d familias): %d ms%n", resources.fonts().families().size(), ms(t0));
+        System.out.printf("cold · scan fonts/ (FontLibrary, %d families): %d ms%n", resources.fonts().families().size(), ms(t0));
         Converter.Builder builder = Converter.builder().resources(resources);
         if (Files.exists(ins.get(0).styles())) builder.styles(reader.readStyles(ins.get(0).styles()));
         Converter converter = builder.build();
         t0 = System.nanoTime();
         LaidOutDocument laidOut = converter.layOut(first);
-        System.out.printf("frío · maquetar %s: %d ms%n", ins.get(0).name(), ms(t0));
+        System.out.printf("cold · lay out %s: %d ms%n", ins.get(0).name(), ms(t0));
         t0 = System.nanoTime();
         converter.toPdf(laidOut, OutputStream.nullOutputStream());
-        System.out.printf("frío · escribir su PDF: %d ms%n", ms(t0));
+        System.out.printf("cold · write its PDF: %d ms%n", ms(t0));
         t0 = System.nanoTime();
         for (In in : ins) convert(reader, resources, in);
-        System.out.printf("frío · los %d ejemplos (1.ª ronda tras lo anterior): %d ms%n", ins.size(), ms(t0));
+        System.out.printf("cold · the %d examples (1st round after the above): %d ms%n", ins.size(), ms(t0));
         for (int k = 0; k < 5; k++) {
             t0 = System.nanoTime();
             for (In in : ins) convert(reader, resources, in);
-            System.out.printf("caliente · los %d ejemplos: %d ms%n", ins.size(), ms(t0));
+            System.out.printf("warm · the %d examples: %d ms%n", ins.size(), ms(t0));
         }
 
-        // 2. Lo que hace PdfFonts.font por cada fuente y documento, por partes, en caliente.
+        // 2. What PdfFonts.font does for each font and document, by parts, warm.
         List<FontFile> files = new ArrayList<>();
         for (String family : resources.fonts().families())
             for (FontWeight w : FontWeight.values())
@@ -90,10 +90,10 @@ public class ColdStartProbe {
             }
         }
         int n = rounds * files.size();
-        System.out.printf("por fuente y documento (%d ficheros, %d veces): leer %.3f ms, parsear %.3f ms, PDType0Font.load %.3f ms, subconjunto y guardar %.3f ms%n",
+        System.out.printf("per font and document (%d files, %d times): read %.3f ms, parse %.3f ms, PDType0Font.load %.3f ms, subset and save %.3f ms%n",
                 files.size(), n, read / 1e6 / n, parse / 1e6 / n, load / 1e6 / n, save / 1e6 / n);
-        // Lo que hace PdfFonts: parsear los bytes que ya tiene FontFile, sin leer el fichero.
-        System.out.printf("ídem, parsear desde FontFile.content(): %.3f ms%n", fromContent / 1e6 / n);
+        // What PdfFonts does: parse the bytes FontFile already has, without reading the file.
+        System.out.printf("same, parsing from FontFile.content(): %.3f ms%n", fromContent / 1e6 / n);
     }
 
     static void convert(DocumentReader reader, Resources resources, In in) throws IOException {

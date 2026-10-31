@@ -1,17 +1,17 @@
-# Hito 27: mayúsculas, interletraje y versalitas (reference/common/typography.md). Página de 200 × 200 con
-# márgenes de 20: área útil de 160 × 160 desde (20, 20). Líneas de 12 (Size 10); con las métricas
-# de prueba cada carácter mide 5 pt. Language es: Case sigue las reglas del castellano.
-#   row:     Stack en (20, 20), de 160 × 12; sus ítems miden su ancho natural y están seguidos:
-#     spaced   "abcd" con Letter spacing 2: 4 × 5 + 3 × 2 (el último no lo lleva) = 26. x = 20.
-#     small    "Ab" con Small caps: la A mide 5 y la b, pasada a B, el 80 % de 5 = 4: 9. x = 46.
-#     upper    "straße" con Case uppercase: STRASSE son 7 caracteres: 35. x = 55.
-#     plain    "abcd" sin nada: 20. x = 90.
-#   tight:   29 caracteres, 145 pt: cabe en la línea de 160: 12. y = 32.
-#   loose:   el mismo texto con Letter spacing 2: cada carácter avanza 7 y el ancho es 7n − 2 ≤ 160,
-#            n ≤ 23; la primera línea es "aaaa bbbb cccc dddd" (19; con " eeee" serían 24) y la
-#            segunda "eeee ffff": 24. y = 44.
-#   title:   Case uppercase y Letter spacing 3 no cambian el alto: 12. y = 68.
-#   caps:    Small caps con Letter spacing 1, una línea: 12. y = 80.
+# Milestone 27: uppercase, letter spacing and small caps (reference/common/typography.md). Page of 200 × 200 with
+# margins of 20: page area of 160 × 160 from (20, 20). Lines of 12 (Size 10); with the test metrics
+# each character measures 5 pt. Language es: Case follows the rules of Spanish.
+#   row:     Stack at (20, 20), 160 × 12; its items take their natural width and follow one another:
+#     spaced   "abcd" with Letter spacing 2: 4 × 5 + 3 × 2 (the last one does not carry it) = 26. x = 20.
+#     small    "Ab" with Small caps: the A measures 5 and the b, turned into B, 80 % of 5 = 4: 9. x = 46.
+#     upper    "straße" with Case uppercase: STRASSE is 7 characters: 35. x = 55.
+#     plain    "abcd" with nothing: 20. x = 90.
+#   tight:   29 characters, 145 pt: it fits in the line of 160: 12. y = 32.
+#   loose:   the same text with Letter spacing 2: each character advances 7 and the width is 7n − 2 ≤ 160,
+#            n ≤ 23; the first line is "aaaa bbbb cccc dddd" (19; with " eeee" it would be 24) and the
+#            second "eeee ffff": 24. y = 44.
+#   title:   Case uppercase and Letter spacing 3 do not change the height: 12. y = 68.
+#   caps:    Small caps with Letter spacing 1, one line: 12. y = 80.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

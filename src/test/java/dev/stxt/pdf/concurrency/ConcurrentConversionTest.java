@@ -33,13 +33,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * La conversión es segura entre hilos con un {@code Engine} por conversión (que es lo que hace {@link Converter}):
- * varios hilos convierten los ejemplos a la vez, con las fuentes y las imágenes reales, y cada PDF es el mismo que da
- * la conversión secuencial.
+ * Conversion is thread-safe with one {@code Engine} per conversion (which is what {@link Converter} does):
+ * several threads convert the examples at the same time, with the real fonts and images, and each PDF is the same as
+ * the one the sequential conversion gives.
  *
- * <p>Se comparan los bytes del PDF una vez quitadas las fechas y los identificadores, que son lo único
- * que cambia de una conversión a otra. Cubre los cuatro usos que importan: un {@link Resources} por hilo,
- * uno compartido por todos, un mismo {@link Converter} usado desde varios hilos y un mismo {@link LaidOutDocument} pintado desde varios hilos.</p>
+ * <p>The PDF bytes are compared once the dates and identifiers are removed, which are the only things
+ * that change from one conversion to another. It covers the four uses that matter: one {@link Resources} per thread,
+ * one shared by all, one {@link Converter} used from several threads and one {@link LaidOutDocument} painted from
+ * several threads.</p>
  */
 class ConcurrentConversionTest {
 
@@ -47,7 +48,7 @@ class ConcurrentConversionTest {
     private static final int THREADS = 4;
     private static final int ROUNDS = 3;
 
-    /** Un ejemplo ya leído (la lectura no es lo que se prueba aquí) y su PDF de referencia. */
+    /** An example already read (reading is not what is tested here) and its reference PDF. */
     private record Example(String name, InlineNode document, InlineNode styles, byte[] pdf) {
     }
 
@@ -69,10 +70,10 @@ class ConcurrentConversionTest {
             EXAMPLE_LIST.add(new Example(pending.name(), document, rules,
                     convert(converter(pending, resources), document)));
         }
-        assertFalse(EXAMPLE_LIST.isEmpty(), "no hay ejemplos en " + EXAMPLES);
+        assertFalse(EXAMPLE_LIST.isEmpty(), "no examples in " + EXAMPLES);
     }
 
-    /** El conversor de un ejemplo: con sus estilos aparte, si los tiene. */
+    /** The converter of an example: with its separate styles, if it has them. */
     private static Converter converter(Example example, Resources resources) {
         Converter.Builder builder = Converter.builder().resources(resources);
         if (example.styles() != null) {
@@ -81,7 +82,7 @@ class ConcurrentConversionTest {
         return builder.build();
     }
 
-    /** Documento y estilos → PDF, sin fechas ni identificadores. */
+    /** Document and styles → PDF, without dates or identifiers. */
     private static byte[] convert(Converter converter, InlineNode document) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         converter.toPdf(document, out);
@@ -125,14 +126,17 @@ class ConcurrentConversionTest {
             Map<String, String> differences = new LinkedHashMap<>();
             for (int i = 0; i < ROUNDS; i++) {
                 if (!Arrays.equals(expected, paint(converter, laidOut))) {
-                    differences.put(example.name(), "ronda " + (i + 1));
+                    differences.put(example.name(), "round " + (i + 1));
                 }
             }
             return differences;
         });
     }
 
-    /** Un mismo {@link Converter} por ejemplo, compartido por todos los hilos: es inmutable y crea un motor por conversión. */
+    /**
+     * One {@link Converter} per example, shared by all the threads: it is immutable and creates one engine per
+     * conversion.
+     */
     @Test
     @Timeout(value = 5, unit = TimeUnit.MINUTES)
     void threadsSharingTheConvertersGetTheSamePdf() throws Exception {
@@ -146,7 +150,7 @@ class ConcurrentConversionTest {
             for (int i = 0; i < ROUNDS; i++) {
                 for (Example e : EXAMPLE_LIST) {
                     if (!Arrays.equals(e.pdf(), convert(converters.get(e.name()), e.document()))) {
-                        differences.put(e.name(), "ronda " + (i + 1));
+                        differences.put(e.name(), "round " + (i + 1));
                     }
                 }
             }
@@ -164,20 +168,23 @@ class ConcurrentConversionTest {
         }
     }
 
-    /** Convierte todos los ejemplos varias veces y devuelve los que no dan el PDF de referencia. */
+    /** Converts all the examples several times and returns the ones that do not give the reference PDF. */
     private static Map<String, String> check(Resources resources) throws IOException {
         Map<String, String> differences = new LinkedHashMap<>();
         for (int i = 0; i < ROUNDS; i++) {
             for (Example e : EXAMPLE_LIST) {
                 if (!Arrays.equals(e.pdf(), convert(converter(e, resources), e.document()))) {
-                    differences.put(e.name(), "ronda " + (i + 1));
+                    differences.put(e.name(), "round " + (i + 1));
                 }
             }
         }
         return differences;
     }
 
-    /** Lanza {@link #THREADS} hilos a la vez (arrancan juntos) y exige que ninguno informe de diferencias ni de excepciones. */
+    /**
+     * Launches {@link #THREADS} threads at once (they start together) and requires that none reports differences or
+     * exceptions.
+     */
     private static void runConcurrently(Callable<Map<String, String>> work) throws Exception {
         ExecutorService pool = Executors.newFixedThreadPool(THREADS);
         try {
@@ -192,9 +199,9 @@ class ConcurrentConversionTest {
             start.countDown();
             for (Future<Map<String, String>> future : futures) {
                 try {
-                    assertEquals(Map.of(), future.get(), "PDF distinto del de la conversión secuencial");
+                    assertEquals(Map.of(), future.get(), "PDF different from the sequential conversion");
                 } catch (ExecutionException e) {
-                    throw new AssertionError("Un hilo ha fallado: " + e.getCause(), e.getCause());
+                    throw new AssertionError("A thread failed: " + e.getCause(), e.getCause());
                 }
             }
         } finally {

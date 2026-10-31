@@ -1,4 +1,4 @@
 package dev.stxt.pdf.model;
 
-/** Eje de un {@code Stack} ({@code Direction}) o de la colocación automática de un {@code Grid} ({@code Flow}). */
+/** Axis of a {@code Stack} ({@code Direction}) or of the automatic placement of a {@code Grid} ({@code Flow}). */
 public enum Direction { HORIZONTAL, VERTICAL }

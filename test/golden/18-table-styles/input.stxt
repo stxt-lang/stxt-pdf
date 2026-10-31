@@ -1,14 +1,14 @@
-# Estilo de las tablas por posición y por columna (reference/common/styles.md y reference/components/table.md).
-# Área útil de 260 × 160 desde (20, 20). Con 10 de tamaño, una línea mide 12 y cada carácter 5.
+# Table styling by position and by column (reference/common/styles.md and reference/components/table.md).
+# Page area of 260 × 160 from (20, 20). At size 10, a line measures 12 and each character 5.
 #
-# Columnas: 100, 100 y 60, sin hueco: x = 20, 120 y 220. Cell da a todas Padding 2 4 (16 de alto).
-#   Header cell: Border 0 0 1 0, así que la cabecera mide 17 (20..37).
-#   Odd row cell: solo el fondo de la cebra. Even row cell: Padding 4 4, y la fila mide 20.
-#   For column: 3 pone Padding 2 4 2 24 a la tercera columna, y gana a Even row cell (posición):
-#     el contenido de esa columna mide 60 − 28 = 32, así que «abc def» (35) se parte en dos líneas.
-#   Footer cell: Border 1 0 0 0 (17); «Total» ocupa las dos primeras columnas.
-# Filas: b1 (37..53, impar), b4 (53..73, par), b7 (73..101, impar: dos líneas en b9) y
-#   b10 (101..121, par); el pie, en 121..138. La tabla mide 118.
+# Columns: 100, 100 and 60, without a gap: x = 20, 120 and 220. Cell gives all of them Padding 2 4 (16 high).
+#   Header cell: Border 0 0 1 0, so the header measures 17 (20..37).
+#   Odd row cell: only the zebra background. Even row cell: Padding 4 4, and the row measures 20.
+#   For column: 3 sets Padding 2 4 2 24 on the third column, and wins over Even row cell (position):
+#     the content of that column measures 60 − 28 = 32, so "abc def" (35) breaks into two lines.
+#   Footer cell: Border 1 0 0 0 (17); "Total" spans the first two columns.
+# Rows: b1 (37..53, odd), b4 (53..73, even), b7 (73..101, odd: two lines in b9) and
+#   b10 (101..121, even); the footer, at 121..138. The table measures 118.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba

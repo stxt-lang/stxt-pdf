@@ -26,28 +26,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Bucle de paginación (reference/common/breaks.md): maqueta la raíz una vez por página, desde el
- * {@link BreakToken} de la anterior, hasta que vuelve como {@code null}.
+ * Pagination loop (reference/common/breaks.md): lays out the root once per page, from the
+ * {@link BreakToken} of the previous one, until it comes back as {@code null}.
  *
- * <p>Las cajas {@code fixed} no ocupan espacio, así que se resuelven después de paginar el flujo
- * y se repiten en las páginas que dice su {@code Pages}, todas por defecto
- * (reference/components/frame-and-overlays.md). Su containing block es el área útil.</p>
+ * <p>The {@code fixed} boxes take up no space, so they are resolved after paginating the flow
+ * and repeated on the pages that their {@code Pages} says, all by default
+ * (reference/components/frame-and-overlays.md). Their reference container is the page area.</p>
  *
- * <p>Al terminar, si el documento usa {@code {page}} o {@code {pages}}, se sustituyen en las
- * líneas de cada página ({@link PageNumbers}). Si el total de páginas tiene más cifras de las reservadas, antes se
- * vuelve a paginar con las suyas.</p>
+ * <p>When finished, if the document uses {@code {page}} or {@code {pages}}, they are replaced in the
+ * lines of each page ({@link PageNumbers}). If the total of pages has more digits than those reserved, the
+ * document is paginated again with its own beforehand.</p>
  *
- * <p>Las referencias a la página de otra caja ({@code {page of: id}}, reference/common/references.md) se resuelven
- * paginando hasta que converjan: cada pasada supone una página para cada caja referida (la
- * primera, un número de prueba), maqueta con ella y mira dónde ha quedado la caja; si no coincide,
- * se vuelve a paginar con la que ha salido. Termina cuando coinciden, o con
- * {@link ErrorCode#REFERENCE_UNSTABLE} tras {@value #MAX_REFERENCE_PASSES} pasadas que cambian
- * alguna página.</p>
+ * <p>The references to the page of another box ({@code {page of: id}}, reference/common/references.md) are resolved
+ * by paginating until they converge: each pass assumes a page for each box referred to (the
+ * first one, a probe number), lays out with it and looks at where the box ended up; if it does not match,
+ * it paginates again with the one that came out. It ends when they match, or with
+ * {@link ErrorCode#REFERENCE_UNSTABLE} after {@value #MAX_REFERENCE_PASSES} passes that change
+ * some page.</p>
  */
 public final class Paginator {
 
     /**
-     * Pasadas de paginación que pueden cambiar las páginas referidas antes de darlas por inestables
+     * Pagination passes that can change the referred pages before they are considered unstable
      * (reference/common/references.md).
      */
     static final int MAX_REFERENCE_PASSES = 10;
@@ -59,33 +59,33 @@ public final class Paginator {
     }
 
     /**
-     * Pagina el documento: cada sección desde su primera página, con su {@link PageSetup}, y sus {@code Page overlay} y
-     * los del documento (reference/components/document.md). Las referencias convergen para todo el documento a la
-     * vez.
+     * Paginates the document: each section from its first page, with its {@link PageSetup}, and its
+     * {@code Page overlay}s and those of the document (reference/components/document.md). The references converge
+     * for the whole document at once.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
         List<Section> sections = tree.sections();
-        // Cada caja fixed de una sección una sola vez, con la posición estática de la página donde aparece.
+        // Each fixed box of a section only once, with the static position of the page where it appears.
         List<Map<Box, PendingOverlay>> fixed = new ArrayList<>();
         sections.forEach(x -> fixed.add(new LinkedHashMap<>()));
-        // Los textos con {page} o {pages}, que cambian de ancho si el total necesita más cifras.
+        // The texts with {page} or {pages}, which change width if the total needs more digits.
         List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
         Flow flow = converge(root, sections, fixed, numberedTexts);
         return pages(root, sections, flow, fixed, !numberedTexts.isEmpty());
     }
 
     /**
-     * El flujo de cada sección, un resultado por página, si acaba con una página en blanco ({@code Begin on: odd} en
-     * la siguiente) y la numeración de sus páginas.
+     * The flow of each section, one result per page, whether it ends with a blank page ({@code Begin on: odd} in
+     * the next one) and the numbering of its pages.
      */
     private record Flow(List<List<LayoutResult>> results, boolean[] blankAfter, Numbering numbering) {
     }
 
     /**
-     * Pagina el flujo hasta que no cambia nada: las cifras del total de páginas (solo crecen) y las páginas
-     * referidas con {@code {page of: id}}, que cambian el ancho de los textos que las escriben. Solo se vuelve a
-     * maquetar lo que depende de esos textos: el resto sale de la caché.
+     * Paginates the flow until nothing changes: the digits of the total of pages (they only grow) and the pages
+     * referred to with {@code {page of: id}}, which change the width of the texts that write them. Only what depends
+     * on those texts is laid out again: the rest comes from the cache.
      */
     private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingOverlay>> fixed,
                           List<Box> numberedTexts) {
@@ -95,7 +95,7 @@ public final class Paginator {
                 .forEach(s -> targets.add(s.reference().id()));
         Map<String, String> numbers = numbers(root, sites);
 
-        // Un número de prueba de las mismas cifras que {page}, hasta saber en qué página está cada caja.
+        // A probe number with the same digits as {page}, until it is known on which page each box is.
         Map<String, String> assumed = new LinkedHashMap<>();
         for (String id : targets) {
             assumed.put(id, "0".repeat(PageNumbers.DIGITS));
@@ -132,12 +132,13 @@ public final class Paginator {
     }
 
     /**
-     * Segunda fase, ya con el total de páginas: cada página con su contenido numerado ({@code {page}} y
-     * {@code {pages}}) y sus {@code Page overlay}, los de su sección y, si los hereda, los del documento.
+     * Second phase, with the total of pages known: each page with its numbered content ({@code {page}} and
+     * {@code {pages}}) and its {@code Page overlay}s, those of its section and, if it inherits them, those of the
+     * document.
      */
     private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingOverlay>> fixed,
                              boolean numbered) {
-        // Los Page overlay del documento: los hijos de la raíz que no son una sección.
+        // The Page overlays of the document: the children of the root that are not a section.
         List<Box> documentPageOverlays = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
@@ -147,7 +148,7 @@ public final class Paginator {
             for (int i = 0; i < own.size(); i++) {
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
-                // Pages cuenta dentro del alcance donde se declara: el documento o la sección
+                // Pages counts within the scope where it is declared: the document or the section
                 // (reference/components/document.md).
                 List<Queued> queue = new ArrayList<>();
                 if (section.inheritPageOverlays()) {
@@ -169,8 +170,8 @@ public final class Paginator {
                         numbering.style(number), false));
             }
             if (flow.blankAfter()[k]) {
-                // La página en blanco para que la siguiente empiece en impar: de esta sección, sin contenido ni Page
-                // overlay (reference/components/document.md).
+                // The blank page so that the next one starts on an odd page: of this section, without content or
+                // Page overlay (reference/components/document.md).
                 int number = pages.size() + 1;
                 Rect area = section.pageSetup().pageArea();
                 Fragment empty = new Fragment(section.box(), 0, 0, area.width(), area.height(), Insets.ZERO,
@@ -183,8 +184,8 @@ public final class Paginator {
     }
 
     /**
-     * Las secciones que acaban con una página en blanco: las que dejan la siguiente, con {@code Begin on: odd}, en una
-     * página física par (reference/components/document.md).
+     * The sections that end with a blank page: those that leave the next one, with {@code Begin on: odd}, on an
+     * even physical page (reference/components/document.md).
      */
     private boolean[] blankAfter(List<Section> sections, List<List<LayoutResult>> results) {
         boolean[] blank = new boolean[sections.size()];
@@ -205,14 +206,14 @@ public final class Paginator {
     private InvalidModelException pageLimit() {
         int maxPages = engine.limits().maxPages();
         return new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT,
-                "El documento tiene más de " + maxPages + " páginas, el máximo que admite el motor "
-                        + "(Limits.maxPages lo cambia)");
+                "The document has more than " + maxPages + " pages, the maximum the engine allows "
+                        + "(Limits.maxPages changes it)");
     }
 
     /**
-     * Los {@code Page overlay} de una página, en el área útil de su sección: solo los que {@code Pages} incluye en ella
-     * (reference/components/frame-and-overlays.md), que no ocupan sitio donde no salen. Una fixed dentro de otra
-     * sale en su resultado y se coloca después.
+     * The {@code Page overlay}s of a page, in the page area of its section: only those that {@code Pages} includes in
+     * it (reference/components/frame-and-overlays.md), which take up no room where they do not appear. A fixed one
+     * inside another comes out in its result and is placed afterwards.
      */
     private List<Fragment> placePageOverlays(List<Queued> queue, Section section, boolean numbered, int printed, String page,
                                       String tanda) {
@@ -233,25 +234,25 @@ public final class Paginator {
         return fragments;
     }
 
-    /** Una caja fixed por colocar y las páginas de su alcance: el documento o su sección. */
+    /** A fixed box to be placed and the pages of its scope: the document or its section. */
     private record Queued(PendingOverlay pending, int number, int total) {
     }
 
     /**
-     * Un texto con {@code {page}} o {@code {pages}} en una página sin número: no hay qué escribir y no se
-     * deja en blanco (reference/components/document.md).
+     * A text with {@code {page}} or {@code {pages}} on a page without a number: there is nothing to write and it is
+     * not left blank (reference/components/document.md).
      */
     private static void unavailable(Box box) {
         Box found = withPageNumbers(box);
         if (found != null) {
-            throw new InvalidModelException(found.line(), ErrorCode.PAGE_NUMBER_UNAVAILABLE, "El texto de la caja "
-                    + (found.id() != null ? found.id() : "(sin Id)") + " tiene {page} o {pages} y sale en una página "
-                    + "sin número (Page numbering: none): sobra el marcador, o hace falta Inherit page overlays: false en la "
-                    + "sección o el Page overlay solo en las secciones que numeran");
+            throw new InvalidModelException(found.line(), ErrorCode.PAGE_NUMBER_UNAVAILABLE, "The text of box "
+                    + (found.id() != null ? found.id() : "(without Id)") + " has {page} or {pages} and appears on a "
+                    + "page without a number (Page numbering: none): the marker is not needed, or the section needs "
+                    + "Inherit page overlays: false, or the Page overlay only in the sections that are numbered");
         }
     }
 
-    /** La primera caja, ella o sus descendientes, con {@code {page}} o {@code {pages}}; {@code null} si no hay. */
+    /** The first box, itself or its descendants, with {@code {page}} or {@code {pages}}; {@code null} if none. */
     private static Box withPageNumbers(Box box) {
         if (PageNumbers.contains(box.text())) {
             return box;
@@ -265,7 +266,7 @@ public final class Paginator {
         return null;
     }
 
-    /** El número de cada caja referida con {@code {number of: id}}; ya validado por el builder. */
+    /** The number of each box referred to with {@code {number of: id}}; already validated by the builder. */
     private static Map<String, String> numbers(Box root, List<References.Site> sites) {
         Map<String, Box> boxes = References.byId(root);
         Map<String, String> numbers = new LinkedHashMap<>();
@@ -278,10 +279,10 @@ public final class Paginator {
     }
 
     /**
-     * La página en que empieza cada caja referida: la de su primer fragmento (reference/common/references.md), con su
-     * número impreso (reference/components/document.md). Una caja que no sale en ninguna página (no debería pasar:
-     * las cajas con {@code Page overlay} se rechazan al construir el árbol) o que está en una página sin número es un
-     * error.
+     * The page on which each referred box starts: that of its first fragment (reference/common/references.md), with
+     * its printed number (reference/components/document.md). A box that does not appear on any page (it should not
+     * happen: the boxes with {@code Page overlay} are rejected when the tree is built) or that is on a page without a
+     * number is an error.
      */
     private static Map<String, String> pagesOf(List<List<LayoutResult>> results, boolean[] blankAfter,
                                                Numbering numbering, Set<String> targets,
@@ -298,13 +299,13 @@ public final class Paginator {
                     firstPages(r.fragment(), number, targets, pages, numbering, sites);
                 }
             }
-            // La página en blanco no tiene nada a lo que referirse, pero ocupa su número.
+            // The blank page has nothing to refer to, but it takes up its number.
             number += blankAfter[k] ? 1 : 0;
         }
         for (String id : targets) {
             if (!pages.containsKey(id)) {
-                throw new InvalidModelException(0, ErrorCode.REFERENCE_NOT_PLACEABLE, "La caja " + id
-                        + " no sale en ninguna página");
+                throw new InvalidModelException(0, ErrorCode.REFERENCE_NOT_PLACEABLE, "Box " + id
+                        + " does not appear on any page");
             }
         }
         return pages;
@@ -317,8 +318,8 @@ public final class Paginator {
             if (numbering.printed(number) == 0) {
                 int line = sites.stream().filter(s -> id.equals(s.reference().id())).mapToInt(References.Site::line)
                         .findFirst().orElse(0);
-                throw new InvalidModelException(line, ErrorCode.REFERENCE_NOT_PLACEABLE, "La caja " + id
-                        + " está en una sección sin números de página (Page numbering: none): no tiene página que dar");
+                throw new InvalidModelException(line, ErrorCode.REFERENCE_NOT_PLACEABLE, "Box " + id
+                        + " is in a section without page numbers (Page numbering: none): it has no page to give");
             }
             pages.put(id, numbering.label(number));
         }
@@ -330,15 +331,15 @@ public final class Paginator {
         References.Site culprit = sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE
                 && !actual.get(s.reference().id()).equals(assumed.get(s.reference().id()))).findFirst().orElseThrow();
         String id = culprit.reference().id();
-        return new InvalidModelException(culprit.line(), ErrorCode.REFERENCE_UNSTABLE, "La página de " + id
-                + " no se estabiliza: tras " + MAX_REFERENCE_PASSES + " pasadas sigue cambiando (suponiendo "
-                + assumed.get(id) + " sale en la " + actual.get(id) + "); el texto de la referencia cambia de "
-                + "ancho con la página y mueve la caja de página");
+        return new InvalidModelException(culprit.line(), ErrorCode.REFERENCE_UNSTABLE, "The page of " + id
+                + " does not stabilize: after " + MAX_REFERENCE_PASSES + " passes it keeps changing (assuming page "
+                + assumed.get(id) + " it appears on page " + actual.get(id) + "); the text of the reference changes "
+                + "width with the page and moves the box to another page");
     }
 
     /**
-     * Pagina el flujo de cada sección: un resultado por página y sección. Apunta en {@code fixed}, por
-     * sección, las cajas {@code fixed}.
+     * Paginates the flow of each section: one result per page and section. Records in {@code fixed}, per
+     * section, the {@code fixed} boxes.
      */
     private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> fixed) {
         List<List<LayoutResult>> all = new ArrayList<>();
@@ -352,8 +353,8 @@ public final class Paginator {
                 LayoutResult r = engine.layout(section.box(), space, token);
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
-                    throw new InternalException("Sin progreso en la página " + (pages + results.size() + 1)
-                            + ": se ha incumplido la garantía de progreso (reference/common/breaks.md)");
+                    throw new InternalException("No progress on page " + (pages + results.size() + 1)
+                            + ": the progress guarantee has been broken (reference/common/breaks.md)");
                 }
                 results.add(r);
                 int section0 = k;
@@ -369,7 +370,7 @@ public final class Paginator {
         return all;
     }
 
-    /** Los textos del árbol que contienen {@code {page}} o {@code {pages}}, en orden del documento. */
+    /** The texts of the tree that contain {@code {page}} or {@code {pages}}, in document order. */
     private static List<Box> withPageNumbers(Box box, List<Box> found) {
         if (PageNumbers.contains(box.text())) {
             found.add(box);
@@ -378,7 +379,7 @@ public final class Paginator {
         return found;
     }
 
-    /** Los textos con una referencia {@code {page of: id}} cuya página no es la que se suponía. */
+    /** The texts with a reference {@code {page of: id}} whose page is not the one assumed. */
     private static List<Box> changedTexts(List<References.Site> sites, Map<String, String> assumed,
                                           Map<String, String> actual) {
         return sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE)
@@ -387,8 +388,8 @@ public final class Paginator {
     }
 
     /**
-     * La raíz representa el área útil, y su alto es el de cada página, no el total de todas: su
-     * token no acumula alto consumido. Así cada página vuelve a tener el área útil completa.
+     * The root represents the page area, and its height is that of each page, not the total of all of them: its
+     * token does not accumulate consumed height. This way each page has the whole page area again.
      */
     private static BreakToken perPage(BreakToken token) {
         return token instanceof BreakToken.Block b ? new BreakToken.Block(b.nextChild(), b.childToken(), 0) : token;

@@ -1,0 +1,25 @@
+# Case: Groups of the table out of order
+# Code: TABLE_ORDER
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Footer rows:
+				Row:
+					Cell: a
+					Cell: b
+			Body:
+				Row:
+					Cell: c
+					Cell: d

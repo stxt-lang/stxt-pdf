@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * El contenido de una página PDF, lo que comparten su lienzo ({@link PdfCanvas}) y su etiquetado
- * ({@link PdfTagging}): el flujo de contenido, el paso de las coordenadas de la página (con la y hacia abajo) a
- * las del PDF (con el origen abajo), los caminos, el color con su opacidad y los giros en curso.
+ * The content of a PDF page, what its canvas ({@link PdfCanvas}) and its tagging ({@link PdfTagging}) share: the
+ * content stream, the conversion from page coordinates (with y pointing down) to PDF coordinates (with the origin at
+ * the bottom), the paths, the color with its opacity and the current rotations.
  */
 final class PdfContent {
 
-    /** Una operación del PDF que puede fallar al escribir. */
+    /** A PDF operation that may fail when writing. */
     @FunctionalInterface
     interface Operation {
         void run() throws IOException;
@@ -31,12 +31,12 @@ final class PdfContent {
 
     private final PDPageContentStream out;
     private final double pageHeight;
-    /** Estados gráficos de opacidad de esta página, por opacidad (en milésimas). */
+    /** Opacity graphics states of this page, by opacity (in thousandths). */
     private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
     /**
-     * Los giros en curso ({@link #rotate}), compuestos, en coordenadas de la página (con la
-     * y hacia abajo); lo necesitan las zonas de los enlaces y el {@code BBox} de las figuras, que
-     * no siguen la matriz del contenido.
+     * The current rotations ({@link #rotate}), composed, in page coordinates (with y
+     * pointing down); needed by the link areas and the {@code BBox} of the figures, which
+     * do not follow the content matrix.
      */
     private AffineTransform turn = new AffineTransform();
     private final Deque<AffineTransform> turns = new ArrayDeque<>();
@@ -54,15 +54,15 @@ final class PdfContent {
         return pageHeight;
     }
 
-    /** Los giros en curso, compuestos; la identidad si no hay ninguno. */
+    /** The current rotations, composed; the identity if there are none. */
     AffineTransform turn() {
         return turn;
     }
 
     /**
-     * Hace una operación del PDF. Las primitivas del lienzo no pueden declarar {@link IOException}: un fallo de
-     * escritura sale como {@link UncheckedIOException}, que {@link PdfDocumentWriter#write} devuelve a lo que es.
-     * Es el único sitio que lo convierte.
+     * Performs a PDF operation. The canvas primitives cannot declare {@link IOException}: a write failure comes out
+     * as {@link UncheckedIOException}, which {@link PdfDocumentWriter#write} turns back into what it is.
+     * It is the only place that converts it.
      */
     static void io(Operation operation) {
         try {
@@ -72,7 +72,7 @@ final class PdfContent {
         }
     }
 
-    /** Un camino que se escribe en el contenido de la página, con el origen abajo. */
+    /** A path written to the content of the page, with the origin at the bottom. */
     Shapes.Path path() {
         return new Shapes.Path() {
             @Override
@@ -104,8 +104,8 @@ final class PdfContent {
     }
 
     /**
-     * Pinta con el color {@code color} lo que haga {@code body}; si el color no es opaco, dentro de
-     * un estado gráfico propio con su opacidad.
+     * Paints with the color {@code color} whatever {@code body} does; if the color is not opaque, inside
+     * its own graphics state with its opacity.
      */
     void painting(String color, Operation body) throws IOException {
         float[] rgba = Colors.rgba(color);
@@ -130,9 +130,9 @@ final class PdfContent {
     }
 
     /**
-     * Empieza a pintar girado {@code degrees} grados alrededor de ({@code x}, {@code y}): una matriz {@code cm}
-     * dentro de un {@code q}/{@code Q}. Con el origen abajo, el giro en el sentido de las agujas del reloj es un
-     * ángulo negativo.
+     * Starts painting rotated {@code degrees} degrees around ({@code x}, {@code y}): a {@code cm} matrix
+     * inside a {@code q}/{@code Q}. With the origin at the bottom, a clockwise rotation is a negative
+     * angle.
      */
     void rotate(double degrees, double x, double y) throws IOException {
         turns.push(turn);
@@ -142,18 +142,18 @@ final class PdfContent {
         out.transform(new Matrix(AffineTransform.getRotateInstance(-Math.toRadians(degrees), x, pageHeight - y)));
     }
 
-    /** Termina el giro empezado con {@link #rotate}. */
+    /** Ends the rotation started with {@link #rotate}. */
     void unrotate() throws IOException {
         turn = turns.pop();
         out.restoreGraphicsState();
     }
 
-    /** El rectángulo de la página que ocupa {@code r} con los giros en curso, en coordenadas del PDF. */
+    /** The rectangle of the page that {@code r} takes with the current rotations, in PDF coordinates. */
     PDRectangle turnedRect(Rect r) {
         return pdfRect(turn.isIdentity() ? r : Rotation.envelope(turn, r));
     }
 
-    /** Un rectángulo en coordenadas del PDF, con el origen abajo. */
+    /** A rectangle in PDF coordinates, with the origin at the bottom. */
     PDRectangle pdfRect(Rect r) {
         return new PDRectangle((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
     }

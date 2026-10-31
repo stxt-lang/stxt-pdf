@@ -1,50 +1,50 @@
 package dev.stxt.pdf.model;
 
 /**
- * Formato de un tramo de texto (reference/common/text-formatting.md): lo que cambia dentro de una línea. La
- * negrita y la cursiva se suman a las de la caja (un tramo en negrita de un texto ya en negrita
- * sigue en negrita); el tamaño, el color y {@code Line height} son siempre los de la caja, y la
- * familia también salvo en el código ({@code family}).
+ * Format of a run of text (reference/common/text-formatting.md): what changes within a line. Bold
+ * and italic add to those of the box (a bold run of a text that is already bold
+ * stays bold); the size, the color and {@code Line height} are always those of the box, and so is the
+ * family except in code ({@code family}).
  *
- * <p>{@code smallCaps} marca las minúsculas que se pintan como versalitas (reference/common/text-formatting.md): el
- * texto del tramo ya está en mayúsculas y se mide y se pinta al {@link #SMALL_CAPS_SCALE} del tamaño. Lo pone el layout
- * al aplicar {@code Small caps}; el documento no lo escribe.</p>
+ * <p>{@code smallCaps} marks the lowercase letters painted as small caps (reference/common/text-formatting.md): the
+ * text of the run is already in upper case and is measured and painted at {@link #SMALL_CAPS_SCALE} of the size. The
+ * layout sets it when it applies {@code Small caps}; the document does not write it.</p>
  *
- * <p>{@code code} marca el código en línea (reference/common/text-formatting.md), que se escribe con la familia de
- * {@code Code font}: al construir la caja, que conoce su {@code Code font}, recibe esa familia en {@code family}.
- * {@code family} es la familia del tramo cuando no es la de la caja; {@code null} = la de la caja. Conserva el peso y
- * el estilo de la caja y los de las marcas del tramo.</p>
+ * <p>{@code code} marks inline code (reference/common/text-formatting.md), which is written with the family of
+ * {@code Code font}: when the box is built, which knows its {@code Code font}, it receives that family in
+ * {@code family}. {@code family} is the family of the run when it is not that of the box; {@code null} = that of the
+ * box. It keeps the weight and style of the box and those of the marks of the run.</p>
  *
- * <p>{@code link} es el destino del enlace del tramo ({@link Links}, reference/common/links.md), o {@code null} si no
- * lo lleva. No cambia cómo se mide ni cómo se pinta el texto: el subrayado de un enlace de
- * Markdown es el {@code underline} de su tramo.</p>
+ * <p>{@code link} is the target of the link of the run ({@link Links}, reference/common/links.md), or {@code null} if
+ * it has none. It does not change how the text is measured or painted: the underline of a Markdown
+ * link is the {@code underline} of its run.</p>
  */
 public record TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
                          boolean smallCaps, boolean code, String family) {
 
-    /** Tamaño de las versalitas respecto al de la caja. */
+    /** Size of the small caps relative to that of the box. */
     public static final double SMALL_CAPS_SCALE = 0.8;
 
-    /** Sin formato: el texto tal como lo declara la caja. */
+    /** No format: the text as the box declares it. */
     public static final TextFormat PLAIN = new TextFormat(false, false, false, false);
 
-    /** Un formato sin enlace ni versalitas. */
+    /** A format without link or small caps. */
     public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike) {
         this(bold, italic, underline, strike, null);
     }
 
-    /** Un formato sin versalitas. */
+    /** A format without small caps. */
     public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link) {
         this(bold, italic, underline, strike, link, false);
     }
 
-    /** Un formato que no es código, con la familia de la caja. */
+    /** A format that is not code, with the family of the box. */
     public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
                       boolean smallCaps) {
         this(bold, italic, underline, strike, link, smallCaps, false, null);
     }
 
-    /** La fuente del tramo a partir de la de la caja. */
+    /** The font of the run, derived from that of the box. */
     public FontFace face(FontFace base) {
         if (!bold && !italic && family == null) {
             return base;
@@ -53,32 +53,32 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
                 italic ? FontStyle.ITALIC : base.style(), base.ligatures());
     }
 
-    /** Si lleva subrayado o tachado, que se pintan aparte del texto. */
+    /** Whether it has underline or strikeout, which are painted apart from the text. */
     public boolean decorated() {
         return underline || strike;
     }
 
-    /** El mismo formato con ese enlace. */
+    /** The same format with that link. */
     public TextFormat withLink(String destination) {
         return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family);
     }
 
-    /** El mismo formato con las versalitas puestas o quitadas. */
+    /** The same format with small caps turned on or off. */
     public TextFormat withSmallCaps(boolean small) {
         return small == smallCaps ? this : new TextFormat(bold, italic, underline, strike, link, small, code, family);
     }
 
-    /** El mismo formato como código en línea, todavía sin su familia. */
+    /** The same format as inline code, still without its family. */
     public TextFormat asCode() {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family);
     }
 
-    /** El mismo formato con esa familia de fuente. */
+    /** The same format with that font family. */
     public TextFormat withFamily(String fontFamily) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily);
     }
 
-    /** Lo que se multiplica el tamaño de la caja para pintar el tramo. */
+    /** The factor applied to the size of the box to paint the run. */
     public double scale() {
         return smallCaps ? SMALL_CAPS_SCALE : 1;
     }

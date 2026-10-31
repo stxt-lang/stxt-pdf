@@ -1,0 +1,26 @@
+# Case: Header cell rule that applies Break to a Cell
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Header cell
+			Break:
+				Keep with next: true
+	Section:
+		Table:
+			Column sizes: *
+			Header rows:
+				Row:
+					Cell: a
+			Body:
+				Row:
+					Cell: b

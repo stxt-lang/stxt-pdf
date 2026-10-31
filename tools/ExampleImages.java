@@ -27,14 +27,14 @@ import java.util.Locale;
 import java.util.Random;
 
 /**
- * Genera las imágenes de los ejemplos de {@code test/examples/} en {@code resources/images/examples/}:
- * logotipos, fotos sintéticas, gráficos, ilustraciones de producto y firmas. Todo se dibuja con
- * Java2D (sin ficheros de terceros, así que no hay derechos que respetar) y con las fuentes IBM
- * Plex de {@code resources/fonts/}, y es determinista: con la misma versión de Java sale lo
- * mismo.
+ * Generates the images of the examples of {@code test/examples/} in {@code resources/images/examples/}:
+ * logos, synthetic photos, charts, product illustrations and signatures. Everything is drawn with
+ * Java2D (no third-party files, so there are no rights to respect) and with the IBM Plex fonts
+ * of {@code resources/fonts/}, and it is deterministic: the same Java version gives the same
+ * result.
  *
  * <pre>
- * java tools/ExampleImages.java            # desde la raíz del repositorio
+ * java tools/ExampleImages.java            # from the root of the repository
  * </pre>
  */
 public class ExampleImages {
@@ -42,7 +42,7 @@ public class ExampleImages {
     static final Path FONTS = Path.of("resources", "fonts");
     static final Path OUT = Path.of("resources", "images", "examples");
 
-    // ---- Paleta común -----------------------------------------------------------------------
+    // ---- Common palette ---------------------------------------------------------------------
     static final Color WALNUT = new Color(0x3B2A1E);
     static final Color AMBER = new Color(0xB5651D);
     static final Color SAND = new Color(0xEFE4D2);
@@ -65,11 +65,11 @@ public class ExampleImages {
         catalog();
         certificate();
         planner();
-        System.out.println("Imágenes escritas en " + OUT);
+        System.out.println("Images written to " + OUT);
     }
 
     // =========================================================================================
-    // Utilidades
+    // Utilities
     // =========================================================================================
 
     static Font font(String family, String variant, float size) {
@@ -82,9 +82,9 @@ public class ExampleImages {
     }
 
     /**
-     * Un dibujo SVG que se escribe a medida que se dibuja: lo justo de Java2D (relleno, trazo, degradado y
-     * texto) para las ilustraciones vectoriales de los ejemplos. Los textos son {@code <text>} con las
-     * familias de {@code resources/fonts/}, que es lo único que admite el motor (reference/components/image.md).
+     * An SVG drawing that is written as it is drawn: just enough of Java2D (fill, stroke, gradient and
+     * text) for the vector illustrations of the examples. The texts are {@code <text>} with the
+     * families of {@code resources/fonts/}, which is the only thing the engine accepts (reference/components/image.md).
      */
     static final class Svg {
         final int w;
@@ -110,7 +110,7 @@ public class ExampleImages {
             return String.format(Locale.ROOT, "#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
         }
 
-        /** {@code fill="#RRGGBB"} y, si no es opaco, su {@code fill-opacity}. */
+        /** {@code fill="#RRGGBB"} and, if it is not opaque, its {@code fill-opacity}. */
         private static String paint(String property, Color c) {
             String out = " " + property + "=\"" + hex(c) + "\"";
             return c.getAlpha() == 255 ? out : out + " " + property + "-opacity=\"" + num(c.getAlpha() / 255.0) + "\"";
@@ -160,7 +160,7 @@ public class ExampleImages {
                     .append(num(width)).append("\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n");
         }
 
-        /** Rellena con un degradado lineal entre dos colores (que pueden llevar opacidad). */
+        /** Fills with a linear gradient between two colors (which can carry opacity). */
         void gradient(Shape sh, GradientPaint p) {
             String id = "g" + ++gradients;
             Point2D a = p.getPoint1();
@@ -201,7 +201,7 @@ public class ExampleImages {
         return new Svg(w, h);
     }
 
-    /** Para medir textos: las métricas de una fuente no dependen de dónde se dibuje. */
+    /** For measuring texts: the metrics of a font do not depend on where it is drawn. */
     private static final Graphics2D SCRATCH = graphics(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
 
     static void fill(Svg g, Color c, Shape s) {
@@ -301,7 +301,7 @@ public class ExampleImages {
         g.fillRect(0, 0, w, h);
     }
 
-    /** Una firma a mano: trazo cursivo con lazos que se apaga hacia el final, y un subrayado. */
+    /** A handwritten signature: a cursive stroke with loops that fades towards the end, and an underline. */
     static void signature(Svg g, Color ink, long seed) {
         Random r = new Random(seed);
         int w = g.w;
@@ -331,7 +331,7 @@ public class ExampleImages {
         stroke(g, ink, h * 0.02f, underline);
     }
 
-    /** Una estrella de cinco puntas, dibujada porque la fuente no tiene el carácter. */
+    /** A five-pointed star, drawn because the font does not have the character. */
     static Path2D.Float star(float cx, float cy, float outer, float inner) {
         Path2D.Float s = new Path2D.Float();
         for (int i = 0; i < 10; i++) {
@@ -350,10 +350,10 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Marca Nogal (factura, carta, catálogo)
+    // Nogal brand (invoice, letter, catalog)
     // =========================================================================================
 
-    /** El anagrama: los anillos de un tronco de nogal. */
+    /** The logo mark: the rings of a walnut trunk. */
     static void ringsMark(Svg g, float cx, float cy, float r, Color main, Color accent) {
         for (int i = 0; i < 5; i++) {
             float rr = r * (1 - i * 0.19f);
@@ -365,21 +365,21 @@ public class ExampleImages {
     }
 
     static void brand() throws IOException {
-        // Anagrama y nombre, en horizontal.
+        // Logo mark and name, horizontal.
         Svg g = svg(1200, 360);
         ringsMark(g, 170, 180, 150, WALNUT, AMBER);
         text(g, "Nogal", font("Serif", "Bold", 190), WALNUT, 360, 218);
         text(g, "TALLER DE MOBILIARIO", font("Sans", "Regular", 44), AMBER, 366, 290);
         g.save("brand/nogal.svg");
 
-        // Solo el anagrama, en blanco, para fondos oscuros.
+        // Only the logo mark, in white, for dark backgrounds.
         Svg mark = svg(400, 400);
         ringsMark(mark, 200, 200, 180, Color.WHITE, new Color(0xF3C27C));
         mark.save("brand/nogal-mark-white.svg");
     }
 
     // =========================================================================================
-    // Carta: firma
+    // Letter: signature
     // =========================================================================================
 
     static void letter() throws IOException {
@@ -389,24 +389,24 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Currículum: retrato
+    // Resume: portrait
     // =========================================================================================
 
     static void resume() throws IOException {
         BufferedImage img = image(700, 700, false);
         Graphics2D g = graphics(img);
         verticalGradient(g, 700, 700, new Color(0xCFE6E4), new Color(0x7FB5B2));
-        // Ventana desenfocada al fondo.
+        // Blurred window in the background.
         fill(g, alpha(Color.WHITE, 70), new RoundRectangle2D.Float(460, 90, 190, 260, 20, 20));
         fill(g, alpha(Color.WHITE, 50), new RoundRectangle2D.Float(60, 140, 120, 120, 120, 120));
-        // Hombros y jersey.
+        // Shoulders and sweater.
         Path2D.Float body = new Path2D.Float();
         body.moveTo(60, 700);
         body.curveTo(70, 560, 190, 520, 350, 520);
         body.curveTo(510, 520, 630, 560, 640, 700);
         body.closePath();
         fill(g, new Color(0x2B4C6F), body);
-        // Cuello y cuello de camisa.
+        // Neck and shirt collar.
         fill(g, new Color(0xD9A47E), new RoundRectangle2D.Float(300, 430, 100, 120, 40, 40));
         Path2D.Float collar = new Path2D.Float();
         collar.moveTo(290, 525);
@@ -417,7 +417,7 @@ public class ExampleImages {
         collar.lineTo(320, 520);
         collar.closePath();
         fill(g, new Color(0xF4F1EA), collar);
-        // Pelo detrás, cara y flequillo.
+        // Hair behind, face and bangs.
         fill(g, new Color(0x3A2A22), new Ellipse2D.Float(222, 120, 256, 330));
         fill(g, new Color(0xE3B18C), new Ellipse2D.Float(250, 200, 200, 250));
         Path2D.Float fringe = new Path2D.Float();
@@ -426,7 +426,7 @@ public class ExampleImages {
         fringe.curveTo(420, 230, 330, 200, 238, 300);
         fringe.closePath();
         fill(g, new Color(0x3A2A22), fringe);
-        // Rasgos.
+        // Features.
         fill(g, new Color(0x2A2220), new Ellipse2D.Float(300, 320, 22, 14));
         fill(g, new Color(0x2A2220), new Ellipse2D.Float(380, 320, 22, 14));
         stroke(g, new Color(0x2A2220), 5, new Arc2D.Float(300, 270, 40, 20, 20, 140, Arc2D.OPEN));
@@ -438,7 +438,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Informe anual: portada y gráficos
+    // Annual report: cover and charts
     // =========================================================================================
 
     static void windTurbine(Graphics2D g, float x, float base, float h, double angle, Color c) {
@@ -453,7 +453,7 @@ public class ExampleImages {
     }
 
     static void report() throws IOException {
-        // Portada: un parque eólico al atardecer.
+        // Cover: a wind farm at sunset.
         int w = 1400;
         int h = 800;
         BufferedImage cover = image(w, h, false);
@@ -490,7 +490,7 @@ public class ExampleImages {
         g.dispose();
         save(cover, "report/cover.jpg");
 
-        // Producción mensual: barras.
+        // Monthly production: bars.
         double[] mwh = {112, 128, 171, 208, 251, 287, 306, 291, 232, 176, 124, 98};
         String[] months = {"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"};
         Svg bars = svg(1400, 640);
@@ -513,7 +513,7 @@ public class ExampleImages {
         }
         bars.save("report/chart-production.svg");
 
-        // Mezcla de clientes: anillo con leyenda.
+        // Customer mix: ring with legend.
         Svg ring = svg(1400, 640);
         String[] names = {"Hogares", "Comercios", "Industria", "Administración"};
         double[] parts = {46, 27, 19, 8};
@@ -537,7 +537,7 @@ public class ExampleImages {
         }
         ring.save("report/chart-mix.svg");
 
-        // Ahorro de emisiones acumulado: línea con área.
+        // Cumulative emission savings: line with area.
         Svg line = svg(1400, 640);
         double[] t = {0, 1.4, 3.1, 5.2, 8.0, 11.6, 15.9};
         String[] years = {"2019", "2020", "2021", "2022", "2023", "2024", "2025"};
@@ -579,11 +579,11 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Boletín: dos fotos
+    // Newsletter: two photos
     // =========================================================================================
 
     static void newsletter() throws IOException {
-        // Mercado: toldos de colores.
+        // Market: colored awnings.
         BufferedImage m = image(1200, 780, false);
         Graphics2D g = graphics(m);
         verticalGradient(g, 1200, 780, new Color(0xBFDFF2), new Color(0xF6EBD3));
@@ -613,7 +613,7 @@ public class ExampleImages {
         g.dispose();
         save(m, "newsletter/market.jpg");
 
-        // Sendero de montaña.
+        // Mountain trail.
         BufferedImage t = image(1200, 780, false);
         g = graphics(t);
         verticalGradient(g, 1200, 780, new Color(0x7FB6E6), new Color(0xE9F2F7));
@@ -675,7 +675,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Menú: emblema y adorno
+    // Menu: emblem and ornament
     // =========================================================================================
 
     static void menu() throws IOException {
@@ -701,7 +701,7 @@ public class ExampleImages {
         centered(g, "LA CALA", font("Serif", "Bold", 54), navy, 250, 262);
         g.save("menu/emblem.svg");
 
-        // Adorno: filete con hojas.
+        // Ornament: rule with leaves.
         Svg o = svg(1200, 80);
         Color gold = new Color(0xA8782F);
         stroke(o, gold, 3, new java.awt.geom.Line2D.Float(40, 40, 520, 40));
@@ -721,7 +721,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Contrato: logotipo del estudio
+    // Contract: logo of the studio
     // =========================================================================================
 
     static void contract() throws IOException {
@@ -740,11 +740,11 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Manual: aparato, pantalla del móvil y esquema de conexión
+    // Manual: device, phone screen and wiring diagram
     // =========================================================================================
 
     static void manual() throws IOException {
-        // Termostato visto de frente.
+        // Thermostat seen from the front.
         Svg d = svg(900, 900);
         fill(d, alpha(Color.BLACK, 30), new RoundRectangle2D.Float(110, 130, 700, 700, 120, 120));
         fill(d, new Color(0xF4F4F1), new RoundRectangle2D.Float(90, 100, 700, 700, 120, 120));
@@ -759,7 +759,7 @@ public class ExampleImages {
         fill(d, new Color(0x4C8C4A), new Ellipse2D.Float(660, 135, 26, 26));
         d.save("manual/thermostat.svg");
 
-        // Pantalla de la aplicación.
+        // Screen of the app.
         BufferedImage s = image(560, 1000, true);
         Graphics2D g = graphics(s);
         fill(g, new Color(0x1A1D23), new RoundRectangle2D.Float(10, 10, 540, 980, 70, 70));
@@ -788,7 +788,7 @@ public class ExampleImages {
         g.dispose();
         save(s, "manual/app.png");
 
-        // Esquema de conexión: regleta de bornes.
+        // Wiring diagram: terminal block.
         Svg w = svg(1400, 560);
         fill(w, new Color(0xF4F4F1), new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
         stroke(w, new Color(0xD0D0CA), 4, new RoundRectangle2D.Float(40, 40, 520, 480, 40, 40));
@@ -808,7 +808,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Catálogo: ocho muebles
+    // Catalog: eight pieces of furniture
     // =========================================================================================
 
     static void catalog() throws IOException {
@@ -825,7 +825,7 @@ public class ExampleImages {
             fill(g, alpha(Color.BLACK, 22), new Rectangle2D.Float(0, 640, 800, 160));
             fill(g, alpha(Color.BLACK, 28), new Ellipse2D.Float(130, 620, 540, 50));
             switch (i) {
-                case 0 -> { // silla
+                case 0 -> { // chair
                     fill(g, wood, new RoundRectangle2D.Float(250, 120, 300, 40, 12, 12));
                     for (int k = 0; k < 4; k++) {
                         fill(g, wood, new Rectangle2D.Float(262 + k * 78, 150, 22, 270));
@@ -835,7 +835,7 @@ public class ExampleImages {
                     fill(g, wood, new Rectangle2D.Float(536, 440, 24, 200));
                     fill(g, darkWood, new Rectangle2D.Float(262, 500, 276, 14));
                 }
-                case 1 -> { // mesa
+                case 1 -> { // table
                     fill(g, darkWood, new RoundRectangle2D.Float(120, 300, 560, 56, 14, 14));
                     fill(g, wood, new RoundRectangle2D.Float(150, 340, 500, 36, 8, 8));
                     for (int x : new int[]{170, 600}) {
@@ -843,7 +843,7 @@ public class ExampleImages {
                     }
                     fill(g, darkWood, new Rectangle2D.Float(200, 520, 400, 16));
                 }
-                case 2 -> { // lámpara
+                case 2 -> { // lamp
                     Path2D.Float shade = new Path2D.Float();
                     shade.moveTo(300, 150);
                     shade.lineTo(500, 150);
@@ -855,7 +855,7 @@ public class ExampleImages {
                     fill(g, darkWood, new Rectangle2D.Float(388, 330, 24, 290));
                     fill(g, darkWood, new Ellipse2D.Float(290, 600, 220, 40));
                 }
-                case 3 -> { // estantería
+                case 3 -> { // bookcase
                     fill(g, darkWood, new Rectangle2D.Float(200, 100, 24, 540));
                     fill(g, darkWood, new Rectangle2D.Float(576, 100, 24, 540));
                     for (int k = 0; k < 5; k++) {
@@ -876,7 +876,7 @@ public class ExampleImages {
                         }
                     }
                 }
-                case 4 -> { // taburete
+                case 4 -> { // stool
                     fill(g, darkWood, new Ellipse2D.Float(250, 300, 300, 70));
                     fill(g, wood, new Ellipse2D.Float(250, 280, 300, 70));
                     Path2D.Float l1 = new Path2D.Float();
@@ -895,7 +895,7 @@ public class ExampleImages {
                     fill(g, wood, l2);
                     fill(g, darkWood, new Rectangle2D.Float(290, 500, 220, 14));
                 }
-                case 5 -> { // banco
+                case 5 -> { // bench
                     fill(g, wood, new RoundRectangle2D.Float(100, 340, 600, 50, 12, 12));
                     fill(g, darkWood, new Rectangle2D.Float(100, 380, 600, 14));
                     for (int x : new int[]{140, 630}) {
@@ -904,14 +904,14 @@ public class ExampleImages {
                     fill(g, darkWood, new Rectangle2D.Float(170, 520, 460, 14));
                     fill(g, new Color(0xB5473A), new RoundRectangle2D.Float(150, 300, 500, 46, 24, 24));
                 }
-                case 6 -> { // espejo
+                case 6 -> { // mirror
                     fill(g, darkWood, new Ellipse2D.Float(190, 100, 420, 520));
                     g.setPaint(new GradientPaint(220, 130, new Color(0xE6F1F5), 600, 600, new Color(0xA9C6D1)));
                     g.fill(new Ellipse2D.Float(220, 130, 360, 460));
                     stroke(g, alpha(Color.WHITE, 170), 12, new Arc2D.Float(260, 170, 220, 300, 110, 70, Arc2D.OPEN));
                     fill(g, darkWood, new Rectangle2D.Float(380, 590, 40, 50));
                 }
-                default -> { // escritorio
+                default -> { // desk
                     fill(g, wood, new RoundRectangle2D.Float(100, 290, 600, 44, 10, 10));
                     fill(g, darkWood, new Rectangle2D.Float(120, 330, 26, 310));
                     fill(g, darkWood, new Rectangle2D.Float(560, 330, 26, 310));
@@ -931,7 +931,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Certificado: sello y dos firmas
+    // Certificate: seal and two signatures
     // =========================================================================================
 
     static void certificate() throws IOException {
@@ -986,7 +986,7 @@ public class ExampleImages {
     }
 
     // =========================================================================================
-    // Agenda semanal: un icono de cabecera
+    // Weekly planner: a header icon
     // =========================================================================================
 
     static void planner() throws IOException {

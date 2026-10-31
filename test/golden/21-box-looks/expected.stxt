@@ -1,18 +1,18 @@
-# Hito 28: aspecto de las cajas (reference/common/box.md). Corner radius, Border color por lado, Background con
-# degradado y colores con opacidad solo cambian el pintado: el volcado comprueba que no mueven ninguna caja y los
-# PNG (con los contornos de depuración) se miran a ojo. Página de 300 × 300 con márgenes de 20: área útil de
-# 260 × 260 desde (20, 20). Cada fila es un Stack de 260 × 50 con huecos de 10 y 10 de margen debajo: y = 20, 80, 140
-# y 200; el último bloque empieza en 200 + 50 + 10 = 260.
-#   row1: round (100 × 50, Corner radius 12, borde de 3 con otro color), circle (50 × 50, Corner radius 50%: un círculo) y
-#         corners (Corner radius 0 20 0 20: solo dos esquinas, en diagonal). x = 20, 130 y 190.
-#   row2: sides (cuatro colores de borde, uniones en diagonal), sidesRound (dos colores y Corner radius 20) y stripe
-#         (Border 0 0 0 4: la franja de un aviso). x = 20, 130 y 190.
-#   row3: gradient (linear de tres colores a 90°: de izquierda a derecha) y base con fade encima (linear a 180°
-#         de un azul transparente a opaco: de arriba abajo, con opacidad). x = 20 y 130.
-#   row4: photo (Image con Corner radius 50%: recortada en círculo) y framed (Corner radius 10 y borde de 2: la imagen se recorta
-#         con el radio de la caja de contenido, 8). x = 20 y 80.
-#   split: 100 × 100 con Corner radius 12 en la caja partida: en la página 1 solo le caben 280 − 260 = 20 y en la 2 los 80
-#          restantes; con Edges: open, la primera parte solo tiene las esquinas de arriba y la segunda las de abajo.
+# Milestone 28: box appearance (reference/common/box.md). Corner radius, Border color per side, Background with a
+# gradient and colors with opacity only change the painting: the dump checks that they do not move any box, and the
+# PNGs (with the debug outlines) are checked by eye. Page of 300 × 300 with margins of 20: page area of
+# 260 × 260 from (20, 20). Each row is a Stack of 260 × 50 with gaps of 10 and a margin of 10 below: y = 20, 80, 140
+# and 200; the last block starts at 200 + 50 + 10 = 260.
+#   row1: round (100 × 50, Corner radius 12, border of 3 in another color), circle (50 × 50, Corner radius 50%: a circle) and
+#         corners (Corner radius 0 20 0 20: only two corners, diagonally opposite). x = 20, 130 and 190.
+#   row2: sides (four border colors, diagonal joins), sidesRound (two colors and Corner radius 20) and stripe
+#         (Border 0 0 0 4: the stripe of a notice). x = 20, 130 and 190.
+#   row3: gradient (linear with three colors at 90°: from left to right) and base with fade on top (linear at 180°
+#         from a transparent to an opaque blue: from top to bottom, with opacity). x = 20 and 130.
+#   row4: photo (Image with Corner radius 50%: cropped to a circle) and framed (Corner radius 10 and border of 2: the image is clipped
+#         with the radius of the content box, 8). x = 20 and 80.
+#   split: 100 × 100 with Corner radius 12 on the split box: on page 1 only 280 − 260 = 20 fit and on page 2 the remaining
+#          80; with Edges: open, the first part has only the top corners and the second only the bottom ones.
 Result:
 	Page: 1
 		Fragment: row1

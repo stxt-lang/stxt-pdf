@@ -1,11 +1,11 @@
 package dev.stxt.pdf.layout.grid;
 
 /**
- * Lo que aporta un ítem al dimensionado de pistas en un eje (reference/components/grid.md). Para columnas son sus
- * anchos más estrecho y natural; para filas, su altura tras el layout con el ancho ya resuelto.
+ * What an item contributes to track sizing on one axis (reference/components/grid.md). For columns, its narrowest
+ * and natural widths; for rows, its height after the layout with the width already resolved.
  *
- * @param track primera pista que ocupa (desde 0)
- * @param span  número de pistas que ocupa
+ * @param track first track it occupies (from 0)
+ * @param span  number of tracks it occupies
  */
 public record ItemContribution(int track, int span, double narrowest, double natural) {
 }
