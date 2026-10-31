@@ -2,7 +2,7 @@
 # sangre (Margin: 0), sin número de página y sin el pie del documento (Inherit page overlays: false), y el
 # cuerpo, que numera desde 1. Tiene un índice de productos con su página impresa (un Table of contents, que el
 # motor rellena con los encabezados), fichas en una rejilla de dos columnas con la foto recortada
-# (Fit: cover) y una etiqueta «Novedad» en diagonal en la esquina (un Overlay con Rotate), y una página
+# (Fit: fill) y una etiqueta «Novedad» en diagonal en la esquina (un Overlay con Rotate), y una página
 # final con maderas, pedidos y contacto. Las fichas son todas iguales: el estilo está en styles.stxt y
 # solo cambia el contenido. El título de la portada y el del índice son un Heading 1 con
 # In table of contents: false, para que no salgan en él. Los rótulos se escriben en minúscula y las reglas los
@@ -20,8 +20,8 @@ Document (dev.stxt.pdf):
 			Padding: 6 0 0 0
 			Border: 0.5 0 0 0
 			Border color: #DCCFB8
-		Flex:
-			Horizontal: between
+		Stack:
+			Horizontal: justify
 			Item:
 				Text: Taller Nogal · Catálogo 2026 · tallernogal.example
 					Link: https://tallernogal.example
@@ -86,25 +86,25 @@ Document (dev.stxt.pdf):
 					Gap: 8
 					Area:
 						Image: examples/catalog/silla.jpg
-							Fit: cover
+							Fit: fill
 							Box:
 								Width: 100%
 								Height: 108
 					Area:
 						Image: examples/catalog/mesa.jpg
-							Fit: cover
+							Fit: fill
 							Box:
 								Width: 100%
 								Height: 108
 					Area:
 						Image: examples/catalog/lampara.jpg
-							Fit: cover
+							Fit: fill
 							Box:
 								Width: 100%
 								Height: 108
 					Area:
 						Image: examples/catalog/estanteria.jpg
-							Fit: cover
+							Fit: fill
 							Box:
 								Width: 100%
 								Height: 108
@@ -146,15 +146,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/silla.jpg
 								Alt: Silla Olot
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -164,8 +164,8 @@ Document (dev.stxt.pdf):
 									Text: MN-022
 										Style: ref
 							Paragraph: Roble macizo con asiento de anea, ensamblada sin un solo clavo.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -183,15 +183,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/mesa.jpg
 								Alt: Mesa Besalú
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -201,8 +201,8 @@ Document (dev.stxt.pdf):
 									Text: MN-014
 										Style: ref
 							Paragraph: Nogal macizo con tablero de una pieza y patas con ensamble de cola de milano.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -220,7 +220,7 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/lampara.jpg
 								Alt: Lámpara Sol
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
@@ -234,8 +234,8 @@ Document (dev.stxt.pdf):
 								Text: Novedad
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -245,8 +245,8 @@ Document (dev.stxt.pdf):
 									Text: MN-063
 										Style: ref
 							Paragraph: Pie de nogal torneado y pantalla de lino natural. Cable textil de dos metros.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -264,15 +264,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/taburete.jpg
 								Alt: Taburete Cal
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -282,8 +282,8 @@ Document (dev.stxt.pdf):
 									Text: MN-049
 										Style: ref
 							Paragraph: Asiento circular de roble con tres patas abiertas. Se apila de dos en dos.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -313,15 +313,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/estanteria.jpg
 								Alt: Estantería Fageda
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -331,8 +331,8 @@ Document (dev.stxt.pdf):
 									Text: MN-031
 										Style: ref
 							Paragraph: Nogal con cinco baldas regulables y laterales con ranura. Se fija a la pared.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -350,15 +350,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/banco.jpg
 								Alt: Banco Mirador
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -368,8 +368,8 @@ Document (dev.stxt.pdf):
 									Text: MN-040
 										Style: ref
 							Paragraph: Banco de recibidor con asiento tapizado en lana de oveja de la comarca.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -387,15 +387,15 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/espejo.jpg
 								Alt: Espejo Lluna
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
 									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -405,8 +405,8 @@ Document (dev.stxt.pdf):
 									Text: MN-057
 										Style: ref
 							Paragraph: Espejo ovalado con marco de nogal macizo y herraje de colgar oculto.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -424,7 +424,7 @@ Document (dev.stxt.pdf):
 								Height: 205
 							Image: examples/catalog/escritorio.jpg
 								Alt: Escritorio Torre
-								Fit: cover
+								Fit: fill
 								Box:
 									Width: 100%
 									Height: 205
@@ -438,8 +438,8 @@ Document (dev.stxt.pdf):
 								Text: Novedad
 						Block:
 							Style: body
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Item:
 									Heading 2:
@@ -449,8 +449,8 @@ Document (dev.stxt.pdf):
 									Text: MN-071
 										Style: ref
 							Paragraph: Roble con cajonera de tres cajones y pasacables. Cantos redondeados.
-							Flex:
-								Horizontal: between
+							Stack:
+								Horizontal: justify
 								Vertical: end
 								Box:
 									Margin: 6 0 0 0
@@ -550,7 +550,7 @@ Document (dev.stxt.pdf):
 					Padding: 22 26
 				Typography:
 					Color: #FFFFFF
-				Flex:
+				Stack:
 					Gap: 24
 					Vertical: center
 					Item:

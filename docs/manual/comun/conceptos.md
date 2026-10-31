@@ -33,7 +33,7 @@ ocupa 200 puntos de ancho y deja 180 para el contenido. Más en [La caja](caja.m
 
 ## Elementos y propiedades
 
-Un elemento solo admite las propiedades que tienen sentido en él, y el motor lo comprueba al leer: `Column sizes` en un `Flex`
+Un elemento solo admite las propiedades que tienen sentido en él, y el motor lo comprueba al leer: `Column sizes` en un `Stack`
 es un error, porque las columnas son de un `Grid`. Las propiedades de cualquier caja van en tres **grupos**:
 
 | Grupo | Qué tiene | Se hereda |
@@ -67,7 +67,7 @@ Cada elemento coloca a sus hijos de una forma:
 | Elemento | Coloca a sus hijos |
 |---|---|
 | `Block` (y casi todos los demás: secciones, encabezados, listas, celdas...) | **Uno debajo de otro**, cada uno con todo el ancho disponible |
-| `Flex` | En una **fila** (o una columna), repartiéndose el espacio |
+| `Stack` | En una **fila** (o una columna), repartiéndose el espacio |
 | `Grid` y `Table` | En una **rejilla** de filas y columnas |
 | `Columns` | En **columnas** por las que el contenido fluye |
 | `Text` y `Paragraph` | No tienen hijos: reparten su texto en **líneas** |

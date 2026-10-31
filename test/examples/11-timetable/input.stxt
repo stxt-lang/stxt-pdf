@@ -1,6 +1,6 @@
 # Horario escolar semanal en una página A4 apaisada (Paper: A4 y Orientation: landscape, 842 × 595): una tabla con las celdas
 # separadas por un Gap, una celda de hora a la izquierda, asignaturas con su color y franjas de
-# recreo y comedor que ocupan los cinco días con Span, una leyenda en un Flex con salto de línea
+# recreo y comedor que ocupan los cinco días con Span, una leyenda en un Stack con salto de línea
 # y unas notas en Markdown. Cada color es un estilo de styles.stxt.
 Document (dev.stxt.pdf):
 	Page:
@@ -13,13 +13,13 @@ Document (dev.stxt.pdf):
 		Page overlay:
 			Id: footer
 			Offset: auto 0 -30 0
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: CEIP Pla de les Eres · Olot
 				Item:
 					Text: Horario válido del 8 de septiembre de 2025 al 19 de junio de 2026
-		Flex:
+		Stack:
 			Id: masthead
 			Vertical: center
 			Gap: 14
@@ -149,7 +149,7 @@ Document (dev.stxt.pdf):
 						Style: slot lab
 					Cell: Proyecto
 						Style: slot proj
-		Flex:
+		Stack:
 			Id: legend
 			Wrap: true
 			Gap: 6 16
@@ -159,7 +159,7 @@ Document (dev.stxt.pdf):
 				Border: 0.5 0 0 0
 				Border color: #CAD3CD
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -171,7 +171,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Matemáticas
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -183,7 +183,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Lengua
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -195,7 +195,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Inglés
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -207,7 +207,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Ciencias
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -219,7 +219,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Música
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -231,7 +231,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Plástica
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -243,7 +243,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Educación física
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -255,7 +255,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Taller
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:
@@ -267,7 +267,7 @@ Document (dev.stxt.pdf):
 					Item:
 						Text: Tutoría
 			Item:
-				Flex:
+				Stack:
 					Gap: 5
 					Vertical: center
 					Item:

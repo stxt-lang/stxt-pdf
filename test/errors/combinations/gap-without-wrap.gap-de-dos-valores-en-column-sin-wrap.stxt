@@ -1,4 +1,4 @@
-# Case: Gap de dos valores en un Flex column sin Wrap
+# Case: Gap de dos valores en un Stack column sin Wrap
 # Code: GAP_WITHOUT_WRAP
 # Line: 13
 Document (dev.stxt.pdf):
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
+		Stack:
 			Direction: vertical
 			Gap: 7 13
 			Item:

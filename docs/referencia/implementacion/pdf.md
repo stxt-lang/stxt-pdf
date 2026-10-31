@@ -33,7 +33,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
 | `Image` con `Alt` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
-| El resto (como `Block`, `Flex`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
+| El resto (como `Block`, `Stack`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
 
 Lo que genera un `Markdown` cuelga de su `Div` con sus propios elementos. El contenido de un `Columns` cuelga de su `Div`
 de columna en columna. El texto de cada caja es contenido marcado de su elemento, también sus tramos con formato, que no
@@ -99,7 +99,7 @@ tiene una sola `THead` y una sola `TFoot`.
 
 ### Figuras
 
-El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `contain`. El de
+El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Fit: inside`. El de
 una imagen girada es el rectángulo que la envuelve.
 
 ### Índices

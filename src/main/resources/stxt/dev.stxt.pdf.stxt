@@ -61,7 +61,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Begin on
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -101,7 +101,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -120,9 +120,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Frame
 			Child: Overlay
 			Child: Page overlay
-	Node: Flex
+	Node: Stack
 		Type: GROUP
-		Description: Contenedor flex: coloca sus ítems (Item) uno tras otro, en horizontal o en vertical (Direction), y reparte el espacio que sobra.
+		Description: Coloca sus ítems (Item) uno tras otro, en horizontal o en vertical (Direction), y reparte entre ellos el espacio que sobra.
 		Children:
 			Child: Id
 				Max: 1
@@ -146,7 +146,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Vertical
 				Max: 1
-			Child: Lines
+			Child: Line distribution
 				Max: 1
 			Child: Item
 			Child: Overlay
@@ -374,7 +374,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Number
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -416,7 +416,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Balance
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -460,7 +460,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate origin
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -502,7 +502,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate origin
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -546,7 +546,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate origin
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -567,13 +567,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Item
 		Type: GROUP
-		Description: Ítem de un Flex: cómo crece, encoge y se alinea en el eje cruzado. Contiene exactamente un elemento.
+		Description: Ítem de un Stack: cómo crece, encoge y se alinea en el eje cruzado. Contiene exactamente un elemento.
 		Children:
 			Child: Grow
 				Max: 1
 			Child: Shrink
 				Max: 1
-			Child: Basis
+			Child: Base size
 				Max: 1
 			Child: Horizontal
 				Max: 1
@@ -583,7 +583,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Block
 				Max: 1
-			Child: Flex
+			Child: Stack
 				Max: 1
 			Child: Grid
 				Max: 1
@@ -628,7 +628,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Block
 				Max: 1
-			Child: Flex
+			Child: Stack
 				Max: 1
 			Child: Grid
 				Max: 1
@@ -744,7 +744,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Row header
 				Max: 1
 			Child: Block
-			Child: Flex
+			Child: Stack
 			Child: Grid
 			Child: Text
 			Child: Paragraph
@@ -1202,11 +1202,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: open
 			Value: closed
 
-	# Flex
+	# Stack
 
 	Node: Direction
 		Type: ENUM
-		Description: Eje principal de un Flex, en el que van los ítems uno tras otro: horizontal (por defecto) o vertical.
+		Description: Eje principal de un Stack, en el que van los ítems uno tras otro: horizontal (por defecto) o vertical.
 		Values:
 			Value: horizontal
 			Value: vertical
@@ -1214,22 +1214,22 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: BOOLEAN
 		Description: Permite repartir los ítems en varias líneas.
 	Node: Gap
-		Description: Separación: en Flex y Grid, un valor, o dos (filas columnas); en Columns, un valor, el hueco entre columnas.
-	Node: Lines
+		Description: Separación: en Stack y Grid, un valor, o dos (filas columnas); en Columns, un valor, el hueco entre columnas.
+	Node: Line distribution
 		Type: ENUM
-		Description: Reparto de las líneas en el contenedor. Solo con Wrap: true.
+		Description: Reparto de las líneas en el contenedor: start, end, center, justify (la primera y la última en los bordes), around o stretch. Solo con Wrap: true.
 		Values:
 			Value: start
 			Value: end
 			Value: center
-			Value: between
+			Value: justify
 			Value: around
 			Value: stretch
 	Node: Grow
 		Description: Parte del espacio sobrante que recibe el ítem.
 	Node: Shrink
-		Description: Parte del déficit que cede el ítem, ponderada por Basis.
-	Node: Basis
+		Description: Parte del déficit que cede el ítem, ponderada por Base size.
+	Node: Base size
 		Description: Tamaño de partida del ítem en el eje principal.
 
 	# Grid
@@ -1249,26 +1249,26 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: vertical
 	Node: Horizontal
 		Type: ENUM
-		Description: Alineación o reparto en horizontal. En un Grid, la alineación de todos los ítems en su área, y en un Area, la de uno (start, end, center o stretch). En un Flex, si su eje principal es el horizontal, el reparto del espacio sobrante (start, end, center, between, around o evenly); si no, la alineación de todos los ítems (start, end, center o stretch). En un Item, la alineación de uno, solo si es el eje cruzado de su Flex.
+		Description: Alineación o reparto en horizontal. En un Grid, la alineación de todos los ítems en su área, y en un Area, la de uno (start, end, center o stretch). En un Stack, si su eje principal es el horizontal, el reparto del espacio sobrante (start, end, center, justify, around o distribute); si no, la alineación de todos los ítems (start, end, center o stretch). En un Item, la alineación de uno, solo si es el eje cruzado de su Stack.
 		Values:
 			Value: start
 			Value: end
 			Value: center
 			Value: stretch
-			Value: between
+			Value: justify
 			Value: around
-			Value: evenly
+			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Alineación o reparto en vertical, como Horizontal: en un Grid y en un Area, la alineación en el área; en un Flex, el reparto si su eje principal es el vertical y, si no, la alineación de los ítems; en un Item, la alineación de uno, solo si es el eje cruzado de su Flex.
+		Description: Alineación o reparto en vertical, como Horizontal: en un Grid y en un Area, la alineación en el área; en un Stack, el reparto si su eje principal es el vertical y, si no, la alineación de los ítems; en un Item, la alineación de uno, solo si es el eje cruzado de su Stack.
 		Values:
 			Value: start
 			Value: end
 			Value: center
 			Value: stretch
-			Value: between
+			Value: justify
 			Value: around
-			Value: evenly
+			Value: distribute
 
 	# List
 
@@ -1320,10 +1320,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Texto alternativo de una Image: con él, la imagen es una figura (Figure) del PDF etiquetado; sin él, es decorativa.
 	Node: Fit
 		Type: ENUM
-		Description: Cómo llena una Image su caja si tienen proporciones distintas: contain (por defecto) cabe entera y centrada; cover llena la caja, centrada y recortada; stretch la estira a la caja y la deforma.
+		Description: Cómo llena una Image su caja si tienen proporciones distintas: inside (por defecto) cabe entera y centrada; fill llena la caja, centrada y recortada; stretch la estira a la caja y la deforma.
 		Values:
-			Value: contain
-			Value: cover
+			Value: inside
+			Value: fill
 			Value: stretch
 	Node: Pdf page
 		Type: INTEGER

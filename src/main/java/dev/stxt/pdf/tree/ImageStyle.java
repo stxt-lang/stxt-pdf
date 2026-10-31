@@ -10,7 +10,7 @@ public final class ImageStyle extends StyleGroup {
 
     /** Texto alternativo de una {@code Image}; {@code null} = decorativa. */
     private String alt;
-    private Fit fit = Fit.CONTAIN;
+    private Fit fit = Fit.INSIDE;
     /** Página de un PDF, desde 1. */
     private int pdfPage = 1;
 

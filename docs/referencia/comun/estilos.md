@@ -95,7 +95,7 @@ Un `For element`, un `For style`, un `For id` o un `For column` que no se aplica
 reglas se pueden reutilizar, y un elemento con ese `Id` o ese estilo puede llegar después (de una plantilla, por ejemplo).
 
 > **Decisión:** una regla por tipo puede dar un error en un elemento concreto (un `Margin: auto` que no centra en un ítem
-> de `Flex`), con la línea de la regla. *Alternativa descartada:* ignorar lo que no tiene efecto cuando viene de una
+> de `Stack`), con la línea de la regla. *Alternativa descartada:* ignorar lo que no tiene efecto cuando viene de una
 > regla.
 
 ## La tipografía base

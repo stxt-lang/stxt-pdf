@@ -59,7 +59,19 @@ El estilo de cada ejemplo está en su `styles.stxt`. Lo que enseña cada uno est
 
 ## Uso
 
-Java 17 o superior y Maven.
+Java 17 o superior.
+
+```xml
+<dependency>
+    <groupId>dev.stxt</groupId>
+    <artifactId>stxt-pdf</artifactId>
+    <version>0.8.0</version>
+</dependency>
+```
+
+```groovy
+implementation 'dev.stxt:stxt-pdf:0.8.0'
+```
 
 ```java
 InlineNode doc = new DocumentReader().read(Path.of("informe.stxt"));

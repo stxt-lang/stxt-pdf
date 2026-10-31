@@ -7,7 +7,7 @@ cortar:
 
 - Entre dos cajas que van una debajo de otra.
 - Entre dos líneas de un texto.
-- Entre dos filas de una tabla o de un `Grid`, o entre dos líneas de un `Flex`.
+- Entre dos filas de una tabla o de un `Grid`, o entre dos líneas de un `Stack`.
 
 Siempre corta lo más arriba posible en el árbol: antes de partir una caja por dentro, prueba a cortar entre ella y sus
 hermanas. Y elige el **último** sitio de la página que cumple todas las reglas:

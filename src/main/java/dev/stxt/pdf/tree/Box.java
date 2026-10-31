@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * Una caja del árbol de cajas (referencia/comun/estructura.md): cada elemento de caja del documento
- * ({@code Block}, {@code Flex}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
+ * ({@code Block}, {@code Stack}, {@code Text}…) es una; la raíz, anónima, es el área útil. Un
  * {@code Text} guarda su texto directamente.
  *
  * <p>No guarda geometría: el resultado del layout, por páginas, son los
@@ -323,8 +323,8 @@ public final class Box {
     }
 
     /**
-     * Si la caja aísla los márgenes, es decir, si corta su colapso (referencia/componentes/block.md): el área útil
-     * (la raíz), los {@code Overlay} y {@code Page overlay}, los ítems de flex y grid, las cajas con
+     * Si la caja aísla los márgenes, es decir, si corta su fusión (referencia/componentes/block.md): el área útil
+     * (la raíz), los {@code Overlay} y {@code Page overlay}, los ítems de stack y grid, las cajas con
      * {@code Isolate margins: true} y las giradas en flujo.
      */
     public boolean isolatesMargins() {
@@ -332,7 +332,7 @@ public final class Box {
             return true;
         }
         Layout l = parent.style.layout();
-        return l == Layout.FLEX || l == Layout.GRID;
+        return l == Layout.STACK || l == Layout.GRID;
     }
 
     /**

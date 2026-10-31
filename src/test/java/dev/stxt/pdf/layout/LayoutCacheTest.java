@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Regresión de la regla de la arquitectura (referencia/arquitectura.md): toda recursión de layout y de tamaños intrínsecos
  * pasa por {@code engine.layout}/{@code engine.intrinsic}, que usan la {@link LayoutCache}. Sin
- * ella, cada nivel de flex o grid maqueta a sus hijos varias veces (medida, intrínsecos, layout
+ * ella, cada nivel de stack o grid maqueta a sus hijos varias veces (medida, intrínsecos, layout
  * final) y el trabajo crece de forma exponencial con la profundidad. El trabajo se mide por las
  * veces que se mide el texto de la hoja.
  */
@@ -35,16 +35,16 @@ class LayoutCacheTest {
         }
     }
 
-    /** {@code Flex} y {@code Grid} alternos, {@code depth} niveles, cada uno con un texto al lado. */
+    /** {@code Stack} y {@code Grid} alternos, {@code depth} niveles, cada uno con un texto al lado. */
     private static String nested(int depth) {
         List<String> lines = new ArrayList<>(List.of("Document (dev.stxt.pdf):", "\tLanguage: es", "\tTitle: Prueba", "\tPage:", "\t\tWidth: 595",
                 "\t\tHeight: 842", "\t\tMargin: 40", "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10"));
         String indent = "\t";
         for (int level = depth; level > 0; level--) {
-            boolean flex = level % 2 == 1;
-            String wrapper = flex ? "Item:" : "Area:";
-            lines.add(indent + (flex ? "Flex:" : "Grid:"));
-            if (!flex) {
+            boolean stack = level % 2 == 1;
+            String wrapper = stack ? "Item:" : "Area:";
+            lines.add(indent + (stack ? "Stack:" : "Grid:"));
+            if (!stack) {
                 lines.add(indent + "\tColumn sizes: auto *");
             }
             lines.add(indent + "\t" + wrapper);

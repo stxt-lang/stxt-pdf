@@ -37,7 +37,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  *     r = context.layout(hijo, caja de contenido como containing block)
  *     strut += margen superior del hijo + los que salen de él por arriba
  *     si aún no hay nada entre el borde superior de la caja y el hijo: el strut sale de la caja
- *     si no: cursor += strut                                           // colapso
+ *     si no: cursor += strut                                           // fusión
  *     colocar el fragmento en (margen izquierdo, cursor)               // márgenes auto = centrar
  *     si es relative: desplazar el fragmento según Offset
  *     cursor += alto; strut = margen inferior del hijo + los que salen de él por abajo
@@ -45,7 +45,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * </pre>
  *
  * <p>Los márgenes que salen de la caja se devuelven en {@link AdjoiningMargins}: el padre los
- * colapsa con los márgenes propios de la caja. Un hijo vacío deja pasar sus márgenes.</p>
+ * fusiona con los márgenes propios de la caja. Un hijo vacío deja pasar sus márgenes.</p>
  *
  * <p><strong>Fragmentación</strong> (referencia/comun/cortes.md). Cada hijo recibe lo que queda de página desde su
  * borde superior. Delante de cada hijo, si ya se ha colocado algo en este fragmento, hay un corte
@@ -188,7 +188,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             AdjoiningMargins adjoining = r.adjoining();
             MarginStrut childTop = noTopMargin ? MarginStrut.EMPTY : adjoining.top().add(margin.top());
-            // Una caja vacía deja colapsar también su margen inferior con los de alrededor.
+            // Una caja vacía deja fusionar también su margen inferior con los de alrededor.
             double flowY = adjoining.collapsesThrough()
                     ? top(childTop.add(margin.bottom()))
                     : top(childTop);
@@ -202,7 +202,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             Fragment f = r.fragment();
 
             if (adjoining.collapsesThrough()) {
-                // Caja vacía: sus dos márgenes colapsan con los de alrededor y el cursor no avanza.
+                // Caja vacía: sus dos márgenes se fusionan con los de alrededor y el cursor no avanza.
                 strut = strut.add(childTop).add(margin.bottom());
             } else {
                 strut = strut.add(childTop);
@@ -248,7 +248,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         /**
-         * Posición del borde superior de un hijo con estos márgenes superiores, colapsados con el
+         * Posición del borde superior de un hijo con estos márgenes superiores, fusionados con el
          * strut actual. Si nada lo separa del borde superior de la caja, sus márgenes salen y
          * empieza en 0.
          */

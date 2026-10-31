@@ -1,4 +1,4 @@
-# Case: Margen auto de una regla en un ítem de flex
+# Case: Margen auto de una regla en un ítem de Stack
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
 # Line: 13
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Margin: auto
 				Width: 100
 	Section:
-		Flex:
+		Stack:
 			Item:
 				Block:
 					Box:

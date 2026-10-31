@@ -92,9 +92,9 @@ Document (dev.stxt.pdf):
 			Box:
 				Width: 500
 				Margin: 0 auto 18 auto
-		Flex:
+		Stack:
 			Id: signatures
-			Horizontal: between
+			Horizontal: justify
 			Vertical: end
 			Item:
 				Block:

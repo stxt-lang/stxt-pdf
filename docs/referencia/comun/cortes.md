@@ -29,7 +29,7 @@ contenedor de fragmentos en el que aparece.
 
 - entre cajas hermanas en flujo de bloque;
 - entre líneas de texto;
-- entre líneas de un `Flex` y entre filas de un `Grid` o una `Table`.
+- entre líneas de un `Stack` y entre filas de un `Grid` o una `Table`.
 
 Siempre se intenta cortar en el punto más alto del árbol posible. Solo si no cabe se corta dentro de un hijo.
 
@@ -72,7 +72,7 @@ un salto a la columna siguiente (que, en la última columna, es también de pág
   `Break` tiene efecto. Si lo escribe el propio elemento (o la `Row` de una celda) es un error
   (`BREAK_IN_UNBREAKABLE`). Si llega de una regla de `Styles`, no tiene efecto y no es un error. Las columnas de un `Columns` de dentro sí se cortan, y sus `Break` cuentan.
 
-> **Decisión:** un corte de página atraviesa las columnas de un `Columns`. *Límite:* dentro de un ítem de un `Flex` o
+> **Decisión:** un corte de página atraviesa las columnas de un `Columns`. *Límite:* dentro de un ítem de un `Stack` o
 > un `Grid` partido en paralelo, un corte de página actúa como uno de columna.
 
 ## Márgenes en los cortes
@@ -110,9 +110,9 @@ en lo que suman esos huecos.
 > estirado) no desborde por partirse, a cambio de que el alto que se ve pueda pasar del `Height`.
 > *Alternativa descartada:* un fragmento que mide solo lo que ocupa su contenido (no llega al final de la página), o dejar que el contenido desborde el último fragmento.
 
-## Cortes en `Flex`, `Grid` y `Table`
+## Cortes en `Stack`, `Grid` y `Table`
 
-En un `Flex` vertical, el corte se hace entre ítems. En uno horizontal y en un `Grid`, entre líneas o filas. Una línea, fila o
+En un `Stack` vertical, el corte se hace entre ítems. En uno horizontal y en un `Grid`, entre líneas o filas. Una línea, fila o
 ítem que no cabe en lo que queda de página pasa entero a la siguiente. Si tampoco cabe al principio de una página, sus
 ítems se parten **en paralelo**: cada uno se parte por su cuenta y la fila continúa en la página siguiente con los ítems
 que no han terminado, todos desde arriba, y con la altura del más largo de ellos. Las filas siguientes van detrás, con el
@@ -120,7 +120,7 @@ hueco que las separaba. Las filas que ocupa un mismo ítem se parten juntas, cad
 reparte entre las páginas el alto que le impone su línea o su área, así que puede terminar antes o después que el texto de
 sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte, y si no cabe es un error.
 
-Al elegir el corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un `Flex` vertical con `Wrap` no
+Al elegir el corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un `Stack` vertical con `Wrap` no
 se parte. Las tablas repiten además su cabecera y su pie ([Table](../componentes/table.md#cortes)).
 
 ## Lo que no se parte

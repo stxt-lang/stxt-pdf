@@ -5,7 +5,7 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.block.BlockLayout;
-import dev.stxt.pdf.layout.flex.FlexLayout;
+import dev.stxt.pdf.layout.stack.StackLayout;
 import dev.stxt.pdf.layout.grid.GridLayout;
 import dev.stxt.pdf.layout.image.ImageLayout;
 import dev.stxt.pdf.layout.image.Images;
@@ -110,7 +110,7 @@ public final class Engine implements LayoutContext {
         this.absolute = new OverlayLayout(this);
         algorithms.put(Layout.BLOCK, new BlockLayout(this));
         algorithms.put(Layout.INLINE, inline);
-        algorithms.put(Layout.FLEX, new FlexLayout(this));
+        algorithms.put(Layout.STACK, new StackLayout(this));
         algorithms.put(Layout.GRID, grid);
         algorithms.put(Layout.COLUMNS, new ColumnsLayout(this));
         algorithms.put(Layout.IMAGE, new ImageLayout(this));

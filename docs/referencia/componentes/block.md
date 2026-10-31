@@ -22,7 +22,7 @@ en flujo se apilan en vertical:
 1. **Ancho.** Con `Width: auto`, la caja ocupa el ancho del contenedor de referencia menos sus márgenes horizontales. Con
    ancho conocido y los dos márgenes horizontales `auto`, el sobrante se reparte entre ambos y la caja queda **centrada**,
    y si solo uno es `auto`, ese absorbe el sobrante ([La caja](../comun/caja.md#márgenes-auto)).
-2. **Posición.** La caja se coloca en la posición del cursor vertical, tras aplicar su margen superior colapsado con el
+2. **Posición.** La caja se coloca en la posición del cursor vertical, tras aplicar su margen superior fusionado con el
    anterior.
 3. **Altura.** Se calcula su layout y el cursor avanza.
 
@@ -30,7 +30,7 @@ Con `Height: auto`, la altura del contenedor es la posición final del cursor m�
 propaga de padres a hijos, y la altura, de hijos a padres.** Un `Overlay` o un `Page overlay` entre los hijos no ocupa sitio
 ([posicionados](frame-and-overlays.md)).
 
-## Colapso de márgenes
+## Fusión de márgenes
 
 Los márgenes **verticales** adyacentes en flujo de bloque se fusionan:
 
@@ -39,21 +39,21 @@ Los márgenes **verticales** adyacentes en flujo de bloque se fusionan:
   (el margen del hijo «sale» del padre);
 - a través de cajas vacías (sin altura, borde, relleno ni contenido).
 
-El resultado de colapsar varios márgenes es **el mayor positivo más el más negativo**: `20` y `30` dan 30, `20` y `−5`
+El resultado de fusionar varios márgenes es **el mayor positivo más el más negativo**: `20` y `30` dan 30, `20` y `−5`
 dan 15, y `−10` y `−4` dan −10. En un corte de página, los márgenes que tocan el corte se truncan
 ([Cortes](../comun/cortes.md#márgenes-en-los-cortes)).
 
 ## Cajas que aíslan los márgenes
 
-Una caja que aísla los márgenes corta su colapso: los márgenes de dentro no salen. Los aíslan: cada sección, `Overlay` y `Page overlay`, los ítems
-de `Flex` y `Grid` (también las celdas de una `Table`), las columnas de un `Columns` y los `Block` y `Frame` con
-`Isolate margins: true`. Los márgenes de los ítems de `Flex` y `Grid` nunca colapsan.
+Una caja que aísla los márgenes corta su fusión: los márgenes de dentro no salen. Los aíslan: cada sección, `Overlay` y `Page overlay`, los ítems
+de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Columns` y los `Block` y `Frame` con
+`Isolate margins: true`. Los márgenes de los ítems de `Stack` y `Grid` nunca se fusionan.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Isolate margins` | booleano | `false` | Aísla los márgenes de la caja: corta el colapso de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Flex` o `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
+| `Isolate margins` | booleano | `false` | Aísla los márgenes de la caja: corta la fusión de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Stack` o `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
-> **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Flex`, `Grid`
+> **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
 
 ## Tamaños intrínsecos

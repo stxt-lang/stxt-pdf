@@ -94,7 +94,7 @@ Document (dev.stxt.pdf):
 					Paragraph: Diseño productos digitales que la gente entiende a la primera. Ocho años entre estudio, cooperativa y producto propio, siempre cerca de quien usa lo que se construye: investigo, prototipo, pruebo y entrego con el equipo de desarrollo, no después de él.
 						Typography:
 							Align: justify
-					Flex:
+					Stack:
 						Id: figures
 						Gap: 10
 						Box:

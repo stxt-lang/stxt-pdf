@@ -203,7 +203,7 @@ class TablesTest {
 
     @Test
     void tablesNestAndGoInItems() {
-        Box root = root("\tFlex:", "\t\tItem:", "\t\t\tTable:", "\t\t\t\tId: t", "\t\t\t\tColumn sizes: auto",
+        Box root = root("\tStack:", "\t\tItem:", "\t\t\tTable:", "\t\t\t\tId: t", "\t\t\t\tColumn sizes: auto",
                 "\t\t\t\tBody:", "\t\t\t\t\tRow:", "\t\t\t\t\t\tCell:", "\t\t\t\t\t\t\tTable:",
                 "\t\t\t\t\t\t\t\tColumn sizes: auto", "\t\t\t\t\t\t\t\tBody:", "\t\t\t\t\t\t\t\t\tRow:",
                 "\t\t\t\t\t\t\t\t\t\tCell: x");

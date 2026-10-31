@@ -87,7 +87,7 @@ Los booleanos se escriben `true` o `false`. Los enteros, sin decimales: `Layer: 
 | `Margin`, `Padding` (los cuatro lados) | el **ancho** del contenedor de referencia, también arriba y abajo |
 | `Offset` arriba/abajo | el alto del contenedor de referencia, que **debe ser definido** |
 | `Offset` izquierda/derecha | el ancho del contenedor de referencia |
-| `Basis` (ítem de `Flex`) | el tamaño del `Flex` en el eje principal (en un `Flex` vertical, su alto, que debe ser definido) |
+| `Base size` (ítem de `Stack`) | el tamaño del `Stack` en el eje principal (en un `Stack` vertical, su alto, que debe ser definido) |
 | `Gap` | el tamaño de la caja de contenido del contenedor en ese eje (entre filas, su alto, que debe ser definido) |
 | Pistas de grid | el tamaño de la caja de contenido del contenedor en ese eje, sin descontar los huecos (`50% 50%` con `Gap` desborda, y es un error); las filas, su alto, que debe ser definido |
 | `Line height` | el `Size` de la propia caja |
@@ -107,10 +107,10 @@ es un **alto definido**, que se decide al leer el documento con esta regla fija:
 - el de un ítem de grid con `Height: auto` estirado en su área (`Vertical: stretch`).
 
 La base de `Height`, `Min height` y `Max height` de un `Overlay` o un `Page overlay` es su contenedor de referencia, y la de un
-ítem de grid, su área: las dos son siempre definidas. Un ítem de `Flex` estirado **no** da un alto definido a sus hijos:
+ítem de grid, su área: las dos son siempre definidas. Un ítem de `Stack` estirado **no** da un alto definido a sus hijos:
 si lo necesitan, el ítem debe declarar su `Height`. El alto de las columnas de un `Columns` tampoco es definido
 ([Columns](../componentes/columns.md#contenido)).
 
-> **Decisión:** el alto definido se decide al leer el documento y no al maquetar. Es más estricto (un ítem de `Flex`
+> **Decisión:** el alto definido se decide al leer el documento y no al maquetar. Es más estricto (un ítem de `Stack`
 > estirado no da alto definido aunque su alto se acabe conociendo), pero el error sale siempre, en la línea de la
 > propiedad. *Alternativa descartada:* detectar los porcentajes sin base durante el layout.

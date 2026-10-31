@@ -181,7 +181,7 @@ class PositioningTest {
     }
 
     // Casos que faltaban según las pruebas de mutación: el borde y el relleno de las cajas
-    // entre un Overlay y su containing block, en un bloque, un ítem flex y un área de grid.
+    // entre un Overlay y su containing block, en un bloque, un ítem stack y un área de grid.
 
     @Test
     void staticPositionInsideABorderedBox() {
@@ -194,11 +194,11 @@ class PositioningTest {
     }
 
     @Test
-    void staticPositionInsideABorderedFlexItemAndGridArea() {
+    void staticPositionInsideABorderedStackItemAndGridArea() {
         String inner = "\t\t\t\t\tBox:\n\t\t\t\t\t\tBorder: 3\n\t\t\t\t\t\tPadding: 5\n\t\t\t\t\tOverlay:\n"
                 + "\t\t\t\t\t\tId: %s\n\t\t\t\t\t\tText: aaa";
-        LayoutFixture flex = layOut("\tFrame:", "\t\tFlex:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
-        assertRect(48, 48, 15, 12, flex.rect("F"));
+        LayoutFixture stack = layOut("\tFrame:", "\t\tStack:", "\t\t\tItem:", "\t\t\t\tBlock:", inner.formatted("F"));
+        assertRect(48, 48, 15, 12, stack.rect("F"));
         LayoutFixture grid = layOut("\tFrame:", "\t\tGrid:", "\t\t\tColumn sizes: 100", "\t\t\tArea:", "\t\t\t\tBlock:",
                 inner.formatted("G"));
         assertRect(48, 48, 15, 12, grid.rect("G"));

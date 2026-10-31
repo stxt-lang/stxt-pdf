@@ -17,7 +17,7 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * {@code Table of contents} y, cuando el árbol está construido y se conocen todos los encabezados, genera
  * sus entradas.
  *
- * <p>Cada entrada es una caja {@code Flex} generada ({@link Element#TOC_1} … según el
+ * <p>Cada entrada es una caja {@code Stack} generada ({@link Element#TOC_1} … según el
  * nivel del encabezado), con tres hijos: el título (el texto del encabezado), la guía, que crece
  * hasta llenar el hueco, y el número de página, que es un {@code {page of: …}} del encabezado: el
  * mismo mecanismo que escribe el autor, así que se resuelve paginando hasta que converja. Como un
@@ -105,7 +105,7 @@ final class TableOfContentsBuilder {
 
     private static Box entry(BuildContext ctx, Box contents, Box heading) {
         Style es = Style.inheriting(contents.style());
-        es.setLayout(Layout.FLEX);
+        es.setLayout(Layout.STACK);
         ctx.rules.apply(Element.tocEntry(heading.headingLevel()), es);
         ModelValidator.validateBox(ctx, es, contents);
         Box entry = new Box(null, Element.tocEntry(heading.headingLevel()), es, false, heading.line());

@@ -113,10 +113,10 @@ class RotationLayoutTest {
         assertEquals(2, l.fragment("T").lines().size());
     }
 
-    /** Lo que aporta a su contenedor es el ancho girado: un ítem de Flex con una caja girada dentro mide 12. */
+    /** Lo que aporta a su contenedor es el ancho girado: un ítem de Stack con una caja girada dentro mide 12. */
     @Test
     void theIntrinsicWidthOfARotatedBoxIsItsTurnedWidth() {
-        LayoutFixture l = LayoutFixture.layOut("\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: I",
+        LayoutFixture l = LayoutFixture.layOut("\tStack:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: I",
                 "\t\t\t\tText: Lunes", "\t\t\t\t\tRotate: -90");
         assertEquals(new Rect(40, 40, 12, 25), l.rect("I"));
     }

@@ -72,14 +72,14 @@ class MarkdownTest {
 
     @Test
     void allowedWhereAFlowElementGoes() {
-        // En un ítem de lista, una celda, un Columns y un Item de Flex (K1).
+        // En un ítem de lista, una celda, un Columns y un Item de Stack (K1).
         assertDoesNotThrow(() -> build("\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tMarkdown:",
                 "\t\t\t\tContent >>", "\t\t\t\t\tUno **dos**"));
         assertDoesNotThrow(() -> build("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell:",
                 "\t\t\t\t\tMarkdown:", "\t\t\t\t\t\tContent >>", "\t\t\t\t\t\t\tUno"));
         assertDoesNotThrow(() -> build("\tColumns:", "\t\tCount: 2", "\t\tMarkdown:", "\t\t\tContent >>",
                 "\t\t\t\t# Uno", "", "\t\t\t\tTexto"));
-        assertDoesNotThrow(() -> build("\tFlex:", "\t\tItem:", "\t\t\tMarkdown:", "\t\t\t\tContent >>",
+        assertDoesNotThrow(() -> build("\tStack:", "\t\tItem:", "\t\t\tMarkdown:", "\t\t\t\tContent >>",
                 "\t\t\t\t\tUno"));
     }
 

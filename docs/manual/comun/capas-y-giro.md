@@ -92,7 +92,7 @@ Document (dev.stxt.pdf):
 - **Sin `Width`, mide su texto en una línea** y no lo parte por el ancho de su columna. Un párrafo largo girado necesita
   un `Width`, que es el ancho de sus líneas antes de girar.
 - **Gira sobre su centro.** Con `Margin: 0 auto` se centra.
-- **No puede ser directamente un ítem de un `Flex` o un `Grid`**, que le dan su tamaño. Lo que se gira es una caja dentro
+- **No puede ser directamente un ítem de un `Stack` o un `Grid`**, que le dan su tamaño. Lo que se gira es una caja dentro
   del ítem.
 
 ### Solo al pintar: `Frame`, `Overlay` y `Page overlay`

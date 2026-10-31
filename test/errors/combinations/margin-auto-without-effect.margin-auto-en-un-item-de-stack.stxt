@@ -1,6 +1,6 @@
-# Case: Rotate en un Flex: se gira un Block que lo contiene
-# Code: CHILD_NOT_DECLARED
-# Line: 12
+# Case: Margin auto en un ítem de Stack
+# Code: MARGIN_AUTO_WITHOUT_EFFECT
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -8,9 +8,10 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
-			Rotate: 10
+		Stack:
 			Item:
 				Block:
 					Box:
+						Width: 100
 						Height: 10
+						Margin: 0 auto

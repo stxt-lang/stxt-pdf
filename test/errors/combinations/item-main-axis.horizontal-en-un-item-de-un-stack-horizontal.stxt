@@ -1,4 +1,4 @@
-# Case: Horizontal en un ítem de un Flex horizontal, cuyo reparto en ese eje es del Flex
+# Case: Horizontal en un ítem de un Stack horizontal, cuyo reparto en ese eje es del Stack
 # Code: ITEM_MAIN_AXIS
 # Line: 18
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
+		Stack:
 			Item:
 				Horizontal: center
 				Text: Hola

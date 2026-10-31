@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
             Box:
                 Width: 100%
                 Margin: 0 0 10 0
-        Flex:
+        Stack:
             Gap: 10
             Item:
                 Image: test/tall.jpg
@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
             Item:
                 Grow: 1
                 Image: test/wide.png
-                    Fit: cover
+                    Fit: fill
                     Box:
                         Height: 60
 ```
@@ -46,7 +46,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 |---|---|---|---|
 | *(valor)* | ruta relativa a `images/` | obligatorio | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | sin valor | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)). Sin él, es decorativa. |
-| `Fit` | `contain`, `cover`, `stretch` | `contain` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Fit` | `inside`, `fill`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../comun/capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
 
@@ -82,16 +82,16 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
 - Con `Width` y `Height` en `auto`, mide su tamaño natural, **también en flujo de bloque**: no se estira al ancho del padre.
   Si no cabe, es un desbordamiento (`BOX_OVERFLOW`). Para que ocupe el ancho disponible, se declara `Width: 100%`.
   `Margin: 0 auto` la centra, porque no ocupa todo el ancho.
-- Con un eje declarado, o impuesto por el padre (un ítem de `Flex` con `Grow`, una columna de `Grid` con
+- Con un eje declarado, o impuesto por el padre (un ítem de `Stack` con `Grow`, una columna de `Grid` con
   `Horizontal: stretch`), el otro sale de la proporción. Con los dos, la caja mide lo declarado y `Fit` decide cómo la llena
   la imagen.
 - `Min width`, `Max width`, `Min height` y `Max height` se aplican como en cualquier caja. Si los dos ejes son `auto` y el
   alto choca con su mínimo o su máximo, el ancho se vuelve a deducir del alto limitado: la proporción se conserva.
-- Su alto es siempre definido, así que un `Flex` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical. En
+- Su alto es siempre definido, así que un `Stack` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical. En
   horizontal sí se estira, y el alto sigue a la proporción.
 - **Tamaños intrínsecos:** el ancho más estrecho y el natural son los dos el ancho de su tamaño natural o, si declara
   `Height` en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un
-  ítem de `Flex` sin `Min width`, la imagen no encoge por debajo de él.
+  ítem de `Stack` sin `Min width`, la imagen no encoge por debajo de él.
 
 Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.
 
@@ -105,9 +105,12 @@ Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción,
 
 Si la caja de contenido y la imagen tienen proporciones distintas:
 
-- `contain` (por defecto) dibuja la imagen entera, lo más grande que cabe y centrada, y deja ver el fondo a los lados.
-- `cover` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra.
+- `inside` (por defecto) dibuja la imagen entera, lo más grande que cabe y centrada, y deja ver el fondo a los lados.
+- `fill` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra.
 - `stretch` la estira a la caja y la deforma.
+
+> **Decisión:** los valores dicen qué pasa con la imagen: cabe dentro (`inside`), llena la caja (`fill`) o se estira
+> (`stretch`). *Alternativa descartada:* `contain` y `cover`, que no se entienden sin conocerlos de antes.
 
 Con la misma proporción, las tres dan lo mismo. Una imagen se recorta además con las esquinas redondeadas de su caja de contenido ([La caja](../comun/caja.md#esquinas)).
 

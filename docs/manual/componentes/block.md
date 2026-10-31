@@ -54,7 +54,7 @@ posicionados.
 
 El margen de arriba del primer hijo (y el de abajo del último) sale fuera del `Block` si este no tiene ni borde ni relleno
 en ese lado: queda como margen del propio `Block`. Con `Isolate margins: true`, los márgenes de los hijos se quedan dentro. Un
-`Block` que es ítem de un `Flex` o un `Grid` ya los deja dentro, así que ahí `Isolate margins: true` es un error.
+`Block` que es ítem de un `Stack` o un `Grid` ya los deja dentro, así que ahí `Isolate margins: true` es un error.
 
 ## Recetas
 

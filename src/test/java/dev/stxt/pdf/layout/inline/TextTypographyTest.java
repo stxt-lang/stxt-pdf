@@ -76,8 +76,8 @@ class TextTypographyTest {
 
     @Test
     void letterSpacingCountsInTheIntrinsicWidth() {
-        // Un ítem flex sin ancho mide su ancho natural: «abcd» con 2 de interletraje, 26.
-        LayoutFixture l = layOut("\tFlex:", "\t\tItem:", "\t\t\tText: abcd", "\t\t\t\tId: T",
+        // Un ítem stack sin ancho mide su ancho natural: «abcd» con 2 de interletraje, 26.
+        LayoutFixture l = layOut("\tStack:", "\t\tItem:", "\t\t\tText: abcd", "\t\t\t\tId: T",
                 "\t\t\t\tTypography:", "\t\t\t\t\tLetter spacing: 2");
         assertEquals(26, l.rect("T").width(), 1e-9);
     }

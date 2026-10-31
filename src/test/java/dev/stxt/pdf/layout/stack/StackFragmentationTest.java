@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.flex;
+package dev.stxt.pdf.layout.stack;
 
 import dev.stxt.pdf.layout.LayoutFixture;
 import dev.stxt.pdf.model.Rect;
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /** Páginas de 180 pt con márgenes de 40: área útil de 515 × 100 desde (40, 40). */
-class FlexFragmentationTest {
+class StackFragmentationTest {
 
     private static final double PAGE = 180;
 
@@ -40,7 +40,7 @@ class FlexFragmentationTest {
     void rowBreaksBetweenLines() {
         // Una línea por ítem (300 + 10 + 300 > 515): líneas en 0, 50, 100 y 150.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10"},
                 item("I1", "Width: 300"), item("I2", "Width: 300"),
                 item("I3", "Width: 300"), item("I4", "Width: 300")));
         assertEquals(2, l.pages());
@@ -55,7 +55,7 @@ class FlexFragmentationTest {
     @Test
     void columnBreaksBetweenItems() {
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
                 item("A"), item("B"), item("C")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "F"));
@@ -68,7 +68,7 @@ class FlexFragmentationTest {
     void columnRespectsKeepsBetweenItems() {
         // Cortar antes de C incumple su Keep with previous: se corta antes de B.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
                 item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true"}));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
@@ -82,7 +82,7 @@ class FlexFragmentationTest {
         // páginas. Líneas de A: 8 + 8 + 4; B: 100 + 100 + 40. La página 3 mide lo que A.
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE,
-                "\tFlex:", "\t\tId: F",
+                "\tStack:", "\t\tId: F",
                 "\t\tItem:", "\t\t\tText: " + text, "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 30",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100");
         assertEquals(3, l.pages());
@@ -98,7 +98,7 @@ class FlexFragmentationTest {
     @Test
     void columnItemTallerThanAPageIsBroken() {
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tDirection: vertical"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
                 new String[]{"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 150"}, item("B")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "A"));
@@ -112,7 +112,7 @@ class FlexFragmentationTest {
         // Tras X (70) no cabe ni la primera línea: el contenedor entero pasa a la página 2.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70"},
-                new String[]{"\tFlex:", "\t\tId: F"},
+                new String[]{"\tStack:", "\t\tId: F"},
                 item("A")));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "F"));
@@ -127,8 +127,8 @@ class FlexFragmentationTest {
     void aWrappedColumnIsASingleUnit() {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tBox:", "\t\t\tHeight: 50"},
-                new String[]{"\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical",
-                        "\t\tWrap: true", "\t\tLines: start"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical",
+                        "\t\tWrap: true", "\t\tLine distribution: start"},
                 item("A", "Width: 50"), item("B", "Width: 50")));
         assertRect(40, 90, 50, 40, l.rect(1, "A"));
         assertRect(90, 90, 50, 40, l.rect(1, "B"));

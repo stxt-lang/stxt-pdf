@@ -1,4 +1,4 @@
-# Case: Un Text girado que es un ítem de Flex: el ítem ocupa el sitio que le da el Flex
+# Case: Un Text girado que es un ítem de Stack: el ítem ocupa el sitio que le da el Stack
 # Code: ROTATED_ITEM
 # Line: 19
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
+		Stack:
 			Item:
 				Text: Lunes
 					Rotate: -90

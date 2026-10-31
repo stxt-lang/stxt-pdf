@@ -27,7 +27,7 @@ Document (dev.stxt.pdf):
 		Id: first
 		Overlay:
 			Offset: 40 72 auto 72
-			Flex:
+			Stack:
 				Horizontal: between
 				Vertical: end
 				Box:

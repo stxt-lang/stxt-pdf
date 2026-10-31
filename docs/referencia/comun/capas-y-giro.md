@@ -4,10 +4,10 @@
 
 El pintado se organiza en **contextos de apilamiento**: grupos de cajas que se pintan como una unidad y ordenan a sus
 hijos por `Layer`. Crean uno: cada sección (el área útil), los `Page overlay`, los `Frame` y `Overlay` con `Layer`
-declarada y los ítems de `Flex` o `Grid` con `Layer` declarada en su `Item` o su `Area`.
+declarada y los ítems de `Stack` o `Grid` con `Layer` declarada en su `Item` o su `Area`.
 
 `Layer` es un entero (por defecto `auto`) que solo existe en los elementos posicionados, en `Item` y en `Area`
-([posicionados](../componentes/frame-and-overlays.md), [Flex](../componentes/flex.md#item),
+([posicionados](../componentes/frame-and-overlays.md), [Stack](../componentes/stack.md#item),
 [Grid](../componentes/grid.md#area)).
 
 ## Orden de pintado
@@ -63,7 +63,7 @@ Text: Lunes
   referencia de los `Overlay` de dentro, que se colocan en su caja sin girar y giran con ella.
 - **No se parte** entre páginas, como una `Image`: entera o, si no cabe en lo que queda, en la página siguiente. `Keep together`
   y `Edges` son `BREAK_IN_ROTATED`, y un `Break` de dentro, `BREAK_IN_UNBREAKABLE` ([Cortes](cortes.md)).
-- **No puede ser un ítem de `Flex` o `Grid`** (`ROTATED_ITEM`), que ocupa el sitio que le da su contenedor: se gira una
+- **No puede ser un ítem de `Stack` o `Grid`** (`ROTATED_ITEM`), que ocupa el sitio que le da su contenedor: se gira una
   caja dentro del ítem.
 
 > **Decisión:** en flujo, la caja girada ocupa el rectángulo que la envuelve, para que un texto en vertical tenga su
@@ -74,9 +74,9 @@ Text: Lunes
 > ancho de una columna dice cuánto puede ocupar girada y no cuánto mide sin girar. *Alternativa descartada:* estirarla
 > al ancho del contenedor, que con −90 grados haría una columna de texto tan alta como ancha es la página.
 
-> **Decisión:** un ítem de `Flex` o `Grid` no gira. Su contenedor le da el tamaño, y un tamaño impuesto a la caja girada
+> **Decisión:** un ítem de `Stack` o `Grid` no gira. Su contenedor le da el tamaño, y un tamaño impuesto a la caja girada
 > no diría si es el de antes o el de después de girar. *Alternativa descartada:* que el ítem ocupe su rectángulo girado,
-> que contradice el `Basis`, el estirado y el `Width` del ítem.
+> que contradice el `Base size`, el estirado y el `Width` del ítem.
 
 ### Giro al pintar: `Frame`, `Overlay` y `Page overlay`
 
@@ -122,5 +122,5 @@ es `VALUE_NOT_ALLOWED`.
 
 - Opacidad de una caja entera (solo de los colores, [Valores](valores.md#colores)), otras transformaciones que el giro
   (escala, inclinación) y cajas que floten a un lado del texto.
-- Girar los demás elementos en flujo (una tabla, una lista, un `Flex`) directamente: se gira un `Block` que los contiene.
+- Girar los demás elementos en flujo (una tabla, una lista, un `Stack`) directamente: se gira un `Block` que los contiene.
 - Que un `Frame` girado se parta entre páginas.

@@ -112,6 +112,6 @@ Las páginas se cuentan desde la primera de su documento o de su sección, en or
 
 - Un `Overlay` o un `Page overlay` puede ocupar los márgenes de la página, pero no salirse del papel: es un error.
 - Un `Overlay` no se parte entre páginas: va entero en la página donde cae.
-- Un `Flex` o un `Grid` se coloca en un sitio exacto dentro de un `Overlay`.
+- Un `Stack` o un `Grid` se coloca en un sitio exacto dentro de un `Overlay`.
 
 Más detalle en la [referencia](../../referencia/componentes/frame-and-overlays.md).

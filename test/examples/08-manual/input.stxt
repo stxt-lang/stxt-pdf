@@ -20,8 +20,8 @@ Document (dev.stxt.pdf):
 		Page overlay:
 			Id: header
 			Offset: -34 0 auto 0
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: Aire+ T2 · Guía rápida
 				Item:
@@ -33,8 +33,8 @@ Document (dev.stxt.pdf):
 				Padding: 5 0 0 0
 				Border: 0.5 0 0 0
 				Border color: #BFD9D7
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: ¿Necesitas ayuda? Escríbenos a soporte@airemas.example
 						Link: mailto:soporte@airemas.example
@@ -67,7 +67,7 @@ Document (dev.stxt.pdf):
 					Color: #C7E4E1
 				Box:
 					Margin: 4 0 0 0
-		Flex:
+		Stack:
 			Id: overview
 			Gap: 26
 			Box:
@@ -255,7 +255,7 @@ Document (dev.stxt.pdf):
 				Text: Conecta la aplicación
 				Box:
 					Margin: 0 0 8 0
-			Flex:
+			Stack:
 				Gap: 24
 				Box:
 					Margin: 0 0 8 0

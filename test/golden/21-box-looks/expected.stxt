@@ -1,7 +1,7 @@
 # Hito 28: aspecto de las cajas (referencia/comun/caja.md). Corner radius, Border color por lado, Background con
 # degradado y colores con opacidad solo cambian el pintado: el volcado comprueba que no mueven ninguna caja y los
 # PNG (con los contornos de depuración) se miran a ojo. Página de 300 × 300 con márgenes de 20: área útil de
-# 260 × 260 desde (20, 20). Cada fila es un Flex de 260 × 50 con huecos de 10 y 10 de margen debajo: y = 20, 80, 140
+# 260 × 260 desde (20, 20). Cada fila es un Stack de 260 × 50 con huecos de 10 y 10 de margen debajo: y = 20, 80, 140
 # y 200; el último bloque empieza en 200 + 50 + 10 = 260.
 #   row1: round (100 × 50, Corner radius 12, borde de 3 con otro color), circle (50 × 50, Corner radius 50%: un círculo) y
 #         corners (Corner radius 0 20 0 20: solo dos esquinas, en diagonal). x = 20, 130 y 190.

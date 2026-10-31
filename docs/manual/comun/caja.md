@@ -52,7 +52,7 @@ negativo junta las cajas.
 
 **Centrar.** `Margin: 0 auto` centra en horizontal una caja con `Width` (o `Max width`): los dos márgenes laterales se
 reparten lo que sobra. Un `auto` donde no hay nada que centrar es un error: en una caja sin ancho, que ya ocupa todo, o en
-vertical. Los ítems de un `Flex` o un `Grid` se centran con sus propias propiedades de alineación.
+vertical. Los ítems de un `Stack` o un `Grid` se centran con sus propias propiedades de alineación.
 
 ## Borde y fondo
 

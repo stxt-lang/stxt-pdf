@@ -13,9 +13,9 @@ Document (dev.stxt.pdf):
 			Offset: auto 0 -42 0
 			Text: Taller Nogal S.L. · CIF B-17482930 · Carrer de la Farga, 14 · 17800 Olot · tallernogal.example
 				Link: https://tallernogal.example
-		Flex:
+		Stack:
 			Id: letterhead
-			Horizontal: between
+			Horizontal: justify
 			Vertical: end
 			Box:
 				Margin: 0 0 24 0

@@ -1,4 +1,4 @@
-# Case: stretch en el eje principal de un Flex, que reparte el sobrante y no estira
+# Case: justify en el eje cruzado de un Stack, que alinea los ítems y no reparte
 # Code: VALUE_NOT_ALLOWED
 # Line: 17
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
-			Horizontal: stretch
+		Stack:
+			Vertical: justify
 			Item:
 				Text: Hola

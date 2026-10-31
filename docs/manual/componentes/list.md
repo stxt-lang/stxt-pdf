@@ -57,7 +57,7 @@ marcadores quedan alineados a la derecha, pegados al texto con un espacio.
 ## Cómo se comporta
 
 - El marcador usa la tipografía del ítem y se alinea con su primera línea. Por eso un ítem tiene que empezar con un texto:
-  si empieza con un `Flex`, un `Grid` o una imagen, es un error.
+  si empieza con un `Stack`, un `Grid` o una imagen, es un error.
 - Cada lista numera sus ítems. Una lista dentro de otra empieza de nuevo.
 - Si el ítem se parte entre páginas, el marcador va en la primera.
 - `{number of: id}` escribe el número de un ítem con `Id` (`3`, `c`, `IV`): «véase la cláusula {number of: pago}».

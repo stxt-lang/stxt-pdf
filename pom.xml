@@ -6,15 +6,49 @@
 
     <groupId>dev.stxt</groupId>
     <artifactId>stxt-pdf</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
-    <name>stxt-pdf</name>
-    <description>Motor de layout y generación de PDF a partir de documentos STXT (manual en docs/manual).</description>
+    <!-- Metadatos exigidos por Maven Central (name, description, url, licencia, desarrolladores y scm),
+         los mismos que los de dev.stxt:stxt-core. -->
+    <name>STXT PDF</name>
+    <description>Layout engine and PDF generator for STXT documents: tagged PDF/UA output with embedded fonts.</description>
+    <url>https://github.com/stxt-lang/stxt-pdf</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Joan Costa Mombiela</name>
+            <email>joan.costa.mombiela@gmail.com</email>
+            <url>https://github.com/stxt-lang</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/stxt-lang/stxt-pdf.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/stxt-lang/stxt-pdf.git</developerConnection>
+        <url>https://github.com/stxt-lang/stxt-pdf</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/stxt-lang/stxt-pdf/issues</url>
+    </issueManagement>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Build reproducible: fija las fechas dentro del jar. Se actualiza en cada release. -->
+        <project.build.outputTimestamp>2026-10-31T18:00:00Z</project.build.outputTimestamp>
         <junit.version>5.10.2</junit.version>
         <commonmark.version>0.30.1</commonmark.version>
         <excludedGroups>perf</excludedGroups>
@@ -94,6 +128,12 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
@@ -124,10 +164,103 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Empaquetado. La versión va fijada para que el build no dependa de la que traiga por defecto cada
+                 versión de Maven. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!-- Nombre de módulo estable para consumidores con JPMS, mientras no haya
+                                 module-info.java. El de stxt-core es dev.stxt. -->
+                            <Automatic-Module-Name>dev.stxt.pdf</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Central exige el jar de fuentes junto al binario. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Central exige también el jar de javadoc. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <!-- Firma GPG solo al publicar: `mvn -Prelease ...`. Fuera de este perfil el build diario no necesita
+             clave ni passphrase. Es el mismo perfil que el de stxt-core. -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Sube el bundle firmado al Central Portal (fase deploy). `extensions` es imprescindible:
+                         registra el participante de ciclo de vida que desactiva el maven-deploy-plugin, que si no
+                         intentaría desplegar además en un <distributionManagement> que no existe. -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <!-- id del <server> de ~/.m2/settings.xml que lleva el user token del Portal (no la
+                                 contraseña de la cuenta). -->
+                            <publishingServerId>central</publishingServerId>
+                            <!-- El deploy deja el despliegue validado y *pendiente* en el Portal, para revisarlo y
+                                 confirmarlo a mano desde la web. Una vez publicado en Central no se puede retirar
+                                 ni sustituir. -->
+                            <autoPublish>false</autoPublish>
+                            <!-- Espera a que el Portal valide el bundle, para que un error de validación falle el
+                                 build en vez de quedarse escondido en la web. -->
+                            <waitUntil>VALIDATED</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <!-- Pruebas de mutación: una pasada puntual sobre layout y fragment, no en la CI.
              mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage
              El informe queda en target/pit-reports/index.html. -->

@@ -1,8 +1,8 @@
 package dev.stxt.pdf.layout;
 
 /**
- * Márgenes verticales adyacentes pendientes de colapsar (referencia/componentes/block.md). Guarda por
- * separado el mayor positivo y el más negativo, porque el colapso de varios márgenes es su suma
+ * Márgenes verticales adyacentes pendientes de fusionar (referencia/componentes/block.md). Guarda por
+ * separado el mayor positivo y el más negativo, porque la fusión de varios márgenes es su suma
  * y no se puede calcular a partir de resultados parciales: {@code 20} y {@code −5} dan 15, pero
  * añadir {@code −10} da 10, no 5.
  *
@@ -28,7 +28,7 @@ public record MarginStrut(double positive, double negative) {
         return positive + negative;
     }
 
-    /** Colapsa una serie de márgenes adyacentes. */
+    /** Fusiona una serie de márgenes adyacentes. */
     public static double collapse(double... margins) {
         MarginStrut s = EMPTY;
         for (double m : margins) {

@@ -1,4 +1,4 @@
-# Case: between en el Horizontal de un Grid, que alinea en el área y no reparte
+# Case: justify en el Horizontal de un Grid, que alinea en el área y no reparte
 # Code: VALUE_NOT_ALLOWED
 # Line: 17
 Document (dev.stxt.pdf):
@@ -14,6 +14,6 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Grid:
-			Horizontal: between
+			Horizontal: justify
 			Area:
 				Text: Hola

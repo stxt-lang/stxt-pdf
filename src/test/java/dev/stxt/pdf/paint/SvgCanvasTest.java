@@ -15,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SvgCanvasTest {
 
     private static final String DOC = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
-            + "\t\tMargin: 20\n\tImage: test/wide.png\n\t\tFit: cover\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
+            + "\t\tMargin: 20\n\tImage: test/wide.png\n\t\tFit: fill\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
 
     private final LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(DOC)));
 
     @Test
     void imagesAreEmbeddedAndClippedToTheirContentBox() {
         String svg = SvgCanvas.page(document.pages().get(0), document.pageSetup(), false, new Resources());
-        // La caja de contenido recorta; con cover, la imagen mide 200 × 100 y empieza 50 a la izquierda.
+        // La caja de contenido recorta; con fill, la imagen mide 200 × 100 y empieza 50 a la izquierda.
         assertTrue(svg.contains("<svg x=\"20.00\" y=\"20.00\" width=\"100.00\" height=\"100.00\">"
                 + "<image x=\"-50.00\" y=\"0.00\" width=\"200.00\" height=\"100.00\" preserveAspectRatio=\"none\" "
                 + "href=\"data:image/png;base64,"), svg);

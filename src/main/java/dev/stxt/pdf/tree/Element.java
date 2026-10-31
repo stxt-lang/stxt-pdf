@@ -28,7 +28,7 @@ public enum Element {
      */
     SECTION("Section", Layout.BLOCK, Position.STATIC, false, false, 0),
     BLOCK("Block", Layout.BLOCK, Position.STATIC, true, false, 0),
-    FLEX("Flex", Layout.FLEX, Position.STATIC, true, false, 0),
+    STACK("Stack", Layout.STACK, Position.STATIC, true, false, 0),
     GRID("Grid", Layout.GRID, Position.STATIC, true, false, 0),
     TEXT("Text", Layout.INLINE, Position.STATIC, true, true, 0),
     PARAGRAPH("Paragraph", Layout.INLINE, Position.STATIC, true, true, 0),
@@ -86,16 +86,16 @@ public enum Element {
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
-     * Las entradas de un {@link #TABLE_OF_CONTENTS}, una por nivel de encabezado: un {@code Flex} generado con el
+     * Las entradas de un {@link #TABLE_OF_CONTENTS}, una por nivel de encabezado: un {@code Stack} generado con el
      * título, la guía y el número de página. No se escriben en el documento, pero las reglas {@code For element} las
      * nombran ({@code TOC 2}) para darles estilo (referencia/componentes/table-of-contents.md).
      */
-    TOC_1("TOC 1", Layout.FLEX),
-    TOC_2("TOC 2", Layout.FLEX),
-    TOC_3("TOC 3", Layout.FLEX),
-    TOC_4("TOC 4", Layout.FLEX),
-    TOC_5("TOC 5", Layout.FLEX),
-    TOC_6("TOC 6", Layout.FLEX),
+    TOC_1("TOC 1", Layout.STACK),
+    TOC_2("TOC 2", Layout.STACK),
+    TOC_3("TOC 3", Layout.STACK),
+    TOC_4("TOC 4", Layout.STACK),
+    TOC_5("TOC 5", Layout.STACK),
+    TOC_6("TOC 6", Layout.STACK),
     /** El título de una entrada del índice: el texto del encabezado. */
     TOC_TITLE(null, Layout.INLINE, Position.STATIC, false, false, 0),
     /** La guía (puntos o línea) entre el título y el número de una entrada: una caja vacía que se pinta. */
@@ -206,7 +206,7 @@ public enum Element {
     /**
      * Lo que significa una caja para quien lee el documento: el papel con que la etiqueta el PDF
      * (referencia/comun/pdf.md) y con que la tratan el pintado y la comprobación de desbordamientos. Varios elementos
-     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Flex} o {@code Page
+     * comparten uno ({@code Paragraph} y el bloque de código son párrafos; {@code Block}, {@code Stack} o {@code Page
      * overlay}, un bloque sin más significado), así que un elemento nuevo solo tiene que decir el suyo ({@link
      * #role()}).
      */

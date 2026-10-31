@@ -152,7 +152,7 @@ El `Id` de una fila es un `Id` del documento, único como cualquier otro: es des
 
 ## Cortes
 
-Una tabla se corta entre filas, como un grid ([Cortes](../comun/cortes.md#cortes-en-flex-grid-y-table)): una fila que no
+Una tabla se corta entre filas, como un grid ([Cortes](../comun/cortes.md#cortes-en-stack-grid-y-table)): una fila que no
 cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus celdas en paralelo, si no cabe ni en una
 página vacía.
 

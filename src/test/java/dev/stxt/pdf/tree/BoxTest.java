@@ -106,7 +106,7 @@ class BoxTest {
                     .map(Field::getName).toList();
             assertEquals(List.of(), open, c.getSimpleName());
         }
-        for (Class<?> c : List.of(Style.class, TypographyStyle.class, BoxStyle.class, BreakStyle.class, FlexStyle.class,
+        for (Class<?> c : List.of(Style.class, TypographyStyle.class, BoxStyle.class, BreakStyle.class, StackStyle.class,
                 GridStyle.class, ItemStyle.class, ListStyle.class, ColumnsStyle.class, ImageStyle.class,
                 TableOfContentsStyle.class)) {
             List<String> open = Arrays.stream(c.getDeclaredFields())

@@ -17,7 +17,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * Fragmentación de los contenedores cuyos ítems se agrupan en <em>unidades</em>
- * (referencia/comun/cortes.md): las líneas de un contenedor flex en {@code row}, los ítems de uno en
+ * (referencia/comun/cortes.md): las líneas de un contenedor stack en {@code row}, los ítems de uno en
  * {@code column} y las filas de una rejilla.
  *
  * <p>El contenedor hace su layout completo sin fragmentar y después {@link #fragment} se queda
@@ -91,7 +91,7 @@ public final class UnitBreaker {
     }
 
     /**
-     * Un contenedor maquetado sin fragmentar, antes de cortarlo: lo producen flex y grid.
+     * Un contenedor maquetado sin fragmentar, antes de cortarlo: lo producen stack y grid.
      *
      * @param model     modelo de caja del contenedor
      * @param placed    ítems colocados, en orden del árbol
@@ -105,7 +105,7 @@ public final class UnitBreaker {
             bands = List.copyOf(bands);
         }
 
-        /** Un contenedor sin franjas: los de flex y grid. */
+        /** Un contenedor sin franjas: los de stack y grid. */
         public Arranged(BoxModel model, List<Placed> placed, List<PendingOverlay> outOfFlow, Units units) {
             this(model, placed, outOfFlow, units, List.of());
         }
@@ -489,7 +489,7 @@ public final class UnitBreaker {
                     repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
-            // Los márgenes de los ítems nunca colapsan con los del contenedor (referencia/componentes/block.md).
+            // Los márgenes de los ítems nunca se fusionan con los del contenedor (referencia/componentes/block.md).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);
             }

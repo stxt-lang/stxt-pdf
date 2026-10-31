@@ -1,6 +1,6 @@
 # Estructura de un documento
 
-Un documento describe un **árbol de cajas** con elementos (`Block`, `Flex`, `Grid`, `Text`, etc.) que solo admiten las
+Un documento describe un **árbol de cajas** con elementos (`Block`, `Stack`, `Grid`, `Text`, etc.) que solo admiten las
 propiedades que tienen sentido en ellos. El motor calcula la posición y el tamaño de cada caja en una secuencia de
 **páginas** de tamaño fijo, parte entre páginas lo que no cabe y escribe el resultado en un PDF.
 
@@ -17,7 +17,7 @@ propiedades que tienen sentido en ellos. El motor calcula la posición y el tama
 ## Elementos
 
 Cada elemento solo admite los hijos que tienen sentido en él: sus propiedades y, si es un contenedor, otros elementos. Lo
-define el [schema](#schema), así que una propiedad fuera de su sitio (`Column sizes` en un `Flex`, `Offset` en un `Block`) es
+define el [schema](#schema), así que una propiedad fuera de su sitio (`Column sizes` en un `Stack`, `Offset` en un `Block`) es
 un error al leer el documento, también en el editor.
 
 La raíz es `Document`, con exactamente un `Page`, un `Title` y un `Language`, un `Styles` opcional con las reglas
@@ -29,7 +29,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 |---|---|---|
 | `Section` | Parte del documento con su `Page`, sus `Page overlay` y su numeración ([Document](../componentes/document.md#section)) | Elementos, y su `Page` |
 | `Block` | Caja que apila sus hijos en vertical ([Block](../componentes/block.md)) | Elementos |
-| `Flex` | Coloca sus ítems en líneas ([Flex](../componentes/flex.md)) | `Item`, `Overlay` y `Page overlay` |
+| `Stack` | Coloca sus ítems en líneas ([Stack](../componentes/stack.md)) | `Item`, `Overlay` y `Page overlay` |
 | `Grid` | Coloca sus ítems en una rejilla ([Grid](../componentes/grid.md)) | `Area`, `Overlay` y `Page overlay` |
 | `Text` | Texto suelto: un rótulo, una cifra, una línea de una cabecera ([Text](../componentes/text.md)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
 | `Paragraph` | Un párrafo del contenido ([Text](../componentes/text.md#paragraph)) | Su texto, en el valor o en `Content`, sin líneas en blanco |
@@ -47,7 +47,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](estilos
 | `Frame` | Bloque que se desplaza sin mover a sus hermanos ([posicionados](../componentes/frame-and-overlays.md)) | Elementos |
 | `Overlay` | Bloque fuera de flujo, colocado en su contenedor de referencia | Elementos |
 | `Page overlay` | Bloque fuera de flujo, colocado en el área útil de las páginas que dice `Pages` | Elementos |
-| `Item` | Ítem de un `Flex`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
+| `Item` | Ítem de un `Stack`: cómo crece, encoge y se alinea | Exactamente un elemento en flujo |
 | `Area` | Ítem de un `Grid`: el área que ocupa y cómo se alinea | Exactamente un elemento en flujo |
 
 **Elementos** son todos menos `Section`, `Item`, `Area`, `Header rows`, `Body`, `Footer rows` y `Row`, y cada uno es una
@@ -60,7 +60,7 @@ o `Box` tiene además una franja que se pinta debajo de sus celdas ([Table](../c
 ocupa sitio.
 
 > **Decisión:** `Item` y `Area` son envoltorios con exactamente un elemento en flujo (`SINGLE_ELEMENT`): el tamaño, los
-> márgenes y el `Id` van en el elemento, y cada ítem es una sola caja. Todo hijo en flujo de un `Flex` es un `Item`, y de
+> márgenes y el `Id` van en el elemento, y cada ítem es una sola caja. Todo hijo en flujo de un `Stack` es un `Item`, y de
 > un `Grid`, un `Area`, aunque no declare nada. *Alternativa descartada:* envoltorios que son cajas con varios hijos, o
 > admitir los elementos sueltos y el envoltorio solo cuando hace falta (dos formas de escribir lo mismo).
 
@@ -69,7 +69,7 @@ ocupa sitio.
 Las propiedades van agrupadas por su significado: `Box` ([la caja](caja.md)), `Typography` ([el texto](tipografia.md),
 que se hereda) y `Break` ([los cortes de página](cortes.md)). Cada grupo va como mucho una vez por elemento, y cada
 propiedad, como mucho una vez por grupo. Fuera de los grupos queda lo que define al elemento: las
-[propiedades del elemento](#propiedades-del-elemento) y las propias de cada uno (`Gap` de `Flex`, `Offset` de `Overlay` o
+[propiedades del elemento](#propiedades-del-elemento) y las propias de cada uno (`Gap` de `Stack`, `Offset` de `Overlay` o
 `Marker` de `List`).
 
 ```
@@ -85,7 +85,7 @@ Text: Resultados del trimestre
 ```
 
 > **Decisión:** dentro de un grupo los nombres son cortos (`Size`, `Align`, `Before`) salvo donde chocan con otro nodo:
-> `Line breaking` y no `Wrap`, que es de `Flex` y es otra cosa, porque un nombre es el mismo nodo en todo el schema.
+> `Line breaking` y no `Wrap`, que es de `Stack` y es otra cosa, porque un nombre es el mismo nodo en todo el schema.
 
 > **Decisión:** un nombre dice qué es la cosa en el documento y no el algoritmo que la maqueta (`Columns`, `Balance`), y
 > cuando el mundo editorial o un procesador de textos ya tiene uno conocido, se usa ese (`Style` para un estilo con nombre,
@@ -102,7 +102,7 @@ Text: Resultados del trimestre
 | `Style` | nombres separados por espacios | sin valor | Elementos y `Section` | Le aplican las reglas `For style` con esos nombres ([Styles](estilos.md)). Cada estilo necesita su regla y no se repite. |
 | `In table of contents` | `true`, `false` | `true` | Encabezados | Si el encabezado tiene entrada en los índices ([Encabezados](../componentes/heading.md#fuera-del-índice)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` o `#id` | sin valor | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](enlaces.md)). No se hereda ni cambia el aspecto. |
-| `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta el colapso de márgenes con los hijos ([Block](../componentes/block.md#colapso-de-márgenes)). |
+| `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta la fusión de márgenes con los hijos ([Block](../componentes/block.md#fusión-de-márgenes)). |
 
 ## Orden y texto
 
@@ -131,7 +131,7 @@ Document (dev.stxt.pdf):
             Id: title
             Typography:
                 Size: 20
-        Flex:
+        Stack:
             Id: body
             Gap: 10
             Item:
@@ -157,14 +157,14 @@ Cada elemento decide **cómo coloca a sus hijos**:
 | Elemento | Coloca a sus hijos en flujo |
 |---|---|
 | `Section` (el área útil), `Block`, `Frame`, `Overlay`, `Page overlay`, encabezados, `List`, `List item`, `Markdown`, `Table of contents`, `Cell` con elementos | En flujo de bloque ([Block](../componentes/block.md#el-flujo-de-bloque)) |
-| `Flex` | En líneas ([Flex](../componentes/flex.md)) |
+| `Stack` | En líneas ([Stack](../componentes/stack.md)) |
 | `Grid`, `Table` | En una rejilla ([Grid](../componentes/grid.md), [Table](../componentes/table.md)) |
 | `Columns` | En columnas, cada una en flujo de bloque ([Columns](../componentes/columns.md)) |
 | `Text`, `Paragraph`, `Cell` con valor | Sin hijos: reparte su texto en líneas ([Tipografía](tipografia.md#el-reparto-en-líneas)) |
 | `Image` | Sin hijos: su contenido es la imagen ([Image](../componentes/image.md)) |
 
 **Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque es un bloque apilado, y dentro
-de un `Flex` o un `Grid`, un ítem. `Overlay` y `Page overlay` salen del flujo, y un `Frame` participa como cualquier caja y
+de un `Stack` o un `Grid`, un ítem. `Overlay` y `Page overlay` salen del flujo, y un `Frame` participa como cualquier caja y
 después se desplaza.
 
 ## Schema
@@ -185,7 +185,7 @@ vez, y los elementos, las veces que se quiera.
 | `Styles` | `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`; elementos |
-| `Flex` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Lines`; `Item`, `Overlay`, `Page overlay` |
+| `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
 | `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (al menos uno) |
@@ -202,13 +202,13 @@ vez, y los elementos, las veces que se quiera.
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
-| `Item` | `Grow`, `Shrink`, `Basis`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
+| `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background` |
 | `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
-*Elementos* son `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
+*Elementos* son `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.
 
 Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`.

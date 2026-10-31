@@ -3,7 +3,7 @@
 # 120 × 160 (90 × 120 pt, proporción 0,75) y square.png de 40 × 40 (30 × 30 pt).
 #
 # Página 1: title (12) y su margen de 8. hero, con Width: 100%, mide 260 × 130 (la proporción da
-# el alto) y deja otro margen de 8: el flex empieza en 178. portrait tiene Height: 60, así que su
+# el alto) y deja otro margen de 8: el Stack empieza en 178. portrait tiene Height: 60, así que su
 # ancho intrínseco es 45; caption crece hasta 260 − 45 − 10 = 205 (41 caracteres por línea: dos
 # líneas) y se estira al alto de la fila, 60. moved (60 × 80 con Width: 60) no cabe en lo que
 # queda (280 − 246 = 34) y pasa entera a la página 2.
@@ -42,7 +42,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Width: 100%
 				Margin: 0 0 8 0
-		Flex:
+		Stack:
 			Id: row
 			Gap: 10
 			Box:
@@ -55,7 +55,7 @@ Document (dev.stxt.pdf):
 						Height: 60
 			Item:
 				Grow: 1
-				Text: Una foto en un flex: su ancho sale de su alto y de la proporción del fichero.
+				Text: Una foto en un Stack: su ancho sale de su alto y de la proporción del fichero.
 					Id: caption
 		Image: test/tall.jpg
 			Id: moved
@@ -77,7 +77,7 @@ Document (dev.stxt.pdf):
 			Area:
 				Image: test/wide.png
 					Id: cover
-					Fit: cover
+					Fit: fill
 					Box:
 						Height: 50
 		Markdown:

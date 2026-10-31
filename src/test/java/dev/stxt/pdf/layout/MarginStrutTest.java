@@ -15,7 +15,7 @@ class MarginStrutTest {
 
     @Test
     void emptyBoxBetweenBAndC() {
-        // B (inferior 0), D vacía (25 y 15), C (superior 10): colapsan 4 márgenes → 25.
+        // B (inferior 0), D vacía (25 y 15), C (superior 10): se fusionan 4 márgenes → 25.
         assertEquals(25, MarginStrut.collapse(0, 25, 15, 10), 1e-9);
     }
 

@@ -18,15 +18,15 @@ Document (dev.stxt.pdf):
 				Padding: 6 0 0 0
 				Border: 0.5 0 0 0
 				Border color: #DCCFB8
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: Taller Nogal S.L. · Inscrita en el Registro Mercantil de Girona, tomo 2217, folio 88
 				Item:
 					Text: Página {page} de {pages}
-		Flex:
+		Stack:
 			Id: masthead
-			Horizontal: between
+			Horizontal: justify
 			Vertical: center
 			Box:
 				Margin: 0 0 30 0

@@ -35,7 +35,7 @@
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro, se nombra lo de dentro.
 Los `Frame` se comprueban en su sitio, sin el desplazamiento de `Offset` ni el giro de `Rotate` (lo girado se comprueba
 además contra la página), y un margen negativo cuenta como espacio ganado: no son desbordamientos, sino decisiones del
-autor. Tampoco cuentan los márgenes verticales, que colapsan. Una caja puede salirse hasta 0,01 pt sin que sea un
+autor. Tampoco cuentan los márgenes verticales, que se fusionan. Una caja puede salirse hasta 0,01 pt sin que sea un
 desbordamiento, lo que acumulan las medidas de las fuentes en milésimas.
 
 Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no se baja a un hijo salvo que se salga

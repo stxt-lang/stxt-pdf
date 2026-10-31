@@ -1,7 +1,7 @@
 # `Image`
 
 Una imagen PNG, JPEG o SVG, o una página de un PDF, de la carpeta `images/` de los recursos. Es una caja como cualquier
-otra: tiene su tamaño, sus márgenes, su borde, sus esquinas, y se coloca en el flujo o en un `Flex`, un `Grid` o un
+otra: tiene su tamaño, sus márgenes, su borde, sus esquinas, y se coloca en el flujo o en un `Stack`, un `Grid` o un
 posicionado.
 
 ```
@@ -28,14 +28,14 @@ Document (dev.stxt.pdf):
             Area:
                 Image: examples/catalog/silla.jpg
                     Alt: Silla de nogal con asiento de lana
-                    Fit: cover
+                    Fit: fill
                     Box:
                         Height: 160
                         Corner radius: 6
             Area:
                 Image: examples/catalog/mesa.jpg
                     Alt: Mesa de comedor de nogal
-                    Fit: cover
+                    Fit: fill
                     Box:
                         Height: 160
                         Corner radius: 6
@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | *(valor)* | La ruta del fichero dentro de `images/`: `Image: logos/acme.png`. Obligatoria |
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
-| `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `contain` (entera, con espacio a los lados), `cover` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
+| `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `inside` (entera, con espacio a los lados), `fill` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../comun/capas-y-giro.md#girar-una-caja-rotate)) |
 
@@ -63,7 +63,7 @@ Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `E
   la llena la imagen.
 - `Margin: 0 auto` la centra.
 - El relleno y el borde van alrededor: no deforman la imagen.
-- En un `Flex` en fila, una imagen no se estira a lo alto: conserva su proporción.
+- En un `Stack` en fila, una imagen no se estira a lo alto: conserva su proporción.
 
 ## Entre páginas
 

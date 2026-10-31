@@ -61,7 +61,7 @@ es el `Padding` izquierdo de la `List`, más el margen izquierdo del ítem. Su l
 ítem: la que se encuentra bajando por el primer hijo en flujo de cada bloque hasta un texto (con una lista anidada al
 principio, los dos marcadores quedan en la misma línea).
 
-- Un ítem con marcador cuyo contenido no lleva así a un texto (empieza con un `Flex`, un `Grid`, una `Image` o un bloque
+- Un ítem con marcador cuyo contenido no lleva así a un texto (empieza con un `Stack`, un `Grid`, una `Image` o un bloque
   vacío) es un error (`LIST_ITEM_WITHOUT_LINE`), en la línea de la caja que lo impide.
 - Un marcador más ancho que su sangría también (`LIST_MARKER_OVERFLOW`): no se sale de la lista.
 

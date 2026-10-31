@@ -7,18 +7,18 @@ Document (dev.stxt.pdf):
 		Height: 842
 		Margin: 40
 	Section:
-		Flex:
+		Stack:
 			Id: row
 			Gap: 20
 			Item:
-				Basis: 100
+				Base size: 100
 				Grow: 1
 				Block:
 					Id: A
 					Box:
 						Height: 50
 			Item:
-				Basis: 150
+				Base size: 150
 				Grow: 3
 				Block:
 					Id: B

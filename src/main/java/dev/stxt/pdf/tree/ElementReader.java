@@ -15,12 +15,12 @@ import java.util.regex.Pattern;
 
 import static dev.stxt.pdf.tree.ListBuilder.validateList;
 import static dev.stxt.pdf.tree.ModelValidator.font;
-import static dev.stxt.pdf.tree.ModelValidator.validateFlex;
+import static dev.stxt.pdf.tree.ModelValidator.validateStack;
 import static dev.stxt.pdf.tree.ModelValidator.validateImage;
 import static dev.stxt.pdf.tree.ModelValidator.validateColumns;
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
-import static dev.stxt.pdf.tree.PropertyReader.flex;
+import static dev.stxt.pdf.tree.PropertyReader.stack;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.grid;
 import static dev.stxt.pdf.tree.PropertyReader.item;
@@ -150,19 +150,19 @@ enum ElementReader {
         }
     },
 
-    FLEX {
+    STACK {
         @Override
         boolean property(Node p, Style s) {
-            if (!PropertyReader.FLEX.contains(p.getCanonicalName())) {
+            if (!PropertyReader.STACK.contains(p.getCanonicalName())) {
                 return false;
             }
-            flex(p, s);
+            stack(p, s);
             return true;
         }
 
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
-            validateFlex(s);
+            validateStack(s);
         }
     },
 
@@ -260,7 +260,7 @@ enum ElementReader {
             case CELL -> CELL;
             case TABLE -> TABLE;
             case GRID -> GRID;
-            case FLEX -> FLEX;
+            case STACK -> STACK;
             case LIST -> LIST;
             case COLUMNS -> COLUMNS;
             case MARKDOWN -> MARKDOWN;
@@ -284,7 +284,7 @@ enum ElementReader {
         }
     }
 
-    /** Lee {@code p} si es una propiedad del tipo del elemento ({@code Flex}, {@code Grid}…); {@code false} si no. */
+    /** Lee {@code p} si es una propiedad del tipo del elemento ({@code Stack}, {@code Grid}…); {@code false} si no. */
     boolean property(Node p, Style s) {
         return false;
     }

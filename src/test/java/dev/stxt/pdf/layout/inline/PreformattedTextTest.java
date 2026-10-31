@@ -140,7 +140,7 @@ class PreformattedTextTest {
 
     @Test
     void anItemWithoutWidthIsAsWideAsItsWidestLine() {
-        LayoutFixture l = layOut("\tFlex:", "\t\tItem:", "\t\t\tText:", "\t\t\t\tId: T",
+        LayoutFixture l = layOut("\tStack:", "\t\tItem:", "\t\t\tText:", "\t\t\t\tId: T",
                 "\t\t\t\tTypography:", "\t\t\t\t\tPreformatted: true",
                 "\t\t\t\tContent >>", "\t\t\t\t\tab", "\t\t\t\t\tabcdef  ");
         // El espacio final de una línea de un bloque lo quita el parser: abcdef mide 30.

@@ -43,7 +43,7 @@ Primero, [primeros pasos](comun/primeros-pasos.md), que escribe un documento de 
 | [Encabezados](componentes/heading.md) | Títulos de capítulo y apartado, numerados o no |
 | [`List`](componentes/list.md) | Listas con viñetas o numeradas |
 | [`Table`](componentes/table.md) | Tablas con cabecera y pie que se repiten en cada página |
-| [`Flex`](componentes/flex.md) | Elementos en fila o en columna que se reparten el espacio |
+| [`Stack`](componentes/stack.md) | Elementos en fila o en columna que se reparten el espacio |
 | [`Grid`](componentes/grid.md) | Una rejilla de filas y columnas |
 | [`Columns`](componentes/columns.md) | Texto en varias columnas, como en una revista |
 | [`Frame`, `Overlay` y `Page overlay`](componentes/frame-and-overlays.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |

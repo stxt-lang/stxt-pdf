@@ -55,7 +55,7 @@ public final class Sizing {
 
     /**
      * Desplazamiento de una caja de tamaño {@code size} alineada en un espacio {@code space}
-     * (referencia/componentes/flex.md y referencia/componentes/grid.md). Con {@code stretch} la caja ya ocupa el
+     * (referencia/componentes/stack.md y referencia/componentes/grid.md). Con {@code stretch} la caja ya ocupa el
      * espacio y empieza al principio.
      */
     public static double align(Alignment alignment, double space, double size) {

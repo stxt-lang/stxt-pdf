@@ -1,5 +1,5 @@
-# Case: Isolate margins en un ítem de Flex, que ya corta el colapso de márgenes
-# Code: ISOLATE_MARGINS_IN_ITEM
+# Case: Ítem con marcador que empieza con un Stack
+# Code: LIST_ITEM_WITHOUT_LINE
 # Line: 19
 Document (dev.stxt.pdf):
 	Language: es
@@ -13,8 +13,9 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
-			Item:
-				Block:
-					Isolate margins: true
-					Text: Hola
+		List:
+			Marker: bullet
+			List item:
+				Stack:
+					Item:
+						Text: Uno

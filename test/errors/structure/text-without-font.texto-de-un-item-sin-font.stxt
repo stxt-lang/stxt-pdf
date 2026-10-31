@@ -8,6 +8,6 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
+		Stack:
 			Item:
 				Text: hola

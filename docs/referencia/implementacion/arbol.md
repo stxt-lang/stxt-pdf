@@ -55,7 +55,7 @@ que se construye con ella lo dice también en `inStyles()`.
 `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`. `BoxTreeBuilder.element`
 es el orden común a todos los elementos (el sitio, la herencia, las reglas, las propiedades y sus comprobaciones, la caja y
 el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
-`GRID`, `FLEX`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la
+`GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la
 caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
 elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`.
 
@@ -65,7 +65,7 @@ Las piezas:
 |---|---|
 | `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title` y `Language` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
-| `PropertyReader` | Los grupos, las propiedades de `Flex`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
+| `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
@@ -86,9 +86,9 @@ Ningún método de `tree` pasa de 60 líneas ni de complejidad 20.
 
 `Box` tiene los campos privados, se lee con métodos (como `text()`, `children()` o `formattedRuns()`) y se escribe con
 métodos `set...` del package. `Style` se parte en un grupo por cada grupo del documento (`TypographyStyle`, `BoxStyle`, `BreakStyle`)
-y por cada tipo de elemento con propiedades propias (`FlexStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ColumnsStyle`,
+y por cada tipo de elemento con propiedades propias (`StackStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ColumnsStyle`,
 `ImageStyle`, `TableOfContentsStyle`). En `Style` quedan las propiedades que definen el elemento y las líneas. Fuera de `tree` se
-lee a través del grupo: `style.typography().fontSize()`, `style.flex().direction()`, `style.box().margin()`. Solo se hereda
+lee a través del grupo: `style.typography().fontSize()`, `style.stack().direction()`, `style.box().margin()`. Solo se hereda
 `TypographyStyle`: `Style.inheriting` copia el grupo del padre. Una propiedad nueva va en el grupo de su sitio en el
 documento, con su lectura y su `set...`.
 
@@ -141,7 +141,7 @@ cerrarlo con `TextRuns`.
 - **Marcador de lista:** `ListBuilder` crea en `Box.marker` la caja del marcador, generada y fuera de `children`
   (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
-- **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Flex` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
+- **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
   con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el
   `Id` o ese nombre.
 - **Bloque de código:** `MarkdownBuilder` marca el nodo `Text` que genera (`Translation.codeBlocks`) y

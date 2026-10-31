@@ -54,8 +54,8 @@ class BoxTreeBuilderTest {
     void elementsGiveLayoutAndPosition() {
         Box root = build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
-                "\tFlex:", "\tGrid:", "\tFrame:", "\tOverlay:", "\tPage overlay:")).sections().get(0).box();
-        assertEquals(List.of(Layout.INLINE, Layout.FLEX, Layout.GRID, Layout.BLOCK,
+                "\tStack:", "\tGrid:", "\tFrame:", "\tOverlay:", "\tPage overlay:")).sections().get(0).box();
+        assertEquals(List.of(Layout.INLINE, Layout.STACK, Layout.GRID, Layout.BLOCK,
                 Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout()).toList());
         assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
                 Position.FRAME, Position.OVERLAY, Position.PAGE_OVERLAY),
@@ -75,7 +75,7 @@ class BoxTreeBuilderTest {
     @Test
     void itemAndAreaPropertiesGoToTheirElement() {
         Box root = build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumn sizes: * *", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
+                "\tStack:", "\t\tItem:", "\t\t\tGrow: 2", "\t\t\tLayer: 1", "\t\t\tBlock:", "\t\t\t\tId: a", "\tGrid:", "\t\tColumn sizes: * *", "\t\tArea: 1 2", "\t\t\tVertical: center", "\t\t\tBlock:", "\t\t\t\tId: b", "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: c")).sections().get(0).box();
         Box a = root.children().get(0).children().get(0);
         assertEquals("a", a.id());
         assertEquals(2, a.style().item().grow(), 1e-9);
@@ -108,7 +108,7 @@ class BoxTreeBuilderTest {
         assertEquals(ErrorCode.SINGLE_ELEMENT, single.errorCode());
         assertEquals(12, single.line());
         InvalidModelException empty = assertThrows(InvalidModelException.class, () -> build(document(
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1")));
+                "\tStack:", "\t\tItem:", "\t\t\tGrow: 1")));
         assertEquals(ErrorCode.SINGLE_ELEMENT, empty.errorCode());
         assertEquals(10, empty.line());
         InvalidModelException noText = assertThrows(InvalidModelException.class, () -> build(document(
@@ -172,7 +172,7 @@ class BoxTreeBuilderTest {
         // También el texto de un ítem, sin importar que un hermano de su contenedor la declare.
         InvalidModelException item = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tText: a", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
-                "\tFlex:", "\t\tItem:", "\t\t\tText: b")));
+                "\tStack:", "\t\tItem:", "\t\t\tText: b")));
         assertEquals(15, item.line());
         // Un elemento sin texto no la necesita.
         build(document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 10"));
@@ -274,7 +274,7 @@ class BoxTreeBuilderTest {
         build(document(
                 "\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans",
                 "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tKeep with next: true",
-                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate margins: false",
+                "\tStack:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate margins: false",
                 "\tOverlay:", "\t\tParagraph: Sello",
                 "\t\tColumns:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
                 "\t\t\tBlock:"));

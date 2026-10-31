@@ -1,7 +1,7 @@
 # `Frame`, `Overlay` y `Page overlay`
 
 Los tres **elementos posicionados** son bloques: apilan a sus hijos en flujo de bloque ([Block](block.md)). Para posicionar
-un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`, y
+un `Stack` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `Link`, `Box` y `Typography`, y
 `Frame`, también `Break` y `Isolate margins`.
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
@@ -18,8 +18,8 @@ un `Flex` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `L
 > marca el contenedor de referencia de los `Overlay`. *Alternativa descartada:* un `Offset` en cualquier elemento en flujo,
 > que necesitaría otra forma de marcar el contenedor de referencia sin desplazar.
 
-> **Decisión:** los elementos posicionados son bloques, y un `Flex` o un `Grid` posicionado se escribe dentro
-> (`Overlay` > `Flex`), con una caja más. *Alternativa descartada:* que fueran envoltorios de un elemento, como `Area`, que
+> **Decisión:** los elementos posicionados son bloques, y un `Stack` o un `Grid` posicionado se escribe dentro
+> (`Overlay` > `Stack`), con una caja más. *Alternativa descartada:* que fueran envoltorios de un elemento, como `Area`, que
 > se leería peor en el caso habitual (un sello, una cabecera).
 
 > **Decisión:** `Overlay` y `Page overlay` no admiten `Break`, porque no se parten ni están en el flujo de la página. Un
@@ -65,9 +65,9 @@ de los dos, absorbe el sobrante). En los demás casos es un error. El **tamaño 
 (`fit`) en horizontal y la altura del contenido en vertical. La **posición estática** es donde habría quedado la
 caja si estuviera en flujo:
 
-- en flujo de bloque, el cursor vertical más los márgenes colapsados de las cajas anteriores, sin colapsar con el margen
+- en flujo de bloque, el cursor vertical más los márgenes fusionados de las cajas anteriores, sin fusionarse con el margen
   superior de la propia caja, que se suma después según la ecuación;
-- dentro de un `Flex` o un `Grid`, la esquina superior izquierda de su caja de contenido.
+- dentro de un `Stack` o un `Grid`, la esquina superior izquierda de su caja de contenido.
 
 Un `Overlay` se coloca cuando su contenedor de referencia ya tiene su tamaño, con el contenido en flujo colocado. Se
 pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia esté más arriba ([Capas y giro](../comun/capas-y-giro.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
@@ -120,4 +120,4 @@ salen). Si un `Page overlay` contiene otro, el de dentro sale solo donde salen l
 
 - Cajas que se queden pegadas al borde mientras se pasa de página dentro de su contenedor, ni que floten a un lado del
   texto.
-- Posicionar un `Flex` o un `Grid` sin un posicionado alrededor.
+- Posicionar un `Stack` o un `Grid` sin un posicionado alrededor.

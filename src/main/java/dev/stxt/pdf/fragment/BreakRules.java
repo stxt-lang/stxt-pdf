@@ -183,7 +183,7 @@ public final class BreakRules {
     }
 
     /**
-     * Calidad del corte entre dos grupos de cajas, como dos líneas flex o dos filas de una
+     * Calidad del corte entre dos grupos de cajas, como dos líneas stack o dos filas de una
      * rejilla: el peor de todos los pares.
      *
      * @param before cajas que acaban antes del corte

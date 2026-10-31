@@ -178,13 +178,13 @@ public enum ErrorCode {
     PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
     /** {@code Begin on: odd} en la primera {@code Section}, que ya empieza en la página 1. */
     BEGIN_ON_FIRST_SECTION,
-    /** {@code Lines} sin {@code Wrap: true}. */
-    LINES_WITHOUT_WRAP,
-    /** {@code Gap} de dos valores en un {@code Flex} sin {@code Wrap: true}. */
+    /** {@code Line distribution} sin {@code Wrap: true}. */
+    LINE_DISTRIBUTION_WITHOUT_WRAP,
+    /** {@code Gap} de dos valores en un {@code Stack} sin {@code Wrap: true}. */
     GAP_WITHOUT_WRAP,
-    /** {@code Grow} en un {@code Flex} vertical sin alto definido. */
+    /** {@code Grow} en un {@code Stack} vertical sin alto definido. */
     GROW_WITHOUT_EFFECT,
-    /** {@code Horizontal} o {@code Vertical} de un {@code Item} en el eje principal de su {@code Flex}. */
+    /** {@code Horizontal} o {@code Vertical} de un {@code Item} en el eje principal de su {@code Stack}. */
     ITEM_MAIN_AXIS,
     /** {@code Aspect ratio} con {@code Width} y {@code Height} declarados. */
     ASPECT_RATIO_CONFLICT,
@@ -200,7 +200,7 @@ public enum ErrorCode {
     SINGLE_COLUMN,
     /** {@code Separator color} sin {@code Separator}. */
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,
-    /** {@code Isolate margins: true} en un ítem de {@code Flex} o {@code Grid}, que ya aísla. */
+    /** {@code Isolate margins: true} en un ítem de {@code Stack} o {@code Grid}, que ya aísla. */
     ISOLATE_MARGINS_IN_ITEM,
     /**
      * Un {@code Break} propio dentro de un {@code Overlay}, un {@code Page overlay}, un {@code Frame} girado o una caja
@@ -213,7 +213,7 @@ public enum ErrorCode {
     BREAK_IN_ROTATED,
     /** {@code Isolate margins: true} en una caja girada en flujo, que ya aísla. */
     ISOLATE_MARGINS_IN_ROTATED,
-    /** {@code Rotate} en un {@code Block}, un {@code Text}, un {@code Paragraph} o una {@code Image} que es un ítem de {@code Flex} o {@code Grid}. */
+    /** {@code Rotate} en un {@code Block}, un {@code Text}, un {@code Paragraph} o una {@code Image} que es un ítem de {@code Stack} o {@code Grid}. */
     ROTATED_ITEM,
 
     // --- Desbordamientos (al maquetar) -------------------------------------------------------

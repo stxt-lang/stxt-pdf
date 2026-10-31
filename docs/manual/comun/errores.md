@@ -16,7 +16,7 @@ línea 18: Margin auto no centra una caja que ocupa todo el ancho: declara Width
 
 | Código | Qué pasa | Qué hacer |
 |---|---|---|
-| `CHILD_NOT_DECLARED` | Una propiedad o un elemento donde no se admite (`Column sizes` en un `Flex`, `Typography` en una `Image`) | Mirar la tabla de propiedades del elemento |
+| `CHILD_NOT_DECLARED` | Una propiedad o un elemento donde no se admite (`Column sizes` en un `Stack`, `Typography` en una `Image`) | Mirar la tabla de propiedades del elemento |
 | `TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE` | Un texto sin fuente o sin tamaño | Declararlos en `For element: Document` |
 | `FONT_UNKNOWN` | La fuente no está en `fonts/` | Revisar el nombre de la familia. El mensaje lista las que hay |
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usar otra fuente o quitar el carácter |
@@ -40,7 +40,7 @@ La lista completa, con un ejemplo de cada uno, está en la [referencia](../../re
 ## Por qué tantos errores
 
 Lo que no tendría efecto o se contradice es un error, para que el documento diga exactamente lo que sale en el PDF. Un
-`Margin: auto` que no centra, un `Lines` o un `Gap` de dos medidas en un `Flex` sin `Wrap` o un `Rotate origin` sin
+`Margin: auto` que no centra, un `Line distribution` o un `Gap` de dos medidas en un `Stack` sin `Wrap` o un `Rotate origin` sin
 `Rotate` no harían nada.
 
 Hay excepciones, para no estorbar: escribir el valor por defecto (`Span: 1 1`), lo que se hereda (una

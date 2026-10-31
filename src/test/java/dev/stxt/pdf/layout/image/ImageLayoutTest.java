@@ -171,9 +171,9 @@ class ImageLayoutTest {
     }
 
     @Test
-    void flexRowUsesTheNaturalWidthAndDoesNotStretchTheHeight() {
+    void stackRowUsesTheNaturalWidthAndDoesNotStretchTheHeight() {
         LayoutFixture f = layOut(
-                "\tFlex:",
+                "\tStack:",
                 "\t\tId: F",
                 "\t\tItem:",
                 "\t\t\tImage: test/wide.png",
@@ -194,9 +194,9 @@ class ImageLayoutTest {
     }
 
     @Test
-    void flexGrowWidensAndTheHeightFollows() {
+    void stackGrowWidensAndTheHeightFollows() {
         LayoutFixture f = layOut(
-                "\tFlex:",
+                "\tStack:",
                 "\t\tItem:",
                 "\t\t\tGrow: 1",
                 "\t\t\tImage: test/wide.png",
@@ -210,9 +210,9 @@ class ImageLayoutTest {
     }
 
     @Test
-    void flexColumnStretchesTheWidth() {
+    void stackColumnStretchesTheWidth() {
         LayoutFixture f = layOut(
-                "\tFlex:",
+                "\tStack:",
                 "\t\tDirection: vertical",
                 "\t\tItem:",
                 "\t\t\tImage: test/wide.png",
@@ -378,10 +378,10 @@ class ImageLayoutTest {
 
     @Test
     void aHeightKeepsTheRatioOfTheContentBox() {
-        // Height: 50 deja 40 al contenido, que mide 80 de ancho: 90 con borde y relleno, también como ítem flex.
+        // Height: 50 deja 40 al contenido, que mide 80 de ancho: 90 con borde y relleno, también como ítem stack.
         LayoutFixture f = layOut(
                 "\tImage: test/wide.png", "\t\tId: I", "\t\tBox:", "\t\t\tHeight: 50", "\t\t\tBorder: 2", "\t\t\tPadding: 3",
-                "\tFlex:", "\t\tItem:", "\t\t\tImage: test/wide.png", "\t\t\t\tId: F", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 50",
+                "\tStack:", "\t\tItem:", "\t\t\tImage: test/wide.png", "\t\t\t\tId: F", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 50",
                 "\t\t\t\t\tBorder: 2", "\t\t\t\t\tPadding: 3");
         assertRect(40, 40, 90, 50, f.rect("I"));
         assertRect(40, 90, 90, 50, f.rect("F"));

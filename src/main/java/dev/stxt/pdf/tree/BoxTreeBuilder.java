@@ -300,7 +300,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate margins} en un ítem de {@code Flex} o
+     * Lo que el elemento declara y no tendría efecto por su sitio: {@code Isolate margins} en un ítem de {@code Stack} o
      * {@code Grid}, que ya aísla (referencia/componentes/block.md), y un {@code Break} propio, o el de la {@code Row}
      * de una celda, dentro de una caja que no se parte (referencia/comun/cortes.md). Lo que llega de una regla no se
      * mira aquí: una regla por tipo daría un error en cada elemento de ese tipo que esté en un pie.
@@ -309,7 +309,7 @@ public final class BoxTreeBuilder {
         boolean item = wrapper != null && !is(wrapper, "row");
         if (item && s.isolateMargins()) {
             throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ITEM, "Isolate margins no tiene efecto en un ítem de "
-                    + "Flex o Grid, que ya corta el colapso de márgenes con sus hijos: sobra");
+                    + "Stack o Grid, que ya corta la fusión de márgenes con sus hijos: sobra");
         }
         if (ctx.unbreakable == null) {
             return;
@@ -366,7 +366,7 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Flex}, {@code Grid} y
+     * Las propiedades que declara el elemento, en orden: los grupos, las de su tipo ({@code Stack}, {@code Grid} y
      * {@code Table}, {@code Columns}) y las sueltas. Pone el giro en el estilo y devuelve el {@code Id}.
      */
     private String properties(BuildContext ctx, InlineNode n, ElementReader reader, Style s, Box parent) {

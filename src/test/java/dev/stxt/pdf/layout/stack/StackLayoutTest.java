@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.flex;
+package dev.stxt.pdf.layout.stack;
 
 import dev.stxt.pdf.layout.LayoutFixture;
 import dev.stxt.pdf.model.Distribution;
@@ -9,7 +9,7 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FlexLayoutTest {
+class StackLayoutTest {
 
     private static void assertRect(double x, double y, double w, double h, Rect r) {
         assertEquals(new Rect(x, y, w, h).toString(), new Rect(round(r.x()), round(r.y()), round(r.width()), round(r.height())).toString());
@@ -22,12 +22,12 @@ class FlexLayoutTest {
     @Test
     void zeroBasisGivesEqualColumns() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tGap: 10",
-                "\t\tItem:", "\t\t\tBasis: 0", "\t\t\tGrow: 1",
+                "\tStack:", "\t\tGap: 10",
+                "\t\tItem:", "\t\t\tBase size: 0", "\t\t\tGrow: 1",
                 "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
-                "\t\tItem:", "\t\t\tBasis: 0", "\t\t\tGrow: 1",
+                "\t\tItem:", "\t\t\tBase size: 0", "\t\t\tGrow: 1",
                 "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10",
-                "\t\tItem:", "\t\t\tBasis: 0", "\t\t\tGrow: 1",
+                "\t\tItem:", "\t\t\tBase size: 0", "\t\t\tGrow: 1",
                 "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10");
         assertRect(40, 40, 165, 10, l.rect("A"));
         assertRect(215, 40, 165, 10, l.rect("B"));
@@ -38,9 +38,9 @@ class FlexLayoutTest {
     void shrinkFreezesAtMinWidth() {
         // Faltan 85: cada uno cedería 42.5, pero A no baja de 280 y B absorbe el resto.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tBasis: 300",
+                "\tStack:", "\t\tItem:", "\t\t\tBase size: 300",
                 "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tMin width: 280", "\t\t\t\t\tHeight: 10",
-                "\t\tItem:", "\t\t\tBasis: 300",
+                "\t\tItem:", "\t\t\tBase size: 300",
                 "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10");
         assertRect(40, 40, 280, 10, l.rect("A"));
         assertRect(320, 40, 235, 10, l.rect("B"));
@@ -50,9 +50,9 @@ class FlexLayoutTest {
     void autoMinWidthIsTheNarrowest() {
         // La palabra de A mide 300: A no encoge por debajo y B cede el resto.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tBasis: 500",
+                "\tStack:", "\t\tItem:", "\t\t\tBase size: 500",
                 "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A",
-                "\t\tItem:", "\t\t\tBasis: 500",
+                "\t\tItem:", "\t\t\tBase size: 500",
                 "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 10");
         assertEquals(300, l.rect("A").width(), 1e-9);
         assertRect(340, 40, 215, 10, l.rect("B"));
@@ -62,7 +62,7 @@ class FlexLayoutTest {
     void itemWithWidthShrinksToItsContent() {
         // Faltan 285: los dos ceden 142.5. Su contenido mide 10, así que Width no los frena.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400",
+                "\tStack:", "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400",
                 "\t\tItem:", "\t\t\tText: bb", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400");
         assertRect(40, 40, 257.5, 12, l.rect("A"));
         assertRect(297.5, 40, 257.5, 12, l.rect("B"));
@@ -72,7 +72,7 @@ class FlexLayoutTest {
     void itemWithWidthDoesNotShrinkBelowItsContent() {
         // A cedería 142.5, pero su palabra mide 300: se congela ahí y B cede el resto.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\tStack:", "\t\tItem:", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 400",
                 "\t\tItem:", "\t\t\tText: b", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 400");
         assertEquals(300, l.rect("A").width(), 1e-9);
@@ -83,7 +83,7 @@ class FlexLayoutTest {
     void columnItemWithHeightShrinksToItsContent() {
         // En 100 de alto faltan 60: los dos ceden 30. Su contenido mide 12 (una línea).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: a", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 80",
                 "\t\tItem:", "\t\t\tText: b", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 80");
         assertRect(40, 40, 515, 50, l.rect("A"));
@@ -94,7 +94,7 @@ class FlexLayoutTest {
     void columnItemWithHeightDoesNotShrinkBelowItsContent() {
         // A cedería 30, pero sus tres líneas miden 36 (con 10 de ancho, una palabra por línea).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 50", "\t\tDirection: vertical",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 50", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tText: aa bb cc", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40",
                 "\t\t\t\t\tWidth: 10",
                 "\t\tItem:", "\t\t\tText: d", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 40");
@@ -105,7 +105,7 @@ class FlexLayoutTest {
     @Test
     void itemMarginsAreOutsideTheMainSize() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
+                "\tStack:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10", "\t\t\t\t\tMargin: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10");
@@ -118,17 +118,17 @@ class FlexLayoutTest {
     void mainAxisDistribution() {
         // Dos ítems de 100 en 515: sobran 315.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tHorizontal: center",
+                "\tStack:", "\t\tHorizontal: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: c1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: c2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
-                "\tFlex:", "\t\tHorizontal: between",
+                "\tStack:", "\t\tHorizontal: justify",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: b1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: b2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
-                "\tFlex:", "\t\tHorizontal: evenly",
+                "\tStack:", "\t\tHorizontal: distribute",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: e1", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: e2", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
@@ -145,7 +145,7 @@ class FlexLayoutTest {
     void crossAxisAlignmentInADefiniteContainer() {
         // Una sola línea con alto definido: la línea mide lo que el contenedor (100).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
                 "\t\tItem:", "\t\t\tVertical: start",
                 "\t\t\tBlock:", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
@@ -162,7 +162,7 @@ class FlexLayoutTest {
     @Test
     void stretchToTheTallestItem() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F",
+                "\tStack:", "\t\tId: F",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
                 "\t\t\t\t\tHeight: 30",
@@ -177,7 +177,7 @@ class FlexLayoutTest {
     void wrapBreaksIntoLines() {
         // 200 + 10 + 200 caben en 515; el tercero pasa a la segunda línea.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 200",
                 "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 200",
@@ -193,7 +193,7 @@ class FlexLayoutTest {
     void linesDistributionInADefiniteContainer() {
         // Líneas de 20 + hueco 10 + 20 en 100: sobran 50, centradas.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLines: center",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
@@ -206,7 +206,7 @@ class FlexLayoutTest {
     void linesStretchByDefault() {
         // Líneas de 0 y 20 en 100 con un hueco de 10: sobran 70, 35 para cada línea.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\t\t\t\tHeight: 20");
@@ -217,7 +217,7 @@ class FlexLayoutTest {
     @Test
     void columnDirection() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tDirection: vertical", "\t\tGap: 5",
+                "\tStack:", "\t\tId: F", "\t\tDirection: vertical", "\t\tGap: 5",
                 "\t\tItem:", "\t\t\tText: aaa", "\t\t\t\tId: A",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tHeight: 20",
@@ -233,7 +233,7 @@ class FlexLayoutTest {
     void columnGrowsWithADefiniteHeight() {
         // Sin Height en el contenedor, Grow es un error (catálogo de errores).
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tGrow: 1",
                 "\t\t\tBlock:", "\t\t\t\tId: G");
@@ -246,11 +246,11 @@ class FlexLayoutTest {
         String a = "\t\tItem:\n\t\t\tText: aa aa\n\t\t\t\tId: %s";
         String b = "\t\tItem:\n\t\t\tText: bbb\n\t\t\t\tId: %s";
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10",
+                "\tStack:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10",
                 a.formatted("maxA"), b.formatted("maxB"),
-                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10",
+                "\tStack:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10",
                 a.formatted("minA"), b.formatted("minB"),
-                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", "\t\tWrap: true",
+                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", "\t\tWrap: true",
                 a.formatted("wrapA"), b.formatted("wrapB"));
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(35, l.rect("min").width(), 1e-9);
@@ -261,9 +261,9 @@ class FlexLayoutTest {
     }
 
     @Test
-    void textInAFlexContainerIsAnAnonymousItem() {
+    void textInAStackContainerIsAnAnonymousItem() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F",
+                "\tStack:", "\t\tId: F",
                 "\t\tItem:", "\t\t\tText: aaa bbb", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 100", "\t\t\t\t\tHeight: 30");
         assertRect(75, 40, 100, 30, l.rect("B"));
@@ -272,9 +272,9 @@ class FlexLayoutTest {
     @Test
     void positionedChildren() {
         LayoutFixture l = layOut(
-                // Un flex posicionado: Frame con el relleno y, dentro, el Flex con el alto.
+                // Un stack posicionado: Frame con el relleno y, dentro, el Stack con el alto.
                 "\tFrame:", "\t\tBox:", "\t\t\tPadding: 5",
-                "\t\tFlex:", "\t\t\tBox:", "\t\t\t\tHeight: 40",
+                "\t\tStack:", "\t\t\tBox:", "\t\t\t\tHeight: 40",
                 "\t\t\tItem:", "\t\t\t\tFrame:", "\t\t\t\t\tId: R", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 100",
                 "\t\t\t\t\tOffset: 3 auto auto 4",
                 "\t\t\tOverlay:", "\t\t\t\tId: A", "\t\t\t\tOffset: auto 0 0 auto", "\t\t\t\tBox:",
@@ -288,14 +288,14 @@ class FlexLayoutTest {
 
     @Test
     void distribution() {
-        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Distribution.START, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{30, 0}, FlexLayout.distribute(Distribution.END, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{0, 15}, FlexLayout.distribute(Distribution.BETWEEN, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{5, 10}, FlexLayout.distribute(Distribution.AROUND, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{7.5, 7.5}, FlexLayout.distribute(Distribution.EVENLY, 30, 3), 1e-9);
-        // Sin sitio: between al principio, evenly centrado.
-        assertArrayEquals(new double[]{0, 0}, FlexLayout.distribute(Distribution.BETWEEN, -30, 3), 1e-9);
-        assertArrayEquals(new double[]{-15, 0}, FlexLayout.distribute(Distribution.EVENLY, -30, 3), 1e-9);
+        assertArrayEquals(new double[]{0, 0}, StackLayout.distribute(Distribution.START, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{30, 0}, StackLayout.distribute(Distribution.END, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{0, 15}, StackLayout.distribute(Distribution.JUSTIFY, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{5, 10}, StackLayout.distribute(Distribution.AROUND, 30, 3), 1e-9);
+        assertArrayEquals(new double[]{7.5, 7.5}, StackLayout.distribute(Distribution.DISTRIBUTE, 30, 3), 1e-9);
+        // Sin sitio: justify al principio, distribute centrado.
+        assertArrayEquals(new double[]{0, 0}, StackLayout.distribute(Distribution.JUSTIFY, -30, 3), 1e-9);
+        assertArrayEquals(new double[]{-15, 0}, StackLayout.distribute(Distribution.DISTRIBUTE, -30, 3), 1e-9);
     }
 
     // Casos que faltaban según las pruebas de mutación: huecos distintos en cada eje,
@@ -313,7 +313,7 @@ class FlexLayoutTest {
     void rowAndColumnGapsInARow() {
         // Gap: filas 7, columnas 13. 200 + 13 + 200 = 413 caben en 515; el tercero pasa a otra línea, 7 más abajo.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 7 13",
+                "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 200", "Height: 20"));
@@ -327,8 +327,8 @@ class FlexLayoutTest {
         // En columna, el hueco entre ítems es el de las filas (7) y entre líneas, el de las columnas (13): 40 + 7 + 40
         // = 87 caben en 100; el tercero pasa a la línea siguiente, 100 + 13 a la derecha.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
-                "\t\tLines: start", "\t\tGap: 7 13",
+                "\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
+                "\t\tLine distribution: start", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("C", "Width: 100", "Height: 40"));
@@ -342,10 +342,10 @@ class FlexLayoutTest {
         // Ancho natural de 5 + 10 + 15 y dos huecos de 10, con y sin Wrap; ancho más estrecho sin Wrap, igual con 5 + 10 + 15.
         String items = "\t\tItem:\n\t\t\tText: a\n\t\tItem:\n\t\t\tText: bb\n\t\tItem:\n\t\t\tText: ccc";
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", items,
-                "\tFlex:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", "\t\tWrap: true",
+                "\tStack:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", items,
+                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", "\t\tWrap: true",
                 items,
-                "\tFlex:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", items);
+                "\tStack:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", items);
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(50, l.rect("wrap").width(), 1e-9);
         assertEquals(50, l.rect("min").width(), 1e-9);
@@ -355,9 +355,9 @@ class FlexLayoutTest {
     void basisCountsTheMargins() {
         // Tamaños hipotéticos exteriores 100 + 20 y 100: sobran 295, 147.5 para cada uno.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("A", "Height: 10", "Margin: 0 10"),
-                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("A", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
         assertRect(50, 40, 247.5, 10, l.rect("A"));
         assertRect(307.5, 40, 247.5, 10, l.rect("B"));
     }
@@ -366,9 +366,9 @@ class FlexLayoutTest {
     void shrinkingStopsAtTheMinimumWithItsMargins() {
         // Exteriores 320 y 300 en 515: faltan 105. A no baja de 280 (300 con márgenes) y B se queda con 215.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 300", block("A", "Min width: 280", "Height: 10", "Margin: 0 10"),
-                "\t\tItem:", "\t\t\tBasis: 300", block("B", "Height: 10"));
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 300", block("A", "Min width: 280", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBase size: 300", block("B", "Height: 10"));
         assertRect(50, 40, 280, 10, l.rect("A"));
         assertRect(340, 40, 215, 10, l.rect("B"));
     }
@@ -377,22 +377,22 @@ class FlexLayoutTest {
     void automaticMinimumWithMargins() {
         // La palabra de A mide 300 y sus márgenes 20: no baja de 320 exteriores, y B se queda con 195.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tMargin: 0 10",
-                "\t\tItem:", "\t\t\tBasis: 500", block("B", "Height: 10"));
+                "\t\tItem:", "\t\t\tBase size: 500", block("B", "Height: 10"));
         assertEquals(300, l.rect("A").width(), 1e-9);
         assertRect(360, 40, 195, 10, l.rect("B"));
     }
 
     @Test
     void shrinkIsWeightedByTheBasisWithoutMargins() {
-        // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Basis (300 y 300), no por los
-        // tamaños con márgenes (referencia/componentes/flex.md): 52.5 cada uno.
+        // Exteriores 320 y 300 en 515: faltan 105, que se reparten por Shrink × Base size (300 y 300), no por los
+        // tamaños con márgenes (referencia/componentes/stack.md): 52.5 cada uno.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 300", block("A", "Height: 10", "Margin: 0 10"),
-                "\t\tItem:", "\t\t\tBasis: 300", block("B", "Height: 10"));
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 300", block("A", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBase size: 300", block("B", "Height: 10"));
         assertRect(50, 40, 247.5, 10, l.rect("A"));
         assertRect(307.5, 40, 247.5, 10, l.rect("B"));
     }
@@ -402,10 +402,10 @@ class FlexLayoutTest {
         // Fila: la línea mide 30 y A, con 5 de margen arriba y abajo, se estira a 20.
         // Columna: el ancho es 515 menos los márgenes de C (505).
         LayoutFixture l = layOut(
-                "\tFlex:",
+                "\tStack:",
                 "\t\tItem:", block("A", "Width: 50", "Margin: 5"),
                 "\t\tItem:", block("B", "Width: 50", "Height: 30"),
-                "\tFlex:", "\t\tDirection: vertical",
+                "\tStack:", "\t\tDirection: vertical",
                 "\t\tItem:", block("C", "Height: 10", "Margin: 5"));
         assertRect(45, 45, 50, 20, l.rect("A"));
         assertRect(45, 75, 505, 10, l.rect("C"));
@@ -415,7 +415,7 @@ class FlexLayoutTest {
     void threeLinesWithLinesBetween() {
         // Tres líneas de 20 con huecos de 10 en 100: sobran 20, 10 entre cada dos líneas.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLines: between",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: justify",
                 "\t\tItem:", block("A", "Width: 300", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 300", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 300", "Height: 20"));
@@ -428,11 +428,11 @@ class FlexLayoutTest {
     void wrapCountsTheGapsExactly() {
         // 200 + 10 + 200 + 10 + 95 = 515: una línea. Con 110, el tercero pasa a otra.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 95", "Height: 20"),
-                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", block("D", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("E", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("G", "Width: 110", "Height: 20"));
@@ -444,10 +444,10 @@ class FlexLayoutTest {
     void automaticMinimumCountsBorderAndPadding() {
         // La palabra de A mide 300, más 2 + 2 de borde y 10 + 10 de relleno: no baja de 324.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 500", "\t\t\tText: " + "a".repeat(60), "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tBorder: 2", "\t\t\t\t\tPadding: 0 10",
-                "\t\tItem:", "\t\t\tBasis: 500", block("B", "Height: 10"));
+                "\t\tItem:", "\t\t\tBase size: 500", block("B", "Height: 10"));
         assertEquals(324, l.rect("A").width(), 1e-9);
         assertRect(364, 40, 191, 10, l.rect("B"));
     }
@@ -456,9 +456,9 @@ class FlexLayoutTest {
     void maxWidthCountsTheMargins() {
         // Crecerían 147.5 cada uno, pero A no pasa de 150 (170 con márgenes): B se queda con 345.
         LayoutFixture l = layOut(
-                "\tFlex:",
-                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("A", "Max width: 150", "Height: 10", "Margin: 0 10"),
-                "\t\tItem:", "\t\t\tBasis: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
+                "\tStack:",
+                "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("A", "Max width: 150", "Height: 10", "Margin: 0 10"),
+                "\t\tItem:", "\t\t\tBase size: 100", "\t\t\tGrow: 1", block("B", "Height: 10"));
         assertRect(50, 40, 150, 10, l.rect("A"));
         assertRect(210, 40, 345, 10, l.rect("B"));
     }
@@ -468,16 +468,16 @@ class FlexLayoutTest {
         // Columnas de 100. Max height 30 (40 con márgenes): B se queda con 60. Min height 70 (80): D, con 20.
         // Mínimo automático: el texto de E, en cuatro líneas, mide 48 (58 con márgenes): F, con 42.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
-                "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("A", "Max height: 30", "Margin: 5 0"),
-                "\t\tItem:", "\t\t\tBasis: 20", "\t\t\tGrow: 1", block("B"),
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
-                "\t\tItem:", "\t\t\tBasis: 80", block("C", "Min height: 70", "Margin: 5 0"),
-                "\t\tItem:", "\t\t\tBasis: 80", block("D"),
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
-                "\t\tItem:", "\t\t\tBasis: 80", "\t\t\tText: aa aa aa aa", "\t\t\t\tId: E", "\t\t\t\tBox:",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
+                "\t\tItem:", "\t\t\tBase size: 20", "\t\t\tGrow: 1", block("A", "Max height: 30", "Margin: 5 0"),
+                "\t\tItem:", "\t\t\tBase size: 20", "\t\t\tGrow: 1", block("B"),
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
+                "\t\tItem:", "\t\t\tBase size: 80", block("C", "Min height: 70", "Margin: 5 0"),
+                "\t\tItem:", "\t\t\tBase size: 80", block("D"),
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical",
+                "\t\tItem:", "\t\t\tBase size: 80", "\t\t\tText: aa aa aa aa", "\t\t\t\tId: E", "\t\t\t\tBox:",
                 "\t\t\t\t\tWidth: 10", "\t\t\t\t\tMargin: 5 0",
-                "\t\tItem:", "\t\t\tBasis: 80", block("F"));
+                "\t\tItem:", "\t\t\tBase size: 80", block("F"));
         assertRect(40, 45, 515, 30, l.rect("A"));
         assertRect(40, 80, 515, 60, l.rect("B"));
         assertRect(40, 145, 515, 70, l.rect("C"));
@@ -489,7 +489,7 @@ class FlexLayoutTest {
     @Test
     void columnItemsThatDoNotStretchFitTheirContentInsideTheirMargins() {
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tDirection: vertical",
+                "\tStack:", "\t\tDirection: vertical",
                 "\t\tItem:", "\t\t\tHorizontal: start", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tMargin: 0 10");
         assertRect(50, 40, 15, 12, l.rect("A"));
@@ -500,7 +500,7 @@ class FlexLayoutTest {
         // Columna con Wrap en 60 de alto: A (50 de ancho y 5 de margen a cada lado) y B, en otra línea. La primera
         // línea mide 60, así que B empieza en 40 + 60.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLines: start",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLine distribution: start",
                 "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
                 "\t\tItem:", block("B", "Width: 80", "Height: 40"));
         assertRect(45, 40, 50, 40, l.rect("A"));
@@ -511,7 +511,7 @@ class FlexLayoutTest {
     void stretchingWithDifferentMarginsInEachAxis() {
         // La línea mide 40 (B). A tiene 10 de margen arriba y abajo y 5 a los lados: se estira a 40 − 20.
         LayoutFixture l = layOut(
-                "\tFlex:",
+                "\tStack:",
                 "\t\tItem:", block("A", "Width: 50", "Padding: 5 0", "Margin: 10 5"),
                 "\t\tItem:", block("B", "Width: 50", "Height: 40"));
         assertRect(45, 50, 50, 20, l.rect("A"));
@@ -521,7 +521,7 @@ class FlexLayoutTest {
     void wrapCountsOneGapLessThanItems() {
         // 100 + 10 + 100 + 10 + 100 = 320; con el cuarto (190) y su hueco, 520: pasa a otra línea.
         LayoutFixture l = layOut(
-                "\tFlex:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 100", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 100", "Height: 20"),

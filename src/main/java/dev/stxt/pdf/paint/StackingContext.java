@@ -165,7 +165,7 @@ public final class StackingContext {
             return false;
         }
         Layout parent = f.box().parent() != null ? f.box().parent().style().layout() : null;
-        boolean item = parent == Layout.FLEX || parent == Layout.GRID;
+        boolean item = parent == Layout.STACK || parent == Layout.GRID;
         return s.isPositioned() || item;
     }
 

@@ -30,7 +30,7 @@ class StylesTest {
     void elementRuleAppliesToEveryElementOfItsType() {
         Box root = root(
                 "\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tPadding: 5",
-                "\tBlock:", "\t\tBlock:", "\tFlex:");
+                "\tBlock:", "\t\tBlock:", "\tStack:");
         Box outer = root.children().get(0);
         assertEquals(5, padding(outer), 1e-9);
         assertEquals(5, padding(outer.children().get(0)), 1e-9);
@@ -83,7 +83,7 @@ class StylesTest {
     void rulesAreAppliedToTheElementInsideAnItem() {
         Box block = root(
                 "\tStyles:", "\t\tFor style: card", "\t\t\tBox:", "\t\t\t\tBackground: #F1EFE8",
-                "\tFlex:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tBlock:", "\t\t\t\tStyle: card")
+                "\tStack:", "\t\tItem:", "\t\t\tGrow: 1", "\t\t\tBlock:", "\t\t\t\tStyle: card")
                 .children().get(0).children().get(0);
         assertEquals(new Paint.Solid("#F1EFE8"), block.style().box().background());
         assertEquals(1, block.style().item().grow(), 1e-9);

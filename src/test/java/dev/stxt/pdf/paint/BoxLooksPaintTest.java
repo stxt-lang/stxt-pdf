@@ -218,7 +218,7 @@ class BoxLooksPaintTest {
 
     @Test
     void imagesAreClippedToTheRoundedBox() throws Exception {
-        String image = HEAD + "\tImage: test/wide.png\n\t\tFit: cover\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n"
+        String image = HEAD + "\tImage: test/wide.png\n\t\tFit: fill\n\t\tBox:\n\t\t\tWidth: 60\n\t\t\tHeight: 60\n"
                 + "\t\t\tCorner radius: 50%\n";
         BufferedImage page = render(image);
         assertColor(page, 22, 22, 255, 255, 255, 0);

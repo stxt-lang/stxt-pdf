@@ -14,7 +14,7 @@ se obtiene.
 
 ## Lo que no tiene efecto
 
-Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Lines` o un `Gap` de dos valores
+Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Line distribution` o un `Gap` de dos valores
 sin `Wrap`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un margen `auto` que no centra o un `Break` dentro de
 un `Overlay`. No lo es, a propósito:
 
@@ -36,7 +36,7 @@ un `Overlay`. No lo es, a propósito:
 
 1. **Sintaxis STXT y schema** ([Estructura](estructura.md#schema)): qué hijos admite cada elemento, cuántos, valores
    vacíos, valores cerrados, enteros y booleanos. Es donde se detecta una propiedad fuera de su elemento (`Offset` en un
-   `Block`, `Column sizes` en un `Flex`), con los códigos de STXT (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`,
+   `Block`, `Column sizes` en un `Stack`), con los códigos de STXT (`CHILD_NOT_DECLARED`, `TOO_MANY_CHILDREN`,
    `TOO_FEW_CHILDREN` o `INVALID_VALUE`, entre otros).
 2. **Modelo:** las reglas que el schema no puede expresar, con los códigos de abajo.
 3. **Recursos** ([Recursos](recursos.md)): las fuentes y las imágenes ([Image](../componentes/image.md)).
@@ -59,7 +59,7 @@ un `Overlay`. No lo es, a propósito:
 | `TEXT_CONTENT` | Un `Text` tiene su texto en el valor o en `Content`, uno de los dos; un `Markdown` tiene contenido, y sus encabezados y párrafos, texto | `Text tiene el texto en el valor y en Content (línea 9): va en uno solo` |
 | `TEXT_WITHOUT_FONT` | El texto, y un `Table of contents`, necesitan `Font` en `Typography`, propia o heredada | `El texto necesita Font: se declara en el Typography del Text, de un antecesor o de Styles (For element: Document)` |
 | `TEXT_WITHOUT_FONT_SIZE` | El texto necesita `Size` en `Typography`, propio o heredado | `El texto necesita Size: se declara en el Typography del Text, de un antecesor o de Styles (For element: Document)` |
-| `STYLE_UNKNOWN_ELEMENT` | `For element` nombra un elemento de caja, un elemento generado o una posición en una tabla ([Styles](estilos.md)) | `For element: 'Item' no es un elemento de caja (Block, Flex...)` |
+| `STYLE_UNKNOWN_ELEMENT` | `For element` nombra un elemento de caja, un elemento generado o una posición en una tabla ([Styles](estilos.md)) | `For element: 'Item' no es un elemento de caja (Block, Stack...)` |
 | `STYLE_DUPLICATE` | Dos reglas del mismo origen no tienen el mismo selector | `Regla repetida: For element: block (ya está en la línea 6)` |
 | `STYLE_NOT_ALLOWED` | Una regla que llega a una `Section` solo da `Typography`; una regla (también de posición, de columna o del estilo de una `Row`) no da `Break` a un `Overlay`, un `Page overlay`, un encabezado, un `Text` de un encabezado o una `Cell`; `For element: Document` solo admite `Typography`, y en ella no `Language` | `La regla For style: page aplica Break a un Overlay (línea 11)...` |
 | `HEADING_LEVEL` | El primer encabezado es `Heading 1` y cada uno sube como mucho un nivel ([Encabezados](../componentes/heading.md#jerarquía)) | `Salto de nivel: Heading 3 después de Heading 1; como mucho, Heading 2` |
@@ -69,7 +69,7 @@ un `Overlay`. No lo es, a propósito:
 | `LIST_ITEM_EMPTY` | Un `List item` contiene al menos un elemento ([List](../componentes/list.md)) | `Un List item necesita al menos un elemento: un Paragraph, un Text, un Block...` |
 | `LIST_NUMBER_NOT_ALLOWED` | `Start` y `Number` solo en las listas numeradas | `Start no tiene efecto con Marker: bullet, que no numera los ítems` |
 | `LIST_NUMBER_RANGE` | El número cabe en la numeración: `decimal` desde 0, letras desde 1, romanos de 1 a 3999 (línea del `Start`, del `Number` o del ítem) | `El número 4000 no se puede escribir con Marker: upper-roman, que numera de 1 a 3999` |
-| `LIST_ITEM_WITHOUT_LINE` | Un ítem con marcador empieza con un texto con el que alinearlo (línea de la caja que lo impide) | `El marcador del List item de la línea 10 se alinea con su primera línea, y el ítem empieza con un Flex...` |
+| `LIST_ITEM_WITHOUT_LINE` | Un ítem con marcador empieza con un texto con el que alinearlo (línea de la caja que lo impide) | `El marcador del List item de la línea 10 se alinea con su primera línea, y el ítem empieza con un Stack...` |
 | `TABLE_ORDER` | `Header rows`, `Body` y `Footer rows` van en ese orden ([Table](../componentes/table.md)) | `Body va después de Footer rows: los grupos de una Table van en el orden Header rows, Body, Footer rows` |
 | `TABLE_ROW_CELLS` | Cada fila llena exactamente las columnas de `Column sizes`, contando los `Span` de las filas de arriba (línea de la fila, o de la celda que sobra) | `La fila deja libre la columna 2 de 2 (Columns): falta una Cell, vacía si hace falta, o un Span` |
 | `TABLE_SPAN` | Un `Span` no se sale de la tabla, no pasa de un grupo a otro ni se solapa con otra celda | `La celda ocupa de la columna 1 a la 3, y la tabla tiene 2 (Columns)` |
@@ -102,23 +102,23 @@ un `Overlay`. No lo es, a propósito:
 | `OFFSET_CONFLICT` | Un `Frame` no se desplaza a la vez desde arriba y abajo, ni desde izquierda y derecha | `Un Frame no puede desplazarse a la vez desde arriba y desde abajo...` |
 | `OVERCONSTRAINED` | Un `Overlay` o un `Page overlay` con inicio, tamaño y fin necesita algún margen `auto` | `Izquierda, Width y derecha declarados fijan la posición dos veces...` |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | `Margin: auto` solo donde centra ([La caja](caja.md#márgenes-auto)) | `Margin auto no centra una caja que ocupa todo el ancho...` |
-| `ISOLATE_MARGINS_IN_ITEM` | `Isolate margins: true` no va en un ítem de `Flex` o `Grid`, que ya corta el colapso de márgenes ([Block](../componentes/block.md#cajas-que-aíslan-los-márgenes)) | `Isolate margins no tiene efecto en un ítem de Flex o Grid, que ya corta el colapso de márgenes con sus hijos: sobra` |
+| `ISOLATE_MARGINS_IN_ITEM` | `Isolate margins: true` no va en un ítem de `Stack` o `Grid`, que ya corta la fusión de márgenes ([Block](../componentes/block.md#cajas-que-aíslan-los-márgenes)) | `Isolate margins no tiene efecto en un ítem de Stack o Grid, que ya corta la fusión de márgenes con sus hijos: sobra` |
 | `START_WITHOUT_RESTART` | `Start` en una `Section` solo con `Page numbering: restart` ([Document](../componentes/document.md#numeración-de-las-páginas)) | `Start solo tiene efecto con Page numbering: restart...` |
 | `ROW_BOX` | El `Box` de una `Row` solo da su aspecto: `Background`, `Border`, `Border color` y `Corner radius` ([Table](../componentes/table.md#filas)) | `Padding no tiene efecto en una Row, que no es una caja del layout...` |
 | `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS` | `Page number format` no va en una `Section` con `Page numbering: none` | `Page number format no tiene efecto con Page numbering: none...` |
 | `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` no va en la primera `Section`, que ya empieza en la página 1 ([Document](../componentes/document.md#empezar-en-página-impar)) | `Begin on: odd no tiene efecto en la primera sección...` |
-| `LINES_WITHOUT_WRAP` | `Lines` solo con `Wrap: true` | `Lines solo tiene efecto con Wrap: true...` |
-| `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Flex`, solo con `Wrap: true` ([Flex](../componentes/flex.md#propiedades-del-flex)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: va un solo valor...` |
-| `GROW_WITHOUT_EFFECT` | `Grow` en un `Flex` vertical necesita un alto definido en el contenedor | `Grow no tiene efecto: el flex vertical del padre no tiene un alto definido...` |
-| `ITEM_MAIN_AXIS` | Un `Item` solo se alinea en el eje cruzado de su `Flex`: `Vertical` en uno horizontal y `Horizontal` en uno vertical ([Flex](../componentes/flex.md#item)) | `Horizontal no tiene efecto en un ítem de un Flex con Direction: horizontal, porque es su eje principal...` |
+| `LINE_DISTRIBUTION_WITHOUT_WRAP` | `Line distribution` solo con `Wrap: true` | `Line distribution solo tiene efecto con Wrap: true...` |
+| `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Stack`, solo con `Wrap: true` ([Stack](../componentes/stack.md#propiedades-del-stack)) | `Gap tiene dos valores, pero sin Wrap hay una sola línea y el primero, el hueco entre filas, no tiene efecto: va un solo valor...` |
+| `GROW_WITHOUT_EFFECT` | `Grow` en un `Stack` vertical necesita un alto definido en el contenedor | `Grow no tiene efecto: el Stack vertical del padre no tiene un alto definido...` |
+| `ITEM_MAIN_AXIS` | Un `Item` solo se alinea en el eje cruzado de su `Stack`: `Vertical` en uno horizontal y `Horizontal` en uno vertical ([Stack](../componentes/stack.md#item)) | `Horizontal no tiene efecto en un ítem de un Stack con Direction: horizontal, porque es su eje principal...` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio no tiene efecto si Width y Height están declarados` |
 | `MIN_MAX_CONFLICT` | Mínimo, máximo y tamaño comparables no se contradicen ([La caja](caja.md#mínimos-y-máximos)) | `Min width es mayor que Max width (línea 7)` |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje vertical necesita un alto definido ([Valores](valores.md#alto-definido)) | `Height usa un porcentaje de un alto que no es definido...` |
 | `ROTATE_ORIGIN_WITHOUT_ROTATE` | `Rotate origin` solo con `Rotate` | `Rotate origin no tiene efecto sin Rotate: falta el giro o sobra Rotate origin` |
 | `BREAK_IN_ROTATED` | Un `Frame` girado o una caja girada en flujo no declara `Keep together` ni `Edges`, tampoco en una regla ([Capas y giro](capas-y-giro.md#giro-rotate)) | `Keep together no tiene efecto en un Frame girado, que no se parte entre páginas: sobra` |
 | `BREAK_IN_UNBREAKABLE` | Un elemento dentro de un `Overlay`, un `Page overlay`, un `Frame` girado o una caja girada en flujo, que no se parten, no escribe `Break` (tampoco la `Row` de una celda); lo que llega de una regla no se comprueba ([Cortes](cortes.md#cortes-forzados)) | `Before no tiene efecto dentro de un Overlay, que no se parte entre páginas: sobra` |
-| `ISOLATE_MARGINS_IN_ROTATED` | `Isolate margins: true` no va en una caja girada en flujo, que ya corta el colapso de márgenes ([Capas y giro](capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)) | `Isolate margins no tiene efecto en una caja girada, que ya corta el colapso de márgenes con sus hijos: sobra` |
-| `ROTATED_ITEM` | Un `Block`, `Text`, `Paragraph` o `Image` girado no es un ítem de `Flex` o `Grid` ([Capas y giro](capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)) | `Un ítem de Flex no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem...` |
+| `ISOLATE_MARGINS_IN_ROTATED` | `Isolate margins: true` no va en una caja girada en flujo, que ya corta la fusión de márgenes ([Capas y giro](capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)) | `Isolate margins no tiene efecto en una caja girada, que ya corta la fusión de márgenes con sus hijos: sobra` |
+| `ROTATED_ITEM` | Un `Block`, `Text`, `Paragraph` o `Image` girado no es un ítem de `Stack` o `Grid` ([Capas y giro](capas-y-giro.md#giro-en-flujo-block-text-paragraph-e-image)) | `Un ítem de Stack no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem...` |
 | `GRID_PLACEMENT` | `Areas` rectangulares y con filas de igual longitud; valor de `Area` válido y con áreas existentes; un ítem con la fila fija cabe en ella ([Grid](../componentes/grid.md#colocación)) | `Área desconocida en Area: foot` |
 | `FONT_UNKNOWN` | `Font` existe en la carpeta de fuentes (línea de la `Font`); también `Code font` (línea de la `Code font`) | `Fuente desconocida: Arial. Familias en .../resources/fonts: IBM Plex Mono, IBM Plex Sans, IBM Plex Serif` |
 | `FONT_VARIANT_MISSING` | La familia tiene la variante de `Bold` e `Italic`, y la de cada tramo con formato (línea del texto, o la del tramo) | `La fuente IBM Plex Sans no tiene la variante bold italic... (Font en la línea 6, ...)` |

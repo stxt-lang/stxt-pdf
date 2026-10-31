@@ -7,7 +7,7 @@ import java.util.OptionalDouble;
  * (referencia/comun/valores.md). El layout lo convierte en un valor <em>usado</em>, en puntos,
  * con {@link #resolve(OptionalDouble)}.
  *
- * <p>Se conservan separados los valores especificados de los usados porque flex y grid
+ * <p>Se conservan separados los valores especificados de los usados porque stack y grid
  * necesitan saber si un valor era {@code auto} en origen (referencia/comun/valores.md).</p>
  */
 public sealed interface Value {

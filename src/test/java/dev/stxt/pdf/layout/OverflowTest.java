@@ -46,7 +46,7 @@ class OverflowTest {
     @Test
     void tooWideNamesTheInnermostBoxOutsideThePage() {
         InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tBasis: 600", "\t\t\tShrink: 0",
+                "\tStack:", "\t\tItem:", "\t\t\tBase size: 600", "\t\t\tShrink: 0",
                 "\t\t\tBlock:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 4", "\t\t\t\t\tPadding: 6",
                 "\t\t\t\tBlock:", "\t\t\t\t\tId: S", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 503", "\t\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\t\tMargin: 0 0 0 4")));
@@ -58,7 +58,7 @@ class OverflowTest {
     @Test
     void tooWideNamesTheBoxWhenItsContentFits() {
         InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
-                "\tFlex:", "\t\tItem:", "\t\t\tBasis: 600", "\t\t\tShrink: 0",
+                "\tStack:", "\t\tItem:", "\t\t\tBase size: 600", "\t\t\tShrink: 0",
                 "\t\t\tBlock:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 4", "\t\t\t\t\tPadding: 6",
                 "\t\t\t\tBlock:", "\t\t\t\t\tId: S", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 493", "\t\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\t\tMargin: 0 0 0 4")));
@@ -150,15 +150,15 @@ class OverflowTest {
     }
 
     /**
-     * El Flex tiene 10 de relleno (su contenido mide 495) y un primer ítem de 20: R empieza en 30 y su contenido en 40;
+     * El Stack tiene 10 de relleno (su contenido mide 495) y un primer ítem de 20: R empieza en 30 y su contenido en 40;
      * S, un Frame desplazado 60 (que no cuenta), ocupa de 44 a 504, dentro de la página: la culpable es R.
      */
     @Test
     void tooWideMeasuresFromTheContainerAndIgnoresRelativeOffsets() {
         InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
-                "\tFlex:", "\t\tBox:", "\t\t\tPadding: 10",
+                "\tStack:", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tItem:", "\t\t\tShrink: 0", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 20", "\t\t\t\t\tHeight: 10",
-                "\t\tItem:", "\t\t\tBasis: 600", "\t\t\tShrink: 0",
+                "\t\tItem:", "\t\t\tBase size: 600", "\t\t\tShrink: 0",
                 "\t\t\tBlock:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 4", "\t\t\t\t\tPadding: 6",
                 "\t\t\t\tFrame:", "\t\t\t\t\tId: S", "\t\t\t\t\tOffset: auto auto auto 60", "\t\t\t\t\tBox:",
                 "\t\t\t\t\t\tWidth: 460", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tMargin: 0 0 0 4")));

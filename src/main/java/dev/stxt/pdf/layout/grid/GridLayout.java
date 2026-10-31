@@ -35,7 +35,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
 /**
  * Layout {@code grid} (referencia/componentes/grid.md). Pasos:
  * <ol>
- *   <li>Colocación: {@link GridAreas}, {@link Cell} y {@link Placement}.</li>
+ *   <li>Colocación: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} y {@link Placement}.</li>
  *   <li>Columnas: {@link TrackSizing} con los anchos más estrecho y natural.</li>
  *   <li>Filas: {@link TrackSizing} con la altura de cada ítem al ancho de sus columnas.</li>
  *   <li>Alinear cada ítem en su área ({@code Horizontal}, {@code Vertical}); estirar = re-layout.</li>

@@ -1,4 +1,4 @@
-# Case: Area en un Flex
+# Case: Rotate en un Stack: se gira un Block que lo contiene
 # Code: CHILD_NOT_DECLARED
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,8 +8,9 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
-			Area: 1 1
+		Stack:
+			Rotate: 10
+			Item:
 				Block:
 					Box:
 						Height: 10

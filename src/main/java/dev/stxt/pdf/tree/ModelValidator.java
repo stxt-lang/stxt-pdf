@@ -28,13 +28,13 @@ import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
-import static dev.stxt.pdf.tree.PropertyKey.FLEX_GAP;
-import static dev.stxt.pdf.tree.PropertyKey.FLEX_LINES;
+import static dev.stxt.pdf.tree.PropertyKey.STACK_GAP;
+import static dev.stxt.pdf.tree.PropertyKey.STACK_LINE_DISTRIBUTION;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_ROWS;
 import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
-import static dev.stxt.pdf.tree.PropertyKey.ITEM_BASIS;
+import static dev.stxt.pdf.tree.PropertyKey.ITEM_BASE_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_GROW;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_HORIZONTAL;
 import static dev.stxt.pdf.tree.PropertyKey.ITEM_VERTICAL;
@@ -62,34 +62,34 @@ final class ModelValidator {
     }
 
     /**
-     * {@code Horizontal} y {@code Vertical}, {@code Lines} y {@code Gap} de un {@code Flex}: la del eje principal
-     * reparte y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code between}, {@code around} ni
-     * {@code evenly} (referencia/componentes/flex.md).
+     * {@code Horizontal} y {@code Vertical}, {@code Line distribution} y {@code Gap} de un {@code Stack}: la del eje principal
+     * reparte y no admite {@code stretch}; la del eje cruzado alinea y no admite {@code justify}, {@code around} ni
+     * {@code distribute} (referencia/componentes/stack.md).
      */
-    static void validateFlex(Style s) {
-        String main = s.flex().isHorizontal() ? "Horizontal" : "Vertical";
-        String cross = s.flex().isHorizontal() ? "Vertical" : "Horizontal";
-        String direction = "Direction: " + (s.flex().isHorizontal() ? "horizontal" : "vertical");
-        if (s.flex().mainAxis() == Distribution.STRETCH) {
-            throw error(s.line(s.flex().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " es el eje principal de "
-                    + "este Flex (" + direction + ") y reparte el espacio sobrante: no admite stretch. Lo que estira los "
+    static void validateStack(Style s) {
+        String main = s.stack().isHorizontal() ? "Horizontal" : "Vertical";
+        String cross = s.stack().isHorizontal() ? "Vertical" : "Horizontal";
+        String direction = "Direction: " + (s.stack().isHorizontal() ? "horizontal" : "vertical");
+        if (s.stack().mainAxis() == Distribution.STRETCH) {
+            throw error(s.line(s.stack().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " es el eje principal de "
+                    + "este Stack (" + direction + ") y reparte el espacio sobrante: no admite stretch. Lo que estira los "
                     + "ítems es su Grow");
         }
         String spread = crossSpread(s);
         if (spread != null) {
-            throw error(s.line(s.flex().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " es el eje cruzado de "
-                    + "este Flex (" + direction + ") y alinea los ítems: admite start, end, center o stretch y no "
+            throw error(s.line(s.stack().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " es el eje cruzado de "
+                    + "este Stack (" + direction + ") y alinea los ítems: admite start, end, center o stretch y no "
                     + spread + ", que reparte el eje principal (" + main + ")");
         }
-        if (s.isDeclared(FLEX_LINES) && !s.flex().wrap()) {
-            throw error(s.line(FLEX_LINES), ErrorCode.LINES_WITHOUT_WRAP,
-                    "Lines solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
+        if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrap()) {
+            throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.LINE_DISTRIBUTION_WITHOUT_WRAP,
+                    "Line distribution solo tiene efecto con Wrap: true, porque sin Wrap hay una sola línea");
         }
         // Sin Wrap hay una sola línea: no hay hueco entre filas en horizontal ni entre columnas en vertical.
-        if (s.flex().gapPair() && !s.flex().wrap()) {
-            String unused = s.flex().direction() == Direction.HORIZONTAL
+        if (s.stack().gapPair() && !s.stack().wrap()) {
+            String unused = s.stack().direction() == Direction.HORIZONTAL
                     ? "primero, el hueco entre filas," : "segundo, el hueco entre columnas,";
-            throw error(s.line(FLEX_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
+            throw error(s.line(STACK_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap tiene dos valores, pero sin Wrap hay una sola"
                     + " línea y el " + unused + " no tiene efecto: va un solo valor, el hueco entre ítems");
         }
     }
@@ -164,64 +164,64 @@ final class ModelValidator {
         }
         if (s.rotatesInFlow() && s.isolateMargins()) {
             throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins no tiene efecto en una caja girada, "
-                    + "que ya corta el colapso de márgenes con sus hijos: sobra");
+                    + "que ya corta la fusión de márgenes con sus hijos: sobra");
         }
     }
 
     /** Las reglas de una caja ya leída, antes de crearla: colocación, desplazamiento, márgenes, tamaños, porcentajes y cortes de columna. */
     static void validateBox(BuildContext ctx, Style s, Box parent) {
         Layout parentLayout = parent.style().layout();
-        // Los hijos en flujo de un Flex o un Grid son ítems (con su Item o su Area), y las celdas
+        // Los hijos en flujo de un Stack o un Grid son ítems (con su Item o su Area), y las celdas
         // de una Table, ítems de su grid.
-        boolean flexItem = !s.isOutOfFlow() && parentLayout == Layout.FLEX;
+        boolean stackItem = !s.isOutOfFlow() && parentLayout == Layout.STACK;
         boolean gridItem = !s.isOutOfFlow() && parentLayout == Layout.GRID;
-        if ((flexItem || gridItem) && s.rotatesInFlow()) {
+        if ((stackItem || gridItem) && s.rotatesInFlow()) {
             // Un ítem ocupa el sitio que le da su contenedor (referencia/comun/capas-y-giro.md).
-            throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (flexItem ? "Flex" : "Grid")
+            throw error(s.line(ROTATE), ErrorCode.ROTATED_ITEM, "Un ítem de " + (stackItem ? "Stack" : "Grid")
                     + " no puede girar: ocupa el sitio que le da su contenedor. Lo que gira es una caja dentro del ítem (un "
                     + "Block con la caja girada dentro)");
         }
 
-        if (flexItem) {
-            validateFlexItem(s, parent);
+        if (stackItem) {
+            validateStackItem(s, parent);
         }
         validateOffset(s);
-        validateMargins(s, parentLayout, flexItem, gridItem);
+        validateMargins(s, parentLayout, stackItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
             throw error(s.line(ASPECT_RATIO), ErrorCode.ASPECT_RATIO_CONFLICT,
                     "Aspect ratio no tiene efecto si Width y Height están declarados");
         }
         validateMinMax(s, WIDTH, s.box().width(), MIN_WIDTH, s.box().minWidth(), MAX_WIDTH, s.box().maxWidth());
         validateMinMax(s, HEIGHT, s.box().height(), MIN_HEIGHT, s.box().minHeight(), MAX_HEIGHT, s.box().maxHeight());
-        validatePercentages(ctx, s, parent, flexItem, gridItem);
+        validatePercentages(ctx, s, parent, stackItem, gridItem);
         validateColumnBreaks(ctx, s);
         validateKeeps(s);
     }
 
     /**
-     * El valor del eje cruzado de un {@code Flex} si es un reparto ({@code between}…), que no vale ahí; si no, {@code
+     * El valor del eje cruzado de un {@code Stack} si es un reparto ({@code justify}…), que no vale ahí; si no, {@code
      * null}.
      */
     private static String crossSpread(Style s) {
-        Distribution v = s.flex().crossDeclared();
-        return v == Distribution.BETWEEN || v == Distribution.AROUND || v == Distribution.EVENLY
+        Distribution v = s.stack().crossDeclared();
+        return v == Distribution.JUSTIFY || v == Distribution.AROUND || v == Distribution.DISTRIBUTE
                 ? v.name().toLowerCase(Locale.ROOT) : null;
     }
 
     /**
-     * En un ítem de {@code Flex}, {@code Horizontal} o {@code Vertical} solo en el eje cruzado: en el principal reparte
-     * el {@code Flex}, con su propia propiedad, y el ítem crece o se encoge con {@code Grow} y {@code Shrink}
-     * (referencia/componentes/flex.md).
+     * En un ítem de {@code Stack}, {@code Horizontal} o {@code Vertical} solo en el eje cruzado: en el principal reparte
+     * el {@code Stack}, con su propia propiedad, y el ítem crece o se encoge con {@code Grow} y {@code Shrink}
+     * (referencia/componentes/stack.md).
      */
-    private static void validateFlexItem(Style s, Box parent) {
-        boolean horizontal = parent.style().flex().isHorizontal();
+    private static void validateStackItem(Style s, Box parent) {
+        boolean horizontal = parent.style().stack().isHorizontal();
         String key = horizontal ? ITEM_HORIZONTAL : ITEM_VERTICAL;
         if (s.isDeclared(key)) {
             String main = horizontal ? "Horizontal" : "Vertical";
             String cross = horizontal ? "Vertical" : "Horizontal";
-            throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " no tiene efecto en un ítem de un Flex con "
+            throw error(s.line(key), ErrorCode.ITEM_MAIN_AXIS, main + " no tiene efecto en un ítem de un Stack con "
                     + "Direction: " + main.toLowerCase(Locale.ROOT) + ", porque es su eje principal: el reparto "
-                    + "lo dan el " + main + " del Flex y el tamaño, Grow y Shrink, y el ítem se alinea con " + cross);
+                    + "lo dan el " + main + " del Stack y el tamaño, Grow y Shrink, y el ítem se alinea con " + cross);
         }
     }
 
@@ -293,7 +293,7 @@ final class ModelValidator {
      * Los márgenes {@code auto} solo centran: en flujo de bloque, en horizontal y con ancho limitado; en Overlay y Page
      * overlay, con inicio, tamaño y fin.
      */
-    private static void validateMargins(Style s, Layout parentLayout, boolean flexItem, boolean gridItem) {
+    private static void validateMargins(Style s, Layout parentLayout, boolean stackItem, boolean gridItem) {
         Sides<Value> m = s.box().margin();
         boolean horizontalAuto = m.left().isAuto() || m.right().isAuto();
         boolean verticalAuto = m.top().isAuto() || m.bottom().isAuto();
@@ -301,9 +301,9 @@ final class ModelValidator {
             return;
         }
         SourceLine line = s.line(MARGIN);
-        if (flexItem || gridItem) {
-            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de flex o "
-                    + "grid; alinea con Horizontal y Vertical");
+        if (stackItem || gridItem) {
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto no tiene efecto en ítems de Stack o "
+                    + "Grid: se alinean con Horizontal y Vertical");
         }
         if (s.isOutOfFlow()) {
             validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);
@@ -362,9 +362,9 @@ final class ModelValidator {
      * Porcentajes verticales de la caja: su base debe ser un alto definido (referencia/comun/valores.md). La base de
      * {@code Height}, {@code Min height} y {@code Max height} es el containing block (siempre
      * definido para Overlay y Page overlay) o el área (los ítems de grid); la de los desplazamientos
-     * de un Frame y de {@code Basis} en un flex {@code column}, la caja de contenido del padre.
+     * de un Frame y de {@code Base size} en un stack {@code column}, la caja de contenido del padre.
      */
-    private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean flexItem,
+    private static void validatePercentages(BuildContext ctx, Style s, Box parent, boolean stackItem,
                                             boolean gridItem) {
         boolean ownBase = s.isOutOfFlow() || gridItem || ctx.isDefinite(parent);
         for (String p : List.of(HEIGHT, MIN_HEIGHT, MAX_HEIGHT)) {
@@ -382,13 +382,13 @@ final class ModelValidator {
                 && (hasPercentage(s.offset().top()) || hasPercentage(s.offset().bottom()))) {
             throw indefinite(s.line(OFFSET), "El desplazamiento vertical de Offset");
         }
-        boolean column = parent.style().flex().direction() == Direction.VERTICAL;
-        if (flexItem && column && !parentDefinite) {
-            if (hasPercentage(s.item().basis())) {
-                throw indefinite(s.line(ITEM_BASIS), "Basis en un flex vertical");
+        boolean column = parent.style().stack().direction() == Direction.VERTICAL;
+        if (stackItem && column && !parentDefinite) {
+            if (hasPercentage(s.item().baseSize())) {
+                throw indefinite(s.line(ITEM_BASE_SIZE), "Base size en un Stack vertical");
             }
             if (s.item().grow() > 0) {
-                throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el flex "
+                throw error(s.line(ITEM_GROW), ErrorCode.GROW_WITHOUT_EFFECT, "Grow no tiene efecto: el Stack "
                         + "vertical del padre no tiene un alto definido que repartir: le falta su Height");
             }
         }
@@ -402,12 +402,12 @@ final class ModelValidator {
         if (s.grid().rowSizes().stream().anyMatch(ValueReader::hasPercentage)) {
             throw indefinite(s.line(GRID_ROWS), "Row sizes");
         }
-        // En flex, el hueco entre filas solo cuenta en vertical o con varias líneas.
+        // En stack, el hueco entre filas solo cuenta en vertical o con varias líneas.
         boolean rowGapUsed = s.layout() == Layout.GRID
-                || (s.layout() == Layout.FLEX && (s.flex().wrap() || s.flex().direction() == Direction.VERTICAL));
-        Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.flex().rowGap();
+                || (s.layout() == Layout.STACK && (s.stack().wrap() || s.stack().direction() == Direction.VERTICAL));
+        Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.stack().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
-            String gap = s.layout() == Layout.GRID ? GRID_GAP : FLEX_GAP;
+            String gap = s.layout() == Layout.GRID ? GRID_GAP : STACK_GAP;
             throw indefinite(s.line(gap), "El hueco entre filas de Gap");
         }
     }

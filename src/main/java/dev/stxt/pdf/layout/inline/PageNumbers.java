@@ -40,7 +40,7 @@ public final class PageNumbers {
         return "0".repeat(DIGITS);
     }
 
-    /** El carácter más ancho de dos de los que forman un número de prueba: {@code 0} < {@code m} < {@code M}. */
+    /** El carácter más ancho de dos de los que forman un número de prueba: {@code 0} &lt; {@code m} &lt; {@code M}. */
     public static char wider(char a, char b) {
         String order = "0mM";
         return order.indexOf(a) >= order.indexOf(b) ? a : b;

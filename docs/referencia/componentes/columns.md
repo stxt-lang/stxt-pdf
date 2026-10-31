@@ -68,7 +68,7 @@ que le queda de él:
 3. El `Columns` mide en esa página lo que su columna más alta (con `Height`, lo de cualquier caja con alto definido,
    [Cortes](../comun/cortes.md#alto-definido-y-cortes)).
 
-Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Flex` o de `Grid`, o que está en un `Overlay`) no
+Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Stack` o de `Grid`, o que está en un `Overlay`) no
 hay alto que llenar: las columnas se equilibran siempre, también con `Balance: false`.
 
 > **Decisión:** el equilibrado no incumple reglas que el reparto en orden respeta: un bloque con `Keep together: true` no se

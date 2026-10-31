@@ -1,4 +1,4 @@
-# Case: Gap de dos valores en un Flex row sin Wrap
+# Case: Gap de dos valores en un Stack row sin Wrap
 # Code: GAP_WITHOUT_WRAP
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,7 +8,7 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
+		Stack:
 			Gap: 7 13
 			Item:
 				Block:

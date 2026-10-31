@@ -1,4 +1,4 @@
-# Case: Propiedad de grid en un Flex
+# Case: Propiedad de grid en un Stack
 # Code: CHILD_NOT_DECLARED
 # Line: 12
 Document (dev.stxt.pdf):
@@ -8,5 +8,5 @@ Document (dev.stxt.pdf):
 		Width: 595
 		Height: 842
 	Section:
-		Flex:
+		Stack:
 			Column sizes: * *

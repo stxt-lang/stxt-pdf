@@ -22,7 +22,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 /**
  * Layout de una {@code Image} (referencia/componentes/image.md): una caja sin hijos con el tamaño y la
  * proporción del fichero, como un elemento reemplazado de CSS. El tamaño lo resuelve
- * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, que también usan los padres flex, grid
+ * {@link BoxModel#resolve(Box, ConstraintSpace, LayoutContext)}, que también usan los padres stack, grid
  * y absolute para medirla; aquí solo se coloca.
  *
  * <p>No se parte entre páginas (referencia/comun/cortes.md): si no cabe en lo que queda de página, corta antes de

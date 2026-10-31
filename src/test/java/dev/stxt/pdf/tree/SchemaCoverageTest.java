@@ -106,14 +106,14 @@ class SchemaCoverageTest {
             Map.entry("Keep with previous", "Keep with previous: true"),
             Map.entry("Keep together", "Keep together: true"),
             Map.entry("Edges", "Edges: closed"),
-            // Flex e Item
+            // Stack e Item
             Map.entry("Direction", "Direction: vertical"),
             Map.entry("Wrap", "Wrap: true"),
             Map.entry("Gap", "Gap: 5"),
-            Map.entry("Lines", "Lines: center"),
+            Map.entry("Line distribution", "Line distribution: center"),
             Map.entry("Grow", "Grow: 1"),
             Map.entry("Shrink", "Shrink: 0"),
-            Map.entry("Basis", "Basis: 50"),
+            Map.entry("Base size", "Base size: 50"),
             // Grid y Area
             Map.entry("Column sizes", "Column sizes: 100"),
             Map.entry("Row sizes", "Row sizes: 20"),
@@ -141,7 +141,7 @@ class SchemaCoverageTest {
             Map.entry("Leader", "Leader: line"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
-            Map.entry("Fit", "Fit: cover"),
+            Map.entry("Fit", "Fit: fill"),
             Map.entry("Pdf page", "Pdf page: 2"));
 
     /** Cabecera de todos los documentos; acaba dentro de {@code Styles}, para añadir reglas. */
@@ -177,8 +177,8 @@ class SchemaCoverageTest {
         }
         // Una sección con solo Page overlay no tiene contenido.
         t.put("Page overlay", new Template(HEADER + "\tBlock:\n\tPage overlay:\n\t\t{}"));
-        // Lines necesita Wrap.
-        t.put("Flex", new Template(HEADER + "\tFlex:\n\t\tWrap: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap")));
+        // Line distribution necesita Wrap.
+        t.put("Stack", new Template(HEADER + "\tStack:\n\t\tWrap: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap")));
         t.put("Grid", new Template(HEADER + "\tGrid:\n\t\t{}\n\t\tArea:\n\t\t\tBlock:"));
         for (String text : List.of("Text", "Paragraph")) {
             t.put(text, new Template(HEADER + "\t" + text + ":\n\t\t{}\n\t\tContent >>\n\t\t\tHola", Set.of("Content")));
@@ -201,9 +201,9 @@ class SchemaCoverageTest {
         // Un índice necesita algún encabezado que listar.
         t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
-        t.put("Item", new Template(HEADER + "\tFlex:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
-        // Un ítem solo se alinea en el eje cruzado: Horizontal, en un Flex vertical.
-        t.put("Item > Horizontal", new Template(HEADER + "\tFlex:\n\t\tDirection: vertical\n\t\tItem:\n\t\t\t{}\n"
+        t.put("Item", new Template(HEADER + "\tStack:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
+        // Un ítem solo se alinea en el eje cruzado: Horizontal, en un Stack vertical.
+        t.put("Item > Horizontal", new Template(HEADER + "\tStack:\n\t\tDirection: vertical\n\t\tItem:\n\t\t\t{}\n"
                 + "\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
         String table = HEADER + "\tTable:\n\t\tColumn sizes: 100\n";

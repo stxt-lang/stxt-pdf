@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Flex:
+		Stack:
 			Item:
 				Columns:
 					Count: 2

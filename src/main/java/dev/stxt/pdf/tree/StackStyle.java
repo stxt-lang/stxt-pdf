@@ -6,24 +6,24 @@ import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades del elemento {@code Flex} (referencia/componentes/flex.md): el eje, el reparto y el hueco entre ítems
+ * Las propiedades del elemento {@code Stack} (referencia/componentes/stack.md): el eje, el reparto y el hueco entre ítems
  * y líneas. No se heredan.
  */
-public final class FlexStyle extends StyleGroup {
+public final class StackStyle extends StyleGroup {
 
     private Direction direction = Direction.HORIZONTAL;
     private boolean wrap;
     /** {@code Horizontal} y {@code Vertical} como se escribieron; {@code null} = sin declarar. */
     private Distribution horizontal;
     private Distribution vertical;
-    private Distribution lines = Distribution.STRETCH;
+    private Distribution lineDistribution = Distribution.STRETCH;
     /** {@code Gap}: entre filas y entre columnas. */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
     /** Si {@code Gap} se escribió con dos valores. */
     private boolean gapPair;
 
-    FlexStyle() {
+    StackStyle() {
     }
 
     public Direction direction() {
@@ -59,21 +59,21 @@ public final class FlexStyle extends StyleGroup {
 
     /**
      * {@code Horizontal} o {@code Vertical}, la del eje cruzado: la alineación de los ítems. Por defecto, {@code
-     * stretch}. Que sea una alineación lo comprueba {@code ModelValidator.validateFlex}.
+     * stretch}. Que sea una alineación lo comprueba {@code ModelValidator.validateStack}.
      */
     public Alignment crossAxis() {
         Distribution v = isHorizontal() ? vertical : horizontal;
         return v != null ? Alignment.valueOf(v.name()) : Alignment.STRETCH;
     }
 
-    /** La clave de la propiedad del eje principal ({@code flex.horizontal} o {@code flex.vertical}), para su línea. */
+    /** La clave de la propiedad del eje principal ({@code stack.horizontal} o {@code stack.vertical}), para su línea. */
     String mainAxisKey() {
-        return isHorizontal() ? PropertyKey.FLEX_HORIZONTAL : PropertyKey.FLEX_VERTICAL;
+        return isHorizontal() ? PropertyKey.STACK_HORIZONTAL : PropertyKey.STACK_VERTICAL;
     }
 
     /** La clave de la propiedad del eje cruzado, para su línea. */
     String crossAxisKey() {
-        return isHorizontal() ? PropertyKey.FLEX_VERTICAL : PropertyKey.FLEX_HORIZONTAL;
+        return isHorizontal() ? PropertyKey.STACK_VERTICAL : PropertyKey.STACK_HORIZONTAL;
     }
 
     /** Lo que se escribió en el eje cruzado; {@code null} si no se declaró. */
@@ -91,13 +91,13 @@ public final class FlexStyle extends StyleGroup {
         vertical = v;
     }
 
-    public Distribution lines() {
-        return lines;
+    public Distribution lineDistribution() {
+        return lineDistribution;
     }
 
-    void setLines(Distribution v) {
+    void setLineDistribution(Distribution v) {
         writable();
-        lines = v;
+        lineDistribution = v;
     }
 
     public Value rowGap() {

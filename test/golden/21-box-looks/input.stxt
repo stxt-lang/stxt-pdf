@@ -7,7 +7,7 @@ Document (dev.stxt.pdf):
 		Height: 300
 		Margin: 20
 	Section:
-		Flex:
+		Stack:
 			Id: row1
 			Gap: 10
 			Box:
@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
 						Height: 50
 						Corner radius: 0 20 0 20
 						Background: #B5651D
-		Flex:
+		Stack:
 			Id: row2
 			Gap: 10
 			Box:
@@ -71,7 +71,7 @@ Document (dev.stxt.pdf):
 						Border: 0 0 0 4
 						Border color: #B5651D
 						Background: #F1EFE8
-		Flex:
+		Stack:
 			Id: row3
 			Gap: 10
 			Box:
@@ -98,7 +98,7 @@ Document (dev.stxt.pdf):
 							Height: 50
 							Corner radius: 8
 							Background: linear(180, #12315A00, #12315A)
-		Flex:
+		Stack:
 			Id: row4
 			Gap: 10
 			Box:
@@ -106,7 +106,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Image: test/wide.png
 					Id: photo
-					Fit: cover
+					Fit: fill
 					Box:
 						Width: 50
 						Height: 50
@@ -114,7 +114,7 @@ Document (dev.stxt.pdf):
 			Item:
 				Image: test/wide.png
 					Id: framed
-					Fit: cover
+					Fit: fill
 					Box:
 						Width: 100
 						Height: 50

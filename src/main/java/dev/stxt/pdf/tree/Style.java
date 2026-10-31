@@ -20,8 +20,8 @@ import java.util.Map;
  *
  * <p>Las propiedades van por grupos, cada uno en su clase: los del documento ({@link TypographyStyle},
  * {@link BoxStyle} y {@link BreakStyle}, referencia/comun/estructura.md) y los de un tipo de elemento ({@link
- * FlexStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle}, {@link ImageStyle} y
- * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.flex().direction()}, {@code
+ * StackStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle}, {@link ImageStyle} y
+ * {@link TableOfContentsStyle}). Un algoritmo lee solo los suyos: {@code style.stack().direction()}, {@code
  * style.box().margin()}. En el propio {@code Style} quedan las propiedades que definen el elemento
  * (referencia/comun/estructura.md y referencia/componentes/frame-and-overlays.md: el layout y la posición, que
  * salen del elemento, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, el giro, {@code Link},
@@ -45,7 +45,7 @@ public final class Style extends StyleGroup {
     private TypographyStyle typography = new TypographyStyle();
     private final BoxStyle box = new BoxStyle();
     private final BreakStyle breaks = new BreakStyle();
-    private final FlexStyle flex = new FlexStyle();
+    private final StackStyle stack = new StackStyle();
     private final GridStyle grid = new GridStyle();
     private final ItemStyle item = new ItemStyle();
     private final ListStyle list = new ListStyle();
@@ -104,9 +104,9 @@ public final class Style extends StyleGroup {
         return breaks;
     }
 
-    /** Las propiedades de {@code Flex} (referencia/componentes/flex.md). */
-    public FlexStyle flex() {
-        return flex;
+    /** Las propiedades de {@code Stack} (referencia/componentes/stack.md). */
+    public StackStyle stack() {
+        return stack;
     }
 
     /** Las propiedades de {@code Grid} y {@code Table} (referencia/componentes/grid.md). */
@@ -115,7 +115,7 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * Las de {@code Item} y {@code Area}, o la celda de una tabla (referencia/componentes/flex.md y
+     * Las de {@code Item} y {@code Area}, o la celda de una tabla (referencia/componentes/stack.md y
      * referencia/componentes/grid.md).
      */
     public ItemStyle item() {
@@ -244,7 +244,7 @@ public final class Style extends StyleGroup {
     // --- Líneas de las propiedades -------------------------------------------------------------------
     /**
      * Línea de cada propiedad declarada, por su clave ({@link PropertyKey}): el nombre canónico ({@code "height"}; las
-     * de {@code Flex}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.row-sizes"}). Es del documento o, si la
+     * de {@code Stack}, {@code Grid} e {@code Item}, con prefijo: {@code "grid.row-sizes"}). Es del documento o, si la
      * propiedad llega de una regla suya, del documento de estilos aparte. Las de {@link #LINED_PROPERTIES} se heredan
      * con su valor, para señalar dónde se declaró.
      */
@@ -327,7 +327,7 @@ public final class Style extends StyleGroup {
         typography.close();
         box.close();
         breaks.close();
-        flex.close();
+        stack.close();
         grid.close();
         item.close();
         list.close();

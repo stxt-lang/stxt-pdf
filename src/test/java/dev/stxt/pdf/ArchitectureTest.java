@@ -51,12 +51,12 @@ class ArchitectureTest {
 
     /**
      * Lo que puede usar cada algoritmo de {@code layout} de los demás: el bloque coloca marcadores de lista
-     * (texto) y cajas posicionadas, flex y grid colocan sus ítems posicionados y la tabla es un grid. Todos usan
+     * (texto) y cajas posicionadas, stack y grid colocan sus ítems posicionados y la tabla es un grid. Todos usan
      * las piezas de {@code layout}, que no cuentan.
      */
     private static final Map<String, Set<String>> ALLOWED_IN_LAYOUT = Map.of(
             "block", Set.of("inline", "position"),
-            "flex", Set.of("position"),
+            "stack", Set.of("position"),
             "grid", Set.of("position"),
             "table", Set.of("grid"));
 

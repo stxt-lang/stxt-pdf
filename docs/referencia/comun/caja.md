@@ -5,7 +5,7 @@
 Cada caja tiene cuatro rectángulos concéntricos: **contenido**, **relleno** (contenido + `Padding`), **borde**
 (relleno + `Border`) y **margen** (borde + `Margin`).
 
-`Width` y `Height` (y sus mínimos y máximos, y `Basis`) miden siempre la **caja de borde**: una caja con `Width: 200`
+`Width` y `Height` (y sus mínimos y máximos, y `Base size`) miden siempre la **caja de borde**: una caja con `Width: 200`
 ocupa 200 pt antes de los márgenes, con el relleno y el borde dentro. No hay forma de que midan la caja de contenido.
 
 ## El contenedor de referencia
@@ -28,7 +28,7 @@ El modelo de caja. No se hereda.
 |---|---|---|---|
 | `Width` | número, %, `auto`, `narrowest`, `natural`, `fit` | `auto` | |
 | `Height` | número, %, `auto` | `auto` | `auto` es el alto del contenido. |
-| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Flex` y `Grid`, y 0 en el resto. |
+| `Min width`, `Min height` | número, %, `auto` | `auto` | `auto` = ancho más estrecho en ítems de `Stack` y `Grid`, y 0 en el resto. |
 | `Max width`, `Max height` | número, % | sin máximo | |
 | `Aspect ratio` | `ancho/alto` o número | sin valor | Si un eje es `auto` y el otro es conocido, se deduce. Ejemplo: `16/9`. Con `Width` y `Height` declarados es un error (`ASPECT_RATIO_CONFLICT`). |
 | `Margin` | 1 a 4 valores (número, %, `auto`) | `0` | Puede ser negativo. `auto` solo centra (ver [márgenes `auto`](#márgenes-auto)). |
@@ -54,7 +54,7 @@ El modelo de caja. No se hereda.
   `auto`, ese absorbe el sobrante;
 - **en un `Overlay` o un `Page overlay`**, con inicio, tamaño y fin declarados ([posicionados](../componentes/frame-and-overlays.md#overlay)).
 
-Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Flex` y `Grid` (que se alinean
+Los márgenes verticales `auto` en flujo de bloque y los márgenes `auto` de los ítems de `Stack` y `Grid` (que se alinean
 con `Horizontal` y `Vertical`) son errores.
 
 > **Decisión:** un margen `auto` que no centraría nada es un error y no un 0 silencioso: con ancho `auto` la caja ocupa
@@ -72,15 +72,15 @@ línea (**ancho natural**):
 | `Text` | palabra más ancha | párrafo más largo en una línea |
 | `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del ancho más estrecho de los hijos | máximo del ancho natural de los hijos |
-| `Flex` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
-| `Flex` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
-| `Flex` vertical | máximo de los ítems | máximo de los ítems |
+| `Stack` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
+| `Stack` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
+| `Stack` vertical | máximo de los ítems | máximo de los ítems |
 | `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su ancho natural también como mínimo, más los huecos |
 | `Columns` | ver [Columns](../componentes/columns.md#tamaños-intrínsecos) | |
 
-Una caja con `Width` fijo tiene ese valor como ancho más estrecho y ancho natural (el mínimo automático de un ítem de `Flex` mira
-en cambio su contenido, [Flex](../componentes/flex.md#algoritmo)). `Overlay` y `Page overlay` no aportan nada a sus ancestros.
-En `Flex` se usan los tamaños intrínsecos de cada ítem tal cual, sin tener en cuenta `Basis`, `Grow` ni `Shrink`. En
+Una caja con `Width` fijo tiene ese valor como ancho más estrecho y ancho natural (el mínimo automático de un ítem de `Stack` mira
+en cambio su contenido, [Stack](../componentes/stack.md#algoritmo)). `Overlay` y `Page overlay` no aportan nada a sus ancestros.
+En `Stack` se usan los tamaños intrínsecos de cada ítem tal cual, sin tener en cuenta `Base size`, `Grow` ni `Shrink`. En
 `Grid`, el ancho natural hace que las fracciones lleguen al ancho natural de su contenido.
 
 ### Definido e indefinido

@@ -72,7 +72,7 @@ class ListsTest {
 
     @Test
     void noneHasNoMarkerAndNeedsNoLine() {
-        Box list = root("\tList:", "\t\tMarker: none", "\t\tList item:", "\t\t\tFlex:",
+        Box list = root("\tList:", "\t\tMarker: none", "\t\tList item:", "\t\t\tStack:",
                 "\t\t\t\tItem:", "\t\t\t\t\tText: a").children().get(0);
         assertNull(list.children().get(0).marker());
     }
@@ -98,9 +98,9 @@ class ListsTest {
     }
 
     @Test
-    void aListCanBeAFlexItem() {
-        Box flex = root("\tFlex:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
+    void aListCanBeAStackItem() {
+        Box stack = root("\tStack:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: a").children().get(0);
-        assertEquals(Element.LIST, flex.children().get(0).element());
+        assertEquals(Element.LIST, stack.children().get(0).element());
     }
 }

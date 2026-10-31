@@ -10,15 +10,15 @@
 | **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Columns`, cada columna ([Cortes](cortes.md#modelo)). |
 | **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](caja.md#el-contenedor-de-referencia)). |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](capas-y-giro.md)). |
-| **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta el colapso de márgenes ([Block](../componentes/block.md#cajas-que-aíslan-los-márgenes)). |
+| **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta la fusión de márgenes ([Block](../componentes/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](valores.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color, ...)` ([La caja](caja.md#degradado)). |
-| **Elemento** | Un nodo del documento que es una caja: `Block`, `Flex`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](estructura.md#elementos)). |
+| **Elemento** | Un nodo del documento que es una caja: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](estructura.md#elementos)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Overlay` y `Page overlay`. |
 | **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `TOC 1` a `TOC 6`. |
 | **Elemento posicionado** | `Frame`, `Overlay` o `Page overlay`. |
 | **Enlace** | `Link` de una caja o `[texto](destino)` de Markdown: una zona del PDF que lleva a una URL o a otra caja ([Enlaces](enlaces.md)). |
-| **Envoltorio** | `Item` o `Area`. No es una caja: añade al elemento que contiene cómo participa en su `Flex` o su `Grid`. |
+| **Envoltorio** | `Item` o `Area`. No es una caja: añade al elemento que contiene cómo participa en su `Stack` o su `Grid`. |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph` o una `Cell`, con `Markup: markdown` ([Formato del texto](formato-del-texto.md#formato-en-línea-markup)). |
 | **Fragmento** | Parte de una caja que cae en un contenedor de fragmentos. |
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve, y posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](capas-y-giro.md#giro-rotate)). |

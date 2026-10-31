@@ -62,8 +62,8 @@ Admiten `Id`, `Style`, `Link`, `Box`, `Typography`, `Break` y `Rotate`. Necesita
 - Ocupan todo el ancho disponible, salvo que declaren `Width`, y miden de alto lo que sus líneas.
 - Se parten entre páginas entre dos líneas, sin dejar líneas sueltas (`Widows` y `Orphans`).
 - Una palabra más ancha que la línea es un error: no se parten palabras.
-- Como ítem de un `Flex` en fila, un texto parte de lo que mide sin partir ninguna línea y se estrecha si no hay sitio
-  ([Flex](flex.md)).
+- Como ítem de un `Stack` en fila, un texto parte de lo que mide sin partir ninguna línea y se estrecha si no hay sitio
+  ([Stack](stack.md)).
 
 ## ¿`Text` o `Paragraph`?
 

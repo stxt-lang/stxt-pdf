@@ -34,7 +34,7 @@ class UnitBreakerTest {
     private static final int PERFECT = BreakAppeal.PERFECT_BREAK;
 
     private final Engine engine = new Engine();
-    private final Box container = new StyleEditor().box("C", Element.FLEX);
+    private final Box container = new StyleEditor().box("C", Element.STACK);
     private final BoxModel model = new BoxModel(Insets.ZERO, Insets.ZERO, Insets.ZERO, 100, NONE, 0, NONE,
             Edges.OPEN);
 

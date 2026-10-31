@@ -22,8 +22,8 @@ Document (dev.stxt.pdf):
 			Padding: 6 0 0 0
 			Border: 0.5 0 0 0
 			Border color: #C9D5E3
-		Flex:
-			Horizontal: between
+		Stack:
+			Horizontal: justify
 			Item:
 				Text: Cooperativa Solvent · Informe anual 2025
 			Item:
@@ -95,7 +95,7 @@ Document (dev.stxt.pdf):
 						Color: #C9D5E3
 					Box:
 						Margin: 0 0 90 0
-				Flex:
+				Stack:
 					Gap: 30
 					Item:
 						Grow: 1

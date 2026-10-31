@@ -170,7 +170,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
                 }
                 return result(balance(fill, single, true));
             }
-            // Sin fragmentación (un ítem de flex con Height), las columnas son la única página que hay.
+            // Sin fragmentación (un ítem de stack con Height), las columnas son la única página que hay.
             boolean atStart = !space.fragmenting() || space.atFragmentainerStart();
             Fill fill = fill(limit, atStart);
             if (fill.before()) {

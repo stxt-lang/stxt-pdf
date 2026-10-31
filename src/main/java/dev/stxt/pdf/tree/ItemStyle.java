@@ -6,15 +6,15 @@ import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Value;
 
 /**
- * Las propiedades de {@code Item} y {@code Area} (referencia/componentes/flex.md y referencia/componentes/grid.md), que
- * pasan al elemento que envuelven: cómo crece y se encoge en un {@code Flex}, dónde va en un {@code Grid} (o la celda
+ * Las propiedades de {@code Item} y {@code Area} (referencia/componentes/stack.md y referencia/componentes/grid.md), que
+ * pasan al elemento que envuelven: cómo crece y se encoge en un {@code Stack}, dónde va en un {@code Grid} (o la celda
  * que le da la tabla) y su alineación. No se heredan.
  */
 public final class ItemStyle extends StyleGroup {
 
     private double grow = 0;
     private double shrink = 1;
-    private Value basis = Value.AUTO;
+    private Value baseSize = Value.AUTO;
     /**
      * Colocación pedida por {@code Area}, con los nombres ya resueltos, o la que da la tabla a
      * cada {@code Cell}; {@link Cell#AUTO} = colocación automática.
@@ -46,13 +46,13 @@ public final class ItemStyle extends StyleGroup {
         shrink = v;
     }
 
-    public Value basis() {
-        return basis;
+    public Value baseSize() {
+        return baseSize;
     }
 
-    void setBasis(Value v) {
+    void setBaseSize(Value v) {
         writable();
-        basis = v;
+        baseSize = v;
     }
 
     public Cell area() {

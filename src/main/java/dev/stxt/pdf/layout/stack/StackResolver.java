@@ -1,19 +1,19 @@
-package dev.stxt.pdf.layout.flex;
+package dev.stxt.pdf.layout.stack;
 
 import java.util.List;
 
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
- * Resuelve los tamaños flexibles de una línea flex (referencia/componentes/flex.md; Flexbox §9.7).
+ * Resuelve los tamaños flexibles de una línea stack (referencia/componentes/stack.md; Flexbox §9.7).
  *
  * <p>Si sobra espacio se crece en proporción a {@code Grow}; si falta, se encoge en proporción a
- * {@code Shrink × Basis}. Los ítems que chocan con su mínimo o máximo se congelan y el reparto se
+ * {@code Shrink × Base size}. Los ítems que chocan con su mínimo o máximo se congelan y el reparto se
  * repite entre los demás.</p>
  */
-public final class FlexResolver {
+public final class StackResolver {
 
-    private FlexResolver() {
+    private StackResolver() {
     }
 
     /**
@@ -21,20 +21,20 @@ public final class FlexResolver {
      * @param available espacio del eje principal ya descontados los huecos
      * @return tamaño principal final de cada ítem
      */
-    public static double[] resolve(List<FlexItem> items, double available) {
+    public static double[] resolve(List<StackItem> items, double available) {
         int n = items.size();
         double[] target = new double[n];
         boolean[] frozen = new boolean[n];
 
         double hypotheticalSum = 0;
-        for (FlexItem it : items) {
+        for (StackItem it : items) {
             hypotheticalSum += it.hypothetical();
         }
         boolean growing = hypotheticalSum < available;
 
         // Ítems inflexibles: factor 0, o base fuera del sentido del reparto.
         for (int i = 0; i < n; i++) {
-            FlexItem it = items.get(i);
+            StackItem it = items.get(i);
             double factor = growing ? it.grow() : it.shrink();
             if (factor == 0
                     || (growing && it.basis() > it.hypothetical())
@@ -52,7 +52,7 @@ public final class FlexResolver {
             for (int i = 0; i < n; i++) {
                 if (!frozen[i]) {
                     anyActive = true;
-                    FlexItem it = items.get(i);
+                    StackItem it = items.get(i);
                     factorSum += growing ? it.grow() : it.shrink();
                     scaledSum += it.scaledShrink();
                 }
@@ -74,7 +74,7 @@ public final class FlexResolver {
                 if (frozen[i]) {
                     continue;
                 }
-                FlexItem it = items.get(i);
+                StackItem it = items.get(i);
                 if (growing) {
                     target[i] = it.basis() + (factorSum > 0 ? free * it.grow() / factorSum : 0);
                 } else {
@@ -109,7 +109,7 @@ public final class FlexResolver {
         return target;
     }
 
-    private static double free(List<FlexItem> items, double[] target, boolean[] frozen, double available) {
+    private static double free(List<StackItem> items, double[] target, boolean[] frozen, double available) {
         double used = 0;
         for (int i = 0; i < items.size(); i++) {
             used += frozen[i] ? target[i] : items.get(i).basis();

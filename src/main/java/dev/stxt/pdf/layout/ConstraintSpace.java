@@ -10,18 +10,18 @@ import java.util.OptionalDouble;
  *
  * @param availableWidth          ancho disponible; siempre conocido
  * @param availableHeight         alto disponible; vacío = indefinido
- * @param fixedWidth              el padre (flex o grid) impone el ancho exacto
+ * @param fixedWidth              el padre (stack o grid) impone el ancho exacto
  * @param fixedHeight             el padre impone el alto exacto (por ejemplo, al estirar)
  * @param percentBaseWidth        base para porcentajes horizontales
  * @param percentBaseHeight       base para porcentajes verticales; vacío = indefinida
  * @param fragmentainerRemaining  espacio que queda en la página actual desde el borde superior de
  *                                la caja (puede ser negativo); vacío = sin fragmentación (una
- *                                caja que no se parte, como un ítem de flex)
+ *                                caja que no se parte, como un ítem de stack)
  * @param atFragmentainerStart    no hay nada antes de la caja en esta página: debe colocar algo
  *                                aunque no quepa (garantía de progreso)
  * @param contentHeight           se mide el alto del contenido: la caja ignora su {@code Height}
- *                                y su {@code Aspect ratio} (el mínimo automático de un ítem flex
- *                                en {@code column}, referencia/componentes/flex.md); no pasa a sus hijos
+ *                                y su {@code Aspect ratio} (el mínimo automático de un ítem stack
+ *                                en {@code column}, referencia/componentes/stack.md); no pasa a sus hijos
  */
 public record ConstraintSpace(
         double availableWidth,
@@ -60,7 +60,7 @@ public record ConstraintSpace(
     }
 
     /**
-     * El padre impone el ancho y, si lo hay, el alto, sin fragmentación: los ítems de flex y grid
+     * El padre impone el ancho y, si lo hay, el alto, sin fragmentación: los ítems de stack y grid
      * y las cajas {@code absolute}.
      */
     public static ConstraintSpace fixed(double width, OptionalDouble height, double baseWidth,

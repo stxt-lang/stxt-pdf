@@ -119,7 +119,7 @@ huecos ([La caja](../comun/caja.md#tamaños-intrínsecos)).
 ## Cortes
 
 Un `Grid` se corta entre filas. Una fila que no cabe en una página entera se parte con sus ítems en paralelo, y las filas
-que ocupa un mismo ítem se parten juntas ([Cortes](../comun/cortes.md#cortes-en-flex-grid-y-table)).
+que ocupa un mismo ítem se parten juntas ([Cortes](../comun/cortes.md#cortes-en-stack-grid-y-table)).
 
 ## Posicionadas
 

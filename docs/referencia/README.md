@@ -46,7 +46,7 @@ Si difiere del resumen de [la estructura](comun/estructura.md#schema), manda el 
 | [Encabezados](componentes/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](componentes/list.md) | `List` y `List item` |
 | [`Table`](componentes/table.md) | `Table`, `Header rows`, `Body`, `Footer rows`, `Row` y `Cell` |
-| [`Flex`](componentes/flex.md) | `Flex` e `Item` |
+| [`Stack`](componentes/stack.md) | `Stack` e `Item` |
 | [`Grid`](componentes/grid.md) | `Grid` y `Area` |
 | [`Columns`](componentes/columns.md) | `Columns` |
 | [`Frame`, `Overlay` y `Page overlay`](componentes/frame-and-overlays.md) | Los elementos posicionados |

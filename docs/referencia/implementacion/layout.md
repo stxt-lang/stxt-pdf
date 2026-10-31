@@ -9,7 +9,7 @@ páginas de comportamiento común y de cada componente, y aquí, cómo está hec
 Los algoritmos no conocen el motor: dependen de **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
 `measurer`, `natural`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
 layout o de tamaños intrínsecos pasa por `context.layout(...)` / `context.intrinsic(...)`**, nunca directamente al
-algoritmo, para usar la `LayoutCache` (sin ella, flex y grid anidados crecen de forma exponencial).
+algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crecen de forma exponencial).
 
 `Engine.layOutDocument` es la entrada: valida las fuentes y las imágenes, pagina con el `Paginator`, comprueba los
 desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
@@ -29,7 +29,7 @@ El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `abso
 
 Tiene dos métodos: `contentIntrinsic(box)`, los anchos más estrecho y natural del contenido (sin borde, relleno, margen
 ni `Width`, e independientes del espacio), y `layout(box, space, from)`. Los de la caja de margen los da
-`context.intrinsic(box)` con `BoxModel.intrinsic`, y los del contenido, `context.contentIntrinsic(box)` (el mínimo automático de un ítem de `Flex`).
+`context.intrinsic(box)` con `BoxModel.intrinsic`, y los del contenido, `context.contentIntrinsic(box)` (el mínimo automático de un ítem de `Stack`).
 
 ## `ConstraintSpace` y `LayoutResult`
 
@@ -47,14 +47,14 @@ estática relativa a la caja de contenido de quien devuelve el resultado) y los 
 Margen, borde, relleno, ancho de la caja de borde y alto si es definido, a partir del `ConstraintSpace`. Es la parte común de
 todos los algoritmos. `childSpace()` da el espacio de los hijos en flujo y `BoxModel.intrinsic(...)` pasa de tamaños
 intrínsecos del contenido a los de la caja de margen. Los márgenes `auto` valen 0: el centrado lo hace el padre, que es quien
-coloca al hijo. El dimensionado de una imagen está en `BoxModel.replaced`, para que las sondas de flex, grid y absolute midan
+coloca al hijo. El dimensionado de una imagen está en `BoxModel.replaced`, para que las sondas de `Stack`, `Grid` y los posicionados midan
 bien la imagen: se usa siempre `BoxModel.resolve(box, space, context)`, que le pasa el tamaño natural. Primero se aplica el
 máximo y luego el mínimo. Si chocan, gana el mínimo (`Sizing.constrain`).
 
-## Colapso de márgenes
+## Fusión de márgenes
 
 Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que salen por arriba o por abajo (y si está vacía y
-deja pasar los suyos). El padre los colapsa con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
+deja pasar los suyos). El padre los fusiona con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
 guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
 
 ## Grid
@@ -118,7 +118,7 @@ huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`
 comparando tokens. El token de la raíz no acumula alto: cada página tiene el área útil entera.
 
 `Slice` calcula el alto, el borde y el relleno de cada fragmento (`Edges: open` y `closed`), y `Slice.contentRemaining`
-da lo que queda al contenido. Flex y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
+da lo que queda al contenido. Stack y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
 que cabe en la página. Una unidad que no cabe ni al principio de página parte sus ítems en paralelo, repitiendo su layout con
 `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de

@@ -1,4 +1,4 @@
-# Case: Isolate margins en un Block girado, que ya corta el colapso de márgenes
+# Case: Isolate margins en un Block girado, que ya corta la fusión de márgenes
 # Code: ISOLATE_MARGINS_IN_ROTATED
 # Line: 18
 Document (dev.stxt.pdf):

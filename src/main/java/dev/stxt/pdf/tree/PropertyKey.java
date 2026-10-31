@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Claves de las propiedades en {@link Style#declared}, {@link Style#isDeclared} y
  * {@link Style#line}: el nombre canónico de la propiedad ({@code min-width}); las de
- * {@code Flex}, {@code Grid} e {@code Item} (o {@code Area}), con prefijo ({@code grid.rows}),
+ * {@code Stack}, {@code Grid} e {@code Item} (o {@code Area}), con prefijo ({@code grid.rows}),
  * porque el mismo nombre está en varios; y las de {@code Typography} y {@code Break} con nombre
  * corto, con su nombre interno ({@code Size} es {@code font-size}).
  *
@@ -59,15 +59,15 @@ public final class PropertyKey {
     public static final String KEEP_TOGETHER = "keep-together";
     public static final String DECORATION = "edges";
 
-    // Flex, Grid e Item
-    public static final String FLEX_HORIZONTAL = "flex.horizontal";
-    public static final String FLEX_VERTICAL = "flex.vertical";
-    public static final String FLEX_LINES = "flex.lines";
-    public static final String FLEX_GAP = "flex.gap";
+    // Stack, Grid e Item
+    public static final String STACK_HORIZONTAL = "stack.horizontal";
+    public static final String STACK_VERTICAL = "stack.vertical";
+    public static final String STACK_LINE_DISTRIBUTION = "stack.line-distribution";
+    public static final String STACK_GAP = "stack.gap";
     public static final String GRID_ROWS = "grid.row-sizes";
     public static final String GRID_GAP = "grid.gap";
     public static final String ITEM_GROW = "item.grow";
-    public static final String ITEM_BASIS = "item.basis";
+    public static final String ITEM_BASE_SIZE = "item.base-size";
     public static final String ITEM_HORIZONTAL = "item.horizontal";
     public static final String ITEM_VERTICAL = "item.vertical";
     /** La colocación de un ítem de grid: el valor de su {@code Area}, o la que calcula una {@code Table}. */
@@ -89,9 +89,9 @@ public final class PropertyKey {
         return INTERNAL.getOrDefault(canonicalName, canonicalName);
     }
 
-    /** Clave de una propiedad de {@code Flex} ({@code gap} → {@code flex.gap}). */
-    static String flex(String canonicalName) {
-        return "flex." + canonicalName;
+    /** Clave de una propiedad de {@code Stack} ({@code gap} → {@code stack.gap}). */
+    static String stack(String canonicalName) {
+        return "stack." + canonicalName;
     }
 
     /** Clave de una propiedad de {@code Grid} ({@code rows} → {@code grid.rows}). */

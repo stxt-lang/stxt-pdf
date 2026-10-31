@@ -1,6 +1,6 @@
-# Case: Ítem con marcador que empieza con un Flex
-# Code: LIST_ITEM_WITHOUT_LINE
-# Line: 19
+# Case: stretch en el eje principal de un Stack, que reparte el sobrante y no estira
+# Code: VALUE_NOT_ALLOWED
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,9 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		List:
-			Marker: bullet
-			List item:
-				Flex:
-					Item:
-						Text: Uno
+		Stack:
+			Horizontal: stretch
+			Item:
+				Text: Hola

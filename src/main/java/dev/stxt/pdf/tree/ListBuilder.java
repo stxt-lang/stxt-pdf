@@ -75,7 +75,7 @@ final class ListBuilder {
         Box b = item;
         while (b.style().layout() != Layout.INLINE) {
             String problem = null;
-            if (b.style().layout() == Layout.FLEX || b.style().layout() == Layout.GRID) {
+            if (b.style().layout() == Layout.STACK || b.style().layout() == Layout.GRID) {
                 problem = "empieza con un " + b.element().label();
             } else if (b.isImage()) {
                 problem = "empieza con una Image";

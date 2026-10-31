@@ -12,17 +12,17 @@ class ImageFitTest {
     private static final Rect BOX = new Rect(10, 20, 100, 100);
 
     @Test
-    void containFitsTheWholeImageCentered() {
-        assertEquals(new Rect(10, 45, 100, 50), ImageFit.place(Fit.CONTAIN, BOX, 150, 75));
+    void insideFitsTheWholeImageCentered() {
+        assertEquals(new Rect(10, 45, 100, 50), ImageFit.place(Fit.INSIDE, BOX, 150, 75));
     }
 
     @Test
-    void coverFillsTheBoxCentered() {
-        assertEquals(new Rect(-40, 20, 200, 100), ImageFit.place(Fit.COVER, BOX, 150, 75));
+    void fillCoversTheBoxCentered() {
+        assertEquals(new Rect(-40, 20, 200, 100), ImageFit.place(Fit.FILL, BOX, 150, 75));
     }
 
     @Test
-    void fillIsTheBox() {
+    void stretchIsTheBox() {
         assertEquals(BOX, ImageFit.place(Fit.STRETCH, BOX, 150, 75));
     }
 

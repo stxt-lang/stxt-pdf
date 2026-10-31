@@ -39,7 +39,7 @@ class PropertyKeyTest {
         assertEquals(PropertyKey.LINE_HEIGHT, PropertyKey.internal("line-height"));
         assertEquals(PropertyKey.GRID_ROWS, PropertyKey.grid("row-sizes"));
         assertEquals(PropertyKey.ITEM_GROW, PropertyKey.item("grow"));
-        assertEquals(PropertyKey.FLEX_GAP, PropertyKey.flex("gap"));
+        assertEquals(PropertyKey.STACK_GAP, PropertyKey.stack("gap"));
     }
 
     /** Las claves que puede guardar el builder: las propiedades, con su nombre interno o su prefijo. */
@@ -51,9 +51,9 @@ class PropertyKeyTest {
                 keys.add(PropertyKey.internal(canonical(node)));
             }
         });
-        for (String flex : children.get("Flex")) {
-            if (children.get(flex).isEmpty()) {
-                keys.add(PropertyKey.flex(canonical(flex)));
+        for (String stack : children.get("Stack")) {
+            if (children.get(stack).isEmpty()) {
+                keys.add(PropertyKey.stack(canonical(stack)));
             }
         }
         for (String grid : children.get("Grid")) {

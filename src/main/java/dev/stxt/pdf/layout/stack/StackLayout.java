@@ -1,4 +1,4 @@
-package dev.stxt.pdf.layout.flex;
+package dev.stxt.pdf.layout.stack;
 
 import dev.stxt.pdf.fragment.BreakRules;
 import dev.stxt.pdf.fragment.BreakToken;
@@ -30,20 +30,20 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
- * Layout {@code flex} (referencia/componentes/flex.md). Los ocho pasos:
+ * Layout {@code stack} (referencia/componentes/stack.md). Los ocho pasos:
  * <ol>
  *   <li>Espacio disponible en el eje principal.</li>
- *   <li>Base de cada ítem: {@code Basis}, el tamaño declarado o el ancho natural.</li>
+ *   <li>Base de cada ítem: {@code Base size}, el tamaño declarado o el ancho natural.</li>
  *   <li>Tamaño hipotético: base limitada por el mínimo (con {@code Min width: auto}, el tamaño
  *       del contenido, sin pasar del declarado).</li>
  *   <li>Repartir en líneas si {@code Wrap}.</li>
- *   <li>Resolver tamaños flexibles con {@link FlexResolver}.</li>
+ *   <li>Resolver tamaños flexibles con {@link StackResolver}.</li>
  *   <li>Tamaño cruzado: layout de cada ítem con su tamaño principal; la línea mide el mayor.</li>
  *   <li>Estirar los ítems con {@code stretch} y repetir su layout.</li>
  *   <li>Alinear en el eje principal, en el cruzado y las líneas.</li>
  * </ol>
  *
- * <p>Los tamaños de {@link FlexItem} son de caja de margen; los márgenes {@code auto} valen 0.
+ * <p>Los tamaños de {@link StackItem} son de caja de margen; los márgenes {@code auto} valen 0.
  * En un contenedor de una sola línea (sin {@code Wrap}) con tamaño cruzado definido, la línea
  * mide lo que el contenedor. En vertical, los ítems con {@code stretch} de un contenedor
  * de una sola línea se miden ya con el ancho del contenedor; en el resto de casos, con su ajuste
@@ -60,11 +60,11 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * vertical, con {@link UnitBreaker}; una línea (en vertical, un ítem) que no cabe en
  * una página se parte en paralelo. Un contenedor vertical con {@code Wrap} no se parte.</p>
  */
-public final class FlexLayout implements LayoutAlgorithm {
+public final class StackLayout implements LayoutAlgorithm {
 
     private final LayoutContext context;
 
-    public FlexLayout(LayoutContext context) {
+    public StackLayout(LayoutContext context) {
         this.context = context;
     }
 
@@ -73,7 +73,7 @@ public final class FlexLayout implements LayoutAlgorithm {
     public IntrinsicSizes contentIntrinsic(Box box) {
         Style s = box.style();
         // Sin containing block, un hueco en porcentaje cuenta como 0.
-        double gap = s.flex().columnGap().resolve(OptionalDouble.empty()).orElse(0);
+        double gap = s.stack().columnGap().resolve(OptionalDouble.empty()).orElse(0);
         List<Box> items = box.inFlowChildren();
         double maxMin = 0;
         double maxMax = 0;
@@ -88,9 +88,9 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         double gaps = gap * Math.max(0, items.size() - 1);
         IntrinsicSizes content;
-        if (s.flex().direction() == Direction.VERTICAL) {
+        if (s.stack().direction() == Direction.VERTICAL) {
             content = new IntrinsicSizes(maxMin, maxMax);
-        } else if (s.flex().wrap()) {
+        } else if (s.stack().wrap()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
         } else {
             content = new IntrinsicSizes(sumMin + gaps, sumMax + gaps);
@@ -109,7 +109,7 @@ public final class FlexLayout implements LayoutAlgorithm {
         final Box box;
         final Insets margin;
         final Alignment align;
-        FlexItem flex;
+        StackItem stack;
         /** En vertical: ancho de caja de borde con el que se mide el ítem. */
         double crossWidth;
         /** Tamaño principal final, de caja de margen. */
@@ -155,15 +155,15 @@ public final class FlexLayout implements LayoutAlgorithm {
             this.box = box;
             this.s = box.style();
             this.model = model;
-            this.row = s.flex().direction() == Direction.HORIZONTAL;
-            this.multiLine = s.flex().wrap();
+            this.row = s.stack().direction() == Direction.HORIZONTAL;
+            this.multiLine = s.stack().wrap();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
             this.crossSize = row ? contentHeight : OptionalDouble.of(contentWidth);
             // Base de los porcentajes: la caja de contenido en el eje de cada hueco (referencia/comun/valores.md).
-            double columnGap = s.flex().columnGap().resolve(contentWidth).orElse(0);
-            double rowGap = s.flex().rowGap().resolve(contentHeight).orElse(0);
+            double columnGap = s.stack().columnGap().resolve(contentWidth).orElse(0);
+            double rowGap = s.stack().rowGap().resolve(contentHeight).orElse(0);
             this.mainGap = row ? columnGap : rowGap;
             this.crossGap = row ? rowGap : columnGap;
             this.atStart = space.atFragmentainerStart();
@@ -209,7 +209,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             if (multiLine && crossSize.isPresent()) {
                 crossFree = crossSize.getAsDouble() - Sizing.sum(lineCross) - crossGap * Math.max(0, n - 1);
             }
-            if (s.flex().lines() == Distribution.STRETCH && crossFree > 0) {
+            if (s.stack().lineDistribution() == Distribution.STRETCH && crossFree > 0) {
                 for (int l = 0; l < n; l++) {
                     lineCross[l] += crossFree / n;
                 }
@@ -238,7 +238,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double[] lineCross = cross.lines();
             List<UnitBreaker.Placed> placed = new ArrayList<>();
             List<Span> spans = new ArrayList<>();
-            double[] lineDistribution = distribute(multiLine ? s.flex().lines() : Distribution.START, cross.free(), n);
+            double[] lineDistribution = distribute(multiLine ? s.stack().lineDistribution() : Distribution.START, cross.free(), n);
             double crossPos = lineDistribution[0];
             double mainExtent = 0;
             for (int l = 0; l < n; l++) {
@@ -249,7 +249,7 @@ public final class FlexLayout implements LayoutAlgorithm {
                 }
                 mainExtent = Math.max(mainExtent, used);
                 double free = mainSize.isPresent() ? mainSize.getAsDouble() - used : 0;
-                double[] d = distribute(s.flex().mainAxis(), free, line.size());
+                double[] d = distribute(s.stack().mainAxis(), free, line.size());
                 double mainPos = d[0];
                 if (row) {
                     spans.add(new Span(crossPos, crossPos + lineCross[l], line.stream().map(it -> it.box).toList()));
@@ -309,14 +309,14 @@ public final class FlexLayout implements LayoutAlgorithm {
                     : is.box().maxWidth().resolve(contentWidth).orElse(Double.POSITIVE_INFINITY) + margins;
             double min;
             if (is.box().minWidth().isAuto()) {
-                // Mínimo automático (referencia/componentes/flex.md): el ancho más estrecho de su contenido, sin pasar de Max
+                // Mínimo automático (referencia/componentes/stack.md): el ancho más estrecho de su contenido, sin pasar de Max
                 // width, y nunca más que el ancho declarado.
                 double content = Math.min(context.contentIntrinsic(b).narrowest() + extra + margins, max);
                 min = declared.isPresent() ? Math.min(content, declared.getAsDouble() + margins) : content;
             } else {
                 min = is.box().minWidth().resolve(contentWidth).orElse(0) + margins;
             }
-            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
+            it.stack = new StackItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
             return it;
         }
 
@@ -345,7 +345,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             double base = basis.orElse(sized.height().orElse(contentSize)) + margins;
             double min;
             if (is.box().minHeight().isAuto()) {
-                // Mínimo automático (referencia/componentes/flex.md): el alto de su contenido, sin pasar de Max height,
+                // Mínimo automático (referencia/componentes/stack.md): el alto de su contenido, sin pasar de Max height,
                 // y nunca más que el alto declarado.
                 double content = sized.height().isPresent()
                         ? context.layout(b, measure.measuringContentHeight(), null).fragment().height()
@@ -356,18 +356,18 @@ public final class FlexLayout implements LayoutAlgorithm {
             }
             double max = is.box().maxHeight() == null ? Double.POSITIVE_INFINITY
                     : is.box().maxHeight().resolve(contentHeight).orElse(Double.POSITIVE_INFINITY) + margins;
-            it.flex = new FlexItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
+            it.stack = new StackItem(base, is.item().grow(), is.item().shrink(), min, max, margins);
             return it;
         }
 
-        /** {@code Basis} en caja de borde; vacío si es {@code auto} o un porcentaje de un tamaño indefinido. */
+        /** {@code Base size} en caja de borde; vacío si es {@code auto} o un porcentaje de un tamaño indefinido. */
         OptionalDouble declaredBasis(Style is) {
-            return is.item().basis().resolve(mainSize);
+            return is.item().baseSize().resolve(mainSize);
         }
 
         Alignment alignment(Style is) {
-            Alignment own = s.flex().isHorizontal() ? is.item().vertical() : is.item().horizontal();
-            return own != null ? own : s.flex().crossAxis();
+            Alignment own = s.stack().isHorizontal() ? is.item().vertical() : is.item().horizontal();
+            return own != null ? own : s.stack().crossAxis();
         }
 
         // --- Pasos 4 a 7 ----------------------------------------------------------------------------
@@ -385,7 +385,7 @@ public final class FlexLayout implements LayoutAlgorithm {
             List<Item> current = new ArrayList<>();
             double used = 0;
             for (Item it : items) {
-                double h = it.flex.hypothetical();
+                double h = it.stack.hypothetical();
                 if (!current.isEmpty() && !fits(used + mainGap + h, limit)) {
                     lines.add(current);
                     current = new ArrayList<>();
@@ -401,11 +401,11 @@ public final class FlexLayout implements LayoutAlgorithm {
         void resolveMainSizes(List<Item> line) {
             if (mainSize.isEmpty()) {
                 // Sin tamaño principal definido no hay espacio libre: Grow no tiene efecto.
-                line.forEach(it -> it.main = it.flex.hypothetical());
+                line.forEach(it -> it.main = it.stack.hypothetical());
                 return;
             }
             double available = mainSize.getAsDouble() - mainGap * (line.size() - 1);
-            double[] sizes = FlexResolver.resolve(line.stream().map(it -> it.flex).toList(), available);
+            double[] sizes = StackResolver.resolve(line.stream().map(it -> it.stack).toList(), available);
             for (int i = 0; i < sizes.length; i++) {
                 line.get(i).main = sizes[i];
             }
@@ -480,8 +480,8 @@ public final class FlexLayout implements LayoutAlgorithm {
 
     /**
      * Reparto del sobrante {@code free} entre {@code n} elementos (tabla del eje principal,
-     * referencia/componentes/flex.md). Si falta sitio, {@code between} se alinea al principio y {@code around} y
-     * {@code evenly} se centran, como en CSS.
+     * referencia/componentes/stack.md). Si falta sitio, {@code justify} se alinea al principio y {@code around} y
+     * {@code distribute} se centran, como en CSS.
      *
      * @return {antes del primero, extra entre elementos}
      */
@@ -491,8 +491,8 @@ public final class FlexLayout implements LayoutAlgorithm {
         }
         if (free < 0) {
             d = switch (d) {
-                case BETWEEN -> Distribution.START;
-                case AROUND, EVENLY -> Distribution.CENTER;
+                case JUSTIFY -> Distribution.START;
+                case AROUND, DISTRIBUTE -> Distribution.CENTER;
                 default -> d;
             };
         }
@@ -500,9 +500,9 @@ public final class FlexLayout implements LayoutAlgorithm {
             case START, STRETCH -> new double[]{0, 0};
             case END -> new double[]{free, 0};
             case CENTER -> new double[]{free / 2, 0};
-            case BETWEEN -> new double[]{0, n > 1 ? free / (n - 1) : 0};
+            case JUSTIFY -> new double[]{0, n > 1 ? free / (n - 1) : 0};
             case AROUND -> new double[]{free / (2 * n), free / n};
-            case EVENLY -> new double[]{free / (n + 1), free / (n + 1)};
+            case DISTRIBUTE -> new double[]{free / (n + 1), free / (n + 1)};
         };
     }
 }

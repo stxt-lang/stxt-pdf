@@ -221,7 +221,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             return new LayoutResult(fragment, new BreakToken.Line(end, slice.consumed()),
                     end == texts.size() ? BreakAppeal.PERFECT_BREAK : appeal, List.of(), AdjoiningMargins.NONE);
         }
-        // Una caja sin líneas, borde, relleno ni alto deja colapsar sus márgenes (referencia/componentes/block.md).
+        // Una caja sin líneas, borde, relleno ni alto deja fusionar sus márgenes (referencia/componentes/block.md).
         boolean empty = first && lines.isEmpty() && slice.height() == 0 && model.openAtTop() && model.openAtBottom()
                 && !box.isolatesMargins();
         return LayoutResult.finished(fragment, List.of(), empty ? AdjoiningMargins.EMPTY_BOX : AdjoiningMargins.NONE);

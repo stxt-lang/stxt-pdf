@@ -62,7 +62,7 @@ import static dev.stxt.pdf.tree.ValueReader.value;
 /**
  * Lee las propiedades de una caja en su {@link Style}: los grupos {@code Box}, {@code Typography}
  * y {@code Break} (referencia/comun/estructura.md), que comparten los elementos y las reglas de
- * {@code Styles}, las propiedades de {@code Flex}, {@code Grid} y {@code Columns} y las de los envoltorios
+ * {@code Styles}, las propiedades de {@code Stack}, {@code Grid} y {@code Columns} y las de los envoltorios
  * {@code Item} y {@code Area}. Cada propiedad guarda su línea ({@link Style#declared}).
  *
  * <p>Los {@code switch} no tienen una rama {@code default} que asigne, y las tablas
@@ -72,9 +72,9 @@ import static dev.stxt.pdf.tree.ValueReader.value;
 final class PropertyReader {
 
     /**
-     * Propiedades del elemento {@code Flex} (la estructura completa está en el schema, referencia/comun/estructura.md).
+     * Propiedades del elemento {@code Stack} (la estructura completa está en el schema, referencia/comun/estructura.md).
      */
-    static final Set<String> FLEX = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "lines");
+    static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution");
     /** Propiedades de los elementos {@code Grid} y {@code Table}. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
     /** Propiedades del elemento {@code Columns}. */
@@ -226,19 +226,19 @@ final class PropertyReader {
         }
     }
 
-    /** Propiedades de flex, hijas del elemento {@code Flex}; su línea se guarda con prefijo ({@code flex.gap}). */
-    static void flex(Node p, Style s) {
-        s.declared(PropertyKey.flex(p.getCanonicalName()), p.getLine());
+    /** Propiedades de stack, hijas del elemento {@code Stack}; su línea se guarda con prefijo ({@code stack.gap}). */
+    static void stack(Node p, Style s) {
+        s.declared(PropertyKey.stack(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
-            case "direction" -> s.flex().setDirection(enumValue(Direction.class, p));
-            case "wrap" -> s.flex().setWrap(bool(p));
+            case "direction" -> s.stack().setDirection(enumValue(Direction.class, p));
+            case "wrap" -> s.stack().setWrap(bool(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
-                s.flex().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
+                s.stack().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
             }
-            case "horizontal" -> s.flex().setHorizontal(enumValue(Distribution.class, p));
-            case "vertical" -> s.flex().setVertical(enumValue(Distribution.class, p));
-            case "lines" -> s.flex().setLines(enumValue(Distribution.class, p));
+            case "horizontal" -> s.stack().setHorizontal(enumValue(Distribution.class, p));
+            case "vertical" -> s.stack().setVertical(enumValue(Distribution.class, p));
+            case "line-distribution" -> s.stack().setLineDistribution(enumValue(Distribution.class, p));
             default -> throw unread(p);
         }
     }
@@ -263,7 +263,7 @@ final class PropertyReader {
 
     /**
      * Propiedades de {@code Columns}, hijas del elemento (referencia/componentes/columns.md); su línea se guarda sin
-     * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Flex} y {@code Grid} lo lleva.
+     * prefijo ({@code separator}, {@code gap}): el {@code Gap} de {@code Stack} y {@code Grid} lo lleva.
      */
     static void columns(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
@@ -303,7 +303,7 @@ final class PropertyReader {
             switch (name) {
                 case "grow" -> s.item().setGrow(nonNegative(p));
                 case "shrink" -> s.item().setShrink(nonNegative(p));
-                case "basis" -> s.item().setBasis(value(p, LENGTH_OR_AUTO, false));
+                case "base-size" -> s.item().setBaseSize(value(p, LENGTH_OR_AUTO, false));
                 case "horizontal" -> s.item().setHorizontal(alignment(p));
                 case "vertical" -> s.item().setVertical(alignment(p));
                 default -> throw unread(p);
@@ -313,13 +313,13 @@ final class PropertyReader {
 
     /**
      * {@code Horizontal} o {@code Vertical} de un {@code Grid}, un {@code Area} o un {@code Item}: una alineación.
-     * {@code between}, {@code around} y {@code evenly} reparten el eje principal de un {@code Flex} y solo valen en él.
+     * {@code justify}, {@code around} y {@code distribute} reparten el eje principal de un {@code Stack} y solo valen en él.
      */
     private static Alignment alignment(Node p) {
         Distribution d = enumValue(Distribution.class, p);
-        if (d == Distribution.BETWEEN || d == Distribution.AROUND || d == Distribution.EVENLY) {
+        if (d == Distribution.JUSTIFY || d == Distribution.AROUND || d == Distribution.DISTRIBUTE) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " alinea en su sitio: admite start, end, center o "
-                    + "stretch, y " + p.getText().trim() + " reparte el eje principal de un Flex y solo vale en él");
+                    + "stretch, y " + p.getText().trim() + " reparte el eje principal de un Stack y solo vale en él");
         }
         return Alignment.valueOf(d.name());
     }
@@ -345,7 +345,7 @@ final class PropertyReader {
     }
 
     /**
-     * {@code Gap} de {@code Flex} o {@code Grid}, como se escribió: un valor para los dos ejes, o el hueco entre filas
+     * {@code Gap} de {@code Stack} o {@code Grid}, como se escribió: un valor para los dos ejes, o el hueco entre filas
      * y el hueco entre columnas.
      */
     private static List<Value> gap(Node p) {

@@ -14,7 +14,7 @@ public interface LayoutContext {
 
     /**
      * Layout de una caja con su algoritmo, a través de la caché. Toda llamada recursiva de layout pasa por aquí,
-     * nunca directamente a otro algoritmo: sin la caché, flex y grid anidados crecen de forma exponencial.
+     * nunca directamente a otro algoritmo: sin la caché, stack y grid anidados crecen de forma exponencial.
      */
     LayoutResult layout(Box box, ConstraintSpace space, BreakToken from);
 
@@ -23,7 +23,7 @@ public interface LayoutContext {
 
     /**
      * Ancho más estrecho y ancho natural del contenido de la caja, sin su {@code Width}: el mínimo automático de un ítem
-     * flex depende de ellos (referencia/componentes/flex.md).
+     * stack depende de ellos (referencia/componentes/stack.md).
      */
     IntrinsicSizes contentIntrinsic(Box box);
 

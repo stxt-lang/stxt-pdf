@@ -168,10 +168,10 @@ class ColumnsLayoutTest {
         assertRect(40, 50, 250, 30, l.rect("A"));
     }
 
-    /** En un ítem de flex no hay página que llenar: se equilibra. El ancho es el ancho natural: 2 × 50 + 10. */
+    /** En un ítem de stack no hay página que llenar: se equilibra. El ancho es el ancho natural: 2 × 50 + 10. */
     @Test
-    void flexItemIsBalancedAndSizedByItsColumns() {
-        List<String> lines = new ArrayList<>(List.of("\tFlex:", "\t\tVertical: start", "\t\tItem:"));
+    void stackItemIsBalancedAndSizedByItsColumns() {
+        List<String> lines = new ArrayList<>(List.of("\tStack:", "\t\tVertical: start", "\t\tItem:"));
         for (String line : columnsElement(List.of("Count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {
@@ -257,8 +257,8 @@ class ColumnsLayoutTest {
         String two = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 2", "Box:",
                 "\tHeight: 30"), block("A", 40, true), block("B", 40, true), block("C", 40, true)))).getMessage();
         assertTrue(two.contains("2 columnas de 30 no bastan"), two);
-        // Sin página (un ítem flex no se parte) ni alto, los cortes de columna necesitan más columnas de las que hay.
-        String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tFlex:", "\t\tItem:",
+        // Sin página (un ítem stack no se parte) ni alto, los cortes de columna necesitan más columnas de las que hay.
+        String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tStack:", "\t\tItem:",
                 "\t\t\tColumns:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
                 "\t\t\t\t\t\tBefore: column")).getMessage();
         assertTrue(breaks.contains("tiene 1 columna y sus cortes"), breaks);

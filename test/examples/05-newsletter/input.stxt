@@ -1,5 +1,5 @@
 # Boletín mensual de unos pueblos, de dos páginas con aire de periódico: cabecera de portada,
-# noticia principal con una foto recortada (Fit: cover), artículos a tres columnas con filete y
+# noticia principal con una foto recortada (Fit: fill), artículos a tres columnas con filete y
 # cortes equilibrados, texto con una foto al lado, agenda en tabla y anuncios por palabras en
 # una rejilla. El cuerpo es Markdown dentro de Columns. La cabecera de portada es un bloque de la
 # primera página; las siguientes llevan un titulillo fijo (Pages: not-first). Los rótulos se escriben en
@@ -19,8 +19,8 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 7
 				Color: #6B635C
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: Gaceta del Valle
 						Typography:
@@ -37,8 +37,8 @@ Document (dev.stxt.pdf):
 				Padding: 5 0 0 0
 				Border: 0.5 0 0 0
 				Border color: #CFC8C0
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Item:
 					Text: Gaceta del Valle · Octubre de 2025 · Nº 87
 						Link: https://gacetadelvalle.example
@@ -57,8 +57,8 @@ Document (dev.stxt.pdf):
 					Line height: 56
 					Bold: true
 					Align: center
-			Flex:
-				Horizontal: between
+			Stack:
+				Horizontal: justify
 				Box:
 					Padding: 4 0 0 0
 					Border: 0.5 0 0 0
@@ -82,7 +82,7 @@ Document (dev.stxt.pdf):
 			Image: examples/newsletter/market.jpg
 				Id: lead-photo
 				Alt: Puestos de un mercado con toldos de colores
-				Fit: cover
+				Fit: fill
 				Box:
 					Width: 100%
 					Height: 214
@@ -117,7 +117,7 @@ Document (dev.stxt.pdf):
 				Style: kicker
 			Heading 1:
 				Text: Tres caminos para no perderse el hayedo
-			Flex:
+			Stack:
 				Id: trail-story
 				Gap: 16
 				Box:

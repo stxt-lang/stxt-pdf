@@ -1,6 +1,6 @@
 # Carta de un restaurante en un formato alargado (420 × 700), de dos páginas. Un fondo crema y un marco
 # doble dibujados con Page overlay de Layer negativa, que quedan detrás del contenido en todas las
-# páginas; platos con descripción y precio en un Flex, y un recuadro para el menú degustación,
+# páginas; platos con descripción y precio en un Stack, y un recuadro para el menú degustación,
 # con el precio y la nota final en negrita dentro de la línea (Markup: markdown). Los rótulos de las
 # secciones se escriben en minúscula y se ponen en mayúsculas, separadas, con Case y Letter spacing.
 Document (dev.stxt.pdf):
@@ -66,7 +66,7 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 2 0
 			Heading 2:
 				Text: Para empezar
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -79,7 +79,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 9
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -92,7 +92,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 11
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -105,7 +105,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 13
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -120,7 +120,7 @@ Document (dev.stxt.pdf):
 						Style: price
 			Heading 2:
 				Text: Del mar
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -133,7 +133,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 26
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -146,7 +146,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 24
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -159,7 +159,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 27
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -174,7 +174,7 @@ Document (dev.stxt.pdf):
 						Style: price
 			Heading 2:
 				Text: De la tierra
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -187,7 +187,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 21
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -208,7 +208,7 @@ Document (dev.stxt.pdf):
 				Text: Postres
 				Box:
 					Margin: 0 0 9 0
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -221,7 +221,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 7
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -234,7 +234,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 8
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -247,7 +247,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 7
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -266,7 +266,7 @@ Document (dev.stxt.pdf):
 					Margin: 10 0 0 0
 			Heading 2:
 				Text: Vinos y bebidas por copa
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -279,7 +279,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 4,50
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -292,7 +292,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 5,00
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
@@ -305,7 +305,7 @@ Document (dev.stxt.pdf):
 				Item:
 					Text: 4,50
 						Style: price
-			Flex:
+			Stack:
 				Style: dish
 				Gap: 12
 				Item:
