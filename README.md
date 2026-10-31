@@ -6,20 +6,20 @@ fuentes incrustadas, accesible (PDF/UA-1, o PDF/UA-2 si se pide) y con marcadore
 
 ```
 Document (dev.stxt.pdf):
-	Language: es
-	Title: Informe del trimestre
-	Page:
-		Paper: A4
-		Margin: 50
-	Styles:
-		For element: Document
-			Typography:
-				Font: IBM Plex Sans
-				Size: 10
-	Section:
-		Heading 1:
-			Text: Informe del trimestre
-		Paragraph: Las ventas han crecido un 12 % respecto al trimestre anterior.
+    Language: es
+    Title: Informe del trimestre
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Section:
+        Heading 1:
+            Text: Informe del trimestre
+        Paragraph: Las ventas han crecido un 12 % respecto al trimestre anterior.
 ```
 
 Todo es claro, definido y sencillo: cada elemento solo admite las propiedades que tienen sentido en él, nada tiene un
