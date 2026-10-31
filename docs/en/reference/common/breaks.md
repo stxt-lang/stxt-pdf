@@ -13,11 +13,11 @@ flow of the page, nor in headings or cells ([Headings](../components/heading.md#
 | `Keep with next` | boolean | `false` | Avoids the break between the box and the next one (titles). With `After: page` or `column` it is `KEEP_CONFLICT`. |
 | `Keep with previous` | boolean | `false` | Avoids the break between the box and the previous one. With `Before: page` or `column` it is `KEEP_CONFLICT`. |
 | `Keep together` | boolean | `false` | Tries not to split the box. |
+| `Edges` | `open`, `closed` | `open` | What happens to the border and the padding at a break. |
 
 > **Decision:** breaks are stated with `Before` and `After`, and what is kept together, with `Keep with next`,
 > `Keep with previous` and `Keep together`, the names used by word processors. *Rejected alternative:* an `avoid` value
 > in `Before`, `After` and `Inside`, which does not say what is kept with what.
-| `Edges` | `open`, `closed` | `open` | What happens to the border and the padding at a break. |
 
 ## Model
 

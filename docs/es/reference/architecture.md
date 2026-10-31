@@ -49,8 +49,8 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | `convert` | todos menos `tree` y `output` | `Converter`, la entrada del motor. Nada depende de él |
 
 Un tipo que necesitan `tree` y `layout` va en `model`. Entre los algoritmos de `layout`, el bloque usa `inline` (los
-marcadores de las listas son texto) y `position`, `stack` y `grid` usan `position`, y la tabla usa `grid`. Ningún algoritmo
-nombra `Engine`: dependen de la interfaz `LayoutContext`.
+marcadores de las listas son texto) y `position`. `stack` y `grid` usan `position`, y la tabla usa `grid`. Ningún
+algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 
 ## Las clases principales
 

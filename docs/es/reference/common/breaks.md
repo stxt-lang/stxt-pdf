@@ -13,11 +13,11 @@ la página, ni en los encabezados ni en las celdas ([Encabezados](../components/
 | `Keep with next` | booleano | `false` | Evita el corte entre la caja y la siguiente (títulos). Con `After: page` o `column` es `KEEP_CONFLICT`. |
 | `Keep with previous` | booleano | `false` | Evita el corte entre la caja y la anterior. Con `Before: page` o `column` es `KEEP_CONFLICT`. |
 | `Keep together` | booleano | `false` | Intenta no partir la caja. |
+| `Edges` | `open`, `closed` | `open` | Qué pasa con el borde y el relleno en un corte. |
 
 > **Decisión:** los saltos se dicen con `Before` y `After`, y lo que se mantiene junto, con `Keep with next`,
 > `Keep with previous` y `Keep together`, los nombres de los procesadores de textos. *Alternativa descartada:* un valor
 > `avoid` en `Before`, `After` e `Inside`, que no dice qué se mantiene con qué.
-| `Edges` | `open`, `closed` | `open` | Qué pasa con el borde y el relleno en un corte. |
 
 ## Modelo
 

@@ -49,7 +49,7 @@ Dependencies go in a single direction and without cycles. `ArchitectureTest` sta
 | `convert` | all except `tree` and `output` | `Converter`, the entry point of the engine. Nothing depends on it |
 
 A type needed by `tree` and `layout` goes in `model`. Among the `layout` algorithms, block uses `inline` (list markers
-are text), `position`, `stack` and `grid` use `position`, and table uses `grid`. No algorithm names `Engine`: they
+are text) and `position`. `stack` and `grid` use `position`, and table uses `grid`. No algorithm names `Engine`: they
 depend on the `LayoutContext` interface.
 
 ## The main classes

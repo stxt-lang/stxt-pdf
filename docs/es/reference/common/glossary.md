@@ -5,12 +5,12 @@
 | **Ancho más estrecho / ancho natural** | El menor ancho sin que nada se salga / el ancho sin ningún salto de línea ([La caja](box.md#tamaños-intrínsecos)). |
 | **Área útil** | Rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer nivel de una sección y de los `Page overlay`. Cada sección tiene la suya ([Document](../components/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](box.md#las-cuatro-cajas)). |
+| **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta la fusión de márgenes ([Block](../components/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes. Los recursos se buscan solo hacia abajo ([Recursos](resources.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Columns` reparte su contenido en una página ([Columns](../components/columns.md)). |
 | **Contenedor de fragmentos** | Donde caen los fragmentos de las cajas: cada página y, dentro de un `Columns`, cada columna ([Cortes](breaks.md#modelo)). |
 | **Contenedor de referencia** | Rectángulo contra el que se resuelven los porcentajes, los `auto` y los desplazamientos de una caja ([La caja](box.md#el-contenedor-de-referencia)). |
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](layers-and-rotation.md)). |
-| **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta la fusión de márgenes ([Block](../components/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](values.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color, ...)` ([La caja](box.md#degradado)). |
 | **Elemento** | Un nodo del documento que es una caja: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](structure.md#elementos)). |
