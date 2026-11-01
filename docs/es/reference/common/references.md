@@ -8,8 +8,11 @@ Un texto puede escribir datos que el motor calcula:
 | `{pages}` | El último número impreso de su tanda ([Document](../components/document.md#numeración-de-las-páginas)) |
 | `{page of: id}` | El número impreso de la página donde empieza la caja con ese `Id` |
 | `{number of: id}` | El número de esa caja en el documento: el de un `List item` numerado o un encabezado numerado |
+| `{heading N}` | El texto del último `Heading N` que empieza en esa página o antes, en un `Page overlay`: el título corrido |
+| `{heading N: first}` | El del primer `Heading N` que empieza en esa página |
 
-Se escriben en el texto de un `Text`, un `Paragraph` o una `Cell` con valor, y se pueden mezclar:
+Se escriben en el texto de un `Text`, un `Paragraph` o una `Cell` con valor (los títulos corridos, solo en un
+`Page overlay`), y se pueden mezclar:
 
 ```
 Text: El esquema de conexión está en la página {page of: wiring}; véase la cláusula {number of: pago}.
@@ -54,6 +57,39 @@ encabezados con `Numbered: true`, y su número es el completo (`4.2`: sus nivele
 encabezado sin numerar o cualquier otra caja no tiene número (`REFERENCE_NOT_NUMBERED`). Un encabezado escrito en un
 `Markdown` se puede referir si lleva `{#id}` ([Markdown](../components/markdown.md#encabezados)). Un ítem de una lista
 de Markdown no se puede referir, porque no lleva `Id`.
+
+## `{heading N}` y `{heading N: first}`
+
+Un **título corrido**: el texto de un encabezado en la cabecera o el pie de cada página, como el capítulo o el apartado
+en curso de un libro o un manual.
+
+- **Qué encabezado es.** `{heading N}`, con `N` de 1 a 6, escribe el texto del último `Heading N` que **empieza en esa
+  página o antes**: el que está en vigor al acabar la página. `{heading N: first}` escribe el **primero que empieza en la
+  página** o, si en ella no empieza ninguno, lo mismo que `{heading N}` (en un diccionario, la primera y la última
+  entrada de la página). Un encabezado de nivel superior (un número menor) deja sin encabezado a los niveles de debajo:
+  en la primera página de un capítulo sin apartado todavía, `{heading 2}` está vacío, y no escribe el último apartado
+  del capítulo anterior. Antes del primer `Heading N` del documento también está vacío.
+- **Qué texto.** El del encabezado, como en el índice y en los marcadores del PDF
+  ([Encabezados](../components/heading.md)): sus `Text` unidos por espacios y, si está numerado, con su número delante
+  (`3 Instalación`). `Case` y `Small caps` del texto que lo escribe se le aplican como al resto. Un texto que queda vacío
+  no ocupa ninguna línea.
+- **Dónde.** Solo en un texto de un `Page overlay`, o dentro de uno: el encabezado en vigor depende de la página, y un
+  `Page overlay` que lleva un título corrido **se maqueta en cada página** con el texto de esa página (los demás, una vez,
+  y se repiten). En cualquier otro texto es `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY`. Como un `Page overlay` no ocupa
+  espacio, el flujo y las referencias a páginas no cambian por él.
+- **La forma.** `{heading 2}` o `{heading 2: first}`; otro nivel u otra variante es `REFERENCE_UNKNOWN`. Un nivel que el
+  documento no usa es válido y queda vacío en todas las páginas.
+- **La fuente necesita los caracteres** de todos los encabezados de ese nivel, en la fuente del texto que los escribe
+  (`GLYPH_MISSING`).
+
+> **Decisión:** un encabezado de nivel superior vacía los títulos corridos de los niveles inferiores, en lugar de dejar el
+> último que empezó. Así el apartado del capítulo anterior no sigue en la cabecera de un capítulo nuevo. *Alternativa
+> descartada:* el último `Heading N` que empezó, sin mirar los niveles superiores, que es lo que hace el `StyleRef` de un
+> procesador de textos.
+
+> **Decisión:** `{heading N: first}` sin ningún encabezado de ese nivel en la página escribe lo mismo que `{heading N}`,
+> en lugar de quedar vacío: una página sin apartado nuevo sigue dentro del apartado en curso. *Alternativa descartada:*
+> vacío.
 
 ## Lo que no hay
 

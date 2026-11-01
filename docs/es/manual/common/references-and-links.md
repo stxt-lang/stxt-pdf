@@ -10,6 +10,8 @@ Un texto puede escribir datos que calcula el motor:
 | `{pages}` | El total de páginas de la cuenta en curso |
 | `{page of: id}` | La página donde empieza la caja con ese `Id` |
 | `{number of: id}` | El número de un ítem de una lista numerada, o el de un encabezado numerado |
+| `{heading 1}` | El título del último `Heading 1` que ha empezado, en la cabecera o el pie de cada página |
+| `{heading 1: first}` | El del primer `Heading 1` que empieza en la página |
 
 ```
 Paragraph: El esquema de conexión está en la página {page of: wiring}. Véase la cláusula {number of: pago}.
@@ -28,6 +30,10 @@ List:
   dentro de un `Page overlay`, que se repite en todas) o de algo que está en una página sin número.
 - `{number of: id}` de un ítem da solo el suyo (`3`, `c`, `IV`), y de un encabezado numerado, el completo (`4.2`). Lo demás
   no tiene número.
+- `{heading N}` (de 1 a 6) es el **título corrido** de un libro o un manual: el capítulo o el apartado en curso en la
+  cabecera. Solo va en un `Page overlay`, que así cambia de una página a otra. Si el encabezado está numerado, lleva su
+  número (`3 Instalación`). Un capítulo nuevo deja vacío el apartado hasta que empieza el primero, y antes del primer
+  encabezado del nivel no escribe nada.
 
 El motor escribe el número antes de repartir el texto en líneas, así que «página 9» y «página 10» ocupan lo que tienen que
 ocupar. Si eso mueve el contenido, vuelve a paginar hasta que todos los números son correctos.

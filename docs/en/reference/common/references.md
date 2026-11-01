@@ -8,8 +8,11 @@ A text can write data that the engine computes:
 | `{pages}` | The last printed number of its page sequence ([Document](../components/document.md#page-numbering)) |
 | `{page of: id}` | The printed number of the page where the box with that `Id` starts |
 | `{number of: id}` | The number of that box in the document: that of a numbered `List item` or a numbered heading |
+| `{heading N}` | The text of the last `Heading N` that starts on that page or before, in a `Page overlay`: the running head |
+| `{heading N: first}` | That of the first `Heading N` that starts on that page |
 
-They are written in the text of a `Text`, a `Paragraph` or a `Cell` with a value, and they can be mixed:
+They are written in the text of a `Text`, a `Paragraph` or a `Cell` with a value (the running heads, only in a
+`Page overlay`), and they can be mixed:
 
 ```
 Text: The wiring diagram is on page {page of: wiring}; see clause {number of: pago}.
@@ -55,6 +58,38 @@ number: to write "4.2" from a nested list, both are written, `{number of: clausu
 an unnumbered heading or any other box has no number (`REFERENCE_NOT_NUMBERED`). A heading written in a `Markdown` can be
 referred to if it carries `{#id}` ([Markdown](../components/markdown.md#headings)). An item of a Markdown list cannot
 be referred to, because it carries no `Id`.
+
+## `{heading N}` and `{heading N: first}`
+
+A **running head**: the text of a heading in the header or the footer of each page, like the current chapter or section
+of a book or a manual.
+
+- **Which heading it is.** `{heading N}`, with `N` from 1 to 6, writes the text of the last `Heading N` that **starts on
+  that page or before**: the one in effect at the end of the page. `{heading N: first}` writes the **first one that
+  starts on the page** or, if none starts on it, the same as `{heading N}` (in a dictionary, the first and the last entry
+  of the page). A heading of a higher level (a lower number) leaves the levels below it without a heading: on the first
+  page of a chapter with no section yet, `{heading 2}` is empty, and does not write the last section of the previous
+  chapter. Before the first `Heading N` of the document it is empty as well.
+- **Which text.** That of the heading, as in the table of contents and in the bookmarks of the PDF
+  ([Headings](../components/heading.md)): its `Text` elements joined by spaces and, if it is numbered, with its number in
+  front (`3 Installation`). The `Case` and `Small caps` of the text that writes it apply to it as to the rest. A text that
+  is left empty takes up no line.
+- **Where.** Only in a text of a `Page overlay`, or inside one: the heading in effect depends on the page, and a
+  `Page overlay` that carries a running head **is laid out on each page** with the text of that page (the others, once,
+  and repeated). In any other text it is `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY`. Since a `Page overlay` takes up no
+  space, the flow and the references to pages do not change because of it.
+- **The form.** `{heading 2}` or `{heading 2: first}`; another level or another variant is `REFERENCE_UNKNOWN`. A level
+  the document does not use is valid and is empty on every page.
+- **The font needs the characters** of every heading of that level, in the font of the text that writes them
+  (`GLYPH_MISSING`).
+
+> **Decision:** a heading of a higher level empties the running heads of the levels below, instead of leaving the last
+> one that started. This way the section of the previous chapter does not stay in the header of a new chapter. *Rejected
+> alternative:* the last `Heading N` that started, regardless of the higher levels, which is what the `StyleRef` of a
+> word processor does.
+
+> **Decision:** `{heading N: first}` with no heading of that level on the page writes the same as `{heading N}`, instead
+> of being empty: a page without a new section is still inside the current one. *Rejected alternative:* empty.
 
 ## What is not supported
 

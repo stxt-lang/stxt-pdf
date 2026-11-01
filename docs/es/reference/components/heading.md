@@ -27,7 +27,8 @@ Paragraph:
 **Sin estilos implícitos.** Un `Heading 1` no es más grande que un `Heading 2` por sí mismo: el estilo de cada nivel se
 declara una vez en `Styles`, igual que el de cualquier otro elemento.
 
-Su texto, en el índice y en los marcadores, es el de sus `Text` unido por espacios.
+Su texto, en el índice, en los marcadores y en los títulos corridos
+([Referencias](../common/references.md#heading-n-y-heading-n-first)), es el de sus `Text` unido por espacios.
 
 ## Cortes
 

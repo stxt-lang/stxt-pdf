@@ -86,6 +86,9 @@ página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Page 
 (desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
 todas en las que sale. Lo que hay dentro de un `Page overlay` es decoración de la página y no contenido: un lector de pantalla no
 lo lee, y no puede tener encabezados (`HEADING_IN_PAGE_OVERLAY`) ni ser el destino de un enlace o una referencia.
+Si un texto suyo lleva un título corrido (`{heading N}`,
+[Referencias](../common/references.md#heading-n-y-heading-n-first)), el `Page overlay` se maqueta en cada página con el
+encabezado en vigor en ella; los demás se maquetan una vez y se repiten igual.
 
 > **Decisión:** un `Page overlay` se admite en cualquier contenedor, no solo como hijo de `Document` o de una sección: su posición
 > estática es la de su sitio en el documento. *Alternativa descartada:* solo como hijo de `Document` y de `Section`, que es

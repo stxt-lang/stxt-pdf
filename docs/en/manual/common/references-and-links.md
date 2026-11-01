@@ -10,6 +10,8 @@ A text can write data that the engine works out:
 | `{pages}` | The total number of pages of the current count |
 | `{page of: id}` | The page where the box with that `Id` starts |
 | `{number of: id}` | The number of an item of a numbered list, or that of a numbered heading |
+| `{heading 1}` | The title of the last `Heading 1` that has started, in the header or the footer of each page |
+| `{heading 1: first}` | That of the first `Heading 1` that starts on the page |
 
 ```
 Paragraph: The wiring diagram is on page {page of: wiring}. See clause {number of: pago}.
@@ -29,6 +31,10 @@ List:
   number.
 - `{number of: id}` of an item gives only its own (`3`, `c`, `IV`), and of a numbered heading, the complete one (`4.2`).
   Nothing else has a number.
+- `{heading N}` (1 to 6) is the **running head** of a book or a manual: the current chapter or section in the header. It
+  only goes in a `Page overlay`, which then changes from one page to the next. If the heading is numbered, it carries its
+  number (`3 Installation`). A new chapter leaves the section empty until the first one starts, and before the first
+  heading of the level it writes nothing.
 
 The engine writes the number before breaking the text into lines, so "page 9" and "page 10" take up the space they need.
 If that moves the content, it paginates again until all the numbers are correct.

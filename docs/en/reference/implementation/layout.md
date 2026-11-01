@@ -243,6 +243,21 @@ the `LayoutCache` and the line breaking store about them and their ancestors (`E
 > which does not change. If a new algorithm read something from outside the subtree, it would have to go into the key. A document of 100
 > pages went from costing twice as much as one of 99 to costing the same. *Rejected alternative:* emptying the whole cache.
 
+**Running heads.** `RunningHeads` walks the pages in physical order and keeps the heading of each level in effect: the
+last one that has started (the `Fragment` with `first()` of a box with `headingLevel() > 0`, with the text of
+`Box.headingText()`, which already carries the number), until one of a higher level starts, which empties those below
+it. For each page it gives the value of each reference of the document (`"2"`, `"2: first"`), and `pages` passes it to
+the engine (`Engine.headings`) before placing the `Page overlay` boxes of the page, only when it differs from that of the
+previous one; the engine keeps it in `InlineLayout` like the assumed pages and forgets what the cache and the line
+breaking hold of the texts that carry a running head and of their ancestors, so those `Page overlay` boxes are laid out
+again on each page that changes, and the rest comes from the cache. The flow is already paginated and is not touched: a
+`Page overlay` takes up no space.
+
+> **Decision:** the running head is replaced in the text before breaking it into lines, like `{page of: id}`, and not in
+> a reserved slot like `{page}`: its width changes from one page to the next and there is no trial number that covers
+> it. The price is laying out the `Page overlay` once per page instead of once, only if it carries one. *Rejected
+> alternative:* reserving the width of the longest heading, which would leave gaps or overflow.
+
 ## Overflows
 
 `Overflow` walks the paginated result and points to the innermost culprit ([Overflow](../common/overflow.md)),

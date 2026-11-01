@@ -96,6 +96,9 @@ They also accept `Id`, `Style`, `Link`, `Box` and `Typography`. `Frame` also acc
   of a `Section` appears only on the pages of that section.
 - What is inside a `Page overlay` is decoration for the tagged PDF: it is not read as content, it cannot have headings and
   it cannot be linked to or referenced.
+- Its texts can write the page number (`{page}`) and the running head (`{heading 2}`: the current section,
+  [References and links](../common/references-and-links.md)). With a running head, the `Page overlay` is laid out on
+  each page with its own.
 
 ### `Pages`
 

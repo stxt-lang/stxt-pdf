@@ -27,7 +27,8 @@ Paragraph:
 **No implicit styles.** A `Heading 1` is not larger than a `Heading 2` by itself: the style of each level is
 declared once in `Styles`, like that of any other element.
 
-Its text, in the table of contents and in the bookmarks, is that of its `Text` elements joined by spaces.
+Its text, in the table of contents, in the bookmarks and in the running heads
+([References](../common/references.md#heading-n-and-heading-n-first)), is that of its `Text` elements joined by spaces.
 
 ## Breaks
 

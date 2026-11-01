@@ -202,6 +202,18 @@ public final class Engine implements LayoutContext {
     }
 
     /**
+     * The running heads of the page whose {@code Page overlay} boxes are going to be laid out
+     * ({@code {heading N}}, reference/common/references.md): the heading of each level in effect on it, by the id of
+     * the reference. The {@link Paginator} sets them before each page whose values differ from the previous one; the
+     * measurements of {@code changed}, the texts with those references, change, and what the cache stores of them and
+     * of their ancestors is forgotten.
+     */
+    void headings(Map<String, String> headings, Collection<Box> changed) {
+        inline.headings(headings);
+        forget(changed);
+    }
+
+    /**
      * Forgets what the cache and the line breaking store of those texts and of their ancestors, whose layout depends
      * on what they measure. The rest is still valid: the result of a box only depends on its subtree, so
      * the body of a document is not laid out again because the number in its footer changes.

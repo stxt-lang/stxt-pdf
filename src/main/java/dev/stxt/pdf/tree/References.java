@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The references from the texts of the tree to other boxes ({@code {page of: id}}, reference/common/references.md):
+ * The references in the texts of the tree ({@code {page of: id}}, {@code {heading N}}, reference/common/references.md):
  * where they are and the check that all of them point to something that can be referenced. Their value is decided by
- * whoever lays out: the page, by the {@link dev.stxt.pdf.layout.Paginator}; the number, by the builder
- * ({@link Box#number()}).
+ * whoever lays out: the page and the heading in effect on it, by the {@link dev.stxt.pdf.layout.Paginator}; the
+ * number, by the builder ({@link Box#number()}).
  */
 public final class References {
 
@@ -63,8 +63,9 @@ public final class References {
     }
 
     /**
-     * Checks that each reference points to a box with that {@code Id} that can be referenced: the page, of a box that
-     * is not in a {@code Page overlay} (which is on every page), and the number, of one that has a number.
+     * Checks that each reference points to something that can be referenced: the page, of a box with that {@code Id}
+     * that is not in a {@code Page overlay} (which is on every page); the number, of one that has a number; and the
+     * heading in effect on the page, of a level from 1 to 6 and from a text in a {@code Page overlay}.
      *
      * @throws InvalidModelException with the line of the reference
      */
@@ -76,7 +77,11 @@ public final class References {
         Map<String, Box> boxes = byId(root);
         for (Site site : sites) {
             Reference r = site.reference();
-            String text = text(r);
+            if (r.kind() == Reference.Kind.HEADING) {
+                validateHeading(site);
+                continue;
+            }
+            String text = r.marker();
             Box target = boxes.get(r.id());
             if (r.id().isEmpty()) {
                 throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_UNKNOWN, text
@@ -100,13 +105,23 @@ public final class References {
                                 + "and the headings with Numbered: true have one)");
                     }
                 }
+                default -> throw new IllegalStateException("Unexpected reference: " + text);
             }
         }
     }
 
-    /** How the reference was written, for messages. */
-    private static String text(Reference r) {
-        return "{" + r.kind().keyword() + " of: " + r.id() + "}";
+    /** A running head: a valid level, and inside a {@code Page overlay}, whose page decides the heading. */
+    private static void validateHeading(Site site) {
+        Reference r = site.reference();
+        if (r.headingLevel() == 0) {
+            throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_UNKNOWN, r.marker()
+                    + ": a running head is {heading N} or {heading N: first}, with N from 1 to 6");
+        }
+        if (!insidePageOverlay(site.box())) {
+            throw new InvalidModelException(site.line(), ErrorCode.HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY, r.marker()
+                    + " is in a text that is not in a Page overlay: the heading in effect depends on the page, and only "
+                    + "a Page overlay is laid out on each one");
+        }
     }
 
     /** Whether the box is a {@code Page overlay} or is inside one. */

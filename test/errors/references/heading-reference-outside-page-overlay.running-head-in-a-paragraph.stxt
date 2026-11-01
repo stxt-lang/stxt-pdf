@@ -1,0 +1,18 @@
+# Case: Running head in a text that is not in a Page overlay
+# Code: HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Heading 1:
+			Text: Capítulo
+		Paragraph: Estamos en {heading 1}.

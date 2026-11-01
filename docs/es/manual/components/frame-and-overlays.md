@@ -96,6 +96,9 @@ Admiten además `Id`, `Style`, `Link`, `Box` y `Typography`. `Frame` admite tamb
   sale solo en las suyas.
 - Lo que hay dentro de un `Page overlay` es decoración para el PDF etiquetado: no se lee como contenido, no puede tener
   encabezados y no se puede enlazar ni referir.
+- Sus textos pueden escribir el número de página (`{page}`) y el título corrido (`{heading 2}`: el apartado en curso,
+  [Referencias y enlaces](../common/references-and-links.md)). Con un título corrido, el `Page overlay` se maqueta en
+  cada página con el suyo.
 
 ### `Pages`
 

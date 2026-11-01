@@ -14,8 +14,10 @@ import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static dev.stxt.pdf.tree.PropertyKey.CODE_FONT;
 import static dev.stxt.pdf.tree.PropertyKey.FONT;
@@ -88,20 +90,30 @@ public final class PdfMetrics implements TextMeasurer {
      */
     @Override
     public void validate(Box root) {
-        validate(root, resources.fonts());
+        Map<Integer, List<String>> headings = new HashMap<>();
+        headingTexts(root, headings);
+        validate(root, resources.fonts(), headings);
     }
 
-    private static void validate(Box box, FontLibrary fonts) {
+    /** The text of every heading of the tree, by level: what a running head ({@code {heading N}}) can paint. */
+    private static void headingTexts(Box box, Map<Integer, List<String>> headings) {
+        if (box.headingLevel() > 0) {
+            headings.computeIfAbsent(box.headingLevel(), k -> new ArrayList<>()).add(box.headingText());
+        }
+        box.children().forEach(child -> headingTexts(child, headings));
+    }
+
+    private static void validate(Box box, FontLibrary fonts, Map<Integer, List<String>> headings) {
         if (box.hasText()) {
-            check(box, fonts);
+            check(box, fonts, headings);
         }
         if (box.marker() != null) {
-            check(box.marker(), fonts);
+            check(box.marker(), fonts, headings);
         }
-        box.children().forEach(child -> validate(child, fonts));
+        box.children().forEach(child -> validate(child, fonts, headings));
     }
 
-    private static void check(Box box, FontLibrary fonts) {
+    private static void check(Box box, FontLibrary fonts, Map<Integer, List<String>> headings) {
         Style s = box.style();
         boolean hyphens = s.typography().hyphenate() || box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0;
         int start = 0;
@@ -121,9 +133,17 @@ public final class PdfMetrics implements TextMeasurer {
                     // {page}, {pages} and the references start with a brace: only then are they looked for.
                     int end = markerEnd(text, i);
                     if (end > i) {
-                        // A page or a number, painted with digits (or letters, in lists).
-                        for (char d : DIGITS.toCharArray()) {
-                            requireGlyph(box, font, d, start + i);
+                        Reference reference = Reference.at(text, i);
+                        if (reference != null && reference.kind() == Reference.Kind.HEADING) {
+                            // A running head paints, in this font, the text of the headings of its level.
+                            for (String heading : headings.getOrDefault(reference.headingLevel(), List.of())) {
+                                requireGlyphs(box, font, heading, start + i);
+                            }
+                        } else {
+                            // A page or a number, painted with digits (or letters, in lists).
+                            for (char d : DIGITS.toCharArray()) {
+                                requireGlyph(box, font, d, start + i);
+                            }
                         }
                         i = end;
                         continue;
@@ -134,6 +154,17 @@ public final class PdfMetrics implements TextMeasurer {
                 i += Character.charCount(cp);
             }
             start += text.length();
+        }
+    }
+
+    /** Requires every character of {@code text}, painted in the box at {@code index}, in the font. */
+    private static void requireGlyphs(Box box, FontFile font, String text, int index) {
+        for (int i = 0; i < text.length(); ) {
+            int cp = text.codePointAt(i);
+            if (cp != LineBreaker.SOFT_HYPHEN) {
+                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, index);
+            }
+            i += Character.charCount(cp);
         }
     }
 

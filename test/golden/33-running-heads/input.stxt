@@ -1,0 +1,67 @@
+# Running heads (reference/common/references.md): page of 300 × 200 with margins of 20, page area of 260 × 160 from
+# (20, 20). Lines of 12 (Size 10); with the test metrics each character measures 5 pt. The header writes {heading 1},
+# the last Heading 1 that has started on the page or before, anchored to the left and as wide as its text (Offset with
+# auto on the right): y = 20 − 15 = 5. The footer writes {heading 1: first}, the first Heading 1 that starts on the
+# page or, if none does, the same as {heading 1}, anchored to the right: its right edge is at 280 and its bottom edge at
+# 180 + 15 = 195, so y = 183. Both are laid out on each page with the text of that page.
+#   Page 1: intro fills the page; no heading has started: both texts are empty, with no lines, 0 × 0.
+#   Page 2: Uno (12) and uno (148). Header and footer "Uno": 15 wide.
+#   Page 3: Dos (12) and the first 148 of dos. Both "Dos": 15 wide.
+#   Page 4: the other 160 of dos. No heading starts: both keep "Dos".
+#   Page 5: Tres (12), tres (20), Cuatro (12) and cuatro (30). Header "Cuatro" (30 wide, the last); footer "Tres"
+#     (20 wide, the first of the page): x = 280 − 20 = 260.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Page overlay:
+			Id: head
+			Offset: -15 auto auto 0
+			Text: {heading 1}
+				Id: head-text
+		Page overlay:
+			Id: foot
+			Offset: auto 0 -15 auto
+			Text: {heading 1: first}
+				Id: foot-text
+		Block:
+			Id: intro
+			Box:
+				Height: 160
+		Heading 1:
+			Id: h-uno
+			Text: Uno
+		Block:
+			Id: uno
+			Box:
+				Height: 148
+		Heading 1:
+			Id: h-dos
+			Text: Dos
+		Block:
+			Id: dos
+			Box:
+				Height: 308
+		Heading 1:
+			Id: h-tres
+			Text: Tres
+		Block:
+			Id: tres
+			Box:
+				Height: 20
+		Heading 1:
+			Id: h-cuatro
+			Text: Cuatro
+		Block:
+			Id: cuatro
+			Box:
+				Height: 30

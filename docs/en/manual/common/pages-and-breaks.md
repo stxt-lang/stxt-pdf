@@ -86,7 +86,8 @@ section: it can continue the count, start again at 1 or have no number, like a c
 ([Document](../components/document.md#page-numbering)). `{pages}` is the last number of the current count.
 With a cover without a number and six body pages, the first one says "Page 1 of 6".
 
-To write the page where another part of the document is ("see page 12") there is `{page of: id}`
+To write the page where another part of the document is ("see page 12") there is `{page of: id}`, and to write the
+current chapter or section in the header, `{heading 1}` or `{heading 2}`, the running head
 ([References and links](references-and-links.md)).
 
 More detail in the [reference](../../reference/common/breaks.md).

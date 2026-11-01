@@ -243,6 +243,20 @@ que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasad
 > que no cambia. Si un algoritmo nuevo leyera algo de fuera del subárbol, tendría que entrar en la clave. Un documento de 100
 > páginas pasó de costar el doble que uno de 99 a costar lo mismo. *Alternativa descartada:* vaciar la caché entera.
 
+**Títulos corridos.** `RunningHeads` recorre las páginas en orden físico y guarda el encabezado de cada nivel en vigor: el
+último que ha empezado (el `Fragment` con `first()` de una caja con `headingLevel() > 0`, con el texto de
+`Box.headingText()`, que ya lleva el número), hasta que empieza uno de un nivel superior, que vacía los de debajo. Para
+cada página da el valor de cada referencia del documento (`"2"`, `"2: first"`), y `pages` se lo pasa al motor
+(`Engine.headings`) antes de colocar los `Page overlay` de la página, solo cuando difiere del de la anterior; el motor lo
+guarda en `InlineLayout` como las páginas supuestas y olvida lo que la caché y el reparto en líneas tienen de los textos
+que llevan un título corrido y de sus antepasados, así que esos `Page overlay` se maquetan de nuevo en cada página que
+cambia, y el resto sale de la caché. El flujo ya está paginado y no se toca: un `Page overlay` no ocupa espacio.
+
+> **Decisión:** el título corrido se sustituye en el texto antes de repartirlo en líneas, como `{page of: id}`, y no en un
+> hueco reservado como `{page}`: su ancho cambia de una página a otra y no hay un número de prueba que lo cubra. El precio
+> es maquetar el `Page overlay` una vez por página en lugar de una, solo si lleva alguno. *Alternativa descartada:*
+> reservar el ancho del encabezado más largo, que dejaría huecos o desbordaría.
+
 ## Desbordamientos
 
 `Overflow` recorre el resultado paginado y señala al culpable más interior ([Desbordamiento](../common/overflow.md)),

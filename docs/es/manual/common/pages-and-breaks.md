@@ -85,7 +85,8 @@ seguir la cuenta, volver a empezar en 1 o no tener número, como una portada
 ([Document](../components/document.md#numeración-de-las-páginas)). `{pages}` es el último número de la cuenta en curso. Con
 una portada sin número y seis páginas de cuerpo, la primera dice «Página 1 de 6».
 
-Para escribir la página donde está otra parte del documento («véase la página 12») está `{page of: id}`
+Para escribir la página donde está otra parte del documento («véase la página 12») está `{page of: id}`, y para
+escribir en la cabecera el capítulo o el apartado en curso, `{heading 1}` o `{heading 2}`, el título corrido
 ([Referencias y enlaces](references-and-links.md)).
 
 Más detalle en la [referencia](../../reference/common/breaks.md).

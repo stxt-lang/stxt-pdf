@@ -154,6 +154,11 @@ public enum ErrorCode {
     REFERENCE_NOT_NUMBERED,
     /** The pages the text refers to do not stabilize: each pagination pass changes them. */
     REFERENCE_UNSTABLE,
+    /**
+     * A running head ({@code {heading N}}) in a text that is not in a {@code Page overlay}: only there does the page
+     * decide which heading is in effect.
+     */
+    HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY,
 
     // --- Links --------------------------------------------------------------------------------
     /** A link target that is empty, malformed or with a scheme that is not https, http, mailto or {@code #id}. */

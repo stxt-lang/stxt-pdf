@@ -62,6 +62,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `Named color` is `VALUE_SYNTAX`, and the name `linear`, `VALUE_NOT_ALLOWED`.
 - The annual report, newsletter and contract examples (`test/examples/04-annual-report`, `05-newsletter` and
   `07-contract`) declare their palette with `Named color`; their PDFs are byte for byte the same.
+- **Running heads.** `{heading N}` (N from 1 to 6) in a text of a `Page overlay` writes the text of the last `Heading N`
+  that has started on that page or before, with its number if it is numbered, and `{heading N: first}`, the first one
+  that starts on the page (or the same as `{heading N}` if none does): the chapter or the section in the header of
+  each page. A heading of a higher level leaves the levels below it empty until their first heading, and before the
+  first heading of the level the text is empty and takes up no line. A `Page overlay` with a running head is laid out
+  on each page with the heading of that page; the flow does not change. `Case` applies to it as to the rest of the
+  text, and the font of the text needs the characters of every heading of that level. Outside a `Page overlay` it is
+  `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY` (new code), and a level or a variant that does not exist, `REFERENCE_UNKNOWN`.
+- The manual example (`test/examples/08-manual`) writes the section in effect on each page in its header with
+  `{heading 2}`.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

@@ -40,7 +40,9 @@ import java.util.Set;
  * {@link BreakToken#BEFORE} is returned so that the parent breaks before the box.</p>
  *
  * <p>{@code {page}} and {@code {pages}} are measured as a probe number and replaced when
- * pagination ends with {@link #number} ({@link PageNumbers}).</p>
+ * pagination ends with {@link #number} ({@link PageNumbers}). The references to other boxes and the running heads
+ * ({@link Reference}) are replaced before breaking the text into lines, with the values the
+ * {@link dev.stxt.pdf.layout.Paginator} gives ({@link #assume}, {@link #headings}).</p>
  *
  * <p>The line breaking of a text is done only once per available width and reused on
  * each page: each fragment starts at another line ({@code from}), so the cache of the
@@ -64,6 +66,11 @@ public final class InlineLayout implements LayoutAlgorithm {
     private Map<String, String> pages = Map.of();
     /** Number of each box referred to with {@code {number of: id}}. */
     private Map<String, String> numbers = Map.of();
+    /**
+     * The running heads of the page being laid out, by the id of their reference ({@code "2"}, {@code "2: first"}):
+     * the text of the heading in effect on the page, or empty; see {@link #headings}.
+     */
+    private Map<String, String> headings = Map.of();
 
     public InlineLayout(LayoutContext context, TextMeasurer measurer) {
         this.context = context;
@@ -76,6 +83,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         this.measurer = PageNumbers.probing(real, PageNumbers.firstProbe());
         this.pages = Map.of();
         this.numbers = Map.of();
+        this.headings = Map.of();
         broken.clear();
     }
 
@@ -97,6 +105,17 @@ public final class InlineLayout implements LayoutAlgorithm {
     public void assume(Map<String, String> pages, Map<String, String> numbers) {
         this.pages = Map.copyOf(pages);
         this.numbers = Map.copyOf(numbers);
+    }
+
+    /**
+     * The running heads of the page whose {@code Page overlay} boxes are going to be laid out
+     * ({@code {heading N}} and {@code {heading N: first}}, reference/common/references.md): the text of the heading of
+     * each level in effect on it, by the id of the reference, and empty where there is none yet. They change from one
+     * page to the next, so the {@link dev.stxt.pdf.layout.Paginator} sets them before each page and, as with
+     * {@link #assume}, the caller forgets the texts that contain them.
+     */
+    public void headings(Map<String, String> headings) {
+        this.headings = Map.copyOf(headings);
     }
 
     /** Forgets the memorized line breaking of those boxes. */
@@ -132,7 +151,11 @@ public final class InlineLayout implements LayoutAlgorithm {
     }
 
     private String referenced(Reference.Kind kind, String id) {
-        return kind == Reference.Kind.PAGE ? pages.get(id) : numbers.get(id);
+        return switch (kind) {
+            case PAGE -> pages.get(id);
+            case NUMBER -> numbers.get(id);
+            case HEADING -> headings.get(id);
+        };
     }
 
     /**

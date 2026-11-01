@@ -32,6 +32,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG, PDF ni un SVG admitido | Revisar la ruta o convertir el fichero |
 | `IMAGE_PAGE` | `Pdf page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quitar `Pdf page` o corregir el número |
 | `REFERENCE_UNKNOWN`, `LINK_UNKNOWN` | Un `{page of: id}` o un `#id` a un `Id` que no existe | Revisar el `Id` |
+| `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY` | Un `{heading 1}` en un texto que no es de una cabecera o un pie (`Page overlay`) | Escribirlo en el `Page overlay` |
 | `DUPLICATE_ID` | Dos cajas con el mismo `Id` | Cambiar uno |
 
 La lista completa, con un ejemplo de cada uno, está en la [referencia](../../reference/common/errors.md#códigos), y el

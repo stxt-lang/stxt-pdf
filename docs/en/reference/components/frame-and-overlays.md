@@ -85,7 +85,10 @@ inherit it, and one that is a child of a `Section`, only in its own ([Document](
 page, negative offsets are used (`Offset: -30 0 auto 0`). If a `Page overlay` depends on its static position
 (`auto` offsets), the one on the first page on which the flow that contains it appears is taken, and it is repeated unchanged on
 all the pages where it appears. What is inside a `Page overlay` is decoration of the page and not content: a screen reader does not
-read it, and it cannot have headings (`HEADING_IN_PAGE_OVERLAY`) or be the target of a link or a reference.
+read it, and it cannot have headings (`HEADING_IN_PAGE_OVERLAY`) or be the target of a link or a reference. If a text
+of its own carries a running head (`{heading N}`, [References](../common/references.md#heading-n-and-heading-n-first)),
+the `Page overlay` is laid out on each page with the heading in effect on it; the others are laid out once and
+repeated unchanged.
 
 > **Decision:** a `Page overlay` is accepted in any container, not only as a child of `Document` or of a section: its static
 > position is that of its place in the document. *Rejected alternative:* only as a child of `Document` and of `Section`, which is

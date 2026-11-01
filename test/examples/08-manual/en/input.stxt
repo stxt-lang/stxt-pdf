@@ -5,7 +5,8 @@
 # a terminal block with aligned columns (a Text with Preformatted: pre, in monospace),
 # inline code and tables of specifications and of faults. The heading
 # structure gives the PDF outline (bookmarks), and the fault table refers to the diagram with
-# {page of: wiring}, the page where it is (also inside Markdown). The sections are numbered Heading 2
+# {page of: wiring}, the page where it is (also inside Markdown). The header writes the section in
+# effect on each page with {heading 2}, a running head. The sections are numbered Heading 2
 # (Numbered: true in styles.stxt: 1 to 8) and their subsections, Heading 3 (3.1, 8.1..., also
 # those of a Markdown); the product title declares Numbered: false. A Markdown link refers to the
 # specifications section with {number of: specs-heading}. The labels are written in
@@ -23,9 +24,9 @@ Document (dev.stxt.pdf):
 			Stack:
 				Horizontal: justify
 				Item:
-					Text: Aire+ T2 · Quick guide
+					Text: Aire+ T2 · Quick guide · Version 2.1
 				Item:
-					Text: Version 2.1 · October 2025
+					Text: {heading 2}
 		Page overlay:
 			Id: footer
 			Offset: auto 0 -40 0

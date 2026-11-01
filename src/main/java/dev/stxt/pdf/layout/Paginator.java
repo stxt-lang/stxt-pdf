@@ -43,6 +43,11 @@ import java.util.Set;
  * it paginates again with the one that came out. It ends when they match, or with
  * {@link ErrorCode#REFERENCE_UNSTABLE} after {@value #MAX_REFERENCE_PASSES} passes that change
  * some page.</p>
+ *
+ * <p>The running heads ({@code {heading N}} in a {@code Page overlay}) are the heading in effect on each page
+ * ({@link RunningHeads}), so the {@code Page overlay} boxes that contain one are laid out on each page with the text
+ * of that page: before placing them, the engine is told the values of the page and forgets what it stored of those
+ * texts. The flow does not change, because a {@code Page overlay} takes up no space.</p>
  */
 public final class Paginator {
 
@@ -71,8 +76,13 @@ public final class Paginator {
         sections.forEach(x -> pageOverlays.add(new LinkedHashMap<>()));
         // The texts with {page} or {pages}, which change width if the total needs more digits.
         List<Box> numberedTexts = withPageNumbers(root, new ArrayList<>());
-        Flow flow = converge(root, sections, pageOverlays, numberedTexts);
-        return pages(root, sections, flow, pageOverlays, !numberedTexts.isEmpty());
+        List<References.Site> sites = References.sites(root);
+        Flow flow = converge(root, sections, pageOverlays, numberedTexts, sites);
+        // The texts with a running head, which change from one page to the next.
+        RunningHeads heads = new RunningHeads(sites.stream().map(References.Site::reference).toList());
+        List<Box> headingTexts = sites.stream().filter(s -> s.reference().kind() == Reference.Kind.HEADING)
+                .map(References.Site::box).distinct().toList();
+        return pages(root, sections, flow, pageOverlays, !numberedTexts.isEmpty(), heads, headingTexts);
     }
 
     /**
@@ -88,8 +98,7 @@ public final class Paginator {
      * on those texts is laid out again: the rest comes from the cache.
      */
     private Flow converge(Box root, List<Section> sections, List<Map<Box, PendingOverlay>> pageOverlays,
-                          List<Box> numberedTexts) {
-        List<References.Site> sites = References.sites(root);
+                          List<Box> numberedTexts, List<References.Site> sites) {
         Set<String> targets = new LinkedHashSet<>();
         sites.stream().filter(s -> s.reference().kind() == Reference.Kind.PAGE)
                 .forEach(s -> targets.add(s.reference().id()));
@@ -134,20 +143,30 @@ public final class Paginator {
     /**
      * Second phase, with the total of pages known: each page with its numbered content ({@code {page}} and
      * {@code {pages}}) and its {@code Page overlay}s, those of its section and, if it inherits them, those of the
-     * document.
+     * document, laid out with the running heads of the page ({@code heads}) if the document has any: the engine is
+     * told them when they differ from those of the previous page, and forgets {@code headingTexts}, the texts that
+     * contain them.
      */
     private List<Page> pages(Box root, List<Section> sections, Flow flow, List<Map<Box, PendingOverlay>> pageOverlays,
-                             boolean numbered) {
+                             boolean numbered, RunningHeads heads, List<Box> headingTexts) {
         // The Page overlays of the document: the children of the root that are not a section.
         List<Box> documentPageOverlays = root.children().stream().filter(b -> b.role() != Role.SECTION).toList();
         Numbering numbering = flow.numbering();
         List<Page> pages = new ArrayList<>();
+        Map<String, String> currentHeads = Map.of();
         for (int k = 0; k < sections.size(); k++) {
             Section section = sections.get(k);
             List<LayoutResult> own = flow.results().get(k);
             for (int i = 0; i < own.size(); i++) {
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
+                if (heads.any()) {
+                    Map<String, String> pageHeads = heads.page(own.get(i).fragment());
+                    if (!pageHeads.equals(currentHeads)) {
+                        engine.headings(pageHeads, headingTexts);
+                        currentHeads = pageHeads;
+                    }
+                }
                 // Pages counts within the scope where it is declared: the document or the section
                 // (reference/components/document.md).
                 List<Queued> queue = new ArrayList<>();
