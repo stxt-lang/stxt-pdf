@@ -48,6 +48,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `List`, `List item` | `L` y `LI`, con el marcador en `Lbl` y el contenido en `LBody` |
 | `Table` y sus partes | `Table`, `THead`, `TBody`, `TFoot`, `TR`, y `TH` o `TD` |
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
+| `Footnote` | `Note` (`FENote` con PDF/UA-2), con el número en un `Lbl`, justo después del texto que la llama; la llamada, un `Reference` dentro de ese texto ([abajo](#notas-al-pie)) |
 | `Image` con `Alt`, `Barcode` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
 | El resto (como `Block`, `Stack`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
@@ -128,6 +129,19 @@ tiene una sola `THead` y una sola `TFoot`.
 El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Fit: inside`. El de
 una imagen girada es el rectángulo que la envuelve.
 
+### Notas al pie
+
+Una `Footnote` ([Footnote](../components/footnote.md)) es un `Note` (con PDF/UA-2, un `FENote` con el atributo
+`NoteType: Footnote`) con un identificador (`ID`, `footnote-` más su `Id`, que PDF/UA-1 exige a un `Note` y que el
+`IDTree` del árbol de estructura recoge), el número que la abre en un `Lbl` y después su contenido. Va **justo después
+del elemento del texto que la llama** (hermana de su `P` o, si la llama una celda, dentro de su `TD`), y no al final de
+la página donde se pinta: el orden de lectura pone la nota tras su párrafo. La llamada es un `Reference` dentro del
+elemento del texto, con el número como contenido marcado, que señala la nota con `Ref`; la nota señala la llamada con
+el suyo.
+
+> **Decisión:** la nota cuelga tras el texto que la llama y no del `Sect` al final de la página: el árbol de estructura
+> es el orden de lectura, no el de pintado. *Alternativa descartada:* un `Div` con las notas al final de cada página.
+
 ### Índices
 
 Cada entrada es un `TOCI` con el título y el número en dos `Span`, y la guía es un *artifact*. El `Link` de la entrada
@@ -201,6 +215,7 @@ estas diferencias:
   caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición. `D`, con la página, queda para los
   visores que no entienden `SD`.
 - **Listas:** `dash` es `ListNumbering: Unordered`.
+- **Notas al pie:** `FENote` en lugar de `Note`, con `NoteType: Footnote`.
 - **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
 
 veraPDF lo valida con su perfil de PDF/UA-2, que añade las reglas de ISO/TS 32005 sobre qué elemento puede contener a

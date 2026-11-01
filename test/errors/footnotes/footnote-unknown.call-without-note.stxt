@@ -1,0 +1,18 @@
+# Case: A footnote call with no Footnote with that Id
+# Code: FOOTNOTE_UNKNOWN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Paragraph: Una afirmación[^fuente] sin su nota.

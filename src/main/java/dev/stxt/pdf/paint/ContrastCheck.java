@@ -71,7 +71,8 @@ public final class ContrastCheck implements Canvas {
     public static void check(LaidOutDocument document) {
         for (Page page : document.pages()) {
             Rect area = page.pageSetup().pageArea();
-            StackingContext.build(page.content(), page.pageOverlays(), area.x(), area.y()).paint(new ContrastCheck());
+            StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())
+                    .paint(new ContrastCheck());
         }
     }
 
@@ -251,6 +252,16 @@ public final class ContrastCheck implements Canvas {
 
         @Override
         public void beginLinkText(Box box) {
+            current = box;
+        }
+
+        @Override
+        public void beginFootnoteCall(Box box, String footnote) {
+            current = box;
+        }
+
+        @Override
+        public void beginFootnoteLabel(Box box) {
             current = box;
         }
 

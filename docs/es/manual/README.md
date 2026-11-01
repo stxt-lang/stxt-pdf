@@ -50,6 +50,7 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [`Image`](components/image.md) | Imágenes PNG, JPEG y SVG, y páginas de un PDF |
 | [`Barcode`](components/barcode.md) | Códigos QR y códigos de barras generados a partir de sus datos |
 | [`Markdown`](components/markdown.md) | Escribir contenido largo en Markdown |
+| [`Footnote`](components/footnote.md) | Notas al pie, numeradas y colocadas en la página de su llamada |
 | [`Table of contents`](components/table-of-contents.md) | El índice automático |
 
 Los [ejemplos](../../../test/examples/README.es.md) son once documentos reales con su PDF, de una factura a un informe anual.

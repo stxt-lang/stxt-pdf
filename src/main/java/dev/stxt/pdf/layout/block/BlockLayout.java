@@ -18,6 +18,7 @@ import dev.stxt.pdf.layout.Slice;
 import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.tree.Box;
 
 import java.util.ArrayList;
@@ -149,6 +150,10 @@ public final class BlockLayout implements LayoutAlgorithm {
         LayoutResult layOut() {
             for (int i = start; i < box.children().size(); i++) {
                 Box child = box.children().get(i);
+                if (child.style().position() == Position.FOOTNOTES) {
+                    // The footnote area of a section: the paginator places it at the bottom of each page.
+                    continue;
+                }
                 if (child.style().isOutOfFlow()) {
                     // Static position: where it would start if it were in flow
                     // (reference/components/frame-and-overlays.md). The box is resolved in its reference container

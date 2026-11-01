@@ -40,6 +40,9 @@ public final class LayoutFixture {
             Map<String, Fragment> f = new HashMap<>();
             Map<String, Rect> r = new HashMap<>();
             walk(page.content().children(), 40, 40, f, r);
+            if (page.footnotes() != null) {
+                walk(List.of(page.footnotes()), 40, 40, f, r);
+            }
             walk(page.pageOverlays(), 40, 40, f, r);
             fragments.add(f);
             rects.add(r);

@@ -138,7 +138,7 @@ class InlineFormatTest {
         Box root = buildInline("\tText: - 5 % de descuento", "\tText: 2024. Un buen año", "\tText: # 1 en ventas",
                 "\tText: > 30 años", "\tText: ---", "\tText: 1) Primero",
                 "\tText:", "\t\tContent >>", "\t\t\tHay que comprar:", "\t\t\t- **leche**", "\t\t\t===");
-        List<String> texts = root.children().stream().map(Box::text).toList();
+        List<String> texts = root.inFlowChildren().stream().map(Box::text).toList();
         assertEquals(List.of("- 5 % de descuento", "2024. Un buen año", "# 1 en ventas", "> 30 años", "---",
                 "1) Primero", "Hay que comprar: - leche ==="), texts);
         assertEquals(List.of(run("Hay que comprar: - "), run("leche", "b"), run(" ===")),

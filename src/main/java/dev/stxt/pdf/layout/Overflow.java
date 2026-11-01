@@ -74,6 +74,10 @@ public final class Overflow {
             // The physical page, in page area coordinates.
             Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
             content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE, false);
+            if (p.footnotes() != null) {
+                // The footnote area is out of the flow, at the bottom of the page area: it and its notes fit on the page.
+                fragment(p.footnotes(), 0, 0, page, NONE, false);
+            }
             for (Fragment f : p.pageOverlays()) {
                 fragment(f, 0, 0, page, NONE, false);
             }

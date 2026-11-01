@@ -43,6 +43,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](styles.
 | `Cell` | Celda: un texto o un bloque | Su texto en el valor, o elementos salvo los encabezados |
 | `Columns` | Bloque cuyo contenido fluye por varias columnas ([Columns](../components/columns.md)) | Elementos en flujo |
 | `Markdown` | Contenido escrito en Markdown ([Markdown](../components/markdown.md)) | Su texto en `Content` |
+| `Footnote` | Nota al pie, que el motor coloca al pie de la página de su llamada `[^id]` ([Footnote](../components/footnote.md)) | `Paragraph`, `Text`, `Markdown`, `List`, `Table` y `Block` |
 | `Image` | Imagen PNG, JPEG o SVG, o una página de un PDF ([Image](../components/image.md)) | Nada: la ruta va en el valor |
 | `Barcode` | Código QR o de barras generado a partir de sus datos ([Barcode](../components/barcode.md)) | Sus datos, en el valor o en `Content` |
 | `Table of contents` | Índice automático ([Table of contents](../components/table-of-contents.md)) | Nada: las entradas las genera el motor |
@@ -182,7 +183,7 @@ vez, y los elementos, las veces que se quiera.
 | Nodo | Hijos |
 |---|---|
 | `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Styles`; `Page overlay`, `Section` (al menos una) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`; elementos |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`; elementos |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
@@ -199,6 +200,7 @@ vez, y los elementos, las veces que se quiera.
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elementos salvo los encabezados |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
+| `Footnote` | `Id` (obligatorio), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
 | `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`), `Break`, `Alt` (obligatorio), `Format`, `Error correction`, `Rotate`, `Content` |
@@ -213,6 +215,7 @@ vez, y los elementos, las veces que se quiera.
 
 *Elementos* son `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.
+`Footnote` va donde van los elementos en flujo (salvo en `Item` y `Area`), pero no es una caja de ese sitio: va al pie de la página.
 
 Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, las reglas de `Styles` y `Named color`.
 `Block: algo` es un error. `Content` va siempre en bloque `>>`, y `Areas`, en línea o en bloque. Lo que el schema no puede

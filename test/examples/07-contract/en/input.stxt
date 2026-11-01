@@ -10,6 +10,8 @@
 # label (Number label: "Appendix I · ...", in the document because it is text and styles.stxt serves both languages), which
 # the clauses refer to with {number of: annex-title}; recital III
 # refers to the clauses section with {number of: terms}.
+# Three footnotes ([^...] in the parties, in clause 4 and in clause 7, with their Footnote after the clauses): numbered
+# in order, at the bottom of their page, under a rule, with the typography of For element: Footnotes in styles.stxt.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -81,7 +83,7 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 8 0
 				Paragraph:
 					Content >>
-						On the one hand, **Lumen Estudio de Diseño, S.L.P.**, Tax ID B-55123987, with registered address at Calle de la Ribera, 8, Olot (Girona), represented by Ms. Irene Calvo Mas, as its director (hereinafter, “the Studio”).
+						On the one hand, **Lumen Estudio de Diseño, S.L.P.**, Tax ID B-55123987, with registered address at Calle de la Ribera, 8, Olot (Girona), represented by Ms. Irene Calvo Mas, as its director[^poder] (hereinafter, “the Studio”).
 			Block:
 				Style: party
 				Paragraph:
@@ -120,13 +122,13 @@ Document (dev.stxt.pdf):
 
 				3. **Deadlines.** The Studio will deliver the visual identity within six weeks of signing, and the website within a further eight weeks of approval of the identity. Deadlines will be suspended for as long as the Client does not provide the materials or approvals for which it is responsible.
 
-				4. **Fees and payment terms.** The fees amount to 18,400 euros, plus applicable VAT, payable according to the schedule in Appendix {number of: annex-title} by bank transfer within thirty days of the date of each invoice. Late payment will accrue the statutory interest set for commercial transactions.
+				4. **Fees and payment terms.** The fees amount to 18,400 euros, plus applicable VAT[^iva], payable according to the schedule in Appendix {number of: annex-title} by bank transfer within thirty days of the date of each invoice. Late payment will accrue the statutory interest set for commercial transactions.
 
 				5. **Obligations of the Studio.** The Studio will carry out the commission with due professional diligence, appoint a person responsible for the relationship with the Client and report regularly on the progress of the work.
 
 				6. **Obligations of the Client.** The Client will provide the necessary texts, images and data, appoint a contact person with decision-making authority and give its approval or comments within ten business days of each delivery.
 
-				7. **Intellectual property.** Upon full payment of the fees, the Studio assigns to the Client, exclusively and worldwide, the exploitation rights to the logo and the other elements of the identity. The Studio may mention the work in its portfolio, unless expressly requested otherwise.
+				7. **Intellectual property.** Upon full payment of the fees, the Studio assigns to the Client, exclusively and worldwide, the exploitation rights to the logo and the other elements of the identity. The Studio may mention the work in its portfolio[^portafolio], unless expressly requested otherwise.
 
 				8. **Confidentiality.** Each party will keep secret any confidential information of the other to which it has access by reason of the contract and will not use it for any other purpose, during its term and for the following five years.
 
@@ -137,6 +139,15 @@ Document (dev.stxt.pdf):
 				11. **Data protection.** Each party will process any personal data it accesses in accordance with the applicable regulations and solely to perform this contract. If the Studio accesses data of cooperative members, it will do so as data processor, under the corresponding agreement.
 
 				12. **Governing law and jurisdiction.** This contract is governed by Spanish law. For any dispute, the parties submit to the courts of Olot, waiving any other jurisdiction that may apply to them.
+		Footnote:
+			Id: poder
+			Paragraph: Under the power of attorney granted before the notary of Olot Mr. Marc Pujol Serra on May 12, 2021, number 1,204 of his records.
+		Footnote:
+			Id: iva
+			Paragraph: At the general rate in force on the date of each invoice, 21% at the signing of this contract.
+		Footnote:
+			Id: portafolio
+			Paragraph: On its website, on its social media and in entries for design awards, without disclosing confidential information of the Client.
 		Block:
 			Id: annex
 			Break:

@@ -57,9 +57,14 @@ class ElementTest {
         assertTrue(Element.of("item").isEmpty());
         // The column flow of a Columns is generated and has no name: "columns" is the Columns itself.
         assertEquals(Optional.of(Element.COLUMNS), Element.of("columns"));
-        // Generated: the marker, the band of a row, the column flow, the code block of a Markdown and, from the table
-        // of contents, six entries, the title, the leader and the page number.
-        assertEquals(Element.values().length - 13, Element.written().size());
+        // Generated: the marker, the band of a row, the column flow, the code block of a Markdown, the footnote area
+        // and, from the table of contents, six entries, the title, the leader and the page number.
+        assertEquals(Element.values().length - 14, Element.written().size());
+        // The footnote area is named by For element rules, but it is not written; a Footnote is.
+        assertEquals(Optional.of(Element.FOOTNOTES), Element.of("footnotes"));
+        assertTrue(Element.selectable().contains(Element.FOOTNOTES));
+        assertTrue(!Element.written().contains(Element.FOOTNOTES));
+        assertTrue(Element.written().contains(Element.FOOTNOTE));
         // The code block is named by For element rules, but it is not written.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK));

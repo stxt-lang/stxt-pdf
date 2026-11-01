@@ -50,6 +50,7 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | [`Image`](components/image.md) | PNG, JPEG and SVG images, and pages of a PDF |
 | [`Barcode`](components/barcode.md) | QR codes and barcodes generated from their data |
 | [`Markdown`](components/markdown.md) | Writing long content in Markdown |
+| [`Footnote`](components/footnote.md) | Footnotes, numbered and placed on the page of their call |
 | [`Table of contents`](components/table-of-contents.md) | The automatic table of contents |
 
 The [examples](../../../test/examples/README.md) are eleven real documents with their PDF, from an invoice to an annual

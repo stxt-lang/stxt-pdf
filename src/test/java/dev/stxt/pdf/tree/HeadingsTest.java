@@ -62,7 +62,7 @@ class HeadingsTest {
                 "\tBlock:", "\t\tHeading 3:", "\t\t\tText: C",
                 "\tHeading 1:", "\t\tText: D",
                 "\tHeading 2:", "\t\tText: E");
-        assertEquals(5, root.children().size());
+        assertEquals(5, root.inFlowChildren().size());
     }
 
     @Test

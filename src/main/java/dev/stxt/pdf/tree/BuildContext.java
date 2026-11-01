@@ -36,6 +36,8 @@ final class BuildContext {
     final HeadingNumbers headingNumbers = new HeadingNumbers();
     /** Whether the content of a {@code Page overlay} is being built. */
     boolean insidePageOverlay;
+    /** Whether the texts of a heading are being built: a footnote call is not allowed in them. */
+    boolean insideHeading;
     /** Whether the content of a {@code Columns} is being built. */
     boolean insideColumns;
     /**
@@ -64,6 +66,8 @@ final class BuildContext {
      * (reference/components/markdown.md).
      */
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** The footnotes: their calls, their boxes and their numbering (reference/components/footnote.md). */
+    final Footnotes footnotes = new Footnotes();
 
     BuildContext(StyleRules rules) {
         this.rules = rules;

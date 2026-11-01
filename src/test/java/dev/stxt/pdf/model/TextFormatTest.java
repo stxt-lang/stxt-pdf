@@ -104,4 +104,28 @@ class TextFormatTest {
         assertNotEquals(link, plain.withLink("https://otro.example"));
         assertNotEquals(link, plain);
     }
+
+    /** The call and the label of a footnote are superscripts: smaller and raised, in the font of the text around them. */
+    @Test
+    void footnoteCallsAndLabelsAreSuperscripts() {
+        TextFormat call = new TextFormat(true, false, false, false).withFootnote("n1");
+        assertEquals("n1", call.footnote());
+        assertFalse(call.label());
+        assertTrue(call.superscript());
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, call.scale());
+        assertEquals(TextFormat.SUPERSCRIPT_RISE, call.rise());
+        // The bold of the text reaches the call.
+        assertEquals(BOLD, call.face(REGULAR));
+        TextFormat label = TextFormat.PLAIN.asLabel();
+        assertTrue(label.label());
+        assertNull(label.footnote());
+        assertTrue(label.superscript());
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, label.scale());
+        // Neither small caps nor the link change a superscript, and the plain text is not raised.
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, call.withSmallCaps(true).scale());
+        assertEquals("n1", call.withLink("https://a.example").footnote());
+        assertEquals(0, TextFormat.PLAIN.rise());
+        assertFalse(TextFormat.PLAIN.superscript());
+        assertNotEquals(call, label);
+    }
 }

@@ -82,6 +82,7 @@ as follows:
 | `~~x~~` | strikethrough run (a single tilde does not strike through) |
 | `[x](target)`, `<target>` | underlined run with a link to that target ([Links](../common/links.md)) |
 | `` `x` `` | code run, with the family of `Code font` |
+| `[^id]` | the call of the footnote with that `Id`: a superscript run with its number ([Footnote](footnote.md)) |
 | Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |
 | `![Alt](path)`, alone in its paragraph | `Image` with that path and its `Alt`, or decorative with `![](path)` ([Image](image.md)) |
 
@@ -204,6 +205,7 @@ What is generated is read like what is written by hand: headings, paragraphs, li
 
 ## What is not supported
 
-- Block quotes, HTML, horizontal rules, forced line breaks, footnotes, task lists and code highlighting.
+- Block quotes, HTML, horizontal rules, forced line breaks, task lists and code highlighting. Footnotes are called with
+  `[^id]`, but their content is a `Footnote`, not a definition `[^id]: ...` ([Footnote](footnote.md)).
 - Images inside a text and links with a title or with a separate definition.
 - `Id` in what is generated, except in the headings (`{#id}`), and `Style`.

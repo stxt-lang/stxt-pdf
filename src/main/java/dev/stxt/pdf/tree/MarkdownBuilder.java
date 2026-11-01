@@ -94,6 +94,9 @@ final class MarkdownBuilder {
     /** The {@code {#id}} at the end of the text of a heading. */
     private static final Pattern HEADING_ID = Pattern.compile("\\{#([^{}]*)}\\s*$");
 
+    /** A footnote call, {@code [^id]} (reference/components/footnote.md): the {@code Id} of a {@code Footnote}. */
+    private static final Pattern FOOTNOTE_CALL = Pattern.compile("\\[\\^([^\\[\\]\\s]+)]");
+
     private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
             + "images alone in their paragraph and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
             + "`code` and [links](target) are allowed";
@@ -113,9 +116,15 @@ final class MarkdownBuilder {
     }
 
     static Translation translate(InlineNode markdown) {
+        return translate(markdown, new Footnotes());
+    }
+
+    /** Like {@link #translate(InlineNode)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}. */
+    static Translation translate(InlineNode markdown, Footnotes footnotes) {
         Node content = child(markdown, "content").orElseThrow();
         // The Content >> block begins on the line after its own.
-        Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1));
+        Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1),
+                footnotes);
         List<InlineNode> elements = t.blocks(PARSER.parse(content.getText()), false);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown needs content in Content");
@@ -133,7 +142,12 @@ final class MarkdownBuilder {
      * @param firstLine line of the document where the text begins
      */
     static List<TextRun> inline(String text, int firstLine) {
-        Translator t = new Translator(null, firstLine, true, new String[0]);
+        return inline(text, firstLine, new Footnotes());
+    }
+
+    /** Like {@link #inline(String, int)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}. */
+    static List<TextRun> inline(String text, int firstLine, Footnotes footnotes) {
+        Translator t = new Translator(null, firstLine, true, new String[0], footnotes);
         TextRun.Joiner out = new TextRun.Joiner();
         boolean first = true;
         for (org.commonmark.node.Node b = INLINE_PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
@@ -168,10 +182,13 @@ final class MarkdownBuilder {
         private final boolean inlineOnly;
         /** The lines of the Markdown, to count the cells of a table row, which the parser does not keep. */
         private final String[] source;
+        /** The footnotes of the document, which number the calls (reference/components/footnote.md). */
+        private final Footnotes footnotes;
 
-        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source) {
+        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source, Footnotes footnotes) {
             this.markdown = markdown;
             this.source = source;
+            this.footnotes = footnotes;
             this.firstLine = firstLine;
             this.inlineOnly = inlineOnly;
             this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet-markers");
@@ -446,7 +463,7 @@ final class MarkdownBuilder {
         void inline(org.commonmark.node.Node parent, TextFormat f, TextRun.Joiner out, int line) {
             for (org.commonmark.node.Node n = parent.getFirstChild(); n != null; n = n.getNext()) {
                 if (n instanceof Text t) {
-                    out.add(t.getLiteral(), f);
+                    calls(t.getLiteral(), f, out, line);
                 } else if (n instanceof SoftLineBreak) {
                     // A single line break counts as a space, as in a Text (reference/common/typography.md).
                     out.add(" ", f);
@@ -465,6 +482,26 @@ final class MarkdownBuilder {
                 } else {
                     throw unsupported(n, line);
                 }
+            }
+        }
+
+        /**
+         * The text of a {@code Text} node with its footnote calls (reference/components/footnote.md): each
+         * {@code [^id]} is a superscript run with the number of the note, in the format of the text around it.
+         */
+        private void calls(String text, TextFormat f, TextRun.Joiner out, int line) {
+            Matcher m = FOOTNOTE_CALL.matcher(text);
+            int at = 0;
+            while (m.find()) {
+                if (m.start() > at) {
+                    out.add(text.substring(at, m.start()), f);
+                }
+                String id = m.group(1);
+                out.add(footnotes.call(id, line), f.withFootnote(id));
+                at = m.end();
+            }
+            if (at < text.length()) {
+                out.add(text.substring(at), f);
             }
         }
 

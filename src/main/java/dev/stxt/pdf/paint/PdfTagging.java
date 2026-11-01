@@ -117,6 +117,30 @@ final class PdfTagging implements Tagging {
     }
 
     @Override
+    public void beginFootnoteCall(Box box, String footnote) {
+        io(() -> {
+            int mcid = structure.markFootnoteCall(box, footnote);
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName("Reference"), mcid);
+            }
+        });
+    }
+
+    @Override
+    public void beginFootnoteLabel(Box box) {
+        io(() -> {
+            int mcid = structure.markFootnoteLabel(box);
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName("Lbl"), mcid);
+            }
+        });
+    }
+
+    @Override
     public void endText() {
         linkText = false;
         io(out::endMarkedContent);

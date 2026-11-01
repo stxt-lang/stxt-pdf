@@ -73,6 +73,7 @@ Las piezas:
 | `TableOfContentsBuilder` | Las entradas de los índices, al final de la construcción |
 | `HeadingNumbers` | Los números de los encabezados |
 | `References`, `LinkTargets` | Comprueban las referencias y los enlaces `#id` del árbol entero |
+| `Footnotes` | Las notas al pie: el área de cada sección, las llamadas `[^id]` numeradas al leerlas y, al final, que cada llamada tiene su nota y cada nota su llamada, y el número delante del primer texto de cada nota |
 | `ModelValidator` | Las reglas que miran la caja ya leída (como los márgenes, los mínimos y máximos, el alto definido o el giro) |
 | `Nodes` | El acceso a los nodos y los errores |
 
@@ -144,6 +145,12 @@ cerrarlo con `TextRuns`.
 - **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
   con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el
   `Id` o ese nombre.
+- **Área de notas:** `Footnotes.beginSection` crea en cada sección la caja `Footnotes` (`Element.FOOTNOTES`,
+  `Position.FOOTNOTES`, fuera del flujo: `Style.isOutOfFlow()`), hija de la sección después de su contenido, con el
+  aspecto por defecto del filete y las reglas `For element: Footnotes` encima. Cada `Footnote` escrita en la sección
+  (`buildContent`, `BoxTreeBuilder.footnote`) se construye con la familia `FOOTNOTE` de `ElementReader` y el área como
+  padre, del que hereda, y es hija del área y no de la caja donde se escribe. `BlockLayout` no la ve; `PdfStructure` la
+  coloca tras el texto que la llama ([El PDF por dentro](pdf.md#árbol-de-estructura)).
 - **Bloque de código:** `MarkdownBuilder` marca el nodo `Text` que genera (`Translation.codeBlocks`) y
   `BoxTreeBuilder.element` le da el elemento `Element.CODE_BLOCK`.
 

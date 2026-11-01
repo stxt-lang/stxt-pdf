@@ -53,6 +53,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [`Image`](components/image.md) | `Image`: PNG, JPEG y SVG |
 | [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 y EAN-13 |
 | [`Markdown`](components/markdown.md) | `Markdown` y el elemento generado `Code block` |
+| [`Footnote`](components/footnote.md) | `Footnote`, la llamada `[^id]` y el área de notas generada `Footnotes` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents` y las entradas que genera |
 
 ## Implementación

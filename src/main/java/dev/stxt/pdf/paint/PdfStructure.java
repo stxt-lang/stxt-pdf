@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Reference;
+import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
 import org.apache.pdfbox.cos.COSArray;
@@ -15,10 +16,12 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDStructureElementNameTreeNode;
 import org.apache.pdfbox.pdmodel.PageMode;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDDefaultAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDParentTreeValue;
@@ -43,6 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Meaning of the document in the PDF (reference/implementation/pdf.md): the structure tree of the tagged PDF and the
@@ -119,6 +123,12 @@ final class PdfStructure {
     private final COSDictionary pdf2;
     /** With PDF/UA-2, the {@code TOCI} of each table of contents entry, pointing to its heading with {@code Ref}. */
     private final Map<Box, PDStructureElement> entries = new HashMap<>();
+    /** The {@code Footnote} boxes of the document, by {@code Id} (reference/components/footnote.md). */
+    private final Map<String, Box> notes = new HashMap<>();
+    /** The {@code Lbl} of each footnote: the number that opens it. */
+    private final Map<Box, PDStructureElement> labels = new HashMap<>();
+    /** The element of each footnote, by its {@code Id}, for the {@code IDTree} that PDF/UA-1 asks for a {@code Note}. */
+    private final Map<String, PDStructureElement> noteIds = new TreeMap<>();
 
     /**
      * The root of the document: it is the "parent" of its sections, which have none (reference/components/document.md).
@@ -147,7 +157,22 @@ final class PdfStructure {
         PDMarkInfo markInfo = new PDMarkInfo();
         markInfo.setMarked(true);
         catalog.setMarkInfo(markInfo);
+        footnotes(root);
         build(root, treeRoot);
+    }
+
+    /**
+     * The footnotes of the document: the children of the footnote area of each section, which hangs from the section
+     * out of its flow. Their elements are built after the text that calls them ({@link #children}), in reading order.
+     */
+    private void footnotes(Box root) {
+        for (Box section : root.children()) {
+            for (Box child : section.children()) {
+                if (child.role() == Role.FOOTNOTES) {
+                    child.children().forEach(note -> notes.put(note.id(), note));
+                }
+            }
+        }
     }
 
     /**
@@ -166,7 +191,7 @@ final class PdfStructure {
         }
         // An image with a link is the content of its Link: Link → Figure.
         PDStructureNode owner = box.isImage() && box.style().link() != null ? newLink(box, parent) : parent;
-        PDStructureElement e = element(type(box), owner);
+        PDStructureElement e = element(type(box, ua), owner);
         owner.appendKid(e);
         elements.put(box, e);
         if (box.headingLevel() > 0) {
@@ -178,6 +203,20 @@ final class PdfStructure {
             return;
         }
         PDStructureNode content = e;
+        if (box.role() == Role.NOTE) {
+            // Note (PDF/UA-1) or FENote (PDF/UA-2): its identifier and the label with its number, before its content.
+            e.setElementIdentifier("footnote-" + box.id());
+            noteIds.put("footnote-" + box.id(), e);
+            if (pdf2 != null) {
+                COSDictionary noteType = new COSDictionary();
+                noteType.setName(COSName.O, "FENote");
+                noteType.setName(COSName.getPDFName("NoteType"), "Footnote");
+                e.addAttribute(new PDDefaultAttributeObject(noteType));
+            }
+            PDStructureElement label = element("Lbl", e);
+            e.appendKid(label);
+            labels.put(box, label);
+        }
         if (box.role() == Role.LIST_ITEM) {
             // LI: the marker (Lbl) and the content (LBody).
             if (box.marker() != null) {
@@ -212,13 +251,25 @@ final class PdfStructure {
         return e;
     }
 
-    /** The elements of the children of the box; of a {@code Page overlay}, which is not content, only its links. */
+    /**
+     * The elements of the children of the box; of a {@code Page overlay}, which is not content, only its links. The
+     * footnote area of a section has no element: each of its notes goes right after the text that calls it
+     * (reference/components/footnote.md), as its sibling, or inside the cell whose text calls it.
+     */
     private void children(Box box, PDStructureNode content) {
         for (Box child : box.children()) {
             if (child.style().position() == Position.PAGE_OVERLAY) {
                 standIns(child, content);
-            } else {
+            } else if (child.role() != Role.FOOTNOTES) {
                 build(child, content);
+                if (child.hasText()) {
+                    PDStructureNode parent = child.role() == Role.CELL ? elements.get(child) : content;
+                    for (TextRun run : child.runs()) {
+                        if (run.format().footnote() != null && notes.containsKey(run.format().footnote())) {
+                            build(notes.get(run.format().footnote()), parent);
+                        }
+                    }
+                }
             }
         }
     }
@@ -414,8 +465,15 @@ final class PdfStructure {
             case TABLE_OF_CONTENTS -> "TOC";
             case TOC_ENTRY -> "TOCI";
             case SPAN, PAGE_NUMBER -> "Span";
-            case LEADER, FLOW, BLOCK -> "Div";
+            // A footnote: Note in PDF 1.7, FENote in PDF 2.0 (PDF/UA-2); the choice is made by whoever has the part.
+            case NOTE -> "Note";
+            case LEADER, FLOW, BLOCK, FOOTNOTES -> "Div";
         };
+    }
+
+    /** The structure type of a footnote: {@code Note}, or {@code FENote} with PDF/UA-2, which is PDF 2.0. */
+    private static String type(Box box, int ua) {
+        return box.role() == Role.NOTE && ua == 2 ? "FENote" : type(box);
     }
 
     /** Starts the content of a page. */
@@ -456,6 +514,49 @@ final class PdfStructure {
         holder.appendKid(link);
         inline = link;
         return reference(link);
+    }
+
+    /**
+     * Records the call of a footnote in the text of the box (reference/components/footnote.md) as the content of a
+     * new {@code Reference}, child of the element of the box, that points with {@code Ref} to the note, which points
+     * back to it; gives its {@code MCID}, or -1 if the text is not content.
+     */
+    int markFootnoteCall(Box box, String footnote) {
+        PDStructureElement holder = holders.containsKey(box) ? holders.get(box) : elements.get(box);
+        PDStructureElement note = elements.get(notes.get(footnote));
+        if (holder == null || note == null || !isContent(box)) {
+            return -1;
+        }
+        PDStructureElement reference = element("Reference", holder);
+        reference.setPage(page);
+        holder.appendKid(reference);
+        refer(reference, note);
+        refer(note, reference);
+        return reference(reference);
+    }
+
+    /** Adds {@code target} to the {@code Ref} of {@code e}: the elements it refers to. */
+    private static void refer(PDStructureElement e, PDStructureElement target) {
+        COSName key = COSName.getPDFName("Ref");
+        COSArray ref = e.getCOSObject().getCOSArray(key);
+        if (ref == null) {
+            ref = new COSArray();
+            e.getCOSObject().setItem(key, ref);
+        }
+        ref.add(target);
+    }
+
+    /**
+     * Records the number that opens a footnote, in its first text, as the content of the {@code Lbl} of the note
+     * (reference/components/footnote.md); gives its {@code MCID}, or -1 if it is not inside a note.
+     */
+    int markFootnoteLabel(Box box) {
+        for (Box b = box; b != null; b = b.parent()) {
+            if (labels.containsKey(b)) {
+                return reference(labels.get(b));
+            }
+        }
+        return -1;
     }
 
     /** A marked content of the current page that hangs from {@code e}; its {@code MCID}. */
@@ -650,6 +751,12 @@ final class PdfStructure {
         parentTree.setNumbers(parents);
         treeRoot.setParentTree(parentTree);
         treeRoot.setParentTreeNextKey(parents.size());
+        if (!noteIds.isEmpty()) {
+            // The identifiers of the footnotes (Note needs one in PDF/UA-1), in the tree that maps them.
+            PDStructureElementNameTreeNode idTree = new PDStructureElementNameTreeNode();
+            idTree.setNames(noteIds);
+            treeRoot.setIDTree(idTree);
+        }
         if (headings.isEmpty()) {
             return;
         }

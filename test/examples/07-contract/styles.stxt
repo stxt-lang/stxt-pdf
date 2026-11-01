@@ -61,6 +61,19 @@ Styles (dev.stxt.pdf):
 			Markup: markdown
 		Box:
 			Margin: 0 0 7 0
+	For element: Footnotes
+		Typography:
+			Size: 8
+			Line height: 11
+			Color: gray
+		Box:
+			Margin: 12 0 0 0
+			Border: 0.5 0 0 0
+			Border color: rule
+			Padding: 4 0 0 0
+	For element: Footnote
+		Box:
+			Margin: 0 0 2 0
 	For element: List
 		Box:
 			Padding: 0 0 0 20

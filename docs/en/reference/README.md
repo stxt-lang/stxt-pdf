@@ -53,6 +53,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [`Image`](components/image.md) | `Image`: PNG, JPEG and SVG |
 | [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 and EAN-13 |
 | [`Markdown`](components/markdown.md) | `Markdown` and the generated element `Code block` |
+| [`Footnote`](components/footnote.md) | `Footnote`, the call `[^id]` and the generated footnote area `Footnotes` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents` and the entries it generates |
 
 ## Implementation

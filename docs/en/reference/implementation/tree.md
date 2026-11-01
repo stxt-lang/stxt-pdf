@@ -73,6 +73,7 @@ The pieces:
 | `TableOfContentsBuilder` | The entries of the tables of contents, at the end of the construction |
 | `HeadingNumbers` | The numbers of the headings |
 | `References`, `LinkTargets` | Check the references and the `#id` links of the whole tree |
+| `Footnotes` | The footnotes: the area of each section, the calls `[^id]` numbered as they are read and, at the end, that each call has its note and each note its call, and the number before the first text of each note |
 | `ModelValidator` | The rules that look at the box already read (such as margins, minimums and maximums, definite height or rotation) |
 | `Nodes` | Access to the nodes and the errors |
 
@@ -144,6 +145,12 @@ closing it with `TextRuns`.
 - **Table of contents entries:** `TableOfContentsBuilder` generates at the end one `Stack` box per heading (`Element.TOC_1` to `Element.TOC_6`)
   with the title, the leader and the number. A heading without `Id` receives a generated name (`Box.anchor`), and `Box.key()` gives the
   `Id` or that name.
+- **Footnote area:** `Footnotes.beginSection` creates in each section the `Footnotes` box (`Element.FOOTNOTES`,
+  `Position.FOOTNOTES`, out of the flow: `Style.isOutOfFlow()`), a child of the section after its content, with the
+  default look of the rule and the `For element: Footnotes` rules on top. Each `Footnote` written in the section
+  (`buildContent`, `BoxTreeBuilder.footnote`) is built with the `FOOTNOTE` family of `ElementReader` and the area as
+  parent, from which it inherits, and is a child of the area and not of the box where it is written. `BlockLayout`
+  does not see it; `PdfStructure` places it after the text that calls it ([The PDF inside](pdf.md#structure-tree)).
 - **Code block:** `MarkdownBuilder` marks the `Text` node it generates (`Translation.codeBlocks`) and
   `BoxTreeBuilder.element` gives it the element `Element.CODE_BLOCK`.
 

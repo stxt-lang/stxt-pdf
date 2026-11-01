@@ -11,7 +11,7 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 |---|---|---|
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
-| `For element` | un elemento generado por el motor: `Code block` o `TOC 1` a `TOC 6` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)) o las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)). No se escriben en el documento |
+| `For element` | un elemento generado por el motor: `Code block`, `TOC 1` a `TOC 6` o `Footnotes` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
 | `For element` | una posición en una tabla: `Header cell`, `Body cell`, `Footer cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../components/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style` y las celdas de una `Row` con él en su `Style` |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |

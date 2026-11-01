@@ -80,7 +80,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
     los índices;
   - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
     imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));
-  - `ModelValidator`, las reglas que miran la caja ya leída.
+  - `ModelValidator`, las reglas que miran la caja ya leída;
+  - `Footnotes`, las notas al pie: el área de cada sección, la numeración de las llamadas y sus comprobaciones.
 
 ### Layout (`layout`)
 
@@ -90,6 +91,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   `TableLayout`, `ColumnsLayout`, `ImageLayout`): `layout(box, space, from)` y `contentIntrinsic(box)`.
 - **`ConstraintSpace`** y **`LayoutResult`**: la entrada y la salida inmutables del layout de una caja. El resultado lleva
   el `Fragment`, el `BreakToken` para continuar en la página siguiente y la calidad del corte.
+- **`FootnoteLayout`**: cada página de una sección con notas al pie: el flujo con la reserva del pie y las notas de sus
+  llamadas apiladas en el área de notas ([El layout](implementation/layout.md#paginación)).
 - **`Paginator`**: reparte cada sección en páginas, hace converger las referencias, numera las páginas y coloca los
   `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.

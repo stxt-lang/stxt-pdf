@@ -1,0 +1,114 @@
+# Footnotes (reference/components/footnote.md). Pages of 300 × 200 with margins of 20: page area of 260 × 160 from
+# (20, 20), which ends at y = 180. Lines of 12 (Size 10); at 5 pt per character, 52 characters fit per line. The
+# footnote area has, by default, a top margin of 8, a rule of 0.5 and a padding of 4 above its notes: 12.5 more than
+# the notes, with the rule 8 below the text that precedes it.
+#
+# Section 1: p1 calls a and p2 calls b and c on the same line; tall (100) and p3, which calls d, follow. With the four
+#   notes (48 + 12.5 = 60.5) the page leaves 99.5 and tall does not fit: it moves to page 2 with p3, and the page
+#   reserves the three notes it calls (36 + 12.5 = 48.5): the area, 40.5 high, at 139.5; a at 144, b at 156, c at 168.
+# Page 2: tall at 20 and p3 at 120, with d below: area of 16.5 at 163.5, d at 168.
+# Section 2: the numbering starts again in letters. big (60) and p5, which calls e, 8 lines (96). The three together
+#   (60 + 12 + 108.5) exceed 160, so p5 moves to page 4 with its note, and page 3 only has big. Page 4: p5 at 20 and the
+#   area, 100.5 high, at 79.5, with e at 84.
+# Section 3: q1, 10 lines, calls f, 12 lines (144), in its first line; q2, 10 lines, follows. f does not fit under its
+#   line even alone: only its first 10 lines do (148 reserved: a line of q1 at the top, and 135.5 for the notes, where
+#   11 lines fit but the last two go together). Page 5: q1's first line at 20, the area at 55.5 (124.5 high) with f's
+#   10 lines at 60. Page 6: the end of f (2 lines) comes first in the area, and q1's other 9 lines (108) fit above it:
+#   q1 at 20, area of 28.5 at 151.5, f at 156. q2 does not fit (one line would violate orphans) and goes to page 7.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Paragraph: Uno[^a] dos.
+			Id: p1
+		Paragraph: Tres[^b] cuatro[^c].
+			Id: p2
+		Footnote:
+			Id: a
+			Paragraph: Nota a.
+		Footnote:
+			Id: b
+			Paragraph: Nota b.
+		Block:
+			Id: tall
+			Box:
+				Height: 100
+			Break:
+				Keep together: true
+		Paragraph: Cinco[^d].
+			Id: p3
+		Footnote:
+			Id: c
+			Paragraph: Nota c.
+		Footnote:
+			Id: d
+			Paragraph: Nota d.
+	Section:
+		Footnote numbering: restart
+		Footnote number format: lower-alpha
+		Block:
+			Id: big
+			Box:
+				Height: 60
+		Paragraph: Seis[^e].
+			Id: p5
+		Footnote:
+			Id: e
+			Paragraph:
+				Content >>
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+					eeeeeeeee eeeeeeeee eeeeeeeee eeeeeeeee
+	Section:
+		Paragraph:
+			Id: q1
+			Content >>
+				qqqqqqqqq[^f] qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq qqqqqqqqq
+				qqqqqqqqq qqqqqqqqq qqqqqqqqq
+		Footnote:
+			Id: f
+			Paragraph:
+				Content >>
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+					fffffffff fffffffff fffffffff fffffffff fffffffff fffffffff
+		Paragraph:
+			Id: q2
+			Content >>
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr rrrrrrrrr
+				rrrrrrrrr rrrrrrrrr

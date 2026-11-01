@@ -80,7 +80,8 @@ depend on the `LayoutContext` interface.
     tables of contents;
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
     generated images ([The box tree](implementation/tree.md#generated-images));
-  - `ModelValidator`, the rules that look at the box once read.
+  - `ModelValidator`, the rules that look at the box once read;
+  - `Footnotes`, the footnotes: the area of each section, the numbering of the calls and their checks.
 
 ### Layout (`layout`)
 
@@ -90,6 +91,8 @@ depend on the `LayoutContext` interface.
   `TableLayout`, `ColumnsLayout`, `ImageLayout`): `layout(box, space, from)` and `contentIntrinsic(box)`.
 - **`ConstraintSpace`** and **`LayoutResult`**: the immutable input and output of the layout of a box. The result carries
   the `Fragment`, the `BreakToken` to continue on the next page and the quality of the break.
+- **`FootnoteLayout`**: each page of a section with footnotes: the flow with the bottom reservation and the notes of
+  its calls stacked in the footnote area ([Layout](implementation/layout.md#pagination)).
 - **`Paginator`**: splits each section into pages, makes the references converge, numbers the pages and places the
   `Page overlay` elements.
 - **`Overflow`**: looks for overflows in the already paginated result.

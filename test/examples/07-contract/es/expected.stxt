@@ -5,12 +5,18 @@ Result:
 		Fragment: terms
 			Rect: 70 498 455.28 16.5
 		Fragment: clauses
-			Rect: 70 520.5 455.28 214
+			Rect: 70 520.5 455.28 192
+		Fragment: poder
+			Rect: 70 739.89 455.28 22
 		Fragment: footer
 			Rect: 70 788.39 455.28 21.5
 	Page: 2
 		Fragment: clauses
-			Rect: 70 92 455.28 558
+			Rect: 70 92 455.28 580
+		Fragment: iva
+			Rect: 70 721.89 455.28 11
+		Fragment: portafolio
+			Rect: 70 739.89 455.28 22
 		Fragment: header
 			Rect: 70 32 455.28 27.55
 		Fragment: footer

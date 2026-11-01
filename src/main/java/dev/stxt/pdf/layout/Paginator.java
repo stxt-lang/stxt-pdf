@@ -44,6 +44,10 @@ import java.util.Set;
  * {@link ErrorCode#REFERENCE_UNSTABLE} after {@value #MAX_REFERENCE_PASSES} passes that change
  * some page.</p>
  *
+ * <p>The footnotes (reference/components/footnote.md) take room from the flow of their page: {@link FootnoteLayout}
+ * lays out each page of a section with footnotes reserving the smallest height in which the notes called on it fit,
+ * and gives the fragment of the footnote area, which goes in the {@link Page} next to the flow.</p>
+ *
  * <p>The running heads ({@code {heading N}} in a {@code Page overlay}) are the heading in effect on each page
  * ({@link RunningHeads}), so the {@code Page overlay} boxes that contain one are laid out on each page with the text
  * of that page: before placing them, the engine is told the values of the page and forgets what it stored of those
@@ -90,7 +94,8 @@ public final class Paginator {
      * The flow of each section, one result per page, whether it ends with a blank page ({@code Begin on: odd} in
      * the next one) and the numbering of its pages.
      */
-    private record Flow(List<List<LayoutResult>> results, boolean[] blankAfter, Numbering numbering) {
+    private record Flow(List<List<LayoutResult>> results, List<List<Fragment>> footnotes, boolean[] blankAfter,
+                        Numbering numbering) {
     }
 
     /**
@@ -116,7 +121,8 @@ public final class Paginator {
         int changes = 0;
         while (true) {
             pageOverlays.forEach(Map::clear);
-            List<List<LayoutResult>> results = flow(sections, pageOverlays);
+            List<List<Fragment>> footnotes = new ArrayList<>();
+            List<List<LayoutResult>> results = flow(sections, pageOverlays, footnotes);
             boolean[] blankAfter = blankAfter(sections, results);
             Numbering numbering = Numbering.of(sections, results, blankAfter);
             boolean again = false;
@@ -126,7 +132,7 @@ public final class Paginator {
                 engine.reservePageNumbers(probe, numberedTexts);
                 again = true;
             }
-            Map<String, String> actual = pagesOf(results, blankAfter, numbering, targets, sites);
+            Map<String, String> actual = pagesOf(results, footnotes, blankAfter, numbering, targets, sites);
             if (!actual.equals(assumed)) {
                 if (++changes > MAX_REFERENCE_PASSES) {
                     throw unstable(sites, assumed, actual);
@@ -136,7 +142,7 @@ public final class Paginator {
                 again = true;
             }
             if (!again) {
-                return new Flow(results, blankAfter, numbering);
+                return new Flow(results, footnotes, blankAfter, numbering);
             }
         }
     }
@@ -186,9 +192,13 @@ public final class Paginator {
                 Fragment content = numbered && printed > 0
                         ? engine.number(own.get(i).fragment(), numbering.label(number), numbering.totalLabel(number))
                         : own.get(i).fragment();
+                Fragment footnotes = flow.footnotes().get(k).get(i);
+                if (footnotes != null && numbered && printed > 0) {
+                    footnotes = engine.number(footnotes, numbering.label(number), numbering.totalLabel(number));
+                }
                 // The medium of the page: with Mirror margins, an even page swaps the left and right margins.
                 pages.add(new Page(number, content, pageOverlayFragments, section.pageSetup().forPage(number), k,
-                        printed, numbering.style(number), false));
+                        printed, numbering.style(number), false, footnotes));
             }
             if (flow.blankAfter()[k]) {
                 // The blank page so that the next one starts on an odd page: of this section, without content or
@@ -306,8 +316,8 @@ public final class Paginator {
      * happen: the boxes with {@code Page overlay} are rejected when the tree is built) or that is on a page without a
      * number is an error.
      */
-    private static Map<String, String> pagesOf(List<List<LayoutResult>> results, boolean[] blankAfter,
-                                               Numbering numbering, Set<String> targets,
+    private static Map<String, String> pagesOf(List<List<LayoutResult>> results, List<List<Fragment>> footnotes,
+                                               boolean[] blankAfter, Numbering numbering, Set<String> targets,
                                                List<References.Site> sites) {
         Map<String, String> pages = new LinkedHashMap<>();
         if (targets.isEmpty()) {
@@ -315,10 +325,14 @@ public final class Paginator {
         }
         int number = 0;
         for (int k = 0; k < results.size(); k++) {
-            for (LayoutResult r : results.get(k)) {
+            for (int i = 0; i < results.get(k).size(); i++) {
                 number++;
                 if (pages.size() < targets.size()) {
-                    firstPages(r.fragment(), number, targets, pages, numbering, sites);
+                    firstPages(results.get(k).get(i).fragment(), number, targets, pages, numbering, sites);
+                    // A footnote (always with Id) can be referred to: it is on the page of its call.
+                    if (footnotes.get(k).get(i) != null) {
+                        firstPages(footnotes.get(k).get(i), number, targets, pages, numbering, sites);
+                    }
                 }
             }
             // The blank page has nothing to refer to, but it takes up its number.
@@ -360,25 +374,32 @@ public final class Paginator {
     }
 
     /**
-     * Paginates the flow of each section: one result per page and section. Records in {@code pageOverlays}, per
-     * section, the {@code Page overlay} boxes.
+     * Paginates the flow of each section: one result per page and section, with the footnote area of each page
+     * ({@link FootnoteLayout}; {@code null} on a page without notes) in {@code footnotes}. Records in
+     * {@code pageOverlays}, per section, the {@code Page overlay} boxes.
      */
-    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> pageOverlays) {
+    private List<List<LayoutResult>> flow(List<Section> sections, List<Map<Box, PendingOverlay>> pageOverlays,
+                                          List<List<Fragment>> footnotes) {
         List<List<LayoutResult>> all = new ArrayList<>();
         int pages = 0;
         for (int k = 0; k < sections.size(); k++) {
             Section section = sections.get(k);
+            FootnoteLayout notes = new FootnoteLayout(engine, section);
             List<LayoutResult> results = new ArrayList<>();
+            List<Fragment> areas = new ArrayList<>();
             BreakToken token = null;
+            FootnoteLayout.Carry carry = null;
             do {
-                ConstraintSpace space = ConstraintSpace.forPage(section.pageSetup());
-                LayoutResult r = engine.layout(section.box(), space, token);
+                FootnoteLayout.Result page = notes.page(token, carry);
+                LayoutResult r = page.body();
                 BreakToken next = perPage(r.breakToken());
                 if (next instanceof BreakToken.Before || (next != null && next.equals(token))) {
                     throw new InternalException("No progress on page " + (pages + results.size() + 1)
                             + ": the progress guarantee has been broken (reference/common/breaks.md)");
                 }
                 results.add(r);
+                areas.add(page.footnotes());
+                carry = page.carry();
                 int section0 = k;
                 r.pending().forEach(p -> pageOverlays.get(section0).putIfAbsent(p.box(), p));
                 token = next;
@@ -388,6 +409,7 @@ public final class Paginator {
             } while (token != null);
             pages += results.size();
             all.add(results);
+            footnotes.add(areas);
         }
         return all;
     }

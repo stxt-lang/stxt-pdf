@@ -13,6 +13,7 @@ import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
@@ -136,8 +137,23 @@ public final class StackingContext {
      * root; their positions are relative to the page area.
      */
     public static StackingContext build(Fragment root, List<Fragment> pageOverlays, double originX, double originY) {
+        return build(root, null, pageOverlays, originX, originY);
+    }
+
+    /**
+     * Root context of a page with its footnote area ({@code footnotes}, relative to the page area like the root;
+     * {@code null} without notes), which is painted after the flow and before the {@code Page overlay} boxes, as one
+     * more in-flow box, and its {@code Page overlay} boxes.
+     */
+    public static StackingContext build(Fragment root, Fragment footnotes, List<Fragment> pageOverlays, double originX,
+                                        double originY) {
         StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
         sc.walkChildren(sc.root);
+        if (footnotes != null) {
+            Piece p = new Piece(footnotes, originX + footnotes.x(), originY + footnotes.y(), List.of());
+            sc.inFlow.add(p);
+            sc.walkChildren(p);
+        }
         for (Fragment f : pageOverlays) {
             sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()));
         }
@@ -500,20 +516,25 @@ public final class StackingContext {
             for (int i = 0; i < runs.size(); i++) {
                 TextLine.Run r = runs.get(i);
                 String link = r.format().link();
-                if (!open || !Objects.equals(link, current)) {
+                String sequence = sequence(r.format());
+                if (!open || !Objects.equals(sequence, current)) {
                     if (open) {
                         tags.endText();
                     }
-                    if (link == null) {
+                    if (r.format().footnote() != null) {
+                        tags.beginFootnoteCall(box, r.format().footnote());
+                    } else if (r.format().label()) {
+                        tags.beginFootnoteLabel(box);
+                    } else if (link == null) {
                         tags.beginText(box);
                     } else {
                         tags.beginLinkText(box);
                     }
                     open = true;
-                    current = link;
+                    current = sequence;
                 }
-                boolean first = i == 0 || !Objects.equals(link, runs.get(i - 1).format().link());
-                boolean last = i == runs.size() - 1 || !Objects.equals(link, runs.get(i + 1).format().link());
+                boolean first = i == 0 || !sameSequence(r.format(), runs.get(i - 1).format());
+                boolean last = i == runs.size() - 1 || !sameSequence(r.format(), runs.get(i + 1).format());
                 if (link != null && first) {
                     paintLinkZone(tags, box, content, l, i, link);
                 }
@@ -524,7 +545,9 @@ public final class StackingContext {
                     tags.beginActualText(sameLinkText(runs, i, spaceAfter, l.hyphenated()));
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
-                canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
+                // A superscript (the call or the label of a footnote) is raised above the baseline.
+                canvas.text(content.x() + l.x() + r.x(), baseline - r.format().rise() * l.fontSize(), shown,
+                        r.format().face(font),
                         l.fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
                 if (actual && last) {
                     tags.endActualText();
@@ -559,14 +582,35 @@ public final class StackingContext {
         return text.toString();
     }
 
-    /** Where the runs that start at {@code first} and follow one another with the same link end (exclusive). */
+    /**
+     * Where the runs that start at {@code first} and follow one another in the same sequence (same link, and neither
+     * the call nor the label of a footnote) end (exclusive).
+     */
     private static int sequenceEnd(List<TextLine.Run> runs, int first) {
-        String link = runs.get(first).format().link();
+        TextFormat f = runs.get(first).format();
         int end = first;
-        while (end < runs.size() && Objects.equals(link, runs.get(end).format().link())) {
+        while (end < runs.size() && sameSequence(f, runs.get(end).format())) {
             end++;
         }
         return end;
+    }
+
+    /**
+     * What makes two runs the same marked content of the tagged PDF: their link, and whether they are the call or
+     * the label of a footnote, which are marked apart (reference/implementation/pdf.md).
+     */
+    private static String sequence(TextFormat f) {
+        if (f.footnote() != null) {
+            return "footnote:" + f.footnote();
+        }
+        if (f.label()) {
+            return "label";
+        }
+        return f.link() == null ? null : "link:" + f.link();
+    }
+
+    private static boolean sameSequence(TextFormat a, TextFormat b) {
+        return Objects.equals(sequence(a), sequence(b));
     }
 
     /**
@@ -578,7 +622,7 @@ public final class StackingContext {
         List<TextLine.Run> runs = l.runs();
         StringBuilder text = new StringBuilder();
         int end = first;
-        while (end < runs.size() && destination.equals(runs.get(end).format().link())) {
+        while (end < runs.size() && sameSequence(runs.get(first).format(), runs.get(end).format())) {
             text.append(runs.get(end).text());
             end++;
         }

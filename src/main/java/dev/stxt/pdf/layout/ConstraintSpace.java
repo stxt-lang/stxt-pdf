@@ -36,8 +36,16 @@ public record ConstraintSpace(
 
     /** Space of the root box when a page starts: the whole page area. */
     public static ConstraintSpace forPage(PageSetup pageSetup) {
+        return forPage(pageSetup, 0);
+    }
+
+    /**
+     * Space of the root box when a page starts, with {@code reserved} points at the bottom of the page area taken by
+     * the footnotes of the page (reference/components/footnote.md): the flow gets the rest.
+     */
+    public static ConstraintSpace forPage(PageSetup pageSetup, double reserved) {
         double width = pageSetup.pageArea().width();
-        OptionalDouble height = OptionalDouble.of(pageSetup.pageArea().height());
+        OptionalDouble height = OptionalDouble.of(pageSetup.pageArea().height() - reserved);
         return new ConstraintSpace(width, height, true, true, width, height, height, true, false);
     }
 

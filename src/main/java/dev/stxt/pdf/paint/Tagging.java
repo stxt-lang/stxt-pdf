@@ -22,6 +22,14 @@ public interface Tagging {
         }
 
         @Override
+        public void beginFootnoteCall(Box box, String footnote) {
+        }
+
+        @Override
+        public void beginFootnoteLabel(Box box) {
+        }
+
+        @Override
         public void endText() {
         }
 
@@ -52,7 +60,19 @@ public interface Tagging {
      */
     void beginLinkText(Box box);
 
-    /** Ends the text started with {@link #beginText(Box)} or {@link #beginLinkText(Box)}. */
+    /**
+     * Starts the call of a footnote inside the text of the box (reference/components/footnote.md): the number, which
+     * the tagged PDF marks as a {@code Reference} to the note with that {@code Id}, until {@link #endText()}.
+     */
+    void beginFootnoteCall(Box box, String footnote);
+
+    /**
+     * Starts the number that opens a footnote, inside the text of the box, which is the first text of the note: the
+     * tagged PDF marks it as the label ({@code Lbl}) of the note, until {@link #endText()}.
+     */
+    void beginFootnoteLabel(Box box);
+
+    /** Ends the text started with {@link #beginText(Box)}, {@link #beginLinkText(Box)} or the footnote ones. */
     void endText();
 
     /**

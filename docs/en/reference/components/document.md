@@ -110,8 +110,11 @@ content is in one of them.
 | `Start` | integer ≥ 1 | `1` | With `restart`, the number of its first page. Without `restart` it is `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | boolean | `true` | Whether it carries the `Page overlay` elements of the document. With `false`, only its own appear. |
 | `Begin on` | `any`, `odd` | `any` | On which physical page it begins ([double-sided](#beginning-on-an-odd-page)). In the first section, `odd` is `BEGIN_ON_FIRST_SECTION`. |
+| `Footnote numbering` | `continue`, `restart` | `continue` | Whether its footnotes follow the counter of the document or start again at 1 ([Footnote](footnote.md#numbering)). |
+| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How its footnotes are numbered, in the call and in the note. |
 
-Its content is in-flow elements, `Frame`, `Overlay` and `Page overlay`.
+Its content is in-flow elements, `Frame`, `Overlay`, `Page overlay` and `Footnote` ([Footnote](footnote.md)), which takes no
+room where it is written.
 
 - **A section starts a page.** Always, even if the previous one ends halfway down a page, and the next one starts another. The
   content of one section is not mixed with that of another.

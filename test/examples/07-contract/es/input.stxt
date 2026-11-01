@@ -9,7 +9,9 @@
 # The annex is a Heading 1 with the annex style, numbered in Roman numerals (Number format, in styles.stxt) with its
 # label (Number label: "Anexo I · ...", in the document because it is text and styles.stxt serves both languages), which
 # the clauses refer to with {number of: annex-title}; recital III
-# refers to the clauses section with {number of: terms}.
+# refers to the clauses section with {number of: terms}. Three footnotes ([^...] in the parties, in clause 4 and in
+# clause 7, with their Footnote after the clauses): numbered in order, at the bottom of their page, under a rule, with the
+# typography of For element: Footnotes in styles.stxt.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -81,7 +83,7 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 8 0
 				Paragraph:
 					Content >>
-						De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora (en adelante, «el Estudio»).
+						De una parte, **Lumen Estudio de Diseño, S.L.P.**, con CIF B-55123987 y domicilio en la calle de la Ribera, 8, de Olot (Girona), representada por doña Irene Calvo Mas, en calidad de administradora[^poder] (en adelante, «el Estudio»).
 			Block:
 				Style: party
 				Paragraph:
@@ -120,13 +122,13 @@ Document (dev.stxt.pdf):
 
 				3. **Plazos.** El Estudio entregará la identidad visual en un plazo de seis semanas desde la firma y el sitio web, en otras ocho semanas desde la aprobación de la identidad. Los plazos se suspenderán mientras la Cliente no facilite los materiales o las aprobaciones que le correspondan.
 
-				4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable, que se abonarán según el calendario del Anexo {number of: annex-title} mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
+				4. **Honorarios y forma de pago.** Los honorarios son de 18.400 euros, más el IVA aplicable[^iva], que se abonarán según el calendario del Anexo {number of: annex-title} mediante transferencia bancaria en el plazo de treinta días desde la fecha de cada factura. El retraso devengará el interés legal previsto para las operaciones comerciales.
 
 				5. **Obligaciones del Estudio.** El Estudio ejecutará el encargo con la diligencia profesional debida, designará a una persona responsable de la relación con la Cliente e informará con regularidad del avance de los trabajos.
 
 				6. **Obligaciones de la Cliente.** La Cliente facilitará los textos, imágenes y datos necesarios, designará un interlocutor con capacidad de decisión y comunicará su conformidad o sus observaciones en un plazo máximo de diez días hábiles desde cada entrega.
 
-				7. **Propiedad intelectual.** Con el pago íntegro de los honorarios, el Estudio cede a la Cliente, en exclusiva y para todo el mundo, los derechos de explotación sobre el logotipo y los demás elementos de la identidad. El Estudio podrá mencionar el trabajo en su portafolio, salvo petición expresa en contrario.
+				7. **Propiedad intelectual.** Con el pago íntegro de los honorarios, el Estudio cede a la Cliente, en exclusiva y para todo el mundo, los derechos de explotación sobre el logotipo y los demás elementos de la identidad. El Estudio podrá mencionar el trabajo en su portafolio[^portafolio], salvo petición expresa en contrario.
 
 				8. **Confidencialidad.** Cada parte mantendrá en secreto la información confidencial de la otra a la que acceda con motivo del contrato y no la utilizará para otro fin, durante su vigencia y durante los cinco años siguientes.
 
@@ -137,6 +139,15 @@ Document (dev.stxt.pdf):
 				11. **Protección de datos.** Cada parte tratará los datos personales a los que acceda conforme a la normativa vigente y solo para ejecutar este contrato. Si el Estudio accediera a datos de socias y socios, lo hará como encargado del tratamiento, con el contrato correspondiente.
 
 				12. **Ley aplicable y jurisdicción.** Este contrato se rige por la ley española. Las partes se someten, para cualquier controversia, a los juzgados y tribunales de Olot, con renuncia a cualquier otro fuero que pudiera corresponderles.
+		Footnote:
+			Id: poder
+			Paragraph: Según escritura de apoderamiento otorgada ante el notario de Olot don Marc Pujol Serra el 12 de mayo de 2021, con el número 1.204 de su protocolo.
+		Footnote:
+			Id: iva
+			Paragraph: Al tipo general vigente en la fecha de cada factura, el 21 % a la firma de este contrato.
+		Footnote:
+			Id: portafolio
+			Paragraph: En su sitio web, en sus redes sociales y en las candidaturas a premios de diseño, sin divulgar información confidencial de la Cliente.
 		Block:
 			Id: annex
 			Break:

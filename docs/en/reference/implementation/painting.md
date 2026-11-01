@@ -26,7 +26,10 @@ whole box is visible. The backgrounds step of a box that paints nothing, and the
 image, do not clip. The areas of the links are computed by
 `StackingContext.paintLinks` when painting (the border box of each fragment with `Link`, and the rectangle of each run with a
 link on each line, joining consecutive ones with the same destination), which calls `Tagging.link`. `StackingContext.paintText` splits the
-text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines.
+text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines; the
+call and the number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a
+superscript run is painted raised `TextFormat.rise()` of the size. The footnote area of a page (`Page.footnotes`) is
+painted as one more in-flow box, after the flow and before the `Page overlay` boxes.
 
 `Canvas` only draws and each canvas gives its `Tagging` with `Canvas.tagging()` (`PdfTagging` in the PDF and `Tagging.NONE` in the
 SVG): the marked text of the tagged PDF and the links.

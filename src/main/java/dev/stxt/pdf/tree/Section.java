@@ -15,9 +15,28 @@ import dev.stxt.pdf.model.NumberFormat;
  *                     not declare it
  * @param inheritPageOverlays whether it carries the {@code Page overlay} elements of the document
  * @param beginOn      on which physical page it begins ({@code Begin on})
+ * @param footnoteNumbering   whether its footnotes continue the numbering of the document or start again at 1
+ *                            ({@code Footnote numbering}, reference/components/footnote.md)
+ * @param footnoteNumberFormat how its footnotes are numbered ({@code Footnote number format})
+ * @param footnotes    its footnote area ({@link Element#FOOTNOTES}): a child of the box, out of its flow, with its
+ *                     {@code Footnote} boxes as children in document order
  */
 public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, NumberFormat pageNumberFormat, int start,
-                      boolean inheritPageOverlays, BeginOn beginOn) {
+                      boolean inheritPageOverlays, BeginOn beginOn, FootnoteNumbering footnoteNumbering,
+                      NumberFormat footnoteNumberFormat, Box footnotes) {
+
+    /** {@code Footnote numbering} (reference/components/footnote.md): what the section does with the footnote counter. */
+    public enum FootnoteNumbering {
+        /** Its footnotes follow the counter of the document. */
+        CONTINUE,
+        /** Its first footnote is number 1 again. */
+        RESTART
+    }
+
+    /** Whether the section has footnotes. */
+    public boolean hasFootnotes() {
+        return !footnotes.children().isEmpty();
+    }
 
     /**
      * {@code Begin on} (reference/components/document.md): on which physical page the section begins. If the next page

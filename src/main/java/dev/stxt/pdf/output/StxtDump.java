@@ -35,6 +35,10 @@ public final class StxtDump {
             Rect pageArea = p.pageSetup().pageArea();
             sb.append("\tPage: ").append(p.number()).append('\n');
             dumpChildren(sb, p.content(), pageArea.x(), pageArea.y(), 2, includeWithoutId);
+            if (p.footnotes() != null) {
+                // The footnote area has no Id: its notes, which always have one, come out at its level.
+                dumpFragment(sb, p.footnotes(), pageArea.x(), pageArea.y(), 2, includeWithoutId);
+            }
             for (Fragment overlay : p.pageOverlays()) {
                 dumpFragment(sb, overlay, pageArea.x(), pageArea.y(), 2, includeWithoutId);
             }

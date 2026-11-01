@@ -1,0 +1,26 @@
+# Page 1: the area, 36.8 high (1 + 3 + 3 × 9.6 + 2 × 2), starts at 180 − 36.8 = 143.2 and its first note at
+# 143.2 + 1 + 3 = 147.2; the notes are 9.6 apart plus the margin of 2. Page 2: area of 32.8 at 147.2, j at 151.2.
+Result:
+	Page: 1
+		Fragment: cols
+			Rect: 20 20 260 72
+			Fragment: c1
+				Rect: 20 20 120 72
+			Fragment: c2
+				Rect: 160 20 120 72
+		Fragment: tab
+			Rect: 20 100 260 12
+		Fragment: g
+			Rect: 20 147.2 260 9.6
+		Fragment: h
+			Rect: 20 158.8 260 9.6
+		Fragment: i
+			Rect: 20 170.4 260 9.6
+	Page: 2
+		Fragment: kt
+			Rect: 20 20 260 24
+			Fragment: k1
+				Rect: 20 20 260 24
+		Fragment: j
+			Rect: 20 151.2 260 28.8
+

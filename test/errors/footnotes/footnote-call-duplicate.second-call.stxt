@@ -1,0 +1,22 @@
+# Case: A footnote called twice
+# Code: FOOTNOTE_CALL_DUPLICATE
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Paragraph: Una afirmación[^fuente].
+		Paragraph: Y otra[^fuente] con la misma nota.
+		Footnote:
+			Id: fuente
+			Paragraph: La fuente.

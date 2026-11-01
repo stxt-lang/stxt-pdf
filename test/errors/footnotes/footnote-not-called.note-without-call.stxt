@@ -1,0 +1,21 @@
+# Case: A Footnote that no text calls
+# Code: FOOTNOTE_NOT_CALLED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Paragraph: Una afirmación sin llamada.
+		Footnote:
+			Id: fuente
+			Paragraph: La fuente.

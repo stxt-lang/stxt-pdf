@@ -152,6 +152,7 @@ public final class BoxTreeBuilder {
             }
         }
         TableOfContentsBuilder.build(ctx, root);
+        ctx.footnotes.finish();
         References.validate(root);
         LinkTargets.validate(root);
         validateOverflow(root);
@@ -181,9 +182,13 @@ public final class BoxTreeBuilder {
         int start = 1;
         boolean inheritPageOverlays = true;
         Section.BeginOn beginOn = Section.BeginOn.ANY;
+        Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
+        NumberFormat footnoteNumberFormat = NumberFormat.DECIMAL;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
+                case "footnote-numbering" -> footnoteNumbering = enumValue(Section.FootnoteNumbering.class, p);
+                case "footnote-number-format" -> footnoteNumberFormat = enumValue(NumberFormat.class, p);
                 case "page" -> pageSetup = PageSetupReader.pageSetup(inline(p), documentPageSetup);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
                 case "page-number-format" -> {
@@ -218,19 +223,28 @@ public final class BoxTreeBuilder {
         }
         Box box = new Box(id, Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
+        // The footnote area of the section (reference/components/footnote.md): its notes hang from it, not from the
+        // boxes that hold them.
+        Box footnotes = ctx.footnotes.beginSection(ctx, n, box, footnoteNumbering, footnoteNumberFormat);
         buildContent(ctx, n, box);
-        if (box.children().stream().allMatch(c -> c.style().position() == Position.PAGE_OVERLAY)) {
+        // After the content, so that the children of the section are its elements in order, and then the area.
+        box.addChild(footnotes);
+        if (box.children().stream().allMatch(c -> c.style().position() == Position.PAGE_OVERLAY
+                || c.style().position() == Position.FOOTNOTES)) {
             throw error(n, ErrorCode.SECTION_EMPTY, "The section has no content: without elements (Page overlays do not "
                     + "count, they take no space) it has no page");
         }
-        return new Section(box, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays, beginOn);
+        return new Section(box, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays, beginOn,
+                footnoteNumbering, footnoteNumberFormat, footnotes);
     }
 
     /** Child elements in order: each one is a box; {@code Item} and {@code Area} wrap theirs. */
     void buildContent(BuildContext ctx, InlineNode node, Box box) {
         for (Node h : node.getChildren()) {
             String name = h.getCanonicalName();
-            if (isElement(h)) {
+            if (name.equals("footnote")) {
+                footnote(ctx, inline(h));
+            } else if (isElement(h)) {
                 box.addChild(element(ctx, inline(h), box, null, null));
             } else if (name.equals("item") || name.equals("area")) {
                 InlineNode wrapper = inline(h);
@@ -242,6 +256,25 @@ public final class BoxTreeBuilder {
                 box.addChild(element(ctx, inline(elements.get(0)), box, wrapper, null));
             }
         }
+    }
+
+    /**
+     * A {@code Footnote} (reference/components/footnote.md): its box is a child of the footnote area of its section,
+     * from which it inherits, wherever it is written; the box that holds it does not see it. It cannot be inside a
+     * {@code Page overlay}, which is repeated on every page, nor inside another note.
+     */
+    private void footnote(BuildContext ctx, InlineNode n) {
+        if (ctx.insidePageOverlay) {
+            throw error(n, ErrorCode.FOOTNOTE_NOT_ALLOWED, "A Footnote cannot be inside a Page overlay, which is "
+                    + "repeated on every page: it goes with the text that calls it");
+        }
+        if (ctx.footnotes.inside) {
+            throw error(n, ErrorCode.FOOTNOTE_NOT_ALLOWED, "A Footnote cannot be inside another Footnote");
+        }
+        Box area = ctx.footnotes.area();
+        Box note = element(ctx, n, area, null, null);
+        area.addChild(note);
+        ctx.footnotes.add(note);
     }
 
     /**
@@ -280,14 +313,17 @@ public final class BoxTreeBuilder {
             listItem(ctx, n, box, parent, number);
         }
         boolean outerPageOverlay = ctx.insidePageOverlay;
+        boolean outerHeading = ctx.insideHeading;
         String outerUnbreakable = ctx.unbreakable;
         ctx.insidePageOverlay |= s.position() == Position.PAGE_OVERLAY;
+        ctx.insideHeading |= kind.headingLevel() > 0;
         if (ctx.unbreakable == null) {
             ctx.unbreakable = unbreakable(s);
         }
         reader.content(this, ctx, n, box);
         validateShrink(n, box);
         ctx.insidePageOverlay = outerPageOverlay;
+        ctx.insideHeading = outerHeading;
         ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
             // The texts of the heading are already read: the number is written before the first one.

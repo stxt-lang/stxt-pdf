@@ -255,6 +255,33 @@ the `LayoutCache` and the line breaking store about them and their ancestors (`E
 > which does not change. If a new algorithm read something from outside the subtree, it would have to go into the key. A document of 100
 > pages went from costing twice as much as one of 99 to costing the same. *Rejected alternative:* emptying the whole cache.
 
+**Footnotes.** `FootnoteLayout` lays out each page of a section with footnotes ([Footnote](../components/footnote.md)):
+the flow with `ConstraintSpace.forPage(pageSetup, reserved)`, which takes from the root the height reserved at the
+bottom, and the notes of the calls that fall in its lines (`TextFormat.footnote` in the runs of the `TextLine`s) stacked
+in the footnote area of the section (`Section.footnotes()`, the generated box `Footnotes`, a child of the section out of
+its flow). Since the body is a function of the reservation and the notes depend on the body, the reservation is found
+by probes: no reservation; if the notes do not fit, the full height of those notes (in which those of any larger
+reservation fit, because less room is less flow), unless it leaves the body no room (it is placed by force by the
+progress guarantee and overflows: then, the largest reservation that does not force it, by bisection); and from one that
+fits, down to what its notes need and, where a smaller one brings back a call that no longer fits, by bisection between
+the two (`PRECISION`, 0.001 pt). Each note is laid out with `context.layout` like any block, so the cache answers the
+repeated probes; only the last one may be left broken, with a break without violations (`BreakAppeal.PERFECT_BREAK`)
+and only if the flow continues, and its rest (`FootnoteLayout.Carry`) heads the area of the next page. The area
+measures what its notes measure and is anchored at the end of the page area: the surplus of the reservation stays
+between the text and the rule. `Paginator.flow` keeps the fragment of the area of each page (`Flow.footnotes`), which
+goes to `Page.footnotes`, numbered with `{page}` like the flow, and `pagesOf` walks it too: a note has an `Id` and can be
+referred to.
+
+> **Decision:** the reservation is found by probes over the whole page, with the layout algorithms untouched, instead
+> of reserving line by line inside the line breaking, as TeX does with its insertions: the algorithms read nothing
+> outside their subtree and the cache stays valid. The price is a few more probes per page with notes (three in the
+> usual case, up to about twenty when a call falls right at the limit). *Rejected alternative:* a footnote budget in
+> `ConstraintSpace`, which enters the cache key and changes every algorithm.
+
+> **Decision:** a note is broken only if its break violates neither widows, orphans nor `Keep`, and only if the flow
+> goes on to another page; otherwise the line that calls it moves whole to the next page. *Rejected alternative:*
+> breaking it by force, which leaves a call with a one-line note, or a page with only the rest of the note.
+
 **Running heads.** `RunningHeads` walks the pages in physical order and keeps the heading of each level in effect: the
 last one that has started (the `Fragment` with `first()` of a box with `headingLevel() > 0`, with the text of
 `Box.headingText()`, which already carries the number), until one of a higher level starts, which empties those below

@@ -82,6 +82,7 @@ así:
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../common/links.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
+| `[^id]` | la llamada a la nota al pie con ese `Id`: un tramo en superíndice con su número ([Footnote](footnote.md)) |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
 
@@ -204,6 +205,7 @@ Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tabl
 
 ## Lo que no hay
 
-- Citas, HTML, líneas horizontales, saltos de línea forzados, notas al pie, listas de tareas y resaltado de código.
+- Citas, HTML, líneas horizontales, saltos de línea forzados, listas de tareas y resaltado de código. Las notas al pie se
+  llaman con `[^id]`, pero su contenido es una `Footnote`, no una definición `[^id]: ...` ([Footnote](footnote.md)).
 - Imágenes dentro de un texto y enlaces con título o con definición aparte.
 - `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Style`.

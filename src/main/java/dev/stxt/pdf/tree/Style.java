@@ -330,7 +330,7 @@ public final class Style extends StyleGroup {
     }
 
     public boolean isOutOfFlow() {
-        return position == Position.OVERLAY || position == Position.PAGE_OVERLAY;
+        return position == Position.OVERLAY || position == Position.PAGE_OVERLAY || position == Position.FOOTNOTES;
     }
 
     /** Closes the style with its box ({@link Box#close}): it no longer changes. */

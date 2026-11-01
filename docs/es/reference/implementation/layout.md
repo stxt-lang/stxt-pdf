@@ -255,6 +255,32 @@ que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasad
 > que no cambia. Si un algoritmo nuevo leyera algo de fuera del subárbol, tendría que entrar en la clave. Un documento de 100
 > páginas pasó de costar el doble que uno de 99 a costar lo mismo. *Alternativa descartada:* vaciar la caché entera.
 
+**Notas al pie.** `FootnoteLayout` maqueta cada página de una sección con notas ([Footnote](../components/footnote.md)):
+el flujo con `ConstraintSpace.forPage(pageSetup, reserva)`, que quita a la raíz la altura reservada al pie, y las notas de
+las llamadas que caen en sus líneas (`TextFormat.footnote` en los tramos de las `TextLine`) apiladas en el área de notas
+de la sección (`Section.footnotes()`, la caja generada `Footnotes`, hija de la sección fuera de su flujo). Como el cuerpo
+es función de la reserva y las notas dependen del cuerpo, la reserva se busca por sondas: sin reserva; si las notas no
+caben, la altura entera de esas notas (en la que las de cualquier reserva mayor caben, porque menos sitio es menos
+flujo), salvo que no deje sitio al cuerpo (lo coloca forzado por la garantía de progreso y desborda: entonces, la mayor
+reserva que no lo fuerza, por bisección); y desde una que cabe, hacia abajo hasta lo que sus notas necesitan y, donde
+una menor trae una llamada que ya no cabe, por bisección entre las dos (`PRECISION`, 0,001 pt). Cada nota se maqueta con
+`context.layout` como cualquier bloque, así que la caché responde a las sondas repetidas; solo la última puede quedar
+partida, con un corte sin violaciones (`BreakAppeal.PERFECT_BREAK`) y solo si el flujo continúa, y su resto
+(`FootnoteLayout.Carry`) encabeza el área de la página siguiente. El área mide lo que miden sus notas y se ancla al final
+del área útil: el sobrante de la reserva queda entre el texto y el filete. `Paginator.flow` guarda el fragmento del
+área de cada página (`Flow.footnotes`), que pasa a `Page.footnotes`, numerado con `{page}` como el flujo, y `pagesOf`
+también lo recorre: una nota tiene `Id` y se puede referir.
+
+> **Decisión:** la reserva se busca por sondas sobre la página entera, con los algoritmos de layout intactos, en lugar de
+> reservar línea a línea dentro del reparto, como TeX con sus inserciones: los algoritmos no leen nada de fuera de su
+> subárbol y la caché sigue valiendo. El precio son unas sondas más por página con notas (tres en el caso corriente,
+> hasta una veintena cuando una llamada queda justo en el límite). *Alternativa descartada:* un presupuesto de notas en
+> `ConstraintSpace`, que entra en la clave de la caché y cambia todos los algoritmos.
+
+> **Decisión:** una nota se parte solo si su corte no viola viudas, huérfanas ni `Keep`, y solo si el flujo sigue en otra
+> página; si no, la línea que la llama pasa entera a la página siguiente. *Alternativa descartada:* partirla por la
+> fuerza, que deja una llamada con una nota de una línea, o una página solo con el resto de la nota.
+
 **Títulos corridos.** `RunningHeads` recorre las páginas en orden físico y guarda el encabezado de cada nivel en vigor: el
 último que ha empezado (el `Fragment` con `first()` de una caja con `headingLevel() > 0`, con el texto de
 `Box.headingText()`, que ya lleva el número), hasta que empieza uno de un nivel superior, que vacía los de debajo. Para

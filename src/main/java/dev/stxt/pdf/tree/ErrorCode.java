@@ -160,6 +160,30 @@ public enum ErrorCode {
      */
     HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY,
 
+    // --- Footnotes -----------------------------------------------------------------------------
+    /** A call {@code [^id]} with no {@code Footnote} with that {@code Id} in its section. */
+    FOOTNOTE_UNKNOWN,
+    /** A {@code Footnote} that no text of its section calls. */
+    FOOTNOTE_NOT_CALLED,
+    /** A second call to the same {@code Footnote}: a note is called once. */
+    FOOTNOTE_CALL_DUPLICATE,
+    /** A call {@code [^id]} inside a {@code Page overlay}, a heading or another footnote. */
+    FOOTNOTE_CALL_NOT_ALLOWED,
+    /** A {@code Footnote} inside a {@code Page overlay} or inside another {@code Footnote}. */
+    FOOTNOTE_NOT_ALLOWED,
+    /**
+     * The content of a {@code Footnote}: it does not start with a {@code Paragraph}, a {@code Text} or a
+     * {@code Markdown} paragraph, which carries the number, or its {@code Markdown} has headings, images or code blocks.
+     */
+    FOOTNOTE_CONTENT,
+    /**
+     * A property of the footnote area ({@code For element: Footnotes}) that has no effect on it: its height,
+     * {@code Rotate} or {@code Overflow}.
+     */
+    FOOTNOTES_PROPERTY_WITHOUT_EFFECT,
+    /** A footnote that does not fit on a page together with the text that calls it. */
+    FOOTNOTE_TOO_TALL,
+
     // --- Links --------------------------------------------------------------------------------
     /** A link target that is empty, malformed or with a scheme that is not https, http, mailto or {@code #id}. */
     LINK_SCHEME,

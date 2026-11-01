@@ -50,6 +50,7 @@ One element per box, in the order of the document, which is the reading order:
 | `List`, `List item` | `L` and `LI`, with the marker in `Lbl` and the content in `LBody` |
 | `Table` and its parts | `Table`, `THead`, `TBody`, `TFoot`, `TR`, and `TH` or `TD` |
 | `Table of contents` and its entries | `TOC` and `TOCI`, with two `Span` (the title and the number) |
+| `Footnote` | `Note` (`FENote` with PDF/UA-2), with the number in a `Lbl`, right after the text that calls it; the call, a `Reference` inside that text ([below](#footnotes)) |
 | `Image` with `Alt`, `Barcode` | `Figure`, with `Alt` and `BBox` |
 | A box with `Link`, a text link | `Link` ([below](#links)) |
 | The rest (such as `Block`, `Stack`, `Grid`, `Columns`, `Markdown` or the positioned elements) | `Div` |
@@ -132,6 +133,20 @@ has a single `THead` and a single `TFoot`.
 The `BBox` of the `Figure` of an image is its content box on the page and not the visible part with `Fit: inside`. That of
 a rotated image is the rectangle that encloses it.
 
+### Footnotes
+
+A `Footnote` ([Footnote](../components/footnote.md)) is a `Note` (with PDF/UA-2, an `FENote` with the attribute
+`NoteType: Footnote`) with an identifier (`ID`, `footnote-` plus its `Id`, which PDF/UA-1 requires of a `Note` and which
+the `IDTree` of the structure tree collects), the number that opens it in a `Lbl` and then its content. It goes **right
+after the element of the text that calls it** (a sibling of its `P` or, if a cell calls it, inside its `TD`), and not at
+the end of the page where it is painted: the reading order puts the note after its paragraph. The call is a
+`Reference` inside the element of the text, with the number as marked content, which points to the note with `Ref`;
+the note points to the call with its own.
+
+> **Decision:** the note hangs after the text that calls it and not from the `Sect` at the end of the page: the
+> structure tree is the reading order, not the painting order. *Rejected alternative:* a `Div` with the notes at the
+> end of each page.
+
 ### Tables of contents
 
 Each entry is a `TOCI` with the title and the number in two `Span`, and the leader is an *artifact*. The `Link` of the entry
@@ -205,6 +220,7 @@ these differences:
   box in `SD` (or that of its nearest ancestor that has an element) and the same position. `D`, with the page, remains for the
   viewers that do not understand `SD`.
 - **Lists:** `dash` is `ListNumbering: Unordered`.
+- **Footnotes:** `FENote` instead of `Note`, with `NoteType: Footnote`.
 - **Links with nothing to read** (those that carry `Alt`): their annotation does not carry `Contents`, because what is read is the `Alt`.
 
 veraPDF validates it with its PDF/UA-2 profile, which adds the rules of ISO/TS 32005 on which element can contain

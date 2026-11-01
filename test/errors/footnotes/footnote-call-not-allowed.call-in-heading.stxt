@@ -1,0 +1,23 @@
+# Case: A footnote call in a heading
+# Code: FOOTNOTE_CALL_NOT_ALLOWED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Heading 1:
+			Text: Título[^fuente]
+		Paragraph: Una afirmación.
+		Footnote:
+			Id: fuente
+			Paragraph: La fuente.

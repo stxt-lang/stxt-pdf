@@ -57,9 +57,13 @@ final class Nodes {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
-    /** Name of the positioned element: {@code Overlay} or {@code Page overlay}. */
+    /** Name of the positioned element: {@code Overlay}, {@code Page overlay} or the footnote area, {@code Footnotes}. */
     static String position(Style s) {
-        return s.position() == Position.PAGE_OVERLAY ? "Page overlay" : "Overlay";
+        return switch (s.position()) {
+            case PAGE_OVERLAY -> "Page overlay";
+            case FOOTNOTES -> "Footnotes";
+            default -> "Overlay";
+        };
     }
 
     /** Parses a value; syntax errors carry the line of the node. */

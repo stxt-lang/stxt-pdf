@@ -236,7 +236,9 @@ enum ElementReader {
     MARKDOWN {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            MarkdownBuilder.Translation t = MarkdownBuilder.translate(n);
+            noCalls(ctx, box);
+            MarkdownBuilder.Translation t = MarkdownBuilder.translate(n, ctx.footnotes);
+            ctx.footnotes.noCalls = null;
             ctx.runs.putAll(t.runs());
             ctx.codeBlocks.addAll(t.codeBlocks());
             ctx.insideMarkdown = true;
@@ -256,6 +258,26 @@ enum ElementReader {
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             builder.buildContent(ctx, n, box);
             ctx.contents.add(box);
+        }
+    },
+
+    /**
+     * A {@code Footnote} (reference/components/footnote.md): its children, read as those of a block. It is laid out
+     * at the bottom of a page, apart from the box that holds it: what that box forbids ({@code Break} inside an
+     * {@code Overlay}, the columns of a {@code Columns}) does not reach the note, and a call inside it is an error.
+     */
+    FOOTNOTE {
+        @Override
+        void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
+            boolean outerColumns = ctx.insideColumns;
+            String outerUnbreakable = ctx.unbreakable;
+            ctx.insideColumns = false;
+            ctx.unbreakable = null;
+            ctx.footnotes.inside = true;
+            builder.buildContent(ctx, n, box);
+            ctx.footnotes.inside = false;
+            ctx.insideColumns = outerColumns;
+            ctx.unbreakable = outerUnbreakable;
         }
     },
 
@@ -284,6 +306,7 @@ enum ElementReader {
             case COLUMNS -> COLUMNS;
             case MARKDOWN -> MARKDOWN;
             case TABLE_OF_CONTENTS -> TABLE_OF_CONTENTS;
+            case FOOTNOTE -> FOOTNOTE;
             default -> CONTAINER;
         };
     }
@@ -331,9 +354,22 @@ enum ElementReader {
             return;
         }
         int first = box.textBlock() ? box.textLine() + 1 : box.textLine();
-        List<TextRun> runs = MarkdownBuilder.inline(box.text(), first);
+        noCalls(ctx, box);
+        List<TextRun> runs = MarkdownBuilder.inline(box.text(), first, ctx.footnotes);
+        ctx.footnotes.noCalls = null;
         box.setText(TextRun.text(runs), first, false);
         box.setRuns(TextRun.formatted(runs) ? runs : null);
+    }
+
+    /**
+     * Where a footnote call is not allowed (reference/components/footnote.md): in a {@code Page overlay}, which is
+     * repeated on every page; in a heading, whose text is copied to the tables of contents and the bookmarks; and in
+     * another footnote. Set while the text of {@code box} is read.
+     */
+    private static void noCalls(BuildContext ctx, Box box) {
+        ctx.footnotes.noCalls = ctx.insidePageOverlay ? "a Page overlay, which is repeated on every page"
+                : ctx.insideHeading ? "a heading, whose text is copied to the tables of contents and the bookmarks"
+                : ctx.footnotes.inside ? "a Footnote" : null;
     }
 
     /**

@@ -1,0 +1,44 @@
+# Section 1, page 1: the area of 40.5 (36 of notes + 12.5) starts at 180 − 40.5 = 139.5 and its first note at
+# 139.5 + 0.5 + 4 = 144. Page 2: area of 16.5 at 163.5. Page 4: 100.5 at 79.5. Page 5: 124.5 at 55.5 (the
+# reservation, 148, leaves 15.5 over between q1 and the rule). Page 6: 28.5 at 151.5.
+Result:
+	Page: 1
+		Fragment: p1
+			Rect: 20 20 260 12
+		Fragment: p2
+			Rect: 20 32 260 12
+		Fragment: a
+			Rect: 20 144 260 12
+		Fragment: b
+			Rect: 20 156 260 12
+		Fragment: c
+			Rect: 20 168 260 12
+	Page: 2
+		Fragment: tall
+			Rect: 20 20 260 100
+		Fragment: p3
+			Rect: 20 120 260 12
+		Fragment: d
+			Rect: 20 168 260 12
+	Page: 3
+		Fragment: big
+			Rect: 20 20 260 60
+	Page: 4
+		Fragment: p5
+			Rect: 20 20 260 12
+		Fragment: e
+			Rect: 20 84 260 96
+	Page: 5
+		Fragment: q1
+			Rect: 20 20 260 12
+		Fragment: f
+			Rect: 20 60 260 120
+	Page: 6
+		Fragment: q1
+			Rect: 20 20 260 108
+		Fragment: f
+			Rect: 20 156 260 24
+	Page: 7
+		Fragment: q2
+			Rect: 20 20 260 120
+

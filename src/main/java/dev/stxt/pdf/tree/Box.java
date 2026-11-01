@@ -239,6 +239,19 @@ public final class Box {
         }
     }
 
+    /**
+     * Writes {@code prefix} before the text, run by run: the number of a footnote (reference/components/footnote.md).
+     * The text without formatting becomes a run after them.
+     */
+    void prependRuns(List<TextRun> prefix) {
+        writable();
+        List<TextRun> prefixed = new ArrayList<>(prefix.size() + (runs != null ? runs.size() : 1));
+        prefixed.addAll(prefix);
+        prefixed.addAll(runs != null ? runs : TextRun.plain(text));
+        text = TextRun.text(prefixed);
+        runs = List.copyOf(prefixed);
+    }
+
     void setImage(String image) {
         writable();
         this.image = image;

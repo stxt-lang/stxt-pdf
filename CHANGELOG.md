@@ -7,6 +7,23 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Footnotes.** New element `Footnote`: the content of a note, with a required `Id`, written anywhere in its section
+  (where an in-flow element goes) without taking room there, and placed by the engine at the bottom of the page where
+  the text calls it with `[^id]` (in a text with `Markup: markdown` or in a `Markdown`), under a rule. The call is a
+  superscript run with the number of the note (70% of the size, raised a third), in the font and format of the text
+  around it, and the note starts with the same number before its first text, which has to be a `Paragraph`, a `Text` or
+  a `Markdown` paragraph; headings, images and code blocks are not allowed inside (`FOOTNOTE_CONTENT`). The calls are
+  numbered in document order, per document or per section (`Footnote numbering: continue | restart` and
+  `Footnote number format` in `Section`). A line enters a page only if its note fits under it, whole or at least its
+  start: otherwise it moves to the next page with the note; a note may continue at the bottom of the next page when the
+  break respects widows, orphans and keeps, and in a `Columns` the notes go at the bottom of the page. The notes of a
+  page go in the generated element `Footnotes`, the footnote area, styled with `For element: Footnotes` (its top
+  `Border` is the rule, 0.5 pt by default, with a top margin of 8 and a padding of 4; its typography is that of all the
+  notes) and `For element: Footnote` (each note). In the tagged PDF the note is a `Note` (`FENote` with PDF/UA-2) with
+  its `Lbl`, right after the paragraph that calls it, and the call a `Reference` linked to it. New codes
+  `FOOTNOTE_UNKNOWN`, `FOOTNOTE_NOT_CALLED`, `FOOTNOTE_CALL_DUPLICATE`, `FOOTNOTE_CALL_NOT_ALLOWED`,
+  `FOOTNOTE_NOT_ALLOWED`, `FOOTNOTE_CONTENT`, `FOOTNOTES_PROPERTY_WITHOUT_EFFECT` and `FOOTNOTE_TOO_TALL`.
+- The contract example (`test/examples/07-contract`) has three footnotes.
 - **Hyphenation.** `Hyphenate: true` in `Typography` (inherited, `false` by default) splits words at the end of a
   line with a hyphen, following the TeX patterns (hyph-utf8) of the language of the box with Liang's algorithm and no
   dependencies: Spanish, Catalan, American English and British English, as resources of the jar (their licenses are

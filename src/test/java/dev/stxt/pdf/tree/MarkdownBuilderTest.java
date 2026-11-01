@@ -90,6 +90,30 @@ class MarkdownBuilderTest {
         assertEquals(List.of("Paragraph: Texto. @19"), outline(t.elements().get(2)));
     }
 
+    /**
+     * A footnote call, {@code [^id]} (reference/components/footnote.md): a superscript run with the number of the
+     * note, in the format of the text around it, numbered in reading order.
+     */
+    @Test
+    void footnoteCallsAreNumberedSuperscriptRuns() {
+        MarkdownBuilder.Translation t = translate("Uno[^a] y **dos[^b-2]**.");
+        assertEquals(List.of("Paragraph: Uno1 y dos2. @15"), outline(t.elements().get(0)));
+        assertEquals(List.of(run("Uno"), new TextRun("1", TextFormat.PLAIN.withFootnote("a")), run(" y "),
+                run("dos", "b"), new TextRun("2", run("", "b").format().withFootnote("b-2")), run(".")),
+                t.runs().get(t.elements().get(0)));
+        // Inline, the same, and the counter is that of the document, not of the text.
+        Footnotes footnotes = new Footnotes();
+        assertEquals(List.of(run("Tres"), new TextRun("1", TextFormat.PLAIN.withFootnote("c"))),
+                MarkdownBuilder.inline("Tres[^c]", 5, footnotes));
+        assertEquals(List.of(new TextRun("2", TextFormat.PLAIN.withFootnote("d")), run(" cuatro")),
+                MarkdownBuilder.inline("[^d] cuatro", 6, footnotes));
+        // A second call to the same note is an error, with the line of the text.
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> MarkdownBuilder.inline("Otra[^c]", 9, footnotes));
+        assertEquals(ErrorCode.FOOTNOTE_CALL_DUPLICATE, e.errorCode());
+        assertEquals(9, e.line());
+    }
+
     @Test
     void plainTextHasNoRuns() {
         MarkdownBuilder.Translation t = translate("Sin formato.");

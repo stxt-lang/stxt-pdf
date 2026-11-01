@@ -55,11 +55,14 @@ class BoxTreeBuilderTest {
         Box root = build(document(
                 "\tText: hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10",
                 "\tStack:", "\tGrid:", "\tFrame:", "\tOverlay:", "\tPage overlay:")).sections().get(0).box();
+        // The last child of a section is its footnote area, which is generated (reference/components/footnote.md).
+        List<Box> written = root.children().subList(0, root.children().size() - 1);
+        assertEquals(Position.FOOTNOTES, root.children().get(root.children().size() - 1).style().position());
         assertEquals(List.of(Layout.INLINE, Layout.STACK, Layout.GRID, Layout.BLOCK,
-                Layout.BLOCK, Layout.BLOCK), root.children().stream().map(b -> b.style().layout()).toList());
+                Layout.BLOCK, Layout.BLOCK), written.stream().map(b -> b.style().layout()).toList());
         assertEquals(List.of(Position.STATIC, Position.STATIC, Position.STATIC,
                 Position.FRAME, Position.OVERLAY, Position.PAGE_OVERLAY),
-                root.children().stream().map(b -> b.style().position()).toList());
+                written.stream().map(b -> b.style().position()).toList());
         assertEquals("hola", root.children().get(0).text());
     }
 

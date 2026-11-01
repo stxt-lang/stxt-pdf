@@ -108,6 +108,16 @@ class StackingContextTest {
         }
 
         @Override
+        public void beginFootnoteCall(Box box, String footnote) {
+            sequences.add("[call " + footnote);
+        }
+
+        @Override
+        public void beginFootnoteLabel(Box box) {
+            sequences.add("[label");
+        }
+
+        @Override
         public void endText() {
             sequences.add("]");
         }

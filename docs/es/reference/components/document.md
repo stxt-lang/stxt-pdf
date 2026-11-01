@@ -111,8 +111,11 @@ contenido está en alguna.
 | `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
+| `Footnote numbering` | `continue`, `restart` | `continue` | Si sus notas al pie siguen el contador del documento o vuelven a empezar en 1 ([Footnote](footnote.md#numeración)). |
+| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se numeran sus notas al pie, en la llamada y en la nota. |
 
-Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
+Su contenido son elementos en flujo, `Frame`, `Overlay`, `Page overlay` y `Footnote` ([Footnote](footnote.md)), que no ocupa
+sitio donde se escribe.
 
 - **Una sección empieza una página.** Siempre, aunque la anterior acabe a mitad de página, y la siguiente empieza otra. El
   contenido de una sección no se mezcla con el de otra.

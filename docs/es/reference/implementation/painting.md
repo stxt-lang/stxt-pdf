@@ -26,7 +26,10 @@ vea la caja entera. El paso de los fondos de una caja que no pinta nada, y el de
 imagen, no recortan. Las zonas de los enlaces las calcula
 `StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`, y el rectángulo de cada tramo con
 enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`. `StackingContext.paintText` parte el
-texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas.
+texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas; la
+llamada y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un
+tramo en superíndice se pinta elevado `TextFormat.rise()` del cuerpo. El área de notas de una página (`Page.footnotes`)
+se pinta como una caja más en flujo, después del flujo y antes de los `Page overlay`.
 
 `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (`PdfTagging` en el PDF y `Tagging.NONE` en el
 SVG): el texto marcado del PDF etiquetado y los enlaces.

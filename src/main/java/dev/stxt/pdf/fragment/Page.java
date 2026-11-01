@@ -19,12 +19,22 @@ import java.util.List;
  * @param style        how its number is written ({@code Page number format} of its section)
  * @param blank        it is the blank page that ends its section so that the next one starts on an odd page
  *                     ({@code Begin on: odd}): without content or {@code Page overlay}
+ * @param footnotes    fragment of the footnote area of the section (reference/components/footnote.md) with the notes
+ *                     called on this page, at the bottom of the page area, relative to it like {@code content};
+ *                     {@code null} if the page has no footnotes. The flow of the page ({@code content}) is laid out in
+ *                     the room it leaves
  */
 public record Page(int number, Fragment content, List<Fragment> pageOverlays, PageSetup pageSetup, int section,
-                   int printed, NumberFormat style, boolean blank) {
+                   int printed, NumberFormat style, boolean blank, Fragment footnotes) {
 
     public Page {
         pageOverlays = List.copyOf(pageOverlays);
+    }
+
+    /** A page without footnotes. */
+    public Page(int number, Fragment content, List<Fragment> pageOverlays, PageSetup pageSetup, int section,
+                int printed, NumberFormat style, boolean blank) {
+        this(number, content, pageOverlays, pageSetup, section, printed, style, blank, null);
     }
 
     /** Whether the page carries a printed number. */

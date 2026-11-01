@@ -34,8 +34,9 @@ which can be combined. Each part is a **run**. They are written with `Markup: ma
 
 By default the text of a `Text`, a `Paragraph` or a `Cell` is **literal**: asterisks are asterisks. With
 `Markup: markdown` it is interpreted as the inline Markdown of a [`Markdown`](../components/markdown.md), with the same
-syntax: `**bold**`, `*italic*`, `++underline++`, `~~strikethrough~~`, `` `code` `` ([below](#inline-code)) and
-`[text](target)` ([Links](links.md)).
+syntax: `**bold**`, `*italic*`, `++underline++`, `~~strikethrough~~`, `` `code` `` ([below](#inline-code)),
+`[text](target)` ([Links](links.md)) and the call of a footnote, `[^id]`, which is a superscript run with the number of
+the note ([Footnote](../components/footnote.md)).
 
 - Marks are not text: they are neither measured nor painted. A special character is written with a backslash in front (`\*`, `\[`,
   `\\`).
@@ -153,6 +154,7 @@ underline goes below the text and the strikethrough, over it. A screen reader do
 
 ## What is not supported
 
-- Runs with another size, another color or another family (except code), or that remove the bold or the italic of the box.
+- Runs with another size (except the superscript of a footnote), another color or another family (except code), nor
+  ones that remove the bold or the italic of the box.
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.

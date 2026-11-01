@@ -41,6 +41,8 @@ class SchemaCoverageTest {
             Map.entry("Inherit page overlays", "Inherit page overlays: false"),
             Map.entry("Begin on", "Begin on: any"),
             Map.entry("Mirror margins", "Mirror margins: false"),
+            Map.entry("Footnote numbering", "Footnote numbering: restart"),
+            Map.entry("Footnote number format", "Footnote number format: lower-alpha"),
             // Elements
             Map.entry("Id", "Id: x"),
             Map.entry("Style", "Style: c"),
@@ -209,6 +211,9 @@ class SchemaCoverageTest {
                 + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Gap", "Separator")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
+        // A footnote needs its call, and its Id is the name of the call.
+        t.put("Footnote", new Template(HEADER + "\tParagraph: Hola[^n]\n\t\tTypography:\n\t\t\tMarkup: markdown\n"
+                + "\tFootnote:\n\t\tId: n\n\t\t{}\n\t\tParagraph: Nota", Set.of("Id")));
         // A table of contents needs some heading to list.
         t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));

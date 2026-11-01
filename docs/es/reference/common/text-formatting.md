@@ -34,8 +34,9 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
 
 Por defecto el texto de un `Text`, un `Paragraph` o una `Cell` es **literal**: los asteriscos son asteriscos. Con
 `Markup: markdown` se interpreta como el Markdown en línea de un [`Markdown`](../components/markdown.md), con la misma
-sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `código` `` ([abajo](#código-en-línea)) y
-`[texto](destino)` ([Enlaces](links.md)).
+sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `código` `` ([abajo](#código-en-línea)),
+`[texto](destino)` ([Enlaces](links.md)) y la llamada a una nota al pie, `[^id]`, que es un tramo en superíndice con el
+número de la nota ([Footnote](../components/footnote.md)).
 
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
@@ -153,6 +154,7 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 ## Lo que no hay
 
-- Tramos con otro tamaño, otro color u otra familia (salvo el código), ni que quiten la negrita o la cursiva de la caja.
+- Tramos con otro tamaño (salvo el superíndice de una nota al pie), otro color u otra familia (salvo el código), ni que
+  quiten la negrita o la cursiva de la caja.
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.

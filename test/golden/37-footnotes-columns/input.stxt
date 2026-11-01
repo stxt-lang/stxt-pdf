@@ -1,0 +1,88 @@
+# Footnotes in columns, in a table and with Keep together (reference/components/footnote.md), with the area styled.
+# Page area of 260 × 160 from (20, 20), which ends at y = 180. Lines of 12 (Size 10) in the text; the footnote area
+# (For element: Footnotes) has Size 8 (lines of 9.6; 4 pt per character), a top margin of 6, a rule of 1 and a padding of
+# 3: 10 more than its notes, which are separated by a margin of 2 (For element: Footnote).
+#
+# cols: two columns of 120 (24 characters per line); c1 calls g and c2 calls h in their first lines, 6 lines each, and
+#   the columns are balanced: 72. The notes go at the bottom of the page, not of the column.
+# tab: a table after a margin of 8, at 100, with a cell that calls i: 12.
+# kt: a block with Keep together, two lines (24), which calls j (3 lines of 9.6 = 28.8) in its second line.
+# Page 1: with the four notes (28.8 + 3 × 9.6 + 3 × 2 + 10 = 73.6) only cols fits; with the three of cols and tab
+#   (3 × 9.6 + 2 × 2 + 10 = 42.8) the page leaves 117.2, and cols and tab (112) fit: kt moves to page 2 with j. The
+#   area, 36.8 high (4 + 32.8), at 143.2: g at 147.2, h at 158.8 and i at 170.4, 9.6 each.
+# Page 2: kt at 20 and the area, 32.8 high, at 147.2, with j at 151.2.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For element: Footnotes
+			Typography:
+				Size: 8
+			Box:
+				Margin: 6 0 0 0
+				Border: 1 0 0 0
+				Border color: #999999
+				Padding: 3 0 0 0
+		For element: Footnote
+			Box:
+				Margin: 0 0 2 0
+	Section:
+		Columns:
+			Id: cols
+			Count: 2
+			Gap: 20
+			Paragraph:
+				Id: c1
+				Content >>
+					ccccccc[^g] ccccccc ccccccc ccccccc ccccccc ccccccc ccccccc
+					ccccccc ccccccc ccccccc ccccccc ccccccc ccccccc ccccccc
+					ccccccc ccccccc ccccccc ccccccc
+			Paragraph:
+				Id: c2
+				Content >>
+					ddddddd[^h] ddddddd ddddddd ddddddd ddddddd ddddddd ddddddd
+					ddddddd ddddddd ddddddd ddddddd ddddddd ddddddd ddddddd
+					ddddddd ddddddd ddddddd ddddddd
+		Footnote:
+			Id: g
+			Paragraph: Nota g.
+		Footnote:
+			Id: h
+			Paragraph: Nota h.
+		Table:
+			Id: tab
+			Column sizes: 100 *
+			Box:
+				Margin: 8 0 0 0
+			Body:
+				Row:
+					Cell: Celda[^i]
+					Cell: x
+		Footnote:
+			Id: i
+			Paragraph: Nota i.
+		Block:
+			Id: kt
+			Break:
+				Keep together: true
+			Paragraph:
+				Id: k1
+				Content >>
+					kkkkkkkkk kkkkkkkkk kkkkkkkkk kkkkkkkkk kkkkkkkkk
+					kkkkkkkkk[^j] kkkkkkkkk kkkkkkkkk kkkkkkkkk kkkkkkkkk
+			Footnote:
+				Id: j
+				Paragraph:
+					Content >>
+						jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj
+						jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj
+						jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj jjjjjjjjj

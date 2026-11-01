@@ -74,9 +74,9 @@ class StylesTest {
                 "\tBlock:", "\t\tStyle: b a",
                 "\tBlock:", "\t\tStyle: a", "\t\tId: x",
                 "\tBlock:", "\t\tStyle: a b", "\t\tId: y", "\t\tBox:", "\t\t\tPadding: 5");
-        assertEquals(List.of(1.0, 2.0, 3.0, 4.0, 5.0), root.children().stream().map(StylesTest::padding).toList());
+        assertEquals(List.of(1.0, 2.0, 3.0, 4.0, 5.0), root.inFlowChildren().stream().map(StylesTest::padding).toList());
         // The rule of the type still contributes what the others do not declare.
-        root.children().forEach(b -> assertEquals(Sides.all(Value.pt(1)), b.style().box().margin()));
+        root.inFlowChildren().forEach(b -> assertEquals(Sides.all(Value.pt(1)), b.style().box().margin()));
     }
 
     @Test
