@@ -4,11 +4,11 @@ import java.util.Objects;
 
 /**
  * Font of a text: family, weight and style (reference/common/typography.md). In the PDF output it
- * identifies a TTF file of the fonts folder (reference/common/resources.md).
+ * identifies a TTF or OTF file of the fonts folder (reference/common/resources.md).
  *
  * <p>{@code ligatures} says whether the text is measured and painted with the ligatures of the font
  * ({@code Ligatures}, reference/common/text-formatting.md). It does not change the file: two fonts that only differ
- * in this are the same TTF ({@link #base()}), but the text measures and paints differently.</p>
+ * in this are the same file ({@link #base()}), but the text measures and paints differently.</p>
  */
 public record FontFace(String family, FontWeight weight, FontStyle style, boolean ligatures) {
 
@@ -28,19 +28,20 @@ public record FontFace(String family, FontWeight weight, FontStyle style, boolea
         return this.ligatures == ligatures ? this : new FontFace(family, weight, style, ligatures);
     }
 
-    /** The font as it identifies a TTF file: without the ligatures option. */
+    /** The font as it identifies a font file: without the ligatures option. */
     public FontFace base() {
         return withLigatures(false);
     }
 
-    /** Variant for the messages: {@code normal}, {@code bold}, {@code italic} or {@code bold italic}. */
+    /**
+     * Variant for the messages: {@code normal}, {@code bold}, {@code italic}, {@code bold italic} and, with another
+     * weight, {@code weight 300} or {@code weight 300 italic}.
+     */
     public String variant() {
-        boolean bold = weight == FontWeight.BOLD;
-        boolean italic = style == FontStyle.ITALIC;
-        if (bold && italic) {
-            return "bold italic";
+        if (style != FontStyle.ITALIC) {
+            return weight.toString();
         }
-        return bold ? "bold" : italic ? "italic" : "normal";
+        return weight.equals(FontWeight.NORMAL) ? "italic" : weight + " italic";
     }
 
     @Override

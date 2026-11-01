@@ -25,7 +25,8 @@ Styles:
 | `Font` | family name | none | The font. **Required** in all text, own or inherited |
 | `Code font` | family name | none | The font of code ([Text formatting](text-formatting.md#code)). **Required** if there is code |
 | `Size` | number > 0 | none | The size of the letters. **Required** in all text |
-| `Bold` | `true`, `false` | `false` | Bold |
+| `Bold` | `true`, `false` | `false` | Bold: the same as `Weight: 700` |
+| `Weight` | 100 to 900, in steps of 100 | `400` | The weight of the letters ([below](#weights)) |
 | `Italic` | `true`, `false` | `false` | Italic |
 | `Line height` | number or % | `120%` | The height of each line: `15` is 15 points and `140%`, 1.4 times the size |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The alignment of the lines |
@@ -45,8 +46,42 @@ The rest (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Prefor
 There is no default font: without `Font` and `Size`, a text is an error. The font is named by its family, as its file
 declares it (`IBM Plex Sans`, with capitals and spaces), and it has to be in the fonts folder
 ([Resources](resources.md)). The repository includes **IBM Plex Sans**, **IBM Plex Serif** and **IBM Plex Mono**, each
-in regular, bold, italic and bold italic. If a text uses a character that its font does not have, it is an error: the
-engine does not look for another font or paint a little box.
+in regular, bold, italic and bold italic, and the Sans also in weights 300, 500 and 600. If a text uses a character that
+its font does not have, it is an error: the engine does not look for another font or paint a little box.
+
+## Weights
+
+`Weight` chooses how heavy the letters are, from 100 to 900: 400 is regular, 700 bold, and the others, the intermediate
+weights the family includes (300 light, 500 medium, 600 semibold...). Each weight is a file of the font: one the family
+does not have is an error. `Bold: true` is another way of writing `Weight: 700`, and the two do not go together in the
+same `Typography`.
+
+```stxt
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Font weights
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+    Section:
+        Text: Marta Ferrer Soler
+            Typography:
+                Size: 28
+                Weight: 300
+        Text: Product Designer
+            Typography:
+                Weight: 600
+        Paragraph: Eight years across a studio, a cooperative and an **in-house product**.
+            Typography:
+                Markup: markdown
+```
+
+A bold within the sentence (`**in-house product**`) is 700, or the weight of the text if it is already 700 or more.
 
 ## Line height
 

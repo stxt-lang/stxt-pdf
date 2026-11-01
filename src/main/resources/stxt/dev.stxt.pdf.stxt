@@ -907,13 +907,15 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Font, code font, size, line height, alignment, hyphenation, color and language of the text, heading numbering, and widows and orphans. Inherited.
+		Description: Font, code font, weight, size, line height, alignment, hyphenation, color and language of the text, heading numbering, and widows and orphans. Inherited.
 		Children:
 			Child: Font
 				Max: 1
 			Child: Code font
 				Max: 1
 			Child: Bold
+				Max: 1
+			Child: Weight
 				Max: 1
 			Child: Italic
 				Max: 1
@@ -1090,12 +1092,15 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Typography
 
 	Node: Font
-		Description: Font family, as declared by its TTF file in resources/fonts. Required in the text, own or inherited (also from Document).
+		Description: Font family, as declared by its TTF or OTF files in resources/fonts. Required in the text, own or inherited (also from Document).
 	Node: Code font
-		Description: Font family of the code (`code` in a text with Markup: markdown or in a Markdown, and the code blocks), as declared by its TTF file in resources/fonts; usually a monospaced one. Required if there is code, own or inherited.
+		Description: Font family of the code (`code` in a text with Markup: markdown or in a Markdown, and the code blocks), as declared by its TTF or OTF files in resources/fonts; usually a monospaced one. Required if there is code, own or inherited.
 	Node: Bold
 		Type: BOOLEAN
-		Description: Bold: the weight 700 variant of the font. By default, false.
+		Description: Bold: true is Weight: 700 and false, Weight: 400. By default, false. Not together with Weight in the same Typography.
+	Node: Weight
+		Type: INTEGER
+		Description: Weight of the font, from 100 (thin) to 900 (black) in steps of 100; the family needs a file with that weight in resources/fonts. By default, 400.
 	Node: Italic
 		Type: BOOLEAN
 		Description: Italic: the italic variant of the font. By default, false.

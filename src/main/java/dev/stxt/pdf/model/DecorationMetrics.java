@@ -4,7 +4,7 @@ package dev.stxt.pdf.model;
  * Position and thickness of the underline and the strikeout of a font, in fractions of the font size
  * (reference/common/text-formatting.md). The positions are those of the top of the stroke, measured
  * upward from the baseline (negative below), as in the {@code post} and {@code OS/2} tables of
- * the TTF.
+ * the font file.
  */
 public record DecorationMetrics(double underlinePosition, double underlineThickness, double strikeoutPosition,
                                 double strikeoutThickness) {

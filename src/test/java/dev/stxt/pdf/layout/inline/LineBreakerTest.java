@@ -28,7 +28,7 @@ class LineBreakerTest {
     private static final FontFace F = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL);
     /** Like {@link #measurer}, but each bold character measures 2 pt. */
     private final TextMeasurer boldIsWider = (text, font, fontSize) ->
-            text.codePointCount(0, text.length()) * fontSize * (font.weight() == FontWeight.BOLD ? 2 : 1);
+            text.codePointCount(0, text.length()) * fontSize * (font.weight().equals(FontWeight.BOLD) ? 2 : 1);
 
     private static List<String> texts(List<LineBreaker.Line> lines) {
         return lines.stream().map(LineBreaker.Line::text).toList();

@@ -11,9 +11,10 @@ inherit it).
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
-| `Font` | family name | none | **Required** in all text, own or inherited (`TEXT_WITHOUT_FONT`). It is the family declared by the TTF file in the fonts folder ([Resources](resources.md#fonts)). |
+| `Font` | family name | none | **Required** in all text, own or inherited (`TEXT_WITHOUT_FONT`). It is the family declared by the TTF or OTF files in the fonts folder ([Resources](resources.md#fonts)). |
 | `Code font` | family name | none | The family of code, inline and in blocks ([Text formatting](text-formatting.md#inline-code)). Usually a monospaced one. **Required** if there is code, own or inherited (`CODE_WITHOUT_FONT`). |
-| `Bold` | `true`, `false` | `false` | Bold: with `false`, weight 400 of the font, and with `true`, 700. |
+| `Bold` | `true`, `false` | `false` | Bold: `true` is `Weight: 700` and `false`, `Weight: 400`. Not together with `Weight` in the same `Typography` (`WEIGHT_CONFLICT`). |
+| `Weight` | 100 to 900, in steps of 100 | `400` | Weight of the font ([Weights](#weights-weight)). |
 | `Italic` | `true`, `false` | `false` | Italic: the italic variant of the font. |
 | `Size` | number > 0 | none | Font size. **Required** in all text, own or inherited (`TEXT_WITHOUT_FONT_SIZE`). |
 | `Line height` | number or % | `120%` | **A number is a measurement** (`15` = 15 pt). For a value relative to `Size`, a percentage (`120%`). |
@@ -63,6 +64,36 @@ Text is broken into **lines** as wide as the content box:
 In both cases, a word wider than the line is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)), also with
 `Hyphenate` if none of its parts fits. Words are only split with `Hyphenate` or where the text has a soft hyphen
 ([Hyphenation](#hyphenation-hyphenate)).
+
+## Weights (`Weight`)
+
+`Weight` chooses the weight of the font: from 100, the thinnest, to 900, the heaviest, in steps of 100; any other number
+is an error (`VALUE_NOT_ALLOWED`). 400 is regular and 700, bold. Each weight is a file of the family in the fonts
+folder: the repository includes IBM Plex Sans in 300, 400, 500, 600 and 700 ([Resources](resources.md#fonts)). A weight
+the family does not have is an error (`FONT_VARIANT_MISSING`): it is not synthesized and the closest one is not used.
+
+```stxt
+Typography:
+    Font: IBM Plex Sans
+    Weight: 300
+```
+
+- **`Bold` is another way of writing the weight**: `Bold: true` is `Weight: 700`, and `Bold: false`, `Weight: 400`.
+  They are the same property: between a rule, an ancestor and the box the last declaration wins, as with the rest, so
+  `Bold: true` in a box that inherits `Weight: 300` gives 700. Both in the same `Typography` are an error
+  (`WEIGHT_CONFLICT`), with the line of the `Bold`.
+- **A bold run** (`**x**`) has weight 700, or that of the box if it is already 700 or more
+  ([Text formatting](text-formatting.md#runs)).
+- **Large bold text**, for the contrast, is text of weight 700 or more ([The PDF](pdf.md#contrast)).
+
+> **Decision:** a numeric `Weight`, as fonts declare it (`usWeightClass`), and `Bold` as a shortcut for 700.
+> *Rejected alternative:* weight names (`light`, `medium`, `semibold`), which each family applies to different weights,
+> or a numeric `Bold`.
+
+> **Decision:** `Bold` and `Weight` in the same `Typography` are an error, because either they contradict each other or
+> one of them is not needed; between rules, ancestors and the box the last declaration wins. *Rejected alternative:* the
+> error also when they come from different places, which would force removing the `Bold` of a rule to give a box a
+> `Weight`.
 
 ## Hyphenation (`Hyphenate`)
 
@@ -149,7 +180,8 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 
 ## What is not supported
 
-- Fallback fonts, synthesized bold or italic, weights other than 400 and 700 ([Resources](resources.md#fonts)).
+- Fallback fonts, synthesized bold or italic, and the closest weight when the requested one is missing
+  ([Resources](resources.md#fonts)).
 - Units relative to the font: everything is measured in points, millimeters or percentages.
 - Kerning, and vertical or right-to-left writing.
 - Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the

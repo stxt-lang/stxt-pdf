@@ -43,8 +43,6 @@ class ErrorCatalogTest {
 
     /** Codes without a case in the catalog, with the reason. */
     private static final Set<ErrorCode> UNCOVERED = EnumSet.of(
-            // The fonts of the repository have the four variants: PdfMetricsTest tests it.
-            ErrorCode.FONT_VARIANT_MISSING,
             // With the same metrics for every digit, pagination always converges: it is a safety
             // net that PageReferencesTest tests with a measurer that forces it.
             ErrorCode.REFERENCE_UNSTABLE,

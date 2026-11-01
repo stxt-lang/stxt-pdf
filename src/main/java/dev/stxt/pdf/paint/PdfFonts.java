@@ -1,26 +1,30 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.resources.FontFile;
 import dev.stxt.pdf.resources.Resources;
-import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeFont;
-import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * The fonts of a PDF and how text is written with them. Each TTF font of the resources folder
- * (reference/common/resources.md) is embedded once per document and {@link FontFace} combination, as a subset
- * (only the glyphs used) in a Type 0 font with Identity-H encoding: the PDF looks the same on any
- * machine. With Identity-H each character takes two bytes and the {@code Tw} operator has no effect, so
- * justification and letter spacing go in the arguments of {@code TJ} ({@link #spaced}).
+ * The fonts of a PDF and how text is written with them. Each font of the resources folder
+ * (reference/common/resources.md) is embedded once per document and {@link FontFace} combination in a Type 0 font
+ * with Identity-H encoding: the PDF looks the same on any machine. A font with TrueType outlines is embedded as a
+ * subset (only the glyphs used); one with CFF outlines, whole ({@link #declareCff}). With Identity-H each character
+ * takes two bytes and the {@code Tw} operator has no effect, so justification and letter spacing go in the arguments
+ * of {@code TJ} ({@link #spaced}).
  */
 final class PdfFonts {
 
@@ -41,13 +45,39 @@ final class PdfFonts {
             // Without ligatures the GSUB table is dropped: PDFBox writes one glyph per character, which is what was
             // measured. From the bytes that were measured, without reading the file again. It is parsed again because
             // TrueTypeFont is not thread-safe and PDFBox changes it when embedding it.
-            TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(
-                    resources.fonts().find(font).content()));
+            FontFile file = resources.fonts().find(font);
+            TrueTypeFont ttf;
+            try (InputStream content = file.content()) {
+                ttf = FontFile.parse(content.readAllBytes());
+            }
             ttf.setEnableGsub(font.ligatures());
-            f = PDType0Font.load(doc, ttf, true);
+            f = PDType0Font.load(doc, ttf, !file.cff());
+            if (file.cff()) {
+                declareCff((PDType0Font) f);
+            }
             fonts.put(font, f);
         }
         return f;
+    }
+
+    /**
+     * Declares a font with CFF outlines as what it is. PDFBox cannot make a subset of CFF outlines, so they are
+     * embedded whole, and it declares them as TrueType: a {@code CIDFontType2} descendant with the file in
+     * {@code FontFile2}, which is only for TrueType outlines (ISO 32000-1, 9.9). The descendant becomes a
+     * {@code CIDFontType0} and the file goes to {@code FontFile3} with subtype {@code OpenType} (PDF 1.6). The codes
+     * are still the glyph numbers: in a CFF that is not CID-keyed, as are those of the OTF files, a CID is the glyph
+     * number. Only the dictionaries change: PDFBox keeps writing the text with the font it loaded.
+     */
+    private static void declareCff(PDType0Font font) {
+        COSDictionary descendant = font.getDescendantFont().getCOSObject();
+        descendant.setItem(COSName.SUBTYPE, COSName.CID_FONT_TYPE0);
+        descendant.removeItem(COSName.CID_TO_GID_MAP);
+        COSDictionary descriptor = descendant.getCOSDictionary(COSName.FONT_DESC);
+        COSStream file = (COSStream) descriptor.getDictionaryObject(COSName.FONT_FILE2);
+        descriptor.removeItem(COSName.FONT_FILE2);
+        file.removeItem(COSName.LENGTH1);
+        file.setItem(COSName.SUBTYPE, COSName.OPEN_TYPE);
+        descriptor.setItem(COSName.FONT_FILE3, file);
     }
 
     /**

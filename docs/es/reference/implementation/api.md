@@ -79,11 +79,17 @@ esos dos puede ser `null`. Ver [Styles](../common/styles.md#documento-de-estilos
 `new Resources(Path.of("otra"))` usa otra carpeta de recursos. Toda ruta pasa por `Resources.resolve`, que nunca va hacia
 atrás. `Resources` se comparte entre hilos y entre conversiones. Indexa `fonts/` una vez y guarda las imágenes leídas.
 
-`FontLibrary` identifica cada TTF por su interior:
+`FontLibrary` indexa los `.ttf` y los `.otf` e identifica cada uno por su interior:
 
 - **familia:** la tipográfica de la tabla `name` (`nameID` 16) o, si no la tiene, la familia (`nameID` 1);
-- **peso:** `usWeightClass` de `OS/2` (400 o 700, y los demás se ignoran sin error);
+- **peso:** `usWeightClass` de `OS/2` tal cual, de 1 a 1000 (fuera de ahí el fichero se ignora sin error). Solo se puede
+  pedir un peso que el documento sabe escribir, de 100 a 900 de 100 en 100: un fichero de 450 se indexa y sale en la
+  lista de variantes del error, pero no se usa;
 - **estilo:** el bit de cursiva de `fsSelection`.
+
+`FontFile.parse` lee un fichero que empieza por `OTTO` (contornos CFF) con el lector de OpenType de fontbox y el resto
+con el de TrueType, sea cual sea su extensión; `FontFile.cff()` dice cuáles son CFF, que se incrustan enteras
+([El PDF por dentro](pdf.md#páginas-fuentes-y-metadatos)).
 
 > **Decisión:** las fuentes solo se comprueban con `PdfMetrics` (`Engine.layOutDocument` llama a `validate`). Con
 > `FixedMetrics` no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar

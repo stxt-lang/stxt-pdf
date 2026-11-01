@@ -83,7 +83,7 @@ class PdfMetricsTest {
                 () -> regularOnly.validate(new BoxTreeBuilder().build(new DocumentReader().read(Docs.sectioned(doc))).root()));
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
         assertEquals(16, e.line());
-        assertTrue(e.getMessage().endsWith("(Font on line 10, Bold on line 15)"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(Font on line 10, Bold or Weight on line 15)"), e.getMessage());
     }
 
     @Test
@@ -101,7 +101,8 @@ class PdfMetricsTest {
         assertEquals(ErrorCode.FONT_VARIANT_MISSING, e.errorCode());
         // The error belongs to the text, in the document; the family is declared in the styles.
         assertFalse(e.inStyles());
-        assertTrue(e.getMessage().endsWith("(Font on line 4 of the styles, Bold on line 10)"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(Font on line 4 of the styles, Bold or Weight on line 10)"),
+                e.getMessage());
     }
 
     @Test

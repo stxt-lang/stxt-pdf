@@ -101,6 +101,38 @@ class BoxTreeBuilderTest {
         assertEquals(Sides.all(Value.pt(0)), child.style().box().padding()); // Padding is not inherited
     }
 
+    /**
+     * {@code Weight} chooses the weight from 100 to 900 and {@code Bold} is another way of writing it: they are the
+     * same property, so the later declaration wins, also between a rule and the element
+     * (reference/common/typography.md).
+     */
+    @Test
+    void weightAndBoldAreTheSameProperty() {
+        Section section = build(document(
+                "\tStyles:", "\t\tFor style: light", "\t\t\tTypography:", "\t\t\t\tWeight: 300",
+                "\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 10", "\t\t\tWeight: 600",
+                "\t\tText: inherited",
+                "\t\tText: bold", "\t\t\tTypography:", "\t\t\t\tBold: true",
+                "\t\tText: light", "\t\t\tStyle: light",
+                "\t\tText: normal", "\t\t\tStyle: light", "\t\t\tTypography:", "\t\t\t\tBold: false"))
+                .sections().get(0);
+        List<Box> texts = section.box().children().get(0).children();
+        assertEquals(List.of(600, 700, 300, 400),
+                texts.stream().map(t -> t.style().typography().fontWeight().value()).toList());
+    }
+
+    @Test
+    void weightGoesFrom100To900InStepsOf100() {
+        for (String value : List.of("0", "50", "350", "1000")) {
+            InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
+                    "\tText: x", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tWeight: " + value)));
+            assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode(), value);
+        }
+        InvalidModelException conflict = assertThrows(InvalidModelException.class, () -> build(document(
+                "\tText: x", "\t\tTypography:", "\t\t\tWeight: 700", "\t\t\tBold: true")));
+        assertEquals(ErrorCode.WEIGHT_CONFLICT, conflict.errorCode());
+    }
+
     @Test
     void rulesTheSchemaCannotExpress() {
         InvalidModelException single = assertThrows(InvalidModelException.class, () -> build(document(

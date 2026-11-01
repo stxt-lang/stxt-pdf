@@ -25,7 +25,8 @@ Styles:
 | `Font` | nombre de familia | sin valor | La fuente. **Obligatoria** en todo texto, propia o heredada |
 | `Code font` | nombre de familia | sin valor | La fuente del código ([Formato del texto](text-formatting.md#código)). **Obligatoria** si hay código |
 | `Size` | número > 0 | sin valor | El tamaño de la letra. **Obligatorio** en todo texto |
-| `Bold` | `true`, `false` | `false` | Negrita |
+| `Bold` | `true`, `false` | `false` | Negrita: lo mismo que `Weight: 700` |
+| `Weight` | de 100 a 900, de 100 en 100 | `400` | El peso de la letra ([abajo](#pesos)) |
 | `Italic` | `true`, `false` | `false` | Cursiva |
 | `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos y `140%`, 1,4 veces el tamaño |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
@@ -45,8 +46,42 @@ El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Prefor
 No hay fuente por defecto: sin `Font` y `Size`, un texto es un error. La fuente se nombra por su familia, tal como la
 declara su fichero (`IBM Plex Sans`, con mayúsculas y espacios), y tiene que estar en la carpeta de fuentes
 ([Recursos](resources.md)). El repositorio trae **IBM Plex Sans**, **IBM Plex Serif** e **IBM Plex Mono**, cada una en
-normal, negrita, cursiva y negrita cursiva. Si un texto usa un carácter que su fuente no tiene, es un error: el motor no
-busca otra fuente ni pinta un cuadradito.
+normal, negrita, cursiva y negrita cursiva, y la Sans además en los pesos 300, 500 y 600. Si un texto usa un carácter que
+su fuente no tiene, es un error: el motor no busca otra fuente ni pinta un cuadradito.
+
+## Pesos
+
+`Weight` elige lo gruesa que es la letra, de 100 a 900: 400 es la normal, 700 la negrita, y los demás, los pesos
+intermedios que trae la familia (300 ligera, 500 media, 600 seminegrita...). Cada peso es un fichero de la fuente: uno que
+la familia no tiene es un error. `Bold: true` es otra forma de escribir `Weight: 700`, y los dos no van juntos en el mismo
+`Typography`.
+
+```stxt
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Pesos de la letra
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+    Section:
+        Text: Marta Ferrer Soler
+            Typography:
+                Size: 28
+                Weight: 300
+        Text: Diseñadora de producto
+            Typography:
+                Weight: 600
+        Paragraph: Ocho años entre estudio, cooperativa y **producto propio**.
+            Typography:
+                Markup: markdown
+```
+
+Una negrita dentro de la frase (`**producto propio**`) es el 700, o el peso del texto si ya es 700 o más.
 
 ## Altura de las líneas
 

@@ -96,6 +96,8 @@ public enum ErrorCode {
      * {@code Keep with next} with {@code After}, or {@code Keep with previous} with {@code Before}, in the same box.
      */
     KEEP_CONFLICT,
+    /** {@code Bold} and {@code Weight} in the same {@code Typography}: they are two ways of writing the weight. */
+    WEIGHT_CONFLICT,
     /** An {@code Overlay} or a {@code Page overlay} inside a {@code Columns}. */
     OVERLAY_IN_COLUMNS,
 
@@ -248,7 +250,7 @@ public enum ErrorCode {
     // --- Fonts --------------------------------------------------------------------------------
     /** {@code Font} is not in the fonts folder. */
     FONT_UNKNOWN,
-    /** The family does not have the variant of {@code Bold} and {@code Italic}. */
+    /** The family does not have the variant of {@code Weight} (or {@code Bold}) and {@code Italic}. */
     FONT_VARIANT_MISSING,
     /** The font does not have a character of the text. */
     GLYPH_MISSING,

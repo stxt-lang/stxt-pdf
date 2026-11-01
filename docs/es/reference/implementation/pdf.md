@@ -9,8 +9,12 @@ escribe el código está en [El pintado](painting.md#el-pdf).
 - Cada página tiene el tamaño del `Page` de su sección. Las etiquetas de página (`PageLabels`) llevan el número impreso
   con su estilo (`D`, `r` o `R`), o ninguno en las páginas sin número, y solo se escriben si alguna página no es su
   número físico en cifras: un documento que numera como siempre no las lleva.
-- Las fuentes son las TTF de la carpeta de recursos, incrustadas como subconjunto (Type 0, Identity-H) con los glifos que
-  se usan.
+- Las fuentes son las de la carpeta de recursos, en Type 0 con Identity-H. Las de contornos TrueType (los `.ttf` y los
+  `.otf` que los llevan) se incrustan como subconjunto, con los glifos que se usan, en un `CIDFontType2` con el fichero en
+  `FontFile2`. Las de contornos CFF (los `.otf` con tabla `CFF `) se incrustan enteras, en un `CIDFontType0` con el
+  fichero en `FontFile3` de subtipo `OpenType`: PDFBox no sabe hacer subconjuntos de CFF, y las declara como TrueType,
+  así que `PdfFonts` cambia el subtipo y la clave del fichero al cargarlas. Los códigos del texto son los números de glifo
+  en las dos: en un CFF que no es CID, como el de un `.otf`, un CID es el número de glifo.
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre,
   y `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
   quien convierte lo pide ([abajo](#pdfua-2)).
@@ -21,6 +25,12 @@ escribe el código está en [El pintado](painting.md#el-pdf).
 > **Decisión:** el identificador sale del contenido y no de la hora. Así una conversión se puede repetir y comparar byte a
 > byte, y dos documentos distintos tienen identificadores distintos, que es lo que pide la norma. *Alternativa
 > descartada:* el identificador que PDFBox calcula con la hora, que cambia en cada conversión.
+
+> **Decisión:** las fuentes CFF se incrustan enteras y se declaran como lo que son. El SemiBold de IBM Plex Sans en
+> `.otf` (143 KB) añade unos 90 KB al PDF que lo usa, frente a unos pocos KB de un subconjunto, y por eso las fuentes del
+> repositorio son TTF. *Alternativa
+> descartada:* hacer el subconjunto del CFF en el motor, que es reescribir la tabla `CFF ` entera, o dejarlas como las
+> declara PDFBox, que no es lo que dice la norma (ISO 32000-1, 9.9) aunque los visores lo toleren.
 
 > **Decisión:** todo PDF declara PDF/UA-1. veraPDF lo comprueba solo en parte (no el orden de lectura ni el sentido de los
 > textos), así que se apoya además en el repaso a mano del etiquetado. *Alternativa descartada:* no declararlo.

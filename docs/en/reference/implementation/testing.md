@@ -21,8 +21,11 @@ content in a `Section`). With `FixedMetrics`, each character measures 5 pt with 
 180 pt of height, the page area measures 100) and `rect(page, id)` / `has(page, id)` look at a specific page. A layout
 test cannot overflow: overflows go to the error catalog.
 
-The test cases that are not code are in `test/` (`golden/`, `errors/`, `examples/`, `spec/`), which the tests read by
-disk path and not from the classpath. The images of the tests are in the resources folder of the repository,
+The test cases that are not code are in `test/` (`golden/`, `errors/`, `examples/`, `spec/` and `resources/`), which
+the tests read by disk path and not from the classpath. `test/resources/` is a resources folder with a single font, IBM
+Plex Sans SemiBold as an `.otf` with CFF outlines, to test those fonts (`FontLibraryTest`, `FontFileTest` and
+`PdfCanvasTest`) without putting them in the default folder, where they would be embedded whole in the PDFs of the
+examples. The images of the tests are in the resources folder of the repository,
 `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30, `shapes.svg` 150 × 75 and
 `label.svg` 120 × 36, and `drawing.gif`, `broken.png` and the `bad-*.svg` for the errors), because the layout tests, the
 error catalog and the golden cases use the default folder.

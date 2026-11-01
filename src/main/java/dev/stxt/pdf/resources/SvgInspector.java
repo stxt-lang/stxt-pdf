@@ -63,7 +63,7 @@ final class SvgInspector {
     private static final Pattern LENGTH = Pattern.compile("([+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:[eE][+-]?\\d+)?)([a-z%]*)");
 
     /** A text of the SVG with the font that draws it. */
-    record TextUse(int line, String family, boolean bold, boolean italic, String text) {
+    record TextUse(int line, String family, FontWeight weight, boolean italic, String text) {
     }
 
     /**
@@ -123,8 +123,16 @@ final class SvgInspector {
                     style != null ? style : this.style);
         }
 
-        boolean bold() {
-            return weight.equals("bold") || weight.equals("700");
+        /**
+         * The weight it requests: {@code normal}, {@code bold} or a number from 100 to 900 in steps of 100, like
+         * {@code Weight}; {@code null} for any other value ({@code bolder}, {@code 350}...).
+         */
+        FontWeight fontWeight() {
+            return switch (weight) {
+                case "normal" -> FontWeight.NORMAL;
+                case "bold" -> FontWeight.BOLD;
+                default -> weight.matches("[1-9]00") ? new FontWeight(Integer.parseInt(weight)) : null;
+            };
         }
 
         boolean italic() {
@@ -133,8 +141,9 @@ final class SvgInspector {
 
         /** The font of {@code fonts/} it requests, or {@code null} if it has no family. */
         FontFace face() {
-            return family == null ? null : new FontFace(firstFamily(family), bold() ? FontWeight.BOLD
-                    : FontWeight.NORMAL, italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
+            FontWeight w = fontWeight();
+            return family == null || w == null ? null
+                    : new FontFace(firstFamily(family), w, italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
         }
     }
 
@@ -311,11 +320,11 @@ final class SvgInspector {
 
         private void flushText() {
             if (textFont != null && !text.toString().isBlank()) {
-                String weight = textFont.weight();
-                if (!Set.of("normal", "400", "bold", "700").contains(weight)) {
+                FontWeight weight = textFont.fontWeight();
+                if (weight == null) {
                     throw new ImageFormatException("The text \"" + text.toString().strip() + "\" of the SVG " + name
-                            + " (line " + textLine + ") has font-weight " + weight
-                            + ": only normal (400) and bold (700) are supported");
+                            + " (line " + textLine + ") has font-weight " + textFont.weight()
+                            + ": only normal, bold and 100 to 900 in steps of 100 are supported");
                 }
                 String style = textFont.style();
                 if (!Set.of("normal", "italic").contains(style)) {
@@ -323,7 +332,7 @@ final class SvgInspector {
                             + " (line " + textLine + ") has font-style " + style
                             + ": only normal and italic are supported");
                 }
-                texts.add(new TextUse(textLine, textFont.family(), textFont.bold(), textFont.italic(),
+                texts.add(new TextUse(textLine, textFont.family(), weight, textFont.italic(),
                         text.toString()));
             }
             text.setLength(0);

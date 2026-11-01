@@ -11,9 +11,10 @@ celdas).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Font` | nombre de familia | sin valor | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declara el fichero TTF de la carpeta de fuentes ([Recursos](resources.md#fuentes)). |
+| `Font` | nombre de familia | sin valor | **Obligatoria** en todo texto, propia o heredada (`TEXT_WITHOUT_FONT`). Es la familia que declaran los ficheros TTF u OTF de la carpeta de fuentes ([Recursos](resources.md#fuentes)). |
 | `Code font` | nombre de familia | sin valor | La familia del código, en línea y en bloques ([Formato del texto](text-formatting.md#código-en-línea)). Suele ser una monoespaciada. **Obligatoria** si hay código, propia o heredada (`CODE_WITHOUT_FONT`). |
-| `Bold` | `true`, `false` | `false` | Negrita: con `false`, el peso 400 de la fuente, y con `true`, el 700. |
+| `Bold` | `true`, `false` | `false` | Negrita: `true` es `Weight: 700` y `false`, `Weight: 400`. No va con `Weight` en el mismo `Typography` (`WEIGHT_CONFLICT`). |
+| `Weight` | de 100 a 900, de 100 en 100 | `400` | Peso de la fuente ([Pesos](#pesos-weight)). |
 | `Italic` | `true`, `false` | `false` | Cursiva: la variante cursiva de la fuente. |
 | `Size` | número > 0 | sin valor | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
 | `Line height` | número o % | `120%` | **Un número es una medida** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
@@ -63,6 +64,35 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
 En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)),
 también con `Hyphenate` si ninguna de sus partes cabe. Las palabras solo se parten con `Hyphenate` o donde el texto
 lleva un guion blando ([Guiones](#guiones-hyphenate)).
+
+## Pesos (`Weight`)
+
+`Weight` elige el peso de la fuente: de 100, el más fino, a 900, el más grueso, de 100 en 100; otro número es un error
+(`VALUE_NOT_ALLOWED`). El 400 es el normal y el 700, la negrita. Cada peso es un fichero de la familia en la carpeta de
+fuentes: el repositorio trae IBM Plex Sans en 300, 400, 500, 600 y 700 ([Recursos](resources.md#fuentes)). Un peso que
+la familia no tiene es un error (`FONT_VARIANT_MISSING`): no se sintetiza ni se usa el más cercano.
+
+```stxt
+Typography:
+    Font: IBM Plex Sans
+    Weight: 300
+```
+
+- **`Bold` es otra forma de escribir el peso**: `Bold: true` es `Weight: 700`, y `Bold: false`, `Weight: 400`. Son la
+  misma propiedad: entre una regla, una antecesora y la caja gana la última declaración, como con el resto, así que
+  `Bold: true` en una caja que hereda `Weight: 300` da el 700. Los dos en el mismo `Typography` son un error
+  (`WEIGHT_CONFLICT`), con la línea del `Bold`.
+- **Un tramo en negrita** (`**x**`) tiene el peso 700, o el de la caja si ya es 700 o más
+  ([Formato del texto](text-formatting.md#tramos)).
+- **El texto grande en negrita**, para el contraste, es el de peso 700 o más ([El PDF](pdf.md#contraste)).
+
+> **Decisión:** un `Weight` numérico, como lo declaran las fuentes (`usWeightClass`), y `Bold` como atajo del 700.
+> *Alternativa descartada:* nombres de peso (`light`, `medium`, `semibold`), que cada familia aplica a pesos distintos,
+> o un `Bold` numérico.
+
+> **Decisión:** `Bold` y `Weight` en el mismo `Typography` son un error, porque o se contradicen o uno sobra; entre
+> reglas, antecesoras y la caja gana la última declaración. *Alternativa descartada:* el error también cuando vienen de
+> sitios distintos, que obligaría a quitar el `Bold` de una regla para dar un `Weight` a una caja.
 
 ## Guiones (`Hyphenate`)
 
@@ -146,7 +176,8 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 
 ## Lo que no hay
 
-- Fuentes de sustitución, síntesis de negrita o cursiva, pesos distintos de 400 y 700 ([Recursos](resources.md#fuentes)).
+- Fuentes de sustitución, síntesis de negrita o cursiva, y el peso más cercano cuando falta el pedido
+  ([Recursos](resources.md#fuentes)).
 - Unidades relativas a la fuente: todo se mide en puntos, en milímetros o en porcentajes.
 - Kerning y escritura vertical o de derecha a izquierda.
 - Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,

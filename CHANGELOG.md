@@ -17,6 +17,19 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   hyphens and the two parts are one word. `Hyphenate: true` on a text in another language is
   `HYPHENATION_LANGUAGE_UNSUPPORTED`, and a font without the hyphen, `GLYPH_MISSING`.
 - The newsletter example (`test/examples/05-newsletter`) is hyphenated.
+- **Font weights.** `Weight` in `Typography` (inherited, `400` by default) chooses the weight of the font from 100 to 900
+  in steps of 100; another number is `VALUE_NOT_ALLOWED`, and a weight the family does not have, `FONT_VARIANT_MISSING`.
+  `Bold` stays as another way of writing it (`true` is 700 and `false`, 400): the last declaration wins between rules,
+  ancestors and the box, and both in the same `Typography` are `WEIGHT_CONFLICT` (new code). A bold run has weight 700,
+  or that of the box if it is already 700 or more. The fonts folder indexes files of any weight (`usWeightClass` as it
+  is), not only 400 and 700, and the variants of a family are listed in the messages from the lightest to the heaviest
+  (`weight 300, normal, italic, weight 600, bold`). The text of an SVG image accepts `font-weight` from 100 to 900 in
+  steps of 100 as well.
+- **OTF fonts.** The fonts folder indexes `.otf` files too. Those with TrueType outlines are embedded as a subset, like
+  a `.ttf`; those with CFF outlines, whole, as a `CIDFontType0` with the file in `FontFile3` (`OpenType`), because PDFBox
+  cannot subset them. A font present as `.ttf` and as `.otf` is two files for the same font, a `RESOURCE` error.
+- IBM Plex Sans Light (300), Medium (500) and SemiBold (600) are in `resources/fonts/`, and the résumé example
+  (`test/examples/03-resume`) uses 300, 500 and 600.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

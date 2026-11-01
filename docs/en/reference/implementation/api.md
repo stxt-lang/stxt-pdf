@@ -78,11 +78,17 @@ those two it can be `null`. See [Styles](../common/styles.md#separate-styles-doc
 `new Resources(Path.of("other"))` uses another resources folder. Every path goes through `Resources.resolve`, which never goes
 backwards. `Resources` is shared across threads and across conversions. It indexes `fonts/` once and keeps the images it has read.
 
-`FontLibrary` identifies each TTF by its contents:
+`FontLibrary` indexes the `.ttf` and `.otf` files and identifies each one by its contents:
 
 - **family:** the typographic family of the `name` table (`nameID` 16) or, if it has none, the family (`nameID` 1);
-- **weight:** `usWeightClass` of `OS/2` (400 or 700; the others are ignored without error);
+- **weight:** `usWeightClass` of `OS/2` as it is, from 1 to 1000 (outside that range the file is ignored without error).
+  Only a weight the document can write can be requested, from 100 to 900 in steps of 100: a file of 450 is indexed and
+  appears in the list of variants of the error, but it is not used;
 - **style:** the italic bit of `fsSelection`.
+
+`FontFile.parse` reads a file that starts with `OTTO` (CFF outlines) with the OpenType parser of fontbox and the rest
+with the TrueType one, whatever its extension; `FontFile.cff()` says which ones are CFF, which are embedded whole
+([The PDF inside](pdf.md#pages-fonts-and-metadata)).
 
 > **Decision:** the fonts are only checked with `PdfMetrics` (`Engine.layOutDocument` calls `validate`). With
 > `FixedMetrics` the fonts folder is not looked at: it is enough for `Font` to be declared. *Rejected alternative:* always validating

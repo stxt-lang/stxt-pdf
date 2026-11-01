@@ -17,6 +17,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FontLibraryTest {
 
     private static final Path PLEX = Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans");
+    /** The resources of the tests: only IBM Plex Sans SemiBold as an OTF with CFF outlines. */
+    static final Path OTF_RESOURCES = Path.of("test", "resources");
 
     @TempDir
     Path dir;
@@ -42,6 +45,32 @@ class FontLibraryTest {
         return new Resources(dir.resolve("resources"));
     }
 
+    /** The OTF of the resources of the tests. */
+    private static Path otf() {
+        return OTF_RESOURCES.resolve("fonts/IBM Plex Sans/IBMPlexSans-SemiBold.otf");
+    }
+
+    /**
+     * Writes {@code usWeightClass} (offset 4 of the {@code OS/2} table) in a font file: the table directory starts at
+     * byte 12, with 16 bytes per table (tag, checksum, offset, length). The checksum is not updated: it is not read.
+     */
+    private static void setWeightClass(Path file, int weight) throws IOException {
+        byte[] b = Files.readAllBytes(file);
+        int tables = (b[4] & 0xFF) << 8 | b[5] & 0xFF;
+        for (int i = 0; i < tables; i++) {
+            int entry = 12 + 16 * i;
+            if (new String(b, entry, 4, java.nio.charset.StandardCharsets.ISO_8859_1).equals("OS/2")) {
+                int offset = (b[entry + 8] & 0xFF) << 24 | (b[entry + 9] & 0xFF) << 16 | (b[entry + 10] & 0xFF) << 8
+                        | b[entry + 11] & 0xFF;
+                b[offset + 4] = (byte) (weight >> 8);
+                b[offset + 5] = (byte) weight;
+                Files.write(file, b);
+                return;
+            }
+        }
+        throw new IllegalStateException("No OS/2 table in " + file);
+    }
+
     @Test
     void indexByFamilyWeightAndStyle() {
         FontLibrary fonts = new Resources().fonts();
@@ -54,13 +83,47 @@ class FontLibraryTest {
                 fonts.find(plex(FontWeight.NORMAL, FontStyle.ITALIC)).path().getFileName().toString());
         assertEquals("IBMPlexSans-BoldItalic.ttf",
                 fonts.find(plex(FontWeight.BOLD, FontStyle.ITALIC)).path().getFileName().toString());
+        // Light, Medium and SemiBold.
+        assertEquals("IBMPlexSans-Light.ttf",
+                fonts.find(plex(new FontWeight(300), FontStyle.NORMAL)).path().getFileName().toString());
+        assertEquals("IBMPlexSans-Medium.ttf",
+                fonts.find(plex(new FontWeight(500), FontStyle.NORMAL)).path().getFileName().toString());
+        assertEquals("IBMPlexSans-SemiBold.ttf",
+                fonts.find(plex(new FontWeight(600), FontStyle.NORMAL)).path().getFileName().toString());
         for (String family : List.of("IBM Plex Serif", "IBM Plex Mono")) {
-            for (FontWeight weight : FontWeight.values()) {
+            for (FontWeight weight : List.of(FontWeight.NORMAL, FontWeight.BOLD)) {
                 for (FontStyle style : FontStyle.values()) {
                     assertNotNull(fonts.find(new FontFace(family, weight, style)), family + " " + weight + " " + style);
                 }
             }
         }
+    }
+
+    /**
+     * An OTF with CFF outlines is read with the OpenType parser and measures with its {@code hmtx} table, like a TTF:
+     * the advance of {@code H} is 719 thousandths in the two SemiBold files, the OTF (CFF outlines) of the resources of
+     * the tests and the TTF (TrueType outlines) of the repository.
+     */
+    @Test
+    void otfWithCffOutlines() {
+        FontFile otf = new Resources(OTF_RESOURCES).fonts().find(plex(new FontWeight(600), FontStyle.NORMAL));
+        FontFile ttf = new Resources().fonts().find(plex(new FontWeight(600), FontStyle.NORMAL));
+        assertEquals("IBMPlexSans-SemiBold.otf", otf.path().getFileName().toString());
+        assertTrue(otf.cff());
+        assertFalse(ttf.cff());
+        assertEquals(7.19, otf.width("H", 10), 1e-9);
+        assertEquals(ttf.width("Hola, eñe", 10), otf.width("Hola, eñe", 10), 1e-9);
+        assertTrue(otf.has('ñ'));
+    }
+
+    /** A font distributed in TTF and in OTF has the same family, weight and style: the two files are an error. */
+    @Test
+    void theSameFontInTtfAndOtf() throws IOException {
+        Resources r = copy("ttf", "SemiBold");
+        Files.createDirectories(r.fontsFolder().resolve("otf"));
+        Files.copy(otf(), r.fontsFolder().resolve("otf/SemiBold.otf"));
+        ResourceException e = assertThrows(ResourceException.class, r::fonts);
+        assertTrue(e.getMessage().startsWith("Two files for the font IBM Plex Sans weight 600: otf"), e.getMessage());
     }
 
     @Test
@@ -104,7 +167,32 @@ class FontLibraryTest {
         ResourceException e = assertThrows(ResourceException.class,
                 () -> r.fonts().find(plex(FontWeight.BOLD, FontStyle.ITALIC)));
         assertEquals("The font IBM Plex Sans has no variant bold italic. Variants in "
-                + r.fontsFolder() + ": bold, normal", e.getMessage());
+                + r.fontsFolder() + ": normal, bold", e.getMessage());
+    }
+
+    /** The variants of the message go from the lightest to the heaviest, the normal style before the italic. */
+    @Test
+    void missingWeightListsTheVariantsByWeight() throws IOException {
+        Resources r = copy("plex", "Bold", "Italic", "SemiBold", "Regular", "Light");
+        ResourceException e = assertThrows(ResourceException.class,
+                () -> r.fonts().find(plex(new FontWeight(900), FontStyle.NORMAL)));
+        assertEquals("The font IBM Plex Sans has no variant weight 900. Variants in "
+                + r.fontsFolder() + ": weight 300, normal, italic, weight 600, bold", e.getMessage());
+    }
+
+    /**
+     * The weight of a file is its {@code usWeightClass} as it is: one of 450 is indexed but cannot be requested, and
+     * one outside 1 to 1000 is not indexed, although its family is known.
+     */
+    @Test
+    void weightOfTheFileAsItIs() throws IOException {
+        Resources r = copy("plex", "Regular", "Medium");
+        setWeightClass(r.fontsFolder().resolve("plex/Regular.ttf"), 0);
+        setWeightClass(r.fontsFolder().resolve("plex/Medium.ttf"), 450);
+        ResourceException e = assertThrows(ResourceException.class,
+                () -> r.fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL)));
+        assertEquals("The font IBM Plex Sans has no variant normal. Variants in "
+                + r.fontsFolder() + ": weight 450", e.getMessage());
     }
 
     @Test

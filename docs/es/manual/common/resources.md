@@ -5,7 +5,7 @@ desde el que se convierte:
 
 ```
 resources/
-    fonts/      fuentes .ttf
+    fonts/      fuentes .ttf y .otf
     images/     imágenes .png, .jpg y .svg
 ```
 
@@ -14,16 +14,19 @@ Dentro de cada una, las subcarpetas son libres. La carpeta se puede cambiar al c
 
 ## Fuentes
 
-- Se usan solo las fuentes `.ttf` de `fonts/`: no las del sistema. Van incrustadas en el PDF, así que se ve igual en cualquier
-  ordenador. Su licencia tiene que permitirlo, como la SIL Open Font License.
+- Se usan solo las fuentes `.ttf` y `.otf` de `fonts/`: no las del sistema. Van incrustadas en el PDF, así que se ve igual
+  en cualquier ordenador. Su licencia tiene que permitirlo, como la SIL Open Font License.
 - Cada fichero se reconoce por la familia, el peso y el estilo que declara dentro, no por su nombre. `Font: IBM Plex Sans`
-  con `Bold: true` busca el fichero de esa familia con peso 700.
-- Solo cuentan los pesos normal (400) y negrita (700). Si un texto pide una variante que no tiene fichero (negrita con
-  cursiva, por ejemplo), es un error: no se inventa.
-- El repositorio incluye IBM Plex Sans, Serif y Mono, con las cuatro variantes.
+  con `Bold: true` busca el fichero de esa familia con peso 700, y con `Weight: 300`, el de peso 300.
+- Si un texto pide una variante que no tiene fichero (un peso que la familia no trae, o negrita con cursiva), es un error:
+  no se inventa ni se usa la más parecida.
+- El repositorio incluye IBM Plex Sans, Serif y Mono, con las cuatro variantes (normal, negrita, cursiva y negrita
+  cursiva), e IBM Plex Sans además en los pesos 300, 500 y 600.
 
-Una fuente nueva se añade copiando sus `.ttf` estáticos en `fonts/` (las fuentes variables no sirven) y se usa con su
-familia en `Font`. Si el nombre está mal escrito, el error lista las familias que hay.
+Una fuente nueva se añade copiando sus ficheros estáticos en `fonts/` (las fuentes variables no sirven) y se usa con su
+familia en `Font`. Si el nombre está mal escrito, el error lista las familias que hay. Si la fuente se distribuye en
+`.ttf` y en `.otf`, se copia solo uno de los dos (los dos juntos son un error), mejor el `.ttf`: muchos `.otf` se incrustan
+enteros y hacen el PDF más grande ([detalle](../../reference/common/resources.md#fuentes)).
 
 ## Imágenes
 

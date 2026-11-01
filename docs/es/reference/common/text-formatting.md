@@ -10,7 +10,9 @@ El texto puede tener partes con formato dentro de una misma línea: **negrita**,
 combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (abajo) o los genera un `Markdown`.
 
 - Cada tramo usa su variante de la fuente, que debe existir (`FONT_VARIANT_MISSING`, con la línea del tramo) y tener sus
-  caracteres (`GLYPH_MISSING`). La negrita y la cursiva se **suman** a las de la caja: no se pueden quitar.
+  caracteres (`GLYPH_MISSING`). La negrita y la cursiva se **suman** a las de la caja: no se pueden quitar. Un tramo en
+  negrita tiene el peso 700, o el de la caja si ya es 700 o más (`Weight`, [Tipografía](typography.md#pesos-weight)): en
+  un texto de peso 300 la negrita es el 700, y en uno de 900 sigue en 900.
 - El tamaño, el color, `Line height` y la familia son los de la caja (salvo el código, que usa `Code font`,
   [abajo](#código-en-línea)), así que las líneas no cambian de alto.
 - Una palabra con partes de varios tramos (**neg**rita) es una sola palabra: no se parte entre ellos y mide lo que suman
@@ -23,6 +25,10 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
 > **Decisión:** un tramo es un conjunto de marcas y no un peso y un estilo propios: así `Styles` puede cambiar la fuente
 > de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` e `Italic` explícitos, que podrían deshacer
 > el estilo de la caja.
+
+> **Decisión:** la negrita de un tramo es el 700, salvo que la caja ya pese más. *Alternativa descartada:* el peso
+> siguiente que tenga la familia por encima del de la caja, que haría que la negrita de un texto cambiara al añadir un
+> fichero a la carpeta de fuentes.
 
 ## Formato en línea (`Markup`)
 

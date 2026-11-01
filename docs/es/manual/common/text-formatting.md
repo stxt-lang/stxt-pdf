@@ -29,8 +29,9 @@ barra delante (`\*`). Solo vale lo que cabe dentro de una línea: un título, un
 [`Markdown`](../components/markdown.md). Lo demás es texto tal cual: `2024. Un buen año` o `- 5 % de descuento` se ven
 como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `Markup: none`.
 
-La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita. El tamaño, el
-color y la fuente son los de la caja.
+La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita, y en un texto
+ligero (`Weight: 300`), la negrita es el peso 700 ([Tipografía](typography.md#pesos)). El tamaño, el color y la fuente
+son los de la caja.
 
 ## Código
 

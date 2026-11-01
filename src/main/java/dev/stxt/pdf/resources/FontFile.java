@@ -4,10 +4,14 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.VerticalMetrics;
 import org.apache.fontbox.ttf.CmapLookup;
+import org.apache.fontbox.ttf.OTFParser;
+import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeFont;
 import org.apache.fontbox.ttf.gsub.GsubWorker;
 import org.apache.fontbox.ttf.gsub.GsubWorkerFactory;
 import org.apache.fontbox.ttf.model.GsubData;
+import org.apache.pdfbox.io.RandomAccessRead;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +26,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A TTF file of the fonts folder, already read, with its metrics (reference/common/resources.md).
+ * A TTF or OTF file of the fonts folder, already read, with its metrics (reference/common/resources.md). An OTF file
+ * may have TrueType outlines, like a TTF, or CFF ones ({@link #cff()}), which are embedded differently in the PDF.
  *
  * <p>The widths are those PDFBox writes in the PDF when it embeds the font (the advance of each
  * glyph in thousandths of the font size, rounded): this way the text measures the same when it is laid out as when it
@@ -44,6 +49,8 @@ public final class FontFile {
     private static final int BMP = 0x10000;
     /** Maximum number of words memoized with ligatures; past this, the memo is cleared. */
     private static final int MAX_LIGATURE_WORDS = 50_000;
+    /** The tag an OpenType file with CFF outlines starts with; the others start with a version number. */
+    private static final int OTTO = 0x4F54544F;
     /** Advance not yet computed in {@link #bmpAdvance}. */
     private static final int UNKNOWN = -1;
     private static final byte HAS = 1;
@@ -52,6 +59,7 @@ public final class FontFile {
     private final Path path;
     private final FontFace face;
     private final TrueTypeFont ttf;
+    private final boolean cff;
     private final CmapLookup cmap;
     private final double unitsPerEm;
     private final VerticalMetrics vertical;
@@ -74,6 +82,7 @@ public final class FontFile {
         this.path = path;
         this.face = face;
         this.ttf = ttf;
+        this.cff = ttf.getTableMap().containsKey("CFF ");
         this.cmap = ttf.getUnicodeCmapLookup();
         this.unitsPerEm = ttf.getUnitsPerEm();
         this.vertical = new VerticalMetrics(ttf.getHorizontalHeader().getAscender() / unitsPerEm,
@@ -87,6 +96,18 @@ public final class FontFile {
             glyphAdvance[glyph] = (int) Math.round(ttf.getAdvanceWidth(glyph) * 1000 / unitsPerEm);
         }
         Arrays.fill(bmpAdvance, UNKNOWN);
+    }
+
+    /**
+     * Reads a font file: with the parser of OpenType fonts if it has CFF outlines (it starts with {@code OTTO}) and
+     * with that of TrueType otherwise, whatever its extension. Each call gives a new object, which only one thread may
+     * use.
+     */
+    public static TrueTypeFont parse(byte[] content) throws IOException {
+        boolean otto = content.length >= 4 && ((content[0] & 0xFF) << 24 | (content[1] & 0xFF) << 16
+                | (content[2] & 0xFF) << 8 | content[3] & 0xFF) == OTTO;
+        RandomAccessRead in = new RandomAccessReadBuffer(content);
+        return otto ? new OTFParser().parse(in) : new TTFParser().parse(in);
     }
 
     public Path path() {
@@ -108,6 +129,14 @@ public final class FontFile {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * Whether the outlines are CFF (an OTF file with a {@code CFF } table) and not TrueType: PDFBox cannot embed them
+     * as a subset, and the PDF declares them as another kind of font (reference/implementation/pdf.md).
+     */
+    public boolean cff() {
+        return cff;
     }
 
     /**

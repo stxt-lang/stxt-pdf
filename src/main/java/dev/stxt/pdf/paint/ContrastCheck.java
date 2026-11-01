@@ -5,7 +5,6 @@ import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
@@ -150,7 +149,7 @@ public final class ContrastCheck implements Canvas {
             return;
         }
         boolean large = Tolerance.fits(LARGE_SIZE, fontSize)
-                || font.weight() == FontWeight.BOLD && Tolerance.fits(LARGE_BOLD_SIZE, fontSize);
+                || font.weight().bold() && Tolerance.fits(LARGE_BOLD_SIZE, fontSize);
         double needed = large ? LARGE : NORMAL;
         float[] ink = Colors.rgba(color);
         for (float[] backdrop : backdrops) {

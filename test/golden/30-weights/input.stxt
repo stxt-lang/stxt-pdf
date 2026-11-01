@@ -1,0 +1,46 @@
+# Weights (reference/common/typography.md): page of 200 × 200 with margins of 20, page area of 160 × 160 from
+# (20, 20). Lines of 12 (Size 10); with the test metrics each character measures 5 pt whatever its weight, so the
+# weight does not change the layout: each text is one line of 12, 160 wide, one after the other. The image shows the
+# five weights of IBM Plex Sans in the fonts folder: 300 (Light), 400, 500 (Medium), 600 (SemiBold) and 700 (Bold).
+#   light:     Weight 300. y = 20.
+#   normal:    without Weight: 400. y = 32.
+#   medium:    Weight 500. y = 44.
+#   semibold:  Weight 600. y = 56.
+#   bold:      Bold: true, which is Weight 700. y = 68.
+#   run:       Weight 300 with a bold run (Markup: markdown): the run has weight 700. y = 80.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Peso 300, ligera
+			Id: light
+			Typography:
+				Weight: 300
+		Text: Peso 400, normal
+			Id: normal
+		Text: Peso 500, media
+			Id: medium
+			Typography:
+				Weight: 500
+		Text: Peso 600, seminegrita
+			Id: semibold
+			Typography:
+				Weight: 600
+		Text: Peso 700, negrita
+			Id: bold
+			Typography:
+				Bold: true
+		Text: Ligera con **negrita**
+			Id: run
+			Typography:
+				Weight: 300
+				Markup: markdown

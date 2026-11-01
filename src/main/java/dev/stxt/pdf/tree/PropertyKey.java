@@ -76,8 +76,8 @@ public final class PropertyKey {
      * Internal name of each property of {@code Typography} and {@code Break} whose name in the document is short.
      */
     private static final Map<String, String> INTERNAL = Map.of(
-            "bold", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE, "align", "text-align",
-            "before", BREAK_BEFORE, "after", BREAK_AFTER);
+            "bold", FONT_WEIGHT, "weight", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE,
+            "align", "text-align", "before", BREAK_BEFORE, "after", BREAK_AFTER);
 
     private PropertyKey() {
     }

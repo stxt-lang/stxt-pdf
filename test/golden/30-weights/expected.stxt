@@ -1,0 +1,15 @@
+# Six texts of one line of 12, 160 wide, one after the other from y = 20 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: light
+			Rect: 20 20 160 12
+		Fragment: normal
+			Rect: 20 32 160 12
+		Fragment: medium
+			Rect: 20 44 160 12
+		Fragment: semibold
+			Rect: 20 56 160 12
+		Fragment: bold
+			Rect: 20 68 160 12
+		Fragment: run
+			Rect: 20 80 160 12

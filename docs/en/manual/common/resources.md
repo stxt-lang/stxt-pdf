@@ -5,7 +5,7 @@ which the conversion is run:
 
 ```
 resources/
-    fonts/      .ttf fonts
+    fonts/      .ttf and .otf fonts
     images/     .png, .jpg and .svg images
 ```
 
@@ -13,16 +13,20 @@ Inside each one, subfolders are free. The folder can be changed when converting 
 
 ## Fonts
 
-- Only the `.ttf` fonts of `fonts/` are used: not those of the system. They are embedded in the PDF, so it looks the same
-  on any computer. Their license has to allow it, as the SIL Open Font License does.
+- Only the `.ttf` and `.otf` fonts of `fonts/` are used: not those of the system. They are embedded in the PDF, so it
+  looks the same on any computer. Their license has to allow it, as the SIL Open Font License does.
 - Each file is recognized by the family, the weight and the style it declares inside, not by its name.
-  `Font: IBM Plex Sans` with `Bold: true` looks for the file of that family with weight 700.
-- Only the regular (400) and bold (700) weights count. If a text asks for a variant that has no file (bold with italic,
-  for example), it is an error: it is not made up.
-- The repository includes IBM Plex Sans, Serif and Mono, with the four variants.
+  `Font: IBM Plex Sans` with `Bold: true` looks for the file of that family with weight 700, and with `Weight: 300`,
+  the one with weight 300.
+- If a text asks for a variant that has no file (a weight the family does not have, or bold with italic), it is an
+  error: it is not made up and the closest one is not used.
+- The repository includes IBM Plex Sans, Serif and Mono, with the four variants (regular, bold, italic and bold italic),
+  and IBM Plex Sans also in weights 300, 500 and 600.
 
-A new font is added by copying its static `.ttf` files into `fonts/` (variable fonts are not valid) and is used with its
-family in `Font`. If the name is misspelled, the error lists the available families.
+A new font is added by copying its static files into `fonts/` (variable fonts are not valid) and is used with its
+family in `Font`. If the name is misspelled, the error lists the available families. If the font is distributed as
+`.ttf` and as `.otf`, only one of the two is copied (both together are an error), preferably the `.ttf`: many `.otf`
+files are embedded whole and make the PDF larger ([details](../../reference/common/resources.md#fonts)).
 
 ## Images
 

@@ -30,8 +30,8 @@ import static dev.stxt.pdf.paint.PdfContent.io;
  * document and shared by its pages. PDF has the origin at the bottom left: vertical coordinates are inverted when
  * painting.
  *
- * <p>Text is painted with the TTF fonts of the resources folder (reference/common/resources.md). For the lines to
- * measure the same as during layout, the layout must use the same metrics:
+ * <p>Text is painted with the TTF and OTF fonts of the resources folder (reference/common/resources.md). For the
+ * lines to measure the same as during layout, the layout must use the same metrics:
  * {@code new Engine(new PdfMetrics(resources))}.</p>
  *
  * <p>Each image (reference/components/image.md) is embedded only once even if it is used on several

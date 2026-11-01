@@ -4,7 +4,6 @@ import com.github.weisj.jsvg.parser.DomElement;
 import com.github.weisj.jsvg.renderer.NullPlatformSupport;
 import com.github.weisj.jsvg.renderer.PlatformSupport;
 import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.resources.FontFile;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
@@ -85,7 +84,7 @@ final class SvgFonts implements PlatformSupport {
         String key = PREFIX + font.digest();
         byKey.put(key, font);
         element.setAttribute("font-family", key);
-        element.setAttribute("font-weight", font.face().weight() == FontWeight.BOLD ? "bold" : "normal");
+        element.setAttribute("font-weight", Integer.toString(font.face().weight().value()));
         element.setAttribute("font-style", font.face().style() == FontStyle.ITALIC ? "italic" : "normal");
         String style = element.attribute("style");
         if (style != null) {

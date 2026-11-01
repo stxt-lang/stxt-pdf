@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -187,8 +188,16 @@ class SvgImageTest {
                 + "font-weight=\"bold\">Hola</text></svg>");
         String glyph = error(head + "<text font-family=\"IBM Plex Sans\">Hola 中</text></svg>");
         assertTrue(glyph.contains("'中' (U+4E2D)"), glyph);
-        assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-weight=\"300\">Hola</text></svg>")
-                .contains("font-weight 300: only normal (400) and bold (700) are supported"));
+        // The weights from 100 to 900 in steps of 100, like Weight, if the family has them: Plex Sans has 300 and 600.
+        read(head + "<text font-family=\"IBM Plex Sans\" font-weight=\"300\">Hola <tspan font-weight=\"600\">mundo"
+                + "</tspan></text></svg>");
+        assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-weight=\"900\">Hola</text></svg>")
+                .contains("The font IBM Plex Sans has no variant weight 900"));
+        for (String weight : List.of("350", "bolder")) {
+            String text = "<text font-family=\"IBM Plex Sans\" font-weight=\"" + weight + "\">Hola</text></svg>";
+            assertTrue(error(head + text).contains("font-weight " + weight
+                    + ": only normal, bold and 100 to 900 in steps of 100 are supported"));
+        }
         assertTrue(error(head + "<text font-family=\"IBM Plex Sans\" font-style=\"oblique\">Hola</text></svg>")
                 .contains("font-style oblique: only normal and italic are supported"));
         // A tspan with another font that does not exist.

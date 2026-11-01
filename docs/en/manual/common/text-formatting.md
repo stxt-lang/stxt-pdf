@@ -29,8 +29,9 @@ backslash before it (`\*`). Only what fits within a line is valid: a title, a li
 [`Markdown`](../components/markdown.md). Everything else is text as it is: `2024. A good year` or `- 5% off` are shown as
 they are written, without escaping anything. A particular text becomes literal again with `Markup: none`.
 
-Bold and italic add to those of the box: inside a bold title, `**x**` is still bold. The size, the color and the font are
-those of the box.
+Bold and italic add to those of the box: inside a bold title, `**x**` is still bold, and in a light text
+(`Weight: 300`), bold is weight 700 ([Typography](typography.md#weights)). The size, the color and the font are those of
+the box.
 
 ## Code
 

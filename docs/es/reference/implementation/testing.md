@@ -21,8 +21,10 @@ contenido en una `Section`). Con `FixedMetrics`, cada carácter mide 5 pt con `S
 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran una página concreta. Un test de
 layout no puede desbordar: los desbordamientos van al catálogo de errores.
 
-Los casos de prueba que no son código están en `test/` (`golden/`, `errors/`, `examples/`, `spec/`), que los tests leen por
-ruta de disco y no del classpath. Las imágenes de los tests están en la carpeta de recursos del repositorio,
+Los casos de prueba que no son código están en `test/` (`golden/`, `errors/`, `examples/`, `spec/` y `resources/`), que
+los tests leen por ruta de disco y no del classpath. `test/resources/` es una carpeta de recursos con una sola fuente, IBM
+Plex Sans SemiBold en `.otf` con contornos CFF, para probar esas fuentes (`FontLibraryTest`, `FontFileTest` y
+`PdfCanvasTest`) sin ponerlas en la carpeta por defecto, donde se incrustarían enteras en los PDF de los ejemplos. Las imágenes de los tests están en la carpeta de recursos del repositorio,
 `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30, `shapes.svg` 150 × 75 y
 `label.svg` 120 × 36, y `drawing.gif`, `broken.png` y los `bad-*.svg` para los errores), porque los tests de layout, el
 catálogo de errores y los casos golden usan la carpeta por defecto.

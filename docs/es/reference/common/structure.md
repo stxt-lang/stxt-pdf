@@ -206,7 +206,7 @@ vez, y los elementos, las veces que se quiera.
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background` |
-| `Typography` | `Font`, `Code font`, `Bold`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
 *Elementos* son `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,

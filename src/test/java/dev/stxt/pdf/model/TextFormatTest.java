@@ -26,6 +26,29 @@ class TextFormatTest {
         assertEquals(BOLD, new TextFormat(true, false, false, false).face(BOLD));
     }
 
+    /** A bold run has weight 700, or that of the box if it is already 700 or more; italic keeps the weight. */
+    @Test
+    void aBoldRunIsWeight700UnlessTheBoxIsHeavier() {
+        TextFormat bold = new TextFormat(true, false, false, false);
+        assertEquals(BOLD, bold.face(new FontFace("F", new FontWeight(300), FontStyle.NORMAL)));
+        assertEquals(BOLD, bold.face(new FontFace("F", new FontWeight(600), FontStyle.NORMAL)));
+        FontFace black = new FontFace("F", new FontWeight(900), FontStyle.NORMAL);
+        assertEquals(black, bold.face(black));
+        FontFace light = new FontFace("F", new FontWeight(300), FontStyle.NORMAL);
+        assertEquals(new FontFace("F", new FontWeight(300), FontStyle.ITALIC),
+                new TextFormat(false, true, false, false).face(light));
+    }
+
+    @Test
+    void variantNamesTheWeightAndTheStyle() {
+        assertEquals("normal", REGULAR.variant());
+        assertEquals("bold", BOLD.variant());
+        assertEquals("italic", new FontFace("F", FontWeight.NORMAL, FontStyle.ITALIC).variant());
+        assertEquals("bold italic", new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC).variant());
+        assertEquals("weight 300", new FontFace("F", new FontWeight(300), FontStyle.NORMAL).variant());
+        assertEquals("weight 600 italic", new FontFace("F", new FontWeight(600), FontStyle.ITALIC).variant());
+    }
+
     @Test
     void aFamilyReplacesTheOneOfTheBoxAndKeepsTheRest() {
         TextFormat code = TextFormat.PLAIN.withFamily("M");

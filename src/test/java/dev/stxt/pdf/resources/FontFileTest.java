@@ -1,9 +1,7 @@
 package dev.stxt.pdf.resources;
 
 import org.apache.fontbox.ttf.CmapLookup;
-import org.apache.fontbox.ttf.TTFParser;
 import org.apache.fontbox.ttf.TrueTypeFont;
-import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -17,7 +15,7 @@ import java.util.concurrent.Future;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/** The widths of {@link FontFile} on the fonts of the repository, against what fontbox answers. */
+/** The widths of {@link FontFile} on the fonts of the repository, TTF and OTF, against what fontbox answers. */
 class FontFileTest {
 
     private static final Resources RESOURCES = new Resources();
@@ -30,10 +28,13 @@ class FontFileTest {
 
     @Test
     void everyCharacterMeasuresWhatFontboxAdvances() throws IOException {
-        List<FontFile> fonts = RESOURCES.fonts().all();
+        List<FontFile> fonts = new ArrayList<>(RESOURCES.fonts().all());
         assertFalse(fonts.isEmpty());
+        // And the OTF with CFF outlines of the resources of the tests.
+        fonts.addAll(new Resources(FontLibraryTest.OTF_RESOURCES).fonts().all());
         for (FontFile font : fonts) {
-            TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(Files.readAllBytes(font.path())));
+            // The OTF with CFF outlines needs the OpenType parser; FontFile.parse chooses it.
+            TrueTypeFont ttf = FontFile.parse(Files.readAllBytes(font.path()));
             CmapLookup cmap = ttf.getUnicodeCmapLookup();
             // Two passes: the second one reads the advance table already cached.
             for (int pass = 0; pass < 2; pass++) {

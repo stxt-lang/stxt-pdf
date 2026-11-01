@@ -1,5 +1,7 @@
 # Styles of the "resume" example: the reusable rules and the base typography. They are passed along with
-# input.stxt when laying out and rank below the rules that the document itself carries in its Styles.
+# input.stxt when laying out and rank below the rules that the document itself carries in its Styles. Four weights of
+# IBM Plex Sans: 300 for the name and the figures, 500 for the dates, 600 for the labels and the roles, and 700 for
+# the bold inside the sentences.
 Styles (dev.stxt.pdf):
 	For element: Document
 		Typography:
@@ -11,13 +13,13 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 30
 			Line height: 34
-			Bold: true
+			Weight: 300
 			Color: #134E4A
 	For element: Heading 2
 		Typography:
 			Size: 10
 			Line height: 14
-			Bold: true
+			Weight: 600
 			Color: #1F7A7A
 			Case: uppercase
 			Letter spacing: 0.8
@@ -43,7 +45,7 @@ Styles (dev.stxt.pdf):
 	For style: side-title
 		Typography:
 			Size: 8
-			Bold: true
+			Weight: 600
 			Color: #8FD1CC
 			Case: uppercase
 			Letter spacing: 0.8
@@ -62,11 +64,11 @@ Styles (dev.stxt.pdf):
 			Background: #FFFFFF
 	For style: dates
 		Typography:
-			Bold: true
+			Weight: 500
 			Color: #1F7A7A
 	For style: role
 		Typography:
-			Bold: true
+			Weight: 600
 			Size: 10
 	For style: place
 		Typography:
@@ -77,7 +79,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 24
 			Line height: 28
-			Bold: true
+			Weight: 300
 			Color: #1F7A7A
 	For style: caption
 		Typography:

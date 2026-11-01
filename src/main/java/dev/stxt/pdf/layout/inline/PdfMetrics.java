@@ -23,7 +23,7 @@ import static dev.stxt.pdf.tree.PropertyKey.FONT_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_WEIGHT;
 
 /**
- * Real metrics of the TTF fonts of the resources folder (reference/common/resources.md): they are the
+ * Real metrics of the TTF and OTF fonts of the resources folder (reference/common/resources.md): they are the
  * metrics that match the output of {@link dev.stxt.pdf.paint.PdfCanvas}, which embeds
  * those same fonts: {@code new Engine(new PdfMetrics(resources))}.
  *
@@ -189,7 +189,7 @@ public final class PdfMetrics implements TextMeasurer {
         List<String> parts = new ArrayList<>();
         for (String p : List.of(FONT, FONT_WEIGHT, FONT_STYLE)) {
             if (s.isDeclared(p)) {
-                String name = p.equals(FONT) ? "Font" : p.equals(FONT_WEIGHT) ? "Bold" : "Italic";
+                String name = p.equals(FONT) ? "Font" : p.equals(FONT_WEIGHT) ? "Bold or Weight" : "Italic";
                 parts.add(name + " on " + s.line(p));
             }
         }

@@ -45,7 +45,7 @@ which writes a PDF 2.0 ([Using from Java](../implementation/api.md#converting)).
 
 When converting, the engine checks that each text is distinguishable from what is under it, with the contrast of the WCAG
 accessibility guidelines (level AA): at least **4.5:1**, or **3:1** for large text (`Size` of 18 or more, or of 14 in
-bold). If it falls short, it is an error (`CONTRAST_LOW`) with the line of the `Color` of the text, also if it is
+bold, which is weight 700 or more). If it falls short, it is an error (`CONTRAST_LOW`) with the line of the `Color` of the text, also if it is
 inherited (without `Color`, the usual black, the line of the box).
 
 - **What is under it** is what has been painted before the text at the point where it starts: the backgrounds

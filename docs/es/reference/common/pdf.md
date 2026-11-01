@@ -43,7 +43,8 @@ escribe un PDF 2.0 ([Uso desde Java](../implementation/api.md#convertir)). Qué 
 ## Contraste
 
 Al convertir, el motor comprueba que cada texto se distingue de lo que tiene debajo, con el contraste de las pautas de
-accesibilidad WCAG (nivel AA): al menos **4,5:1**, o **3:1** en el texto grande (`Size` de 18 o más, o de 14 en negrita).
+accesibilidad WCAG (nivel AA): al menos **4,5:1**, o **3:1** en el texto grande (`Size` de 18 o más, o de 14 en negrita,
+que es el peso 700 o más).
 Si no llega, es un error (`CONTRAST_LOW`) con la línea del `Color` del texto, también si lo hereda (sin `Color`, el negro
 de siempre, la línea de la caja).
 

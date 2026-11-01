@@ -4,9 +4,6 @@
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.resources.FontFile;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -61,12 +58,9 @@ public class ColdStartProbe {
         }
 
         // 2. What PdfFonts.font does for each font and document, by parts, warm.
-        List<FontFile> files = new ArrayList<>();
-        for (String family : resources.fonts().families())
-            for (FontWeight w : FontWeight.values())
-                for (FontStyle s : FontStyle.values()) {
-                    try { files.add(resources.fonts().find(new FontFace(family, w, s))); } catch (RuntimeException e) { }
-                }
+        // The TTF ones: the OTF with CFF outlines are embedded whole, which this does not measure.
+        List<FontFile> files = new ArrayList<>(resources.fonts().all());
+        files.removeIf(FontFile::cff);
         int rounds = 50;
         long read = 0, parse = 0, load = 0, save = 0, fromContent = 0;
         for (int r = 0; r < rounds + 10; r++) {

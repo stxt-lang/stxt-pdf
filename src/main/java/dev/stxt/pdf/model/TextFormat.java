@@ -2,8 +2,8 @@ package dev.stxt.pdf.model;
 
 /**
  * Format of a run of text (reference/common/text-formatting.md): what changes within a line. Bold
- * and italic add to those of the box (a bold run of a text that is already bold
- * stays bold); the size, the color and {@code Line height} are always those of the box, and so is the
+ * and italic add to those of the box (a bold run has weight 700, or that of the box if it is already 700 or more,
+ * {@link FontWeight#bolder()}); the size, the color and {@code Line height} are always those of the box, and so is the
  * family except in code ({@code family}).
  *
  * <p>{@code smallCaps} marks the lowercase letters painted as small caps (reference/common/text-formatting.md): the
@@ -49,7 +49,7 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
         if (!bold && !italic && family == null) {
             return base;
         }
-        return new FontFace(family != null ? family : base.family(), bold ? FontWeight.BOLD : base.weight(),
+        return new FontFace(family != null ? family : base.family(), bold ? base.weight().bolder() : base.weight(),
                 italic ? FontStyle.ITALIC : base.style(), base.ligatures());
     }
 

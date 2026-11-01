@@ -59,6 +59,7 @@ import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 import static dev.stxt.pdf.tree.ValueReader.sides;
 import static dev.stxt.pdf.tree.ValueReader.tracks;
 import static dev.stxt.pdf.tree.ValueReader.value;
+import static dev.stxt.pdf.tree.ValueReader.weight;
 
 /**
  * Reads the properties of a box into its {@link Style}: the {@code Box}, {@code Typography} and {@code Break} groups
@@ -92,6 +93,7 @@ final class PropertyReader {
             entry("font", (p, s) -> s.typography().setFont(fontFamily(p))),
             entry("code-font", (p, s) -> s.typography().setCodeFont(fontFamily(p))),
             entry("bold", (p, s) -> s.typography().setFontWeight(bool(p) ? FontWeight.BOLD : FontWeight.NORMAL)),
+            entry("weight", (p, s) -> s.typography().setFontWeight(weight(p))),
             entry("italic", (p, s) -> s.typography().setFontStyle(bool(p) ? FontStyle.ITALIC : FontStyle.NORMAL)),
             entry("size", (p, s) -> s.typography().setFontSize(positive(p))),
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
@@ -161,9 +163,26 @@ final class PropertyReader {
 
     /**
      * {@code Typography} group, in an element or in {@code Document}: it is inherited. The lines are kept with the
-     * internal name ({@code Size} is {@code font-size}).
+     * internal name ({@code Size} is {@code font-size}; {@code Bold} and {@code Weight}, {@code font-weight}).
+     * {@code Bold} is another way of writing {@code Weight}: the two in the same group are {@code WEIGHT_CONFLICT}
+     * (reference/common/typography.md).
      */
     static void typography(InlineNode group, Style s) {
+        Node bold = null;
+        Node weight = null;
+        for (Node p : group.getChildren()) {
+            switch (p.getCanonicalName()) {
+                case "bold" -> bold = p;
+                case "weight" -> weight = p;
+                default -> {
+                }
+            }
+        }
+        if (bold != null && weight != null) {
+            throw error(bold, ErrorCode.WEIGHT_CONFLICT, "Bold and Weight are declared in the same Typography, and "
+                    + "Bold is another way of writing Weight (true is 700 and false, 400): one of the two is not "
+                    + "needed");
+        }
         for (Node p : group.getChildren()) {
             String name = p.getCanonicalName();
             s.declared(PropertyKey.internal(name), p.getLine());

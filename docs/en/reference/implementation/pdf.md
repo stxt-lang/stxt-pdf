@@ -9,8 +9,12 @@ code writes it is in [Painting](painting.md#the-pdf).
 - Each page has the size of the `Page` of its section. The page labels (`PageLabels`) carry the printed number
   with its style (`D`, `r` or `R`), or none on the pages without a number, and are only written if some page is not its
   physical number in digits: a document numbered in the usual way does not have them.
-- The fonts are the TTF of the resources folder, embedded as a subset (Type 0, Identity-H) with the glyphs that
-  are used.
+- The fonts are those of the resources folder, in Type 0 with Identity-H. Those with TrueType outlines (the `.ttf` and
+  the `.otf` that carry them) are embedded as a subset, with the glyphs that are used, in a `CIDFontType2` with the file in
+  `FontFile2`. Those with CFF outlines (the `.otf` with a `CFF ` table) are embedded whole, in a `CIDFontType0` with the
+  file in `FontFile3` of subtype `OpenType`: PDFBox cannot subset CFF, and it declares them as TrueType, so `PdfFonts`
+  changes the subtype and the key of the file when loading them. The codes of the text are the glyph numbers in both: in a
+  CFF that is not CID-keyed, like that of an `.otf`, a CID is the glyph number.
 - `Title` goes to the document information and to the XMP metadata, with `DisplayDocTitle` so that the viewer shows it,
   and `Language` is the `Lang` of the catalog. Every PDF declares PDF/UA-1 (`pdfuaid:part`) in its XMP metadata, or PDF/UA-2 if
   the caller asks for it ([below](#pdfua-2)).
@@ -22,6 +26,12 @@ code writes it is in [Painting](painting.md#the-pdf).
 > **Decision:** the identifier comes from the content and not from the time. This way a conversion can be repeated and
 > compared byte for byte, and two different documents have different identifiers, which is what the standard asks for.
 > *Rejected alternative:* the identifier that PDFBox computes from the time, which changes on every conversion.
+
+> **Decision:** CFF fonts are embedded whole and declared as what they are. IBM Plex Sans SemiBold as an `.otf`
+> (143 KB) adds about 90 KB to the PDF that uses it, against a few KB for a subset, and that is why the fonts of the
+> repository are TTF. *Rejected alternative:* subsetting the CFF in the engine, which means rewriting the whole `CFF `
+> table, or leaving them as PDFBox declares them, which is not what the standard says (ISO 32000-1, 9.9) even though
+> viewers tolerate it.
 
 > **Decision:** every PDF declares PDF/UA-1. veraPDF checks it only in part (not the reading order or the meaning of the
 > texts), so it also relies on the manual review of the tagging. *Rejected alternative:* not declaring it.

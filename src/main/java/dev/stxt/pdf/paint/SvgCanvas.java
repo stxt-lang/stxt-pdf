@@ -275,7 +275,9 @@ public final class SvgCanvas implements Canvas {
         if (text.contains("  ") || text.startsWith(" ") || text.endsWith(" ")) {
             spacing += " xml:space=\"preserve\"";
         }
-        String weight = font.weight() == FontWeight.BOLD ? " font-weight=\"bold\"" : "";
+        FontWeight w = font.weight();
+        String weight = w.equals(FontWeight.NORMAL) ? ""
+                : " font-weight=\"" + (w.equals(FontWeight.BOLD) ? "bold" : w.value()) + "\"";
         String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,
                 "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\"%s%s>%s</text>\n",

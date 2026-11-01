@@ -13,7 +13,9 @@ import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.TextRuns;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.contentstream.operator.Operator;
+import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -45,6 +47,7 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -124,6 +127,69 @@ class PdfCanvasTest {
             names.sort(null);
             // The title in bold; the rest, normal.
             assertEquals(List.of("IBMPlexSans", "IBMPlexSans-Bold"), names);
+        }
+    }
+
+    /**
+     * Fonts with TrueType and with CFF outlines (reference/implementation/pdf.md): Light and Medium are the TTF of the
+     * repository and are embedded as subsets; SemiBold is the OTF with CFF outlines of the resources of the tests,
+     * which PDFBox cannot subset: it is embedded whole, as a {@code CIDFontType0} with the file in {@code FontFile3}
+     * and subtype {@code OpenType}. The dictionaries are read as they are written, without {@code PDFontFactory},
+     * which would change them when loading. The text is extracted and the PDF passes PDF/UA-1 and PDF/UA-2.
+     */
+    @Test
+    void embedsTheTrueTypeFontsAsSubsetsAndTheCffOnesWhole(@TempDir Path dir) throws Exception {
+        Path fonts = Files.createDirectories(dir.resolve("fonts"));
+        for (String variant : List.of("Light", "Medium")) {
+            Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-" + variant + ".ttf"),
+                    fonts.resolve(variant + ".ttf"));
+        }
+        Files.copy(Path.of("test/resources/fonts/IBM Plex Sans/IBMPlexSans-SemiBold.otf"),
+                fonts.resolve("SemiBold.otf"));
+        Resources resources = new Resources(dir);
+        StringBuilder texts = new StringBuilder();
+        for (int weight : List.of(300, 500, 600)) {
+            texts.append("\tText: Peso ").append(weight).append(" con eñe\n\t\tTypography:\n\t\t\tWeight: ")
+                    .append(weight).append('\n');
+        }
+        String source = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n"
+                + "\t\tHeight: 200\n\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
+                + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n" + texts;
+        byte[] bytes = null;
+        for (int ua : List.of(1, 2)) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Converter.builder().resources(resources).pdfUa(ua).build().toPdf(reader.read(Docs.sectioned(source)), out);
+            assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), ua), "PDF/UA-" + ua);
+            bytes = bytes == null ? out.toByteArray() : bytes;
+        }
+        Files.createDirectories(PDF_DIR);
+        Files.write(PDF_DIR.resolve("weights.pdf"), bytes);
+        try (PDDocument pdf = Loader.loadPDF(bytes)) {
+            COSDictionary dictionaries = pdf.getPage(0).getResources().getCOSObject().getCOSDictionary(COSName.FONT);
+            Map<String, String> kinds = new java.util.TreeMap<>();
+            for (COSName name : dictionaries.keySet()) {
+                COSDictionary font = dictionaries.getCOSDictionary(name);
+                COSDictionary descendant = (COSDictionary) font.getCOSArray(COSName.DESCENDANT_FONTS).getObject(0);
+                COSDictionary descriptor = descendant.getCOSDictionary(COSName.FONT_DESC);
+                COSName fileKey = descriptor.containsKey(COSName.FONT_FILE3) ? COSName.FONT_FILE3 : COSName.FONT_FILE2;
+                COSStream file = (COSStream) descriptor.getDictionaryObject(fileKey);
+                String subtype = file.getNameAsString(COSName.SUBTYPE);
+                kinds.put(font.getNameAsString(COSName.BASE_FONT), descendant.getNameAsString(COSName.SUBTYPE) + " "
+                        + fileKey.getName() + (subtype == null ? "" : " " + subtype));
+            }
+            Map<String, String> byWeight = new java.util.TreeMap<>();
+            kinds.forEach((base, kind) -> byWeight.put(base.substring(base.indexOf('+') + 1), kind));
+            assertEquals(Map.of("IBMPlexSans-Light", "CIDFontType2 FontFile2",
+                    "IBMPlexSans-Medm", "CIDFontType2 FontFile2",
+                    "IBMPlexSans-SmBld", "CIDFontType0 FontFile3 OpenType"), byWeight);
+            // The TrueType ones are subsets (a prefix of six letters and +); the CFF one is not.
+            assertTrue(kinds.keySet().stream().filter(k -> k.contains("Light") || k.contains("Medm"))
+                    .allMatch(k -> k.matches("[A-Z]{6}\\+.*")), kinds.toString());
+            assertTrue(kinds.containsKey("IBMPlexSans-SmBld"), kinds.toString());
+            String text = new PDFTextStripper().getText(pdf);
+            for (int weight : List.of(300, 500, 600)) {
+                assertTrue(text.contains("Peso " + weight + " con eñe"), text);
+            }
         }
     }
 

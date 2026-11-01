@@ -91,7 +91,7 @@ the line, which is what the OpenType specification says. They are painted as *ar
 > `TextMeasurer`, `Canvas.text` and the font cache of the PDF use it without changes, and a file is identified the same with and
 > without ligatures. *Rejected alternative:* one more parameter in `TextMeasurer.width` and in `Canvas.text`.
 
-> **Decision:** each TTF is read once, when indexing the folder: what is embedded and drawn comes from those bytes
+> **Decision:** each font file is read once, when indexing the folder: what is embedded and drawn comes from those bytes
 > (`FontFile.content()`), so it is what was measured even if the file changes or disappears, and painting cannot fail with an
 > `IOException` from a font. *Rejected alternative:* a copy of the bytes of its own, which doubles the memory, or reading the
 > file in each conversion.

@@ -91,7 +91,7 @@ la raya, que es lo que dice la especificación OpenType. Se pintan como *artifac
 > la usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del PDF, y un fichero se identifica igual con y
 > sin ligaduras. *Alternativa descartada:* un parámetro más en `TextMeasurer.width` y en `Canvas.text`.
 
-> **Decisión:** cada TTF se lee una vez, al indexar la carpeta: lo que se incrusta y se dibuja sale de esos bytes
+> **Decisión:** cada fichero de fuente se lee una vez, al indexar la carpeta: lo que se incrusta y se dibuja sale de esos bytes
 > (`FontFile.content()`), así que es lo que se midió aunque el fichero cambie o desaparezca, y pintar no puede fallar con una
 > `IOException` de una fuente. *Alternativa descartada:* una copia propia de los bytes, que duplica la memoria, o leer el
 > fichero en cada conversión.

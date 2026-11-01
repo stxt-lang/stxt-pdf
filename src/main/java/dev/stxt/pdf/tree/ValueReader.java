@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.Corners;
+import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Sides;
@@ -210,6 +211,15 @@ final class ValueReader {
                     + "(es, en-US, ca...): '" + tag + "'");
         }
         return tag;
+    }
+
+    /** {@code Weight} (reference/common/typography.md): from 100 to 900 in steps of 100. */
+    static FontWeight weight(Node n) {
+        int v = integer(n);
+        if (v < 100 || v > 900 || v % 100 != 0) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Weight allows 100 to 900 in steps of 100: " + v);
+        }
+        return new FontWeight(v);
     }
 
     static int positiveInteger(Node n) {

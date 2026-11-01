@@ -8,7 +8,7 @@ fixed subfolders, which can in turn be organized in subfolders:
 
 ```
 resources/
-    fonts/      TTF fonts
+    fonts/      TTF and OTF fonts
     images/     PNG, JPEG, SVG and PDF images
 ```
 
@@ -25,10 +25,15 @@ subfolder: that of an `Image`, to `images/` (`logos/acme.png` is `resources/imag
 
 ## Fonts
 
-Only the TTF fonts in `fonts/` are used. There are no system fonts, nor the 14 standard PDF fonts, nor fallback fonts. The
-PDF output embeds them (only the glyphs used), so that the document looks the same on any machine. That is why they must
-have a license that allows embedding them, such as the SIL Open Font License. The repository includes IBM Plex Sans, IBM
-Plex Serif and IBM Plex Mono, each in regular, bold, italic and bold italic.
+Only the fonts in `fonts/` are used: the `.ttf` and `.otf` files. There are no system fonts, nor the 14 standard PDF
+fonts, nor fallback fonts. The PDF output embeds them, so that the document looks the same on any machine. That is why
+they must have a license that allows embedding them, such as the SIL Open Font License. The repository includes IBM
+Plex Sans, IBM Plex Serif and IBM Plex Mono, each in regular, bold, italic and bold italic, and IBM Plex Sans also in
+weights 300 (Light), 500 (Medium) and 600 (SemiBold).
+
+An `.otf` can carry TrueType outlines, like a `.ttf`, or CFF ones. TrueType ones are embedded with only the glyphs used;
+CFF ones, whole, and the PDF grows by what the font weighs ([The PDF inside](../implementation/pdf.md#pages-fonts-and-metadata)).
+That is why, when a family is distributed in both formats, the `.ttf` gives smaller PDFs.
 
 Each file is identified by what its contents declare and not by its name
 ([details](../implementation/api.md#resources)):
@@ -36,32 +41,38 @@ Each file is identified by what its contents declare and not by its name
 - **family:** the one that font programs show (`IBM Plex Sans` and not `IBM Plex Sans Bold`). It is compared exactly,
   with uppercase and spaces. If it only differs in case, the error suggests it
   (`The closest name is 'IBM Plex Sans'.`);
-- **weight:** 400 is regular and 700 is bold (`Bold: true`), and files of other weights (such as 300 or 500) are ignored;
+- **weight:** the number it declares, from 1 to 1000, as it is: 400 is regular, 700 bold, and the document asks for
+  one from 100 to 900 in steps of 100 with `Weight` ([Typography](typography.md#weights-weight)). A file of another
+  weight (such as 450) cannot be requested;
 - **style:** normal or italic.
 
 Variable fonts are not allowed: the static files of each variant are used. Kerning is not applied, and ligatures, only
 with `Ligatures: true` ([Text formatting](text-formatting.md#ligatures-ligatures)). `Font` and `Size` have no default
 value: they are required in every text ([Typography](typography.md)).
 
-> **Decision:** only weights 400 and 700, and the family is compared exactly. *Rejected alternative:* a numeric `Bold`
-> (100 to 900), or a case-insensitive comparison.
+> **Decision:** the weight of the file is taken as it is, and the family is compared exactly. *Rejected alternative:*
+> rounding the weight to the hundred, which would merge different files, or comparing the family case-insensitively.
+
+> **Decision:** `.otf` files are allowed with CFF outlines, even though they are embedded whole, because many fonts are
+> only distributed that way. *Rejected alternative:* only `.ttf`, which forces converting the fonts before using them.
 
 ## Checks
 
 Before layout, the engine checks that each box with text has its font (family, weight and style) in `fonts/` and that the
 font has all the characters of its text (white space characters are checked as spaces, and `{page}`, `{pages}` and the
-references to other boxes, as digits). A text with runs also needs the variant of each run (`Bold: false` with a bold run
-needs the bold), and each run, its characters in it. An unknown font (`FONT_UNKNOWN`), a missing variant
+references to other boxes, as digits). A text with runs also needs the variant of each run (`Weight: 300` with a bold
+run also needs 700), and each run, its characters in it. An unknown font (`FONT_UNKNOWN`), a missing variant
 (`FONT_VARIANT_MISSING`) or a character the font does not have (`GLYPH_MISSING`) are errors with the line of the culprit
 node:
 
 - if the family does not exist, that of the declared `Font`, even if it is in an ancestor or in a rule;
-- if a variant is missing, that of the text or that of the run, and the message names where `Font`, `Bold` and `Italic`
-  are declared;
+- if a variant is missing, that of the text or that of the run, and the message names where `Font`, the weight (`Bold`
+  or `Weight`) and `Italic` are declared;
 - if a character is missing, that of the character inside a `Content >>` block.
 
 These are also errors, without a line because they do not belong to the document (`RESOURCE`): `fonts/` not existing, a
-file that cannot be read, a variable font, or two files with the same family, weight and style.
+file that cannot be read, a variable font, or two files with the same family, weight and style, also if one is the
+`.ttf` and the other the `.otf` of the same font.
 
 > **Decision:** a character the font does not have is an error, with its line. No empty box is painted and no other font
 > is looked for. *Rejected alternative:* the replacement glyph, or a list of fallback fonts.
@@ -96,7 +107,8 @@ original; the header of `ca.txt` does so. The files are regenerated with `java t
 
 ## What is not supported
 
-- Fonts that are not a `.ttf` file (`.otf`, WOFF), system fonts or downloaded fonts: only the `.ttf` files of `fonts/` and
-  its subfolders are indexed.
-- Synthesized bold or italics: the variant must exist as a file.
+- Fonts that are not a `.ttf` or `.otf` file (WOFF, `.ttc` collections), system fonts or downloaded fonts: only the
+  `.ttf` and `.otf` files of `fonts/` and its subfolders are indexed.
+- Synthesized bold or italics, or the closest weight: the variant must exist as a file.
+- Subsets of CFF fonts: they are embedded whole.
 - Hyphenation patterns of the document's own, or for languages other than those in the jar.

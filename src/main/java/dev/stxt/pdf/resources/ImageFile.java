@@ -3,7 +3,6 @@ package dev.stxt.pdf.resources;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -167,8 +166,7 @@ public final class ImageFile {
             throw new ImageFormatException(where + " uses the generic family " + family + ", which would have to be "
                     + "replaced by another: it has to be a family of resources/fonts/");
         }
-        FontFace face = new FontFace(family, use.bold() ? FontWeight.BOLD : FontWeight.NORMAL,
-                use.italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
+        FontFace face = new FontFace(family, use.weight(), use.italic() ? FontStyle.ITALIC : FontStyle.NORMAL);
         FontFile font;
         try {
             font = resources.fonts().find(face);

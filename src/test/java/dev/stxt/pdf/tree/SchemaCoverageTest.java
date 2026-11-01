@@ -80,6 +80,7 @@ class SchemaCoverageTest {
             // Typography
             Map.entry("Font", "Font: IBM Plex Sans"),
             Map.entry("Bold", "Bold: true"),
+            Map.entry("Weight", "Weight: 600"),
             Map.entry("Italic", "Italic: true"),
             Map.entry("Size", "Size: 12"),
             Map.entry("Line height", "Line height: 14"),
