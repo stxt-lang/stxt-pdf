@@ -16,8 +16,9 @@ code writes it is in [Painting](painting.md#the-pdf).
   changes the subtype and the key of the file when loading them. The codes of the text are the glyph numbers in both: in a
   CFF that is not CID-keyed, like that of an `.otf`, a CID is the glyph number.
 - `Title` goes to the document information and to the XMP metadata, with `DisplayDocTitle` so that the viewer shows it,
-  and `Language` is the `Lang` of the catalog. Every PDF declares PDF/UA-1 (`pdfuaid:part`) in its XMP metadata, or PDF/UA-2 if
-  the caller asks for it ([below](#pdfua-2)).
+  and `Language` is the `Lang` of the catalog (`PdfMetadata`). Every PDF declares PDF/UA-1 (`pdfuaid:part`) in its XMP
+  metadata, or PDF/UA-2 if the caller asks for it ([below](#pdfua-2)), and PDF/A if the caller asks for it
+  ([below](#pdfa)).
 - The PDF carries no dates, and its identifier (`/ID` of the trailer) comes from the content: the same document, with the
   same resources and options, gives the same bytes. `PdfId` saves the document with a placeholder identifier of zeros,
   computes the SHA-256 of what was saved and puts its first 16 bytes in place of the zeros, in both halves, without moving
@@ -215,6 +216,64 @@ which.
 > **Decision:** the links with `Alt` do not carry `Contents` in PDF/UA-2. The standard requires that, if both are present, they say the
 > same, and they do, but veraPDF compares the `Alt` without decoding when the text has accents and considers it different.
 > *Rejected alternative:* removing the `Alt`, which is what a screen reader reads in an empty `Link`.
+
+## PDF/A
+
+With `Converter.builder().pdfA(...)` (`PdfA.A2B`, `A2A`, `A3B` or `A3A`), the PDF conforms to that part and level of
+ISO 19005 besides PDF/UA-1. `PdfMetadata` writes what the standard asks for, and the rest of the PDF does not change:
+
+- **XMP metadata:** `pdfaid:part` (2 or 3) and `pdfaid:conformance` (`A` or `B`) in their `rdf:Description`. PDF/A only
+  allows in the packet the schemas it predefines or those the packet itself describes, and `pdfuaid` is not among the
+  former, so the packet also carries a `pdfaExtension:schemas` with the description of the PDF/UA identification
+  schema (`part`, an integer; the one the PDF Association gives).
+- **Output intent:** an `OutputIntent` of subtype `GTS_PDFA1` with the sRGB profile of the ICC (`sRGB2014.icc`, 3 KB,
+  [Resources](../common/resources.md#color-profile)) as `DestOutputProfile` and `sRGB IEC61966-2.1` as the condition.
+  Every color of the PDF is `DeviceRGB` or `DeviceGray`, and with an RGB output profile both are allowed.
+- **What it already met:** the fonts embedded (the subset ones, with `CIDSet`) and with `ToUnicode`; the transparency
+  declared with `ca` in a graphics state and the soft masks of the gradients, allowed since PDF/A-2; the link
+  annotations with the print flag and without an appearance, which PDF/A-2 does not require of a `Link`; and no
+  JavaScript, encryption or forms. An SVG and the page of a PDF used as images are drawn with the same.
+- **What is not checked:** the page of a PDF used as an image is copied as it is, with its colors
+  (`Check.PDF_IMAGE_FONTS` looks at its fonts, not at its color spaces): a page with `DeviceCMYK`, or a CMYK JPEG, would
+  give a PDF that declares PDF/A without conforming to it.
+
+PDF/UA-2 is PDF 2.0 and PDF/A-2 and PDF/A-3 are PDF 1.7: `Converter.build()` and `PdfDocumentWriter.write` reject the
+combination (`IllegalArgumentException`). PDF/A-4, on PDF 2.0, waits until PDF/UA-2 is the usual one.
+
+veraPDF validates it with its `2b`, `2a`, `3b` and `3a` profiles on the eleven examples
+([Tests](testing.md#examples-examplestest)) and in `PdfATest`, on a document with what PDF/A restricts: opacities, a
+gradient with opacities, links, a table of contents, PNG, JPEG, an SVG with text, the page of a PDF and a QR code.
+
+> **Decision:** the sRGB profile goes inside the jar and is always the same (`sRGB2014.icc`): the same document gives
+> the same bytes on any JVM. *Rejected alternative:* the sRGB profile of the JDK (`ICC_Profile`), which changes with the
+> version and the vendor of the JDK, or the one of colord (CC0), which weighs 16 KB.
+
+> **Decision:** the `pdfuaid` schema is described as an extension schema only with PDF/A, and only with `part`:
+> PDF/UA-2 adds `rev`, but it is PDF 2.0 and does not go with PDF/A-2 or PDF/A-3. *Rejected alternative:* describing it
+> always, which PDF/UA does not ask for.
+
+### Embedded files
+
+`PdfAttachments` writes each `Attachment` as a file specification (`Filespec`) with the file embedded in `EF` (`F` and
+`UF`, the same stream, Flate-compressed, with the type as `Subtype` and, in `Params`, `Size` and, if given, `ModDate`),
+the name in `F` and `UF`, the relationship in `AFRelationship` and the description in `Desc`. All of them go in the
+`EmbeddedFiles` name tree of the catalog, where the viewer finds them, and in the `AF` array of the catalog, which makes
+them associated files of the document, as PDF/A-3 and Factur-X ask.
+
+The XMP of `Attachments.withXmp` is written after the engine's own, as it is except for its `pdfaExtension:schemas`: an
+XMP packet only allows that property once, so its schema descriptions move to the engine's bag, next to that of
+`pdfuaid`, and the rest of each `rdf:Description` stays where it was. `Xmp` (`model`) does it: it parses the fragment
+with the XML parser of the JDK, without DTD or entities, and writes it again declaring in each element the namespaces it
+needs. A fragment that is not XML is an `IllegalArgumentException` when the `Attachments` are built.
+
+> **Decision:** the XMP fragment is passed as text and the engine rearranges it, instead of asking for it in parts: the
+> Factur-X specification gives the whole fragment, with its extension schemas, and so it is copied as it is.
+> *Rejected alternative:* one call per property and another per schema, or `xmpbox`, which rewrites the packet its own
+> way.
+
+> **Decision:** an `Attachment` without a modification date carries no `ModDate`: the PDF carries no dates and the
+> conversion can be repeated byte for byte. Whoever needs it gives it with `withModified`. *Rejected alternative:* the
+> time of the conversion.
 
 ## Images
 

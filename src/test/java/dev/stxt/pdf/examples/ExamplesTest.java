@@ -2,7 +2,9 @@ package dev.stxt.pdf.examples;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.PdfA;
 import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.golden.ReferenceFiles;
 import dev.stxt.pdf.layout.Engine;
@@ -169,6 +171,12 @@ class ExamplesTest {
                 + "is in " + actual + "); if the change is intended, -Dexamples.update=true accepts it");
         accessibility(id, pdf, 1);
         accessibility(id, pdf(document, resources, 2), 2);
+        for (PdfA pdfA : PdfA.values()) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false, 1, pdfA, Attachments.NONE);
+            assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), PdfUa.flavour(pdfA)), id + ": " + pdfA
+                    + " rules failed");
+        }
     }
 
     private static byte[] pdf(LaidOutDocument document, Resources resources) throws IOException {

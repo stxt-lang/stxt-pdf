@@ -9,7 +9,6 @@ import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
-import dev.stxt.pdf.tree.Metadata;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
@@ -18,7 +17,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PageMode;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkInfo;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
@@ -36,10 +34,7 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineNode;
-import org.apache.pdfbox.pdmodel.interactive.viewerpreferences.PDViewerPreferences;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -67,9 +62,6 @@ import java.util.Set;
  *
  * <p>The language of a box that declares a different one ({@code Language} in {@code Typography},
  * reference/common/typography.md) is the {@code Lang} of its element, inherited by the ones inside.</p>
- *
- * <p>The title and the language of the document ({@code Title} and {@code Language}) go to the
- * document information, the XMP metadata and the catalog.</p>
  *
  * <p>A link (reference/implementation/pdf.md) is a {@code Link} that wraps what is clicked and carries the PDF
  * annotation as an object reference ({@code OBJR}): that of a whole box ({@code Link} of the element), child of the
@@ -402,50 +394,6 @@ final class PdfStructure {
             case LOWER_ROMAN -> PDListAttributeObject.LIST_NUMBERING_LOWER_ROMAN;
             case UPPER_ROMAN -> PDListAttributeObject.LIST_NUMBERING_UPPER_ROMAN;
         };
-    }
-
-    /**
-     * Title and language of the document. The title goes in the document information and in the
-     * XMP metadata ({@code dc:title}), and the viewer shows it instead of the file name; the
-     * language ({@code Lang} of the catalog) is that of all the content.
-     */
-    static void metadata(PDDocument doc, Metadata metadata, int ua) throws IOException {
-        PDDocumentCatalog catalog = doc.getDocumentCatalog();
-        if (metadata.language() != null) {
-            catalog.setLanguage(metadata.language());
-        }
-        if (metadata.title() == null) {
-            return;
-        }
-        doc.getDocumentInformation().setTitle(metadata.title());
-        PDViewerPreferences preferences = new PDViewerPreferences(new COSDictionary());
-        preferences.setDisplayDocTitle(true);
-        catalog.setViewerPreferences(preferences);
-        PDMetadata xmp = new PDMetadata(doc);
-        xmp.importXMPMetadata(xmp(metadata.title(), ua).getBytes(StandardCharsets.UTF_8));
-        catalog.setMetadata(xmp);
-    }
-
-    /**
-     * Minimal XMP packet with the title and the PDF/UA declaration ({@code pdfuaid:part}, 1 or 2; 2 with the revision
-     * of the standard, {@code pdfuaid:rev}). A document always has a {@code Title} (required): without a title the PDF
-     * would not comply with PDF/UA (7.1) and could not claim it.
-     */
-    static String xmp(String title, int ua) {
-        String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-        return "<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
-                + "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n"
-                + "<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n"
-                + "<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n"
-                + "<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">" + escaped + "</rdf:li></rdf:Alt></dc:title>\n"
-                + "</rdf:Description>\n"
-                + "<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n"
-                + "<pdfuaid:part>" + ua + "</pdfuaid:part>\n"
-                + (ua == 2 ? "<pdfuaid:rev>2024</pdfuaid:rev>\n" : "")
-                + "</rdf:Description>\n"
-                + "</rdf:RDF>\n"
-                + "</x:xmpmeta>\n"
-                + "<?xpacket end=\"w\"?>";
     }
 
     /** Standard structure type of the box (decision G1 of the roadmap). */

@@ -289,6 +289,13 @@ public enum ErrorCode {
     /** The text has low contrast with what is under it; the check can be disabled when converting. */
     CONTRAST_LOW,
 
+    // --- The PDF (when writing) --------------------------------------------------------------
+    /**
+     * A file to embed ({@code Attachment}) in a PDF that is not PDF/A-3, the only one that admits files of any kind
+     * (reference/common/pdf.md); it belongs to no line: it is the configuration of whoever converts.
+     */
+    ATTACHMENT_REQUIRES_PDFA3(Kind.RESOURCE),
+
     // --- Limits -------------------------------------------------------------------------------
     /** The document takes up more pages than {@code Limits.maxPages}; it belongs to no line. */
     PAGE_LIMIT(Kind.LIMIT),
@@ -312,7 +319,10 @@ public enum ErrorCode {
         this.kind = kind;
     }
 
-    /** Whose fault it is: the document's ({@link Kind#INVALID_DOCUMENT}) except for the limits ({@link Kind#LIMIT}). */
+    /**
+     * Whose fault it is: the document's ({@link Kind#INVALID_DOCUMENT}) except for the limits ({@link Kind#LIMIT}) and
+     * the configuration of whoever converts ({@link Kind#RESOURCE}, {@link #ATTACHMENT_REQUIRES_PDFA3}).
+     */
     public Kind kind() {
         return kind;
     }

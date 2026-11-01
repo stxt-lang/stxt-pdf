@@ -76,6 +76,8 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 - Un marcador por encabezado, que el visor muestra en su panel lateral.
 - El etiquetado para accesibilidad (PDF/UA-1): el orden de lectura, qué es un título, un párrafo, una lista o una tabla, y
   el texto alternativo de las imágenes.
+- PDF/A, la norma de archivo, si se pide al convertir, con ficheros adjuntos para Factur-X
+  ([Uso desde Java](java-usage.md#pdfa-y-adjuntos)).
 
 ## Siguientes pasos
 

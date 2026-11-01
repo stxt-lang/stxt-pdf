@@ -16,8 +16,8 @@ escribe el código está en [El pintado](painting.md#el-pdf).
   así que `PdfFonts` cambia el subtipo y la clave del fichero al cargarlas. Los códigos del texto son los números de glifo
   en las dos: en un CFF que no es CID, como el de un `.otf`, un CID es el número de glifo.
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre,
-  y `Language` es el `Lang` del catálogo. Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos XMP, o PDF/UA-2 si
-  quien convierte lo pide ([abajo](#pdfua-2)).
+  y `Language` es el `Lang` del catálogo (`PdfMetadata`). Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos
+  XMP, o PDF/UA-2 si quien convierte lo pide ([abajo](#pdfua-2)), y PDF/A si lo pide ([abajo](#pdfa)).
 - El PDF no lleva fechas, y su identificador (`/ID` del tráiler) sale del contenido: el mismo documento, con los mismos
   recursos y opciones, da los mismos bytes. `PdfId` guarda el documento con un identificador provisional de ceros, calcula
   el SHA-256 de lo guardado y pone sus 16 primeros bytes en lugar de los ceros, en las dos mitades, sin mover nada más.
@@ -212,6 +212,64 @@ cuál.
 > **Decisión:** los enlaces con `Alt` no llevan `Contents` en PDF/UA-2. La norma pide que, si están los dos, digan lo
 > mismo, y lo dicen, pero veraPDF compara el `Alt` sin descodificar cuando el texto tiene acentos y lo da por distinto.
 > *Alternativa descartada:* quitar el `Alt`, que es lo que lee un lector de pantalla en un `Link` vacío.
+
+## PDF/A
+
+Con `Converter.builder().pdfA(...)` (`PdfA.A2B`, `A2A`, `A3B` o `A3A`), el PDF cumple esa parte y ese nivel de ISO 19005
+además de PDF/UA-1. `PdfMetadata` escribe lo que la norma pide, y el resto del PDF no cambia:
+
+- **Metadatos XMP:** `pdfaid:part` (2 o 3) y `pdfaid:conformance` (`A` o `B`) en su `rdf:Description`. PDF/A solo admite
+  en el paquete los esquemas que predefine o los que el propio paquete describe, y `pdfuaid` no es de los primeros, así
+  que el paquete lleva además un `pdfaExtension:schemas` con la descripción del esquema de identificación de PDF/UA
+  (`part`, entero; la que da la PDF Association).
+- **Perfil de salida:** un `OutputIntent` de subtipo `GTS_PDFA1` con el perfil sRGB del ICC (`sRGB2014.icc`, 3 KB,
+  [Recursos](../common/resources.md#perfil-de-color)) como `DestOutputProfile` y `sRGB IEC61966-2.1` como condición.
+  Todo color del PDF es `DeviceRGB` o `DeviceGray`, y con un perfil RGB de salida los dos están permitidos.
+- **Lo que ya cumplía:** las fuentes incrustadas (las de subconjunto, con `CIDSet`) y con `ToUnicode`; la transparencia
+  declarada con `ca` en un estado gráfico y las máscaras suaves de los degradados, permitidas desde PDF/A-2; las
+  anotaciones de enlace con la marca de impresión y sin apariencia, que PDF/A-2 no exige a un `Link`; y nada de
+  JavaScript, cifrado ni formularios. Un SVG y la página de un PDF usados como imagen se dibujan con lo mismo.
+- **Lo que no se comprueba:** la página de un PDF usada como imagen se copia tal cual, con sus colores
+  (`Check.PDF_IMAGE_FONTS` mira sus fuentes, no sus espacios de color): una página con `DeviceCMYK`, o un JPEG en CMYK,
+  darían un PDF que declara PDF/A sin cumplirlo.
+
+PDF/UA-2 es PDF 2.0 y PDF/A-2 y PDF/A-3 son PDF 1.7: `Converter.build()` y `PdfDocumentWriter.write` rechazan la
+combinación (`IllegalArgumentException`). PDF/A-4, sobre PDF 2.0, queda para cuando PDF/UA-2 sea lo de siempre.
+
+veraPDF lo valida con sus perfiles `2b`, `2a`, `3b` y `3a` en los once ejemplos ([Tests](testing.md#ejemplos-examplestest))
+y en `PdfATest`, sobre un documento con lo que PDF/A restringe: opacidades, un degradado con opacidades, enlaces, un
+índice, PNG, JPEG, un SVG con texto, la página de un PDF y un código QR.
+
+> **Decisión:** el perfil sRGB va dentro del jar y es siempre el mismo (`sRGB2014.icc`): el mismo documento da los
+> mismos bytes en cualquier JVM. *Alternativa descartada:* el perfil sRGB del JDK (`ICC_Profile`), que cambia con la
+> versión y el fabricante del JDK, o el de colord (CC0), que pesa 16 KB.
+
+> **Decisión:** el esquema `pdfuaid` se describe como esquema de extensión solo con PDF/A, y solo con `part`: PDF/UA-2
+> añade `rev`, pero es PDF 2.0 y no va con PDF/A-2 ni PDF/A-3. *Alternativa descartada:* describirlo siempre, que PDF/UA
+> no pide.
+
+### Ficheros adjuntos
+
+`PdfAttachments` escribe cada `Attachment` como una especificación de fichero (`Filespec`) con el fichero incrustado en
+`EF` (`F` y `UF`, el mismo flujo, comprimido con Flate, con el tipo como `Subtype` y, en `Params`, `Size` y, si se dio,
+`ModDate`), el nombre en `F` y `UF`, la relación en `AFRelationship` y la descripción en `Desc`. Todas van en el árbol
+de nombres `EmbeddedFiles` del catálogo, por el que las encuentra el visor, y en el array `AF` del catálogo, que las
+hace ficheros asociados del documento, como piden PDF/A-3 y Factur-X.
+
+El XMP de `Attachments.withXmp` se escribe tras el del motor, tal cual salvo su `pdfaExtension:schemas`: un paquete XMP
+solo admite esa propiedad una vez, así que sus descripciones de esquema pasan a la bolsa del motor, junto a la de
+`pdfuaid`, y el resto de cada `rdf:Description` queda donde estaba. Lo hace `Xmp` (`model`), que analiza el fragmento
+con el parser XML del JDK, sin DTD ni entidades, y lo vuelve a escribir declarando en cada elemento los espacios de
+nombres que necesita. Un fragmento que no es XML es un `IllegalArgumentException` al construir los `Attachments`.
+
+> **Decisión:** el fragmento XMP se pasa como texto y el motor lo recoloca, en lugar de pedirlo por partes: la
+> especificación de Factur-X da el fragmento entero, con sus esquemas de extensión, y así se copia sin más.
+> *Alternativa descartada:* una llamada por propiedad y otra por esquema, o `xmpbox`, que reescribe el paquete a su
+> manera.
+
+> **Decisión:** un `Attachment` sin fecha de modificación no lleva `ModDate`: el PDF no lleva fechas y la conversión se
+> puede repetir byte a byte. Quien la necesite la da con `withModified`. *Alternativa descartada:* la hora de la
+> conversión.
 
 ## Imágenes
 

@@ -32,6 +32,7 @@ converter.toPdf(doc, out);
 | `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF |
 | `debug` | `false`. Con `true`, pinta el contorno de cada caja |
 | `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
+| `pdfA` | Ninguno. Con `PdfA.A2B`, `A2A`, `A3B` o `A3A`, el PDF cumple también ese PDF/A, la norma de archivo ([abajo](#pdfa-y-adjuntos)) |
 | `exclude` | Ninguna: se comprueba todo. Quita las comprobaciones que se le dicen (abajo) |
 
 Por defecto se comprueba todo. Con `exclude` se quitan comprobaciones, que dejan de ser un error:
@@ -45,6 +46,20 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 | `Check.CONTRAST` | Un texto que apenas se distingue de su fondo ([Caja](box.md#contraste)) |
 | `Check.PDF_IMAGE_FONTS` | Una página de un PDF con una fuente que no cumple PDF/UA, como una sin incrustar o que no dice qué carácter es cada glifo ([Image](../components/image.md#una-página-de-un-pdf)) |
 | `Check.PDF_IMAGE_ANNOTATIONS` | Una página de un PDF con un campo de formulario o un comentario visibles, que no se dibujarían |
+
+## PDF/A y adjuntos
+
+```java
+Converter converter = Converter.builder().pdfA(PdfA.A3B).build();
+Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE);
+converter.toPdf(doc, out, Attachments.of(xml).withXmp(facturXmp));
+```
+
+Con `pdfA`, el PDF declara PDF/A y lleva lo que la norma pide: un perfil de color y sus metadatos. PDF/A-3 (`A3B`, `A3A`)
+admite además ficheros adjuntos, que es cómo se hace una factura electrónica Factur-X: el XML de la factura va dentro
+del PDF. Los adjuntos se pasan en cada llamada a `toPdf`, con su nombre, sus bytes, su tipo y su relación con el
+documento (`ALTERNATIVE` para el XML de una factura), y `withXmp` añade el fragmento de metadatos que Factur-X pide,
+tal como lo da su especificación. Sin PDF/A-3, un adjunto es un error (`ATTACHMENT_REQUIRES_PDFA3`).
 
 ## Errores
 

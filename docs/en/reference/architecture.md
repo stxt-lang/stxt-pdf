@@ -107,7 +107,7 @@ depend on the `LayoutContext` interface.
 - **`Canvas`**: the interface of the canvases, which only draw. Each canvas provides its `Tagging`: the tagging of the PDF, and in the
   SVG, nothing.
 - **`PdfDocumentWriter`**: writes the PDF document: pages, tagging (`PdfStructure`), bookmarks, destinations
-  (`PdfDestinations`), links (`PdfLinks`) and saving. `PdfCanvas` draws a page, with `PdfContent`, `PdfFonts`,
+  (`PdfDestinations`), links (`PdfLinks`), metadata and PDF/A (`PdfMetadata`), attachments (`PdfAttachments`) and saving. `PdfCanvas` draws a page, with `PdfContent`, `PdfFonts`,
   `PdfGradients` and `PdfImages`.
 - **`SvgCanvas`**: the debug SVG of the tests ([Painting](implementation/painting.md)).
 - **`ContrastCheck`**: the contrast of the text with what is underneath it ([Painting](implementation/painting.md#contrast)).

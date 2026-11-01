@@ -29,6 +29,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `limits(Limits)` | Los límites de la conversión |
 | `debug(boolean)` | Pinta los contornos de las cajas |
 | `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)). Otro valor es un `IllegalArgumentException` |
+| `pdfA(PdfA)` | El PDF/A que cumple además el PDF: `A2B`, `A2A`, `A3B` o `A3A` ([abajo](#pdfa-y-adjuntos)); por defecto, ninguno. Con `pdfUa(2)`, `build()` es un `IllegalArgumentException` |
 | `exclude(Check...)` | Quita comprobaciones. Por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
@@ -36,6 +37,30 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 > no hay, no se llama a `styles`. Vive en un package propio, encima de todos los demás. `PdfDocumentWriter.write` y `Engine`
 > siguen siendo públicos como capa de bajo nivel. *Alternativa descartada:* un método con una sobrecarga por cada
 > combinación de opciones.
+
+## PDF/A y adjuntos
+
+```java
+Converter converter = Converter.builder().pdfA(PdfA.A3B).build();
+Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE)
+        .withDescription("Factur-X invoice");
+converter.toPdf(doc, out, Attachments.of(xml).withXmp(facturXmp));   // una factura Factur-X
+```
+
+`pdfA` es del `Converter`, como `pdfUa`: una decisión de quien publica ([El PDF](../common/pdf.md#pdfa)). Los adjuntos
+son de cada documento y van en la llamada: `toPdf(documento, destino, Attachments)`, también con un `LaidOutDocument`.
+`Attachments.of(Attachment...)` reúne los ficheros (de nombres distintos) y `withXmp` les añade el XMP que los acompaña
+(uno o más `rdf:Description`, con sus espacios de nombres declarados; `rdf` ya lo está). `Attachment.of(nombre, bytes,
+tipo, relación)` es inmutable y copia los bytes; `withDescription` y `withModified` dan la descripción y la fecha de
+modificación. Todo está en `model`. Los dos `toPdf` sin adjuntos equivalen a `Attachments.NONE`.
+
+Un adjunto sin `pdfA(A3B)` o `pdfA(A3A)` es `ATTACHMENT_REQUIRES_PDFA3`, un `StxtPdfException` de tipo `RESOURCE` (es la
+configuración de quien convierte, no el documento) y sin línea. Un XMP que no es XML, dos adjuntos con el mismo
+nombre, un nombre en blanco o un tipo que no es `tipo/subtipo` son un `IllegalArgumentException` al construirlos, antes
+de convertir. `PdfDocumentWriter.write` recibe lo mismo (`ua`, `pdfA` y `Attachments`) como capa de bajo nivel.
+
+> **Decisión:** los adjuntos y su XMP se pasan en la llamada y no en el `builder`: un `Converter` se comparte entre
+> documentos y el XML de una factura es de una factura. *Alternativa descartada:* `attach(...)` en el `builder`.
 
 ## Comprobaciones
 

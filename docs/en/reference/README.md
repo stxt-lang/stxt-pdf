@@ -29,7 +29,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [References](common/references.md) | `{page of: id}` and `{number of: id}`, and how pagination converges |
 | [Links](common/links.md) | `Link` and Markdown links: targets, areas and tagged PDF |
 | [Resources and fonts](common/resources.md) | The resources folder, safe paths and how fonts are identified and checked |
-| [The PDF](common/pdf.md) | What every PDF carries: embedded fonts, accessibility, contrast, bookmarks, title and PDF/UA-1 or PDF/UA-2 |
+| [The PDF](common/pdf.md) | What every PDF carries: embedded fonts, accessibility, contrast, bookmarks, title and PDF/UA-1 or PDF/UA-2; PDF/A and embedded files (Factur-X) on request |
 | [Overflow](common/overflow.md) | Nothing can overflow: what is checked and which box is reported |
 | [Errors](common/errors.md) | The error policy, the validation levels, the codes and their types |
 | [Limits](common/limits.md) | Pages, pixels and SVG complexity that a conversion accepts |

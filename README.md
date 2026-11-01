@@ -27,6 +27,7 @@ The PDF has:
 
 - **Embedded fonts**, with the characters that are used.
 - **Tagging** for accessibility: PDF/UA-1, or PDF/UA-2 on request.
+- **PDF/A** (2 and 3, `b` and `a`) on request, with embedded files for Factur-X.
 - **Bookmarks**, one per heading.
 
 **The engine is strict.** Each element accepts only the properties that make sense in it. No element has a look of its

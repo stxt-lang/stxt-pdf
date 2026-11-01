@@ -98,6 +98,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   negative `Margin`. Before, the box was lower than its own border and the message gave a negative height.
 - An in-flow box that the `Offset` of a `Frame` or a negative `Margin` takes off the physical page is `BOX_OVERFLOW`, at
   the line of that `Offset` or `Margin`. Before, it was laid out without an error and did not show.
+- **PDF/A.** `Converter.builder().pdfA(PdfA.A2B | A2A | A3B | A3A)` writes a PDF that conforms to that part and level of
+  ISO 19005 besides PDF/UA-1 (PDF/A-2 and PDF/A-3 are PDF 1.7 files; with `pdfUa(2)`, PDF 2.0, `build()` is an
+  `IllegalArgumentException`): the `pdfaid` declaration in the XMP packet, the description of the `pdfuaid` schema as an
+  extension schema, and an output intent with the sRGB v2 profile of the ICC (`sRGB2014.icc`, 3 KB, inside the jar;
+  its license is in `docs/*/reference/common/resources.md`). Nothing else changes: the fonts, the transparency, the
+  links and the images already met the rules. By default no PDF/A is declared. veraPDF validates the four variants on
+  the eleven examples.
+- **Embedded files (Factur-X).** `converter.toPdf(document, out, attachments)`, also with a `LaidOutDocument`, embeds
+  the files of an `Attachments` (`Attachment.of(name, bytes, mimeType, relationship)`, with `DATA`, `ALTERNATIVE`,
+  `SOURCE` or `SUPPLEMENT`, an optional description and an optional modification date; without it the PDF still
+  carries no date) as associated files (`EmbeddedFiles` and `AF`), and `withXmp` adds the XMP fragment that goes with
+  them (for Factur-X, the one its specification gives), whose extension schemas join the engine's own. An attachment
+  needs PDF/A-3: otherwise, `ATTACHMENT_REQUIRES_PDFA3` (new code, kind `RESOURCE`). The engine does not generate the
+  invoice XML or its metadata. `PdfDocumentWriter.write` has an overload with `PdfA` and `Attachments`.
+- The title, the language and the XMP packet are written by `PdfMetadata` (before, `PdfStructure`).
 
 ## [0.8.0] - 2026-10-31
 

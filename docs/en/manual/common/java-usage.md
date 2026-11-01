@@ -32,6 +32,7 @@ converter.toPdf(doc, out);
 | `limits` | 2,000 pages, 25 million pixels per image, 20,000 elements and 64 levels per SVG and 20 MB per PDF |
 | `debug` | `false`. With `true`, it paints the outline of each box |
 | `pdfUa` | `1`: the PDF complies with PDF/UA-1. With `2`, PDF/UA-2, in PDF 2.0, which some old viewers do not open |
+| `pdfA` | None. With `PdfA.A2B`, `A2A`, `A3B` or `A3A`, the PDF also complies with that PDF/A, the archiving standard ([below](#pdfa-and-attachments)) |
 | `exclude` | None: everything is checked. It removes the checks it is given (below) |
 
 By default everything is checked. With `exclude` checks are removed, and what they detect is no longer an error:
@@ -45,6 +46,21 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 | `Check.CONTRAST` | A text that barely stands out from its background ([Box](box.md#contrast)) |
 | `Check.PDF_IMAGE_FONTS` | A page of a PDF with a font that does not comply with PDF/UA, such as one that is not embedded or that does not say which character each glyph is ([Image](../components/image.md#a-page-of-a-pdf)) |
 | `Check.PDF_IMAGE_ANNOTATIONS` | A page of a PDF with a visible form field or comment, which would not be drawn |
+
+## PDF/A and attachments
+
+```java
+Converter converter = Converter.builder().pdfA(PdfA.A3B).build();
+Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE);
+converter.toPdf(doc, out, Attachments.of(xml).withXmp(facturXmp));
+```
+
+With `pdfA`, the PDF declares PDF/A and carries what the standard asks for: a color profile and its metadata. PDF/A-3
+(`A3B`, `A3A`) also allows embedded files, which is how a Factur-X electronic invoice is made: the XML of the invoice
+goes inside the PDF. The attachments are passed with each call to `toPdf`, with their name, their bytes, their type and
+their relationship with the document (`ALTERNATIVE` for the XML of an invoice), and `withXmp` adds the metadata
+fragment Factur-X requires, as its specification gives it. Without PDF/A-3, an attachment is an error
+(`ATTACHMENT_REQUIRES_PDFA3`).
 
 ## Errors
 

@@ -49,6 +49,8 @@ SVG): the marked text of the tagged PDF and the links.
 | `PdfPages` | The copy of a page of another PDF into a form, without its tagging |
 | `SvgFonts` | The fonts of `fonts/` with which the text of an SVG is drawn |
 | `PdfStructure` | The tagged PDF and the bookmarks |
+| `PdfMetadata` | The title, the language, the XMP packet (PDF/UA, PDF/A and the XMP of the attachments) and the output intent of PDF/A |
+| `PdfAttachments` | The embedded files of PDF/A-3: the file specifications, the `EmbeddedFiles` tree and the `AF` array |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
 | `ImageFit`, `Leaders`, `Shapes` | Where an image is drawn according to `Fit`, the leader of a table of contents and the paths of the boxes |
 

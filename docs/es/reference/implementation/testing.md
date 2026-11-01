@@ -50,7 +50,8 @@ Cada carpeta de `test/examples/NN-nombre/` es un documento completo escrito en d
 castellano (`es/`), el original, e inglés (`en/`), su espejo. Las dos versiones comparten el `styles.stxt` de la carpeta del
 ejemplo. Cada idioma tiene su `input.stxt`, un `page-N.png` por página (versionados, sin contornos, a 110 ppp), el
 `output.pdf` y un `expected.stxt` con el volcado de las cajas con `Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
-valida con veraPDF, como PDF/UA-1 y escrito también como PDF/UA-2. El
+valida con veraPDF, como PDF/UA-1, escrito también como PDF/UA-2 y escrito como PDF/A en sus cuatro variantes (`2b`,
+`2a`, `3b` y `3a`). El
 volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta las imágenes que
 cambian y el `output.pdf`, y se revisa mirando las imágenes. `-Dexamples.only` limita la prueba a un ejemplo
 (`01-invoice`), a un idioma (`en`) o a los dos (`01-invoice/en`). Un test comprueba además que la versión inglesa es espejo

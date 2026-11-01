@@ -1,5 +1,6 @@
 package dev.stxt.pdf.golden;
 
+import dev.stxt.pdf.model.PdfA;
 import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
@@ -12,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Accessibility validation of a PDF against PDF/UA-1 or PDF/UA-2 with veraPDF (for the tests only). It gives the
+ * Validation of a PDF against PDF/UA-1, PDF/UA-2 or a PDF/A with veraPDF (for the tests only). It gives the
  * rules the PDF fails, each with the number of times and its message. PDF/UA-2 is validated with the veraPDF profile
  * that adds the rules of ISO/TS 32005 (which element can contain which).
  */
@@ -32,7 +33,21 @@ public final class PdfUa {
 
     /** The rules of part {@code part} of PDF/UA (1 or 2) that the PDF fails. */
     public static Map<String, String> failedRules(byte[] pdf, int part) {
-        PDFAFlavour flavour = part == 2 ? PDFAFlavour.PDFUA_2 : PDFAFlavour.PDFUA_1;
+        return failedRules(pdf, part == 2 ? PDFAFlavour.PDFUA_2 : PDFAFlavour.PDFUA_1);
+    }
+
+    /** The veraPDF flavour of a PDF/A ({@code PDFA_3_B}...). */
+    public static PDFAFlavour flavour(PdfA pdfA) {
+        return switch (pdfA) {
+            case A2B -> PDFAFlavour.PDFA_2_B;
+            case A2A -> PDFAFlavour.PDFA_2_A;
+            case A3B -> PDFAFlavour.PDFA_3_B;
+            case A3A -> PDFAFlavour.PDFA_3_A;
+        };
+    }
+
+    /** The rules of {@code flavour} (a PDF/UA or a PDF/A profile of veraPDF) that the PDF fails. */
+    public static Map<String, String> failedRules(byte[] pdf, PDFAFlavour flavour) {
         try (PDFAParser parser = Foundries.defaultInstance().createParser(new ByteArrayInputStream(pdf), flavour)) {
             PDFAValidator validator = Foundries.defaultInstance().createValidator(flavour, false);
             Map<String, String> failed = new LinkedHashMap<>();

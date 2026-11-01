@@ -132,6 +132,7 @@ un `Overlay`. No lo es, a propósito:
 | `GLYPH_MISSING` | La fuente tiene todos los caracteres del texto (línea del carácter), y el guion si el texto puede partirse | `The font IBM Plex Sans normal has no character '漢' (U+6F22)` |
 | `HYPHENATION_LANGUAGE_UNSUPPORTED` | `Hyphenate: true` solo en un texto cuyo `Language` tiene patrones en el motor: `es`, `ca`, `en-US` o `en-GB` ([Tipografía](typography.md#guiones-hyphenate)); línea del `Hyphenate`, aunque esté en una antecesora o en una regla | `Hyphenate: true needs hyphenation patterns for the language 'de', and the engine has them for es, ca, en-US and en-GB: the text needs Hyphenate: false, or one of those languages in Language` |
 | `CONTRAST_LOW` | El texto tiene un contraste de 4,5:1 con lo que tiene debajo, o de 3:1 si es grande ([El PDF](pdf.md#contraste)); línea del `Color` del texto, o de su caja si no lo tiene | `The text of box at line 12 has a contrast of 2.84:1 with its background (#999999 on #FFFFFF) and needs 4.5:1...` |
+| `ATTACHMENT_REQUIRES_PDFA3` | Un fichero adjunto (`Attachment`) solo va en un PDF/A-3 ([El PDF](pdf.md#ficheros-adjuntos-factur-x)); es de la configuración de quien convierte (tipo `RESOURCE`) y no de ninguna línea | `Embedding a file (factur-x.xml) needs PDF/A-3, Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is not PDF/A` |
 | `TEXT_OVERFLOW` | Ninguna palabra es más ancha que su línea, ni una línea de un texto con `Preformatted: true` (línea de la palabra) | `The word 'supercalifragilística' does not fit on the line: the line measures 138.69 pt and the box leaves 100 pt...` |
 | `BOX_OVERFLOW` | Las cajas caben en su contenedor, el contenido en su alto (también en las columnas de un `Columns`), y ninguna caja se sale de la página física | `The content of box at line 7 does not fit in its height: its text reaches 24 pt and the box leaves 20 pt` |
 | `LIST_MARKER_OVERFLOW` | El marcador de un ítem, con su espacio, cabe en el `Padding` izquierdo de la lista más el margen izquierdo del ítem (línea del ítem) | `The marker '1.' of List item at line 12 measures 11.45 pt with its space, and the indent leaves 5 pt...` |
@@ -153,7 +154,7 @@ contestar:
 | Tipo | Qué es | Un servicio contesta |
 |---|---|---|
 | `INVALID_DOCUMENT` | El documento o sus estilos no son válidos: sintaxis, schema, una regla del modelo, un desbordamiento, un recurso que el documento nombra y no existe | un error del cliente (4xx), con la línea |
-| `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas) o no se puede leer el fichero del documento | un fallo de su configuración (5xx) |
+| `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas), no se puede leer el fichero del documento, o un adjunto en un PDF que no es PDF/A-3 | un fallo de su configuración (5xx) |
 | `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limits.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, un PDF demasiado grande, o un texto STXT demasiado grande o anidado | un error del cliente por exceso (413 o 422) |
 | `INTERNAL` | Un fallo del motor y no del documento ni del entorno | un fallo del servidor (500), que conviene informar |
 

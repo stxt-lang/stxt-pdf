@@ -105,6 +105,20 @@ la cabecera de `ca.txt` lo hace. Los ficheros se regeneran con `java tools/Hyphe
 > los patrones de un idioma son los mismos para todos. *Alternativa descartada:* una subcarpeta `hyphenation/` en
 > `resources/`, que admitiría otros idiomas pero daría un reparto distinto según la máquina.
 
+## Perfil de color
+
+El perfil sRGB que un PDF/A lleva como perfil de salida ([El PDF](pdf.md#pdfa)) tampoco está en la carpeta de recursos:
+va dentro del jar, en `dev/stxt/pdf/icc/sRGB2014.icc`, y es siempre el mismo. Es el perfil sRGB v2 del International
+Color Consortium (`sRGB2014.icc`, revisado en febrero de 2015, 3 KB, descargado de https://www.color.org), con el
+copyright del ICC en su etiqueta `cprt` y su licencia: *«This profile is made available by the International Color
+Consortium, and may be copied, distributed, embedded, made, used, and sold without restriction. Altered versions of this
+profile shall have the original identification and copyright information removed and shall not be misrepresented as the
+original profile.»* El fichero no se modifica.
+
+> **Decisión:** el perfil del ICC, y no el del JDK: el del JDK cambia con la versión y el fabricante, y el PDF dejaría de
+> ser el mismo byte a byte en otra máquina. *Alternativa descartada:* el `sRGB.icc` de colord (CC0), de 16 KB, que
+> añadiría cinco veces más a cada PDF/A.
+
 ## Lo que no hay
 
 - Fuentes que no son un fichero `.ttf` u `.otf` (WOFF, colecciones `.ttc`), fuentes del sistema o descargadas: solo se
@@ -112,3 +126,4 @@ la cabecera de `ca.txt` lo hace. Los ficheros se regeneran con `java tools/Hyphe
 - Síntesis de negrita o cursiva, o el peso más cercano: la variante debe existir como fichero.
 - Subconjuntos de las fuentes CFF: se incrustan enteras.
 - Patrones de partición propios o de otros idiomas que los del jar.
+- Otro perfil de salida que el sRGB del jar.

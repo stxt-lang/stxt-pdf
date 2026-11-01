@@ -27,6 +27,7 @@ El PDF lleva:
 
 - **Las fuentes incrustadas**, con los caracteres que se usan.
 - **Etiquetado** para la accesibilidad: PDF/UA-1, o PDF/UA-2 si se pide.
+- **PDF/A** (2 y 3, `b` y `a`) si se pide, con ficheros adjuntos para Factur-X.
 - **Marcadores**, uno por encabezado.
 
 **El motor es estricto.** Cada elemento solo admite las propiedades que tienen sentido en él. Ningún elemento tiene un

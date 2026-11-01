@@ -5,9 +5,11 @@ import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.PdfA;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.paint.PdfDocumentWriter;
@@ -49,6 +51,10 @@ import java.util.function.Supplier;
  * <p>To use the pages before painting them (or to paint them to PDF and SVG at once), the document is laid out with
  * {@link #layOut(InlineNode)} and the result is painted with {@link #toPdf(LaidOutDocument, OutputStream)} and
  * {@link #toSvg(LaidOutDocument)}. A {@link LaidOutDocument} does not change after it is laid out.</p>
+ *
+ * <p>What belongs to one document and not to the configuration, the files to embed and their XMP
+ * ({@link Attachments}, for Factur-X), goes with each call: {@link #toPdf(InlineNode, OutputStream, Attachments)}.
+ * Embedding a file needs {@link Builder#pdfA PDF/A-3}.</p>
  */
 public final class Converter {
 
@@ -58,6 +64,7 @@ public final class Converter {
     private final Limits limits;
     private final Set<Check> excluded;
     private final int pdfUa;
+    private final PdfA pdfA;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
@@ -66,6 +73,7 @@ public final class Converter {
         this.limits = builder.limits;
         this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
         this.pdfUa = builder.pdfUa;
+        this.pdfA = builder.pdfA;
     }
 
     /** A converter with the default configuration: resources in {@code resources/}, no separate styles, no debug. */
@@ -92,6 +100,16 @@ public final class Converter {
         return excluded;
     }
 
+    /** The part of PDF/UA its PDFs comply with ({@link Builder#pdfUa}): 1 or 2. */
+    public int pdfUa() {
+        return pdfUa;
+    }
+
+    /** The PDF/A its PDFs comply with ({@link Builder#pdfA}), or {@code null} if they declare none. */
+    public PdfA pdfA() {
+        return pdfA;
+    }
+
     /**
      * Lays out an already validated document ({@link DocumentReader}) with the real metrics of the fonts of the
      * resources folder. It fails with the errors of the document (reference/common/errors.md) before anything is
@@ -112,8 +130,18 @@ public final class Converter {
 
     /** Lays out {@code document} and writes the PDF to {@code target}, which is not closed. */
     public void toPdf(InlineNode document, OutputStream target) throws IOException {
+        toPdf(document, target, Attachments.NONE);
+    }
+
+    /**
+     * Lays out {@code document} and writes the PDF, with the files and the XMP of {@code attachments} embedded
+     * (reference/implementation/api.md), to {@code target}, which is not closed. A file to embed needs
+     * {@link Builder#pdfA PDF/A-3}: otherwise, {@code ATTACHMENT_REQUIRES_PDFA3}.
+     */
+    public void toPdf(InlineNode document, OutputStream target, Attachments attachments) throws IOException {
         Objects.requireNonNull(target, "target");
-        toPdf(layOut(document), target);
+        Objects.requireNonNull(attachments, "attachments");
+        toPdf(layOut(document), target, attachments);
     }
 
     /**
@@ -121,9 +149,18 @@ public final class Converter {
      * that get embedded) to {@code target}, which is not closed.
      */
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
+        toPdf(document, target, Attachments.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(LaidOutDocument, OutputStream)}, with the files and the XMP of {@code attachments}
+     * embedded ({@link #toPdf(InlineNode, OutputStream, Attachments)}).
+     */
+    public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
-        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa));
+        Objects.requireNonNull(attachments, "attachments");
+        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments));
     }
 
     /** The SVG of each page of an already laid out document, in order. */
@@ -177,6 +214,7 @@ public final class Converter {
         private Limits limits = Limits.DEFAULT;
         private final Set<Check> excluded = EnumSet.noneOf(Check.class);
         private int pdfUa = 1;
+        private PdfA pdfA;
 
         private Builder() {
         }
@@ -242,13 +280,32 @@ public final class Converter {
             return this;
         }
 
+        /**
+         * The PDF/A the PDF conforms to, besides PDF/UA (reference/common/pdf.md): PDF/A-2 or PDF/A-3, level
+         * {@code b} or {@code a}. By default none. PDF/A-3 is the one that admits files of any kind
+         * ({@link Attachments}). The PDF/A parts are PDF 1.7 files: with {@link #pdfUa pdfUa(2)}, which is PDF 2.0,
+         * {@link #build} fails.
+         */
+        public Builder pdfA(PdfA pdfA) {
+            this.pdfA = Objects.requireNonNull(pdfA, "pdfA");
+            return this;
+        }
+
         /** Draws the outline of each box, to review a document by hand; off by default. */
         public Builder debug(boolean debug) {
             this.debug = debug;
             return this;
         }
 
+        /**
+         * @throws IllegalArgumentException with {@link #pdfUa pdfUa(2)} and a {@link #pdfA}: PDF/UA-2 is a PDF 2.0
+         *         file and PDF/A-2 and PDF/A-3 are PDF 1.7 ones
+         */
         public Converter build() {
+            if (pdfUa == 2 && pdfA != null) {
+                throw new IllegalArgumentException("PDF/UA-2 is a PDF 2.0 file and " + pdfA
+                        + " a PDF 1.7 one: a PDF cannot comply with both");
+            }
             return new Converter(this);
         }
     }

@@ -49,6 +49,8 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 | `PdfPages` | La copia de una página de otro PDF en un formulario, sin su etiquetado |
 | `SvgFonts` | Las fuentes de `fonts/` con que se dibuja el texto de un SVG |
 | `PdfStructure` | El PDF etiquetado y los marcadores |
+| `PdfMetadata` | El título, el idioma, el paquete XMP (PDF/UA, PDF/A y el XMP de los adjuntos) y el perfil de salida de PDF/A |
+| `PdfAttachments` | Los ficheros adjuntos de PDF/A-3: las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
 | `ImageFit`, `Leaders`, `Shapes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice y los caminos de las cajas |
 

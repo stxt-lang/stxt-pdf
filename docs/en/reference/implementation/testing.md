@@ -51,7 +51,8 @@ Each folder of `test/examples/NN-name/` is a complete document written in two la
 Spanish (`es/`), the original, and English (`en/`), its mirror. Both versions share the `styles.stxt` of the folder of the
 example. Each language has its `input.stxt`, one `page-N.png` per page (versioned, without outlines, at 110 dpi), the
 `output.pdf` and an `expected.stxt` with the dump of the boxes with `Id`. They are laid out with the **real metrics** and the `resources/` folder, the contrast of the text is checked, and the PDF is
-validated with veraPDF, as PDF/UA-1 and also written as PDF/UA-2. The
+validated with veraPDF, as PDF/UA-1, also written as PDF/UA-2 and written as PDF/A in its four variants (`2b`, `2a`,
+`3b` and `3a`). The
 dump is not computed by hand: it is a snapshot generated with `-Dexamples.update=true`, which also accepts the images that
 change and the `output.pdf`, and it is reviewed by looking at the images. `-Dexamples.only` limits the run to an example
 (`01-invoice`), a language (`en`) or both (`01-invoice/en`). A test also checks that the English version mirrors the

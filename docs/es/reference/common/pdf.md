@@ -82,10 +82,73 @@ muestra al abrir el documento.
 
 `Title` es lo que el visor muestra en lugar del nombre del fichero.
 
+## PDF/A
+
+PDF/A es la norma del PDF para archivo (ISO 19005), la que piden los archivos, las administraciones y la facturación
+electrónica. Quien convierte la pide con `Converter.builder().pdfA(PdfA.A3B)`
+([Uso desde Java](../implementation/api.md#pdfa-y-adjuntos)); por defecto el PDF no la declara. Hay cuatro opciones,
+las partes 2 y 3 en sus niveles `b` y `a` (`A2B`, `A2A`, `A3B`, `A3A`):
+
+- **PDF/A-2 y PDF/A-3** son PDF 1.7, como PDF/UA-1, así que el PDF cumple las dos normas a la vez. PDF/A-3 es PDF/A-2
+  más los [ficheros adjuntos](#ficheros-adjuntos-factur-x).
+- **El nivel `b`** promete que el PDF se verá igual dentro de años: fuentes incrustadas, colores definidos, sin cifrado
+  ni código. **El nivel `a`** añade el etiquetado y el texto legible por máquina, que todo PDF del motor ya lleva: los
+  dos niveles dan el mismo PDF con otra declaración.
+
+PDF/A añade al PDF un perfil de color sRGB de 3 KB y los metadatos que la norma pide
+([El PDF por dentro](../implementation/pdf.md#pdfa)). Lo demás ya lo cumple todo PDF del motor: las fuentes van
+incrustadas, los colores son definidos, y no hay JavaScript, cifrado ni formularios. Los tests validan los once
+ejemplos con veraPDF en las cuatro variantes.
+
+PDF/UA-2 escribe un PDF 2.0, y PDF/A-2 y PDF/A-3 son PDF 1.7: pedir los dos es un `IllegalArgumentException`. PDF/A-4,
+sobre PDF 2.0, no está hecho.
+
+> **Decisión:** PDF/A se pide al convertir y no en el documento, como PDF/UA-2 y el contraste: es una decisión de quien
+> publica. *Alternativa descartada:* una propiedad de `Document`.
+
+> **Decisión:** solo las partes 2 y 3. PDF/A-1 no admite transparencia, que el motor usa en las opacidades y los
+> degradados, y PDF/A-4 es PDF 2.0, que aún no abre bien cualquier visor. *Alternativa descartada:* PDF/A-1b, que
+> obligaría a rechazar los documentos con opacidad.
+
+### Ficheros adjuntos (Factur-X)
+
+Con PDF/A-3, el PDF lleva ficheros dentro. Es cómo funciona la factura electrónica Factur-X / ZUGFeRD: un PDF/A-3 con
+el XML de la factura adjunto. Los adjuntos se pasan en cada llamada, porque son de cada documento y no de la
+configuración:
+
+```java
+Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE)
+        .withDescription("Factur-X invoice");
+converter.toPdf(document, out, Attachments.of(xml).withXmp(facturXmp));
+```
+
+Cada adjunto tiene un nombre (único en el PDF; el visor lo muestra), su contenido, su tipo (`text/xml`,
+`application/pdf`…) y su relación con el documento: `DATA` (los datos que el documento muestra), `ALTERNATIVE` (otra
+representación del documento, como el XML de una factura), `SOURCE` (de lo que se hizo) o `SUPPLEMENT` (lo que lo
+completa). Puede llevar una descripción y una fecha de modificación; sin fecha, el PDF sigue sin llevar ninguna y el
+mismo documento da los mismos bytes. `withXmp` añade los metadatos XMP que acompañan a los adjuntos: Factur-X pide
+unos (el nombre del fichero, el tipo de documento, la versión y el perfil) y su especificación da el fragmento, que se
+pasa tal cual. El motor no sabe de facturas: no genera el XML ni sus metadatos, solo los incrusta.
+
+Un adjunto en un PDF que no es PDF/A-3 es un error, `ATTACHMENT_REQUIRES_PDFA3` ([Errores](errors.md#códigos)):
+PDF/A-2 solo admite adjuntar otros PDF/A.
+
+> **Decisión:** los adjuntos van en la llamada a `toPdf` y no en el `Converter`: el `Converter` se crea una vez y se
+> comparte, y el XML de una factura es de esa factura. *Alternativa descartada:* `attach(...)` en el `builder`, que
+> obliga a un `Converter` por documento.
+
+> **Decisión:** un adjunto sin PDF/A-3 es un error y no un PDF con el fichero dentro: en PDF/A-2 está prohibido, y
+> fuera de PDF/A sería un caso más que no pide nadie. *Alternativa descartada:* admitirlo en cualquier PDF, que PDF 1.7
+> permite.
+
+> **Decisión:** el motor incrusta el XML que le dan y escribe los metadatos que le dan: Factur-X tiene perfiles y
+> versiones, y las facturas son de quien convierte. *Alternativa descartada:* `facturX(xml, perfil)`, que ataría el
+> motor a una versión de la especificación.
+
 ## Lo que no hay
 
-- PDF/A.
+- PDF/A-1 y PDF/A-4 ([arriba](#pdfa)).
 - Idioma por tramo dentro de una línea ([Tipografía](typography.md#idioma-language)).
-- Formularios, adjuntos, firmas digitales y cifrado.
+- Formularios, firmas digitales y cifrado. Adjuntos fuera de PDF/A-3.
 - Capas opcionales propias: solo se conservan las de la página de un PDF usada como imagen
   ([Image](../components/image.md#pdf)).

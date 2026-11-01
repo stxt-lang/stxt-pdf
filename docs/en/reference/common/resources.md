@@ -106,6 +106,20 @@ original; the header of `ca.txt` does so. The files are regenerated with `java t
 > document, and the patterns of a language are the same for everyone. *Rejected alternative:* a `hyphenation/`
 > subfolder in `resources/`, which would allow other languages but would give a different line breaking per machine.
 
+## Color profile
+
+The sRGB profile a PDF/A carries as its output intent ([The PDF](pdf.md#pdfa)) is not in the resources folder either:
+it goes inside the jar, in `dev/stxt/pdf/icc/sRGB2014.icc`, and is always the same. It is the sRGB v2 profile of the
+International Color Consortium (`sRGB2014.icc`, revised in February 2015, 3 KB, downloaded from https://www.color.org),
+with the copyright of the ICC in its `cprt` tag and its license: *"This profile is made available by the International
+Color Consortium, and may be copied, distributed, embedded, made, used, and sold without restriction. Altered versions
+of this profile shall have the original identification and copyright information removed and shall not be
+misrepresented as the original profile."* The file is not modified.
+
+> **Decision:** the profile of the ICC, and not that of the JDK: the JDK's changes with the version and the vendor, and
+> the PDF would stop being the same byte for byte on another machine. *Rejected alternative:* the `sRGB.icc` of colord
+> (CC0), 16 KB, which would add five times more to each PDF/A.
+
 ## What is not supported
 
 - Fonts that are not a `.ttf` or `.otf` file (WOFF, `.ttc` collections), system fonts or downloaded fonts: only the
@@ -113,3 +127,4 @@ original; the header of `ca.txt` does so. The files are regenerated with `java t
 - Synthesized bold or italics, or the closest weight: the variant must exist as a file.
 - Subsets of CFF fonts: they are embedded whole.
 - Hyphenation patterns of the document's own, or for languages other than those in the jar.
+- Another output intent than the sRGB of the jar.

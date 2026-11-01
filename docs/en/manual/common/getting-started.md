@@ -78,6 +78,8 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 - One bookmark per heading, which the viewer shows in its side panel.
 - The tagging for accessibility (PDF/UA-1): the reading order, what is a title, a paragraph, a list or a table, and the
   alternative text of the images.
+- PDF/A, the archiving standard, if requested when converting, with embedded files for Factur-X
+  ([Using from Java](java-usage.md#pdfa-and-attachments)).
 
 ## Next steps
 

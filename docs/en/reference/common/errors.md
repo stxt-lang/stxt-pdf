@@ -133,6 +133,7 @@ an `Overlay`. These are not errors, on purpose:
 | `GLYPH_MISSING` | The font has all the characters of the text (line of the character), and the hyphen if the text may be split | `The font IBM Plex Sans normal has no character '漢' (U+6F22)` |
 | `HYPHENATION_LANGUAGE_UNSUPPORTED` | `Hyphenate: true` only on a text whose `Language` has patterns in the engine: `es`, `ca`, `en-US` or `en-GB` ([Typography](typography.md#hyphenation-hyphenate)); line of the `Hyphenate`, even if it is in an ancestor or in a rule | `Hyphenate: true needs hyphenation patterns for the language 'de', and the engine has them for es, ca, en-US and en-GB: the text needs Hyphenate: false, or one of those languages in Language` |
 | `CONTRAST_LOW` | The text has a contrast of 4.5:1 with what is under it, or of 3:1 if it is large ([The PDF](pdf.md#contrast)); line of the `Color` of the text, or of its box if it has none | `The text of box at line 12 has a contrast of 2.84:1 with its background (#999999 on #FFFFFF) and needs 4.5:1...` |
+| `ATTACHMENT_REQUIRES_PDFA3` | An embedded file (`Attachment`) only goes in a PDF/A-3 ([The PDF](pdf.md#embedded-files-factur-x)); it belongs to the configuration of the caller (kind `RESOURCE`) and to no line | `Embedding a file (factur-x.xml) needs PDF/A-3, Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is not PDF/A` |
 | `TEXT_OVERFLOW` | No word is wider than its line, nor is a line of a text with `Preformatted: true` (line of the word) | `The word 'supercalifragilística' does not fit on the line: the line measures 138.69 pt and the box leaves 100 pt...` |
 | `BOX_OVERFLOW` | Boxes fit in their container, content in its height (also in the columns of a `Columns`), and no box goes outside the physical page | `The content of box at line 7 does not fit in its height: its text reaches 24 pt and the box leaves 20 pt` |
 | `LIST_MARKER_OVERFLOW` | The marker of an item, with its space, fits in the left `Padding` of the list plus the left margin of the item (line of the item) | `The marker '1.' of List item at line 12 measures 11.45 pt with its space, and the indent leaves 5 pt...` |
@@ -153,7 +154,7 @@ Each error says, besides its code and its line, **who is to blame**, which is wh
 | Type | What it is | A service responds with |
 |---|---|---|
 | `INVALID_DOCUMENT` | The document or its styles are not valid: syntax, schema, a model rule, an overflow, a resource that the document names and does not exist | a client error (4xx), with the line |
-| `RESOURCE` | The resources folder is not usable (it does not exist, a broken font or image) or the document file cannot be read | a failure of its configuration (5xx) |
+| `RESOURCE` | The resources folder is not usable (it does not exist, a broken font or image), the document file cannot be read, or an attachment in a PDF that is not PDF/A-3 | a failure of its configuration (5xx) |
 | `LIMIT` | The document is valid but asks for more than is allowed ([Limits](limits.md)): more pages, an image with too many pixels, an SVG with too many elements or levels, a PDF that is too large, or an STXT text that is too large or too deeply nested | a client error for excess (413 or 422) |
 | `INTERNAL` | A failure of the engine and not of the document or the environment | a server failure (500), which should be reported |
 
