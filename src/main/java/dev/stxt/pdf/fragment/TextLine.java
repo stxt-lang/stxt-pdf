@@ -15,9 +15,12 @@ import java.util.List;
  * @param wordSpacing space added to each space between words ({@code justify}); 0 otherwise
  * @param runs        runs of the line in order (reference/common/text-formatting.md); their joined text is
  *                    {@code text}
+ * @param hyphenated  whether the line ends inside a word, with a hyphen that the line breaking added
+ *                    (reference/common/typography.md): the last run ends with it, the text that is read does not
+ *                    (reference/implementation/pdf.md)
  */
 public record TextLine(double x, double y, double width, double height, String text, double wordSpacing,
-                       List<Run> runs) {
+                       List<Run> runs, boolean hyphenated) {
 
     /**
      * A run of the line with its format.
@@ -30,6 +33,12 @@ public record TextLine(double x, double y, double width, double height, String t
 
     public TextLine {
         runs = List.copyOf(runs);
+    }
+
+    /** A line that ends between words. */
+    public TextLine(double x, double y, double width, double height, String text, double wordSpacing,
+                    List<Run> runs) {
+        this(x, y, width, height, text, wordSpacing, runs, false);
     }
 
     /** Unformatted line: a single run with all the text. */

@@ -152,6 +152,25 @@ donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas s
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`).
 
+**Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
+(`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones
+del recurso del idioma, con una caché por palabra. `LineBreaker.words` da a cada palabra sus puntos de corte (los de sus
+guiones blandos, que quita del texto, o los de los patrones sobre sus letras), y los dos repartos trabajan sobre las
+**posiciones** del texto (`LineBreaker.Paragraph`): el inicio de cada palabra y cada punto de corte. Una línea va de
+una posición a otra; si acaba en un punto de corte lleva el guion, medido con el formato de la letra anterior, y la
+`Line` (y la `TextLine` colocada) lo dice con `hyphenated`. El reparto voraz prueba, cuando una palabra no cabe, sus
+puntos de corte de mayor a menor; Knuth-Plass suma a los deméritos la penalización de TeX por guion (50²) y por dos
+guiones seguidos (10 000). Los anchos siguen siendo sumas: los de las palabras enteras, los espacios y las partes de una
+palabra partida, cada uno medido una vez. `Hyphenations.validate` comprueba antes del layout, como las fuentes, que cada
+caja con texto y `Hyphenate: true` está en un idioma con patrones.
+
+> **Decisión:** el idioma se comprueba al empezar el layout y no al construir el árbol, como las fuentes: `tree` no
+> depende de `layout`, donde viven los patrones. *Alternativa descartada:* los patrones en `model`.
+
+> **Decisión:** los dos repartos comparten las posiciones y las sumas de `Paragraph`, en lugar de un reparto por
+> átomos (partes de palabra) con sumas de prefijos: con ligaduras una palabra entera no mide lo que suman sus partes,
+> y así cada línea se mide como se pinta.
+
 **Medida.** Un `TextMeasurer` tiene que ser **aditivo entre palabras** (el ancho de un texto es la suma de los de sus palabras
 y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.width(texto, tamaño, ligaduras)`, que aplica
 `GSUB` palabra a palabra si hay ligaduras. `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics`

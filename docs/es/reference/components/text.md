@@ -67,4 +67,5 @@ encabezado ([El PDF](../common/pdf.md#accesibilidad)).
 ## Lo que no hay
 
 - Texto fuera de un `Text`, un `Paragraph` o una `Cell`.
-- Partir palabras con guiones: una palabra más ancha que la línea es un error.
+- Partir palabras sin `Hyphenate` ni un guion blando: una palabra más ancha que la línea es un error
+  ([Tipografía](../common/typography.md#guiones-hyphenate)).

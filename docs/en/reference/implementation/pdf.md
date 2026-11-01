@@ -77,6 +77,17 @@ and `wrap` does not have it: its lines are lines.
 > **Decision:** the invisible space at the end of each broken line. *Rejected alternative:* leaving it to the geometry,
 > as some extractors do.
 
+A line split inside a word (`Hyphenate` or a soft hyphen,
+[Typography](../common/typography.md#hyphenation-hyphenate)) ends with the painted hyphen and **without** the
+invisible space, and the sequence of runs that ends it goes in a `Span` with `ActualText` in which the hyphen is the
+soft hyphen U+00AD: it is how a tagged PDF says that the hyphen was added by the line breaking, so whoever extracts the
+text does not see the hyphen and can join the two parts. PDFBox drops it when extracting and gives each part on its
+line; Acrobat copies the soft hyphen, which is not seen.
+
+> **Decision:** `ActualText` with the soft hyphen in the sequence that ends the line, and neither an empty
+> `ActualText` nor the whole word in both parts: the first would lose the signal of the break and the second would
+> duplicate it when extracting.
+
 With `Letter spacing`, the characters of a text are painted apart, and whoever extracts the text by looking at where each
 one is guesses spaces between them (with PDFBox, `I n f o r m e` from 1.5 pt at a size of 10). That is why each sequence
 of consecutive runs of a line with the same link goes in a `Span` marked content with `ActualText`: its text, with the

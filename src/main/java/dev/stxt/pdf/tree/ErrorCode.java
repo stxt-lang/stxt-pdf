@@ -253,6 +253,13 @@ public enum ErrorCode {
     /** The font does not have a character of the text. */
     GLYPH_MISSING,
 
+    // --- Hyphenation --------------------------------------------------------------------------
+    /**
+     * {@code Hyphenate: true} on a text whose {@code Language} has no hyphenation patterns in the engine (line of the
+     * {@code Hyphenate}).
+     */
+    HYPHENATION_LANGUAGE_UNSUPPORTED,
+
     // --- Accessibility (during conversion) ---------------------------------------------------
     /** The text has low contrast with what is under it; the check can be disabled when converting. */
     CONTRAST_LOW,

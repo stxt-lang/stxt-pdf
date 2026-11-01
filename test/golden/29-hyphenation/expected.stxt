@@ -1,0 +1,14 @@
+# greedy and balanced: three lines of 12 each in a box of 70; soft: three lines in a box of 60; row: the Stack with
+# its item at its natural width, 25 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: greedy
+			Rect: 20 20 70 36
+		Fragment: balanced
+			Rect: 20 56 70 36
+		Fragment: soft
+			Rect: 20 92 60 36
+		Fragment: row
+			Rect: 20 128 160 12
+			Fragment: unsplit
+				Rect: 20 128 25 12

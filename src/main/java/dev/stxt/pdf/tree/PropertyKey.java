@@ -33,6 +33,7 @@ public final class PropertyKey {
     public static final String LINE_HEIGHT = "line-height";
     public static final String COLOR = "color";
     public static final String CODE_FONT = "code-font";
+    public static final String HYPHENATE = "hyphenate";
 
     // Properties of the elements
     public static final String OFFSET = "offset";

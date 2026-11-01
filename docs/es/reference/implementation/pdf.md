@@ -76,6 +76,15 @@ y `wrap` no lo lleva: sus líneas son líneas.
 > **Decisión:** el espacio invisible al final de cada línea partida. *Alternativa descartada:* dejarlo a la geometría,
 > como hacen algunos extractores.
 
+Una línea partida dentro de una palabra (`Hyphenate` o un guion blando,
+[Tipografía](../common/typography.md#guiones-hyphenate)) acaba con el guion pintado y **sin** el espacio invisible, y la
+secuencia de tramos que la termina va en un `Span` con `ActualText` donde el guion es el guion blando U+00AD: es como un
+PDF etiquetado dice que el guion lo puso el reparto, y así quien extrae el texto no ve el guion y puede unir las dos
+partes. PDFBox lo descarta al extraer y da cada parte en su línea; Acrobat copia el guion blando, que no se ve.
+
+> **Decisión:** `ActualText` con el guion blando en la secuencia que acaba la línea, y no un `ActualText` vacío ni la
+> palabra entera en los dos trozos: el primero perdería la señal del corte y el segundo la duplicaría al extraer.
+
 Con `Letter spacing`, los caracteres de un texto se pintan separados, y quien extrae el texto mirando dónde está cada
 uno adivina espacios entre ellos (con PDFBox, `I n f o r m e` desde 1,5 pt en un cuerpo de 10). Por eso cada secuencia
 de tramos seguidos de una línea con el mismo enlace va en un contenido marcado `Span` con `ActualText`: su texto, con el

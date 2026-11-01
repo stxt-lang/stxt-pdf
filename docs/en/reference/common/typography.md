@@ -20,6 +20,7 @@ inherit it).
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The last line of a justified paragraph is aligned to the left. |
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |
 | `Line breaking` | `simple`, `balanced` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`balanced`). |
+| `Hyphenate` | `true`, `false` | `false` | Split words with a hyphen at the end of the line, with the patterns of the language ([Hyphenation](#hyphenation-hyphenate)). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
@@ -59,8 +60,53 @@ Text is broken into **lines** as wide as the content box:
   lines are chosen, so that the lines are more even. Spaces stretch up to half their width and do not shrink,
   and the last line does not count.
 
-In both cases, a word wider than the line is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)).
-Words are not split and no hyphens are added.
+In both cases, a word wider than the line is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)), also with
+`Hyphenate` if none of its parts fits. Words are only split with `Hyphenate` or where the text has a soft hyphen
+([Hyphenation](#hyphenation-hyphenate)).
+
+## Hyphenation (`Hyphenate`)
+
+With `Hyphenate: true` the line breaking may split a word at the end of the line with a hyphen, following the
+hyphenation patterns of the language of the box (`Language`). It belongs to `Typography`, is inherited and is `false`
+by default.
+
+- **The patterns are those of TeX** (`hyph-utf8`), with Liang's algorithm, and are built into the engine for `es`,
+  `ca`, `en-US` and `en-GB` ([Resources](resources.md#hyphenation-patterns)). `en` without a region, and any other
+  region of English, use the American ones; `es` and `ca` with any region, their own. `Hyphenate: true` on a box with
+  text in another language is an error (`HYPHENATION_LANGUAGE_UNSUPPORTED`), with the line of the `Hyphenate`, even if
+  it comes from an ancestor or from a rule. A box without text is not checked.
+- **The minima are those of the patterns**: at least 2 letters stay before the hyphen and 2 after it in `es` and `ca`,
+  and 2 and 3 in English; a shorter word is not split. A word is split only through its letters, which have to be all
+  together: what goes before them (a quotation mark, a parenthesis) and after them (a period, a comma) stays with the
+  first and the last part and does not count for the minima. A word with something that is not a letter among its
+  letters (a digit, a hyphen, the middle dot of `col·lecció`) or with `{page}`, `{pages}` or a reference is not split.
+  Capitals are split like lowercase letters.
+- **A soft hyphen** (U+00AD) written in the text is an explicit break point, with or without `Hyphenate`: a word that
+  has one is split only there, and the patterns add no more. It is neither painted nor measured where the word is not
+  split. In a text with `Preformatted: true` or `wrap` it is discarded.
+- **The hyphen** is the one of the font (`-`, U+002D), which has to have it (`GLYPH_MISSING`), measures what it
+  measures in it and is painted with the font and the format of the letter before it (bold if that letter is bold;
+  never in small caps). It counts in the width of the line.
+- **In the line breaking**, with `simple`, when a word does not fit whole the longest part of it that fits with its
+  hyphen is added and the rest starts the next line; with `balanced`, each break point is a possible break with TeX's
+  penalty (50, squared, in the demerits of the line, and 10,000 more if two consecutive lines end with a hyphen). A
+  word wider than the line is split in as many parts as needed.
+- **Intrinsic sizes**: the narrowest width is the widest part that cannot be split further, with its hyphen.
+- **What is read**: the text that is copied or that a screen reader reads does not carry the hyphen; in its place
+  goes a soft hyphen (U+00AD), which is how a tagged PDF says that the hyphen was added by the line breaking, and the
+  split line does not carry the invisible space at its end
+  ([The PDF inside](../implementation/pdf.md#text-that-is-read)).
+
+> **Decision:** the TeX patterns as resources of the engine, converted to a plain-text format of its own and without
+> dependencies; four languages to start with, and the rest are an error and not a silence. *Rejected alternative:* a
+> hyphenation library, or splitting without patterns.
+
+> **Decision:** a single property, `Hyphenate`, with the minima the patterns of each language bring. *Rejected
+> alternative:* properties for the minimum length of the word and for the letters on each side, which almost nobody
+> changes.
+
+> **Decision:** a word with a soft hyphen is split only where it has one, as in TeX, where whoever writes the break
+> decides. *Rejected alternative:* adding the break points of the patterns.
 
 ## Line height and baseline
 
@@ -87,8 +133,9 @@ several runs measures the sum of its parts. What is measured is exactly what is 
 
 ## Intrinsic sizes
 
-The narrowest width is the widest word, and the natural width, the longest paragraph on a single line (with
-`Preformatted: true` or `wrap`, see [Text formatting](text-formatting.md#intrinsic-sizes)).
+The narrowest width is the widest word (with `Hyphenate` or a soft hyphen, the widest part of a word with its
+hyphen), and the natural width, the longest paragraph on a single line (with `Preformatted: true` or `wrap`, see
+[Text formatting](text-formatting.md#intrinsic-sizes)).
 
 ## Language (`Language`)
 
@@ -104,6 +151,8 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 
 - Fallback fonts, synthesized bold or italic, weights other than 400 and 700 ([Resources](resources.md#fonts)).
 - Units relative to the font: everything is measured in points, millimeters or percentages.
-- Hyphenation when breaking words, kerning, and vertical or right-to-left writing.
+- Kerning, and vertical or right-to-left writing.
+- Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the
+  document's own, and changing the minimum letters on each side of the hyphen.
 - A different color or size within a line: a run only changes bold, italic, underline and strikethrough
   ([Text formatting](text-formatting.md#runs)).

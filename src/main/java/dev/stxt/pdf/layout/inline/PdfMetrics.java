@@ -29,7 +29,10 @@ import static dev.stxt.pdf.tree.PropertyKey.FONT_WEIGHT;
  *
  * <p>{@link #validate(Box)} checks before the layout that each text has its font (family,
  * weight and style) and that the font has all its characters; there are no fallback fonts. A text with runs
- * (reference/common/text-formatting.md) needs the variant of each run, and each run, its characters in it.</p>
+ * (reference/common/text-formatting.md) needs the variant of each run, and each run, its characters in it. A text
+ * that may be split with a hyphen ({@code Hyphenate: true}, or a soft hyphen in it) needs the hyphen
+ * ({@link LineBreaker#HYPHEN}) in the font of each run, and the soft hyphen itself is never painted, so it is not
+ * looked for.</p>
  */
 public final class PdfMetrics implements TextMeasurer {
 
@@ -100,12 +103,20 @@ public final class PdfMetrics implements TextMeasurer {
 
     private static void check(Box box, FontLibrary fonts) {
         Style s = box.style();
+        boolean hyphens = s.typography().hyphenate() || box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0;
         int start = 0;
         for (TextRun run : box.runs()) {
             FontFile font = font(box, fonts, run.format().face(s.typography().fontFace()), start);
             String text = run.text();
+            if (hyphens) {
+                requireGlyph(box, font, LineBreaker.HYPHEN.charAt(0), start);
+            }
             for (int i = 0; i < text.length(); ) {
                 int cp = text.codePointAt(i);
+                if (cp == LineBreaker.SOFT_HYPHEN) {
+                    i++;
+                    continue;
+                }
                 if (cp == '{') {
                     // {page}, {pages} and the references start with a brace: only then are they looked for.
                     int end = markerEnd(text, i);

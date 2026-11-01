@@ -1,6 +1,8 @@
 package dev.stxt.pdf.layout.inline;
 
 import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
 import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
@@ -13,8 +15,10 @@ import dev.stxt.pdf.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Locale;
 
 import static dev.stxt.pdf.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LineBreakerTest {
@@ -248,5 +252,123 @@ class LineBreakerTest {
         TextLine line = LineBreaker.place("ab cd", measurer, s.style(), 15, true, 0, 1);
         assertEquals(6, line.wordSpacing(), 1e-9);
         assertEquals(15, line.width(), 1e-9);
+    }
+
+    // --- Hyphenation (reference/common/typography.md) ---------------------------------------------------------------
+
+    /** A hyphenator with exceptions only: the words it knows are split exactly there, the rest nowhere. */
+    private static final Hyphenator HYPHENATOR = new Hyphenator(List.of(),
+            List.of("pro-gra-ma-ción", "ex-tra-or-di-na-ria"), 2, 2);
+    private static final String TEXT = "la programación extraordinaria";
+
+    @Test
+    void greedySplitsTheWordThatDoesNotFitAtItsLongestFittingPart() {
+        // Width 14: "la programación" is 15. The longest part of programación that fits after "la " with its hyphen
+        // is "programa-" (12); the rest, "ción", starts the next line, where "extraordinaria" does not fit after it
+        // and is split at "extraor-" (13).
+        assertEquals(List.of("la programa-", "ción extraor-", "dinaria"),
+                LineBreaker.breakLines(TEXT, 14, measurer, F, 1, LineBreaking.SIMPLE, HYPHENATOR));
+        // Without a hyphenator, the words stay whole.
+        assertEquals(List.of("la", "programación", "extraordinaria"),
+                LineBreaker.breakLines(TEXT, 14, measurer, F, 1, LineBreaking.SIMPLE));
+    }
+
+    @Test
+    void aWordWiderThanTheLineIsSplitInAsManyPartsAsNeeded() {
+        // Width 7: "extraor-" (8) does not fit and "extra-" (6) does; of the rest, "ordina-" (7).
+        assertEquals(List.of("extra-", "ordina-", "ria"),
+                LineBreaker.breakLines("extraordinaria", 7, measurer, F, 1, LineBreaking.SIMPLE, HYPHENATOR));
+    }
+
+    @Test
+    void aWordThatDoesNotFitEvenSplitOverflowsWhole() {
+        // Width 2: no part fits with its hyphen ("ex-" is 3): the word takes a line of its own and overflows.
+        assertEquals(List.of("la", "extraordinaria"),
+                LineBreaker.breakLines("la extraordinaria", 2, measurer, F, 1, LineBreaking.SIMPLE, HYPHENATOR));
+    }
+
+    @Test
+    void balancedChoosesAmongTheSamePositions() {
+        // Width 14. Every other choice leaves a line of one word that does not fill the width (maximum badness) or
+        // stretches a single space beyond its half ("la progra-" leaves 4, "ción extra-" leaves 3: maximum too), so
+        // the hyphen penalties do not change the breaks of the greedy algorithm here.
+        assertEquals(List.of("la programa-", "ción extraor-", "dinaria"),
+                LineBreaker.breakLines(TEXT, 14, measurer, F, 1, LineBreaking.BALANCED, HYPHENATOR));
+        // Width 9: "aaaa bbbb" fills the line exactly, and "aaaa bb-" would leave 1 to stretch and pay the hyphen.
+        Hyphenator h = new Hyphenator(List.of(), List.of("bb-bb"), 2, 2);
+        assertEquals(List.of("aaaa bbbb", "cccc"),
+                LineBreaker.breakLines("aaaa bbbb cccc", 9, measurer, F, 1, LineBreaking.BALANCED, h));
+    }
+
+    @Test
+    void hyphenatedLinesAreMarkedAndEndWithTheHyphen() {
+        List<LineBreaker.Line> lines = LineBreaker.breakLines(TextRun.plain(TEXT), 14, measurer, F, 1, 0,
+                LineBreaking.SIMPLE, HYPHENATOR);
+        assertEquals(List.of(true, true, false), lines.stream().map(LineBreaker.Line::hyphenated).toList());
+        assertEquals(List.of(run("la programa-")), lines.get(0).runs());
+    }
+
+    @Test
+    void softHyphensAreBreakPointsAndAreNeverMeasured() {
+        // Without a hyphenator, the soft hyphen is the only place where the word may split.
+        String text = "ultra\u00ADmoderno";
+        assertEquals(List.of("ultramoderno"), LineBreaker.breakLines(text, 12, measurer, F, 1));
+        assertEquals(List.of("ultra-", "moderno"), LineBreaker.breakLines(text, 11, measurer, F, 1));
+        assertEquals(12, LineBreaker.intrinsics(text, measurer, F, 1).natural(), 1e-9);
+        // The narrowest width counts the parts, like with the patterns: "moderno" (7) is wider than "ultra-" (6).
+        assertEquals(7, LineBreaker.intrinsics(text, measurer, F, 1).narrowest(), 1e-9);
+    }
+
+    @Test
+    void aWordWithSoftHyphensIsSplitOnlyThere() {
+        // The author decided: "extra\u00ADordinaria" splits at "extra-", and the patterns, which would fill the line
+        // with "extraordi-" (13), do not add their break points.
+        assertEquals(List.of("la extra-", "ordinaria"), LineBreaker.breakLines("la extra\u00ADordinaria", 13, measurer,
+                F, 1, LineBreaking.SIMPLE, HYPHENATOR));
+        assertEquals(List.of("la extraordi-", "naria"), LineBreaker.breakLines("la extraordinaria", 13, measurer,
+                F, 1, LineBreaking.SIMPLE, HYPHENATOR));
+    }
+
+    @Test
+    void softHyphensAtTheEdgesOrDoubledAddNoBreakPoint() {
+        String text = "\u00ADab\u00AD\u00ADcd\u00AD";
+        assertEquals(List.of("abcd"), LineBreaker.breakLines(text, 4, measurer, F, 1));
+        assertEquals(List.of("ab-", "cd"), LineBreaker.breakLines(text, 3, measurer, F, 1));
+    }
+
+    @Test
+    void theHyphenTakesTheFormatOfTheLetterBeforeIt() {
+        // Bold characters measure 2. Width 8: "pro-" in bold is 6 + 2 and fits; "progra-" (6 + 3 + 1) does not. Of
+        // the rest, "grama-" (6) and "ción".
+        List<TextRun> runs = List.of(run("pro", "b"), run("gramación"));
+        List<LineBreaker.Line> lines = LineBreaker.breakLines(runs, 8, boldIsWider, F, 1, 0, LineBreaking.SIMPLE,
+                HYPHENATOR);
+        assertEquals(List.of("pro-", "grama-", "ción"), texts(lines));
+        assertEquals(List.of(run("pro-", "b")), lines.get(0).runs());
+        // Width 7: not even "pro-" fits, so the word is not split and overflows.
+        assertEquals(List.of("programación"), texts(LineBreaker.breakLines(runs, 7, boldIsWider, F, 1, 0,
+                LineBreaking.SIMPLE, HYPHENATOR)));
+    }
+
+    @Test
+    void theNarrowestWidthIsTheWidestPartWithItsHyphen() {
+        // Parts of programación with the hyphen: pro- gra- ma- (4, 4, 3) and ción (4); of extraordinaria, ex- tra-
+        // or- di- na- (3, 4, 3, 3, 3) and ria (3). Without hyphenation, the widest word: 14.
+        assertEquals(4, LineBreaker.intrinsics(TextRun.plain(TEXT), measurer, F, 1, 0, HYPHENATOR).narrowest(), 1e-9);
+        assertEquals(30, LineBreaker.intrinsics(TextRun.plain(TEXT), measurer, F, 1, 0, HYPHENATOR).natural(), 1e-9);
+        assertEquals(14, LineBreaker.intrinsics(TextRun.plain(TEXT), measurer, F, 1, 0, null).narrowest(), 1e-9);
+    }
+
+    @Test
+    void onlyTheLettersOfAWordAreHyphenated() {
+        Hyphenator es = Hyphenations.forLocale(Locale.forLanguageTag("es"));
+        // Punctuation around the letters stays with them and does not count: pro-gra-ma-ción shifted by the «.
+        assertArrayEquals(new int[]{4, 7, 9}, LineBreaker.breaks("«programación».", es));
+        // Something that is not a letter among the letters, or a brace, which may hold {page}: no break.
+        assertArrayEquals(new int[0], LineBreaker.breaks("extra-ordinaria", es));
+        assertArrayEquals(new int[0], LineBreaker.breaks("col·lecció", es));
+        assertArrayEquals(new int[0], LineBreaker.breaks("abc123def", es));
+        assertArrayEquals(new int[0], LineBreaker.breaks("{page}", es));
+        assertArrayEquals(new int[0], LineBreaker.breaks("2025", es));
     }
 }

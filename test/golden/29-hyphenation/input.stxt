@@ -1,0 +1,53 @@
+# Hyphenation (reference/common/typography.md): page of 200 × 200 with margins of 20, page area of 160 × 160 from
+# (20, 20). Lines of 12 (Size 10); with the test metrics each character measures 5 pt, the hyphen too. Language es:
+# the Spanish patterns give pro-gra-ma-ción and ex-tra-or-di-na-ria.
+#   greedy:   Hyphenate: true in a box of 70 (14 characters). "la programación" is 15 and does not fit; the longest part
+#             of programación that fits with its hyphen is "programa-": "la programa-" (12). The rest, "ción", starts
+#             the next line, where "extraordinaria" (14) does not fit after it; its longest fitting part is "extraor-":
+#             "ción extraor-" (13). Then "dinaria" (7). Three lines: 36. y = 20.
+#   balanced: the same text with Line breaking: balanced. The text has 30 characters with its spaces: two lines of 14
+#             cannot hold it (at most 29 with the space between them), so it has three lines whatever the breaks: 36.
+#             y = 56.
+#   soft:     "ultra<SHY>moderno ultra<SHY>modernos", where <SHY> is a soft hyphen (U+00AD, invisible in this file),
+#             without Hyphenate, in a box of 60 (12 characters). The soft hyphen is not measured: "ultramoderno" is 12
+#             and fills the first line. "ultramodernos" (13) does not fit, and the soft hyphen is the only place where
+#             it may split: "ultra-" (6) and "modernos" (8). Three lines: 36. y = 92.
+#   row:      a Stack whose item takes its natural width: "ul<SHY>tra" measures its five letters, 25, because the soft
+#             hyphen is not painted where the word is not split. x = 20, y = 128, 12 high.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: la programación extraordinaria
+			Id: greedy
+			Box:
+				Width: 70
+			Typography:
+				Hyphenate: true
+		Text: la programación extraordinaria
+			Id: balanced
+			Box:
+				Width: 70
+			Typography:
+				Hyphenate: true
+				Line breaking: balanced
+		Text:
+			Id: soft
+			Box:
+				Width: 60
+			Content >>
+				ultra­moderno ultra­modernos
+		Stack:
+			Id: row
+			Item:
+				Text: ul­tra
+					Id: unsplit

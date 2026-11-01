@@ -31,6 +31,7 @@ Styles:
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The alignment of the lines |
 | `Color` | color | `#000000` | The color of the text |
 | `Line breaking` | `simple`, `balanced` | `simple` | How the text is broken into lines |
+| `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md)) |
@@ -62,11 +63,43 @@ except the last one of each paragraph, those with a single word and preformatted
 
 The text is broken into lines of the width of its box, always between words. With `Line breaking: simple`, each line is
 filled as much as it can be. With `Line breaking: balanced`, the engine looks at the whole paragraph and chooses the
-breaks that leave the most even lines, which shows above all in justified text. Words are not hyphenated: a word wider
-than the line is an error.
+breaks that leave the most even lines, which shows above all in justified text. By default words are not split: a word
+wider than the line is an error.
 
 Consecutive spaces and single line breaks are a single space. A blank line is an error: each text is a single paragraph,
 and several are written as several `Paragraph`.
+
+## Hyphenation
+
+With `Hyphenate: true` the engine splits words with a hyphen at the end of the line where the rules of the language of
+the box (`Language`) allow it, as a word processor does, and narrow justified columns are left without gaps. It has
+rules for Spanish, Catalan and American and British English; in another language, `Hyphenate: true` is an error. The
+usual thing is to declare it once, in `For element: Document`:
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Hyphenation
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 10
+                Align: justify
+                Hyphenate: true
+    Section:
+        Columns:
+            Count: 3
+            Gap: 12
+            Paragraph: The hyphenation patterns divide the long words by their syllables, and so the narrow columns are left without gaps between the words.
+```
+
+A soft hyphen (U+00AD) written inside a word says where that word may be split, with or without `Hyphenate`, and is
+not seen if it is not split. The text that is copied from the PDF, and the one a screen reader reads, does not carry
+the hyphens the engine added.
 
 ## Widows and orphans
 

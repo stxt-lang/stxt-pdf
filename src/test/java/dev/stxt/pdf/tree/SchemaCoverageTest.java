@@ -86,6 +86,7 @@ class SchemaCoverageTest {
             Map.entry("Align", "Align: center"),
             Map.entry("Color", "Color: #333333"),
             Map.entry("Line breaking", "Line breaking: balanced"),
+            Map.entry("Hyphenate", "Hyphenate: true"),
             Map.entry("Markup", "Markup: markdown"),
             Map.entry("Case", "Case: uppercase"),
             Map.entry("Letter spacing", "Letter spacing: 1.5"),

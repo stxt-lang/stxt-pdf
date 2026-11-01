@@ -399,6 +399,20 @@ class StackingContextTest {
                 "[text", "(actual ' hoy '", "' hoy '", ")", "(actual 'y mañana'", "'y mañana'", ")", "]"), r.sequences);
     }
 
+    /**
+     * A line split inside a word (reference/common/typography.md) ends with its hyphen and without the invisible
+     * space, and the sequence that ends it carries the text with the soft hyphen U+00AD in place of the hyphen
+     * (reference/implementation/pdf.md). Width 70 = 14 characters: la programa- / ción extraor- / dinaria.
+     */
+    @Test
+    void hyphenatedLinesCarryTheSoftHyphenAndNoTrailingSpace() {
+        Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: la programación extraordinaria", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 70",
+                "\t\tTypography:", "\t\t\tHyphenate: true");
+        assertEquals(List.of("[text", "(actual 'la programa\u00AD'", "'la programa-'", ")",
+                "(actual 'ción extraor\u00AD'", "'ción extraor-'", ")", "'dinaria'", "]"), r.sequences);
+    }
+
     @Test
     void noLinkMeansNoZone() {
         assertEquals(List.of(), record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",

@@ -13,6 +13,8 @@ import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.Slice;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.Preformatted;
@@ -104,7 +106,8 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     /**
      * The runs of the text of the box, with their references to other boxes already replaced and their
-     * case transformed ({@link TextTransform}).
+     * case transformed ({@link TextTransform}). In a preformatted text the soft hyphens are removed: its lines break
+     * only where the text does (reference/common/text-formatting.md).
      */
     private List<TextRun> runs(Box box) {
         List<TextRun> runs = box.runs();
@@ -112,7 +115,20 @@ public final class InlineLayout implements LayoutAlgorithm {
             runs = runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format()))
                     .toList();
         }
+        if (box.style().typography().preformatted().enabled() && box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0) {
+            runs = runs.stream().map(r -> new TextRun(r.text().replace(String.valueOf(LineBreaker.SOFT_HYPHEN), ""),
+                    r.format())).filter(r -> !r.text().isEmpty()).toList();
+        }
         return TextTransform.apply(runs, box.style());
+    }
+
+    /**
+     * The hyphenator of the text of the box with {@code Hyphenate: true}, the one of its language
+     * (reference/common/typography.md); {@code null} without it. {@link Hyphenations#validate} has already checked
+     * that the language has patterns.
+     */
+    private static Hyphenator hyphenator(Style s) {
+        return s.typography().hyphenate() ? Hyphenations.forLocale(s.typography().locale()) : null;
     }
 
     private String referenced(Reference.Kind kind, String id) {
@@ -144,7 +160,8 @@ public final class InlineLayout implements LayoutAlgorithm {
             changed = true;
             List<TextRun> runs = l.runs().stream()
                     .map(r -> new TextRun(PageNumbers.apply(r.text(), page, pages), r.format())).toList();
-            lines.add(LineBreaker.place(runs, real, s, available, l.wordSpacing() > 0, l.y(), l.height()));
+            lines.add(LineBreaker.place(runs, real, s, available, l.wordSpacing() > 0, l.y(), l.height(),
+                    l.hyphenated()));
         }
         if (!changed) {
             return f;
@@ -164,7 +181,7 @@ public final class InlineLayout implements LayoutAlgorithm {
                     available, measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing()));
         }
         return List.copyOf(LineBreaker.breakLines(runs(box), available, measurer, s.typography().fontFace(),
-                s.typography().fontSize(), s.typography().letterSpacing(), s.typography().lineBreaking()));
+                s.typography().fontSize(), s.typography().letterSpacing(), s.typography().lineBreaking(), hyphenator(s)));
     }
 
     @Override
@@ -177,7 +194,8 @@ public final class InlineLayout implements LayoutAlgorithm {
             return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
                     measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
         }
-        return LineBreaker.intrinsics(runs(box), measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
+        return LineBreaker.intrinsics(runs(box), measurer, s.typography().fontFace(), s.typography().fontSize(),
+                s.typography().letterSpacing(), hyphenator(s));
     }
 
     @Override
@@ -209,7 +227,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             // Preformatted lines are not justified.
             boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1;
             lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, available, justify, lines.size() * lineHeight,
-                    lineHeight));
+                    lineHeight, texts.get(j).hyphenated()));
         }
 
         Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,

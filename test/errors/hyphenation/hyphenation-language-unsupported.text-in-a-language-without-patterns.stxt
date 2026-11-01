@@ -1,0 +1,17 @@
+# Case: Text in a language without hyphenation patterns
+# Code: HYPHENATION_LANGUAGE_UNSUPPORTED
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: de
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Hyphenate: true
+				Size: 10
+	Section:
+		Paragraph: Donaudampfschifffahrtsgesellschaft

@@ -7,6 +7,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Hyphenation.** `Hyphenate: true` in `Typography` (inherited, `false` by default) splits words at the end of a
+  line with a hyphen, following the TeX patterns (hyph-utf8) of the language of the box with Liang's algorithm and no
+  dependencies: Spanish, Catalan, American English and British English, as resources of the jar (their licenses are
+  in `docs/*/reference/common/resources.md`). Both `Line breaking` algorithms use the break points (`balanced`, with
+  TeX's hyphen penalties), and the narrowest width of a text counts the parts of its words. A soft hyphen (U+00AD) in
+  the text is always a break point, with or without `Hyphenate`, and is never painted where the word is not split. In
+  the tagged PDF the hyphen of a split word is read as a soft hyphen (`ActualText`), so the copied text carries no
+  hyphens and the two parts are one word. `Hyphenate: true` on a text in another language is
+  `HYPHENATION_LANGUAGE_UNSUPPORTED`, and a font without the hyphen, `GLYPH_MISSING`.
+- The newsletter example (`test/examples/05-newsletter`) is hyphenated.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

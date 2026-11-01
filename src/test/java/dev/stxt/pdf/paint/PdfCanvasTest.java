@@ -4,6 +4,7 @@ import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.model.TextRun;
@@ -11,25 +12,29 @@ import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.TextRuns;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.COSObjectable;
 import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
-import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
+import org.apache.pdfbox.pdmodel.documentinterchange.markedcontent.PDPropertyList;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
+import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
@@ -43,6 +48,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,6 +60,7 @@ import java.util.TreeSet;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -836,6 +843,51 @@ class PdfCanvasTest {
             assertEquals(List.of("Informe del trimestre", "Informe del trimestre"),
                     new PDFTextStripper().getText(pdf).strip().lines().map(String::stripTrailing).toList());
         }
+    }
+
+    /**
+     * A word split at the end of a line (reference/common/typography.md) is painted with a hyphen, but the text that
+     * is read has the soft hyphen U+00AD in its place and no space after it: the two parts are one word for whoever
+     * extracts it (reference/implementation/pdf.md), and the PDF is still PDF/UA.
+     */
+    @Test
+    void hyphenatedWordsAreReadWithASoftHyphen() throws Exception {
+        InlineNode doc = reader.read(Docs.sectioned("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 200\n"
+                + "\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+                + "\t\t\t\tHyphenate: true\n"
+                + "\tParagraph: la programación extraordinaria\n\t\tBox:\n\t\t\tWidth: 60\n"));
+        byte[] bytes = render(doc, "hyphenation");
+        try (PDDocument pdf = Loader.loadPDF(bytes)) {
+            // pdfbox reads the ActualText and drops its soft hyphen: each line is its part of the word, bare.
+            assertEquals(List.of("la programa", "ción extraor", "dinaria"),
+                    new PDFTextStripper().getText(pdf).strip().lines().map(String::stripTrailing).toList());
+            // The sequence that ends each split line carries its text with the soft hyphen.
+            assertEquals(List.of("la programa\u00AD", "ción extraor\u00AD"), actualTexts(pdf.getPage(0)));
+        }
+        assertEquals(Map.of(), PdfUa.failedRules(bytes));
+    }
+
+    /** The {@code ActualText} of each marked content of the page, in order. */
+    private static List<String> actualTexts(PDPage page) throws IOException {
+        List<String> texts = new ArrayList<>();
+        PDFStreamParser parser = new PDFStreamParser(page);
+        List<Object> operands = new ArrayList<>();
+        Object token;
+        while ((token = parser.parseNextToken()) != null) {
+            if (!(token instanceof Operator op)) {
+                operands.add(token);
+                continue;
+            }
+            if (op.getName().equals("BDC") && operands.size() == 2 && operands.get(1) instanceof COSName name) {
+                PDPropertyList properties = page.getResources().getProperties(name);
+                String actual = properties == null ? null : properties.getCOSObject().getString(COSName.ACTUAL_TEXT);
+                if (actual != null) {
+                    texts.add(actual);
+                }
+            }
+            operands.clear();
+        }
+        return texts;
     }
 
     /**

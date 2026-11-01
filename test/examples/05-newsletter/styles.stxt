@@ -1,4 +1,4 @@
-# Styles of the "newsletter" example: the reusable rules and the base typography. They are passed along with
+# Styles of the "newsletter" example: the reusable rules and the base typography (hyphenated, except the headings). They are passed along with
 # input.stxt when laying out and rank below the rules that the document itself carries in its Styles.
 Styles (dev.stxt.pdf):
 	For element: Document
@@ -7,11 +7,13 @@ Styles (dev.stxt.pdf):
 			Size: 9
 			Line height: 13
 			Color: #1C1A19
+			Hyphenate: true
 	For element: Heading 1
 		Typography:
 			Size: 27
 			Line height: 30
 			Bold: true
+			Hyphenate: false
 		Box:
 			Margin: 2 0 8 0
 	For element: Heading 2
@@ -20,6 +22,7 @@ Styles (dev.stxt.pdf):
 			Line height: 13
 			Bold: true
 			Color: #A4301F
+			Hyphenate: false
 		Box:
 			Margin: 8 0 3 0
 	For element: Paragraph

@@ -253,11 +253,12 @@ public final class Style extends StyleGroup {
     /**
      * Properties that are inherited with their line, to point to it in errors: those of the font (the ones of
      * {@code Typography} that choose it, also the code one), {@code Line height}, which set the height of the lines
-     * (reference/common/overflow.md), and {@code Color}, for the contrast of the text (reference/common/pdf.md).
+     * (reference/common/overflow.md), {@code Color}, for the contrast of the text (reference/common/pdf.md), and
+     * {@code Hyphenate}, for a language without patterns (reference/common/typography.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
             PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT,
-            PropertyKey.COLOR);
+            PropertyKey.COLOR, PropertyKey.HYPHENATE);
 
     /** New style with the default values and the inheritable properties of the parent. */
     static Style inheriting(Style parent) {

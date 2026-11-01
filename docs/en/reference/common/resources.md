@@ -70,8 +70,33 @@ file that cannot be read, a variable font, or two files with the same family, we
 
 Images are in `images/` and are checked before layout, along with the fonts ([Image](../components/image.md)).
 
+## Hyphenation patterns
+
+The patterns with which `Hyphenate` splits words ([Typography](typography.md#hyphenation-hyphenate)) are not in the
+resources folder: they are inside the jar, in `dev/stxt/pdf/hyphenation/`, one per language, and are neither changed
+nor added from outside. They are those of `hyph-utf8` (the TeX ones), converted to a plain-text format of the engine's
+own by `tools/HyphenationPatterns.java`: the header of the original as comments, the minima (`left`, `right`), one
+pattern per line and one exception per line. Each file thus keeps the copyright notice and the license of its
+original:
+
+| Language | Source file | Authors | License |
+|---|---|---|---|
+| `es` | `hyph-es.tex` (5.0, 2019-09-24) | Javier Bezos, CervanTeX | MIT/X11 |
+| `ca` | `hyph-ca.tex` (1.11, 2003-07-15) | Gonçal Badenes, Francina Turon | LPPL 1.0 or later |
+| `en-US` | `hyph-en-us.tex` (2005-05-30) | Gerard D.C. Kuiken, on those of Knuth and Liang | Copying and distribution permitted, with or without modification, preserving the notice |
+| `en-GB` | `hyph-en-gb.tex` (2005-10-18) | Dominik Wujastyk, Graham Toal | MIT |
+
+The LPPL allows distributing a derived version if it has another name, is identified as derived and refers to the
+original; the header of `ca.txt` does so. The files are regenerated with `java tools/HyphenationPatterns.java
+<folder>`, with the `hyph-*.tex` files of https://github.com/hyphenation/tex-hyphen in that folder.
+
+> **Decision:** the patterns go in the jar and not in the resources folder: the language is not a resource of the
+> document, and the patterns of a language are the same for everyone. *Rejected alternative:* a `hyphenation/`
+> subfolder in `resources/`, which would allow other languages but would give a different line breaking per machine.
+
 ## What is not supported
 
 - Fonts that are not a `.ttf` file (`.otf`, WOFF), system fonts or downloaded fonts: only the `.ttf` files of `fonts/` and
   its subfolders are indexed.
 - Synthesized bold or italics: the variant must exist as a file.
+- Hyphenation patterns of the document's own, or for languages other than those in the jar.

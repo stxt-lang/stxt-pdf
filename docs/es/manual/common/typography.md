@@ -31,6 +31,7 @@ Styles:
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
 | `Color` | color | `#000000` | El color del texto |
 | `Line breaking` | `simple`, `balanced` | `simple` | Cómo se reparte el texto en líneas |
+| `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)) |
@@ -62,10 +63,42 @@ salvo la última de cada párrafo, las de una sola palabra y las líneas preform
 
 El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `Line breaking: simple`, cada línea se llena todo lo
 que puede. Con `Line breaking: balanced`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
-se nota sobre todo en texto justificado. No se parten palabras con guion: una palabra más ancha que la línea es un error.
+se nota sobre todo en texto justificado. Por defecto no se parten palabras: una palabra más ancha que la línea es un error.
 
 Los espacios seguidos y los saltos de línea simples son un solo espacio. Una línea en blanco es un error: cada texto es
 un solo párrafo, y para varios se escriben varios `Paragraph`.
+
+## Guiones
+
+Con `Hyphenate: true` el motor parte las palabras con guion al final de la línea donde lo permiten las reglas del idioma
+de la caja (`Language`), como hace un procesador de textos, y las columnas estrechas justificadas quedan sin huecos.
+Tiene reglas para el castellano, el catalán y el inglés americano y británico; en otro idioma, `Hyphenate: true` es un
+error. Lo normal es declararlo una vez, en `For element: Document`:
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Guiones
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Serif
+                Size: 10
+                Align: justify
+                Hyphenate: true
+    Section:
+        Columns:
+            Count: 3
+            Gap: 12
+            Paragraph: Los patrones de partición dividen las palabras largas por sus sílabas, y así las columnas estrechas quedan sin huecos entre las palabras.
+```
+
+Un guion blando (U+00AD) escrito dentro de una palabra dice dónde puede partirse esa palabra, con o sin `Hyphenate`, y
+no se ve si no se parte. El texto que se copia del PDF, y el que lee un lector de pantalla, no lleva los guiones que puso
+el motor.
 
 ## Viudas y huérfanas
 

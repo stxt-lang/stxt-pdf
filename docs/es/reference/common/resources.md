@@ -69,8 +69,32 @@ leer, una fuente variable o dos ficheros con la misma familia, peso y estilo.
 
 Las imágenes están en `images/` y se comprueban antes de maquetar, con las fuentes ([Image](../components/image.md)).
 
+## Patrones de partición
+
+Los patrones con los que `Hyphenate` parte las palabras ([Tipografía](typography.md#guiones-hyphenate)) no están en la
+carpeta de recursos: van dentro del jar, en `dev/stxt/pdf/hyphenation/`, uno por idioma, y no se cambian ni se añaden
+desde fuera. Son los de `hyph-utf8` (los de TeX), convertidos a un formato propio de texto plano por
+`tools/HyphenationPatterns.java`: la cabecera del original como comentarios, los mínimos (`left`, `right`), un patrón
+por línea y una excepción por línea. Cada fichero conserva así el aviso de copyright y la licencia del original:
+
+| Idioma | Fichero de origen | Autores | Licencia |
+|---|---|---|---|
+| `es` | `hyph-es.tex` (5.0, 2019-09-24) | Javier Bezos, CervanTeX | MIT/X11 |
+| `ca` | `hyph-ca.tex` (1.11, 2003-07-15) | Gonçal Badenes, Francina Turon | LPPL 1.0 o posterior |
+| `en-US` | `hyph-en-us.tex` (2005-05-30) | Gerard D.C. Kuiken, sobre los de Knuth y Liang | Copia y distribución libres, con o sin cambios, conservando el aviso |
+| `en-GB` | `hyph-en-gb.tex` (2005-10-18) | Dominik Wujastyk, Graham Toal | MIT |
+
+La LPPL admite distribuir una versión derivada si lleva otro nombre, se identifica como derivada y remite al original;
+la cabecera de `ca.txt` lo hace. Los ficheros se regeneran con `java tools/HyphenationPatterns.java <carpeta>`, con los
+`hyph-*.tex` de https://github.com/hyphenation/tex-hyphen en esa carpeta.
+
+> **Decisión:** los patrones van en el jar y no en la carpeta de recursos: el idioma no es un recurso del documento y
+> los patrones de un idioma son los mismos para todos. *Alternativa descartada:* una subcarpeta `hyphenation/` en
+> `resources/`, que admitiría otros idiomas pero daría un reparto distinto según la máquina.
+
 ## Lo que no hay
 
 - Fuentes que no son un fichero `.ttf` (`.otf`, WOFF), fuentes del sistema o descargadas: solo se indexan los `.ttf`
   de `fonts/` y sus subcarpetas.
 - Síntesis de negrita o cursiva: la variante debe existir como fichero.
+- Patrones de partición propios o de otros idiomas que los del jar.

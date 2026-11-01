@@ -15,8 +15,8 @@ import java.util.Locale;
 
 /**
  * The {@code Typography} group (reference/common/typography.md): the font, the size, the line height, the alignment,
- * the color, the case, the letter spacing and the white space of the text, the numbering of the headings, the language
- * and the widows and orphans. It is the only group that is <strong>inherited</strong>: each box starts with a copy of
+ * the color, the case, the letter spacing and the white space of the text, the hyphenation, the numbering of the
+ * headings, the language and the widows and orphans. It is the only group that is <strong>inherited</strong>: each box starts with a copy of
  * its parent's ({@link Style#inheriting}).
  */
 public final class TypographyStyle extends StyleGroup {
@@ -33,6 +33,11 @@ public final class TypographyStyle extends StyleGroup {
     private Value lineHeight;
     private TextAlign textAlign = TextAlign.LEFT;
     private LineBreaking lineBreaking = LineBreaking.SIMPLE;
+    /**
+     * {@code Hyphenate}: whether the line breaking may split words with a hyphen, with the patterns of the language
+     * of {@link #locale} (reference/common/typography.md). Inherited.
+     */
+    private boolean hyphenate;
     private Markup markup = Markup.NONE;
     private TextCase textCase = TextCase.NONE;
     /** Spacing between letters, in points; it can be negative. */
@@ -82,6 +87,7 @@ public final class TypographyStyle extends StyleGroup {
         lineHeight = parent.lineHeight;
         textAlign = parent.textAlign;
         lineBreaking = parent.lineBreaking;
+        hyphenate = parent.hyphenate;
         markup = parent.markup;
         textCase = parent.textCase;
         letterSpacing = parent.letterSpacing;
@@ -168,6 +174,15 @@ public final class TypographyStyle extends StyleGroup {
     void setLineBreaking(LineBreaking v) {
         writable();
         lineBreaking = v;
+    }
+
+    public boolean hyphenate() {
+        return hyphenate;
+    }
+
+    void setHyphenate(boolean v) {
+        writable();
+        hyphenate = v;
     }
 
     public Markup markup() {

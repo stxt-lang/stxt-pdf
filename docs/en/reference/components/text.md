@@ -67,4 +67,5 @@ heading ([The PDF](../common/pdf.md#accessibility)).
 ## What is not supported
 
 - Text outside a `Text`, a `Paragraph` or a `Cell`.
-- Hyphenating words: a word wider than the line is an error.
+- Splitting words without `Hyphenate` or a soft hyphen: a word wider than the line is an error
+  ([Typography](../common/typography.md#hyphenation-hyphenate)).

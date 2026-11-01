@@ -14,6 +14,7 @@ import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.InlineLayout;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.columns.ColumnsLayout;
 import dev.stxt.pdf.layout.position.OverlayLayout;
 import dev.stxt.pdf.layout.table.TableLayout;
@@ -119,7 +120,8 @@ public final class Engine implements LayoutContext {
      * STXT document → pages, with the medium and the metadata. The usual way is to read it with
      * {@link dev.stxt.pdf.stxt.DocumentReader}; if it is not validated, {@link BoxTreeBuilder}
      * validates it against the schema. Before laying out it checks with the {@link TextMeasurer} that
-     * all the text can be measured (the fonts, in the PDF output) and that all the images exist,
+     * all the text can be measured (the fonts, in the PDF output), that all the images exist and that every
+     * hyphenated text is in a language with patterns ({@link Hyphenations#validate}),
      * and afterwards that nothing overflows ({@link Overflow}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
@@ -143,6 +145,7 @@ public final class Engine implements LayoutContext {
     public LaidOutDocument layOutDocument(BoxTreeBuilder.Result tree) {
         measurer.validate(tree.root());
         images.validate(tree.root());
+        Hyphenations.validate(tree.root());
         release();
         try {
             List<Page> pages = new Paginator(this).paginate(tree);

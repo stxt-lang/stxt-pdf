@@ -20,6 +20,7 @@ celdas).
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |
 | `Line breaking` | `simple`, `balanced` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`balanced`). |
+| `Hyphenate` | `true`, `false` | `false` | Partir palabras con guion al final de la línea, con los patrones del idioma ([Guiones](#guiones-hyphenate)). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
@@ -59,8 +60,50 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
   líneas, de modo que las líneas quedan más parejas. Los espacios se estiran hasta la mitad de su ancho y no se encogen,
   y la última línea no cuenta.
 
-En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)).
-No se parten palabras ni se ponen guiones.
+En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)),
+también con `Hyphenate` si ninguna de sus partes cabe. Las palabras solo se parten con `Hyphenate` o donde el texto
+lleva un guion blando ([Guiones](#guiones-hyphenate)).
+
+## Guiones (`Hyphenate`)
+
+Con `Hyphenate: true` el reparto en líneas puede partir una palabra al final de la línea con un guion, siguiendo los
+patrones de partición del idioma de la caja (`Language`). Es de `Typography`, se hereda y vale `false` por defecto.
+
+- **Los patrones son los de TeX** (`hyph-utf8`), con el algoritmo de Liang, y van dentro del motor para `es`, `ca`,
+  `en-US` y `en-GB` ([Recursos](resources.md#patrones-de-partición)). `en` sin región y cualquier otra región del
+  inglés usan los americanos; `es` y `ca` con cualquier región, los suyos. `Hyphenate: true` en una caja con texto en
+  otro idioma es un error (`HYPHENATION_LANGUAGE_UNSUPPORTED`), con la línea del `Hyphenate`, aunque venga de una
+  antecesora o de una regla. Una caja sin texto no se comprueba.
+- **Los mínimos son los de los patrones**: quedan al menos 2 letras antes del guion y 2 después en `es` y `ca`, y 2 y 3
+  en inglés; una palabra más corta no se parte. Una palabra se parte solo por sus letras, que tienen que ir todas
+  seguidas: lo que va delante (una comilla, un paréntesis) y detrás (un punto, una coma) se queda con la primera y la
+  última parte y no cuenta para los mínimos. Una palabra con algo que no es una letra entre sus letras (una cifra, un
+  guion, el punto volado de `col·lecció`) o con `{page}`, `{pages}` o una referencia no se parte. Las mayúsculas se
+  parten como las minúsculas.
+- **Un guion blando** (U+00AD) escrito en el texto es un punto de corte explícito, con o sin `Hyphenate`: una palabra
+  que lo lleva se parte solo ahí, y los patrones no añaden más. No se pinta ni se mide donde la palabra no se parte. En
+  un texto con `Preformatted: true` o `wrap` se descarta.
+- **El guion** es el de la fuente (`-`, U+002D), que tiene que tenerlo (`GLYPH_MISSING`), mide lo que mide en ella y
+  se pinta con la fuente y el formato de la letra que lo precede (en negrita si ella lo está; nunca en versalitas).
+  Cuenta en el ancho de la línea.
+- **En el reparto**, con `simple`, cuando una palabra no cabe entera se añade la parte más larga que cabe con su guion
+  y el resto empieza la línea siguiente; con `balanced`, cada punto de corte es un salto posible con la penalización de
+  TeX (50, al cuadrado, en los deméritos de la línea, y 10 000 más si dos líneas seguidas acaban en guion). Una palabra
+  más ancha que la línea se parte en tantas partes como haga falta.
+- **Tamaños intrínsecos**: el ancho más estrecho es la parte más ancha que no se puede partir más, con su guion.
+- **Lo que se lee**: el texto que se copia o que lee un lector de pantalla no lleva el guion; en su lugar va un guion
+  blando (U+00AD), que es como un PDF etiquetado dice que el guion lo puso el reparto, y la línea partida no lleva el
+  espacio invisible del final ([El PDF por dentro](../implementation/pdf.md#texto-que-se-lee)).
+
+> **Decisión:** los patrones de TeX como recursos del motor, convertidos a un formato propio de texto plano y sin
+> dependencias; cuatro idiomas para empezar, y los demás son un error y no un silencio. *Alternativa descartada:*
+> una biblioteca de partición, o partir sin patrones.
+
+> **Decisión:** una sola propiedad, `Hyphenate`, con los mínimos que traen los patrones de cada idioma. *Alternativa
+> descartada:* propiedades para la longitud mínima de la palabra y para las letras a cada lado, que casi nadie cambia.
+
+> **Decisión:** una palabra con guion blando se parte solo donde lo lleva, como en TeX, donde quien escribe el corte
+> decide. *Alternativa descartada:* sumar los puntos de los patrones.
 
 ## Altura de las líneas y línea base
 
@@ -87,8 +130,9 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 ## Tamaños intrínsecos
 
-El ancho más estrecho es la palabra más ancha, y el natural, el párrafo más largo en una sola línea (con
-`Preformatted: true` o `wrap`, ver [Formato del texto](text-formatting.md#tamaños-intrínsecos)).
+El ancho más estrecho es la palabra más ancha (con `Hyphenate` o un guion blando, la parte más ancha de una palabra
+con su guion), y el natural, el párrafo más largo en una sola línea (con `Preformatted: true` o `wrap`, ver
+[Formato del texto](text-formatting.md#tamaños-intrínsecos)).
 
 ## Idioma (`Language`)
 
@@ -104,6 +148,8 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 
 - Fuentes de sustitución, síntesis de negrita o cursiva, pesos distintos de 400 y 700 ([Recursos](resources.md#fuentes)).
 - Unidades relativas a la fuente: todo se mide en puntos, en milímetros o en porcentajes.
-- Guiones al partir palabras, kerning y escritura vertical o de derecha a izquierda.
+- Kerning y escritura vertical o de derecha a izquierda.
+- Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,
+  y cambiar los mínimos de letras a cada lado del guion.
 - Color o tamaño distintos dentro de una línea: un tramo solo cambia negrita, cursiva, subrayado y tachado
   ([Formato del texto](text-formatting.md#tramos)).

@@ -58,7 +58,7 @@ public interface Tagging {
     /**
      * What is painted until {@link #endActualText()}, inside a started text, is extracted as {@code text}
      * (reference/implementation/pdf.md): text with letter spacing, whose separated letters would make extractors guess
-     * spaces.
+     * spaces, and the end of a line split inside a word, whose hyphen is read as a soft hyphen.
      */
     void beginActualText(String text);
 

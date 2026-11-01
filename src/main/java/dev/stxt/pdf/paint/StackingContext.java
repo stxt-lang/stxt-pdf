@@ -2,6 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.inline.LineBreaker;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
@@ -423,6 +424,11 @@ public final class StackingContext {
      * sequence is a separate marked content, and that of a link hangs from the {@code Link} of the tagged PDF
      * (reference/common/links.md). Inside each link sequence, one clickable area per line ({@link
      * #paintLinkZone}).</p>
+     *
+     * <p>A line that is not the last one ends with an invisible space, so that whoever joins the lines does not run
+     * the words together; a line split inside a word ({@link TextLine#hyphenated()}) does not, and the sequence that
+     * ends it carries an {@code ActualText} in which the hyphen is the soft hyphen U+00AD, which is how a tagged PDF
+     * says that the hyphen was added by the line breaking (reference/implementation/pdf.md).</p>
      */
     private static void paintText(Canvas canvas, Piece p) {
         if (p.f().lines().isEmpty()) {
@@ -444,8 +450,10 @@ public final class StackingContext {
         for (int n = 0; n < lines.size(); n++) {
             TextLine l = lines.get(n);
             // The line break swallows the space: it is written invisible after the last word, so that whoever
-            // joins the text of the lines (screen reader, extraction, search) does not run the words together.
-            boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE;
+            // joins the text of the lines (screen reader, extraction, search) does not run the words together. A
+            // line split inside a word has no space: its two parts are one word.
+            boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE
+                    && !l.hyphenated();
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {
@@ -464,16 +472,20 @@ public final class StackingContext {
                     current = link;
                 }
                 boolean first = i == 0 || !Objects.equals(link, runs.get(i - 1).format().link());
+                boolean last = i == runs.size() - 1 || !Objects.equals(link, runs.get(i + 1).format().link());
                 if (link != null && first) {
                     paintLinkZone(tags, box, content, l, i, link);
                 }
-                if (spaced && first) {
-                    tags.beginActualText(sameLinkText(runs, i, spaceAfter));
+                // The sequence carries its text when letter spacing would make extractors guess spaces, and when it
+                // ends the line with the hyphen of a split word, which is read as a soft hyphen.
+                boolean actual = spaced || l.hyphenated() && sequenceEnd(runs, i) == runs.size();
+                if (actual && first) {
+                    tags.beginActualText(sameLinkText(runs, i, spaceAfter, l.hyphenated()));
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
                 canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
                         s.typography().fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
-                if (spaced && (i == runs.size() - 1 || !Objects.equals(link, runs.get(i + 1).format().link()))) {
+                if (actual && last) {
                     tags.endActualText();
                 }
             }
@@ -486,17 +498,34 @@ public final class StackingContext {
 
     /**
      * The text of the runs of a line that start at {@code first} and follow one another with the same link, with the
-     * invisible trailing space if they reach the end of the line and it has one ({@code spaceAfter}).
+     * invisible trailing space if they reach the end of the line and it has one ({@code spaceAfter}), and with the
+     * hyphen of a split word ({@code hyphenated}) turned into the soft hyphen U+00AD if they reach it.
      */
-    private static String sameLinkText(List<TextLine.Run> runs, int first, boolean spaceAfter) {
+    private static String sameLinkText(List<TextLine.Run> runs, int first, boolean spaceAfter, boolean hyphenated) {
         StringBuilder text = new StringBuilder();
+        int end = sequenceEnd(runs, first);
+        for (int i = first; i < end; i++) {
+            text.append(runs.get(i).text());
+        }
+        if (end == runs.size()) {
+            if (hyphenated && text.length() > 0 && text.charAt(text.length() - 1) == LineBreaker.HYPHEN.charAt(0)) {
+                text.setCharAt(text.length() - 1, LineBreaker.SOFT_HYPHEN);
+            }
+            if (spaceAfter) {
+                text.append(' ');
+            }
+        }
+        return text.toString();
+    }
+
+    /** Where the runs that start at {@code first} and follow one another with the same link end (exclusive). */
+    private static int sequenceEnd(List<TextLine.Run> runs, int first) {
         String link = runs.get(first).format().link();
         int end = first;
         while (end < runs.size() && Objects.equals(link, runs.get(end).format().link())) {
-            text.append(runs.get(end).text());
             end++;
         }
-        return spaceAfter && end == runs.size() ? text.append(' ').toString() : text.toString();
+        return end;
     }
 
     /**

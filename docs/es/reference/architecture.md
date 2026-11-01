@@ -43,7 +43,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
 | `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`) y las reglas de corte (`BreakRules`) |
-| `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`) y un subpackage por algoritmo: `block`, `inline`, `stack`, `grid`, `table`, `columns`, `position` e `image` |
+| `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`) y un subpackage por algoritmo: `block`, `inline` (con `inline.hyphenation`, los patrones de partición), `stack`, `grid`, `table`, `columns`, `position` e `image` |
 | `output` | `fragment`, `model` | `StxtDump`, el volcado de los tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | El pintado (`StackingContext`, `Canvas`) y los dos lienzos: el PDF (`PdfDocumentWriter`, `PdfCanvas` y sus piezas) y el SVG (`SvgCanvas`) |
 | `convert` | todos menos `tree` y `output` | `Converter`, la entrada del motor. Nada depende de él |
@@ -91,7 +91,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`Paginator`**: reparte cada sección en páginas, hace converger las referencias, numera las páginas y coloca los
   `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.
-- Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas), `StackResolver`, `TrackSizing` y `Placement` (grid),
+- Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas, con el `Hyphenator` de `inline.hyphenation` para
+  partir palabras), `StackResolver`, `TrackSizing` y `Placement` (grid),
   `Columns` (cuántas columnas y de qué ancho), `OverlayEquation`, `UnitBreaker` (cortes de `Stack`, `Grid` y tablas), `Slice` (alto, borde y
   relleno de cada fragmento) ([El layout](implementation/layout.md)).
 - **`TextMeasurer`**: mide el texto. `FixedMetrics` (cada carácter mide medio cuerpo) es el de los tests de layout.

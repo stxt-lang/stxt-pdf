@@ -152,6 +152,25 @@ where they are content): `BreakRules.cutLines` applies widows and orphans to all
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
 `List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`).
 
+**Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
+box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns
+of the resource of the language, with a cache per word. `LineBreaker.words` gives each word its break points (those of
+its soft hyphens, which it removes from the text, or those of the patterns over its letters), and both line breakings
+work over the **positions** of the text (`LineBreaker.Paragraph`): the start of each word and each break point. A
+line goes from one position to another; if it ends at a break point it carries the hyphen, measured with the format of
+the previous letter, and the `Line` (and the placed `TextLine`) says so with `hyphenated`. The greedy breaking tries,
+when a word does not fit, its break points from the longest to the shortest; Knuth-Plass adds to the demerits TeX's
+penalty per hyphen (50²) and per two consecutive hyphens (10,000). Widths are still sums: those of the whole words,
+the spaces and the parts of a split word, each one measured once. `Hyphenations.validate` checks before the layout,
+like the fonts, that every box with text and `Hyphenate: true` is in a language with patterns.
+
+> **Decision:** the language is checked when the layout starts and not when the tree is built, like the fonts:
+> `tree` does not depend on `layout`, where the patterns live. *Rejected alternative:* the patterns in `model`.
+
+> **Decision:** both line breakings share the positions and the sums of `Paragraph`, instead of a breaking over atoms
+> (parts of words) with prefix sums: with ligatures a whole word does not measure what its parts add up to, and this
+> way each line is measured as it is painted.
+
 **Measurement.** A `TextMeasurer` has to be **additive between words** (the width of a text is the sum of those of its words
 and spaces): both line breaking algorithms add up. `PdfMetrics` measures with `FontFile.width(text, size, ligatures)`, which applies
 `GSUB` word by word if there are ligatures. `Engine.layOutDocument` first calls `validate(root)`, which in `PdfMetrics`

@@ -3,11 +3,11 @@ Result:
 		Fragment: masthead
 			Rect: 44 38 507.28 89.5
 		Fragment: lead
-			Rect: 44 141.5 507.28 581
+			Rect: 44 141.5 507.28 574
 			Fragment: lead-photo
 				Rect: 44 224.5 507.28 214
 			Fragment: lead-text
-				Rect: 44 464.5 507.28 188
+				Rect: 44 464.5 507.28 181
 		Fragment: footer
 			Rect: 44 801.39 507.28 18.5
 	Page: 2
