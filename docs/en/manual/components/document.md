@@ -89,7 +89,8 @@ The size of the page and its margins. The size is given in one of two ways, neve
 
 `Margin` is the margins of the page, from 1 to 4 measurements (top, right, bottom, left). What remains inside is the
 **page area**: where the content goes. The headers and footers go in the margins, with a `Page overlay`
-([positioned](frame-and-overlays.md#page-overlay)).
+([positioned](frame-and-overlays.md#page-overlay)). For double-sided printing, `Mirror margins: true` swaps the left and
+right margins on the even pages ([double-sided](#double-sided)).
 
 ## `Section`
 
@@ -97,7 +98,7 @@ A section is a part of the document that **always starts on a new page**. All th
 
 | Property | What it does |
 |---|---|
-| `Page` | Another paper, another orientation or other margins for this section. It inherits from the `Page` of the document what it does not declare: with only `Orientation: landscape`, it is the same paper in landscape, and with only `Margin`, the same paper with other margins |
+| `Page` | Another paper, another orientation or other margins for this section. It inherits from the `Page` of the document what it does not declare: with only `Orientation: landscape`, it is the same paper in landscape, and with only `Margin`, the same paper with other margins (`Mirror margins` goes with `Margin`: they are inherited or declared together) |
 | `Page numbering` | `continue` (the default) continues the page count, `restart` starts again at 1 and with `none` its pages have no number and do not count |
 | `Page number format` | How its page numbers are written: `decimal` (the default), `lower-roman` (`i`, `ii`, `iii`) or `upper-roman` (`I`, `II`, `III`) |
 | `Start` | With `Page numbering: restart`, the number of its first page (`Start: 5`) |
@@ -126,13 +127,20 @@ an odd page, the engine adds a **blank page** after it: without content, without
 page number, as in a book, even though it is not printed: this way the odd pages stay on the right. The first section
 already starts on page 1, so in it this is an error.
 
+The margin at the spine, the inner one, is usually larger than the outer one, and it changes sides with the page. With
+`Mirror margins: true` in `Page`, `Margin` gives the margins of the odd pages, the right-hand ones, and on the even ones
+the left and the right are swapped. With the left margin equal to the right one it would do nothing, and it is an error.
+Headers and footers do not change sides: a page number on the outside is two `Page overlay` elements, one with
+`Pages: odd` on the right and another with `Pages: even` on the left.
+
 ```
 Document (dev.stxt.pdf):
     Language: en
     Title: Two chapters
     Page:
         Paper: A5
-        Margin: 50
+        Margin: 40 30 50 60
+        Mirror margins: true
     Styles:
         For element: Document
             Typography:

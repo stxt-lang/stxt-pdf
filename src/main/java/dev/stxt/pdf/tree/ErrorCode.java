@@ -210,6 +210,8 @@ public enum ErrorCode {
     PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS,
     /** {@code Begin on: odd} in the first {@code Section}, which already starts on page 1. */
     BEGIN_ON_FIRST_SECTION,
+    /** {@code Mirror margins: true} in a {@code Page} whose left and right margins are equal. */
+    MIRROR_MARGINS_WITHOUT_EFFECT,
     /** {@code Line distribution} without {@code Wrap: true}. */
     LINE_DISTRIBUTION_WITHOUT_WRAP,
     /** Two-value {@code Gap} in a {@code Stack} without {@code Wrap: true}. */

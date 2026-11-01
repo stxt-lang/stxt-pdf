@@ -1,0 +1,91 @@
+# Mirror margins (reference/components/document.md). Pages of 300 × 200 with Margin: 20 30 20 50 and Mirror margins: true:
+# the odd pages have the page area of 220 × 160 from (50, 20) and the even ones, from (30, 20).
+#
+# Three sections, five pages:
+#   first (2 pages):  a (100 high) and b (100 high) do not fit together (200 > 160): a on page 1 (odd, x = 50) and b on
+#                     page 2 (even, x = 30). foot (Page overlay of the document, full width) follows the page area:
+#                     (50, 168) on page 1 and (30, 168) on page 2. num-odd (Pages: odd, bottom right) only on the odd
+#                     pages, at x = 50 + 220 - 30 = 240; num-even (Pages: even, bottom left) only on the even ones, at x = 30.
+#   second (1 page):  Begin on: odd and page 3 is odd: no blank page. c at (50, 20); foot and num-odd as on page 1.
+#   third (1 page):   Begin on: odd, and the previous one ends on page 3: page 4 is blank (nothing is dumped) and the
+#                     section starts on page 5. Its Page declares Margin: 10 without Mirror margins, so it declares the
+#                     margin group again, symmetric: page area of 280 × 180 from (10, 10). d at (10, 10); foot at (10, 178),
+#                     280 wide; num-odd at x = 10 + 280 - 30 = 260.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20 30 20 50
+		Mirror margins: true
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Page overlay:
+		Id: foot
+		Offset: auto 0 0 0
+		Box:
+			Height: 12
+			Background: #E3E8EE
+		Text: Pie
+			Typography:
+				Align: center
+	Page overlay:
+		Id: num-odd
+		Pages: odd
+		Offset: auto 0 0 auto
+		Box:
+			Width: 30
+			Height: 12
+			Background: #F2C94C
+		Text: {page}
+			Typography:
+				Align: right
+	Page overlay:
+		Id: num-even
+		Pages: even
+		Offset: auto auto 0 0
+		Box:
+			Width: 30
+			Height: 12
+			Background: #F2C94C
+		Text: {page}
+	Section:
+		Id: first
+		Block:
+			Id: a
+			Box:
+				Height: 100
+				Background: #DCEBDD
+			Text: Uno
+		Block:
+			Id: b
+			Break:
+				Keep together: true
+			Box:
+				Height: 100
+				Background: #EFE6CF
+			Text: Dos
+	Section:
+		Id: second
+		Begin on: odd
+		Block:
+			Id: c
+			Box:
+				Height: 60
+				Background: #DCEBDD
+			Text: Tres
+	Section:
+		Id: third
+		Begin on: odd
+		Page:
+			Margin: 10
+		Block:
+			Id: d
+			Box:
+				Height: 60
+				Background: #EFE6CF
+			Text: Cuatro

@@ -89,7 +89,8 @@ El tamaño de la página y sus márgenes. El tamaño se da de una de dos formas,
 
 `Margin` son los márgenes de la página, de 1 a 4 medidas (arriba, derecha, abajo, izquierda). Lo que queda dentro es el
 **área útil**: donde va el contenido. Las cabeceras y los pies van en los márgenes, con un `Page overlay`
-([posicionados](frame-and-overlays.md#page-overlay)).
+([posicionados](frame-and-overlays.md#page-overlay)). Para imprimir a doble cara, `Mirror margins: true` intercambia el
+margen izquierdo y el derecho en las páginas pares ([doble cara](#doble-cara)).
 
 ## `Section`
 
@@ -97,7 +98,7 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 
 | Propiedad | Qué hace |
 |---|---|
-| `Page` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Page` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado, y con solo `Margin`, el mismo papel con otros márgenes |
+| `Page` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Page` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado, y con solo `Margin`, el mismo papel con otros márgenes (`Mirror margins` va con `Margin`: se heredan o se declaran juntos) |
 | `Page numbering` | `continue` (por defecto) sigue la cuenta de páginas, `restart` vuelve a empezar en 1 y con `none` sus páginas no tienen número ni cuentan |
 | `Page number format` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`, `iii`) o `upper-roman` (`I`, `II`, `III`) |
 | `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
@@ -125,13 +126,20 @@ acaba en una página impar, el motor añade detrás una **página en blanco**: s
 para el número de página, como en un libro, aunque no se imprima: así las páginas impares siguen a la derecha. La primera
 sección ya empieza en la página 1, así que en ella es un error.
 
+El margen del lomo, el interior, suele ser mayor que el exterior, y cambia de lado con la página. Con `Mirror margins:
+true` en `Page`, `Margin` da los márgenes de las páginas impares, las de la derecha, y en las pares el izquierdo y el
+derecho se intercambian. Con el margen izquierdo igual al derecho no haría nada, y es un error. Las cabeceras y los pies
+no cambian de lado: un número de página en el exterior son dos `Page overlay`, uno con `Pages: odd` a la derecha y otro
+con `Pages: even` a la izquierda.
+
 ```
 Document (dev.stxt.pdf):
     Language: es
     Title: Dos capítulos
     Page:
         Paper: A5
-        Margin: 50
+        Margin: 40 30 50 60
+        Mirror margins: true
     Styles:
         For element: Document
             Typography:

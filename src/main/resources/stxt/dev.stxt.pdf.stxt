@@ -28,7 +28,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: Page
 		Type: GROUP
-		Description: The page: its size, with Paper (and Orientation) or with Width and Height, and its margins. It defines the page area, which is the initial reference container.
+		Description: The page: its size, with Paper (and Orientation) or with Width and Height, and its margins, mirrored on the even pages with Mirror margins. It defines the page area, which is the initial reference container.
 		Children:
 			Child: Paper
 				Max: 1
@@ -39,6 +39,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Height
 				Max: 1
 			Child: Margin
+				Max: 1
+			Child: Mirror margins
 				Max: 1
 	Node: Section
 		Type: GROUP
@@ -1073,6 +1075,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Inherit page overlays
 		Type: BOOLEAN
 		Description: Whether the Section carries the Page overlay of the Document. By default, true; with false only its own appear (a cover without a footer).
+	Node: Mirror margins
+		Type: BOOLEAN
+		Description: Whether the even physical pages swap the left and right margins of Margin, for double-sided printing: Margin is that of the odd pages, the right-hand ones. By default, false. A Section inherits it together with Margin. With equal left and right margins it has no effect and is an error.
 	Node: Begin on
 		Type: ENUM
 		Description: On which physical page a Section starts: any (by default), on the next one; odd, on an odd one, the right-hand one when printing double-sided. If it does not fall there, the previous section ends with a blank page, which counts for the number but does not print it or carry the Page overlay. Not valid in the first section.

@@ -40,6 +40,7 @@ class SchemaCoverageTest {
             Map.entry("Page number format", "Page number format: lower-roman"),
             Map.entry("Inherit page overlays", "Inherit page overlays: false"),
             Map.entry("Begin on", "Begin on: any"),
+            Map.entry("Mirror margins", "Mirror margins: false"),
             // Elements
             Map.entry("Id", "Id: x"),
             Map.entry("Style", "Style: c"),

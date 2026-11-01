@@ -11,7 +11,8 @@ import java.util.List;
  * @param number       physical page number, from 1, across the whole document
  * @param content      root fragment with the flow of this page: that of the box of its section
  * @param pageOverlays fragments of the {@code Page overlay} boxes that appear on this page
- * @param pageSetup    the medium of the page: that of its section (reference/components/document.md)
+ * @param pageSetup    the medium of the page: that of its section, with the margins of this page's side if it has
+ *                     {@code Mirror margins} (reference/components/document.md)
  * @param section      position of its section in the document, from 0
  * @param printed      printed number of the page (what {@code {page}} and the tables of contents say), from 1;
  *                     0 if the page is not numbered ({@code Page numbering: none})

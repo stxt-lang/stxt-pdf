@@ -1,0 +1,17 @@
+# Case: Mirror margins: true with equal left and right margins, which the even pages would swap for nothing
+# Code: MIRROR_MARGINS_WITHOUT_EFFECT
+# Line: 10
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Paper: A4
+		Margin: 40
+		Mirror margins: true
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Paragraph: Uno

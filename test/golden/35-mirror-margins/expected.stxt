@@ -1,0 +1,31 @@
+# The flow fragments and, after them, the Page overlay elements of the document (reference/components/document.md). The blank page 4 has nothing to dump.
+Result:
+	Page: 1
+		Fragment: a
+			Rect: 50 20 220 100
+		Fragment: foot
+			Rect: 50 168 220 12
+		Fragment: num-odd
+			Rect: 240 168 30 12
+	Page: 2
+		Fragment: b
+			Rect: 30 20 220 100
+		Fragment: foot
+			Rect: 30 168 220 12
+		Fragment: num-even
+			Rect: 30 168 30 12
+	Page: 3
+		Fragment: c
+			Rect: 50 20 220 60
+		Fragment: foot
+			Rect: 50 168 220 12
+		Fragment: num-odd
+			Rect: 240 168 30 12
+	Page: 4
+	Page: 5
+		Fragment: d
+			Rect: 10 10 280 60
+		Fragment: foot
+			Rect: 10 178 280 12
+		Fragment: num-odd
+			Rect: 260 178 30 12

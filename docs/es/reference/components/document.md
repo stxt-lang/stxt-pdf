@@ -57,6 +57,7 @@ puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-pag
 | `Width` | número > 0 | sin valor | Ancho de la página, sin `Paper`. |
 | `Height` | número > 0 | sin valor | Alto de la página, sin `Paper`. |
 | `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo medidas, sin porcentajes. |
+| `Mirror margins` | `true`, `false` | `false` | En las páginas físicas pares, el margen izquierdo y el derecho se intercambian ([márgenes espejo](#márgenes-espejo)). Con los dos iguales es `MIRROR_MARGINS_WITHOUT_EFFECT`. |
 
 El tamaño de la página se declara **de una sola forma**: un `Paper` (con su `Orientation`, si es apaisada) o un `Width` y
 un `Height`. Declarar `Paper` con `Width` o `Height`, `Orientation` sin `Paper`, solo uno de `Width` y `Height`, o ninguna
@@ -134,9 +135,11 @@ Su contenido son elementos en flujo, `Frame`, `Overlay` y `Page overlay`.
 ### El `Page` de una sección
 
 Hereda del `Page` del documento **por grupos**: el tamaño (`Paper` con su `Orientation`, o `Width` y `Height`) se hereda
-entero o se declara entero, y `Margin` se hereda o se declara. Una sección que solo declara `Orientation` gira el `Paper`
-del documento (`Orientation: landscape` sobre un documento A4 es un A4 apaisado). Si el documento declara `Width` y
-`Height`, no hay papel que girar y es `PAGE_SIZE`. Declarar `Paper` con `Width` o `Height` sigue siendo `PAGE_SIZE`.
+entero o se declara entero, y los márgenes (`Margin` con su `Mirror margins`) se heredan juntos o se declaran juntos: una
+sección que declara `Margin` sin `Mirror margins` no los espeja, y `Mirror margins` sin `Margin` es `PAGE_SIZE`. Una sección
+que solo declara `Orientation` gira el `Paper` del documento (`Orientation: landscape` sobre un documento A4 es un A4
+apaisado). Si el documento declara `Width` y `Height`, no hay papel que girar y es `PAGE_SIZE`. Declarar `Paper` con
+`Width` o `Height` sigue siendo `PAGE_SIZE`.
 
 > **Decisión:** herencia por grupos, para que `Orientation: landscape` sola dé el papel del documento apaisado.
 > *Alternativa descartada:* un `Page` completo en cada sección.
@@ -231,6 +234,39 @@ La primera sección ya empieza en la página 1: `Begin on: odd` en ella no tendr
 > **Decisión:** la paridad es la de la página física, que es la que decide el lado al imprimir. Solo `odd`: empezar en
 > par casi no se usa y obligaría a una página en blanco antes de la primera sección. *Alternativa descartada:* la
 > paridad del número impreso, que no existe en una sección `none` y no siempre coincide con el lado.
+
+### Márgenes espejo
+
+En un libro, el margen interior, el del lomo, es distinto del exterior, y cambia de lado con la página. `Mirror margins:
+true` en `Page` lo hace: `Margin` da los márgenes de las páginas físicas **impares**, las de la derecha, y en las **pares** el
+margen izquierdo y el derecho se intercambian. El área útil mide lo mismo en las dos caras, así que el contenido se
+reparte igual: solo cambia dónde empieza.
+
+```
+Page:
+    Paper: A5
+    Margin: 40 30 50 60
+    Mirror margins: true
+```
+
+da un margen interior de 60 y uno exterior de 30: en las impares, 60 a la izquierda y 30 a la derecha; en las pares, al
+revés. La paridad es la de la página física, la misma de `Begin on`; la página en blanco que deja `Begin on: odd` es par
+y lleva los márgenes de las pares, aunque no tenga nada que colocar.
+
+- Los `Page overlay` **no se mueven solos**: se colocan en el área útil de cada página, que es la que cambia de sitio, y
+  el que está pegado a su borde izquierdo lo sigue estando en las dos caras. Un folio en el exterior son dos `Page
+  overlay`, uno con `Pages: odd` a la derecha y otro con `Pages: even` a la izquierda.
+- Una sección lo hereda **junto con `Margin`** ([arriba](#el-page-de-una-sección)): la que declara `Margin` empieza de
+  nuevo, sin espejo salvo que lo escriba.
+- `Mirror margins: true` con el margen izquierdo igual al derecho no cambia nada y es `MIRROR_MARGINS_WITHOUT_EFFECT`.
+
+> **Decisión:** `Margin` es el de las páginas impares, las de la derecha, que son las primeras de cada sección con
+> `Begin on: odd`: así el margen interior es el izquierdo, como se escribe. *Alternativa descartada:* un `Inside` y un
+> `Outside` además de `Margin`, que darían dos formas al mismo margen.
+
+> **Decisión:** los `Page overlay` no se espejan: un pie centrado no necesita nada y uno exterior se escribe con `Pages`,
+> que ya existe y deja la posición a la vista. *Alternativa descartada:* espejar su `Offset` en las páginas pares, que
+> movería también lo que no debe moverse (un logotipo siempre a la izquierda).
 
 ## Lo que no hay
 

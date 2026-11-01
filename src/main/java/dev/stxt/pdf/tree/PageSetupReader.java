@@ -4,10 +4,12 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static dev.stxt.pdf.tree.Nodes.child;
@@ -48,7 +50,8 @@ final class PageSetupReader {
     /**
      * The medium (reference/components/document.md): its size is a {@code Paper} with its {@code Orientation} or a
      * {@code Width} and a {@code Height}, never both; the schema only knows that each one appears once. The one of a
-     * section inherits by groups the one of the document, {@code base} ({@code null} in the one of the document).
+     * section inherits by groups the one of the document, {@code base} ({@code null} in the one of the document): the
+     * size, and the margins with their {@code Mirror margins}.
      */
     static Spec pageSetup(InlineNode n, Spec base) {
         Optional<Node> orientation = child(n, "orientation");
@@ -79,14 +82,35 @@ final class PageSetupReader {
             width = points(widthNode.get());
             height = points(heightNode.get());
         }
+        // The margins are a group too: Margin with its Mirror margins, inherited together or declared together.
         Optional<Node> marginNode = child(n, "margin");
-        Insets margin = marginNode.map(PageSetupReader::margin)
-                .orElse(base != null ? base.pageSetup().margin() : Insets.ZERO);
-        PageSetup pageSetup = new PageSetup(width, height, margin);
+        Optional<Node> mirrorNode = child(n, "mirror-margins");
+        Insets margin;
+        boolean mirror;
+        if (marginNode.isPresent() || base == null) {
+            margin = marginNode.map(PageSetupReader::margin).orElse(Insets.ZERO);
+            mirror = mirrorNode.map(ValueReader::bool).orElse(false);
+        } else if (mirrorNode.isPresent()) {
+            throw error(mirrorNode.get(), ErrorCode.PAGE_SIZE, "Mirror margins goes with Margin: the section inherits "
+                    + "both from the document or declares both");
+        } else {
+            margin = base.pageSetup().margin();
+            mirror = base.pageSetup().mirrorMargins();
+        }
+        if (mirror && Tolerance.same(margin.left(), margin.right())) {
+            throw error(mirrorNode.orElseThrow(), ErrorCode.MIRROR_MARGINS_WITHOUT_EFFECT, "Mirror margins: true has "
+                    + "no effect with equal left and right margins (" + pt(margin.left()) + "): the even pages swap "
+                    + "them, so the margins have to differ, or Mirror margins is not needed");
+        }
+        PageSetup pageSetup = new PageSetup(width, height, margin, mirror);
         if (pageSetup.pageArea().width() <= 0 || pageSetup.pageArea().height() <= 0) {
             throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "The margins of the page leave no page area");
         }
         return new Spec(pageSetup, named);
+    }
+
+    private static String pt(double v) {
+        return String.format(Locale.ROOT, "%.2f", v).replaceAll("\\.?0+$", "") + " pt";
     }
 
     /**

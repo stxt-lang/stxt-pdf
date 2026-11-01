@@ -8,15 +8,37 @@ import dev.stxt.pdf.model.Value;
  * The output medium (reference/components/document.md): a sequence of pages of fixed size. It defines the initial
  * reference container: the page area.
  *
- * @param width  width of the page, in pt
- * @param height height of the page, in pt
- * @param margin page margins, in pt
+ * <p>With {@code Mirror margins}, {@code margin} is the one of the odd physical pages (the right-hand ones when
+ * printing double-sided) and the even pages swap its left and right: {@link #forPage(int)} gives the medium of each
+ * page. The page area measures the same on both sides, so the flow does not depend on the side.</p>
+ *
+ * @param width         width of the page, in pt
+ * @param height        height of the page, in pt
+ * @param margin        page margins, in pt: those of the odd pages if {@code mirrorMargins}
+ * @param mirrorMargins whether the even pages swap the left and right margins ({@code Mirror margins})
  */
-public record PageSetup(double width, double height, Insets margin) {
+public record PageSetup(double width, double height, Insets margin, boolean mirrorMargins) {
+
+    /** A medium without {@code Mirror margins}. */
+    public PageSetup(double width, double height, Insets margin) {
+        this(width, height, margin, false);
+    }
 
     /** Page area: the initial reference container and the one of {@code Page overlay} boxes. */
     public Rect pageArea() {
         return new Rect(margin.left(), margin.top(), width - margin.horizontal(), height - margin.vertical());
+    }
+
+    /**
+     * The medium of the physical page {@code number} (from 1): with {@code Mirror margins}, an even page swaps the
+     * left and right margins; otherwise it is this one.
+     */
+    public PageSetup forPage(int number) {
+        if (!mirrorMargins || number % 2 != 0) {
+            return this;
+        }
+        return new PageSetup(width, height, new Insets(margin.top(), margin.left(), margin.bottom(), margin.right()),
+                true);
     }
 
     /**

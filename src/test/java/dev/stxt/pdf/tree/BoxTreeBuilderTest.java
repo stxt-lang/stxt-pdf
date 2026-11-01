@@ -242,6 +242,32 @@ class BoxTreeBuilderTest {
     }
 
     /**
+     * {@code Mirror margins} (reference/components/document.md): a section inherits it together with {@code Margin}, and
+     * one that declares {@code Margin} declares the group again, without mirroring unless it says so.
+     */
+    @Test
+    void mirrorMarginsAreInheritedWithTheMargin() {
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tPaper: A4\n"
+                + "\t\tMargin: 40 30 40 50\n\t\tMirror margins: true\n"
+                + "\tSection:\n\t\tBlock:\n"
+                + "\tSection:\n\t\tPage:\n\t\t\tOrientation: landscape\n\t\tBlock:\n"
+                + "\tSection:\n\t\tPage:\n\t\t\tMargin: 20\n\t\tBlock:\n"
+                + "\tSection:\n\t\tPage:\n\t\t\tMargin: 20 10 20 30\n\t\t\tMirror margins: true\n\t\tBlock:\n";
+        BoxTreeBuilder.Result r = build(doc);
+        assertTrue(r.pageSetup().mirrorMargins());
+        assertEquals(new dev.stxt.pdf.model.Insets(40, 30, 40, 50), r.pageSetup().margin());
+        // Inherited, and inherited together with the margin when the section only rotates the paper.
+        assertTrue(r.sections().get(0).pageSetup().mirrorMargins());
+        assertTrue(r.sections().get(1).pageSetup().mirrorMargins());
+        assertEquals(new dev.stxt.pdf.model.Insets(40, 30, 40, 50), r.sections().get(1).pageSetup().margin());
+        // Declared again without Mirror margins: not mirrored.
+        assertFalse(r.sections().get(2).pageSetup().mirrorMargins());
+        assertEquals(new dev.stxt.pdf.model.Insets(20, 20, 20, 20), r.sections().get(2).pageSetup().margin());
+        assertTrue(r.sections().get(3).pageSetup().mirrorMargins());
+        assertEquals(new dev.stxt.pdf.model.Insets(20, 10, 20, 30), r.sections().get(3).pageSetup().margin());
+    }
+
+    /**
      * {@code Paper} and {@code Orientation} (reference/components/document.md): the size in portrait, rotated with
      * {@code landscape}.
      */

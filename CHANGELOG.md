@@ -128,6 +128,15 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   page; the box is not split across pages (`Keep together` or `Edges` on it are `BREAK_IN_CLIPPED`, new code, and a
   `Break` inside it, `BREAK_IN_UNBREAKABLE`). The sizes of the boxes do not change: `shrink` fits the text to them, and
   `clip` cuts what sticks out.
+- **Mirror margins.** `Mirror margins: true` in `Page` (`false` by default) swaps the left and right margins on the even
+  physical pages, for double-sided printing: `Margin` is that of the odd pages, the right-hand ones, so the inner margin
+  is the left one. The page area measures the same on both sides, so the flow does not change; the `Page overlay`
+  elements are placed in the page area of each page and do not change sides (a folio on the outside is two of them,
+  with `Pages: odd` and `Pages: even`). A `Section` inherits it together with `Margin`: one that declares `Margin`
+  starts afresh, without mirroring unless it says so, and `Mirror margins` without `Margin` in a section is
+  `PAGE_SIZE`. With equal left and right margins it is `MIRROR_MARGINS_WITHOUT_EFFECT` (new code). In the Java API,
+  `PageSetup` has a fourth component, `mirrorMargins`, and `forPage(number)` gives the medium of each page, which is
+  the one `Page.pageSetup()` carries.
 
 ## [0.8.0] - 2026-10-31
 

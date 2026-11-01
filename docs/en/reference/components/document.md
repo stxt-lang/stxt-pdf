@@ -57,6 +57,7 @@ can declare its own, which inherits from the document's by groups ([below](#the-
 | `Width` | number > 0 | none | Width of the page, without `Paper`. |
 | `Height` | number > 0 | none | Height of the page, without `Paper`. |
 | `Margin` | 1 to 4 numbers | `0` | Page margins. Measurements only, without percentages. |
+| `Mirror margins` | `true`, `false` | `false` | On the even physical pages, the left and right margins are swapped ([mirror margins](#mirror-margins)). With both equal it is `MIRROR_MARGINS_WITHOUT_EFFECT`. |
 
 The size of the page is declared **in one way only**: a `Paper` (with its `Orientation`, if it is landscape) or a `Width` and
 a `Height`. Declaring `Paper` with `Width` or `Height`, `Orientation` without `Paper`, only one of `Width` and `Height`, or neither
@@ -133,9 +134,11 @@ Its content is in-flow elements, `Frame`, `Overlay` and `Page overlay`.
 ### The `Page` of a section
 
 It inherits from the `Page` of the document **by groups**: the size (`Paper` with its `Orientation`, or `Width` and `Height`) is inherited
-whole or declared whole, and `Margin` is inherited or declared. A section that only declares `Orientation` rotates the `Paper`
-of the document (`Orientation: landscape` on an A4 document is a landscape A4). If the document declares `Width` and
-`Height`, there is no paper to rotate and it is `PAGE_SIZE`. Declaring `Paper` with `Width` or `Height` is still `PAGE_SIZE`.
+whole or declared whole, and the margins (`Margin` with its `Mirror margins`) are inherited together or declared together: a
+section that declares `Margin` without `Mirror margins` does not mirror them, and `Mirror margins` without `Margin` is
+`PAGE_SIZE`. A section that only declares `Orientation` rotates the `Paper` of the document (`Orientation: landscape` on an
+A4 document is a landscape A4). If the document declares `Width` and `Height`, there is no paper to rotate and it is
+`PAGE_SIZE`. Declaring `Paper` with `Width` or `Height` is still `PAGE_SIZE`.
 
 > **Decision:** inheritance by groups, so that `Orientation: landscape` on its own gives the document's paper in landscape.
 > *Rejected alternative:* a complete `Page` in each section.
@@ -230,6 +233,39 @@ The first section already begins on page 1: `Begin on: odd` in it would have no 
 > **Decision:** the parity is that of the physical page, which is what decides the side when printing. Only `odd`: beginning on an
 > even page is hardly used and would force a blank page before the first section. *Rejected alternative:* the
 > parity of the printed number, which does not exist in a `none` section and does not always match the side.
+
+### Mirror margins
+
+In a book, the inner margin, the one at the spine, differs from the outer one, and it changes sides with the page.
+`Mirror margins: true` in `Page` does that: `Margin` gives the margins of the **odd** physical pages, the right-hand ones,
+and on the **even** ones the left and right margins are swapped. The page area measures the same on both sides, so the
+content is distributed the same way: only where it starts changes.
+
+```
+Page:
+    Paper: A5
+    Margin: 40 30 50 60
+    Mirror margins: true
+```
+
+gives an inner margin of 60 and an outer one of 30: on the odd pages, 60 on the left and 30 on the right; on the even
+ones, the other way round. The parity is that of the physical page, the same as in `Begin on`; the blank page that
+`Begin on: odd` leaves is even and carries the margins of the even pages, although it has nothing to place.
+
+- The `Page overlay` elements **do not move on their own**: they are placed in the page area of each page, which is
+  what changes place, and one stuck to its left edge stays there on both sides. A folio on the outside is two `Page
+  overlay` elements, one with `Pages: odd` on the right and another with `Pages: even` on the left.
+- A section inherits it **together with `Margin`** ([above](#the-page-of-a-section)): one that declares `Margin` starts
+  afresh, without mirroring unless it says so.
+- `Mirror margins: true` with the left margin equal to the right one changes nothing and is `MIRROR_MARGINS_WITHOUT_EFFECT`.
+
+> **Decision:** `Margin` is that of the odd pages, the right-hand ones, which are the first of each section with
+> `Begin on: odd`: that way the inner margin is the left one, as it is written. *Rejected alternative:* an `Inside` and an
+> `Outside` besides `Margin`, which would give two forms to the same margin.
+
+> **Decision:** the `Page overlay` elements are not mirrored: a centered footer needs nothing, and an outer one is written
+> with `Pages`, which already exists and keeps the position in sight. *Rejected alternative:* mirroring their `Offset` on
+> the even pages, which would also move what must not move (a logo always on the left).
 
 ## What is not supported
 

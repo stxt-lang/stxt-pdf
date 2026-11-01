@@ -209,7 +209,10 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
 `Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
 (`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`). `Page` lleva su `PageSetup`, su
-sección, su `printed` (0 = sin número) y su estilo. Un `Page overlay` del documento se pone con `PendingOverlay(box, 0, 0)`
+sección, su `printed` (0 = sin número) y su estilo. El `PageSetup` de una página es el de su sección pasado por
+`forPage(número)`: con `Mirror margins`, en las páginas físicas pares lleva el margen izquierdo y el derecho
+intercambiados, y como el área útil mide lo mismo en las dos caras, el flujo se maqueta una sola vez y el pintado, el
+volcado y `Overflow` no saben de caras. Un `Page overlay` del documento se pone con `PendingOverlay(box, 0, 0)`
 en cada página de cada sección que lo hereda, y `Pages.includes` se evalúa con las páginas de su alcance.
 
 **Páginas en blanco.** Tras el flujo, `blankAfter` mira qué secciones dejan la siguiente, con `Begin on: odd`, en una

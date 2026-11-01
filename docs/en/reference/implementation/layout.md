@@ -209,7 +209,10 @@ line when the sum is within `Tolerance.MODEL` of the available width.
 `Paginator` makes one flow pass per section (`flow`) with **a single convergence** of the references, and computes with
 `Numbering` the printed number of each page (the counter, `restart` with its `Start` and `none`), the last one of its page sequence
 (`{pages}`) and its `Page number format`, with which it writes them (`label`, `totalLabel`). `Page` carries its `PageSetup`, its
-section, its `printed` (0 = no number) and its style. A `Page overlay` of the document is placed with `PendingOverlay(box, 0, 0)`
+section, its `printed` (0 = no number) and its style. The `PageSetup` of a page is that of its section passed through
+`forPage(number)`: with `Mirror margins`, on the even physical pages it carries the left and right margins swapped, and
+since the page area measures the same on both sides, the flow is laid out once and the painting, the dump and
+`Overflow` know nothing about sides. A `Page overlay` of the document is placed with `PendingOverlay(box, 0, 0)`
 on each page of each section that inherits it, and `Pages.includes` is evaluated with the pages in its scope.
 
 **Blank pages.** After the flow, `blankAfter` looks at which sections leave the next one, with `Begin on: odd`, on an

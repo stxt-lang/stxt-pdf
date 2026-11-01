@@ -66,7 +66,8 @@ public final class Paginator {
     /**
      * Paginates the document: each section from its first page, with its {@link PageSetup}, and its
      * {@code Page overlay}s and those of the document (reference/components/document.md). The references converge
-     * for the whole document at once.
+     * for the whole document at once. With {@code Mirror margins}, each page gets the medium of its side
+     * ({@link PageSetup#forPage}): the page area measures the same on both, so the flow is laid out once.
      */
     public List<Page> paginate(BoxTreeBuilder.Result tree) {
         Box root = tree.root();
@@ -185,17 +186,19 @@ public final class Paginator {
                 Fragment content = numbered && printed > 0
                         ? engine.number(own.get(i).fragment(), numbering.label(number), numbering.totalLabel(number))
                         : own.get(i).fragment();
-                pages.add(new Page(number, content, pageOverlayFragments, section.pageSetup(), k, printed,
-                        numbering.style(number), false));
+                // The medium of the page: with Mirror margins, an even page swaps the left and right margins.
+                pages.add(new Page(number, content, pageOverlayFragments, section.pageSetup().forPage(number), k,
+                        printed, numbering.style(number), false));
             }
             if (flow.blankAfter()[k]) {
                 // The blank page so that the next one starts on an odd page: of this section, without content or
                 // Page overlay (reference/components/document.md).
                 int number = pages.size() + 1;
-                Rect area = section.pageSetup().pageArea();
+                PageSetup pageSetup = section.pageSetup().forPage(number);
+                Rect area = pageSetup.pageArea();
                 Fragment empty = new Fragment(section.box(), 0, 0, area.width(), area.height(), Insets.ZERO,
                         Insets.ZERO, Insets.ZERO, List.of(), List.of(), true, true);
-                pages.add(new Page(number, empty, List.of(), section.pageSetup(), k, numbering.printed(number),
+                pages.add(new Page(number, empty, List.of(), pageSetup, k, numbering.printed(number),
                         numbering.style(number), true));
             }
         }

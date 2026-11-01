@@ -1,0 +1,21 @@
+# Case: Mirror margins in the Page of a section without Margin, which is inherited or declared together with it
+# Code: PAGE_SIZE
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Paper: A4
+		Margin: 40 30 40 50
+		Mirror margins: true
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Paragraph: Uno
+	Section:
+		Page:
+			Mirror margins: false
+		Paragraph: Dos

@@ -183,7 +183,7 @@ once, and the elements, as many times as needed.
 |---|---|
 | `Document` | `Page`, `Title` and `Language` (exactly one of each), `Styles`; `Page overlay`, `Section` (at least one) |
 | `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`; elements |
-| `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
+| `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`; elements |
