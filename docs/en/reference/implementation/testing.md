@@ -120,7 +120,11 @@ the valid cases, and the invalid ones go to the catalog.
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs `mvn test` with JDK 17 and 21 and with the JVM in Turkish (which checks that the locale of the JVM does not
-change anything and that the tree is left clean), and, in the daily run and when run by hand, on Windows.
+change anything and that the tree is left clean), and, in the daily run and when run by hand, on Windows. veraPDF
+(`PdfUa`) validates with the neutral locale as the default of the JVM, because in 1.28.2 it lowercases the value types of
+the XMP extension schemas with the default locale and in Turkish `Integer`, the type of `pdfuaid:part`, becomes a type it
+does not know: every PDF/A would fail 6.6.2.3.1 and 6.6.2.3.3 with a PDF that is byte for byte the one of any other
+locale.
 
 ## The dump
 

@@ -119,7 +119,10 @@ los casos válidos, y los inválidos van al catálogo.
 ## Integración continua
 
 `.github/workflows/ci.yml` ejecuta `mvn test` con JDK 17 y 21 y con la JVM en turco (que comprueba que el idioma de la JVM no
-cambia nada y que el árbol queda limpio), y, en la ejecución diaria y a mano, en Windows.
+cambia nada y que el árbol queda limpio), y, en la ejecución diaria y a mano, en Windows. veraPDF (`PdfUa`) valida con el
+locale neutro como predeterminado de la JVM, porque en 1.28.2 pasa a minúsculas los tipos de valor de los esquemas de
+extensión XMP con el locale predeterminado y en turco `Integer`, el tipo de `pdfuaid:part`, se convierte en un tipo que no
+conoce: todo PDF/A fallaría 6.6.2.3.1 y 6.6.2.3.3 con un PDF que es byte a byte el de cualquier otro locale.
 
 ## El volcado
 
