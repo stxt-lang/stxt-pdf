@@ -78,14 +78,19 @@ pero uno por **esquina**: arriba a la izquierda, arriba a la derecha, abajo a la
 **opacidad** (`FF` o `F`, opaco, y `00`, transparente) y, si falta, el color es opaco. Vale en todas las propiedades de
 color (`Color`, `Border color`, `Background`, `Separator color`).
 
+En lugar del valor hexadecimal se puede escribir el **nombre** de un color declarado en `Styles` con `Named color`
+(`Named color: brand #12315A`, y después `Color: brand`), también en cada color de `Border color` y de un degradado
+([Styles](styles.md#colores-con-nombre)). Un valor que empieza por `#` y no es un color hexadecimal es `VALUE_SYNTAX`; uno
+con forma de nombre que no está declarado es `COLOR_UNKNOWN`.
+
 > **Decisión:** la opacidad va en cada color. No hay `Opacity` de la caja, que afectaría a todo lo que contiene.
 
 El fondo también admite un **degradado lineal**: `linear(ángulo, color, color, ...)`, con el ángulo en grados (`0` va hacia
 arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores, repartidos a partes iguales:
 `linear(180, #12315A00, #12315A)`. Cómo se pinta está en [La caja](box.md#degradado).
 
-No hay colores con nombre (`red`), funciones de color (`rgb()`), paradas con posición ni degradados radiales, cónicos o
-repetidos.
+No hay nombres de color predefinidos (`red`): cada nombre se declara con `Named color`. Tampoco hay funciones de color
+(`rgb()`), paradas con posición ni degradados radiales, cónicos o repetidos.
 
 ## Booleanos y enteros
 

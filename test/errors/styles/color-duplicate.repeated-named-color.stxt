@@ -1,0 +1,15 @@
+# Case: Two Named color with the same name in Styles
+# Code: COLOR_DUPLICATE
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		Named color: marca #12315A
+		Named color: fondo #EEF3F8
+		Named color: marca #1B6E8C
+	Section:
+		Text: Hola

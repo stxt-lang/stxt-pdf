@@ -18,14 +18,14 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 7
-				Color: #6B635C
+				Color: gray
 			Stack:
 				Horizontal: justify
 				Item:
 					Text: Gaceta del Valle
 						Typography:
 							Bold: true
-							Color: #A4301F
+							Color: red
 							Case: uppercase
 							Letter spacing: 0.8
 				Item:
@@ -36,7 +36,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 5 0 0 0
 				Border: 0.5 0 0 0
-				Border color: #CFC8C0
+				Border color: rule
 			Stack:
 				Horizontal: justify
 				Item:
@@ -49,7 +49,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 6 0 6 0
 				Border: 3 0 1 0
-				Border color: #1C1A19
+				Border color: ink
 				Margin: 0 0 14 0
 			Text: Gaceta del Valle
 				Typography:
@@ -62,7 +62,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Padding: 4 0 0 0
 					Border: 0.5 0 0 0
-					Border color: #1C1A19
+					Border color: ink
 				Typography:
 					Font: IBM Plex Sans
 					Size: 7.5
@@ -93,7 +93,7 @@ Document (dev.stxt.pdf):
 				Count: 3
 				Gap: 16
 				Separator: 0.5
-				Separator color: #CFC8C0
+				Separator color: rule
 				Box:
 					Margin: 0 0 6 0
 				Markdown:
@@ -150,7 +150,7 @@ Document (dev.stxt.pdf):
 				Count: 2
 				Gap: 22
 				Separator: 0.5
-				Separator color: #CFC8C0
+				Separator color: rule
 				Box:
 					Margin: 0 0 14 0
 				Markdown:

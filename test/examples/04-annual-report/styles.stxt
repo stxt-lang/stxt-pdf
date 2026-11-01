@@ -1,12 +1,25 @@
 # Styles of the "annual report" example: the reusable rules and the base typography. They are passed along with
 # input.stxt when laying out and rank below the rules that the document itself carries in its Styles.
 Styles (dev.stxt.pdf):
+	# The palette: each color once, by its name.
+	Named color: ink #1E2A3A
+	Named color: navy #12315A
+	Named color: slate #5B6B7C
+	Named color: gray #687788
+	Named color: rule #C9D5E3
+	Named color: cell-rule #D5DEE9
+	Named color: teal #1B6E8C
+	Named color: copper #B16118
+	Named color: orange #E07B1F
+	Named color: mist #EEF3F8
+	Named color: pale-teal #EEF6F8
+	Named color: white #FFFFFF
 	For element: Document
 		Typography:
 			Font: IBM Plex Sans
 			Size: 9.5
 			Line height: 14.5
-			Color: #1E2A3A
+			Color: ink
 			Numbered: true
 			Kerning: true
 	For element: Heading 1
@@ -15,19 +28,19 @@ Styles (dev.stxt.pdf):
 			Size: 26
 			Line height: 30
 			Bold: true
-			Color: #12315A
+			Color: navy
 		Box:
 			Margin: 0 0 14 0
 			Padding: 0 0 10 0
 			Border: 0 0 1 0
-			Border color: #C9D5E3
+			Border color: rule
 	For element: Heading 2
 		Typography:
 			Font: IBM Plex Serif
 			Size: 13
 			Line height: 17
 			Bold: true
-			Color: #12315A
+			Color: navy
 		Box:
 			Margin: 14 0 5 0
 	For element: Paragraph
@@ -44,11 +57,11 @@ Styles (dev.stxt.pdf):
 		Box:
 			Padding: 6 8
 			Border: 0 0 0.5 0
-			Border color: #D5DEE9
+			Border color: cell-rule
 	For element: Page overlay
 		Typography:
 			Size: 7.5
-			Color: #687788
+			Color: gray
 	For style: section
 		Break:
 			Before: page
@@ -58,7 +71,7 @@ Styles (dev.stxt.pdf):
 			Italic: true
 			Size: 12.5
 			Line height: 18
-			Color: #12315A
+			Color: navy
 			Align: left
 		Box:
 			Margin: 0 0 14 0
@@ -66,7 +79,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 8
 			Bold: true
-			Color: #B16118
+			Color: copper
 			Case: uppercase
 			Letter spacing: 1
 		Box:
@@ -75,7 +88,7 @@ Styles (dev.stxt.pdf):
 		Box:
 			Padding: 10 0 0 0
 			Border: 2 0 0 0
-			Border color: #12315A
+			Border color: navy
 		Typography:
 			Size: 8.5
 			Line height: 12.5
@@ -83,27 +96,27 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Size: 7.5
 			Bold: true
-			Color: #FFFFFF
+			Color: white
 			Align: center
 		Box:
-			Background: #1B6E8C
+			Background: teal
 	For style: tile
 		Box:
-			Background: #EEF3F8
+			Background: mist
 			Padding: 14 14 12 14
 			Border: 0 0 0 3
-			Border color: #E07B1F
+			Border color: orange
 	For style: figure
 		Typography:
 			Font: IBM Plex Serif
 			Size: 21
 			Line height: 26
 			Bold: true
-			Color: #12315A
+			Color: navy
 	For style: caption
 		Typography:
 			Size: 8
-			Color: #5B6B7C
+			Color: slate
 			Align: left
 		Box:
 			Margin: 4 0 12 0
@@ -117,27 +130,27 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Bold: true
 			Size: 8
-			Color: #FFFFFF
+			Color: white
 		Box:
-			Background: #12315A
+			Background: navy
 	For style: total
 		Typography:
 			Bold: true
-			Color: #12315A
+			Color: navy
 		Box:
-			Background: #EEF3F8
+			Background: mist
 			Border: 1.5 0 0 0
-			Border color: #12315A
+			Border color: navy
 	For style: quote
 		Box:
 			Padding: 12 16
 			Margin: 6 0 12 0
 			Border: 0 0 0 3
-			Border color: #1B6E8C
-			Background: #EEF6F8
+			Border color: teal
+			Background: pale-teal
 		Typography:
 			Font: IBM Plex Serif
 			Italic: true
 			Size: 11
 			Line height: 16
-			Color: #12315A
+			Color: navy

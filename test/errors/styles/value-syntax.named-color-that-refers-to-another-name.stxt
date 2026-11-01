@@ -1,0 +1,14 @@
+# Case: A Named color whose color is another name
+# Code: VALUE_SYNTAX
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		Named color: marca #12315A
+		Named color: titulo marca
+	Section:
+		Text: Hola

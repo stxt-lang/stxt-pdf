@@ -184,7 +184,7 @@ once, and the elements, as many times as needed.
 | `Document` | `Page`, `Title` and `Language` (exactly one of each), `Styles`; `Page overlay`, `Section` (at least one) |
 | `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin` |
-| `Styles` | `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
+| `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`; elements |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`; `Item`, `Overlay`, `Page overlay` |
@@ -214,7 +214,7 @@ once, and the elements, as many times as needed.
 *Elements* are `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`,
 `Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` and `Page overlay`. *In-flow elements* are all except `Overlay` and `Page overlay`.
 
-Only the properties (not the groups), `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` and the `Styles` rules carry a value on their line.
+Only the properties (not the groups), `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, the `Styles` rules and `Named color` carry a value on their line.
 `Block: something` is an error. `Content` always goes in a `>>` block, and `Areas`, inline or in a block. What the schema cannot
 express (that `Page` declares its size in a single way, that an `Item` has exactly one element, the order of the
 parts of a table) is checked by the engine, with the codes of [Errors](errors.md).

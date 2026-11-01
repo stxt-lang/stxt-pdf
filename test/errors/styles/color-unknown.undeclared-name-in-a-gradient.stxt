@@ -1,0 +1,15 @@
+# Case: An undeclared name in a gradient of a rule that is not applied
+# Code: COLOR_UNKNOWN
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For style: portada
+			Box:
+				Background: linear(180, #FFFFFF, marca)
+	Section:
+		Text: Hola

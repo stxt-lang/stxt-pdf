@@ -81,9 +81,21 @@ public final class Style extends StyleGroup {
      * (reference/components/table-of-contents.md). Not inherited.
      */
     private boolean inTableOfContents = true;
+    /** The names of {@code Named color} with which its colors are read; all the boxes share those of the root. */
+    private NamedColors namedColors = NamedColors.NONE;
 
     /** Only {@code tree} creates it: the style of each box comes from {@link BoxTreeBuilder}. */
     Style() {
+    }
+
+    /** A style whose colors can be the names of {@code Named color} (reference/common/styles.md). */
+    Style(NamedColors namedColors) {
+        this.namedColors = namedColors;
+    }
+
+    /** The names of {@code Named color} that its color properties can write. */
+    NamedColors namedColors() {
+        return namedColors;
     }
 
     // --- Groups ------------------------------------------------------------------------------------
@@ -264,6 +276,7 @@ public final class Style extends StyleGroup {
     static Style inheriting(Style parent) {
         Style s = new Style();
         if (parent != null) {
+            s.namedColors = parent.namedColors;
             s.typography = new TypographyStyle(parent.typography);
             for (String p : LINED_PROPERTIES) {
                 if (parent.lines.containsKey(p)) {

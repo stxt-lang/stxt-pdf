@@ -57,6 +57,9 @@ En hexadecimal: `#RGB` o `#RRGGBB` (`#000`, `#A32D2D`). Con un dígito o un par 
 `#RRGGBBAA` (`#12315A80` es azul a medias, `00` es transparente, `FF` opaco). Valen en el color del texto, del borde, del
 fondo y de la línea entre columnas.
 
+Un color que se repite se puede declarar una vez con nombre en `Styles` (`Named color: brand #12315A`) y escribir
+después `Color: brand` ([Colores con nombre](styles.md#colores-con-nombre)).
+
 ## Degradados
 
 Un fondo puede ser un degradado: `linear(ángulo, color, color, ...)`. El ángulo está en grados: `0` va de abajo arriba,

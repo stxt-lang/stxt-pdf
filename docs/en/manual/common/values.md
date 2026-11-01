@@ -58,6 +58,9 @@ In hexadecimal: `#RGB` or `#RRGGBB` (`#000`, `#A32D2D`). With one more digit or 
 `#RRGGBBAA` (`#12315A80` is half-transparent blue, `00` is transparent, `FF` opaque). They are valid in the color of the
 text, of the border, of the background and of the rule between columns.
 
+A color that repeats can be declared once with a name in `Styles` (`Named color: brand #12315A`) and then written as
+`Color: brand` ([Named colors](styles.md#named-colors)).
+
 ## Gradients
 
 A background can be a gradient: `linear(angle, color, color, ...)`. The angle is in degrees: `0` goes from bottom to

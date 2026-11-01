@@ -1,0 +1,13 @@
+# Case: A Named color called linear, the name of the gradient
+# Code: VALUE_NOT_ALLOWED
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		Named color: linear #12315A
+	Section:
+		Text: Hola

@@ -100,7 +100,7 @@ final class PropertyReader {
             entry("size", (p, s) -> s.typography().setFontSize(positive(p))),
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
             entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
-            entry("color", (p, s) -> s.typography().setColor(color(p))),
+            entry("color", (p, s) -> s.typography().setColor(color(p, s.namedColors()))),
             entry("line-breaking", (p, s) -> s.typography().setLineBreaking(enumValue(LineBreaking.class, p))),
             entry("hyphenate", (p, s) -> s.typography().setHyphenate(bool(p))),
             entry("markup", (p, s) -> s.typography().setMarkup(enumValue(Markup.class, p))),
@@ -158,9 +158,9 @@ final class PropertyReader {
                 case "margin" -> s.box().setMargin(sides(p, LENGTH_OR_AUTO, true));
                 case "padding" -> s.box().setPadding(nonNegativeSides(p, true));
                 case "border" -> s.box().setBorder(nonNegativeSides(p, false));
-                case "border-color" -> s.box().setBorderColor(colorSides(p));
+                case "border-color" -> s.box().setBorderColor(colorSides(p, s.namedColors()));
                 case "corner-radius" -> s.box().setCornerRadius(radius(p));
-                case "background" -> s.box().setBackground(paint(p));
+                case "background" -> s.box().setBackground(paint(p, s.namedColors()));
                 default -> throw unread(p);
             }
         }
@@ -304,7 +304,7 @@ final class PropertyReader {
             case "min-column-width" -> s.columns().setMinColumnWidth(positive(p));
             case "gap" -> s.columns().setColumnGap(columnGap(p));
             case "separator" -> s.columns().setSeparator(positive(p));
-            case "separator-color" -> s.columns().setSeparatorColor(color(p));
+            case "separator-color" -> s.columns().setSeparatorColor(color(p, s.namedColors()));
             case "balance" -> s.columns().setBalance(bool(p));
             default -> throw unread(p);
         }

@@ -1,0 +1,15 @@
+# Case: A color with a name that no Named color declares
+# Code: COLOR_UNKNOWN
+# Line: 15
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		Named color: marca #12315A
+	Section:
+		Text: Hola
+			Typography:
+				Color: azul

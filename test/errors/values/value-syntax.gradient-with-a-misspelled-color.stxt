@@ -10,4 +10,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Block:
 			Box:
-				Background: linear(90, #FFFFFF, rojo)
+				Background: linear(90, #FFFFFF, #FF00GG)

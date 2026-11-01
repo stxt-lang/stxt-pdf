@@ -59,6 +59,8 @@ final class StyleRules {
     private final List<ColumnRule> columnRules = new ArrayList<>();
     /** The rules that come from the separate styles document: their errors say so. */
     private final Set<InlineNode> external = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** The {@code Named color} of the two sources, read before the rules, which can use them. */
+    private final NamedColors namedColors;
 
     /** A {@code For style} rule. */
     private record ClassRule(String name, InlineNode rule) {
@@ -81,6 +83,7 @@ final class StyleRules {
      * the rule applies to no element; what depends on the element (reference/common/errors.md), when it is applied.
      */
     StyleRules(InlineNode document, InlineNode styles) {
+        namedColors = NamedColors.read(document, styles);
         if (styles != null) {
             load(styles, true);
         }
@@ -91,6 +94,9 @@ final class StyleRules {
     private void load(InlineNode styles, boolean fromFile) {
         Map<String, InlineNode> seen = new HashMap<>();
         for (Node r : styles.getChildren()) {
+            if (r.getCanonicalName().equals("named-color")) {
+                continue; // already read by NamedColors
+            }
             InlineNode rule = inline(r);
             String selector = rule.getText().trim();
             String key = rule.getCanonicalName() + ": " + selector;
@@ -121,7 +127,7 @@ final class StyleRules {
                 }
                 default -> throw unread(rule);
             }
-            read(rule, new Style());
+            read(rule, new Style(namedColors));
         }
     }
 
@@ -156,6 +162,11 @@ final class StyleRules {
                                 Arrays.stream(CellSelector.values()).map(CellSelector::label))
                         .collect(Collectors.joining(", ")) + ")"), fromFile));
         elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(rule);
+    }
+
+    /** The {@code Named color} of the document and of the separate styles document, for the style of the root. */
+    NamedColors namedColors() {
+        return namedColors;
     }
 
     /** An error of a rule; if it comes from the separate styles document, it says so. */

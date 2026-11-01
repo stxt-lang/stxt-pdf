@@ -56,6 +56,44 @@ una regla gana a la herencia: con `For element: Text` y `Size: 10`, un texto mid
 Un nombre de `Style` que no tiene su regla `For style` es un error, para que una errata no pase sin verse. Una regla que
 no se aplica a nada no es un error, para poder reutilizar el mismo `Styles` en muchos documentos.
 
+## Colores con nombre
+
+Un color que se repite (el de la marca, el de los filetes) se declara una vez en `Styles` con `Named color`: el nombre y
+el color, separados por un espacio. Después, el nombre se escribe donde iría el color, en las reglas y en los elementos:
+`Color`, `Border color`, `Background` (también dentro de un degradado) y `Separator color`.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Colores con nombre
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        Named color: brand #12315A
+        Named color: mist #EEF3F8
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Color: brand
+        For style: panel
+            Box:
+                Background: mist
+                Padding: 10
+                Border: 0 0 0 3
+                Border color: brand
+    Section:
+        Heading 1:
+            Text: Informe del trimestre
+        Text: Las ventas han crecido un 12 % respecto al trimestre anterior.
+            Style: panel
+```
+
+El nombre va en minúsculas, empieza por una letra y une sus palabras con un guion (`brand`, `dark-gray`, `gray-2`). Un
+nombre que no está declarado es un error (`COLOR_UNKNOWN`), como lo es declarar dos veces el mismo (`COLOR_DUPLICATE`).
+Cambiar la paleta de un documento es cambiar estas líneas.
+
 ## La tipografía base
 
 `Font` y `Size` no tienen valor por defecto, así que todo documento los declara, normalmente en `For element: Document`. Todo
@@ -63,11 +101,12 @@ lo demás lo hereda de ahí.
 
 ## Estilos en un fichero aparte
 
-Las reglas pueden ir en un documento propio, con raíz `Styles`, para compartirlas entre varios documentos o dejar el
-documento solo con el contenido:
+Las reglas y los colores con nombre pueden ir en un documento propio, con raíz `Styles`, para compartirlos entre varios
+documentos o dejar el documento solo con el contenido:
 
 ```
 Styles (dev.stxt.pdf):
+    Named color: brand #12315A
     For element: Document
         Typography:
             Font: IBM Plex Sans
@@ -75,11 +114,14 @@ Styles (dev.stxt.pdf):
     For style: panel
         Box:
             Padding: 10
+            Border: 0 0 0 3
+            Border color: brand
 ```
 
 El documento no dice dónde está su fichero de estilos: se pasa al convertirlo ([Uso desde Java](java-usage.md)). Si el
 documento tiene también su `Styles`, en cada nivel de la lista de arriba gana el del documento, así que sacar el `Styles`
-a un fichero no cambia nada. Un error en el fichero de estilos empieza por `line 8 of the styles:`, también si se ve al
+a un fichero no cambia nada. Lo mismo vale para los colores: si el documento declara un `Named color` con el nombre de
+uno del fichero, gana el suyo, y todas las reglas que usan ese nombre, también las del fichero, toman su color. Un error en el fichero de estilos empieza por `line 8 of the styles:`, también si se ve al
 maquetar, como una fuente que no existe o una caja que no cabe.
 
 Más detalle en la [referencia](../../reference/common/styles.md).

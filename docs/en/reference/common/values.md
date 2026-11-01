@@ -78,14 +78,19 @@ but one per **corner**: top left, top right, bottom right and bottom left
 **opacity** (`FF` or `F`, opaque, and `00`, transparent) and, if it is missing, the color is opaque. It is valid in all the color
 properties (`Color`, `Border color`, `Background`, `Separator color`).
 
+Instead of the hexadecimal value, the **name** of a color declared in `Styles` with `Named color` can be written
+(`Named color: brand #12315A`, and then `Color: brand`), also in each color of `Border color` and of a gradient
+([Styles](styles.md#named-colors)). A value that starts with `#` and is not a hexadecimal color is `VALUE_SYNTAX`; one
+with the form of a name that is not declared is `COLOR_UNKNOWN`.
+
 > **Decision:** opacity goes in each color. There is no `Opacity` of the box, which would affect everything it contains.
 
 The background also accepts a **linear gradient**: `linear(angle, color, color, ...)`, with the angle in degrees (`0` points
 up, `90` to the right, `180` down) and at least two colors, spread evenly:
 `linear(180, #12315A00, #12315A)`. How it is painted is in [The box](box.md#gradient).
 
-There are no named colors (`red`), color functions (`rgb()`), stops with a position, or radial, conic or
-repeating gradients.
+There are no predefined color names (`red`): each name is declared with `Named color`. Nor are there color functions
+(`rgb()`), stops with a position, or radial, conic or repeating gradients.
 
 ## Booleans and integers
 

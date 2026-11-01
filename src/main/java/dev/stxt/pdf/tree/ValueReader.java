@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import dev.stxt.Node;
-import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.Corners;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Paint;
@@ -309,37 +308,32 @@ final class ValueReader {
         throw error(n, ErrorCode.VALUE_SYNTAX, "Aspect ratio expects 'width/height' or a positive number: " + t);
     }
 
-    static String color(Node n) {
-        String t = n.getText().trim();
-        if (!Colors.isValid(t)) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Invalid color (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + t);
-        }
-        return t;
+    /** A color: {@code #...} or the name of a {@code Named color} ({@link NamedColors}). */
+    static String color(Node n, NamedColors names) {
+        return names.resolve(n, n.getText().trim(), "");
     }
 
     /** {@code Border color}: from 1 to 4 colors, top, right, bottom, left. */
-    static Sides<String> colorSides(Node n) {
+    static Sides<String> colorSides(Node n, NamedColors names) {
         String[] parts = n.getText().trim().split("\\s+");
         if (parts.length > 4) {
             throw error(n, ErrorCode.VALUE_SYNTAX, n.getName() + " allows from 1 to 4 colors and there are " + parts.length);
         }
+        List<String> colors = new java.util.ArrayList<>();
         for (String part : parts) {
-            if (!Colors.isValid(part)) {
-                throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Invalid color (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + part);
-            }
+            colors.add(names.resolve(n, part, ""));
         }
-        return Sides.shorthand(List.of(parts));
+        return Sides.shorthand(colors);
     }
 
     /**
      * {@code Background}: a color or {@code linear(angle, color, color...)}, with the angle in degrees (0
-     * upward, 90 to the right, 180 downward) and at least two colors.
+     * upward, 90 to the right, 180 downward) and at least two colors. Each color can be a name.
      */
-    static Paint paint(Node n) {
+    static Paint paint(Node n, NamedColors names) {
         String t = n.getText().trim();
         if (!t.startsWith("linear(")) {
-            return new Paint.Solid(color(n));
+            return new Paint.Solid(color(n, names));
         }
         if (!t.endsWith(")")) {
             throw error(n, ErrorCode.VALUE_SYNTAX, "linear( is not closed: " + t);
@@ -360,12 +354,7 @@ final class ValueReader {
         }
         List<String> stops = new java.util.ArrayList<>();
         for (int i = 1; i < args.length; i++) {
-            String stop = args[i].trim();
-            if (!Colors.isValid(stop)) {
-                throw error(n, ErrorCode.VALUE_SYNTAX,
-                        "Invalid color in linear (it is written #RGB, #RGBA, #RRGGBB or #RRGGBBAA): " + stop);
-            }
-            stops.add(stop);
+            stops.add(names.resolve(n, args[i].trim(), " in linear"));
         }
         return new Paint.Linear(angle, stops);
     }

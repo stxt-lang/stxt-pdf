@@ -52,6 +52,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `BARCODE_PROPERTY_WITHOUT_EFFECT`; `Keep together` and `Edges` in a `Barcode` are `BREAK_IN_IMAGE`, as in an `Image`.
 - The invoice example (`test/examples/01-invoice`) carries a payment QR code, and the certificate
   (`test/examples/10-certificate`), a QR code with its verification address.
+- **Named colors.** `Named color: brand #12315A`, a repeatable child of `Styles`, gives a name to a hexadecimal color,
+  and the name is then written wherever a color goes: `Color`, `Border color`, `Background` (also inside `linear(...)`)
+  and `Separator color`, in the rules and in the elements. The name is replaced by its color when the document is read,
+  so the PDF is the same as with the color written out. The names of the separate styles document and of the document
+  form a single set, and the document wins: redeclaring a name in the document changes it also in the rules of the
+  styles document. New codes `COLOR_DUPLICATE` (a name repeated in one source) and `COLOR_UNKNOWN` (a color with the form
+  of a name that no `Named color` declares, so `Color: red` now gives this code instead of `VALUE_SYNTAX`); a malformed
+  `Named color` is `VALUE_SYNTAX`, and the name `linear`, `VALUE_NOT_ALLOWED`.
+- The annual report, newsletter and contract examples (`test/examples/04-annual-report`, `05-newsletter` and
+  `07-contract`) declare their palette with `Named color`; their PDFs are byte for byte the same.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

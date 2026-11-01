@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 		Box:
 			Padding: 6 0 0 0
 			Border: 0.5 0 0 0
-			Border color: #C9D5E3
+			Border color: rule
 		Stack:
 			Horizontal: justify
 			Item:
@@ -39,9 +39,9 @@ Document (dev.stxt.pdf):
 			Box:
 				Width: 210mm
 				Height: 297mm
-				Background: #12315A
+				Background: navy
 			Typography:
-				Color: #FFFFFF
+				Color: white
 			Image: examples/report/cover.jpg
 				Id: cover-photo
 				Box:
@@ -51,7 +51,7 @@ Document (dev.stxt.pdf):
 				Offset: 250 0 auto 0
 				Box:
 					Height: 90
-					Background: linear(180, #12315A00, #12315A)
+					Background: linear(180, #12315A00, navy)
 			Block:
 				Box:
 					Padding: 36 56 0 56
@@ -78,21 +78,21 @@ Document (dev.stxt.pdf):
 							Bold: true
 							Size: 44
 							Line height: 48
-							Color: #FFFFFF
+							Color: white
 					Text: and of wind
 						Typography:
 							Font: IBM Plex Serif
 							Bold: true
 							Size: 44
 							Line height: 48
-							Color: #FFFFFF
+							Color: white
 				Text: Cooperativa Solvent · Local renewable energy in the Garrotxa
 					Typography:
 						Font: IBM Plex Serif
 						Italic: true
 						Size: 14
 						Line height: 20
-						Color: #C9D5E3
+						Color: rule
 					Box:
 						Margin: 0 0 90 0
 				Stack:
@@ -108,7 +108,7 @@ Document (dev.stxt.pdf):
 							Text: of clean energy produced
 								Typography:
 									Size: 8.5
-									Color: #C9D5E3
+									Color: rule
 					Item:
 						Grow: 1
 						Block:
@@ -120,7 +120,7 @@ Document (dev.stxt.pdf):
 							Text: customers supplied
 								Typography:
 									Size: 8.5
-									Color: #C9D5E3
+									Color: rule
 					Item:
 						Grow: 1
 						Block:
@@ -132,7 +132,7 @@ Document (dev.stxt.pdf):
 							Text: net result for the year
 								Typography:
 									Size: 8.5
-									Color: #C9D5E3
+									Color: rule
 			Text: Approved by the General Assembly of members on March 21, 2026.
 				Typography:
 					Size: 8
@@ -173,7 +173,7 @@ Document (dev.stxt.pdf):
 			Text: President of the Governing Council
 				Typography:
 					Size: 8.5
-					Color: #5B6B7C
+					Color: slate
 			Heading 2:
 				Text: Milestones of the year
 			Grid:
@@ -291,7 +291,7 @@ Document (dev.stxt.pdf):
 				Count: 2
 				Gap: 26
 				Separator: 0.5
-				Separator color: #C9D5E3
+				Separator color: rule
 				Box:
 					Margin: 0 0 14 0
 				Markdown:

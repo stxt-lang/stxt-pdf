@@ -10,6 +10,6 @@ Document (dev.stxt.pdf):
 	Styles:
 		For element: Grid
 			Box:
-				Background: rojo
+				Background: #12345
 	Section:
 		Text: Hola

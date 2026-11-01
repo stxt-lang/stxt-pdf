@@ -132,7 +132,7 @@ public final class BoxTreeBuilder {
         BuildContext ctx = new BuildContext(new StyleRules(document, styles));
 
         // The typography of For element: Document is inherited by all boxes.
-        Style rootStyle = new Style();
+        Style rootStyle = new Style(ctx.rules.namedColors());
         rootStyle.typography().setLocale(Locale.forLanguageTag(metadata.language()));
         ctx.rules.applyDocument(rootStyle);
         Box root = new Box(null, null, rootStyle, true, document.getLine());

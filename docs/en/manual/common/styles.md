@@ -56,6 +56,44 @@ wins over inheritance: with `For element: Text` and `Size: 10`, a text measures 
 A `Style` name without its `For style` rule is an error, so that a typo does not go unnoticed. A rule that applies to
 nothing is not an error, so that the same `Styles` can be reused in many documents.
 
+## Named colors
+
+A color that repeats (that of the brand, that of the rules) is declared once in `Styles` with `Named color`: the name
+and the color, separated by a space. Then the name is written where the color would go, in the rules and in the
+elements: `Color`, `Border color`, `Background` (also inside a gradient) and `Separator color`.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Named colors
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        Named color: brand #12315A
+        Named color: mist #EEF3F8
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Color: brand
+        For style: panel
+            Box:
+                Background: mist
+                Padding: 10
+                Border: 0 0 0 3
+                Border color: brand
+    Section:
+        Heading 1:
+            Text: Quarterly report
+        Text: Sales have grown by 12% compared to the previous quarter.
+            Style: panel
+```
+
+The name is lowercase, starts with a letter and joins its words with a hyphen (`brand`, `dark-gray`, `gray-2`). A name
+that is not declared is an error (`COLOR_UNKNOWN`), as is declaring the same one twice (`COLOR_DUPLICATE`). Changing the
+palette of a document is changing these lines.
+
 ## The base typography
 
 `Font` and `Size` have no default value, so every document declares them, usually in `For element: Document`.
@@ -63,11 +101,12 @@ Everything else inherits from there.
 
 ## Styles in a separate file
 
-The rules can go in a document of their own, with `Styles` as the root, to share them between several documents or to
-leave the document with only the content:
+The rules and the named colors can go in a document of their own, with `Styles` as the root, to share them between
+several documents or to leave the document with only the content:
 
 ```
 Styles (dev.stxt.pdf):
+    Named color: brand #12315A
     For element: Document
         Typography:
             Font: IBM Plex Sans
@@ -75,11 +114,14 @@ Styles (dev.stxt.pdf):
     For style: panel
         Box:
             Padding: 10
+            Border: 0 0 0 3
+            Border color: brand
 ```
 
 The document does not say where its styles file is: it is passed when converting it ([Using from Java](java-usage.md)).
 If the document also has its own `Styles`, at each level of the list above the one in the document wins, so moving the
-`Styles` to a file changes nothing. An error in the styles file starts with `line 8 of the styles:`, also if it is
+`Styles` to a file changes nothing. The same goes for colors: if the document declares a `Named color` with the name of
+one in the file, its own wins, and all the rules that use that name, also those of the file, take its color. An error in the styles file starts with `line 8 of the styles:`, also if it is
 detected during layout, such as a font that does not exist or a box that does not fit.
 
 More detail in the [reference](../../reference/common/styles.md).

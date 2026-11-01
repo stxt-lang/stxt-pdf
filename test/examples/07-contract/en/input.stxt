@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 0 0 6 0
 				Border: 0 0 0.75 0
-				Border color: #3F3D8F
+				Border color: indigo
 			Stack:
 				Horizontal: justify
 				Vertical: end
@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Padding: 6 0 0 0
 				Border: 0.5 0 0 0
-				Border color: #B9B8D9
+				Border color: rule
 			Stack:
 				Horizontal: justify
 				Vertical: end
@@ -66,7 +66,7 @@ Document (dev.stxt.pdf):
 			Typography:
 				Align: center
 				Italic: true
-				Color: #6C6B8A
+				Color: gray
 			Box:
 				Margin: 0 0 14 0
 		Heading 2:
@@ -201,7 +201,7 @@ Document (dev.stxt.pdf):
 						Text: For the Studio
 							Typography:
 								Bold: true
-								Color: #3F3D8F
+								Color: indigo
 								Case: uppercase
 								Letter spacing: 0.6
 						Image: examples/certificate/signature-director.svg
@@ -212,7 +212,7 @@ Document (dev.stxt.pdf):
 						Block:
 							Box:
 								Border: 0.5 0 0 0
-								Border color: #1E1D2B
+								Border color: ink
 								Padding: 4 0 0 0
 							Text: Irene Calvo Mas
 							Text: Director, Lumen Estudio de Diseño, S.L.P.
@@ -222,7 +222,7 @@ Document (dev.stxt.pdf):
 						Text: For the Client
 							Typography:
 								Bold: true
-								Color: #3F3D8F
+								Color: indigo
 								Case: uppercase
 								Letter spacing: 0.6
 						Image: examples/letter/signature.svg
@@ -233,7 +233,7 @@ Document (dev.stxt.pdf):
 						Block:
 							Box:
 								Border: 0.5 0 0 0
-								Border color: #1E1D2B
+								Border color: ink
 								Padding: 4 0 0 0
 							Text: Carme Vidal i Roca
 							Text: Chair of the Governing Board, Cooperativa Solvent

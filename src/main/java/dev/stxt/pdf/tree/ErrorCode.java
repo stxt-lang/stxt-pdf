@@ -180,6 +180,10 @@ public enum ErrorCode {
     STYLE_NOT_ALLOWED,
     /** A {@code Style} class without a {@code For style} rule. */
     STYLE_WITHOUT_RULE,
+    /** Two {@code Named color} with the same name in the same source. */
+    COLOR_DUPLICATE,
+    /** A color written with a name that no {@code Named color} declares (line of the property). */
+    COLOR_UNKNOWN,
 
     // --- Combinations without effect or contradictory ----------------------------------------
     /** A {@code Frame} with top and bottom, or with left and right. */

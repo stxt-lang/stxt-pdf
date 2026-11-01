@@ -148,7 +148,9 @@ class SchemaCoverageTest {
             Map.entry("Pdf page", "Pdf page: 2"),
             // Barcode
             Map.entry("Format", "Format: qr"),
-            Map.entry("Error correction", "Error correction: high"));
+            Map.entry("Error correction", "Error correction: high"),
+            // Styles
+            Map.entry("Named color", "Named color: brand #12315A"));
 
     /** Header of all the documents; it ends inside {@code Styles}, to add rules. */
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -220,7 +222,8 @@ class SchemaCoverageTest {
         t.put("Table", new Template(table + "\t\t{}\n\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Column sizes")));
         t.put("Row", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
         t.put("Cell", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
-        // The rules go inside the Styles of the header.
+        // The rules and the named colors go inside the Styles of the header.
+        t.put("Styles", new Template(HEADER + "\t\t{}\n\tBlock:"));
         t.put("For element", new Template(HEADER + "\t\tFor element: Block\n\t\t\t{}\n\tBlock:"));
         t.put("For style", new Template(HEADER + "\t\tFor style: d\n\t\t\t{}\n\tBlock:"));
         t.put("For id", new Template(HEADER + "\t\tFor id: r\n\t\t\t{}\n\tBlock:\n\t\tId: r"));

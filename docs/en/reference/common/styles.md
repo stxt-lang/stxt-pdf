@@ -1,8 +1,9 @@
 # Reusable rules: `Styles`
 
 `Styles`, an optional child of `Document` (at most one), declares once properties that apply by default to many
-elements. The same rules can also be in a [separate styles document](#separate-styles-document). There is no cascade:
-the rules give default values to the elements of a type, of a style or with an `Id`, and the element can override them.
+elements, and the [named colors](#named-colors) of the document. The same rules and colors can also be in a [separate
+styles document](#separate-styles-document). There is no cascade: the rules give default values to the elements of a
+type, of a style or with an `Id`, and the element can override them.
 
 ## Rules
 
@@ -42,6 +43,53 @@ Text: A side note.
 
 > **Decision:** rules only allow the groups: the properties of an element itself could not be validated when the
 > document is written, because the element type goes in the value of `For element`.
+
+## Named colors
+
+`Named color`, a repeatable child of `Styles`, gives a name to a color: the name and the color go separated by a space.
+From then on the name is written wherever a color goes, in the rules and in the elements: `Color`, `Border color`,
+`Background` (also inside `linear(...)`) and `Separator color` ([Values](values.md#colors)).
+
+```
+Styles:
+    Named color: brand #12315A
+    Named color: mist #EEF3F8
+    For element: Heading 1
+        Typography:
+            Color: brand
+    For style: panel
+        Box:
+            Background: mist
+            Border: 0 0 0 3
+            Border color: brand
+Text: A note on a light background.
+    Style: panel
+    Box:
+        Background: linear(180, mist, #FFFFFF)
+```
+
+- **The name** is written in lowercase, with letters from `a` to `z` and digits, starts with a letter and joins its
+  words with a hyphen: `brand`, `dark-gray`, `gray-2`. `linear` cannot be a name.
+- **The color** is a hexadecimal color, with its opacity if it has one (`#12315A80`). It cannot be another name or a
+  gradient.
+- **The order does not matter**: a rule can use a name declared later in `Styles`.
+- **A name is replaced by its color when the document is read.** The result is the same as with the color written in
+  its place, and the messages that cite a color (such as that of `CONTRAST_LOW`) give its hexadecimal value.
+- **The document wins over the separate styles document.** The names of the two sources form a single set; if both
+  declare the same name, the color of the document applies, also in the rules of the separate styles document. Within
+  one source, a repeated name is `COLOR_DUPLICATE`.
+- A color with the form of a name that no `Named color` declares is `COLOR_UNKNOWN`, with the line of the property. A
+  `Named color` that is not used is not an error.
+
+> **Decision:** one `Named color` node per color, repeatable. *Rejected alternative:* a `Colors >>` block with one line
+> per color, which the schema cannot validate line by line.
+
+> **Decision:** a document can change a color of its separate styles document by declaring the same name, and the change
+> reaches all the rules that use it. *Rejected alternative:* each rule taking the names of its own source, which would
+> force copying the rules to change a color.
+
+> **Decision:** only hexadecimal colors have names. *Rejected alternative:* a name defined with another name or with a
+> gradient, which adds chains and cycles without a clear need.
 
 ## Priority
 
@@ -88,7 +136,11 @@ These are errors:
 - a rule that gives `Break` to an element that does not allow it: `Overlay`, `Page overlay`, a heading, a `Text` of a
   heading or a cell, also with a position rule, a column rule or a rule of the style of its `Row` (`STYLE_NOT_ALLOWED`);
 - a rule that gives a `Section` something that is not `Typography` (`STYLE_NOT_ALLOWED`);
-- a `Style` name without its `For style` rule (`STYLE_WITHOUT_RULE`).
+- a `Style` name without its `For style` rule (`STYLE_WITHOUT_RULE`);
+- two `Named color` with the same name in the same source (`COLOR_DUPLICATE`);
+- a color with the form of a name that no `Named color` declares (`COLOR_UNKNOWN`);
+- a `Named color` without a name and a color separated by a space, with a misspelled name or with a color that is not
+  hexadecimal (`VALUE_SYNTAX`), or with the name `linear` (`VALUE_NOT_ALLOWED`).
 
 A `For element`, a `For style`, a `For id` or a `For column` that do not apply to any element are not errors: this way the
 rules can be reused, and an element with that `Id` or that style can come later (from a template, for example).
@@ -118,11 +170,12 @@ descendants.
 
 ## Separate styles document
 
-The rules can be written in a separate document, with root `Styles` and the namespace `dev.stxt.pdf`, to take them out of
-the main document or share them among several:
+The rules and the named colors can be written in a separate document, with root `Styles` and the namespace
+`dev.stxt.pdf`, to take them out of the main document or share them among several:
 
 ```
 Styles (dev.stxt.pdf):
+    Named color: brand #12315A
     For element: Document
         Typography:
             Font: IBM Plex Sans
@@ -130,6 +183,8 @@ Styles (dev.stxt.pdf):
     For style: panel
         Box:
             Padding: 10
+            Border: 0 0 0 3
+            Border color: brand
 ```
 
 - **It is passed at layout time, never looked up.** The document does not say where its styles document is and the engine
@@ -139,9 +194,11 @@ Styles (dev.stxt.pdf):
   level (that of `For id`, that of `For style`, that of `For element`, etc.), the rules of the separate styles document go
   **before** and those of the document **after**, so the document wins, property by property. The priority between levels
   does not change: a `For style` of the separate document still wins over a `For element` of the document. With this,
-  moving the `Styles` of a document to a separate file does not change the result.
+  moving the `Styles` of a document to a separate file does not change the result. Named colors follow the same rule:
+  if both sources declare a name, the color of the document wins ([Named colors](#named-colors)).
 - **Each source is strict on its own.** Two rules with the same selector are an error within one source
-  (`STYLE_DUPLICATE`), but the same rule can be in both. A `Style` name can have its `For style` in either of the two.
+  (`STYLE_DUPLICATE`), like two `Named color` with the same name (`COLOR_DUPLICATE`), but the same rule or the same name
+  can be in both. A `Style` name can have its `For style` in either of the two.
 - **Errors.** A rule of the styles document is validated like one of the document, and its error carries the line **of
   that file** and says so: `line 8 of the styles: ...`. A root that is not `Styles` is `DOCUMENT_ROOT`. A property that
   comes from a rule of the styles document keeps its line in it, also the typography that is inherited, so the same holds
