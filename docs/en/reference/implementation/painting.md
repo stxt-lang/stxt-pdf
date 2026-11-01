@@ -16,10 +16,14 @@ a rounded box (quarter ellipses as Bézier curves) and the trapezoid of each sid
 Each `Piece` carries in `frames` the chain of rotations and clips of its ancestors, from the page inwards, and each step of
 painting applies it with `Canvas.beginRotation`/`endRotation` and `beginClip`/`endClip`, and then the rotation of the box itself:
 a rotated box is painted rotated with everything it contains, whether it is a context or rotates in flow. A box with rounded
-corners adds to what it has in flow (also to a `Frame`) the clip along the curve of its padding box. An
-`Overlay` inherits only the rotations, and a `Page overlay`, nothing. The background, the border and the image are painted with the clips. The text
-is painted only with the rotations, and the debug outline (`Canvas.outlines()`), without clips, so that the whole box is visible. The backgrounds
-step of a box that paints nothing does not clip. The areas of the links are computed by
+corners adds to what it has in flow (also to a `Frame`) the clip along the curve of its padding box (`Frame.Kind.CORNERS`),
+and a box with `Overflow: clip` ([Overflow](../common/overflow.md#clipping-clip)), the clip by its padding box to everything
+it contains (`Frame.Kind.WINDOW`). An `Overlay` inherits the rotations and the windows, not the corners, and a
+`Page overlay`, nothing. The background, the border and the image are painted with all the clips (`Clips.ALL`). The text is
+painted with the rotations and the windows (`Clips.WINDOWS`), each line at its size (`TextLine.fontSize`, that of the box or
+the one `Overflow: shrink` left it), and the debug outline (`Canvas.outlines()`), without clips (`Clips.NONE`), so that the
+whole box is visible. The backgrounds step of a box that paints nothing, and the content step of a box without text or
+image, do not clip. The areas of the links are computed by
 `StackingContext.paintLinks` when painting (the border box of each fragment with `Link`, and the rectangle of each run with a
 link on each line, joining consecutive ones with the same destination), which calls `Tagging.link`. `StackingContext.paintText` splits the
 text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines.

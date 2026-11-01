@@ -19,6 +19,7 @@ import dev.stxt.pdf.model.Leader;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.NumberFormat;
+import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
@@ -98,6 +99,7 @@ final class PropertyReader {
             entry("weight", (p, s) -> s.typography().setFontWeight(weight(p))),
             entry("italic", (p, s) -> s.typography().setFontStyle(bool(p) ? FontStyle.ITALIC : FontStyle.NORMAL)),
             entry("size", (p, s) -> s.typography().setFontSize(positive(p))),
+            entry("min-size", (p, s) -> s.typography().setMinFontSize(positive(p))),
             entry("line-height", (p, s) -> s.typography().setLineHeight(value(p, LENGTH, false))),
             entry("align", (p, s) -> s.typography().setTextAlign(enumValue(TextAlign.class, p))),
             entry("color", (p, s) -> s.typography().setColor(color(p, s.namedColors()))),
@@ -161,6 +163,7 @@ final class PropertyReader {
                 case "border-color" -> s.box().setBorderColor(colorSides(p, s.namedColors()));
                 case "corner-radius" -> s.box().setCornerRadius(radius(p));
                 case "background" -> s.box().setBackground(paint(p, s.namedColors()));
+                case "overflow" -> s.box().setOverflow(enumValue(Overflow.class, p));
                 default -> throw unread(p);
             }
         }

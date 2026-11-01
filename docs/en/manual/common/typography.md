@@ -25,6 +25,7 @@ Styles:
 | `Font` | family name | none | The font. **Required** in all text, own or inherited |
 | `Code font` | family name | none | The font of code ([Text formatting](text-formatting.md#code)). **Required** if there is code |
 | `Size` | number > 0 | none | The size of the letters. **Required** in all text |
+| `Min size` | number > 0 | `6` | How far the letters may shrink with `Overflow: shrink` ([Box](box.md#what-does-not-fit)) |
 | `Bold` | `true`, `false` | `false` | Bold: the same as `Weight: 700` |
 | `Weight` | 100 to 900, in steps of 100 | `400` | The weight of the letters ([below](#weights)) |
 | `Italic` | `true`, `false` | `false` | Italic |

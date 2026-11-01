@@ -171,6 +171,15 @@ like the fonts, that every box with text and `Hyphenate: true` is in a language 
 > (parts of words) with prefix sums: with ligatures a whole word does not measure what its parts add up to, and this
 > way each line is measured as it is painted.
 
+**Shrinking.** With `Overflow: shrink` ([Overflow](../common/overflow.md#shrinking-the-text-shrink)), `InlineLayout.shrink`
+breaks the text at the `Size` of the box and, while some line measures more than the available width (with the tolerance
+of `Overflow`, `Tolerance.MODEL`) or the lines add up to more than the height limit (`InlineLayout.limit`: the content box
+of the definite `BoxModel.height()` or, without one, of the `maxHeight()`), breaks it again at a size 0.5 pt smaller, with
+`Min size` as the last step. The limit is part of the key of the memorized line breaking (`BrokenKey`), because the same
+box is measured without a height (`measuringContentHeight`) and laid out stretched afterwards. The lines keep the size they
+were broken at (`TextLine.fontSize`, the one `LineBreaker.place`, `Engine.number` and the painting use), and the line
+height comes from `TypographyStyle.usedLineHeight(size)`. The intrinsic sizes (`contentIntrinsic`) are measured at `Size`.
+
 **Measurement.** A `TextMeasurer` has to be **additive between words** (the width of a text is the sum of those of its words
 and spaces): both line breaking algorithms add up. `PdfMetrics` measures with `FontFile.width(text, size, ligatures,
 kerning)`, which applies `GSUB` and the kerning pairs word by word if they are requested; a pair does not cross a space,
@@ -261,7 +270,11 @@ again on each page that changes, and the rest comes from the cache. The flow is 
 ## Overflows
 
 `Overflow` walks the paginated result and points to the innermost culprit ([Overflow](../common/overflow.md)),
-using the `PageSetup` of each page. There are two tolerances, with names: `Tolerance.EPSILON` (10⁻⁹), that of the arithmetic of the
+using the `PageSetup` of each page. What a box with `Overflow: clip` contains is not checked against it (neither its
+lines nor its children) and, with the `clipped` flag that goes down through its descendants, not against the page either;
+each box inside is still checked against its own parent. `Engine.layout` lays out a box with `Overflow: clip` like a
+rotated one: without fragmentation, and `BEFORE` if it does not fit in what is left of the page. Where a text could
+shrink, `textOverflow` and `tooTall` say so, and where it already shrinks and does not fit at `Min size`, too. There are two tolerances, with names: `Tolerance.EPSILON` (10⁻⁹), that of the arithmetic of the
 layout, and `Tolerance.MODEL` (0.01 pt), how far a box can stick out without overflowing and the precision of the dumps. Comparisons
 use `Tolerance.fits(size, space)` and `Tolerance.same(a, b)`, never a `1e-9` of their own.
 

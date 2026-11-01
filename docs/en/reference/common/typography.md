@@ -17,6 +17,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Weight` | 100 to 900, in steps of 100 | `400` | Weight of the font ([Weights](#weights-weight)). |
 | `Italic` | `true`, `false` | `false` | Italic: the italic variant of the font. |
 | `Size` | number > 0 | none | Font size. **Required** in all text, own or inherited (`TEXT_WITHOUT_FONT_SIZE`). |
+| `Min size` | number > 0 | `6` | The smallest `Size` that `Overflow: shrink` reduces the text to ([Overflow](overflow.md#shrinking-the-text-shrink)). |
 | `Line height` | number or % | `120%` | **A number is a measurement** (`15` = 15 pt). For a value relative to `Size`, a percentage (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The last line of a justified paragraph is aligned to the left. |
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |

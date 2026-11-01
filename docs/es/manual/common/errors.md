@@ -21,8 +21,8 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `FONT_UNKNOWN` | La fuente no está en `fonts/` | Revisar el nombre de la familia. El mensaje lista las que hay |
 | `GLYPH_MISSING` | Un carácter que la fuente no tiene | Usar otra fuente o quitar el carácter |
 | `CONTRAST_LOW` | Un texto que apenas se distingue de su fondo: un gris claro sobre blanco | Oscurecer su `Color` o cambiar el fondo ([Caja](box.md#contraste)) |
-| `TEXT_OVERFLOW` | Una palabra más ancha que su línea | Ensanchar la caja, bajar el tamaño o partir la palabra |
-| `BOX_OVERFLOW` | Una caja no cabe en su sitio: más ancha que su padre, contenido más alto que su `Height`, o algo que se sale de la página | Revisar el `Width`, el `Height`, el `Offset` o el `Margin` que dice el mensaje |
+| `TEXT_OVERFLOW` | Una palabra más ancha que su línea | Ensanchar la caja, bajar el tamaño, partir la palabra o encoger el texto con `Overflow: shrink` ([Caja](box.md#lo-que-no-cabe)) |
+| `BOX_OVERFLOW` | Una caja no cabe en su sitio: más ancha que su padre, contenido más alto que su `Height`, o algo que se sale de la página | Revisar el `Width`, el `Height`, el `Offset` o el `Margin` que dice el mensaje; en un texto de alto fijo, `Overflow: shrink` |
 | `PAGE_OVERFLOW` | Algo que no se puede partir no cabe ni en una página vacía | Hacerlo más pequeño o permitir partirlo |
 | `INDEFINITE_PERCENTAGE` | Un porcentaje de un alto que no se conoce | Dar un `Height` en puntos o en milímetros al contenedor ([Valores](values.md#porcentajes)) |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | Un `Margin: auto` que no puede centrar | Dar un `Width` a la caja, o quitar el `auto` |

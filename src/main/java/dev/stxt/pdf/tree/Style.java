@@ -269,8 +269,8 @@ public final class Style extends StyleGroup {
      * {@code Hyphenate}, for a language without patterns (reference/common/typography.md).
      */
     public static final List<String> LINED_PROPERTIES = List.of(PropertyKey.FONT, PropertyKey.FONT_WEIGHT,
-            PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.LINE_HEIGHT, PropertyKey.CODE_FONT,
-            PropertyKey.COLOR, PropertyKey.HYPHENATE);
+            PropertyKey.FONT_STYLE, PropertyKey.FONT_SIZE, PropertyKey.MIN_FONT_SIZE, PropertyKey.LINE_HEIGHT,
+            PropertyKey.CODE_FONT, PropertyKey.COLOR, PropertyKey.HYPHENATE);
 
     /** New style with the default values and the inheritable properties of the parent. */
     static Style inheriting(Style parent) {

@@ -37,8 +37,8 @@ class InlineLayoutTest {
         LayoutFixture l = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100");
         Fragment f = l.fragment("T");
         assertEquals(2, f.lines().size());
-        assertEquals(new TextLine(0, 0, 95, 12, "aaaa bbbb cccc dddd"), f.lines().get(0));
-        assertEquals(new TextLine(0, 12, 20, 12, "eeee"), f.lines().get(1));
+        assertEquals(new TextLine(0, 0, 95, 12, 10, "aaaa bbbb cccc dddd"), f.lines().get(0));
+        assertEquals(new TextLine(0, 12, 20, 12, 10, "eeee"), f.lines().get(1));
         assertEquals(24, f.height(), 1e-9);
     }
 
@@ -63,8 +63,8 @@ class InlineLayoutTest {
                 "\t\t\tAlign: justify", "\t\tContent >>", "\t\t\t" + TEXT);
         List<TextLine> lines = l.fragment("T").lines();
         assertEquals(2, lines.size());
-        assertEquals(new TextLine(0, 0, 100, 12, "aaaa bbbb cccc dddd", 5.0 / 3), lines.get(0));
-        assertEquals(new TextLine(0, 12, 20, 12, "eeee", 0), lines.get(1));
+        assertEquals(new TextLine(0, 0, 100, 12, 10, "aaaa bbbb cccc dddd", 5.0 / 3), lines.get(0));
+        assertEquals(new TextLine(0, 12, 20, 12, 10, "eeee", 0), lines.get(1));
     }
 
     @Test
@@ -139,5 +139,69 @@ class InlineLayoutTest {
         assertEquals(List.of("aa bb", "cc dd"), lines.stream().map(TextLine::text).toList());
         assertEquals(5, lines.get(0).wordSpacing(), 1e-9);
         assertEquals(0, lines.get(1).wordSpacing(), 1e-9);
+    }
+
+    // Overflow: shrink (reference/common/overflow.md): the Size goes down in steps of 0.5 until the text fits.
+
+    @Test
+    void shrinkReducesTheSizeUntilTheWidestWordFits() {
+        // Twelve characters: 60 pt at Size 10, 51 at 8.5 and 48 at 8, the first size at which they fit in 50.
+        Fragment f = layOut("\tText: aaaaaaaaaaaa", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tOverflow: shrink")
+                .fragment("T");
+        assertEquals(1, f.lines().size());
+        TextLine l = f.lines().get(0);
+        assertEquals(8, l.fontSize(), 1e-9);
+        assertEquals(48, l.width(), 1e-9);
+        // The default line height (120%) follows the size.
+        assertEquals(9.6, l.height(), 1e-9);
+        assertEquals(9.6, f.height(), 1e-9);
+    }
+
+    @Test
+    void shrinkReducesTheSizeUntilTheLinesFitTheHeight() {
+        // Two lines (24 pt) at Size 10 do not fit in 20; at 8 the 24 characters fit in one line (96) of 9.6.
+        Fragment f = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 20",
+                "\t\t\tOverflow: shrink").fragment("T");
+        assertEquals(List.of(TEXT), f.lines().stream().map(TextLine::text).toList());
+        assertEquals(8, f.lines().get(0).fontSize(), 1e-9);
+        assertEquals(20, f.height(), 1e-9);
+    }
+
+    @Test
+    void shrinkKeepsALineHeightInPoints() {
+        // Line height: 14 is a length and does not follow the size: the text needs one line of 14, which it has at
+        // Size 6 (24 characters, 72 pt).
+        Fragment f = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 72", "\t\t\tHeight: 14",
+                "\t\t\tOverflow: shrink", "\t\tTypography:", "\t\t\tLine height: 14").fragment("T");
+        assertEquals(1, f.lines().size());
+        assertEquals(6, f.lines().get(0).fontSize(), 1e-9);
+        assertEquals(14, f.lines().get(0).height(), 1e-9);
+    }
+
+    @Test
+    void shrinkTriesMinSizeAsTheLastStep() {
+        // Ten characters in 39.5: 40 at Size 8 does not fit, and the next step, 7.5, is below Min size 7.9, which is
+        // tried instead: 39.5.
+        Fragment f = layOut("\tText: aaaaaaaaaa", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 39.5", "\t\t\tOverflow: shrink",
+                "\t\tTypography:", "\t\t\tMin size: 7.9").fragment("T");
+        assertEquals(7.9, f.lines().get(0).fontSize(), 1e-9);
+    }
+
+    @Test
+    void aTextThatFitsIsNotShrunk() {
+        Fragment f = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tOverflow: shrink")
+                .fragment("T");
+        assertEquals(2, f.lines().size());
+        assertEquals(10, f.lines().get(0).fontSize(), 1e-9);
+    }
+
+    @Test
+    void shrinkAlsoFitsAMaxHeight() {
+        // Without Height the box grows with its text, but Max height: 20 limits it: as with Height 20.
+        Fragment f = layOut("\tText: " + TEXT, "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tMax height: 20",
+                "\t\t\tOverflow: shrink").fragment("T");
+        assertEquals(1, f.lines().size());
+        assertEquals(8, f.lines().get(0).fontSize(), 1e-9);
+        assertEquals(9.6, f.height(), 1e-9);
     }
 }

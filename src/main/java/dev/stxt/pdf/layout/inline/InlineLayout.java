@@ -15,7 +15,9 @@ import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.Slice;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
+import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.Reference;
+import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 
 /**
@@ -44,21 +47,38 @@ import java.util.Set;
  * ({@link Reference}) are replaced before breaking the text into lines, with the values the
  * {@link dev.stxt.pdf.layout.Paginator} gives ({@link #assume}, {@link #headings}).</p>
  *
- * <p>The line breaking of a text is done only once per available width and reused on
- * each page: each fragment starts at another line ({@code from}), so the cache of the
+ * <p>With {@code Overflow: shrink} (reference/common/overflow.md) the text is broken at the {@code Size} of the box
+ * and, if some line is wider than the box or the lines are taller than its definite height, again at smaller sizes,
+ * from {@code Size} down in steps of {@link #SHRINK_STEP} and {@code Min size} as the last one, until it fits
+ * ({@link #shrink}). The lines keep the size they were broken at ({@link TextLine#fontSize()}) and the line height
+ * follows it if it is a percentage.</p>
+ *
+ * <p>The line breaking of a text is done only once per available width (and height limit, if it shrinks) and reused
+ * on each page: each fragment starts at another line ({@code from}), so the cache of the
  * {@link LayoutContext} does not help, and without it a text of N pages was broken N times (quadratic cost).</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
-    private record BrokenKey(Box box, double available) {
+    /** How much {@code Overflow: shrink} reduces the {@code Size} at each step, in points. */
+    public static final double SHRINK_STEP = 0.5;
+
+    /**
+     * @param limit height of the content box the lines have to fit in, if the text shrinks and the height is definite
+     *              or has a maximum; empty otherwise (it is not part of the key of a text that does not shrink)
+     */
+    private record BrokenKey(Box box, double available, OptionalDouble limit) {
+    }
+
+    /** The lines of a text and the size they are broken at: the {@code Size} of the box, or the one it shrank to. */
+    private record Broken(List<LineBreaker.Line> lines, double fontSize) {
     }
 
     private final LayoutContext context;
     /** Measures {@code {page}} and {@code {pages}} as the probe number ({@link PageNumbers}). */
     private TextMeasurer measurer;
     private final TextMeasurer real;
-    /** Line breaking of each text per available width; depends on {@link #measurer}. */
-    private final Map<BrokenKey, List<LineBreaker.Line>> broken = new HashMap<>();
+    /** Line breaking of each text per available width (and height limit); depends on {@link #measurer}. */
+    private final Map<BrokenKey, Broken> broken = new HashMap<>();
     /**
      * Page assumed for each box referred to with {@code {page of: id}} (reference/common/references.md); see {@link
      * #assume}.
@@ -183,8 +203,8 @@ public final class InlineLayout implements LayoutAlgorithm {
             changed = true;
             List<TextRun> runs = l.runs().stream()
                     .map(r -> new TextRun(PageNumbers.apply(r.text(), page, pages), r.format())).toList();
-            lines.add(LineBreaker.place(runs, real, s, available, l.wordSpacing() > 0, l.y(), l.height(),
-                    l.hyphenated()));
+            lines.add(LineBreaker.place(runs, real, s, l.fontSize(), available, l.wordSpacing() > 0, l.y(),
+                    l.height(), l.hyphenated()));
         }
         if (!changed) {
             return f;
@@ -193,18 +213,72 @@ public final class InlineLayout implements LayoutAlgorithm {
                 children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned());
     }
 
-    /** The lines of the text of the box, a single paragraph (in a preformatted one, blank lines do not split it). */
-    private List<LineBreaker.Line> breakText(Box box, double available) {
+    /**
+     * The lines of the text of the box at {@code fontSize}, a single paragraph (in a preformatted one, blank lines do
+     * not split it).
+     */
+    private List<LineBreaker.Line> breakText(Box box, double available, double fontSize) {
         Style s = box.style();
         if (!box.hasText()) {
             return List.of();
         }
         if (s.typography().preformatted().enabled()) {
             return List.copyOf(PreformattedText.lines(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
-                    available, measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing()));
+                    available, measurer, s.typography().fontFace(), fontSize, s.typography().letterSpacing()));
         }
         return List.copyOf(LineBreaker.breakLines(runs(box), available, measurer, s.typography().fontFace(),
-                s.typography().fontSize(), s.typography().letterSpacing(), s.typography().lineBreaking(), hyphenator(s)));
+                fontSize, s.typography().letterSpacing(), s.typography().lineBreaking(), hyphenator(s)));
+    }
+
+    /**
+     * The lines of the text at the {@code Size} of the box or, with {@code Overflow: shrink}
+     * (reference/common/overflow.md), at the largest size, from {@code Size} down in steps of {@link #SHRINK_STEP} and
+     * {@code Min size} as the last one, at which no line is wider than {@code available} and, with a {@code limit},
+     * the lines are not taller than it. If none fits, those of {@code Min size}: {@link dev.stxt.pdf.layout.Overflow}
+     * reports what still sticks out.
+     */
+    private Broken shrink(Box box, double available, OptionalDouble limit) {
+        Style s = box.style();
+        double size = s.typography().fontSize();
+        List<LineBreaker.Line> lines = breakText(box, available, size);
+        if (!s.box().shrinks()) {
+            return new Broken(lines, size);
+        }
+        double min = s.typography().minFontSize();
+        while (!fits(lines, s, size, available, limit) && size > min + Tolerance.EPSILON) {
+            size = Math.max(min, size - SHRINK_STEP);
+            lines = breakText(box, available, size);
+        }
+        return new Broken(lines, size);
+    }
+
+    /**
+     * Whether the lines at {@code size} fit: none is wider than {@code available}, with the tolerance of
+     * {@link dev.stxt.pdf.layout.Overflow} ({@link Tolerance#MODEL}), and together they are not taller than
+     * {@code limit}.
+     */
+    private boolean fits(List<LineBreaker.Line> lines, Style s, double size, double available, OptionalDouble limit) {
+        FontFace font = s.typography().fontFace();
+        for (LineBreaker.Line l : lines) {
+            if (LineBreaker.width(l.runs(), measurer, font, size, s.typography().letterSpacing()) > available + Tolerance.MODEL) {
+                return false;
+            }
+        }
+        return limit.isEmpty() || lines.size() * s.typography().usedLineHeight(size) <= limit.getAsDouble() + Tolerance.MODEL;
+    }
+
+    /**
+     * The height of the content box that the lines of a text with {@code Overflow: shrink} have to fit in: that of its
+     * definite height (declared, imposed by the parent or deduced from {@code Aspect ratio}) or, without one, of its
+     * {@code Max height}; empty if nothing limits it, or if the text does not shrink.
+     */
+    private static OptionalDouble limit(Box box, BoxModel model) {
+        if (!box.style().box().shrinks()) {
+            return OptionalDouble.empty();
+        }
+        double decoration = model.border().vertical() + model.padding().vertical();
+        OptionalDouble height = model.height().isPresent() ? model.height() : model.maxHeight();
+        return height.isPresent() ? OptionalDouble.of(Math.max(0, height.getAsDouble() - decoration)) : OptionalDouble.empty();
     }
 
     @Override
@@ -226,11 +300,14 @@ public final class InlineLayout implements LayoutAlgorithm {
         BoxModel model = BoxModel.resolve(box, space, context);
         Style s = box.style();
         double available = model.contentWidth();
-        double lineHeight = s.typography().usedLineHeight();
         boolean first = from == null;
         int start = first ? 0 : ((BreakToken.Line) from).nextLine();
 
-        List<LineBreaker.Line> texts = broken.computeIfAbsent(new BrokenKey(box, available), k -> breakText(box, available));
+        OptionalDouble limit = limit(box, model);
+        Broken b = broken.computeIfAbsent(new BrokenKey(box, available, limit), k -> shrink(box, available, limit));
+        List<LineBreaker.Line> texts = b.lines();
+        double fontSize = b.fontSize();
+        double lineHeight = s.typography().usedLineHeight(fontSize);
 
         int end = texts.size();
         int appeal = BreakAppeal.PERFECT_BREAK;
@@ -249,8 +326,8 @@ public final class InlineLayout implements LayoutAlgorithm {
         for (int j = start; j < end; j++) {
             // Preformatted lines are not justified.
             boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1;
-            lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, available, justify, lines.size() * lineHeight,
-                    lineHeight, texts.get(j).hyphenated()));
+            lines.add(LineBreaker.place(texts.get(j).runs(), measurer, s, fontSize, available, justify,
+                    lines.size() * lineHeight, lineHeight, texts.get(j).hyphenated()));
         }
 
         Slice slice = Slice.of(model, first, BreakToken.consumed(from), lines.size() * lineHeight,

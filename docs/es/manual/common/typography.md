@@ -25,6 +25,7 @@ Styles:
 | `Font` | nombre de familia | sin valor | La fuente. **Obligatoria** en todo texto, propia o heredada |
 | `Code font` | nombre de familia | sin valor | La fuente del código ([Formato del texto](text-formatting.md#código)). **Obligatoria** si hay código |
 | `Size` | número > 0 | sin valor | El tamaño de la letra. **Obligatorio** en todo texto |
+| `Min size` | número > 0 | `6` | Hasta dónde puede encoger la letra con `Overflow: shrink` ([Caja](box.md#lo-que-no-cabe)) |
 | `Bold` | `true`, `false` | `false` | Negrita: lo mismo que `Weight: 700` |
 | `Weight` | de 100 a 900, de 100 en 100 | `400` | El peso de la letra ([abajo](#pesos)) |
 | `Italic` | `true`, `false` | `false` | Cursiva |

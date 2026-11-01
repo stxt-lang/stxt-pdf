@@ -1,0 +1,19 @@
+# Case: Word that does not fit on its line even at Min size
+# Code: TEXT_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: supercalifragilisticoespialidoso
+			Box:
+				Width: 50
+				Overflow: shrink

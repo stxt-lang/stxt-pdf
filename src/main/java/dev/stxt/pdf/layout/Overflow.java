@@ -47,7 +47,11 @@ import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
  * {@code Margin} takes out of it. It looks at the final result, not at the measuring passes.
  *
  * <p>The error points to the deepest culprit: the word that does not fit on its line, the innermost
- * box that sticks out, or the {@code Height} that falls short.</p>
+ * box that sticks out, or the {@code Height} that falls short. Where the text could shrink ({@code Overflow: shrink}),
+ * the message says so; where it already does and still does not fit at {@code Min size}, it says that too.</p>
+ *
+ * <p>What a box with {@code Overflow: clip} contains is painted clipped and is not checked against it nor against the
+ * page (reference/common/overflow.md); each box inside it is still checked against its own parent.</p>
  */
 public final class Overflow {
 
@@ -69,18 +73,20 @@ public final class Overflow {
             Insets m = pageSetup.margin();
             // The physical page, in page area coordinates.
             Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
-            content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE);
+            content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE, false);
             for (Fragment f : p.pageOverlays()) {
-                fragment(f, 0, 0, page, NONE);
+                fragment(f, 0, 0, page, NONE, false);
             }
         }
     }
 
     /**
      * A fragment whose parent's content box starts at ({@code ox}, {@code oy});
-     * {@code turn} is the rotations of its ancestors (reference/common/layers-and-rotation.md), painted with it.
+     * {@code turn} is the rotations of its ancestors (reference/common/layers-and-rotation.md), painted with it, and
+     * {@code clipped}, whether an ancestor has {@code Overflow: clip}: then it is not checked against the page, because
+     * what sticks out of that ancestor is not painted.
      */
-    private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn) {
+    private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn, boolean clipped) {
         double x = ox + f.x();
         double y = oy + f.y();
         Style s = f.box().style();
@@ -89,7 +95,9 @@ public final class Overflow {
             turn = new AffineTransform(turn);
             turn.concatenate(s.rotation().transform(borderBox));
         }
-        if (s.rotation() != null || (s.isOutOfFlow() && !turn.isIdentity())) {
+        if (clipped) {
+            // Inside a clipped box: what goes off the page is clipped too.
+        } else if (s.rotation() != null || (s.isOutOfFlow() && !turn.isIdentity())) {
             // What is rotated is checked as it is painted: the rectangle that encloses it, on the page.
             if (!inside(Rotation.envelope(turn, borderBox), page)) {
                 boolean own = s.rotation() != null;
@@ -114,7 +122,7 @@ public final class Overflow {
         }
         double cx = borderBox.x() + f.border().left() + f.padding().left();
         double cy = borderBox.y() + f.border().top() + f.padding().top();
-        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn);
+        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn, clipped);
     }
 
     /** Whether {@code r} is inside {@code page}, with the tolerance. */
@@ -125,11 +133,16 @@ public final class Overflow {
 
     /**
      * The lines and the children of a fragment, whose content box starts at ({@code cx},
-     * {@code cy}) and measures {@code width} × {@code height}; {@code isPage}: it is the flow of a page.
+     * {@code cy}) and measures {@code width} × {@code height}; {@code isPage}: it is the flow of a page. If the box
+     * has {@code Overflow: clip}, nothing it contains is checked against it: it is painted clipped.
      */
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
-                                Rect page, AffineTransform turn) {
+                                Rect page, AffineTransform turn, boolean clipped) {
+        boolean window = f.box().style().box().clips();
         for (TextLine l : f.lines()) {
+            if (window) {
+                break;
+            }
             if (l.x() < -TOLERANCE || l.x() + l.width() > width + TOLERANCE) {
                 throw textOverflow(f.box(), l, width);
             }
@@ -140,13 +153,13 @@ public final class Overflow {
         for (Fragment c : f.children()) {
             if (c.box().isMarker()) {
                 // It hangs outside the item: it is checked in the indent of its list (marker).
-                fragment(c, cx, cy, page, turn);
+                fragment(c, cx, cy, page, turn, clipped || window);
                 continue;
             }
-            if (f.box().role() == Role.LIST) {
+            if (f.box().role() == Role.LIST && !window) {
                 marker(f, c);
             }
-            if (!c.box().style().isOutOfFlow()) {
+            if (!c.box().style().isOutOfFlow() && !window) {
                 // The Frame boxes are checked in their place, without the offset.
                 double x = c.x() - c.offsetX();
                 double y = c.y() - c.offsetY();
@@ -163,7 +176,7 @@ public final class Overflow {
                     throw tooTall(f, y + c.height(), height, c);
                 }
             }
-            fragment(c, cx, cy, page, turn);
+            fragment(c, cx, cy, page, turn, clipped || window);
         }
     }
 
@@ -268,8 +281,29 @@ public final class Overflow {
         }
         return new InvalidModelException(property != null ? s.line(property) : SourceLine.of(box.line()),
                 ErrorCode.BOX_OVERFLOW,
-                "The content of box " + box.describe() + " does not fit in its height: " + what + " reaches "
-                        + pt(needed) + " and the box leaves " + pt(height));
+                "The content of box " + box.describe() + " does not fit in its height"
+                        + (child == null ? atMinSize(box) : "") + ": " + what + " reaches "
+                        + pt(needed) + " and the box leaves " + pt(height) + (child == null ? shrinkHint(box) : ""));
+    }
+
+    /**
+     * Where the text of the box shrinks ({@code Overflow: shrink}) and still does not fit: that it is already at
+     * {@code Min size} (reference/common/overflow.md). Empty otherwise.
+     */
+    private static String atMinSize(Box box) {
+        if (!box.style().box().shrinks()) {
+            return "";
+        }
+        return " even at Min size (" + pt(box.style().typography().minFontSize())
+                + "), the smallest size Overflow: shrink allows";
+    }
+
+    /** Where the text of the box could shrink and does not: that {@code Overflow: shrink} exists. Empty otherwise. */
+    private static String shrinkHint(Box box) {
+        if (box.style().box().shrinks()) {
+            return "";
+        }
+        return ", or its Box needs Overflow: shrink, which reduces the Size until the text fits";
     }
 
     /** The first in-flow fragment inside {@code f}, in tree order, with a negative top or bottom margin; or null. */
@@ -345,14 +379,17 @@ public final class Overflow {
         // It is not in the text if the layout has changed it, like a page number.
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
+        boolean shrinks = box.style().box().shrinks();
         if (box.style().typography().preformatted() == Preformatted.TRUE) {
             return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "A line of a text with Preformatted: "
-                    + "true ('" + excerpt(word) + "'...) does not fit in the box: the line measures " + pt(l.width())
-                    + " and the box leaves " + pt(width) + ". The box has to be wider, the Size smaller, or the text "
-                    + "needs Preformatted: wrap, which breaks the lines");
+                    + "true ('" + excerpt(word) + "'...) does not fit in the box" + atMinSize(box) + ": the line measures "
+                    + pt(l.width()) + " and the box leaves " + pt(width) + ". The box has to be wider, "
+                    + (shrinks ? "Min size" : "the Size") + " smaller, or the text needs Preformatted: wrap, which "
+                    + "breaks the lines" + shrinkHint(box));
         }
         return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "The word '" + excerpt(word) + "' does not fit "
-                + "on the line: the line measures " + pt(l.width()) + " and the box leaves " + pt(width)
-                + ": the box has to be wider or the Size of the text smaller");
+                + "on the line" + atMinSize(box) + ": the line measures " + pt(l.width()) + " and the box leaves "
+                + pt(width) + ": the box has to be wider or " + (shrinks ? "Min size" : "the Size of the text")
+                + " smaller" + shrinkHint(box));
     }
 }

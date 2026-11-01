@@ -114,12 +114,12 @@ class LineBreakerTest {
         s.textAlign(TextAlign.JUSTIFY);
         // "uno dos tres" measures 12 in 20: 8 left over between 2 spaces, 4 per space.
         TextLine l = LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 30, 12);
-        assertEquals(new TextLine(0, 30, 20, 12, "uno dos tres", 4), l);
+        assertEquals(new TextLine(0, 30, 20, 12, 1, "uno dos tres", 4), l);
         // The last line of the text is not justified.
-        assertEquals(new TextLine(0, 30, 12, 12, "uno dos tres", 0),
+        assertEquals(new TextLine(0, 30, 12, 12, 1, "uno dos tres", 0),
                 LineBreaker.place("uno dos tres", measurer, s.style(), 20, false, 30, 12));
         s.textAlign(TextAlign.CENTER);
-        assertEquals(new TextLine(4, 0, 12, 12, "uno dos tres", 0),
+        assertEquals(new TextLine(4, 0, 12, 12, 1, "uno dos tres", 0),
                 LineBreaker.place("uno dos tres", measurer, s.style(), 20, true, 0, 12));
     }
 
@@ -186,7 +186,7 @@ class LineBreakerTest {
                         new TextLine.Run(6.5, 6, "dos", run("dos", "b").format()),
                         new TextLine.Run(12.5, 7.5, " tres", TextFormat.PLAIN)),
                 l.runs());
-        assertEquals(new TextLine(0, 0, 20, 12, "uno dos tres", 2.5, l.runs()), l);
+        assertEquals(new TextLine(0, 0, 20, 12, 1, "uno dos tres", 2.5, l.runs()), l);
     }
 
     // --- Letter spacing and small caps (reference/common/typography.md)

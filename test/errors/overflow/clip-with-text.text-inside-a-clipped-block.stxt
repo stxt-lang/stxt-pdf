@@ -1,0 +1,20 @@
+# Case: Overflow: clip on a Block with a Text inside
+# Code: CLIP_WITH_TEXT
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Height: 40
+				Overflow: clip
+			Text: Un texto que se recortaría

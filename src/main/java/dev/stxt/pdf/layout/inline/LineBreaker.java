@@ -380,12 +380,22 @@ public final class LineBreaker {
      */
     public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available,
                                  boolean justify, double y, double height, boolean hyphenated) {
+        return place(runs, measurer, s, s.typography().fontSize(), available, justify, y, height, hyphenated);
+    }
+
+    /**
+     * Like {@link #place(List, TextMeasurer, Style, double, boolean, double, double, boolean)}, with the text at
+     * {@code fontSize} instead of at the {@code Size} of {@code s}: the size {@code Overflow: shrink} reduced it to
+     * (reference/common/overflow.md). The line keeps it ({@link TextLine#fontSize()}).
+     */
+    public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double fontSize, double available,
+                                 boolean justify, double y, double height, boolean hyphenated) {
         FontFace font = s.typography().fontFace();
         double[] widths = new double[runs.size()];
         double natural = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            widths[i] = advance(r.text(), r.format(), measurer, font, s.typography().fontSize(), s.typography().letterSpacing());
+            widths[i] = advance(r.text(), r.format(), measurer, font, fontSize, s.typography().letterSpacing());
             natural += widths[i];
         }
         // The last character of the line carries no letter spacing (an empty line, of a preformatted text, has none).
@@ -403,7 +413,7 @@ public final class LineBreaker {
             placed.add(new TextLine.Run(at, w, r.text(), r.format()));
             at += w;
         }
-        return new TextLine(x, y, natural + spacing * spaces(text), height, text, spacing, placed, hyphenated);
+        return new TextLine(x, y, natural + spacing * spaces(text), height, fontSize, text, spacing, placed, hyphenated);
     }
 
     /**

@@ -24,12 +24,15 @@ public final class PropertyKey {
     public static final String MARGIN = "margin";
     public static final String PADDING = "padding";
     public static final String BORDER = "border";
+    public static final String OVERFLOW = "overflow";
 
     // Typography
     public static final String FONT = "font";
     public static final String FONT_WEIGHT = "font-weight";
     public static final String FONT_STYLE = "font-style";
     public static final String FONT_SIZE = "font-size";
+    /** {@code Min size}. */
+    public static final String MIN_FONT_SIZE = "min-font-size";
     public static final String LINE_HEIGHT = "line-height";
     public static final String COLOR = "color";
     public static final String CODE_FONT = "code-font";
@@ -78,7 +81,7 @@ public final class PropertyKey {
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "bold", FONT_WEIGHT, "weight", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE,
-            "align", "text-align", "before", BREAK_BEFORE, "after", BREAK_AFTER);
+            "min-size", MIN_FONT_SIZE, "align", "text-align", "before", BREAK_BEFORE, "after", BREAK_AFTER);
 
     private PropertyKey() {
     }

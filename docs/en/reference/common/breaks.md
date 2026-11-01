@@ -73,8 +73,8 @@ to the next column (which, in the last column, is also a page break). They only 
 - A forced break at the start of a page (or of a column) is ignored: it does not leave blank pages. The same goes for the
   `After: page` of the last box of a section.
 - A page break inside a `Columns` leaves the remaining columns on that page unfilled.
-- Inside a box that is not split (an `Overlay`, a `Page overlay`, a rotated `Frame` or a rotated in-flow box), no
-  `Break` has any effect. If the element itself (or the `Row` of a cell) writes it, it is an error
+- Inside a box that is not split (an `Overlay`, a `Page overlay`, a rotated `Frame`, a rotated in-flow box or a box with
+  `Overflow: clip`), no `Break` has any effect. If the element itself (or the `Row` of a cell) writes it, it is an error
   (`BREAK_IN_UNBREAKABLE`). If it comes from a `Styles` rule, it has no effect and is not an error. The columns of a `Columns` inside it are broken, and their `Break` counts.
 
 > **Decision:** a page break goes through the columns of a `Columns`. *Limit:* inside an item of a `Stack` or a `Grid`
@@ -141,6 +141,8 @@ split. Tables also repeat their header and their footer ([Table](../components/t
   ([Layers and rotation](layers-and-rotation.md#rotation-rotate)).
 - **Rotated in-flow elements.** A rotated `Block`, `Text` or `Paragraph` is not split either: like an image, whole or on
   the next page, with the height of the rectangle that encloses it.
+- **Clipped boxes.** A box with `Overflow: clip` is not split either: whole or on the next page
+  ([Overflow](overflow.md#clipping-clip)).
 
 ## Page numbers: `{page}` and `{pages}`
 

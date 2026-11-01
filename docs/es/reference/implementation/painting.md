@@ -16,10 +16,14 @@ una caja redondeada (cuartos de elipse como Bézier) y el trapecio de cada lado 
 Cada `Piece` lleva en `frames` la cadena de giros y recortes de sus ancestros, de la página hacia dentro, y cada paso del
 pintado se la aplica con `Canvas.beginRotation`/`endRotation` y `beginClip`/`endClip`, y después el giro de la propia caja:
 una caja girada se pinta girada con todo lo que contiene, sea un contexto o gire en flujo. Una caja con esquinas
-redondeadas añade a lo que tiene en flujo (también a un `Frame`) el recorte por la curva de su caja de relleno. Un
-`Overlay` hereda solo los giros, y un `Page overlay`, nada. El fondo, el borde y la imagen se pintan con los recortes. El texto
-se pinta solo con los giros, y el contorno de depuración (`Canvas.outlines()`), sin recortes, para que se vea la caja entera. El paso
-de los fondos de una caja que no pinta nada no recorta. Las zonas de los enlaces las calcula
+redondeadas añade a lo que tiene en flujo (también a un `Frame`) el recorte por la curva de su caja de relleno
+(`Frame.Kind.CORNERS`), y una caja con `Overflow: clip` ([Desbordamiento](../common/overflow.md#recortar-clip)), el recorte
+por su caja de relleno a todo lo que contiene (`Frame.Kind.WINDOW`). Un `Overlay` hereda los giros y las ventanas, no las
+esquinas, y un `Page overlay`, nada. El fondo, el borde y la imagen se pintan con todos los recortes (`Clips.ALL`). El texto
+se pinta con los giros y las ventanas (`Clips.WINDOWS`), cada línea con su tamaño (`TextLine.fontSize`, el de la caja o el
+que `Overflow: shrink` le dejó), y el contorno de depuración (`Canvas.outlines()`), sin recortes (`Clips.NONE`), para que se
+vea la caja entera. El paso de los fondos de una caja que no pinta nada, y el del contenido de una caja sin texto ni
+imagen, no recortan. Las zonas de los enlaces las calcula
 `StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`, y el rectángulo de cada tramo con
 enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`. `StackingContext.paintText` parte el
 texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas.

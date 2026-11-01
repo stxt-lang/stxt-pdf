@@ -5,6 +5,9 @@ import static dev.stxt.pdf.tree.ListBuilder.marker;
 import static dev.stxt.pdf.tree.ListBuilder.markerLine;
 import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
+import static dev.stxt.pdf.tree.ModelValidator.validateClip;
+import static dev.stxt.pdf.tree.ModelValidator.validateOverflow;
+import static dev.stxt.pdf.tree.ModelValidator.validateShrink;
 import static dev.stxt.pdf.tree.ModelValidator.validateContainer;
 import static dev.stxt.pdf.tree.ModelValidator.validateRotation;
 import static dev.stxt.pdf.tree.Nodes.child;
@@ -151,6 +154,7 @@ public final class BoxTreeBuilder {
         TableOfContentsBuilder.build(ctx, root);
         References.validate(root);
         LinkTargets.validate(root);
+        validateOverflow(root);
         finish.accept(root);
         // From here on the tree does not change: the layout, the painting and other threads only read it.
         root.close();
@@ -258,6 +262,7 @@ public final class BoxTreeBuilder {
         String id = properties(ctx, n, reader, s, parent);
         reader.check(n, wrapper, s, position);
         validateRotation(s);
+        validateClip(s);
         withoutEffect(ctx, n, wrapper, s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
@@ -281,6 +286,7 @@ public final class BoxTreeBuilder {
             ctx.unbreakable = unbreakable(s);
         }
         reader.content(this, ctx, n, box);
+        validateShrink(n, box);
         ctx.insidePageOverlay = outerPageOverlay;
         ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
@@ -324,6 +330,9 @@ public final class BoxTreeBuilder {
 
     /** How the box is named in messages if it is not split across pages, or {@code null} if it is split. */
     private static String unbreakable(Style s) {
+        if (s.box().clips()) {
+            return "a box with Overflow: clip";
+        }
         return switch (s.position()) {
             case OVERLAY -> "an Overlay";
             case PAGE_OVERLAY -> "a Page overlay";

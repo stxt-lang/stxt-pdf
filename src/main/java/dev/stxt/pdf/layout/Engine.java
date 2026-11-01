@@ -276,17 +276,19 @@ public final class Engine implements LayoutContext {
      * repeated with that space reserved (reference/common/breaks.md): the box ends inside the page or is broken
      * before, and the end goes to the next one with the border and the padding.</p>
      *
-     * <p>A box with {@code Rotate} is not broken, like an image: it is laid out without fragmentation and,
-     * if it does not fit in what is left of the page, it returns {@code BEFORE}; at the start of a page it is
-     * placed even if it does not fit, and {@link Overflow} reports the overflow.</p>
+     * <p>A box with {@code Rotate}, or with {@code Overflow: clip} (reference/common/overflow.md), is not broken, like
+     * an image: it is laid out without fragmentation and, if it does not fit in what is left of the page, it returns
+     * {@code BEFORE}; at the start of a page it is placed even if it does not fit, and {@link Overflow} reports the
+     * overflow.</p>
      */
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         if (box.style().rotatesInFlow()) {
             return rotatedInFlow(box, space);
         }
-        if (space.fragmenting() && box.style().rotation() != null) {
-            // A rotated box is not broken (reference/common/breaks.md): whole or, if it does not fit, on the next page.
+        if (space.fragmenting() && (box.style().rotation() != null || box.style().box().clips())) {
+            // A rotated or clipped box is not broken (reference/common/breaks.md): whole or, if it does not fit, on the
+            // next page.
             LayoutResult whole = layoutOnce(box, space.unfragmented(), from);
             if (!space.atFragmentainerStart()
                     && !fits(whole.fragment().height(), space.fragmentainerRemaining().getAsDouble())) {

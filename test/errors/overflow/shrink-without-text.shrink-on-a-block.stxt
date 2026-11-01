@@ -1,0 +1,20 @@
+# Case: Overflow: shrink on a Block, which has no text
+# Code: SHRINK_WITHOUT_TEXT
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Width: 100
+				Overflow: shrink
+			Text: Un texto dentro

@@ -292,6 +292,23 @@ class BoxLooksPaintTest {
         assertTrue(svg.contains("<g clip-path=\"url(#c0)\"><svg x=\"20.00\""), svg);
     }
 
+    /**
+     * Overflow: clip (reference/common/overflow.md): the frame at (20, 20), 100 × 40, clips the overlay at (100, 30),
+     * 60 × 20, by its right edge (x = 120); without the clip the overlay is painted whole, since it stays on the page.
+     */
+    @Test
+    void overflowClipHidesWhatSticksOutOfTheBox() throws Exception {
+        String clipped = HEAD + "\tFrame:\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 40\n\t\t\tOverflow: clip\n"
+                + "\t\tOverlay:\n\t\t\tOffset: 10 auto auto 80\n\t\t\tBox:\n\t\t\t\tWidth: 60\n\t\t\t\tHeight: 20\n"
+                + "\t\t\t\tBackground: #FF0000\n";
+        BufferedImage page = render(clipped);
+        assertColor(page, 110, 40, 255, 0, 0, 0);
+        assertColor(page, 130, 40, 255, 255, 255, 0);
+        assertColor(render(clipped.replace("\t\t\tOverflow: clip\n", "")), 130, 40, 255, 0, 0, 0);
+        String svg = svg(clipped);
+        assertEquals(1, svg.split("<clipPath", -1).length - 1, svg);
+    }
+
     private static String svg(String document) {
         InlineNode input = new DocumentReader().read(Docs.sectioned(document));
         LaidOutDocument laidOut = new Engine().layOutDocument(input);

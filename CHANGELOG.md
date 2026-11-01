@@ -113,6 +113,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   needs PDF/A-3: otherwise, `ATTACHMENT_REQUIRES_PDFA3` (new code, kind `RESOURCE`). The engine does not generate the
   invoice XML or its metadata. `PdfDocumentWriter.write` has an overload with `PdfA` and `Attachments`.
 - The title, the language and the XMP packet are written by `PdfMetadata` (before, `PdfStructure`).
+- **Overflow policy per box.** `Overflow` in `Box` (`error` by default, `shrink` or `clip`) says what is done when what
+  a box contains does not fit in it. `shrink`, in a box with text (`Text`, `Paragraph`, a `Cell` with a value), reduces
+  the `Size` of the text in steps of 0.5 pt until every line fits in the width and, if the box has a definite height (its
+  `Height`, one imposed by its parent, its `Aspect ratio`) or a `Max height`, the lines fit in it; it never goes below
+  `Min size`, new in `Typography` (inherited, 6 by default), which it tries as the last step. A `Line height` in percent
+  follows the size, one in points does not; the contrast is checked at the reduced size. If the text does not fit even
+  at `Min size`, `TEXT_OVERFLOW` or `BOX_OVERFLOW` as before, and the message says so; where a text could shrink and does
+  not, those messages say that `Overflow: shrink` exists. `Overflow: shrink` written by an element without text is
+  `SHRINK_WITHOUT_TEXT` (new code); from a `Styles` rule it is ignored on boxes without text, so `For element: Cell`
+  serves a whole table; `Min size` greater than `Size` in a box that shrinks is `MIN_SIZE_CONFLICT` (new code).
+  `clip`, in a box without text inside it at any depth (otherwise `CLIP_WITH_TEXT`, new code), paints what sticks out of
+  its padding box clipped, the `Overlay` boxes inside included, and does not check it against the box nor against the
+  page; the box is not split across pages (`Keep together` or `Edges` on it are `BREAK_IN_CLIPPED`, new code, and a
+  `Break` inside it, `BREAK_IN_UNBREAKABLE`). The sizes of the boxes do not change: `shrink` fits the text to them, and
+  `clip` cuts what sticks out.
 
 ## [0.8.0] - 2026-10-31
 

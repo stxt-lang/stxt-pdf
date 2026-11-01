@@ -84,6 +84,29 @@ curve. An image is clipped with the corners of its box. What is inside a rounded
 background, the border or the image of a child that reaches the corner is clipped, without having to round it. Text is
 not clipped, and neither is an `Overlay`, which can stick out of the corner on purpose.
 
+## What does not fit
+
+What does not fit in a box is an error, so that nothing is cut or overlapped without anyone knowing. There are two
+exceptions, asked for box by box with `Overflow`, in `Box`:
+
+- **`Overflow: shrink`**, in a text box (`Text`, `Paragraph` or a `Cell` with a value), **shrinks the letters** until the
+  text fits in the width and, if it is fixed, in the height: half a point at a time, without going below `Min size` (in
+  `Typography`, 6 by default). It is what a fixed-height cell with a name longer than planned needs. If it does not fit
+  even so, the usual error, which says so.
+- **`Overflow: clip`**, in a box without text inside, **clips** what sticks out of it instead of giving an error: a
+  decoration that peeks out over the edge of a card. It is not allowed with text inside, because cut text would not be
+  read, and the box moves whole to the next page if it does not fit in the current one.
+
+```
+Styles:
+    For element: Cell
+        Box:
+            Height: 16
+            Overflow: shrink
+```
+
+More detail in the [reference](../../reference/common/overflow.md#policy-per-box-overflow).
+
 ## What does not change the size
 
 The background, the border color and the corners only change how the box is painted, never where it goes or how big it

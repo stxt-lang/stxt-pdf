@@ -37,6 +37,7 @@ El modelo de caja. No se hereda.
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](values.md#abreviados-de-cuatro-lados)). No afecta al layout. |
 | `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(...)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
+| `Overflow` | `error`, `shrink`, `clip` | `error` | Qué se hace con lo que no cabe en la caja ([Desbordamiento](overflow.md#política-por-caja-overflow)). |
 
 > **Decisión:** `narrowest`, `natural` y `fit` solo valen en `Width` (y en las pistas de `Grid` y `Table`): un alto
 > `auto` ya es el de su contenido, y en `Height` serían otra forma de escribir `auto`. *Alternativa descartada:*
@@ -169,6 +170,3 @@ las esquinas no se pintan dos veces.
 
 - Sombras: el PDF no desenfoca y habría que aproximarlas con capas semitransparentes.
 - Estilos de borde (punteado o doble), varias capas de fondo ni imágenes de fondo.
-- Recorte del contenido por el contorno de una caja cuadrada: lo que se sale de la caja es un
-  [desbordamiento](overflow.md), y las esquinas redondeadas solo recortan los fondos, los bordes y las imágenes
-  ([arriba](#esquinas)).

@@ -171,6 +171,15 @@ caja con texto y `Hyphenate: true` está en un idioma con patrones.
 > átomos (partes de palabra) con sumas de prefijos: con ligaduras una palabra entera no mide lo que suman sus partes,
 > y así cada línea se mide como se pinta.
 
+**Encoger.** Con `Overflow: shrink` ([Desbordamiento](../common/overflow.md#encoger-el-texto-shrink)),
+`InlineLayout.shrink` reparte el texto al `Size` de la caja y, mientras alguna línea mida más que el ancho disponible (con
+la tolerancia de `Overflow`, `Tolerance.MODEL`) o las líneas sumen más que el límite de alto (`InlineLayout.limit`: la caja de
+contenido del `BoxModel.height()` definido o, sin él, del `maxHeight()`), vuelve a repartirlo a un tamaño 0,5 pt menor, con
+`Min size` como último paso. El límite forma parte de la clave del reparto memorizado (`BrokenKey`), porque la misma caja se
+mide sin alto (`measuringContentHeight`) y se maqueta después estirada. Las líneas guardan el tamaño al que se repartieron
+(`TextLine.fontSize`, el que usan `LineBreaker.place`, `Engine.number` y el pintado), y el interlineado sale de
+`TypographyStyle.usedLineHeight(size)`. Los tamaños intrínsecos (`contentIntrinsic`) se miden al `Size`.
+
 **Medida.** Un `TextMeasurer` tiene que ser **aditivo entre palabras** (el ancho de un texto es la suma de los de sus palabras
 y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.width(texto, tamaño, ligaduras, kerning)`,
 que aplica `GSUB` y los pares de kerning palabra a palabra si se piden; un par no cruza un espacio, así que la suma sigue
@@ -260,7 +269,11 @@ cambia, y el resto sale de la caché. El flujo ya está paginado y no se toca: u
 ## Desbordamientos
 
 `Overflow` recorre el resultado paginado y señala al culpable más interior ([Desbordamiento](../common/overflow.md)),
-usando el `PageSetup` de cada página. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
+usando el `PageSetup` de cada página. Lo que contiene una caja con `Overflow: clip` no se comprueba contra ella (ni sus
+líneas ni sus hijos) y, con el indicador `clipped` que baja por sus descendientes, tampoco contra la página; cada caja de
+dentro se sigue comprobando contra su propio padre. `Engine.layout` maqueta una caja con `Overflow: clip` como una girada:
+sin fragmentación, y `BEFORE` si no cabe en lo que queda de la página. Donde un texto podría encoger, `textOverflow` y
+`tooTall` lo dicen, y donde ya encoge y no cabe a `Min size`, también. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
 layout, y `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar y la precisión de los volcados. Se
 compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un `1e-9` propio.
 

@@ -917,7 +917,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Box
 		Type: GROUP
-		Description: Box model: size, margins, padding, border and background. Not inherited.
+		Description: Box model: size, margins, padding, border and background, and what is done with what does not fit (Overflow). Not inherited.
 		Children:
 			Child: Width
 				Max: 1
@@ -945,9 +945,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Background
 				Max: 1
+			Child: Overflow
+				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Font, code font, weight, size, line height, alignment, hyphenation, color and language of the text, heading numbering, and widows and orphans. Inherited.
+		Description: Font, code font, weight, size (and the minimum it may shrink to), line height, alignment, hyphenation, color and language of the text, heading numbering, and widows and orphans. Inherited.
 		Children:
 			Child: Font
 				Max: 1
@@ -960,6 +962,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Italic
 				Max: 1
 			Child: Size
+				Max: 1
+			Child: Min size
 				Max: 1
 			Child: Line height
 				Max: 1
@@ -1130,6 +1134,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background, the border and the clipping of an Image or a Barcode.
 	Node: Background
 		Description: Background, painted in the padding box: a color or a gradient linear(angle, color, color...).
+	Node: Overflow
+		Type: ENUM
+		Description: What is done when what the box contains does not fit in it: error (by default) stops the conversion; shrink, only in a box with text (Text, Paragraph, a Cell with a value), reduces the Size of the text in steps of 0.5 pt until it fits, without going below Min size (if it still does not fit, it is an error); clip, only in a box without text inside, paints what sticks out of its padding box clipped (also the Overlay boxes inside) and does not split the box across pages.
+		Values:
+			Value: error
+			Value: shrink
+			Value: clip
 
 	# Typography
 
@@ -1148,6 +1159,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Italic: the italic variant of the font. By default, false.
 	Node: Size
 		Description: Font size, a length. Required in the text, own or inherited (also from Document).
+	Node: Min size
+		Description: The smallest Size that Overflow: shrink may reduce the text to, a length. By default, 6. Inherited. In a box with Overflow: shrink it cannot be greater than Size.
 	Node: Line height
 		Description: Line height: a length, or a percentage (120%) relative to the Size.
 	Node: Align

@@ -72,8 +72,8 @@ un salto a la columna siguiente (que, en la última columna, es también de pág
 - Un corte forzado al principio de una página (o de una columna) se ignora: no deja páginas en blanco. Lo mismo el
   `After: page` de la última caja de una sección.
 - Un corte de página dentro de un `Columns` deja sin llenar las columnas que quedan en esa página.
-- Dentro de una caja que no se parte (un `Overlay`, un `Page overlay`, un `Frame` girado o una caja girada en flujo), ningún
-  `Break` tiene efecto. Si lo escribe el propio elemento (o la `Row` de una celda) es un error
+- Dentro de una caja que no se parte (un `Overlay`, un `Page overlay`, un `Frame` girado, una caja girada en flujo o una
+  caja con `Overflow: clip`), ningún `Break` tiene efecto. Si lo escribe el propio elemento (o la `Row` de una celda) es un error
   (`BREAK_IN_UNBREAKABLE`). Si llega de una regla de `Styles`, no tiene efecto y no es un error. Las columnas de un `Columns` de dentro sí se cortan, y sus `Break` cuentan.
 
 > **Decisión:** un corte de página atraviesa las columnas de un `Columns`. *Límite:* dentro de un ítem de un `Stack` o
@@ -138,6 +138,8 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../components
   ([Capas y giro](layers-and-rotation.md#giro-rotate)).
 - **Giradas en flujo.** Un `Block`, un `Text` o un `Paragraph` girado tampoco se parte: como una imagen, entero o en la
   página siguiente, con el alto del rectángulo que lo envuelve.
+- **Recortadas.** Una caja con `Overflow: clip` tampoco: entera o en la página siguiente
+  ([Desbordamiento](overflow.md#recortar-clip)).
 
 ## Números de página: `{page}` y `{pages}`
 

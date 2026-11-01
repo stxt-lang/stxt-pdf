@@ -1,0 +1,21 @@
+# Case: Min size greater than Size in a text that shrinks
+# Code: MIN_SIZE_CONFLICT
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: Un texto que encoge
+			Box:
+				Width: 100
+				Overflow: shrink
+			Typography:
+				Min size: 12

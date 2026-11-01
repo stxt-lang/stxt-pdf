@@ -1,6 +1,7 @@
 # Overflow
 
-**Nothing can overflow.** The engine checks the already paginated result and gives an error with the first of these
+**Nothing can overflow**, except what a box decides with [`Overflow`](#policy-per-box-overflow). The engine checks the
+already paginated result and gives an error with the first of these
 situations:
 
 - **a word wider than its line, or a line of a text with `Preformatted: true` wider than its box**
@@ -59,3 +60,105 @@ the culprit of what goes outside the width of the rotated one.
 > **Decision:** the error points to the property that has to be changed (the `Width`, the `Height`, the `Line height`) and
 > not to the box. *Rejected alternative:* the line of the box, or always comparing with the immediate parent, which in an
 > `auto` box points to the box and not to what widens it.
+
+## Policy per box: `Overflow`
+
+`Overflow`, in the `Box` group, says what the engine does when what a box contains does not fit in it. It is not
+inherited.
+
+| Value | What it does | Where it is valid |
+|---|---|---|
+| `error` | The above: the first overflow stops the conversion. It is the default. | In any box |
+| `shrink` | Reduces the `Size` of the text until it fits, without going below `Min size` ([shrinking](#shrinking-the-text-shrink)). | In a box with text: `Text`, `Paragraph` and a `Cell` with a value |
+| `clip` | Paints what sticks out of the padding box clipped and does not check it ([clipping](#clipping-clip)). | In a box without text inside |
+
+### Shrinking the text: `shrink`
+
+With `Overflow: shrink` the text is broken into lines at the `Size` of the box and, if some line is wider than the
+content box or the lines do not fit in its height, it is broken again at a smaller size: in steps of 0.5 pt down from
+`Size`, with `Min size` as the last attempt if the step skips it. The largest size at which it fits is kept. `Min size`
+is a `Typography` property ([Typography](typography.md)): it is inherited and is 6 by default.
+
+- **In width**, always: the width of a box is definite when laying out, and what has to fit is each line (in a normal
+  text, its widest word) in the width of the content box.
+- **In height**, only if the box has a height that does not come from its content: its `Height`, the one its parent
+  imposes (a cell of a fixed-height row, a stretched item) or the one that follows from `Aspect ratio`; otherwise, its
+  `Max height`. With an `auto` height the box grows with its lines and there is nothing to shrink.
+- The `Line height` follows the size if it is a percentage (also the default 120%); a length in points does not change.
+- Nothing else changes: the font, the color, the `Case` and the tagging of the PDF are the same. The contrast is checked
+  with the reduced size: a text that goes below 18 pt stops being large ([The PDF](pdf.md#contrast)).
+- If it does not fit even at `Min size`, it is the usual error (`TEXT_OVERFLOW` or `BOX_OVERFLOW`), and the message says
+  that the text is already at `Min size`. Where the text could shrink and does not, the message of those two errors says
+  that `shrink` exists.
+- The intrinsic sizes (the narrowest and the natural width, [The box](box.md#intrinsic-sizes)) are measured at `Size`,
+  not at `Min size`: a box with an `auto` width, an `auto` column of a table or an item with its automatic minimum grow
+  to their content and do not shrink the text. `shrink` acts where the size is fixed.
+
+`Overflow: shrink` only has an effect on a box with text. Written on an element without text (a `Block`, a `Cell` with
+elements inside) it is an error (`SHRINK_WITHOUT_TEXT`); if it reaches a box without text from a `Styles` rule, it does
+nothing and is not an error, like a `Break` that reaches a box that is not split from a rule
+([Errors](errors.md#what-has-no-effect)): this way `For element: Cell` serves every cell of a table that is filled from
+data. `Min size` greater than `Size` in a box that shrinks is a contradiction (`MIN_SIZE_CONFLICT`); equal to `Size` is
+not.
+
+```stxt
+Styles:
+    For element: Cell
+        Box:
+            Height: 16
+            Overflow: shrink
+```
+
+### Clipping: `clip`
+
+With `Overflow: clip` the box is a window: what it contains is painted clipped by its padding box (with its corners, if
+they are rounded), the `Overlay` boxes that hang from it or from its descendants included, and nothing that sticks out
+of it is checked, neither against the box nor against the physical page. What is inside is checked as always against its
+own parent: a grandchild that sticks out of a child is still an overflow. So is the box itself: it fits in its parent and
+on the page.
+
+- Only in a box without text inside, at any depth: clipped text would be content that is not read and would give no
+  warning. With text inside it is an error (`CLIP_WITH_TEXT`). To clip a decoration in a card with text, the decoration
+  is wrapped in an `Overlay` with `Offset: 0` and `Overflow: clip`, and the text goes outside it.
+- It is not split across pages: like a rotated box, it moves whole to the next page if it does not fit in what is left,
+  and if it does not fit on a page it is `PAGE_OVERFLOW` ([Breaks](breaks.md#what-is-not-split)). `Keep together` and
+  `Edges` on it have no effect and are an error (`BREAK_IN_CLIPPED`), and a `Break` written by an element inside it,
+  `BREAK_IN_UNBREAKABLE`.
+- In a box with nothing that could stick out (an `Image`, an empty `Block`) `clip` does nothing and is not an error, like
+  a `Corner radius` with nothing to round.
+
+```stxt
+Frame:
+    Box:
+        Width: 120
+        Height: 50
+        Background: #EEF2F7
+        Overflow: clip
+    Overlay:
+        Offset: 20 auto auto 90
+        Box:
+            Width: 60
+            Height: 60
+            Corner radius: 50%
+            Background: #C8102E
+```
+
+> **Decision:** `error` by default: the engine stays strict, and shrinking or clipping is the author's decision, box by
+> box or by type with a rule. *Rejected alternative:* shrinking by default in cells, which would change existing documents
+> without warning.
+
+> **Decision:** `shrink` goes down in steps of 0.5 pt and tries `Min size` as the last step, instead of searching for the
+> exact size at which it fits: it gives readable sizes (`8`, `7.5`) and the same result after a minimal change of the
+> text. *Rejected alternative:* a binary search down to the thousandth.
+
+> **Decision:** the intrinsic sizes are measured at `Size`, so `shrink` only acts where the size is fixed and an `auto`
+> column grows instead of shrinking its text. *Rejected alternative:* measuring the narrowest width at `Min size`, with
+> which a table with `auto` columns would shrink the text without anyone asking for it.
+
+> **Decision:** `clip` also clips the `Overlay` boxes inside and admits no text, the opposite of rounded corners, which
+> clip neither the text nor the `Overlay` boxes: its use is the decoration that peeks out over the edge of a box, and what
+> is not seen cannot be content. *Rejected alternative:* not clipping the text and still checking it, a mixed rule in
+> which the text of a box that sticks out would stay in view outside the window.
+
+> **Decision:** a box with `clip` is not split: a window split across pages would have to decide which part of what is
+> clipped goes in each fragment. *Rejected alternative:* splitting it and clipping each fragment on its own.

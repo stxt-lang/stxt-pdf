@@ -81,6 +81,29 @@ Una imagen se recorta con las esquinas de su caja. Lo que hay dentro de una caja
 fondo, el borde o la imagen de un hijo que llega a la esquina se recorta, sin tener que redondearlo. El texto no se recorta,
 ni un `Overlay`, que puede asomar por la esquina a propósito.
 
+## Lo que no cabe
+
+Lo que no cabe en una caja es un error, para que nada quede cortado ni montado sin que se sepa. Hay dos excepciones, que se
+piden caja a caja con `Overflow`, en `Box`:
+
+- **`Overflow: shrink`**, en una caja de texto (`Text`, `Paragraph` o una `Cell` con valor), **encoge la letra** hasta que
+  el texto cabe en el ancho y, si lo tiene fijo, en el alto: de medio punto en medio punto, sin bajar de `Min size`
+  (en `Typography`, 6 por defecto). Es lo que necesita una celda de alto fijo con un nombre más largo de lo previsto. Si
+  ni así cabe, el error de siempre, que lo dice.
+- **`Overflow: clip`**, en una caja sin texto dentro, **recorta** lo que se sale de ella en lugar de dar error: una
+  decoración que asoma por el borde de una tarjeta. No se admite con texto dentro, porque un texto cortado no se leería,
+  y la caja pasa entera a la página siguiente si no cabe en la actual.
+
+```
+Styles:
+    For element: Cell
+        Box:
+            Height: 16
+            Overflow: shrink
+```
+
+Más detalle en la [referencia](../../reference/common/overflow.md#política-por-caja-overflow).
+
 ## Lo que no cambia el tamaño
 
 El fondo, el color del borde y las esquinas solo cambian cómo se pinta la caja, nunca dónde va ni cuánto mide.

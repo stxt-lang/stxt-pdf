@@ -1,0 +1,76 @@
+# Overflow (reference/common/overflow.md): page of 200 × 300 with margins of 20, page area of 160 × 260 from (20, 20).
+# One box after the other in block flow; the Rects are those of the declared sizes, which Overflow: shrink does not
+# change (it reduces the Size of the text until it fits them).
+#   shrink:   a Text with Width 120 and Height 14 whose text does not fit in one line at Size 10: the text is reduced
+#             until it fits the width in one line of at most 14. Rect 20 20 120 14.
+#   table:    a Table of 50 + 110 with For element: Cell giving Height 16 and Overflow: shrink. "Cliente" fits at Size
+#             10 and is not reduced; the second cell is. Rect 20 34 160 16; c1 20 34 50 16; c2 70 34 110 16.
+#   absolute: a Text with Line height 12 (points, not a percentage), Width 100 and Height 24: three lines at Size 10
+#             do not fit in 24, and the text is reduced until it has two, which keep the line height of 12.
+#             Rect 20 50 100 24.
+#   clip:     a Frame of 120 × 50 with Overflow: clip, a background and two boxes that stick out of it, painted clipped
+#             by its padding box: band, in flow, 160 wide (Rect 20 74 160 10), and badge, an Overlay with Offset
+#             20 auto auto 90 of 60 × 60 (Rect 110 94 60 60), which sticks out on the right and at the bottom.
+#             Rect 20 74 120 50.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 300
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Cell
+			Box:
+				Height: 16
+				Overflow: shrink
+	Section:
+		Text: Nombre de cliente especialmente largo
+			Id: shrink
+			Box:
+				Width: 120
+				Height: 14
+				Border: 0 0 1 0
+				Overflow: shrink
+		Table:
+			Id: table
+			Column sizes: 50 110
+			Body:
+				Row:
+					Cell: Cliente
+						Id: c1
+					Cell: Transportes del Mediterráneo S.L.
+						Id: c2
+		Text: Un texto que se encoge hasta caber en dos líneas
+			Id: absolute
+			Box:
+				Width: 100
+				Height: 24
+				Overflow: shrink
+			Typography:
+				Line height: 12
+		Frame:
+			Id: clip
+			Box:
+				Width: 120
+				Height: 50
+				Background: #EEF2F7
+				Overflow: clip
+			Block:
+				Id: band
+				Box:
+					Width: 160
+					Height: 10
+					Background: #1F3A5F
+			Overlay:
+				Id: badge
+				Offset: 20 auto auto 90
+				Box:
+					Width: 60
+					Height: 60
+					Corner radius: 50%
+					Background: #C8102E

@@ -1,0 +1,20 @@
+# The declared sizes, one box after the other from y = 20 (see input.stxt): shrink does not move anything, and what
+# sticks out of clip keeps its place.
+Result:
+	Page: 1
+		Fragment: shrink
+			Rect: 20 20 120 14
+		Fragment: table
+			Rect: 20 34 160 16
+			Fragment: c1
+				Rect: 20 34 50 16
+			Fragment: c2
+				Rect: 70 34 110 16
+		Fragment: absolute
+			Rect: 20 50 100 24
+		Fragment: clip
+			Rect: 20 74 120 50
+			Fragment: band
+				Rect: 20 74 160 10
+			Fragment: badge
+				Rect: 110 94 60 60

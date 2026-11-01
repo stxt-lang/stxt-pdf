@@ -207,8 +207,8 @@ once, and the elements, as many times as needed.
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; one in-flow element |
-| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background` |
-| `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background`, `Overflow` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Min size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
 *Elements* are `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`,

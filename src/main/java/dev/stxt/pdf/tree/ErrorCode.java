@@ -222,6 +222,14 @@ public enum ErrorCode {
     ASPECT_RATIO_CONFLICT,
     /** Minimum greater than the maximum, or a size outside its minimum and its maximum. */
     MIN_MAX_CONFLICT,
+    /** {@code Overflow: shrink} written by an element without text (reference/common/overflow.md). */
+    SHRINK_WITHOUT_TEXT,
+    /** {@code Overflow: clip} in a box with text inside it, at any depth (reference/common/overflow.md). */
+    CLIP_WITH_TEXT,
+    /** {@code Min size} greater than {@code Size} in a box with {@code Overflow: shrink}. */
+    MIN_SIZE_CONFLICT,
+    /** {@code Keep together} or {@code Edges} in a box with {@code Overflow: clip}, which is not split. */
+    BREAK_IN_CLIPPED,
     /** A vertical percentage whose base is not a definite height. */
     INDEFINITE_PERCENTAGE,
     /** Non-rectangular {@code Areas} or an invalid {@code Area} value. */

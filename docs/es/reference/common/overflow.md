@@ -1,6 +1,7 @@
 # Desbordamiento
 
-**Nada puede desbordar.** El motor comprueba el resultado ya paginado y da un error con la primera de estas situaciones:
+**Nada puede desbordar**, salvo lo que una caja decide con [`Overflow`](#política-por-caja-overflow). El motor comprueba el
+resultado ya paginado y da un error con la primera de estas situaciones:
 
 - **una palabra más ancha que su línea, o una línea de un texto con `Preformatted: true` más ancha que su caja**
   (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra;
@@ -56,3 +57,103 @@ sale a lo ancho de la girada.
 > **Decisión:** el error señala la propiedad que hay que cambiar (el `Width`, el `Height`, el `Line height`) y no la caja.
 > *Alternativa descartada:* la línea de la caja, o comparar siempre con el padre inmediato, que en una caja `auto` señala
 > la caja y no lo que la ensancha.
+
+## Política por caja: `Overflow`
+
+`Overflow`, en el grupo `Box`, dice qué hace el motor cuando lo que una caja contiene no cabe en ella. No se hereda.
+
+| Valor | Qué hace | Dónde vale |
+|---|---|---|
+| `error` | Lo de arriba: el primer desbordamiento para la conversión. Es el valor por defecto. | En cualquier caja |
+| `shrink` | Reduce el `Size` del texto hasta que cabe, sin bajar de `Min size` ([encoger](#encoger-el-texto-shrink)). | En una caja con texto: `Text`, `Paragraph` y `Cell` con valor |
+| `clip` | Pinta recortado lo que se sale de la caja de relleno y no lo comprueba ([recortar](#recortar-clip)). | En una caja sin texto dentro |
+
+### Encoger el texto: `shrink`
+
+Con `Overflow: shrink` el texto se reparte en líneas al `Size` de la caja y, si alguna línea es más ancha que la caja de
+contenido o las líneas no caben en su alto, se reparte otra vez a un tamaño menor: de 0,5 en 0,5 pt desde el `Size`, y
+`Min size` como último intento si el paso lo salta. Se queda con el mayor tamaño al que cabe. `Min size` es una propiedad
+de `Typography` ([Tipografía](typography.md)): se hereda y vale 6 por defecto.
+
+- **A lo ancho**, siempre: el ancho de una caja es definido al maquetar, y lo que tiene que caber es cada línea (en un
+  texto normal, su palabra más ancha) en el ancho de la caja de contenido.
+- **A lo alto**, solo si la caja tiene un alto que no sale de su contenido: su `Height`, el que le impone el padre (una
+  celda de una fila de alto fijo, un ítem estirado) o el que sale de `Aspect ratio`; si no, su `Max height`. Con alto
+  `auto` la caja crece con sus líneas y no hay nada que encoger.
+- El `Line height` sigue al tamaño si es un porcentaje (también el 120 % por defecto); una medida en puntos no cambia.
+- Nada más cambia: la fuente, el color, el `Case` y el etiquetado del PDF son los mismos. El contraste se comprueba con
+  el tamaño reducido: un texto que baja de 18 pt deja de ser grande ([El PDF](pdf.md#contraste)).
+- Si ni a `Min size` cabe, es el error de siempre (`TEXT_OVERFLOW` o `BOX_OVERFLOW`), y el mensaje dice que el texto ya
+  está a `Min size`. Donde el texto podría encoger y no lo hace, el mensaje de esos dos errores dice que existe `shrink`.
+- Los tamaños intrínsecos (el ancho más estrecho y el natural, [La caja](box.md#tamaños-intrínsecos)) se miden al `Size`,
+  no a `Min size`: una caja de ancho `auto`, una columna `auto` de una tabla o un ítem con su mínimo automático crecen
+  hasta su contenido y no encogen el texto. `shrink` actúa donde el tamaño está fijado.
+
+`Overflow: shrink` solo tiene efecto en una caja con texto. Escrito en un elemento sin texto (un `Block`, una `Cell` con
+elementos dentro) es un error (`SHRINK_WITHOUT_TEXT`); si llega de una regla de `Styles` a una caja sin texto, no hace
+nada y no es un error, como un `Break` que llega de una regla a una caja que no se parte
+([Errores](errors.md#lo-que-no-tiene-efecto)): así `For element: Cell` sirve para todas las celdas de una tabla que se
+rellena desde datos. `Min size` mayor que `Size` en una caja que encoge es una contradicción (`MIN_SIZE_CONFLICT`);
+igual que `Size` no lo es.
+
+```stxt
+Styles:
+    For element: Cell
+        Box:
+            Height: 16
+            Overflow: shrink
+```
+
+### Recortar: `clip`
+
+Con `Overflow: clip` la caja es una ventana: lo que contiene se pinta recortado por su caja de relleno (con sus esquinas,
+si las tiene redondeadas), también los `Overlay` que cuelgan de ella o de sus descendientes, y nada de lo que se sale de
+ella se comprueba, ni contra la caja ni contra la página física. Lo que hay dentro se comprueba como siempre contra su
+propio padre: un nieto que se sale de un hijo sigue siendo un desbordamiento. La caja misma también: cabe en su padre y
+en la página.
+
+- Solo en una caja sin texto dentro, a cualquier profundidad: un texto recortado sería contenido que no se lee y no
+  avisaría. Con texto dentro es un error (`CLIP_WITH_TEXT`). Para recortar una decoración en una tarjeta con texto, la
+  decoración se envuelve en un `Overlay` con `Offset: 0` y `Overflow: clip`, y el texto va fuera de él.
+- No se parte entre páginas: como una caja girada, pasa entera a la página siguiente si no cabe en lo que queda, y si no
+  cabe en una página es `PAGE_OVERFLOW` ([Cortes](breaks.md#lo-que-no-se-parte)). `Keep together` y `Edges` en ella no
+  tienen efecto y son un error (`BREAK_IN_CLIPPED`), y un `Break` escrito por un elemento de dentro,
+  `BREAK_IN_UNBREAKABLE`.
+- En una caja sin nada que pueda salirse (una `Image`, un `Block` vacío) `clip` no hace nada y no es un error, como un
+  `Corner radius` sin nada que redondear.
+
+```stxt
+Frame:
+    Box:
+        Width: 120
+        Height: 50
+        Background: #EEF2F7
+        Overflow: clip
+    Overlay:
+        Offset: 20 auto auto 90
+        Box:
+            Width: 60
+            Height: 60
+            Corner radius: 50%
+            Background: #C8102E
+```
+
+> **Decisión:** `error` por defecto: el motor sigue siendo estricto, y encoger o recortar es una decisión del autor, caja
+> a caja o por tipo con una regla. *Alternativa descartada:* encoger por defecto en las celdas, que cambiaría documentos
+> existentes sin avisar.
+
+> **Decisión:** `shrink` baja de 0,5 en 0,5 pt y prueba `Min size` como último paso, en lugar de buscar el tamaño exacto
+> al que cabe: da tamaños legibles (`8`, `7.5`) y el mismo resultado ante un cambio mínimo del texto. *Alternativa
+> descartada:* una búsqueda binaria hasta la milésima.
+
+> **Decisión:** los tamaños intrínsecos se miden al `Size`, así que `shrink` solo actúa donde el tamaño está fijado y una
+> columna `auto` crece en lugar de encoger su texto. *Alternativa descartada:* medir el ancho más estrecho a `Min size`,
+> con el que una tabla de columnas `auto` encogería el texto sin que nadie lo pidiera.
+
+> **Decisión:** `clip` recorta también los `Overlay` de dentro y no admite texto, al revés que las esquinas redondeadas,
+> que no recortan ni el texto ni los `Overlay`: su uso es la decoración que asoma por el borde de una caja, y lo que no
+> se ve no puede ser contenido. *Alternativa descartada:* no recortar el texto y seguir comprobándolo, una regla mixta
+> en la que el texto de una caja que se sale quedaría a la vista fuera de la ventana.
+
+> **Decisión:** una caja con `clip` no se parte: una ventana partida entre páginas tendría que decidir qué parte de lo
+> recortado va en cada fragmento. *Alternativa descartada:* partirla y recortar cada fragmento por su cuenta.

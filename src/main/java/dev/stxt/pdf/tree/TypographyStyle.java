@@ -14,8 +14,8 @@ import dev.stxt.pdf.model.Preformatted;
 import java.util.Locale;
 
 /**
- * The {@code Typography} group (reference/common/typography.md): the font, the size, the line height, the alignment,
- * the color, the case, the letter spacing, the kerning and the white space of the text, the hyphenation, the
+ * The {@code Typography} group (reference/common/typography.md): the font, the size (and the minimum it may be
+ * reduced to with {@code Overflow: shrink}), the line height, the alignment, the color, the case, the letter spacing, the kerning and the white space of the text, the hyphenation, the
  * numbering of the headings, the language and the widows and orphans. It is the only group that is
  * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link Style#inheriting}).
  */
@@ -29,6 +29,11 @@ public final class TypographyStyle extends StyleGroup {
     private FontStyle fontStyle = FontStyle.NORMAL;
     /** {@code NaN} = not declared, which is an error in a box with text (reference/common/errors.md). */
     private double fontSize = Double.NaN;
+    /**
+     * {@code Min size}: the size below which {@code Overflow: shrink} does not reduce the text
+     * (reference/common/overflow.md). Inherited.
+     */
+    private double minFontSize = 6;
     /** {@code null} = 120% of the size. A number is points; a percentage, relative to the size. */
     private Value lineHeight;
     private TextAlign textAlign = TextAlign.LEFT;
@@ -89,6 +94,7 @@ public final class TypographyStyle extends StyleGroup {
         fontWeight = parent.fontWeight;
         fontStyle = parent.fontStyle;
         fontSize = parent.fontSize;
+        minFontSize = parent.minFontSize;
         lineHeight = parent.lineHeight;
         textAlign = parent.textAlign;
         lineBreaking = parent.lineBreaking;
@@ -153,6 +159,15 @@ public final class TypographyStyle extends StyleGroup {
     void setFontSize(double v) {
         writable();
         fontSize = v;
+    }
+
+    public double minFontSize() {
+        return minFontSize;
+    }
+
+    void setMinFontSize(double v) {
+        writable();
+        minFontSize = v;
     }
 
     public Value lineHeight() {
@@ -339,9 +354,17 @@ public final class TypographyStyle extends StyleGroup {
 
     /** Used line height, in points. */
     public double usedLineHeight() {
+        return usedLineHeight(fontSize);
+    }
+
+    /**
+     * Used line height, in points, of the text at {@code size}: a {@code Line height} in points stays, and a percentage
+     * (or the default 120%) follows the size, which {@code Overflow: shrink} reduces (reference/common/overflow.md).
+     */
+    public double usedLineHeight(double size) {
         if (lineHeight == null) {
-            return fontSize * 1.2;
+            return size * 1.2;
         }
-        return lineHeight.resolve(fontSize).orElse(fontSize * 1.2);
+        return lineHeight.resolve(size).orElse(size * 1.2);
     }
 }

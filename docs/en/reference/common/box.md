@@ -37,6 +37,7 @@ The box model. It is not inherited.
 | `Border color` | 1 to 4 colors | the text `Color` | Top, right, bottom, left ([Values](values.md#four-side-shorthands)). It does not affect the layout. |
 | `Corner radius` | 1 to 4 values (number ≥ 0, % ≥ 0) | `0` | Rounded corners of the border box: top left, top right, bottom right, bottom left ([corners](#corners)). It does not affect the layout. |
 | `Background` | color or `linear(...)` | transparent | It is painted in the padding box ([background](#background-border-and-corners)). It does not affect the layout. |
+| `Overflow` | `error`, `shrink`, `clip` | `error` | What is done with what does not fit in the box ([Overflow](overflow.md#policy-per-box-overflow)). |
 
 > **Decision:** `narrowest`, `natural` and `fit` are valid only in `Width` (and in the tracks of `Grid` and `Table`): an `auto`
 > height is already that of its content, and in `Height` they would be another way of writing `auto`. *Rejected alternative:*
@@ -169,6 +170,3 @@ the corners are not painted twice.
 
 - Shadows: PDF does not blur, and they would have to be approximated with semitransparent layers.
 - Border styles (dotted or double), several background layers or background images.
-- Clipping of the content along the outline of a square box: what sticks out of the box is an
-  [overflow](overflow.md), and rounded corners only clip backgrounds, borders and images
-  ([above](#corners)).

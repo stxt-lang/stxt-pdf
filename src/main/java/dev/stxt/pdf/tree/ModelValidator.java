@@ -16,7 +16,9 @@ import dev.stxt.pdf.model.Value;
 import java.util.List;
 import java.util.Locale;
 
+import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
+import static dev.stxt.pdf.tree.Nodes.inline;
 import static dev.stxt.pdf.tree.Nodes.label;
 import static dev.stxt.pdf.tree.Nodes.position;
 import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
@@ -43,9 +45,11 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_VERTICAL;
 import static dev.stxt.pdf.tree.PropertyKey.MARGIN;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_WIDTH;
+import static dev.stxt.pdf.tree.PropertyKey.MIN_FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.MIN_HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MIN_WIDTH;
 import static dev.stxt.pdf.tree.PropertyKey.OFFSET;
+import static dev.stxt.pdf.tree.PropertyKey.OVERFLOW;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE_ORIGIN;
 import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
@@ -193,6 +197,87 @@ final class ModelValidator {
             throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins has no effect on a rotated box, "
                     + "which already stops margin merging with its children: it is not needed");
         }
+    }
+
+    /**
+     * A box with {@code Overflow: clip} is not split across pages (reference/common/overflow.md): {@code Keep together}
+     * and {@code Edges}, also from a rule, have no effect on it.
+     */
+    static void validateClip(Style s) {
+        if (!s.box().clips()) {
+            return;
+        }
+        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
+            if (s.isDeclared(p)) {
+                throw error(s.line(p), ErrorCode.BREAK_IN_CLIPPED, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
+                        + " has no effect on a box with Overflow: clip, which does not split across pages: it is not "
+                        + "needed");
+            }
+        }
+    }
+
+    /**
+     * {@code Overflow: shrink} written by the element itself needs text to reduce (reference/common/overflow.md); from
+     * a rule it is not checked, so that a rule by type ({@code For element: Cell}) serves the cells with a value and
+     * leaves the others alone. After the content is read, which is where the text of a {@code Content} block comes
+     * from.
+     */
+    static void validateShrink(InlineNode n, Box box) {
+        if (!box.style().box().shrinks() || box.hasText()) {
+            return;
+        }
+        child(n, "box").map(Nodes::inline).flatMap(b -> child(b, "overflow")).ifPresent(p -> {
+            throw error(p, ErrorCode.SHRINK_WITHOUT_TEXT, "Overflow: shrink only has an effect on a box with text (a "
+                    + "Text, a Paragraph or a Cell with a value), and this " + n.getName() + " has none: it goes on the "
+                    + "box with the text");
+        });
+    }
+
+    /**
+     * The whole tree, once built (reference/common/overflow.md): a box with {@code Overflow: clip} has no text inside
+     * it, at any depth, because clipped text would not be read; and where the text shrinks, {@code Min size} is not
+     * greater than {@code Size}.
+     */
+    static void validateOverflow(Box box) {
+        Style s = box.style();
+        if (s.box().clips()) {
+            Box text = textInside(box);
+            if (text != null) {
+                throw error(s.line(OVERFLOW), ErrorCode.CLIP_WITH_TEXT, "Overflow: clip is not allowed on a box with text "
+                        + "inside it (the text at line " + text.textLine() + "): clipped text would not be read. Only "
+                        + "boxes without text are clipped; the text goes outside the clipped box");
+            }
+        }
+        if (s.box().shrinks() && box.hasText() && s.typography().minFontSize() > s.typography().fontSize()) {
+            throw error(s.line(MIN_FONT_SIZE), ErrorCode.MIN_SIZE_CONFLICT, "Min size (" + pt(s.typography().minFontSize())
+                    + ") is greater than Size (" + pt(s.typography().fontSize()) + ", " + s.line(FONT_SIZE) + "): "
+                    + "Overflow: shrink cannot reduce the text below Min size");
+        }
+        for (Box child : box.children()) {
+            validateOverflow(child);
+        }
+    }
+
+    /** A measure in points, as {@code layout.Messages.pt} writes it: at most two decimals and the unit. */
+    private static String pt(double v) {
+        return String.format(Locale.ROOT, "%.2f", v).replaceAll("\\.?0+$", "") + " pt";
+    }
+
+    /** The first box with text inside {@code box}, itself included, in document order; its marker counts. Or null. */
+    private static Box textInside(Box box) {
+        if (box.hasText()) {
+            return box;
+        }
+        if (box.marker() != null && box.marker().hasText()) {
+            return box.marker();
+        }
+        for (Box child : box.children()) {
+            Box text = textInside(child);
+            if (text != null) {
+                return text;
+            }
+        }
+        return null;
     }
 
     /**

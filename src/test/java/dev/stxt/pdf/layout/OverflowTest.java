@@ -4,6 +4,9 @@ import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
+import dev.stxt.pdf.model.Rect;
+
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,5 +218,64 @@ class OverflowTest {
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b",
                 "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));
         assertContains("measure 110 pt and leave no room for the body", e);
+    }
+
+    // Overflow: shrink and clip (reference/common/overflow.md).
+
+    @Test
+    void aTextThatCouldShrinkIsToldSo() {
+        InvalidModelException word = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tText: aaaaaaaaaaaa", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50")));
+        assertContains("the box has to be wider or the Size of the text smaller, or its Box needs Overflow: shrink, "
+                + "which reduces the Size until the text fits", word);
+        InvalidModelException tall = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tText: aaaa bbbb cccc", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 20")));
+        assertContains("its text reaches 24 pt and the box leaves 20 pt, or its Box needs Overflow: shrink", tall);
+    }
+
+    @Test
+    void aTextThatDoesNotFitAtMinSizeSaysSo() {
+        // Eight characters: 32 pt at Min size 8, inherited from the block, in a box of 20.
+        InvalidModelException word = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tBlock:", "\t\tTypography:", "\t\t\tMin size: 8", "\t\tText: aaaaaaaa", "\t\t\tId: T",
+                        "\t\t\tBox:", "\t\t\t\tWidth: 20", "\t\t\t\tOverflow: shrink")));
+        assertContains("does not fit on the line even at Min size (8 pt), the smallest size Overflow: shrink allows: "
+                + "the line measures 32 pt and the box leaves 20 pt: the box has to be wider or Min size smaller", word);
+        // At Min size 6 the 24 characters are one line (72) of 7.2, in a box of 5.
+        InvalidModelException tall = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
+                () -> layOut("\tText: aaaa bbbb cccc dddd eeee", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 100",
+                        "\t\t\tHeight: 5", "\t\t\tOverflow: shrink")));
+        assertContains("does not fit in its height even at Min size (6 pt), the smallest size Overflow: shrink allows: "
+                + "its text reaches 7.2 pt and the box leaves 5 pt", tall);
+    }
+
+    /**
+     * W, 150 wide in a frame of 100, and O, an Overlay whose right edge (620) is past the page (595): both are errors
+     * in a frame that does not clip, and neither is in one with Overflow: clip, which paints them clipped.
+     */
+    @Test
+    void whatSticksOutOfAClippedBoxIsNotAnOverflow() {
+        String[] frame = {"\tFrame:", "\t\tId: C", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 20", "\t\t\tOverflow: clip",
+                "\t\tBlock:", "\t\t\tId: W", "\t\t\tBox:", "\t\t\t\tWidth: 150", "\t\t\t\tHeight: 30",
+                "\t\tOverlay:", "\t\t\tId: O", "\t\t\tOffset: 0 auto auto 480", "\t\t\tBox:", "\t\t\t\tWidth: 100",
+                "\t\t\t\tHeight: 10"};
+        LayoutFixture l = layOut(frame);
+        assertEquals(new Rect(40, 40, 150, 30), l.rect("W"));
+        assertEquals(new Rect(520, 40, 100, 10), l.rect("O"));
+        String[] unclipped = Arrays.stream(frame).filter(line -> !line.contains("Overflow")).toArray(String[]::new);
+        InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW,
+                assertThrows(InvalidModelException.class, () -> layOut(unclipped)));
+        assertContains("Box W (line", e);
+    }
+
+    /** A clipped frame of 80 does not fit in the 40 left under a block of 60 on a page area of 100: it goes whole to page 2. */
+    @Test
+    void aClippedBoxIsNotSplitAcrossPages() {
+        LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
+                "\tFrame:", "\t\tId: C", "\t\tBox:", "\t\t\tHeight: 80", "\t\t\tOverflow: clip",
+                "\t\tBlock:", "\t\t\tId: W", "\t\t\tBox:", "\t\t\t\tHeight: 80");
+        assertEquals(2, l.pages());
+        assertEquals(new Rect(40, 40, 515, 80), l.rect(2, "C"));
+        assertEquals(new Rect(40, 40, 515, 80), l.rect(2, "W"));
     }
 }

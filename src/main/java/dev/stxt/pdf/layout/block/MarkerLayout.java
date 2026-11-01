@@ -49,7 +49,7 @@ final class MarkerLayout {
         double y = baseline.getAsDouble() - measurer.vertical(s.typography().fontFace()).baseline(0, height, s.typography().fontSize());
         // The marker box is generated: without margin, border or padding.
         return Optional.of(new Fragment(marker, x, y, width, height, Insets.ZERO, Insets.ZERO, Insets.ZERO,
-                List.of(), List.of(new TextLine(0, 0, width, height, marker.text())), true, true));
+                List.of(), List.of(new TextLine(0, 0, width, height, s.typography().fontSize(), marker.text())), true, true));
     }
 
     /**

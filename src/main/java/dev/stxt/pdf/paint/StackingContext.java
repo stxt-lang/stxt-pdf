@@ -44,10 +44,12 @@ import java.util.Objects;
  * its descendants, also those of them that create a context, which stay inside it.</p>
  *
  * <p>A box with {@code Rotate} (reference/common/layers-and-rotation.md) is painted rotated with everything it
- * contains, and a box with {@code Corner radius} clips by its curve the backgrounds, borders and images of what it has
- * in flow (reference/common/box.md). Each piece carries the chain of rotations and clips of its ancestors, from the
- * page inwards ({@code Piece.frames}), and each painting step applies it: background, border and image, the whole
- * chain; text, only the rotations.</p>
+ * contains; a box with {@code Corner radius} clips by its curve the backgrounds, borders and images of what it has
+ * in flow (reference/common/box.md); and a box with {@code Overflow: clip} (reference/common/overflow.md) clips by its
+ * padding box everything it contains, the {@code Overlay} boxes inside it and the text included. Each piece carries
+ * the chain of rotations and clips of its ancestors, from the page inwards ({@code Piece.frames}), and each painting
+ * step applies it: background, border and image, the whole chain; text, the rotations and the clips of
+ * {@code Overflow: clip}.</p>
  *
  * <p>The "tree order" is that of the document, not that of the fragments: {@code Overlay}
  * boxes hang from the fragment of their reference container, after its in-flow children, and
@@ -64,26 +66,52 @@ public final class StackingContext {
             return f.borderBox(x, y);
         }
 
-        /** The frames of what it contains: its own, its rotation and, if it has rounded corners, its clip. */
+        /**
+         * The frames of what it contains: its own, its rotation and its clip: by its padding box if it has
+         * {@code Overflow: clip} (which also follows its corners), or by the curve of its corners if they are rounded.
+         */
         List<Frame> inner() {
             List<Frame> inner = new ArrayList<>(frames);
             if (f.box().style().rotation() != null) {
-                inner.add(new Frame(this, false));
+                inner.add(new Frame(this, Frame.Kind.ROTATION));
             }
-            if (!radii(this).isSquare()) {
-                inner.add(new Frame(this, true));
+            if (f.box().style().box().clips()) {
+                inner.add(new Frame(this, Frame.Kind.WINDOW));
+            } else if (!radii(this).isSquare()) {
+                inner.add(new Frame(this, Frame.Kind.CORNERS));
             }
             return List.copyOf(inner);
         }
     }
 
-    /** The rotation ({@code clip} false) or the clip by the curve of its padding box of the piece of an ancestor. */
-    private record Frame(Piece piece, boolean clip) {
+    /** What the piece of an ancestor applies to what it contains. */
+    private record Frame(Piece piece, Kind kind) {
+        enum Kind {
+            /** Its {@code Rotate}. */
+            ROTATION,
+            /** The clip by the curve of its padding box: backgrounds, borders and images of its flow. */
+            CORNERS,
+            /** The clip of {@code Overflow: clip} by its padding box: everything, {@code Overlay} boxes and text too. */
+            WINDOW
+        }
     }
 
-    /** The frames without the clips: what an {@code Overlay} inherits, which the outer boxes do not clip. */
-    private static List<Frame> turnsOnly(List<Frame> frames) {
-        return frames.stream().filter(f -> !f.clip()).toList();
+    /** What a painting step applies of the clips of its ancestors. */
+    private enum Clips {
+        /** The corners and the windows: backgrounds, borders and images. */
+        ALL,
+        /** Only the windows of {@code Overflow: clip}: the text, which the rounded corners do not clip. */
+        WINDOWS,
+        /** None: the debugging outlines, so that the whole box is visible. */
+        NONE
+    }
+
+    /**
+     * The frames without the clips of the rounded corners: what an {@code Overlay} inherits, which the outer boxes
+     * do not clip by their corners but do by {@code Overflow: clip}.
+     */
+    private static List<Frame> forOverlay(List<Frame> frames) {
+        return frames.stream().filter(f -> f.kind() != Frame.Kind.CORNERS).toList();
     }
 
     private final Piece root;
@@ -142,7 +170,7 @@ public final class StackingContext {
         for (Fragment h : parent.f().children()) {
             Style s = h.box().style();
             List<Frame> frames = s.position() == Position.PAGE_OVERLAY ? List.of()
-                    : s.position() == Position.OVERLAY ? turnsOnly(inner) : inner;
+                    : s.position() == Position.OVERLAY ? forOverlay(inner) : inner;
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), frames);
             if (createsContext(h)) {
                 addContext(p);
@@ -216,23 +244,35 @@ public final class StackingContext {
     /**
      * Paints the context. Each step is painted with the rotations and clips of its piece ({@link #framed}): a rotated
      * box ({@code Rotate}, reference/common/layers-and-rotation.md) is painted rotated with everything it contains,
-     * and a box with rounded corners clips the backgrounds, borders and images of its flow (reference/common/box.md).
+     * a box with rounded corners clips the backgrounds, borders and images of its flow (reference/common/box.md) and
+     * a box with {@code Overflow: clip} clips everything it contains (reference/common/overflow.md).
      */
     public void paint(Canvas canvas) {
         box(canvas, root);
         negative.forEach(s -> s.paint(canvas));
         inFlow.forEach(p -> box(canvas, p));
-        framed(canvas, root, root.f().box().isImage(), () -> paintContent(canvas, root));
-        inFlow.forEach(p -> framed(canvas, p, p.f().box().isImage(), () -> paintContent(canvas, p)));
+        framed(canvas, root, contentClips(root), () -> paintContent(canvas, root));
+        inFlow.forEach(p -> framed(canvas, p, contentClips(p), () -> paintContent(canvas, p)));
         positionedZero.forEach(s -> s.paint(canvas));
         positive.forEach(s -> s.paint(canvas));
     }
 
+    /**
+     * What the content step of the piece clips: an image, by the corners and the windows of its ancestors; text or a
+     * leader, only by the windows; a box with nothing to paint there, nothing (no empty clip is written).
+     */
+    private static Clips contentClips(Piece p) {
+        if (p.f().box().isImage()) {
+            return Clips.ALL;
+        }
+        return p.f().lines().isEmpty() && p.f().box().role() != Role.LEADER ? Clips.NONE : Clips.WINDOWS;
+    }
+
     /** The background and the border of the piece, with its clips, and its debugging outline, without them. */
     private static void box(Canvas canvas, Piece p) {
-        framed(canvas, p, paintsBox(p), () -> paintBackgroundAndBorder(canvas, p));
+        framed(canvas, p, paintsBox(p) ? Clips.ALL : Clips.NONE, () -> paintBackgroundAndBorder(canvas, p));
         if (canvas.outlines()) {
-            framed(canvas, p, false, () -> canvas.outline(p.borderBox()));
+            framed(canvas, p, Clips.NONE, () -> canvas.outline(p.borderBox()));
         }
     }
 
@@ -245,17 +285,18 @@ public final class StackingContext {
     }
 
     /**
-     * Paints {@code body} with the rotations of the ancestors of {@code p} and its own, if it has {@code Rotate}, and,
-     * if {@code clipped}, with the clips of its rounded ancestors; text is painted without clips.
+     * Paints {@code body} with the rotations of the ancestors of {@code p} and its own, if it has {@code Rotate}, and
+     * with the clips of its ancestors that {@code clips} says: those of the rounded corners do not reach the text
+     * (reference/common/box.md), those of {@code Overflow: clip} reach everything (reference/common/overflow.md).
      */
-    private static void framed(Canvas canvas, Piece p, boolean clipped, Runnable body) {
+    private static void framed(Canvas canvas, Piece p, Clips clips, Runnable body) {
         List<Runnable> ends = new ArrayList<>();
         for (Frame frame : p.frames()) {
-            if (!frame.clip()) {
+            if (frame.kind() == Frame.Kind.ROTATION) {
                 if (beginRotation(canvas, frame.piece()) > 0) {
                     ends.add(canvas::endRotation);
                 }
-            } else if (clipped) {
+            } else if (clips == Clips.ALL || clips == Clips.WINDOWS && frame.kind() == Frame.Kind.WINDOW) {
                 Piece c = frame.piece();
                 canvas.beginClip(c.borderBox().shrink(c.f().border()), radii(c).inset(c.f().border()));
                 ends.add(canvas::endClip);
@@ -454,7 +495,7 @@ public final class StackingContext {
             // line split inside a word has no space: its two parts are one word.
             boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE
                     && !l.hyphenated();
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {
                 TextLine.Run r = runs.get(i);
@@ -484,7 +525,7 @@ public final class StackingContext {
                 }
                 String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
                 canvas.text(content.x() + l.x() + r.x(), baseline, shown, r.format().face(font),
-                        s.typography().fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
+                        l.fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
                 if (actual && last) {
                     tags.endActualText();
                 }
@@ -551,15 +592,15 @@ public final class StackingContext {
                                          boolean underline) {
         Style s = p.f().box().style();
         for (TextLine l : p.f().lines()) {
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), s.typography().fontSize());
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
             for (TextLine.Run r : l.runs()) {
                 if (underline ? !r.format().underline() : !r.format().strike()) {
                     continue;
                 }
                 DecorationMetrics d = canvas.decoration(r.format().face(s.typography().fontFace()));
                 double x = content.x() + l.x() + r.x();
-                canvas.background(underline ? d.underline(x, baseline, r.width(), s.typography().fontSize())
-                        : d.strikeout(x, baseline, r.width(), s.typography().fontSize()), s.typography().color());
+                canvas.background(underline ? d.underline(x, baseline, r.width(), l.fontSize())
+                        : d.strikeout(x, baseline, r.width(), l.fontSize()), s.typography().color());
             }
         }
     }

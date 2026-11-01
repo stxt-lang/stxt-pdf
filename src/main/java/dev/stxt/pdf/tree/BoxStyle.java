@@ -1,13 +1,15 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Corners;
+import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
 
 /**
- * The {@code Box} group (reference/common/box.md): the box model (sizes, margins, padding and border) and its
- * appearance (background, border color and rounded corners), which only changes the painting. It is not inherited.
+ * The {@code Box} group (reference/common/box.md): the box model (sizes, margins, padding and border), its
+ * appearance (background, border color and rounded corners), which only changes the painting, and what is done with
+ * what does not fit in it ({@code Overflow}, reference/common/overflow.md). It is not inherited.
  */
 public final class BoxStyle extends StyleGroup {
 
@@ -30,6 +32,8 @@ public final class BoxStyle extends StyleGroup {
     private Sides<String> borderColor;
     /** Rounded corners, of the border box; painting only. */
     private Corners<Value> cornerRadius = Corners.all(Value.pt(0));
+    /** What is done with what does not fit in the box (reference/common/overflow.md). */
+    private Overflow overflow = Overflow.ERROR;
 
     BoxStyle() {
     }
@@ -149,5 +153,24 @@ public final class BoxStyle extends StyleGroup {
     void setCornerRadius(Corners<Value> v) {
         writable();
         cornerRadius = v;
+    }
+
+    public Overflow overflow() {
+        return overflow;
+    }
+
+    void setOverflow(Overflow v) {
+        writable();
+        overflow = v;
+    }
+
+    /** Whether the text of the box is reduced until it fits ({@code Overflow: shrink}). */
+    public boolean shrinks() {
+        return overflow == Overflow.SHRINK;
+    }
+
+    /** Whether what sticks out of the box is painted clipped and not checked ({@code Overflow: clip}). */
+    public boolean clips() {
+        return overflow == Overflow.CLIP;
     }
 }

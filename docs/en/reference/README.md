@@ -30,7 +30,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [Links](common/links.md) | `Link` and Markdown links: targets, areas and tagged PDF |
 | [Resources and fonts](common/resources.md) | The resources folder, safe paths and how fonts are identified and checked |
 | [The PDF](common/pdf.md) | What every PDF carries: embedded fonts, accessibility, contrast, bookmarks, title and PDF/UA-1 or PDF/UA-2; PDF/A and embedded files (Factur-X) on request |
-| [Overflow](common/overflow.md) | Nothing can overflow: what is checked and which box is reported |
+| [Overflow](common/overflow.md) | Nothing can overflow: what is checked and which box is reported; `Overflow: shrink` and `clip`, box by box |
 | [Errors](common/errors.md) | The error policy, the validation levels, the codes and their types |
 | [Limits](common/limits.md) | Pages, pixels and SVG complexity that a conversion accepts |
 | [Complete example](common/complete-example.md) | A document with the computation of each box done by hand |

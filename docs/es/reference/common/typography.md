@@ -17,6 +17,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Weight` | de 100 a 900, de 100 en 100 | `400` | Peso de la fuente ([Pesos](#pesos-weight)). |
 | `Italic` | `true`, `false` | `false` | Cursiva: la variante cursiva de la fuente. |
 | `Size` | número > 0 | sin valor | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
+| `Min size` | número > 0 | `6` | El menor `Size` al que `Overflow: shrink` reduce el texto ([Desbordamiento](overflow.md#encoger-el-texto-shrink)). |
 | `Line height` | número o % | `120%` | **Un número es una medida** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |

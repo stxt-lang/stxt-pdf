@@ -1,0 +1,21 @@
+# Case: Keep together on a box with Overflow: clip, which is not split
+# Code: BREAK_IN_CLIPPED
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Height: 40
+				Overflow: clip
+			Break:
+				Keep together: true
