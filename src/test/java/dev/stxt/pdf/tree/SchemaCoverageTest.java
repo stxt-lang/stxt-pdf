@@ -93,6 +93,7 @@ class SchemaCoverageTest {
             Map.entry("Letter spacing", "Letter spacing: 1.5"),
             Map.entry("Small caps", "Small caps: true"),
             Map.entry("Ligatures", "Ligatures: true"),
+            Map.entry("Kerning", "Kerning: true"),
             Map.entry("Code font", "Code font: IBM Plex Mono"),
             Map.entry("Preformatted", "Preformatted: wrap"),
             Map.entry("Tab size", "Tab size: 8"),

@@ -58,8 +58,8 @@ SVG): the marked text of the tagged PDF and the links.
 
 ### Text
 
-The fonts are Type 0 Identity-H (each character takes two bytes), so `justify` and letter spacing are written with
-`TJ` adjustments between the characters and not with `Tw` or `Tc`. `PdfFonts.font` embeds one font per combination with
+The fonts are Type 0 Identity-H (each character takes two bytes), so `justify`, letter spacing and kerning are written
+with `TJ` adjustments between the characters and not with `Tw` or `Tc`. `PdfFonts.font` embeds one font per combination with
 `TrueTypeFont.setEnableGsub(font.ligatures())`: without ligatures PDFBox does not apply `GSUB` (one glyph per character, 17 to 30
 times faster) and what is measured is what is painted.
 
@@ -67,7 +67,19 @@ The width of each glyph is rounded to thousandths of the font size, which is wha
 font: this way layout and painting measure the same with fonts of any `unitsPerEm`. The baseline comes from the ascender and
 the descender of the `hhea` table.
 
-> **Decision:** no kerning: applying that of the `kern`/`GPOS` tables would require placing each glyph separately in the PDF.
+With `Kerning: true`, `FontFile.kerning(text, ligatures)` gives, for each position of the text, the adjustment in
+thousandths of the font size that goes before the character that starts there, and `PdfFonts.spaced` splits the text at
+those positions and writes the adjustment in `TJ`, with the sign changed (in `TJ` a positive number brings closer). The
+embedded font is the same with and without kerning: `PdfFonts.font` looks it up without that option. The pairs are read
+by `KerningPairs` the first time they are requested: from `GPOS`, the pair adjustment *lookups* (type 2, formats 1 and 2,
+also inside extensions, type 9) of the `kern` features; if there are none, the `kern` table, through fontbox. A table
+that cannot be read is a `ResourceException`.
+
+> **Decision:** with ligatures, there is a pair only where the word can be split without changing its glyphs: where what
+> `GSUB` leaves of the two parts, one after the other, are the glyphs of the whole word. PDFBox applies `GSUB` to each
+> piece of `TJ` separately, so splitting inside a ligature would undo it. If the pieces of all the positions with kerning
+> together do not give the glyphs of the word, the word goes without kerning. *Rejected alternative:* writing the glyphs
+> one by one without going through `showText`, which would require redoing the `ToUnicode` of the ligatures.
 
 > **Decision:** the ascender and the descender come from `hhea` and not from `OS/2`: neither from `sTypo*`, even if the font
 > sets `USE_TYPO_METRICS`, nor from `usWin*`. In IBM Plex Sans, `hhea` gives 1025 and 275 per 1000, the same as `usWin*`, and
@@ -87,9 +99,9 @@ Underline and strikethrough use the metrics of the variant of the run: `underlin
 `post` table, and `yStrikeoutPosition` and `yStrikeoutSize` of `OS/2`, measured from the baseline to the top of
 the line, which is what the OpenType specification says. They are painted as *artifacts*.
 
-> **Decision:** the ligatures option travels in `FontFace` (its fourth component, and `base()` is the font without it): this way
-> `TextMeasurer`, `Canvas.text` and the font cache of the PDF use it without changes, and a file is identified the same with and
-> without ligatures. *Rejected alternative:* one more parameter in `TextMeasurer.width` and in `Canvas.text`.
+> **Decision:** the ligatures and kerning options travel in `FontFace` (its fourth and fifth components, and `base()` is
+> the font without them): this way `TextMeasurer`, `Canvas.text` and the font cache of the PDF use them without changes,
+> and a file is identified the same with and without them. *Rejected alternative:* one more parameter in `TextMeasurer.width` and in `Canvas.text`.
 
 > **Decision:** each font file is read once, when indexing the folder: what is embedded and drawn comes from those bytes
 > (`FontFile.content()`), so it is what was measured even if the file changes or disappears, and painting cannot fail with an
@@ -203,6 +215,8 @@ possible color underneath and an image leaves it unknown until an opaque color c
 `SvgCanvas` writes the SVG of the tests: `<path>` for the rounded boxes, `linearGradient` and `clipPath`, and `<rect>` for
 what is plain and square, a `<g transform>` for the rotation and the images as `data:` (the page of a PDF, drawn into a PNG at
 144 dpi with `PDFRenderer`, because a browser does not draw a PDF inside an SVG). It does not paint links or distinguish ligatures.
+With `Kerning` and the resources folder, it writes the adjustments of the pairs as `dx`, with `font-kerning: none` so
+that the viewer does not add its own.
 
 > **Decision:** the SVG keeps the spaces with `xml:space="preserve"` when a text has two consecutive spaces or starts
 > or ends with a space, and writes the lines with `\n` on any system.

@@ -317,10 +317,9 @@ public final class LineBreaker {
             int from = 0;
             for (int k = 0; k <= word.breaks().length; k++) {
                 int to = k < word.breaks().length ? word.breaks()[k] : word.length();
-                double advance = advance(slice(word.parts(), from, to), measurer, font, fontSize, letterSpacing);
-                if (k < word.breaks().length) {
-                    advance += advance(HYPHEN, hyphenFormat(word.parts(), to), measurer, font, fontSize, letterSpacing);
-                }
+                List<TextRun> part = slice(word.parts(), from, to);
+                double advance = advance(k < word.breaks().length ? hyphenated(part, word.parts(), to) : part,
+                        measurer, font, fontSize, letterSpacing);
                 min = Math.max(min, advance - letterSpacing);
                 from = to;
             }
@@ -596,6 +595,19 @@ public final class LineBreaker {
         return parts.get(parts.size() - 1).format().withSmallCaps(false);
     }
 
+    /**
+     * A part of a word that ends at break position {@code offset} of its {@code parts}, followed by its hyphen: joined
+     * to the last run if it has the format of the hyphen, as {@link Paragraph#line} joins them.
+     */
+    static List<TextRun> hyphenated(List<TextRun> part, List<TextRun> parts, int offset) {
+        TextRun.Joiner runs = new TextRun.Joiner();
+        for (TextRun run : part) {
+            runs.add(run.text(), run.format());
+        }
+        runs.add(HYPHEN, hyphenFormat(parts, offset));
+        return runs.build();
+    }
+
     /** Walks the runs forward: the positions asked of it never go back. */
     static final class RunCursor {
         private final List<TextRun> runs;
@@ -751,7 +763,8 @@ public final class LineBreaker {
             int first = posWord[a];
             int last = lastWord(b);
             if (first == last) {
-                return piece(first, posOffset[a], lastOffset(b)) + (hyphen(b) ? hyphenAdvance(first, posOffset[b]) : 0);
+                return hyphen(b) ? withHyphen(first, posOffset[a], posOffset[b])
+                        : piece(first, posOffset[a], lastOffset(b));
             }
             double sum = posOffset[a] == 0 ? wholeWords[first + 1] - wholeWords[first] : tail(a);
             sum += wholeWords[last] - wholeWords[first + 1];
@@ -775,7 +788,7 @@ public final class LineBreaker {
         /** Advance of the part of its word before break position {@code b}, with its hyphen. */
         private double head(int b) {
             if (Double.isNaN(head[b])) {
-                head[b] = piece(posWord[b], 0, posOffset[b]) + hyphenAdvance(posWord[b], posOffset[b]);
+                head[b] = withHyphen(posWord[b], 0, posOffset[b]);
             }
             return head[b];
         }
@@ -796,8 +809,13 @@ public final class LineBreaker {
             return LineBreaker.advance(slice(word.parts(), from, to), measurer, font, fontSize, letterSpacing);
         }
 
-        private double hyphenAdvance(int w, int offset) {
-            return LineBreaker.advance(HYPHEN, hyphenFormat(words.get(w).parts(), offset), measurer, font, fontSize,
+        /**
+         * Advance of the part of word {@code w} from {@code from} to break position {@code to}, with its hyphen,
+         * measured together as the line paints them: with kerning, the last letter and the hyphen are a pair.
+         */
+        private double withHyphen(int w, int from, int to) {
+            List<TextRun> parts = words.get(w).parts();
+            return LineBreaker.advance(hyphenated(slice(parts, from, to), parts, to), measurer, font, fontSize,
                     letterSpacing);
         }
 

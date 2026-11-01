@@ -15,9 +15,9 @@ import java.util.Locale;
 
 /**
  * The {@code Typography} group (reference/common/typography.md): the font, the size, the line height, the alignment,
- * the color, the case, the letter spacing and the white space of the text, the hyphenation, the numbering of the
- * headings, the language and the widows and orphans. It is the only group that is <strong>inherited</strong>: each box starts with a copy of
- * its parent's ({@link Style#inheriting}).
+ * the color, the case, the letter spacing, the kerning and the white space of the text, the hyphenation, the
+ * numbering of the headings, the language and the widows and orphans. It is the only group that is
+ * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link Style#inheriting}).
  */
 public final class TypographyStyle extends StyleGroup {
 
@@ -48,6 +48,11 @@ public final class TypographyStyle extends StyleGroup {
      * (reference/common/text-formatting.md). Inherited.
      */
     private boolean ligatures;
+    /**
+     * {@code Kerning}: whether the text is measured and painted with the kerning pairs of the font
+     * (reference/common/typography.md). Inherited.
+     */
+    private boolean kerning;
     private Preformatted preformatted = Preformatted.FALSE;
     /** Columns of a tab in preformatted text ({@code Tab size}). */
     private int tabSize = 4;
@@ -93,6 +98,7 @@ public final class TypographyStyle extends StyleGroup {
         letterSpacing = parent.letterSpacing;
         smallCaps = parent.smallCaps;
         ligatures = parent.ligatures;
+        kerning = parent.kerning;
         preformatted = parent.preformatted;
         tabSize = parent.tabSize;
         numbered = parent.numbered;
@@ -230,6 +236,15 @@ public final class TypographyStyle extends StyleGroup {
         ligatures = v;
     }
 
+    public boolean kerning() {
+        return kerning;
+    }
+
+    void setKerning(boolean v) {
+        writable();
+        kerning = v;
+    }
+
     public Preformatted preformatted() {
         return preformatted;
     }
@@ -315,10 +330,11 @@ public final class TypographyStyle extends StyleGroup {
     /**
      * Font of the text. Only in boxes with text, which always have {@code Font} (reference/common/errors.md). Ligatures
      * are turned off with a {@code Letter spacing} other than 0: spacing the letters and joining two into
-     * one glyph contradict each other.
+     * one glyph contradict each other. Kerning is kept: it adjusts the space between two letters, which the letter
+     * spacing adds to.
      */
     public FontFace fontFace() {
-        return new FontFace(font, fontWeight, fontStyle, ligatures && letterSpacing == 0);
+        return new FontFace(font, fontWeight, fontStyle, ligatures && letterSpacing == 0, kerning);
     }
 
     /** Used line height, in points. */

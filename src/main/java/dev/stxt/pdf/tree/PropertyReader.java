@@ -106,6 +106,7 @@ final class PropertyReader {
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
+            entry("kerning", (p, s) -> s.typography().setKerning(bool(p))),
             entry("preformatted", (p, s) -> s.typography().setPreformatted(enumValue(Preformatted.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
             entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),

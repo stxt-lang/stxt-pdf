@@ -46,8 +46,9 @@ Cada fichero se identifica por lo que declara su interior y no por su nombre
   se puede pedir;
 - **estilo:** normal o cursiva.
 
-Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El kerning no se aplica, y las
-ligaduras, solo con `Ligatures: true` ([Formato del texto](text-formatting.md#ligaduras-ligatures)). `Font` y `Size` no
+Las fuentes variables no se admiten: se usan los ficheros estáticos de cada variante. El kerning se aplica solo con
+`Kerning: true` ([Tipografía](typography.md#kerning-kerning)), y las ligaduras, solo con `Ligatures: true`
+([Formato del texto](text-formatting.md#ligaduras-ligatures)). `Font` y `Size` no
 tienen valor por defecto: son obligatorios en todo texto ([Tipografía](typography.md)).
 
 > **Decisión:** el peso del fichero se toma tal cual, y la familia se compara exactamente. *Alternativa descartada:*

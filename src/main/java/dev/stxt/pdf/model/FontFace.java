@@ -7,10 +7,11 @@ import java.util.Objects;
  * identifies a TTF or OTF file of the fonts folder (reference/common/resources.md).
  *
  * <p>{@code ligatures} says whether the text is measured and painted with the ligatures of the font
- * ({@code Ligatures}, reference/common/text-formatting.md). It does not change the file: two fonts that only differ
- * in this are the same file ({@link #base()}), but the text measures and paints differently.</p>
+ * ({@code Ligatures}, reference/common/text-formatting.md), and {@code kerning}, whether with the kerning pairs of the
+ * font ({@code Kerning}, reference/common/typography.md). They do not change the file: two fonts that only differ in
+ * them are the same file ({@link #base()}), but the text measures and paints differently.</p>
  */
-public record FontFace(String family, FontWeight weight, FontStyle style, boolean ligatures) {
+public record FontFace(String family, FontWeight weight, FontStyle style, boolean ligatures, boolean kerning) {
 
     public FontFace {
         Objects.requireNonNull(family, "family");
@@ -18,19 +19,24 @@ public record FontFace(String family, FontWeight weight, FontStyle style, boolea
         Objects.requireNonNull(style, "style");
     }
 
-    /** A font without ligatures, which is what is requested by default. */
+    /** A font without ligatures or kerning, which is what is requested by default. */
     public FontFace(String family, FontWeight weight, FontStyle style) {
-        this(family, weight, style, false);
+        this(family, weight, style, false, false);
     }
 
     /** The same font with or without ligatures. */
     public FontFace withLigatures(boolean ligatures) {
-        return this.ligatures == ligatures ? this : new FontFace(family, weight, style, ligatures);
+        return this.ligatures == ligatures ? this : new FontFace(family, weight, style, ligatures, kerning);
     }
 
-    /** The font as it identifies a font file: without the ligatures option. */
+    /** The same font with or without kerning. */
+    public FontFace withKerning(boolean kerning) {
+        return this.kerning == kerning ? this : new FontFace(family, weight, style, ligatures, kerning);
+    }
+
+    /** The font as it identifies a font file: without the ligatures and kerning options. */
     public FontFace base() {
-        return withLigatures(false);
+        return withLigatures(false).withKerning(false);
     }
 
     /**

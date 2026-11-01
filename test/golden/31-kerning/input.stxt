@@ -1,0 +1,45 @@
+# Kerning (reference/common/typography.md): page of 200 × 200 with margins of 20, page area of 160 × 160 from (20, 20).
+# Size 24 with Line height 30; with the test metrics each character measures 12 pt with or without kerning, so the
+# kerning does not change the layout: each text is one line of 30, 160 wide, one after the other. The image shows the
+# same words with the pairs of IBM Plex Sans (A-V, V-A, A-T, T-A, T-o and o-f, all of them closer) and without them.
+#   plain:     without Kerning. y = 20.
+#   kerned:    Kerning true. y = 50.
+#   ligatures: Kerning and Ligatures true: the pair is o and the fi ligature. y = 80.
+#   spaced:    Kerning true with Letter spacing 2: each pair also carries the letter spacing. y = 110; 10 spacings of
+#              2 make the line 11 × 12 + 20 = 152 wide, which still fits.
+#   run:       Kerning true with the first A in bold (Markup: markdown): A-V is not a pair. y = 140.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 24
+				Line height: 30
+	Section:
+		Text: AVATAR Tofi
+			Id: plain
+		Text: AVATAR Tofi
+			Id: kerned
+			Typography:
+				Kerning: true
+		Text: AVATAR Tofi
+			Id: ligatures
+			Typography:
+				Kerning: true
+				Ligatures: true
+		Text: AVATAR Tofi
+			Id: spaced
+			Typography:
+				Kerning: true
+				Letter spacing: 2
+		Text: **A**VATAR Tofi
+			Id: run
+			Typography:
+				Kerning: true
+				Markup: markdown

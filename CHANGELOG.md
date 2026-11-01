@@ -30,6 +30,15 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   cannot subset them. A font present as `.ttf` and as `.otf` is two files for the same font, a `RESOURCE` error.
 - IBM Plex Sans Light (300), Medium (500) and SemiBold (600) are in `resources/fonts/`, and the résumé example
   (`test/examples/03-resume`) uses 300, 500 and 600.
+- **Kerning.** `Kerning: true` in `Typography` (inherited, `false` by default) measures and paints the text with the
+  kerning pairs of the font: those of the `kern` feature of its `GPOS` table, which the engine reads itself (pair
+  adjustment lookups in both formats, also inside extension lookups), or, in a font without it, those of its `kern`
+  table. A pair does not cross a space or the boundary between two runs; with `Ligatures: true` it is between the glyphs
+  left after `GSUB`, never inside a ligature. The adjustments are rounded to thousandths of the font size and written as
+  shifts of `TJ`, so what is measured is what is painted, and the embedded font and the copied text are the same as
+  without kerning. A font without pairs (IBM Plex Mono) is painted as without `Kerning`; a `GPOS` or `kern` table that
+  cannot be read is a `RESOURCE` error. The debugging SVG writes the pairs as `dx`.
+- The annual report example (`test/examples/04-annual-report`) uses kerning.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

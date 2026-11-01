@@ -941,6 +941,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Ligatures
 				Max: 1
+			Child: Kerning
+				Max: 1
 			Child: Preformatted
 				Max: 1
 			Child: Tab size
@@ -1149,6 +1151,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Ligatures
 		Type: BOOLEAN
 		Description: Whether the text is measured and painted with the ligatures of the font (fi, fl, ffi...). By default, false: one glyph per character. Inherited. With Letter spacing other than 0 there are no ligatures. It only matters in the fonts that have them (IBM Plex Sans and Serif; Plex Mono does not).
+	Node: Kerning
+		Type: BOOLEAN
+		Description: Whether the text is measured and painted with the kerning pairs of the font, which adjust the space between two letters (AV, To). By default, false. Inherited. The pairs come from the kern feature of the GPOS table or, in a font without it, from the kern table; a pair does not cross a space or the boundary between two runs. It does not change the text that is read or copied.
 	Node: Preformatted
 		Type: ENUM
 		Description: Preformatted text: false (by default; spaces and line breaks count as a space), true (keeps the spaces and line breaks, and does not break lines: one wider than the box is an error) or wrap (like true, but breaks lines that are too wide between words). Preformatted lines are not justified.

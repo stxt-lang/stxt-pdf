@@ -50,7 +50,7 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
             return base;
         }
         return new FontFace(family != null ? family : base.family(), bold ? base.weight().bolder() : base.weight(),
-                italic ? FontStyle.ITALIC : base.style(), base.ligatures());
+                italic ? FontStyle.ITALIC : base.style(), base.ligatures(), base.kerning());
     }
 
     /** Whether it has underline or strikeout, which are painted apart from the text. */

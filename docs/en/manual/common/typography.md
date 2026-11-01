@@ -33,6 +33,7 @@ Styles:
 | `Color` | color | `#000000` | The color of the text |
 | `Line breaking` | `simple`, `balanced` | `simple` | How the text is broken into lines |
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
+| `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md)) |
@@ -135,6 +136,37 @@ Document (dev.stxt.pdf):
 A soft hyphen (U+00AD) written inside a word says where that word may be split, with or without `Hyphenate`, and is
 not seen if it is not split. The text that is copied from the PDF, and the one a screen reader reads, does not carry
 the hyphens the engine added.
+
+## Kerning
+
+Some pairs of letters leave a visible gap between them because of their shape: `AV`, `To`, `P.`. Fonts have a list of
+those pairs with how much to bring them closer, or move them apart: the **kerning**. By default it is not applied; with
+`Kerning: true`, it is. It shows above all in large titles, and the usual thing is to declare it once, in
+`For element: Document`:
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Kerning
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Kerning: true
+    Section:
+        Text: TECHNICAL ADVANCE
+            Typography:
+                Size: 36
+                Bold: true
+        Paragraph: Torre Vall, October 2025.
+```
+
+A pair is not formed across a space or between a bold letter and one that is not. IBM Plex Sans and Serif have kerning;
+IBM Plex Mono, in which every letter measures the same, does not. The text copied from the PDF does not change.
 
 ## Widows and orphans
 

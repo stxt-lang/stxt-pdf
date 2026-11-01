@@ -39,7 +39,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | Package | Puede usar | Qué hay |
 |---|---|---|
 | `model` | nada | Tipos puros y compartidos: los valores (`Value`, `ValueParser`), los enums de los valores (uno por fichero, como `TextAlign`, `Marker` o `Break`), la geometría (`Rect`, `Sides`, `Insets`), el texto con formato (`TextRun`, `TextFormat`, `FontFace`), las referencias (`Reference`), los enlaces (`Links`), la colocación de grid (`GridAreas`, `Area`, `Cell`), los colores y los fondos (`Colors`, `Paint`, `Radii`), el giro (`Rotation`), la tolerancia (`Tolerance`), los límites (`Limits`) y la raíz de los errores (`StxtPdfException`) |
-| `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
+| `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`, `KerningPairs`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
 | `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`) y las reglas de corte (`BreakRules`) |

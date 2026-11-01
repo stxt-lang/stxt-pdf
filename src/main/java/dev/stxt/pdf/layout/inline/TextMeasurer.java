@@ -8,7 +8,7 @@ import dev.stxt.pdf.tree.Box;
  * Measures the width of a text in points.
  *
  * <p>The width has to be additive between words: that of a text is the sum of those of its words and of the
- * spaces that separate them (without kerning between them, and the ligatures within each word). {@link LineBreaker}
+ * spaces that separate them (the ligatures and the kerning pairs stay within each word). {@link LineBreaker}
  * breaks the lines by adding them up, and only measures the whole line when the sum is very close to the available
  * width.</p>
  */

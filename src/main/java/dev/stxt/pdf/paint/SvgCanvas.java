@@ -13,6 +13,7 @@ import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.resources.ImageFile;
+import dev.stxt.pdf.resources.ResourceException;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.PageSetup;
@@ -280,8 +281,42 @@ public final class SvgCanvas implements Canvas {
                 : " font-weight=\"" + (w.equals(FontWeight.BOLD) ? "bold" : w.value()) + "\"";
         String style = font.style() == FontStyle.ITALIC ? " font-style=\"italic\"" : "";
         svg.append(String.format(Locale.ROOT,
-                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\"%s%s>%s</text>\n",
-                x, baselineY, escape(font.family()), weight, style, fontSize, fillAttr(color), spacing, escape(text)));
+                "<text x=\"%.2f\" y=\"%.2f\" font-family=\"%s\"%s%s font-size=\"%.2f\"%s%s%s>%s</text>\n",
+                x, baselineY, escape(font.family()), weight, style, fontSize, fillAttr(color), spacing,
+                kerning(text, font, fontSize), escape(text)));
+    }
+
+    /**
+     * With {@code Kerning}, the adjustments of the pairs of the font (reference/common/typography.md) as {@code dx},
+     * one shift per character, and without the kerning of the viewer, so that it is not added twice. Without the
+     * resources folder, or without the font in it, nothing: the viewer paints with its own fonts.
+     */
+    private String kerning(String text, FontFace font, double fontSize) {
+        if (!font.kerning() || resources == null) {
+            return "";
+        }
+        int[] kerning;
+        try {
+            kerning = resources.fonts().find(font).kerning(text, font.ligatures());
+        } catch (ResourceException e) {
+            // A debugging SVG does not need the fonts: without the file there is no kerning to add.
+            return "";
+        }
+        if (kerning == null) {
+            return "";
+        }
+        StringBuilder dx = new StringBuilder();
+        int last = 0;
+        for (int i = 0; i < text.length(); i += Character.charCount(text.codePointAt(i))) {
+            if (dx.length() > 0) {
+                dx.append(' ');
+            }
+            dx.append(kerning[i] == 0 ? "0" : String.format(Locale.ROOT, "%.2f", kerning[i] / 1000.0 * fontSize));
+            if (kerning[i] != 0) {
+                last = dx.length();
+            }
+        }
+        return " dx=\"" + dx.substring(0, last) + "\" style=\"font-kerning: none\"";
     }
 
     /**

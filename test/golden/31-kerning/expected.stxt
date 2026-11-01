@@ -1,0 +1,13 @@
+# Five texts of one line of 30, 160 wide, one after the other from y = 20 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: plain
+			Rect: 20 20 160 30
+		Fragment: kerned
+			Rect: 20 50 160 30
+		Fragment: ligatures
+			Rect: 20 80 160 30
+		Fragment: spaced
+			Rect: 20 110 160 30
+		Fragment: run
+			Rect: 20 140 160 30

@@ -124,7 +124,7 @@ public final class FontLibrary {
 
     /** The file of a font, or {@code null} if it is not there. */
     FontFile lookup(FontFace requested) {
-        // A file serves with and without ligatures: it is identified without that option.
+        // A file serves with and without ligatures and kerning: it is identified without those options.
         return faces.get(requested.base());
     }
 

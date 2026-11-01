@@ -172,8 +172,10 @@ caja con texto y `Hyphenate: true` está en un idioma con patrones.
 > y así cada línea se mide como se pinta.
 
 **Medida.** Un `TextMeasurer` tiene que ser **aditivo entre palabras** (el ancho de un texto es la suma de los de sus palabras
-y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.width(texto, tamaño, ligaduras)`, que aplica
-`GSUB` palabra a palabra si hay ligaduras. `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics`
+y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.width(texto, tamaño, ligaduras, kerning)`,
+que aplica `GSUB` y los pares de kerning palabra a palabra si se piden; un par no cruza un espacio, así que la suma sigue
+siendo exacta. La parte de una palabra partida se mide junto con su guion, como se pinta: con kerning, la última letra y
+el guion son un par. `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics`
 comprueba que existen las fuentes y tienen todos los caracteres.
 
 **Texto largo.** Cada página maqueta el texto desde otra línea, así que la `LayoutCache` no ayuda. `InlineLayout` memoriza

@@ -27,6 +27,7 @@ inherit it).
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
+| `Kerning` | `true`, `false` | `false` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
 | `Tab size` | integer ≥ 1 | `4` | With `Preformatted: true` or `wrap`, the columns of a tab. |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). |
@@ -139,6 +140,36 @@ by default.
 > **Decision:** a word with a soft hyphen is split only where it has one, as in TeX, where whoever writes the break
 > decides. *Rejected alternative:* adding the break points of the patterns.
 
+## Kerning (`Kerning`)
+
+With `Kerning: true` the text is measured and painted with the kerning pairs of the font, which bring two specific
+letters closer or move them apart according to their shape (`AV`, `To`, `P.`). It belongs to `Typography`, is inherited
+and is `false` by default: it is declared once in `For element: Document`.
+
+- **The pairs are those of the font**: those of the `kern` feature of its `GPOS` table (that of the default script,
+  `DFLT`, or, if it has none, that of Latin, `latn`) or, in a font without it, those of its `kern` table. A font without
+  pairs is measured and painted as without `Kerning`, without an error. IBM Plex Sans and Serif have them in `GPOS`;
+  IBM Plex Mono, monospaced, has none.
+- **A pair** is two consecutive characters of the same word and the same run: it does not cross a space or the boundary
+  between two runs (`**A**V`). The last letter of a split word and its hyphen are a pair too, since they go in the same
+  run except in small caps. With `Ligatures: true` the pair is between the glyphs that are left (the `o` and the `fi`
+  ligature of `Tofi`), never inside a ligature.
+- **Measurement**: the adjustment of each pair is rounded to thousandths of the font size, like the advance of the glyphs,
+  and is added to the width of the word; what is measured is what is painted. With `Letter spacing`, the letter spacing is
+  added to the adjustment.
+- **What is read**: kerning does not change the text that is copied or that a screen reader reads.
+
+> **Decision:** the engine reads the pairs of `GPOS`, which the font library (fontbox) does not read, because current
+> fonts, IBM Plex included, only have them there; the `kern` table is left for old fonts. *Rejected alternative:* only
+> the `kern` table, with which `Kerning` would do nothing with the fonts of the repository.
+
+> **Decision:** `false` by default, so that no existing document changes, and a single property, without choosing tables
+> or pairs. *Rejected alternative:* kerning always, which would move the lines of every document.
+
+> **Decision:** of `GPOS` only horizontal kerning is applied: the advance of the first glyph of each pair, without
+> skipping the marks that separate two letters or the pairs specific to a language. *Rejected alternative:* a complete
+> shaping engine, with every feature, context and script.
+
 ## Line height and baseline
 
 Each line measures `Line height`, and the height of the content is the number of lines times `Line height`. Inside the line, the
@@ -157,8 +188,9 @@ page, so it is justified.
 
 ## Text measurement
 
-The width of a text is the sum of the advances of its glyphs, rounded to thousandths of the font size, without kerning and with
-ligatures only if they are requested ([Text formatting](text-formatting.md#ligatures-ligatures)). A word with parts from
+The width of a text is the sum of the advances of its glyphs, rounded to thousandths of the font size, with the kerning
+adjustments only if they are requested ([Kerning](#kerning-kerning)) and with ligatures only if they are requested
+([Text formatting](text-formatting.md#ligatures-ligatures)). A word with parts from
 several runs measures the sum of its parts. What is measured is exactly what is painted
 ([details](../implementation/painting.md#text)).
 
@@ -183,7 +215,7 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 - Fallback fonts, synthesized bold or italic, and the closest weight when the requested one is missing
   ([Resources](resources.md#fonts)).
 - Units relative to the font: everything is measured in points, millimeters or percentages.
-- Kerning, and vertical or right-to-left writing.
+- Vertical or right-to-left writing, and, of `GPOS`, what is not horizontal kerning (marks, contextual positioning).
 - Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the
   document's own, and changing the minimum letters on each side of the hyphen.
 - A different color or size within a line: a run only changes bold, italic, underline and strikethrough

@@ -58,8 +58,8 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 
 ### Texto
 
-Las fuentes son Type 0 Identity-H (cada carácter ocupa dos bytes), así que `justify` y el interletraje se escriben con
-ajustes de `TJ` entre los caracteres y no con `Tw` ni `Tc`. `PdfFonts.font` incrusta una fuente por combinación con
+Las fuentes son Type 0 Identity-H (cada carácter ocupa dos bytes), así que `justify`, el interletraje y el kerning se
+escriben con ajustes de `TJ` entre los caracteres y no con `Tw` ni `Tc`. `PdfFonts.font` incrusta una fuente por combinación con
 `TrueTypeFont.setEnableGsub(font.ligatures())`: sin ligaduras PDFBox no aplica `GSUB` (un glifo por carácter, de 17 a 30
 veces más rápido) y lo medido es lo pintado.
 
@@ -67,7 +67,19 @@ El ancho de cada glifo se redondea a milésimas del cuerpo, que es lo que el PDF
 incrustada: así maquetar y pintar miden lo mismo con fuentes de cualquier `unitsPerEm`. La línea base sale del ascendente y
 el descendente de la tabla `hhea`.
 
-> **Decisión:** sin kerning: aplicar el de las tablas `kern`/`GPOS` obligaría a colocar cada glifo por separado en el PDF.
+Con `Kerning: true`, `FontFile.kerning(texto, ligaduras)` da, para cada posición del texto, el ajuste en milésimas del
+cuerpo que va antes del carácter que empieza en ella, y `PdfFonts.spaced` parte el texto en esas posiciones y escribe el
+ajuste en `TJ`, con el signo cambiado (en `TJ` un número positivo acerca). La fuente incrustada es la misma con y sin
+kerning: `PdfFonts.font` la busca sin esa opción. Los pares los lee `KerningPairs` la primera vez que se piden: de
+`GPOS`, los *lookups* de ajuste de pares (tipo 2, formatos 1 y 2, también dentro de extensiones, tipo 9) de las
+características `kern`; si no los hay, la tabla `kern`, a través de fontbox. Una tabla que no se puede leer es un
+`ResourceException`.
+
+> **Decisión:** con ligaduras, solo hay par donde la palabra se puede partir sin cambiar sus glifos: donde lo que `GSUB`
+> deja de las dos partes, una tras otra, son los glifos de la palabra entera. PDFBox aplica `GSUB` a cada trozo de `TJ`
+> por separado, así que partir dentro de una ligadura la desharía. Si los trozos de todas las posiciones con kerning
+> juntos no dan los glifos de la palabra, la palabra va sin kerning. *Alternativa descartada:* escribir los glifos uno
+> a uno sin pasar por `showText`, que obligaría a rehacer el `ToUnicode` de las ligaduras.
 
 > **Decisión:** el ascendente y el descendente salen de `hhea` y no de `OS/2`: ni de `sTypo*`, aunque la fuente
 > marque `USE_TYPO_METRICS`, ni de `usWin*`. En IBM Plex Sans, `hhea` da 1025 y 275 por 1000, igual que `usWin*`, y
@@ -87,9 +99,9 @@ El subrayado y el tachado usan las métricas de la variante del tramo: `underlin
 tabla `post`, y `yStrikeoutPosition` y `yStrikeoutSize` de `OS/2`, medidos desde la línea base hasta la parte de arriba de
 la raya, que es lo que dice la especificación OpenType. Se pintan como *artifacts*.
 
-> **Decisión:** la opción de las ligaduras viaja en `FontFace` (su cuarto componente, y `base()` es la fuente sin ella): así
-> la usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del PDF, y un fichero se identifica igual con y
-> sin ligaduras. *Alternativa descartada:* un parámetro más en `TextMeasurer.width` y en `Canvas.text`.
+> **Decisión:** las opciones de las ligaduras y del kerning viajan en `FontFace` (sus componentes cuarto y quinto, y
+> `base()` es la fuente sin ellas): así las usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del
+> PDF, y un fichero se identifica igual con y sin ellas. *Alternativa descartada:* un parámetro más en `TextMeasurer.width` y en `Canvas.text`.
 
 > **Decisión:** cada fichero de fuente se lee una vez, al indexar la carpeta: lo que se incrusta y se dibuja sale de esos bytes
 > (`FontFile.content()`), así que es lo que se midió aunque el fichero cambie o desaparezca, y pintar no puede fallar con una
@@ -203,6 +215,8 @@ color posible de debajo y una imagen lo deja sin conocer hasta que un color opac
 `SvgCanvas` escribe el SVG de los tests: `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para
 lo liso y cuadrado, un `<g transform>` para el giro y las imágenes como `data:` (la página de un PDF, dibujada en un PNG a
 144 ppp con `PDFRenderer`, porque un navegador no dibuja un PDF dentro de un SVG). No pinta enlaces ni distingue las ligaduras.
+Con `Kerning` y la carpeta de recursos, escribe los ajustes de los pares como `dx`, con `font-kerning: none` para que el
+visor no sume los suyos.
 
 > **Decisión:** el SVG conserva los espacios con `xml:space="preserve"` cuando un texto tiene dos espacios seguidos o empieza
 > o acaba en espacio, y escribe las líneas con `\n` en cualquier sistema.

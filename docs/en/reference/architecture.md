@@ -39,7 +39,7 @@ Dependencies go in a single direction and without cycles. `ArchitectureTest` sta
 | Package | Can use | Contents |
 |---|---|---|
 | `model` | nothing | Pure, shared types: the values (`Value`, `ValueParser`), the enums of the values (one per file, such as `TextAlign`, `Marker` or `Break`), geometry (`Rect`, `Sides`, `Insets`), formatted text (`TextRun`, `TextFormat`, `FontFace`), references (`Reference`), links (`Links`), grid placement (`GridAreas`, `Area`, `Cell`), colors and backgrounds (`Colors`, `Paint`, `Radii`), rotation (`Rotation`), tolerance (`Tolerance`), limits (`Limits`) and the root of the errors (`StxtPdfException`) |
-| `resources` | `model` | The resources folder (`Resources`), fonts (`FontLibrary`, `FontFile`) and images (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
+| `resources` | `model` | The resources folder (`Resources`), fonts (`FontLibrary`, `FontFile`, `KerningPairs`) and images (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | The box tree (`Box`, `Element`, `Style` and its groups) and its construction (`BoxTreeBuilder` and its parts), the model errors (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
 | `fragment` | `model`, `tree` | The result of the layout: `Fragment`, `Page`, `TextLine`, the break tokens (`BreakToken`, `BreakAppeal`, `Unit`) and the break rules (`BreakRules`) |

@@ -126,7 +126,7 @@ class LineBreakerPropertiesTest {
 
     /**
      * Greedy line breaking adds up the advances of the words and the spaces and gives the same lines as measuring the
-     * whole line with each word, as before: with the real metrics (bold, italic, small caps and ligatures),
+     * whole line with each word, as before: with the real metrics (bold, italic, small caps, ligatures and kerning),
      * with letter spacing and with widths that are exactly that of a line, where the rounding of the sum could decide.
      */
     @Test
@@ -136,7 +136,8 @@ class LineBreakerPropertiesTest {
         double[] nudges = {0, 0, 1e-12, -1e-12, 1e-9, -1e-9, 0.004, -0.004};
         for (int i = 0; i < 3000; i++) {
             List<TextRun> runs = randomRuns(random);
-            FontFace font = new FontFace("IBM Plex Sans", FontWeight.NORMAL, FontStyle.NORMAL, random.nextBoolean());
+            FontFace font = new FontFace("IBM Plex Sans", FontWeight.NORMAL, FontStyle.NORMAL, random.nextBoolean(),
+                    random.nextBoolean());
             double size = 6 + random.nextInt(9) + (random.nextBoolean() ? 0.5 : 0);
             double spacing = random.nextInt(3) == 0 ? (random.nextInt(9) - 4) * 0.25 : 0;
             double available;

@@ -172,8 +172,10 @@ like the fonts, that every box with text and `Hyphenate: true` is in a language 
 > way each line is measured as it is painted.
 
 **Measurement.** A `TextMeasurer` has to be **additive between words** (the width of a text is the sum of those of its words
-and spaces): both line breaking algorithms add up. `PdfMetrics` measures with `FontFile.width(text, size, ligatures)`, which applies
-`GSUB` word by word if there are ligatures. `Engine.layOutDocument` first calls `validate(root)`, which in `PdfMetrics`
+and spaces): both line breaking algorithms add up. `PdfMetrics` measures with `FontFile.width(text, size, ligatures,
+kerning)`, which applies `GSUB` and the kerning pairs word by word if they are requested; a pair does not cross a space,
+so the sum is still exact. The part of a split word is measured together with its hyphen, as it is painted: with
+kerning, the last letter and the hyphen are a pair. `Engine.layOutDocument` first calls `validate(root)`, which in `PdfMetrics`
 checks that the fonts exist and have all the characters.
 
 **Long text.** Each page lays out the text from a different line, so the `LayoutCache` does not help. `InlineLayout` memoizes

@@ -39,7 +39,7 @@ class LigaturesTest {
     private static final PdfMetrics METRICS = new PdfMetrics(RESOURCES);
 
     private static FontFace serif(boolean ligatures) {
-        return new FontFace("IBM Plex Serif", FontWeight.NORMAL, FontStyle.NORMAL, ligatures);
+        return new FontFace("IBM Plex Serif", FontWeight.NORMAL, FontStyle.NORMAL, ligatures, false);
     }
 
     /** A document with a single {@code Text} with the typography of {@code typography} (lines with tabs). */

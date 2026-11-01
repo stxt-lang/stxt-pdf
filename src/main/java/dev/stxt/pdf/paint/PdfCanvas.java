@@ -312,10 +312,11 @@ public final class PdfCanvas implements Canvas {
                 out.beginText();
                 out.setFont(fonts.font(font), (float) fontSize);
                 out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
-                if (wordSpacing == 0 && letterSpacing == 0) {
+                int[] kerning = font.kerning() ? resources.fonts().find(font).kerning(text, font.ligatures()) : null;
+                if (wordSpacing == 0 && letterSpacing == 0 && kerning == null) {
                     out.showText(text);
                 } else {
-                    out.showTextWithPositioning(PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize));
+                    out.showTextWithPositioning(PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize, kerning));
                 }
                 out.endText();
             });

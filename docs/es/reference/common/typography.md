@@ -27,6 +27,7 @@ celdas).
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
+| `Kerning` | `true`, `false` | `false` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: true` o `wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). |
@@ -135,6 +136,35 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
 > **Decisión:** una palabra con guion blando se parte solo donde lo lleva, como en TeX, donde quien escribe el corte
 > decide. *Alternativa descartada:* sumar los puntos de los patrones.
 
+## Kerning (`Kerning`)
+
+Con `Kerning: true` el texto se mide y se pinta con los pares de kerning de la fuente, que acercan o separan dos letras
+concretas según su forma (`AV`, `To`, `P.`). Es de `Typography`, se hereda y vale `false` por defecto: se declara una vez
+en `For element: Document`.
+
+- **Los pares son los de la fuente**: los de la característica `kern` de su tabla `GPOS` (la del sistema de escritura por
+  defecto, `DFLT`, o, si no la tiene, la del latino, `latn`) o, en una fuente sin ella, los de su tabla `kern`. Una fuente
+  sin pares se mide y se pinta como sin `Kerning`, sin error. IBM Plex Sans y Serif los traen en `GPOS`; IBM Plex Mono,
+  monoespaciada, no tiene.
+- **Un par** son dos caracteres seguidos de la misma palabra y del mismo tramo: no cruza un espacio ni el límite entre
+  dos tramos (`**A**V`). Lo forman también la última letra de una palabra partida y su guion, que van en el mismo tramo
+  salvo en versalitas. Con `Ligatures: true` el par es entre los glifos que quedan (la `o` y la ligadura `fi` de
+  `Tofi`), nunca dentro de una ligadura.
+- **La medida**: el ajuste de cada par se redondea a milésimas del cuerpo, como el avance de los glifos, y se suma al
+  ancho de la palabra; lo que se mide es lo que se pinta. Con `Letter spacing`, el interletraje se suma al ajuste.
+- **Lo que se lee**: el kerning no cambia el texto que se copia ni el que lee un lector de pantalla.
+
+> **Decisión:** el motor lee los pares de `GPOS`, que la biblioteca de fuentes (fontbox) no lee, porque las fuentes
+> actuales, IBM Plex incluida, solo los traen ahí; la tabla `kern` queda para las fuentes antiguas. *Alternativa
+> descartada:* solo la tabla `kern`, con la que `Kerning` no haría nada con las fuentes del repositorio.
+
+> **Decisión:** `false` por defecto, para que ningún documento existente cambie, y una sola propiedad, sin elegir tablas
+> ni pares. *Alternativa descartada:* kerning siempre, que movería las líneas de todos los documentos.
+
+> **Decisión:** de `GPOS` solo se aplica el kerning horizontal: el avance del primer glifo de cada par, sin saltar las
+> marcas que separen dos letras ni los pares propios de un idioma. *Alternativa descartada:* un motor de composición
+> completo, con todas las características, contextos y sistemas de escritura.
+
 ## Altura de las líneas y línea base
 
 Cada línea mide `Line height`, y la altura del contenido es el número de líneas por `Line height`. Dentro de la línea, la
@@ -153,8 +183,9 @@ siguiente, así que se justifica.
 
 ## Medida del texto
 
-El ancho de un texto es la suma de los avances de sus glifos, redondeados a milésimas del cuerpo, sin kerning y con
-ligaduras solo si se piden ([Formato del texto](text-formatting.md#ligaduras-ligatures)). Una palabra con partes de
+El ancho de un texto es la suma de los avances de sus glifos, redondeados a milésimas del cuerpo, con los ajustes de
+kerning solo si se piden ([Kerning](#kerning-kerning)) y con ligaduras solo si se piden
+([Formato del texto](text-formatting.md#ligaduras-ligatures)). Una palabra con partes de
 varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que se pinta
 ([detalles](../implementation/painting.md#texto)).
 
@@ -179,7 +210,8 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 - Fuentes de sustitución, síntesis de negrita o cursiva, y el peso más cercano cuando falta el pedido
   ([Recursos](resources.md#fuentes)).
 - Unidades relativas a la fuente: todo se mide en puntos, en milímetros o en porcentajes.
-- Kerning y escritura vertical o de derecha a izquierda.
+- Escritura vertical o de derecha a izquierda, y de `GPOS`, lo que no es kerning horizontal (marcas, posiciones
+  contextuales).
 - Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,
   y cambiar los mínimos de letras a cada lado del guion.
 - Color o tamaño distintos dentro de una línea: un tramo solo cambia negrita, cursiva, subrayado y tachado

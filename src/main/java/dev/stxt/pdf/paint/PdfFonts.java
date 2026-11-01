@@ -24,7 +24,7 @@ import java.util.Map;
  * with Identity-H encoding: the PDF looks the same on any machine. A font with TrueType outlines is embedded as a
  * subset (only the glyphs used); one with CFF outlines, whole ({@link #declareCff}). With Identity-H each character
  * takes two bytes and the {@code Tw} operator has no effect, so justification and letter spacing go in the arguments
- * of {@code TJ} ({@link #spaced}).
+ * of {@code TJ} ({@link #spaced}), and so does the kerning.
  */
 final class PdfFonts {
 
@@ -38,8 +38,12 @@ final class PdfFonts {
         this.resources = resources;
     }
 
-    /** The embedded font; it is loaded the first time it is used in the document. */
-    PDFont font(FontFace font) throws IOException {
+    /**
+     * The embedded font; it is loaded the first time it is used in the document. Kerning does not change it: it is
+     * written in {@code TJ}, so a font with and without kerning is the same embedded font.
+     */
+    PDFont font(FontFace requested) throws IOException {
+        FontFace font = requested.withKerning(false);
         PDFont f = fonts.get(font);
         if (f == null) {
             // Without ligatures the GSUB table is dropped: PDFBox writes one glyph per character, which is what was
@@ -85,35 +89,32 @@ final class PdfFonts {
      * the pieces. A number in {@code TJ} shifts to the left, in thousandths of the font size.
      */
     static Object[] justified(String text, double wordSpacing, double fontSize) {
-        return spaced(text, wordSpacing, 0, fontSize);
+        return spaced(text, wordSpacing, 0, fontSize, null);
     }
 
     /**
-     * Argument of {@code TJ} with the extra space of {@code justify} after each space and the
-     * letter spacing after each character except the last. Without letter spacing, the text is split only
-     * after the spaces; with it, one piece per character. {@code TJ} is used and not {@code Tc}/{@code Tw}
+     * Argument of {@code TJ} with the extra space of {@code justify} after each space, the
+     * letter spacing after each character except the last and the kerning of each pair ({@code kerning}, in
+     * thousandths of the font size, by position, as {@link dev.stxt.pdf.resources.FontFile#kerning} gives it; or
+     * {@code null}). Without letter spacing, the text is split only after the spaces, if it is justified, and where a
+     * pair has kerning; with it, one piece per character. {@code TJ} is used and not {@code Tc}/{@code Tw}
      * because the fonts are Type 0 Identity-H, where {@code Tw} has no effect.
      */
-    static Object[] spaced(String text, double wordSpacing, double letterSpacing, double fontSize) {
-        if (letterSpacing != 0) {
-            List<Object> parts = new ArrayList<>();
-            for (int i = 0; i < text.length(); ) {
-                int cp = text.codePointAt(i);
-                i += Character.charCount(cp);
-                parts.add(new String(Character.toChars(cp)));
-                if (i < text.length()) {
-                    parts.add((float) (-(letterSpacing + (cp == ' ' ? wordSpacing : 0)) * 1000 / fontSize));
-                }
-            }
-            return parts.toArray();
-        }
-        Float shift = (float) (-wordSpacing * 1000 / fontSize);
+    static Object[] spaced(String text, double wordSpacing, double letterSpacing, double fontSize, int[] kerning) {
         List<Object> parts = new ArrayList<>();
         int start = 0;
-        for (int i = text.indexOf(' '); i >= 0; i = text.indexOf(' ', i + 1)) {
-            parts.add(text.substring(start, i + 1));
-            parts.add(shift);
-            start = i + 1;
+        for (int i = 0; i < text.length(); ) {
+            int cp = text.codePointAt(i);
+            i += Character.charCount(cp);
+            int kern = kerning != null && i < text.length() ? kerning[i] : 0;
+            boolean split = letterSpacing != 0 ? i < text.length() : cp == ' ' && wordSpacing != 0 || kern != 0;
+            if (split) {
+                double extra = letterSpacing + (cp == ' ' ? wordSpacing : 0);
+                parts.add(text.substring(start, i));
+                // A positive kerning moves the next glyph to the right: in TJ, a negative number.
+                parts.add((float) (-extra * 1000 / fontSize - kern));
+                start = i;
+            }
         }
         parts.add(text.substring(start));
         return parts.toArray();

@@ -33,6 +33,7 @@ Styles:
 | `Color` | color | `#000000` | El color del texto |
 | `Line breaking` | `simple`, `balanced` | `simple` | Cómo se reparte el texto en líneas |
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
+| `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)) |
@@ -134,6 +135,37 @@ Document (dev.stxt.pdf):
 Un guion blando (U+00AD) escrito dentro de una palabra dice dónde puede partirse esa palabra, con o sin `Hyphenate`, y
 no se ve si no se parte. El texto que se copia del PDF, y el que lee un lector de pantalla, no lleva los guiones que puso
 el motor.
+
+## Kerning
+
+Algunas parejas de letras dejan un hueco visible entre ellas por su forma: `AV`, `To`, `P.`. Las fuentes traen una lista
+de esas parejas con lo que hay que acercarlas, o separarlas: el **kerning**. Por defecto no se aplica; con
+`Kerning: true`, sí. Se nota sobre todo en los títulos grandes, y lo normal es declararlo una vez, en
+`For element: Document`:
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Kerning
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Kerning: true
+    Section:
+        Text: AVANCE TÉCNICO
+            Typography:
+                Size: 36
+                Bold: true
+        Paragraph: Torre Vall, octubre de 2025.
+```
+
+Una pareja no se forma por encima de un espacio ni entre una letra en negrita y otra que no lo está. IBM Plex Sans y Serif
+traen kerning; IBM Plex Mono, en la que todas las letras miden lo mismo, no. El texto que se copia del PDF no cambia.
 
 ## Viudas y huérfanas
 

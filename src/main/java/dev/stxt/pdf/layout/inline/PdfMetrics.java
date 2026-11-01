@@ -62,7 +62,7 @@ public final class PdfMetrics implements TextMeasurer {
 
     @Override
     public double width(String text, FontFace font, double fontSize) {
-        return file(font).width(text, fontSize, font.ligatures());
+        return file(font).width(text, fontSize, font.ligatures(), font.kerning());
     }
 
     private FontFile file(FontFace font) {
