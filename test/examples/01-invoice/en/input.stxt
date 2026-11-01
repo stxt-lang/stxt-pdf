@@ -4,6 +4,8 @@
 # Markup: markdown to put a bold word inside the sentence, and the payment details also carry Code
 # font: the IBAN and the BIC, as inline code, in the monospaced font. The labels are written as
 # a normal sentence and the rules put them in uppercase (Case) and space them out (Letter spacing).
+# Next to the payment details, the transfer QR code that banking apps read (the EPC format: beneficiary, IBAN,
+# amount and reference, one per line): a Barcode with its data in a Content block.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
@@ -194,15 +196,37 @@ Document (dev.stxt.pdf):
 			Column sizes: * *
 			Gap: 18
 			Area:
-				Block:
-					Typography:
-						Markup: markdown
-						Code font: IBM Plex Mono
-					Text: Payment details
-						Style: label
-					Paragraph: **`ES91 2100 0418 4502 0005 1332`**
-					Paragraph: Caixa Girona · BIC `CAIXESBBXXX`
-					Paragraph: Include the **invoice number** in the payment reference.
+				Stack:
+					Gap: 12
+					Item:
+						Grow: 1
+						Block:
+							Typography:
+								Markup: markdown
+								Code font: IBM Plex Mono
+							Text: Payment details
+								Style: label
+							Paragraph: **`ES91 2100 0418 4502 0005 1332`**
+							Paragraph: Caixa Girona · BIC `CAIXESBBXXX`
+							Paragraph: Include the **invoice number** in the payment reference.
+					Item:
+						Barcode:
+							Id: payment-qr
+							Alt: QR code to pay the invoice by transfer: €13,360.82 to Taller Nogal S.L.
+							Box:
+								Width: 76
+							Content >>
+								BCD
+								002
+								1
+								SCT
+								CAIXESBBXXX
+								Taller Nogal S.L.
+								ES9121000418450200051332
+								EUR13360.82
+
+
+								Invoice 2025-0147
 			Area:
 				Block:
 					Text: Terms

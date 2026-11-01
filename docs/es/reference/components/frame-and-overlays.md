@@ -9,7 +9,7 @@ un `Stack` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `
 | `Offset` | 1 a 4 valores (número, %, `auto`) | `auto` | Los tres | Arriba, derecha, abajo, izquierda ([Valores](../common/values.md#abreviados-de-cuatro-lados)). |
 | `Layer` | entero | `auto` | Los tres | Orden de apilamiento ([Capas y giro](../common/layers-and-rotation.md)). También en `Item` y `Area`. |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Page overlay` | Las páginas en que sale ([Pages](#pages)). |
-| `Rotate`, `Rotate origin` | ver [Capas y giro](../common/layers-and-rotation.md#giro-rotate) | sin valor | Los tres | Gira la caja al pintarla. También en `Image`. |
+| `Rotate`, `Rotate origin` | ver [Capas y giro](../common/layers-and-rotation.md#giro-rotate) | sin valor | Los tres | Gira la caja al pintarla. También en `Image` y `Barcode`. |
 
 `Offset`, `Layer`, `Pages` y `Rotate` son propiedades del elemento: no van en `Styles` ni se heredan.
 

@@ -60,6 +60,11 @@ public enum Element {
      */
     IMAGE("Image", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
+     * A QR code or a barcode (reference/components/barcode.md): an image that the engine generates from its value,
+     * with the modules in {@link Box#modules()}. It is laid out and painted as an {@code Image}.
+     */
+    BARCODE("Barcode", Layout.IMAGE, Position.STATIC, true, false, 0),
+    /**
      * Automatic table of contents (reference/common/references.md): a block whose children, generated when the tree is
      * built, are one entry per heading ({@link #TOC_1} ... {@link #TOC_6}).
      */
@@ -232,7 +237,7 @@ public enum Element {
         /** The band of a row of a table: it has no content, it is only painted. */
         ROW,
         CELL,
-        /** An image. */
+        /** An image, read from a file or generated ({@code Image} and {@code Barcode}). */
         FIGURE,
         /** A table of contents ({@code Table of contents}, reference/components/table-of-contents.md). */
         TABLE_OF_CONTENTS,
@@ -269,7 +274,7 @@ public enum Element {
             case TABLE -> Role.TABLE;
             case ROW -> Role.ROW;
             case CELL -> Role.CELL;
-            case IMAGE -> Role.FIGURE;
+            case IMAGE, BARCODE -> Role.FIGURE;
             case TABLE_OF_CONTENTS -> Role.TABLE_OF_CONTENTS;
             case TOC_1, TOC_2, TOC_3, TOC_4, TOC_5,
                  TOC_6 -> Role.TOC_ENTRY;

@@ -1,0 +1,13 @@
+# Case: An EAN-13 whose check digit is wrong
+# Code: BARCODE_DATA
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: 8412345678901
+			Alt: Código de producto
+			Format: ean-13

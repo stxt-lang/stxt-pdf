@@ -1,0 +1,14 @@
+# Case: Keep together in a Barcode
+# Code: BREAK_IN_IMAGE
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: https://example.com/verify/1234
+			Alt: Verificación
+			Break:
+				Keep together: true

@@ -1,0 +1,15 @@
+# Case: Font in the Typography of a Barcode
+# Code: BARCODE_PROPERTY_WITHOUT_EFFECT
+# Line: 15
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: https://example.com/verify/1234
+			Alt: Verificación
+			Typography:
+				Color: #1F3A5F
+				Font: IBM Plex Sans

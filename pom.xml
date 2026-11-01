@@ -108,6 +108,14 @@
             <version>3.0.5</version>
         </dependency>
 
+        <!-- Barcode element (tree.Barcodes): ZXing encodes the QR codes, Code 128 and EAN-13 as a matrix of modules,
+             which the canvases paint as rectangles (reference/components/barcode.md). Pure Java, without AWT. -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

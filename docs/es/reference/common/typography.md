@@ -7,7 +7,7 @@ Lo que una regla de `Styles` da a un elemento en `Typography` lo heredan sus des
 él.
 
 `Typography` se admite en todos los elementos de caja salvo `Image`, que no tiene texto, y en `Row` (lo heredan sus
-celdas).
+celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../components/barcode.md#los-módulos)).
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|

@@ -121,7 +121,7 @@ A negative leftover space after shrinking means that the items do not fit: it is
 - An item does not shrink below the narrowest width of its content unless it declares `Min width: 0`. A declared `Width` does not
   stop it: an item with `Width: 400` and little content shrinks if it does not fit.
 - A stretched item does **not** give a definite height to its children ([Values](../common/values.md#definite-height)).
-- An `Image` is not stretched on the cross axis of a row: its height comes from its proportions
+- An `Image` or a `Barcode` is not stretched on the cross axis of a row: its height comes from its proportions
   ([Image](image.md#sizing)).
 
 ## Intrinsic sizes

@@ -17,6 +17,7 @@ import static dev.stxt.pdf.tree.ListBuilder.validateList;
 import static dev.stxt.pdf.tree.ModelValidator.font;
 import static dev.stxt.pdf.tree.ModelValidator.validateStack;
 import static dev.stxt.pdf.tree.ModelValidator.validateImage;
+import static dev.stxt.pdf.tree.ModelValidator.validateBarcode;
 import static dev.stxt.pdf.tree.ModelValidator.validateColumns;
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
@@ -74,12 +75,29 @@ enum ElementReader {
     IMAGE {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
-            validateImage(s);
+            validateImage(s, "an Image");
         }
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             image(n, box);
+        }
+    },
+
+    /**
+     * A {@code Barcode} (reference/components/barcode.md): an image that is generated from its value
+     * ({@link Barcodes}), once its properties are checked.
+     */
+    BARCODE {
+        @Override
+        void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
+            validateImage(s, "a Barcode");
+            validateBarcode(n, s);
+        }
+
+        @Override
+        void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
+            box.setModules(Barcodes.GENERATOR.generate(n, box.style()));
         }
     },
 
@@ -257,6 +275,7 @@ enum ElementReader {
         }
         return switch (kind) {
             case IMAGE -> IMAGE;
+            case BARCODE -> BARCODE;
             case CELL -> CELL;
             case TABLE -> TABLE;
             case GRID -> GRID;

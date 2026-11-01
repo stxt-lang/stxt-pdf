@@ -48,6 +48,7 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [`Columns`](components/columns.md) | Texto en varias columnas, como en una revista |
 | [`Frame`, `Overlay` y `Page overlay`](components/frame-and-overlays.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
 | [`Image`](components/image.md) | Imágenes PNG, JPEG y SVG, y páginas de un PDF |
+| [`Barcode`](components/barcode.md) | Códigos QR y códigos de barras generados a partir de sus datos |
 | [`Markdown`](components/markdown.md) | Escribir contenido largo en Markdown |
 | [`Table of contents`](components/table-of-contents.md) | El índice automático |
 

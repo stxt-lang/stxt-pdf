@@ -121,7 +121,7 @@ Un sobrante negativo después de encoger significa que los ítems no caben: es u
 - Un ítem no encoge por debajo del ancho más estrecho de su contenido salvo que declare `Min width: 0`. Un `Width` declarado no
   lo frena: un ítem con `Width: 400` y poco contenido encoge si no cabe.
 - Un ítem estirado **no** da un alto definido a sus hijos ([Valores](../common/values.md#alto-definido)).
-- Una `Image` no se estira en el eje cruzado de una fila: su alto sale de su proporción
+- Una `Image` o un `Barcode` no se estira en el eje cruzado de una fila: su alto sale de su proporción
   ([Image](image.md#dimensionado)).
 
 ## Tamaños intrínsecos

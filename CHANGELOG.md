@@ -39,6 +39,19 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   without kerning. A font without pairs (IBM Plex Mono) is painted as without `Kerning`; a `GPOS` or `kern` table that
   cannot be read is a `RESOURCE` error. The debugging SVG writes the pairs as `dx`.
 - The annual report example (`test/examples/04-annual-report`) uses kerning.
+- **QR codes and barcodes.** New element `Barcode`: an image that the engine generates from its data instead of reading
+  it from a file, in the `Format` `qr` (by default), `code-128` or `ean-13`, encoded with ZXing `core` 3.5.4 (a new
+  dependency, Apache 2.0, pure Java). The data goes in the value or, if it has several lines (the EPC payment QR code),
+  in a `Content` block; a QR code with data outside ASCII goes in UTF-8 with its ECI designator, and an EAN-13 takes 12
+  digits (the check digit is added) or 13 (it is checked). `Error correction` (`low`, `medium` by default, `quartile`,
+  `high`) only goes in a QR code. It is laid out and broken like an `Image`, with a natural size that comes from its
+  modules and includes the quiet zone (0.5 mm per module in a QR code; 0.33 × 22.85 mm in the barcodes); a QR code is
+  drawn square and centered in its box, and a barcode is stretched to it. The modules have the `Color` of the
+  typography, the only property its `Typography` accepts, and are painted as a single vector path. `Alt` is required:
+  it is a `Figure` of the tagged PDF. New codes `BARCODE_DATA`, `BARCODE_WITHOUT_ALT` and
+  `BARCODE_PROPERTY_WITHOUT_EFFECT`; `Keep together` and `Edges` in a `Barcode` are `BREAK_IN_IMAGE`, as in an `Image`.
+- The invoice example (`test/examples/01-invoice`) carries a payment QR code, and the certificate
+  (`test/examples/10-certificate`), a QR code with its verification address.
 - Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
   `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
   (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and

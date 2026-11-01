@@ -51,6 +51,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [`Columns`](components/columns.md) | `Columns` |
 | [`Frame`, `Overlay` y `Page overlay`](components/frame-and-overlays.md) | Los elementos posicionados |
 | [`Image`](components/image.md) | `Image`: PNG, JPEG y SVG |
+| [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 y EAN-13 |
 | [`Markdown`](components/markdown.md) | `Markdown` y el elemento generado `Code block` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents` y las entradas que genera |
 

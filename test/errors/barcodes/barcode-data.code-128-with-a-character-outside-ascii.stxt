@@ -1,0 +1,13 @@
+# Case: A Code 128 with a character outside ASCII
+# Code: BARCODE_DATA
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: Peña-0042
+			Alt: Referencia
+			Format: code-128

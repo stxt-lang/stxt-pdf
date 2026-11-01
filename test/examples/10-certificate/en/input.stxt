@@ -3,7 +3,8 @@
 # centered, with the person's name as the protagonist; and at the bottom, two scanned signatures on either
 # side of a seal with ribbons, slightly rotated (an Image with Rotate, which takes up the square that
 # encloses it). The certificate number runs vertically in the left margin: a Page overlay rotated −90 degrees
-# around its top left corner.
+# around its top left corner. In the footer, the verification address next to a QR code that leads to the
+# page of this certificate (a Barcode, with dark blue modules).
 # The name of the school is written in lowercase and the rule of its style puts it in uppercase,
 # spaced out (Case and Letter spacing).
 Document (dev.stxt.pdf):
@@ -64,8 +65,21 @@ Document (dev.stxt.pdf):
 		Page overlay:
 			Id: footer
 			Offset: auto 0 -22 0
-			Text: Verifiable at escuelaceramica.example/verificar
-				Link: https://escuelaceramica.example/verificar
+			Stack:
+				Horizontal: center
+				Vertical: center
+				Gap: 8
+				Item:
+					Barcode: https://escuelaceramica.example/verificar/cer-2025-0412
+						Id: verification
+						Alt: QR code to verify the certificate
+						Box:
+							Width: 48
+						Typography:
+							Color: #14305E
+				Item:
+					Text: Verifiable at escuelaceramica.example/verificar
+						Link: https://escuelaceramica.example/verificar/cer-2025-0412
 		Page overlay:
 			Id: serial
 			Offset: 363.5 auto auto -31

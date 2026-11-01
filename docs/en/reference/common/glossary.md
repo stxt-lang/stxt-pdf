@@ -6,7 +6,7 @@
 | **Box that isolates margins** | Box out of which the margins of its children do not pass: it stops margin merging ([Block](../components/block.md#boxes-that-isolate-margins)). |
 | **Column** | Each fragment container into which a `Columns` splits its content on a page ([Columns](../components/columns.md)). |
 | **Definite** | Size that is known without laying out the content ([Values](values.md#definite-height)). |
-| **Element** | A node of the document that is a box: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` or `Page overlay` ([Structure](structure.md#elements)). |
+| **Element** | A node of the document that is a box: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` or `Page overlay` ([Structure](structure.md#elements)). |
 | **Fragment** | Part of a box that falls in a fragment container. |
 | **Fragment container** | Where the fragments of the boxes fall: each page and, inside a `Columns`, each column ([Breaks](breaks.md#model)). |
 | **Generated element** | A box that the engine creates and the document does not write, but that `For element` rules name: `Code block` and `TOC 1` to `TOC 6`. |

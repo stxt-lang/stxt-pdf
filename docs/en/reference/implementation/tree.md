@@ -19,7 +19,7 @@ The structure is only in the schema: `DocumentSchema` compiles it once, `Documen
 In the schema:
 
 - the container elements and the groups are `GROUP` (no value);
-- `Text`, `Paragraph`, `Cell`, `Image`, `Area` and the rules of `Styles`, `INLINE`;
+- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` and the rules of `Styles`, `INLINE`;
 - `Content`, `BLOCK`, and `Areas`, `TEXT`;
 - `Isolate margins`, `Wrap`, `Row header` and `In table of contents`, `BOOLEAN`;
 - `Layer`, `Widows`, `Orphans`, `Start`, `Number` and `Count`, `INTEGER`, and `Rotate`, `NUMBER`;
@@ -148,6 +148,30 @@ closing it with `TextRuns`.
   `BoxTreeBuilder.element` gives it the element `Element.CODE_BLOCK`.
 
 The generated elements that are named in `Styles` without being written in the document are `Element.selectable()`.
+
+## Generated images
+
+A `Barcode` is an image that does not come from a file: the tree generates it from its value when it is built. The
+`BARCODE` family of `ElementReader` checks its properties (`ModelValidator.validateBarcode`) and asks `Barcodes` for the
+drawing, which encodes the data with ZXing 3.5.4 and returns a `Modules` (`model`): the matrix of dark and light modules,
+with the quiet zone, and the natural size of a module. The box keeps it in `Box.modules()`; its element has
+`Layout.IMAGE` and the role `FIGURE`, and `Box.isImage()` is true, so the layout sizes it with the natural size of the
+modules (`Images.natural`) and the painting draws it without knowing which element it comes from (`Canvas.image`, which
+looks at `Box.modules()`).
+
+It is the **extension point** of the generated images: `ImageGenerator` (`tree`) receives the node and its style already
+read and returns a `Modules`, and `Barcodes` is its first implementation. Another generator is another element with its
+family in `ElementReader`, and nothing changes outside `tree`.
+
+> **Decision:** the drawing is generated when the tree is built, in `tree`, which is where the node and its line are: the
+> errors of the data (`BARCODE_DATA`) come out with the other model errors, before the layout, and the layout and the
+> painting receive a ready matrix. ZXing is pure Java, like commonmark-java in `MarkdownBuilder`. *Rejected alternative:*
+> generating it in `layout` or in `resources`, like the file images, which means carrying the format and the data through
+> the tree to use them later and giving the line of the error from outside.
+
+> **Decision:** the contract is a matrix of modules, without a list of shapes or a plugin system (`ServiceLoader`). It
+> covers one- and two-dimensional codes, and it is extended the day something else is needed. *Rejected alternative:* a
+> public interface for generators from outside the engine, which fixes an API before there is a second case.
 
 ## Markdown
 

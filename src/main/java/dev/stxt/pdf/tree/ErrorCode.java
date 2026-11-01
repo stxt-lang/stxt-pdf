@@ -125,8 +125,22 @@ public enum ErrorCode {
      * page}).
      */
     IMAGE_PAGE,
-    /** {@code Keep together} or {@code Edges} in an {@code Image}, which is not split. */
+    /** {@code Keep together} or {@code Edges} in an {@code Image} or a {@code Barcode}, which are not split. */
     BREAK_IN_IMAGE,
+
+    // --- Barcodes -------------------------------------------------------------------------------
+    /**
+     * A {@code Barcode} without data, or with data that its {@code Format} cannot encode: characters it does not have,
+     * too many of them, or digits with a wrong check digit (line of the {@code Barcode}).
+     */
+    BARCODE_DATA,
+    /** A {@code Barcode} without {@code Alt}, which says what it is to whoever cannot see it. */
+    BARCODE_WITHOUT_ALT,
+    /**
+     * In a {@code Barcode}, a property with no effect: {@code Error correction} outside a QR code, or in its
+     * {@code Typography} something other than {@code Color}.
+     */
+    BARCODE_PROPERTY_WITHOUT_EFFECT,
 
     // --- References ----------------------------------------------------------------------------
     /** A reference ({@code {page of: id}}) without {@code Id}, or with an {@code Id} that no box has. */

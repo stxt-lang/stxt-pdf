@@ -78,7 +78,7 @@ final class ListBuilder {
             if (b.style().layout() == Layout.STACK || b.style().layout() == Layout.GRID) {
                 problem = "starts with a " + b.element().label();
             } else if (b.isImage()) {
-                problem = "starts with an Image";
+                problem = b.element() == Element.IMAGE ? "starts with an Image" : "starts with a " + b.element().label();
             } else if (b.inFlowChildren().isEmpty()) {
                 problem = b == item ? "has no in-flow content" : "starts with an empty " + b.element().label();
             }

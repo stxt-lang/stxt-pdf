@@ -9,6 +9,8 @@ Result:
 		Fragment: lines
 			Rect: 44 318.6 507.28 303.5
 		Fragment: payment
-			Rect: 44 646.1 507.28 68
+			Rect: 44 646.1 507.28 69.45
+			Fragment: payment-qr
+				Rect: 219.19 646.1 69.45 69.45
 		Fragment: footer
 			Rect: 44 796.39 507.28 19.5

@@ -70,7 +70,7 @@ break (**natural width**):
 | Element | Narrowest width | Natural width |
 |---|---|---|
 | `Text` | widest word | longest paragraph on one line |
-| `Image` | natural width or, with a `Height` that is a measurement, the width that follows from it with the aspect ratio | same |
+| `Image`, `Barcode` | natural width or, with a `Height` that is a measurement, the width that follows from it with the aspect ratio | same |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | maximum of the narrowest widths of the children | maximum of the natural widths of the children |
 | Horizontal `Stack`, without `Wrap` | sum of the narrowest widths of the items + gaps | sum of the natural widths + gaps |
 | Horizontal `Stack`, with `Wrap` | maximum of the narrowest widths of the items | sum of the natural widths + gaps |
@@ -120,8 +120,8 @@ box and a vertical one, of its height: `50%` makes a circle in a square box and 
 radii of a side add up to more than the side, all of them are reduced by the same factor until they fit.
 
 - **Inside the box.** The background, which goes in the padding box, has the radii of the border box minus the thickness of the
-  border on each side, and a corner that is left without a radius is square. An `Image` is clipped with the radii of its content
-  box (the border box minus the border and the padding).
+  border on each side, and a corner that is left without a radius is square. An `Image` or a `Barcode` is clipped with the
+  radii of its content box (the border box minus the border and the padding).
 - **What it contains.** A box with rounded corners clips, along the curve of its padding box, the **backgrounds, the
   borders and the images** of what it has in its flow, at any depth (also a `Frame` and an item with
   `Layer`): a child with a background that reaches the corner follows the curve without rounding the child. **Text is not clipped**, nor is an

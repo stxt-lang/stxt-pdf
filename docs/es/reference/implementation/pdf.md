@@ -48,7 +48,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `List`, `List item` | `L` y `LI`, con el marcador en `Lbl` y el contenido en `LBody` |
 | `Table` y sus partes | `Table`, `THead`, `TBody`, `TFoot`, `TR`, y `TH` o `TD` |
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
-| `Image` con `Alt` | `Figure`, con `Alt` y `BBox` |
+| `Image` con `Alt`, `Barcode` | `Figure`, con `Alt` y `BBox` |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
 | El resto (como `Block`, `Stack`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
 

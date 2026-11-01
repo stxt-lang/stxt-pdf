@@ -19,7 +19,7 @@ La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `Doc
 En el schema:
 
 - los elementos contenedores y los grupos son `GROUP` (sin valor);
-- `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`, `INLINE`;
+- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` y las reglas de `Styles`, `INLINE`;
 - `Content`, `BLOCK`, y `Areas`, `TEXT`;
 - `Isolate margins`, `Wrap`, `Row header` e `In table of contents`, `BOOLEAN`;
 - `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`, y `Rotate`, `NUMBER`;
@@ -148,6 +148,30 @@ cerrarlo con `TextRuns`.
   `BoxTreeBuilder.element` le da el elemento `Element.CODE_BLOCK`.
 
 Los elementos generados que se nombran en `Styles` sin escribirse en el documento son `Element.selectable()`.
+
+## Imágenes generadas
+
+Un `Barcode` es una imagen que no sale de un fichero: el árbol la genera a partir de su valor al construirse. La familia
+`BARCODE` de `ElementReader` comprueba sus propiedades (`ModelValidator.validateBarcode`) y le pide el dibujo a
+`Barcodes`, que codifica los datos con ZXing 3.5.4 y devuelve un `Modules` (`model`): la matriz de módulos oscuros y
+claros, con la zona de silencio, y el tamaño natural de un módulo. La caja lo guarda en `Box.modules()`; su elemento tiene
+`Layout.IMAGE` y el papel `FIGURE`, y `Box.isImage()` es cierto, así que el layout lo dimensiona con el tamaño natural de
+los módulos (`Images.natural`) y el pintado lo dibuja sin saber de qué elemento viene (`Canvas.image`, que mira
+`Box.modules()`).
+
+Es el **punto de extensión** de las imágenes generadas: `ImageGenerator` (`tree`) recibe el nodo y su estilo ya leído y
+devuelve un `Modules`, y `Barcodes` es su primera implementación. Otro generador es otro elemento con su familia en
+`ElementReader`, y no cambia nada fuera de `tree`.
+
+> **Decisión:** el dibujo se genera al construir el árbol, en `tree`, que es donde están el nodo y su línea: los errores de
+> los datos (`BARCODE_DATA`) salen con los demás errores del modelo, antes de maquetar, y el layout y el pintado reciben
+> una matriz ya hecha. ZXing es Java puro, como commonmark-java en `MarkdownBuilder`. *Alternativa descartada:* generarlo en
+> `layout` o en `resources`, como las imágenes de fichero, que obliga a pasar el formato y los datos por el árbol para
+> usarlos después y a dar la línea del error desde fuera.
+
+> **Decisión:** el contrato es una matriz de módulos, sin una lista de formas ni un sistema de *plugins* (`ServiceLoader`).
+> Cubre los códigos de una y dos dimensiones, y el día que haga falta otra cosa se amplía. *Alternativa descartada:* una
+> interfaz pública para generadores de fuera del motor, que fija una API antes de tener un segundo caso.
 
 ## Markdown
 

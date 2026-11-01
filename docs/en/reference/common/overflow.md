@@ -15,7 +15,7 @@ situations:
   line of what prevents splitting it:
   - its `Padding` or its `Border`, if the padding and the border of the fragment no longer fit on the page;
   - if not, and it is a line of text, its `Line height` (or, without it, its `Size`), its own or inherited;
-  - if not, its `Height` (in an `Image` without it, its `Width`, from which the height comes);
+  - if not, its `Height` (in an `Image` or a `Barcode` without it, its `Width`, from which the height comes);
   - in a rotated box, which is not split, its `Rotate`;
 - **an `Overlay` or a `Page overlay` that goes outside the physical page** (`BOX_OVERFLOW`), at the line of its `Offset`.
   They can take up the margins of the page, but not go outside the page;

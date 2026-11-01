@@ -171,6 +171,14 @@ error of those that have not been removed. `LayerUtility` also copies the layers
 > **Decision:** the rotation matrix is our own and not that of `LayerUtility`, which keeps the unrotated size and distorts a
 > page rotated 90°.
 
+A generated image, such as a `Barcode` (`Box.modules()`), does not go through `PdfImages`: `PdfCanvas.modules` places the
+matrix with `ImageFit` (`Modules.fit()`: `inside` if it has several rows, `stretch` if it has one) and writes one rectangle
+for each run of consecutive dark modules of each row (`Modules.runs`), all in a single path that is filled once (`f`) with
+the color of the typography, inside the clip of the corners and the marked content of its figure.
+
+> **Decision:** a single path and a single fill, and not one fill per module: two rectangles filled separately show a thin
+> line between them in some viewers because of anti-aliasing, which in a QR code reads as a light module.
+
 > **Decision:** JSVG and `pdfbox-graphics2d` for the SVGs, without dependencies of their own. *Rejected alternative:* Apache Batik, which
 > drags in dozens of jars.
 
@@ -213,7 +221,8 @@ possible color underneath and an image leaves it unknown until an opaque color c
 ## The debug SVG
 
 `SvgCanvas` writes the SVG of the tests: `<path>` for the rounded boxes, `linearGradient` and `clipPath`, and `<rect>` for
-what is plain and square, a `<g transform>` for the rotation and the images as `data:` (the page of a PDF, drawn into a PNG at
+what is plain and square, a `<g transform>` for the rotation, the modules of a `Barcode` as a `<path>` with one rectangle per
+run and the images as `data:` (the page of a PDF, drawn into a PNG at
 144 dpi with `PDFRenderer`, because a browser does not draw a PDF inside an SVG). It does not paint links or distinguish ligatures.
 With `Kerning` and the resources folder, it writes the adjustments of the pairs as `dx`, with `font-kerning: none` so
 that the viewer does not add its own.

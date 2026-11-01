@@ -44,6 +44,7 @@ reglas pueden venir también de un documento de estilos aparte ([Styles](styles.
 | `Columns` | Bloque cuyo contenido fluye por varias columnas ([Columns](../components/columns.md)) | Elementos en flujo |
 | `Markdown` | Contenido escrito en Markdown ([Markdown](../components/markdown.md)) | Su texto en `Content` |
 | `Image` | Imagen PNG, JPEG o SVG, o una página de un PDF ([Image](../components/image.md)) | Nada: la ruta va en el valor |
+| `Barcode` | Código QR o de barras generado a partir de sus datos ([Barcode](../components/barcode.md)) | Sus datos, en el valor o en `Content` |
 | `Table of contents` | Índice automático ([Table of contents](../components/table-of-contents.md)) | Nada: las entradas las genera el motor |
 | `Frame` | Bloque que se desplaza sin mover a sus hermanos ([posicionados](../components/frame-and-overlays.md)) | Elementos |
 | `Overlay` | Bloque fuera de flujo, colocado en su contenedor de referencia | Elementos |
@@ -162,7 +163,7 @@ Cada elemento decide **cómo coloca a sus hijos**:
 | `Grid`, `Table` | En una rejilla ([Grid](../components/grid.md), [Table](../components/table.md)) |
 | `Columns` | En columnas, cada una en flujo de bloque ([Columns](../components/columns.md)) |
 | `Text`, `Paragraph`, `Cell` con valor | Sin hijos: reparte su texto en líneas ([Tipografía](typography.md#el-reparto-en-líneas)) |
-| `Image` | Sin hijos: su contenido es la imagen ([Image](../components/image.md)) |
+| `Image`, `Barcode` | Sin hijos: su contenido es la imagen ([Image](../components/image.md), [Barcode](../components/barcode.md)) |
 
 **Participación.** Cómo participa una caja en su padre lo decide el padre: dentro de un bloque es un bloque apilado, y dentro
 de un `Stack` o un `Grid`, un ítem. `Overlay` y `Page overlay` salen del flujo, y un `Frame` participa como cualquier caja y
@@ -200,6 +201,7 @@ vez, y los elementos, las veces que se quiera.
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (obligatorio) |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`), `Break`, `Alt` (obligatorio), `Format`, `Error correction`, `Rotate`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
@@ -210,9 +212,9 @@ vez, y los elementos, las veces que se quiera.
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
 *Elementos* son `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`,
-`Table of contents`, `Image`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.
+`Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` y `Page overlay`. *Elementos en flujo* son todos menos `Overlay` y `Page overlay`.
 
-Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Area` y las reglas de `Styles`.
+Solo llevan valor en su línea las propiedades (no los grupos), `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` y las reglas de `Styles`.
 `Block: algo` es un error. `Content` va siempre en bloque `>>`, y `Areas`, en línea o en bloque. Lo que el schema no puede
 expresar (que `Page` declare su tamaño de una sola forma, que un `Item` tenga exactamente un elemento, el orden de las
 partes de una tabla) lo comprueba el motor, con los códigos de [Errores](errors.md).

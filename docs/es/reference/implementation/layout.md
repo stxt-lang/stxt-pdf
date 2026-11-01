@@ -73,7 +73,7 @@ que incluye su `Pages`.
 
 ## Cajas giradas en flujo
 
-`Engine.layout` maqueta aparte una caja con `Style.rotatesInFlow()` (un `Block`, `Text`, `Paragraph` o `Image` con
+`Engine.layout` maqueta aparte una caja con `Style.rotatesInFlow()` (un `Block`, `Text`, `Paragraph`, `Image` o `Barcode` con
 `Rotate`): con `ConstraintSpace.fixed` y el ancho de `turnedWidth` (su `Width` resuelto o, con `auto`, su ancho natural más
 borde y relleno), sin fragmentación y sin `from`. El resultado se envuelve con `Fragment.turned`: el fragmento mide el
 rectángulo que envuelve su caja de borde girada sobre su centro, y `turned` guarda esa caja sin girar, centrada en él. Los

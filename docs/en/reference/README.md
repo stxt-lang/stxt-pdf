@@ -51,6 +51,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [`Columns`](components/columns.md) | `Columns` |
 | [`Frame`, `Overlay` and `Page overlay`](components/frame-and-overlays.md) | The positioned elements |
 | [`Image`](components/image.md) | `Image`: PNG, JPEG and SVG |
+| [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 and EAN-13 |
 | [`Markdown`](components/markdown.md) | `Markdown` and the generated element `Code block` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents` and the entries it generates |
 

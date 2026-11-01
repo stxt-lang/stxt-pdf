@@ -37,7 +37,8 @@ There are two ways of rotating, depending on the box.
 
 ### In place: `Block`, `Text`, `Paragraph` and `Image`
 
-A rotated box in the flow **takes up the rectangle that encloses it once rotated**, and what is around it moves aside.
+A rotated box in the flow **takes up the rectangle that encloses it once rotated**, and what is around it moves aside. A
+`Barcode` rotates like an `Image`.
 This is what is needed for vertical text, such as the headers of some narrow columns:
 
 ```

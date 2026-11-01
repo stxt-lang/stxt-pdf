@@ -43,6 +43,7 @@ public final class PropertyKey {
     public static final String START = "start";
     public static final String NUMBER = "number";
     public static final String PDF_PAGE = "pdf-page";
+    public static final String ERROR_CORRECTION = "error-correction";
 
     // Columns
     public static final String COUNT = "count";

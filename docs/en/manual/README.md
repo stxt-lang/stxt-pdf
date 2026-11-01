@@ -48,6 +48,7 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | [`Columns`](components/columns.md) | Text in several columns, as in a magazine |
 | [`Frame`, `Overlay` and `Page overlay`](components/frame-and-overlays.md) | Shifting a box, placing it at an exact position or repeating it on each page |
 | [`Image`](components/image.md) | PNG, JPEG and SVG images, and pages of a PDF |
+| [`Barcode`](components/barcode.md) | QR codes and barcodes generated from their data |
 | [`Markdown`](components/markdown.md) | Writing long content in Markdown |
 | [`Table of contents`](components/table-of-contents.md) | The automatic table of contents |
 

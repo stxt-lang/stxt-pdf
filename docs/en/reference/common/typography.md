@@ -7,7 +7,7 @@ What a `Styles` rule gives an element in `Typography` is inherited by its descen
 it.
 
 `Typography` is accepted in all box elements except `Image`, which has no text, and in `Row` (its cells
-inherit it).
+inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barcode](../components/barcode.md#the-modules)).
 
 | Property | Values | Default | Notes |
 |---|---|---|---|

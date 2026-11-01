@@ -5,7 +5,7 @@ las páginas de [implementación](README.md#implementación) y en el javadoc.
 
 Java 17 y Maven: artefacto `dev.stxt:stxt-pdf`, package raíz `dev.stxt.pdf`. Las dependencias de terceros son
 `stxt-core` (leer y validar STXT), PDFBox (escribir el PDF), commonmark-java (Markdown), JSVG y `pdfbox-graphics2d`
-(dibujar SVG en el PDF). En los tests, JUnit 5, veraPDF y PIT.
+(dibujar SVG en el PDF) y ZXing `core` (codificar los códigos QR y de barras). En los tests, JUnit 5, veraPDF y PIT.
 
 ## Flujo de datos
 
@@ -38,7 +38,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 
 | Package | Puede usar | Qué hay |
 |---|---|---|
-| `model` | nada | Tipos puros y compartidos: los valores (`Value`, `ValueParser`), los enums de los valores (uno por fichero, como `TextAlign`, `Marker` o `Break`), la geometría (`Rect`, `Sides`, `Insets`), el texto con formato (`TextRun`, `TextFormat`, `FontFace`), las referencias (`Reference`), los enlaces (`Links`), la colocación de grid (`GridAreas`, `Area`, `Cell`), los colores y los fondos (`Colors`, `Paint`, `Radii`), el giro (`Rotation`), la tolerancia (`Tolerance`), los límites (`Limits`) y la raíz de los errores (`StxtPdfException`) |
+| `model` | nada | Tipos puros y compartidos: los valores (`Value`, `ValueParser`), los enums de los valores (uno por fichero, como `TextAlign`, `Marker` o `Break`), la geometría (`Rect`, `Sides`, `Insets`), el texto con formato (`TextRun`, `TextFormat`, `FontFace`), las referencias (`Reference`), los enlaces (`Links`), la colocación de grid (`GridAreas`, `Area`, `Cell`), los colores y los fondos (`Colors`, `Paint`, `Radii`), el giro (`Rotation`), los módulos de una imagen generada (`Modules`, con `BarcodeFormat` y `ErrorCorrection`), la tolerancia (`Tolerance`), los límites (`Limits`) y la raíz de los errores (`StxtPdfException`) |
 | `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`, `KerningPairs`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
@@ -78,6 +78,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   - `StyleRules`, las reglas de `Styles`;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` y `TableOfContentsBuilder`, las tablas, las listas, el Markdown y
     los índices;
+  - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
+    imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));
   - `ModelValidator`, las reglas que miran la caja ya leída.
 
 ### Layout (`layout`)

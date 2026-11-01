@@ -73,7 +73,7 @@ pages included by their `Pages`.
 
 ## Rotated boxes in flow
 
-`Engine.layout` lays out separately a box with `Style.rotatesInFlow()` (a `Block`, `Text`, `Paragraph` or `Image` with
+`Engine.layout` lays out separately a box with `Style.rotatesInFlow()` (a `Block`, `Text`, `Paragraph`, `Image` or `Barcode` with
 `Rotate`): with `ConstraintSpace.fixed` and the width from `turnedWidth` (its resolved `Width` or, with `auto`, its natural width plus
 border and padding), without fragmentation and without `from`. The result is wrapped with `Fragment.turned`: the fragment measures the
 rectangle that encloses its border box rotated about its center, and `turned` keeps that box unrotated, centered in it. The

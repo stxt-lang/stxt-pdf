@@ -36,7 +36,8 @@ Hay dos formas de girar, según la caja.
 
 ### En su sitio: `Block`, `Text`, `Paragraph` e `Image`
 
-Una caja del flujo girada **ocupa el rectángulo que la envuelve girada**, y lo de alrededor se aparta. Es lo que hace
+Una caja del flujo girada **ocupa el rectángulo que la envuelve girada**, y lo de alrededor se aparta. Un `Barcode` gira
+igual que una `Image`. Es lo que hace
 falta para un texto en vertical, como las cabeceras de unas columnas estrechas:
 
 ```

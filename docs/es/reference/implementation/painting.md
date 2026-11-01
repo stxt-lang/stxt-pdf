@@ -171,6 +171,14 @@ configuración sin `Name` (la `D` y las de `Configs`) y le quita sus `AS`: PDF/U
 > **Decisión:** la matriz del giro es propia y no la de `LayerUtility`, que conserva el tamaño sin girar y deforma una
 > página girada 90°.
 
+Una imagen generada, como un `Barcode` (`Box.modules()`), no pasa por `PdfImages`: `PdfCanvas.modules` coloca la matriz
+con `ImageFit` (`Modules.fit()`: `inside` si tiene varias filas, `stretch` si tiene una) y escribe un rectángulo por cada
+tramo de módulos oscuros seguidos de cada fila (`Modules.runs`), todos en un mismo trazado que se rellena una vez (`f`) con
+el color de la tipografía, dentro del recorte de las esquinas y del contenido marcado de su figura.
+
+> **Decisión:** un solo trazado y un solo relleno, y no un relleno por módulo: dos rectángulos rellenados por separado
+> dejan ver una línea fina entre ellos en algunos visores por el suavizado, que en un QR se lee como un módulo claro.
+
 > **Decisión:** JSVG y `pdfbox-graphics2d` para los SVG, sin dependencias propias. *Alternativa descartada:* Apache Batik, que
 > arrastra decenas de jars.
 
@@ -213,7 +221,8 @@ color posible de debajo y una imagen lo deja sin conocer hasta que un color opac
 ## El SVG de depuración
 
 `SvgCanvas` escribe el SVG de los tests: `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para
-lo liso y cuadrado, un `<g transform>` para el giro y las imágenes como `data:` (la página de un PDF, dibujada en un PNG a
+lo liso y cuadrado, un `<g transform>` para el giro, los módulos de un `Barcode` como un `<path>` con un rectángulo por
+tramo y las imágenes como `data:` (la página de un PDF, dibujada en un PNG a
 144 ppp con `PDFRenderer`, porque un navegador no dibuja un PDF dentro de un SVG). No pinta enlaces ni distingue las ligaduras.
 Con `Kerning` y la carpeta de recursos, escribe los ajustes de los pares como `dx`, con `font-kerning: none` para que el
 visor no sume los suyos.

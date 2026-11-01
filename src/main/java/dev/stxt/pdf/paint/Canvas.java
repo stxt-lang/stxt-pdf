@@ -64,7 +64,9 @@ public interface Canvas {
     /**
      * The image of an {@code Image} (reference/components/image.md) in its content box
      * {@code content}, placed according to its {@code Fit} ({@link ImageFit}) and clipped to the box with
-     * the corners {@code radii} (those of the content box).
+     * the corners {@code radii} (those of the content box). A generated image, such as a {@code Barcode}
+     * (reference/components/barcode.md), has no file: its modules ({@link Box#modules()}) are painted in the color
+     * of its typography, placed according to {@link dev.stxt.pdf.model.Modules#fit()}.
      */
     void image(Box box, Rect content, Radii radii);
 

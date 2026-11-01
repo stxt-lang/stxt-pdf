@@ -75,6 +75,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -115,6 +116,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -382,6 +384,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -430,6 +433,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -474,6 +478,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -516,6 +521,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -560,6 +566,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -609,6 +616,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 				Max: 1
 			Child: Image
+			Child: Barcode
 				Max: 1
 			Child: Table
 				Max: 1
@@ -654,6 +662,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Table of contents
 				Max: 1
 			Child: Image
+			Child: Barcode
 				Max: 1
 			Child: Table
 				Max: 1
@@ -752,6 +761,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Markdown
 			Child: Table of contents
 			Child: Image
+			Child: Barcode
 			Child: Table
 			Child: Columns
 			Child: Frame
@@ -820,6 +830,32 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Pdf page
 				Max: 1
 			Child: Rotate
+				Max: 1
+	Node: Barcode
+		Type: INLINE
+		Description: QR code or barcode that the engine generates from its data, in the Format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
+		Children:
+			Child: Id
+				Max: 1
+			Child: Style
+				Max: 1
+			Child: Link
+				Max: 1
+			Child: Box
+				Max: 1
+			Child: Typography
+				Max: 1
+			Child: Break
+				Max: 1
+			Child: Alt
+				Max: 1
+			Child: Format
+				Max: 1
+			Child: Error correction
+				Max: 1
+			Child: Rotate
+				Max: 1
+			Child: Content
 				Max: 1
 
 	# Reusable rules
@@ -1037,7 +1073,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: odd
 	Node: Rotate
 		Type: NUMBER
-		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph and Image, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
+		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
 		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
 	Node: Paper
@@ -1060,7 +1096,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: landscape
 	Node: Content
 		Type: BLOCK
-		Description: Block text. A single line break counts as a space; a blank line is an error, except in a preformatted Text (Preformatted: true or wrap).
+		Description: Block text. A single line break counts as a space; a blank line is an error, except in a preformatted Text (Preformatted: true or wrap). In a Barcode, the data, with its lines as they are.
 
 	# Box
 
@@ -1087,7 +1123,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Border color
 		Description: Border color: top, right, bottom, left (1 to 4 colors). By default, the Color of the text.
 	Node: Corner radius
-		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background, the border and the clipping of an Image.
+		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background, the border and the clipping of an Image or a Barcode.
 	Node: Background
 		Description: Background, painted in the padding box: a color or a gradient linear(angle, color, color...).
 
@@ -1332,7 +1368,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Image
 
 	Node: Alt
-		Description: Alternative text of an Image: with it, the image is a figure (Figure) of the tagged PDF; without it, it is decorative.
+		Description: Alternative text of an Image or a Barcode: with it, the image is a figure (Figure) of the tagged PDF; without it, an Image is decorative. A Barcode requires it.
 	Node: Fit
 		Type: ENUM
 		Description: How an Image fills its box if they have different proportions: inside (by default) fits whole and centered; fill fills the box, centered and clipped; stretch stretches it to the box and distorts it.
@@ -1343,6 +1379,24 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Pdf page
 		Type: INTEGER
 		Description: Page drawn by an Image of a PDF, from 1 (by default, the first). In an image that is not a PDF, or a page the PDF does not have, it is an error.
+
+	# Barcode
+
+	Node: Format
+		Type: ENUM
+		Description: Symbology of a Barcode: qr (by default), a QR code; code-128, printable ASCII characters, up to 80; ean-13, 12 digits (the check digit is added) or 13 (it is checked).
+		Values:
+			Value: qr
+			Value: code-128
+			Value: ean-13
+	Node: Error correction
+		Type: ENUM
+		Description: Error correction of a QR code, the part of its modules that can be damaged and it can still be read: low (7 %), medium (15 %, by default), quartile (25 %) or high (30 %). In another Format, it is an error.
+		Values:
+			Value: low
+			Value: medium
+			Value: quartile
+			Value: high
 
 	# Markdown
 

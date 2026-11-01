@@ -13,7 +13,7 @@
 | **Contexto de apilamiento** | Grupo de cajas que se pinta como una unidad y ordena a sus hijos por `Layer` ([Capas y giro](layers-and-rotation.md)). |
 | **Definido** | Tamaño que se conoce sin hacer el layout del contenido ([Valores](values.md#alto-definido)). |
 | **Degradado** | Fondo que pasa de un color a otro a lo largo de una línea: `linear(ángulo, color, color, ...)` ([La caja](box.md#degradado)). |
-| **Elemento** | Un nodo del documento que es una caja: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Frame`, `Overlay` o `Page overlay` ([Estructura](structure.md#elementos)). |
+| **Elemento** | Un nodo del documento que es una caja: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, los encabezados, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` o `Page overlay` ([Estructura](structure.md#elementos)). |
 | **Elemento en flujo** | Elemento que puede ser un ítem: todos menos `Overlay` y `Page overlay`. |
 | **Elemento generado** | Una caja que crea el motor y que el documento no escribe, pero que las reglas `For element` nombran: `Code block` y `TOC 1` a `TOC 6`. |
 | **Elemento posicionado** | `Frame`, `Overlay` o `Page overlay`. |

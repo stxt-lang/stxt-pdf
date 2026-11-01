@@ -129,8 +129,8 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../components
 
 ## Lo que no se parte
 
-- **Imágenes.** Una `Image` no se parte: si no cabe en lo que queda de la página (o de la columna), pasa entera a la
-  siguiente ([Image](../components/image.md#cortes-de-página)).
+- **Imágenes.** Una `Image` o un `Barcode` no se parte: si no cabe en lo que queda de la página (o de la columna), pasa
+  entero a la siguiente ([Image](../components/image.md#cortes-de-página)).
 - **Posicionadas.** Un `Overlay` se coloca en la página donde cae su posición y no se parte. Si su contenedor de
   referencia está partido, se resuelve contra el fragmento de esa página: su alto es el de ese fragmento y no el total. Un
   `Page overlay` se repite en las páginas que dice su `Pages`. Un `Frame` se parte como cualquier bloque, salvo si está

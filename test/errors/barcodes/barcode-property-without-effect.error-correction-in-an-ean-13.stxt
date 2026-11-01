@@ -1,0 +1,14 @@
+# Case: Error correction in an EAN-13
+# Code: BARCODE_PROPERTY_WITHOUT_EFFECT
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: 8412345678905
+			Alt: Código de producto
+			Format: ean-13
+			Error correction: high

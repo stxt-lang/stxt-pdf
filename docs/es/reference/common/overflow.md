@@ -14,7 +14,7 @@
   que impide partirlo:
   - su `Padding` o su `Border`, si el relleno y el borde del fragmento ya no caben en la página;
   - si no, y es una línea de texto, su `Line height` (o, sin él, su `Size`), propios o heredados;
-  - si no, su `Height` (en una `Image` sin él, su `Width`, del que sale el alto);
+  - si no, su `Height` (en una `Image` o un `Barcode` sin él, su `Width`, del que sale el alto);
   - en una caja girada, que no se parte, su `Rotate`;
 - **un `Overlay` o un `Page overlay` que se sale de la página física** (`BOX_OVERFLOW`), en la línea de su `Offset`. Pueden
   ocupar los márgenes de la página, pero no salir de la página;

@@ -16,7 +16,8 @@ import java.util.Set;
 
 /**
  * The images of the document in the resources folder (reference/components/image.md): the file and
- * the natural size of each {@code Image}. The errors of the file belong to the document and carry the
+ * the natural size of each {@code Image}, and the natural size of the generated images, such as a {@code Barcode},
+ * which have no file. The errors of the file belong to the document and carry the
  * line of the {@code Image}: {@code IMAGE_UNKNOWN} if the path does not exist or leaves the folder, and
  * {@code IMAGE_FORMAT} if it is not PNG, JPEG, PDF or a supported SVG. An image that exceeds the {@link Limits} is
  * {@code IMAGE_TOO_LARGE} (the pixels of a PNG or JPEG) or {@code SVG_TOO_COMPLEX} (the elements and the
@@ -45,7 +46,7 @@ public final class Images {
      * @throws InvalidModelException with the line of the first {@code Image} that fails
      */
     public void validate(Box box) {
-        if (box.isImage()) {
+        if (box.image() != null) {
             checkPdfBytes(box);
             ImageFile file = file(box);
             checkLimits(file, box);
@@ -141,8 +142,14 @@ public final class Images {
         }
     }
 
-    /** Natural size of an {@code Image}, in points: for a PDF, the size of its page. */
+    /**
+     * Natural size of an image, in points: for a PDF, the size of its page; for a generated image such as a
+     * {@code Barcode}, that of its modules (reference/components/barcode.md).
+     */
     public NaturalSize natural(Box box) {
+        if (box.modules() != null) {
+            return new NaturalSize(box.modules().naturalWidth(), box.modules().naturalHeight());
+        }
         ImageFile f = file(box);
         int page = box.style().image().pdfPage();
         return new NaturalSize(f.width(page), f.height(page));

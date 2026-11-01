@@ -28,7 +28,7 @@ mayores. Los `Page overlay` del documento se pintan antes que los de la sección
 
 ## Giro (`Rotate`)
 
-`Rotate` es una propiedad del elemento en `Block`, `Text`, `Paragraph`, `Image`, `Frame`, `Overlay` y `Page overlay`,
+`Rotate` es una propiedad del elemento en `Block`, `Text`, `Paragraph`, `Image`, `Barcode`, `Frame`, `Overlay` y `Page overlay`,
 y `Rotate origin`, solo en los tres posicionados:
 
 | Propiedad | Valores | Por defecto | Notas |
@@ -43,7 +43,7 @@ zonas de sus enlaces. Un giro dentro de otro se suma al de fuera. Lo que cambia 
 ### Giro en flujo: `Block`, `Text`, `Paragraph` e `Image`
 
 Una caja en flujo girada **ocupa el rectángulo que la envuelve girada**: lo que la rodea se coloca alrededor de ese
-rectángulo y nunca debajo de lo girado. Es la forma de escribir un texto en vertical en su sitio, como la cabecera de una
+rectángulo y nunca debajo de lo girado. Un `Barcode` gira igual que una `Image`. Es la forma de escribir un texto en vertical en su sitio, como la cabecera de una
 columna estrecha:
 
 ```

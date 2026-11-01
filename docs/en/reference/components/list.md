@@ -61,8 +61,8 @@ is the left `Padding` of the `List`, plus the left margin of the item. Its basel
 item: the one found by going down through the first in-flow child of each block until a text is reached (with a nested list at the
 start, both markers are on the same line).
 
-- An item with a marker whose content does not lead to a text in this way (it starts with a `Stack`, a `Grid`, an `Image` or an empty
-  block) is an error (`LIST_ITEM_WITHOUT_LINE`), on the line of the box that prevents it.
+- An item with a marker whose content does not lead to a text in this way (it starts with a `Stack`, a `Grid`, an `Image`, a
+  `Barcode` or an empty block) is an error (`LIST_ITEM_WITHOUT_LINE`), on the line of the box that prevents it.
 - So is a marker wider than its indent (`LIST_MARKER_OVERFLOW`): it does not stick out of the list.
 
 > **Decision:** there is no indent property and no fixed marker width: the indent is the `Padding` of the `List`.

@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -328,6 +329,10 @@ public final class SvgCanvas implements Canvas {
      */
     @Override
     public void image(Box box, Rect content, Radii radii) {
+        if (box.modules() != null) {
+            modules(box, content, radii);
+            return;
+        }
         if (resources == null) {
             return;
         }
@@ -361,6 +366,28 @@ public final class SvgCanvas implements Canvas {
         if (rounded) {
             svg.append("</g>\n");
         }
+    }
+
+    /**
+     * The modules of a generated image, such as a {@code Barcode} (reference/components/barcode.md): a path with one
+     * rectangle per run of dark modules of each row, in the {@code Color} of its {@code Typography}, clipped to the
+     * content box with its corners.
+     */
+    private void modules(Box box, Rect content, Radii radii) {
+        Modules m = box.modules();
+        Rect target = ImageFit.place(m.fit(), content, m.naturalWidth(), m.naturalHeight());
+        double w = target.width() / m.columns();
+        double h = target.height() / m.rows();
+        String id = "c" + ids++;
+        svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(path(content, radii))
+                .append("\"/></clipPath>\n<path clip-path=\"url(#").append(id).append(")\" d=\"");
+        for (int row = 0; row < m.rows(); row++) {
+            for (int[] run : m.runs(row)) {
+                svg.append(String.format(Locale.ROOT, "M%.2f %.2fh%.2fv%.2fh%.2fz", target.x() + run[0] * w,
+                        target.y() + row * h, run[1] * w, h, -run[1] * w));
+            }
+        }
+        svg.append("\"").append(fillAttr(box.style().typography().color())).append("/>\n");
     }
 
     /** Page {@code number} (from 1) of a PDF, drawn into a PNG. */

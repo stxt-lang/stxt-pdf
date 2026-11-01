@@ -1,0 +1,54 @@
+# Barcodes (reference/components/barcode.md): page of 200 × 300 with margins of 20, page area of 160 × 260 from (20, 20).
+# Each Barcode is laid out as an Image with the natural size of its modules (with the quiet zone): the ratio of its
+# content box is that of the modules, and with Width the height follows from it. One after the other in block flow.
+#   qr:     a QR code with Width 60: its content box is square, 60 × 60. y = 20.
+#   framed: a QR code with Error correction high, Width 80, Padding 5, Border 1, a background and dark blue modules:
+#           its content box measures 80 − 12 = 68 wide and so 68 high, and the box, 68 + 12 = 80. y = 80.
+#   code:   a Code 128 with Width 160 and Height 30: the bars are stretched to the box. y = 160.
+#   ean:    an EAN-13 with Width 100. Its modules are 11 + 95 + 7 = 113 of 0.33 mm (37.29 mm) by 22.85 mm, so the
+#           height is 100 × 22.85 / 37.29 = 61.28. y = 190.
+#   wide:   a QR code in a box of 60 × 20: it is drawn square, 20 × 20, centered. y = 251.28.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 300
+		Margin: 20
+	Section:
+		Barcode: https://stxt.dev
+			Id: qr
+			Alt: Enlace a stxt.dev
+			Box:
+				Width: 60
+		Barcode: https://stxt.dev/pdf
+			Id: framed
+			Alt: Enlace a la documentación
+			Error correction: high
+			Box:
+				Width: 80
+				Padding: 5
+				Border: 1
+				Border color: #1F3A5F
+				Background: #EEF2F7
+			Typography:
+				Color: #1F3A5F
+		Barcode: STXT-2026-0042
+			Id: code
+			Alt: Referencia STXT-2026-0042
+			Format: code-128
+			Box:
+				Width: 160
+				Height: 30
+		Barcode: 8412345678905
+			Id: ean
+			Alt: Código de producto 8412345678905
+			Format: ean-13
+			Box:
+				Width: 100
+		Barcode: https://stxt.dev
+			Id: wide
+			Alt: Enlace a stxt.dev
+			Box:
+				Width: 60
+				Height: 20

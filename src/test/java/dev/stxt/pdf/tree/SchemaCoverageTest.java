@@ -145,7 +145,10 @@ class SchemaCoverageTest {
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
             Map.entry("Fit", "Fit: fill"),
-            Map.entry("Pdf page", "Pdf page: 2"));
+            Map.entry("Pdf page", "Pdf page: 2"),
+            // Barcode
+            Map.entry("Format", "Format: qr"),
+            Map.entry("Error correction", "Error correction: high"));
 
     /** Header of all the documents; it ends inside {@code Styles}, to add rules. */
     private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
@@ -204,6 +207,10 @@ class SchemaCoverageTest {
         // A table of contents needs some heading to list.
         t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
+        t.put("Barcode", new Template(HEADER + "\tBarcode: https://example.com/a\n\t\tAlt: Enlace\n\t\t{}",
+                Set.of("Alt")));
+        // The data goes in the value or in Content, not in both.
+        t.put("Barcode > Content", new Template(HEADER + "\tBarcode:\n\t\tAlt: Datos\n\t\t{}", Set.of("Alt")));
         t.put("Item", new Template(HEADER + "\tStack:\n\t\tItem:\n\t\t\t{}\n\t\t\tBlock:"));
         // An item is only aligned on the cross axis: Horizontal, in a vertical Stack.
         t.put("Item > Horizontal", new Template(HEADER + "\tStack:\n\t\tDirection: vertical\n\t\tItem:\n\t\t\t{}\n"

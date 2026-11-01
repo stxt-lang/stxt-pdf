@@ -1,0 +1,13 @@
+# Case: A QR code without Alt
+# Code: BARCODE_WITHOUT_ALT
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: https://example.com/verify/1234
+			Box:
+				Width: 80

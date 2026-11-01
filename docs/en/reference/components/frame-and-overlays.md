@@ -9,7 +9,7 @@ a `Stack` or a `Grid`, it is put inside one of them. They accept `Id`, `Style`, 
 | `Offset` | 1 to 4 values (number, %, `auto`) | `auto` | All three | Top, right, bottom, left ([Values](../common/values.md#four-side-shorthands)). |
 | `Layer` | integer | `auto` | All three | Stacking order ([Layers and rotation](../common/layers-and-rotation.md)). Also in `Item` and `Area`. |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Page overlay` | The pages on which it appears ([Pages](#pages)). |
-| `Rotate`, `Rotate origin` | described in [Layers and rotation](../common/layers-and-rotation.md#rotation-rotate) | none | All three | Rotates the box when it is painted. Also in `Image`. |
+| `Rotate`, `Rotate origin` | described in [Layers and rotation](../common/layers-and-rotation.md#rotation-rotate) | none | All three | Rotates the box when it is painted. Also in `Image` and `Barcode`. |
 
 `Offset`, `Layer`, `Pages` and `Rotate` are properties of the element: they do not go in `Styles` and are not inherited.
 

@@ -3,9 +3,11 @@ package dev.stxt.pdf.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
+import dev.stxt.pdf.model.BarcodeFormat;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Edges;
+import dev.stxt.pdf.model.ErrorCorrection;
 import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Fit;
@@ -131,6 +133,8 @@ final class PropertyReader {
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
+            entry("format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
+            entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
             entry("levels", TableOfContentsBuilder::levels),
             entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 
@@ -223,7 +227,10 @@ final class PropertyReader {
         return destination;
     }
 
-    /** The alternative text of an {@code Image}: not empty; for a decorative image, it is not declared. */
+    /**
+     * The alternative text of an {@code Image} or a {@code Barcode}: not empty; for a decorative image, it is not
+     * declared.
+     */
     private static String alt(Node p) {
         String alt = p.getText().trim();
         if (alt.isEmpty()) {

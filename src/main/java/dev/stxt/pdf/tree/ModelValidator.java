@@ -3,6 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
+import dev.stxt.pdf.model.BarcodeFormat;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Distribution;
@@ -25,6 +26,7 @@ import static dev.stxt.pdf.tree.PropertyKey.KEEP_TOGETHER;
 import static dev.stxt.pdf.tree.PropertyKey.KEEP_WITH_NEXT;
 import static dev.stxt.pdf.tree.PropertyKey.KEEP_WITH_PREVIOUS;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
+import static dev.stxt.pdf.tree.PropertyKey.ERROR_CORRECTION;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
@@ -126,16 +128,41 @@ final class ModelValidator {
     }
 
     /**
-     * An {@code Image} does not split (reference/components/image.md): {@code Keep together} and {@code Edges}, which
-     * only count when a box splits, have no effect (also if a rule of {@code Styles} gives them).
+     * An {@code Image} or a {@code Barcode} does not split (reference/components/image.md): {@code Keep together} and
+     * {@code Edges}, which only count when a box splits, have no effect (also if a rule of {@code Styles} gives them).
+     *
+     * @param element how the element is named in the message: {@code an Image}, {@code a Barcode}
      */
-    static void validateImage(Style s) {
+    static void validateImage(Style s, String element) {
         for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
                 throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " has no effect on an Image, which does not split across pages: it is not needed");
+                        + " has no effect on " + element + ", which does not split across pages: it is not needed");
             }
         }
+    }
+
+    /**
+     * The properties of a {@code Barcode} (reference/components/barcode.md): {@code Alt} is required, {@code Error
+     * correction} only has an effect on a QR code and, of its own {@code Typography}, only {@code Color} has one (the
+     * color of the modules). What a rule of {@code Styles} gives it is not checked, as with any box without text.
+     */
+    static void validateBarcode(InlineNode n, Style s) {
+        if (s.image().alt() == null) {
+            throw error(n, ErrorCode.BARCODE_WITHOUT_ALT, "The Barcode needs Alt, the text that says what it is and "
+                    + "where it leads to whoever cannot see it, as in Alt: QR code of the invoice verification");
+        }
+        if (s.isDeclared(ERROR_CORRECTION) && s.image().format() != BarcodeFormat.QR) {
+            throw error(s.line(ERROR_CORRECTION), ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, "Error correction only "
+                    + "has an effect on a QR code, and the Barcode is " + s.image().format().name().toLowerCase(Locale.ROOT)
+                    .replace('_', '-') + ": it is not needed");
+        }
+        Nodes.child(n, "typography").map(Nodes::inline).ifPresent(t -> t.getChildren().stream()
+                .filter(p -> !p.getCanonicalName().equals("color")).findFirst().ifPresent(p -> {
+                    throw error(p, ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, p.getName() + " has no effect on a "
+                            + "Barcode, which has no text: of its Typography, only Color has one, the color of the "
+                            + "modules");
+                }));
     }
 
     /**

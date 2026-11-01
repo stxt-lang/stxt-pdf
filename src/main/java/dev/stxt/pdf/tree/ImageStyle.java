@@ -1,10 +1,13 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.BarcodeFormat;
+import dev.stxt.pdf.model.ErrorCorrection;
 import dev.stxt.pdf.model.Fit;
 
 /**
- * The properties of an {@code Image} (reference/components/image.md): the alternative text, how it fills its box and
- * the page of a PDF. They are not inherited.
+ * The properties of the images: of an {@code Image} (reference/components/image.md), the alternative text, how it
+ * fills its box and the page of a PDF; of a {@code Barcode} (reference/components/barcode.md), the alternative text,
+ * its format and its error correction. They are not inherited.
  */
 public final class ImageStyle extends StyleGroup {
 
@@ -13,6 +16,8 @@ public final class ImageStyle extends StyleGroup {
     private Fit fit = Fit.INSIDE;
     /** Page of a PDF, from 1. */
     private int pdfPage = 1;
+    private BarcodeFormat format = BarcodeFormat.QR;
+    private ErrorCorrection errorCorrection = ErrorCorrection.MEDIUM;
 
     ImageStyle() {
     }
@@ -43,5 +48,25 @@ public final class ImageStyle extends StyleGroup {
     void setPdfPage(int v) {
         writable();
         pdfPage = v;
+    }
+
+    /** The format of a {@code Barcode}; {@code qr} if it is not declared. */
+    public BarcodeFormat format() {
+        return format;
+    }
+
+    void setFormat(BarcodeFormat v) {
+        writable();
+        format = v;
+    }
+
+    /** The error correction of a QR code; {@code medium} if it is not declared. */
+    public ErrorCorrection errorCorrection() {
+        return errorCorrection;
+    }
+
+    void setErrorCorrection(ErrorCorrection v) {
+        writable();
+        errorCorrection = v;
     }
 }

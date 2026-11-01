@@ -132,8 +132,8 @@ split. Tables also repeat their header and their footer ([Table](../components/t
 
 ## What is not split
 
-- **Images.** An `Image` is not split: if it does not fit in what is left of the page (or of the column), it moves whole
-  to the next one ([Image](../components/image.md#page-breaks)).
+- **Images.** An `Image` or a `Barcode` is not split: if it does not fit in what is left of the page (or of the column),
+  it moves whole to the next one ([Image](../components/image.md#page-breaks)).
 - **Positioned elements.** An `Overlay` is placed on the page where its position falls and is not split. If its reference
   container is split, it is resolved against the fragment on that page: its height is that of that fragment and not the
   total. A `Page overlay` is repeated on the pages its `Pages` says. A `Frame` is split like any block, except when it is

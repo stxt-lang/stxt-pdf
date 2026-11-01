@@ -1,6 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
@@ -44,6 +45,7 @@ public final class Box {
     private String text;
     private List<TextRun> runs;
     private String image;
+    private Modules modules;
     private String anchor;
     private String number;
     private int textLine;
@@ -123,6 +125,15 @@ public final class Box {
      */
     public String image() {
         return image;
+    }
+
+    /**
+     * The drawing of a generated image, such as a {@code Barcode} (reference/components/barcode.md), which the tree
+     * generates from its value when it is built ({@link ImageGenerator}); {@code null} in the other boxes, also in an
+     * {@code Image}, whose file is {@link #image()}.
+     */
+    public Modules modules() {
+        return modules;
     }
 
     /**
@@ -231,6 +242,11 @@ public final class Box {
     void setImage(String image) {
         writable();
         this.image = image;
+    }
+
+    void setModules(Modules modules) {
+        writable();
+        this.modules = modules;
     }
 
     void setAnchor(String anchor) {
@@ -372,9 +388,12 @@ public final class Box {
         return element == null ? Element.Role.DOCUMENT : element.role();
     }
 
-    /** Whether it is an {@code Image}. */
+    /**
+     * Whether it is an image: an {@code Image}, with its file in {@link #image()}, or a generated image such as a
+     * {@code Barcode}, with its drawing in {@link #modules()}. Both are laid out the same way.
+     */
     public boolean isImage() {
-        return element == Element.IMAGE;
+        return element == Element.IMAGE || element == Element.BARCODE;
     }
 
     /** Whether it is the generated box of the marker of a {@code List item}. */

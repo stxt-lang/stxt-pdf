@@ -70,7 +70,7 @@ línea (**ancho natural**):
 | Elemento | Ancho más estrecho | Ancho natural |
 |---|---|---|
 | `Text` | palabra más ancha | párrafo más largo en una línea |
-| `Image` | ancho natural o, con un `Height` que es una medida, el que sale de él con la proporción | igual |
+| `Image`, `Barcode` | ancho natural o, con un `Height` que es una medida, el que sale de él con la proporción | igual |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del ancho más estrecho de los hijos | máximo del ancho natural de los hijos |
 | `Stack` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
 | `Stack` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
@@ -120,8 +120,8 @@ de borde y uno vertical, de su alto: `50%` hace un círculo en una caja cuadrada
 seguidos de un lado suman más que el lado, todos se reducen por el mismo factor hasta que caben.
 
 - **Dentro de la caja.** El fondo, que va en la caja de relleno, tiene los radios de la caja de borde menos el grosor del
-  borde de cada lado, y una esquina que se queda sin radio es cuadrada. Una `Image` se recorta con los radios de su caja
-  de contenido (la de borde menos el borde y el relleno).
+  borde de cada lado, y una esquina que se queda sin radio es cuadrada. Una `Image` o un `Barcode` se recorta con los
+  radios de su caja de contenido (la de borde menos el borde y el relleno).
 - **Lo que contiene.** Una caja con esquinas redondeadas recorta por la curva de su caja de relleno los **fondos, los
   bordes y las imágenes** de lo que tiene en su flujo, a cualquier profundidad (también un `Frame` y un ítem con
   `Layer`): un hijo con fondo que llega a la esquina sigue la curva sin redondearlo. El **texto no se recorta**, ni un

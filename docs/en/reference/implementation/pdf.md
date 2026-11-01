@@ -49,7 +49,7 @@ One element per box, in the order of the document, which is the reading order:
 | `List`, `List item` | `L` and `LI`, with the marker in `Lbl` and the content in `LBody` |
 | `Table` and its parts | `Table`, `THead`, `TBody`, `TFoot`, `TR`, and `TH` or `TD` |
 | `Table of contents` and its entries | `TOC` and `TOCI`, with two `Span` (the title and the number) |
-| `Image` with `Alt` | `Figure`, with `Alt` and `BBox` |
+| `Image` with `Alt`, `Barcode` | `Figure`, with `Alt` and `BBox` |
 | A box with `Link`, a text link | `Link` ([below](#links)) |
 | The rest (such as `Block`, `Stack`, `Grid`, `Columns`, `Markdown` or the positioned elements) | `Div` |
 

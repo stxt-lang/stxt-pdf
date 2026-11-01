@@ -29,7 +29,7 @@ context:** the content of a context is painted as a block at the level of that c
 
 ## Rotation (`Rotate`)
 
-`Rotate` is an element property in `Block`, `Text`, `Paragraph`, `Image`, `Frame`, `Overlay` and `Page overlay`, and
+`Rotate` is an element property in `Block`, `Text`, `Paragraph`, `Image`, `Barcode`, `Frame`, `Overlay` and `Page overlay`, and
 `Rotate origin`, only in the three positioned elements:
 
 | Property | Values | Default | Notes |
@@ -45,7 +45,7 @@ depending on the element is **how it takes up space**.
 ### Rotation in flow: `Block`, `Text`, `Paragraph` and `Image`
 
 A rotated in-flow box **takes up the rectangle that encloses it rotated**: what surrounds it is placed around that
-rectangle and never under what is rotated. It is the way to write a vertical text in its place, like the header of a
+rectangle and never under what is rotated. A `Barcode` rotates like an `Image`. It is the way to write a vertical text in its place, like the header of a
 narrow column:
 
 ```
