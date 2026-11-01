@@ -2,6 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Value;
 
 /**
  * The output medium (reference/components/document.md): a sequence of pages of fixed size. It defines the initial
@@ -19,20 +20,21 @@ public record PageSetup(double width, double height, Insets margin) {
     }
 
     /**
-     * The named paper sizes of {@code Paper} (reference/components/document.md), in portrait and in whole points: the
-     * ISO 216 ones rounded, as they are always used (A4 = 595 × 842), and the US ones.
+     * The named paper sizes of {@code Paper} (reference/components/document.md), in portrait: the ISO 216 ones, exact
+     * in millimeters (A4 = 210 × 297 mm, 595.28 × 841.89 pt), and the US ones, exact in points.
      */
     public enum Paper {
-        A3(842, 1191), A4(595, 842), A5(420, 595), A6(298, 420), B4(709, 1001), B5(499, 709),
-        LETTER(612, 792), LEGAL(612, 1008);
+        A3(Value.mm(297), Value.mm(420)), A4(Value.mm(210), Value.mm(297)), A5(Value.mm(148), Value.mm(210)),
+        A6(Value.mm(105), Value.mm(148)), B4(Value.mm(250), Value.mm(353)), B5(Value.mm(176), Value.mm(250)),
+        LETTER(Value.pt(612), Value.pt(792)), LEGAL(Value.pt(612), Value.pt(1008));
 
         /** Width and height in portrait, in pt. */
         public final double width;
         public final double height;
 
-        Paper(double width, double height) {
-            this.width = width;
-            this.height = height;
+        Paper(Value width, Value height) {
+            this.width = ((Value.Points) width).pt();
+            this.height = ((Value.Points) height).pt();
         }
     }
 

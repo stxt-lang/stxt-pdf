@@ -6,7 +6,8 @@ fixed-size **pages**, splits across pages what does not fit and writes the resul
 
 ## Conventions
 
-- **All measurements are in typographic points** (1 pt = 1/72 of an inch). An A4 page measures 595 × 842 pt.
+- **Measurements are in typographic points** (1 pt = 1/72 of an inch) **or in millimeters** (`12mm`), which are turned
+  into points when the document is read. An A4 page measures 210 × 297 mm, 595.28 × 841.89 pt.
 - **The names of nodes and values are in English**: `Margin`, `Overlay`, `Edges: open`. The text of a `Text`
   can be in any language.
 - **The axes:** *horizontal* is that of `Width` and *left/right*, and *vertical*, that of `Height` and *top/bottom*. Writing

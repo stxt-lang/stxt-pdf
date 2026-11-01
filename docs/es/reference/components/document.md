@@ -56,19 +56,18 @@ puede declarar el suyo, que hereda del del documento por grupos ([abajo](#el-pag
 | `Orientation` | `portrait`, `landscape` | `portrait` | Solo con `Paper`: `landscape` cambia el ancho por el alto. |
 | `Width` | número > 0 | sin valor | Ancho de la página, sin `Paper`. |
 | `Height` | número > 0 | sin valor | Alto de la página, sin `Paper`. |
-| `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo puntos. |
+| `Margin` | 1 a 4 números | `0` | Márgenes de página. Solo medidas, sin porcentajes. |
 
 El tamaño de la página se declara **de una sola forma**: un `Paper` (con su `Orientation`, si es apaisada) o un `Width` y
 un `Height`. Declarar `Paper` con `Width` o `Height`, `Orientation` sin `Paper`, solo uno de `Width` y `Height`, o ninguna
-de las dos formas, es `PAGE_SIZE`. También lo son unos márgenes que no dejan área útil. Los tamaños con nombre, en puntos
-enteros:
+de las dos formas, es `PAGE_SIZE`. También lo son unos márgenes que no dejan área útil. Los tamaños con nombre:
 
-| `Paper` | Ancho × alto (pt) | | `Paper` | Ancho × alto (pt) |
-|---|---|---|---|---|
-| `A3` | 842 × 1191 | | `B4` | 709 × 1001 |
-| `A4` | 595 × 842 | | `B5` | 499 × 709 |
-| `A5` | 420 × 595 | | `Letter` | 612 × 792 |
-| `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
+| `Paper` | Ancho × alto | En puntos | | `Paper` | Ancho × alto | En puntos |
+|---|---|---|---|---|---|---|
+| `A3` | 297 × 420 mm | 841,89 × 1190,55 | | `B4` | 250 × 353 mm | 708,66 × 1000,63 |
+| `A4` | 210 × 297 mm | 595,28 × 841,89 | | `B5` | 176 × 250 mm | 498,9 × 708,66 |
+| `A5` | 148 × 210 mm | 419,53 × 595,28 | | `Letter` | 8,5 × 11 in | 612 × 792 |
+| `A6` | 105 × 148 mm | 297,64 × 419,53 | | `Legal` | 8,5 × 14 in | 612 × 1008 |
 
 ```
 Page:
@@ -77,13 +76,15 @@ Page:
     Margin: 40
 ```
 
-es una página de 842 × 595, igual que `Width: 842` y `Height: 595`.
+es una página de 297 × 210 mm, igual que `Width: 297mm` y `Height: 210mm`.
 
 El **área útil** es el rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer
 nivel de cada sección y de los `Page overlay`, y su alto es siempre definido.
 
-> **Decisión:** los tamaños ISO 216 van redondeados a puntos enteros, como se usan siempre (A4 = 595 × 842), y Letter
-> y Legal son exactos. *Alternativa descartada:* los valores con decimales (A4 = 595,28 × 841,89).
+> **Decisión:** los tamaños ISO 216 son exactos en milímetros (A4 = 210 × 297 mm, 595,28 × 841,89 pt), como en los
+> procesadores de texto y en los visores de PDF: una caja de `Width: 210mm` mide lo mismo que la hoja. Letter y Legal
+> son exactos en pulgadas. *Alternativa descartada:* redondearlos a puntos enteros (A4 = 595 × 842), que hacía que
+> 210 mm no cupieran en un A4.
 
 ## `Title` y `Language`
 

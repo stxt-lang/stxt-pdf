@@ -91,8 +91,8 @@ class PdfCanvasTest {
         try (PDDocument pdf = Loader.loadPDF(render(doc, "report"))) {
             assertEquals(1, pdf.getNumberOfPages());
             PDRectangle box = pdf.getPage(0).getMediaBox();
-            assertEquals(595, box.getWidth(), 1e-3);
-            assertEquals(842, box.getHeight(), 1e-3);
+            assertEquals(210 * 72 / 25.4, box.getWidth(), 1e-3);
+            assertEquals(297 * 72 / 25.4, box.getHeight(), 1e-3);
             String text = new PDFTextStripper().getText(pdf);
             assertTrue(text.contains("Resultados del trimestre"), text);
             assertTrue(text.contains("Informe trimestral"), text);
@@ -1084,8 +1084,8 @@ class PdfCanvasTest {
                 + "\tSection:\n\t\tStyle: english\n\t\tPage:\n\t\t\tOrientation: landscape\n\t\t\tPaper: A4\n\t\tText: Two\n");
         try (PDDocument pdf = Loader.loadPDF(render(doc, "sections-structure"))) {
             assertEquals(300, pdf.getPage(0).getMediaBox().getWidth(), 1e-3);
-            assertEquals(842, pdf.getPage(1).getMediaBox().getWidth(), 1e-3);
-            assertEquals(595, pdf.getPage(1).getMediaBox().getHeight(), 1e-3);
+            assertEquals(297 * 72 / 25.4, pdf.getPage(1).getMediaBox().getWidth(), 1e-3);
+            assertEquals(210 * 72 / 25.4, pdf.getPage(1).getMediaBox().getHeight(), 1e-3);
             PDStructureElement outer = (PDStructureElement) pdf.getDocumentCatalog().getStructureTreeRoot().getKids().get(0);
             assertEquals(List.of("Sect", "Sect"), types(outer));
             assertNull(((PDStructureElement) outer.getKids().get(0)).getLanguage());

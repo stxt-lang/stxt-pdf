@@ -70,7 +70,7 @@ break (**natural width**):
 | Element | Narrowest width | Natural width |
 |---|---|---|
 | `Text` | widest word | longest paragraph on one line |
-| `Image` | natural width or, with `Height` in points, the width that follows from it with the aspect ratio | same |
+| `Image` | natural width or, with a `Height` that is a measurement, the width that follows from it with the aspect ratio | same |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | maximum of the narrowest widths of the children | maximum of the natural widths of the children |
 | Horizontal `Stack`, without `Wrap` | sum of the narrowest widths of the items + gaps | sum of the natural widths + gaps |
 | Horizontal `Stack`, with `Wrap` | maximum of the narrowest widths of the items | sum of the natural widths + gaps |
@@ -92,9 +92,9 @@ is definite: a top-level box of a section with `Height: 100%` takes up the page.
 ### Minimums and maximums
 
 The provisional size is computed, limited by the maximum and raised to the minimum. If they can be compared when the
-document is read (both in points or both as percentages), a minimum greater than the maximum, or a `Width`/`Height` outside
-them, is an error (`MIN_MAX_CONFLICT`). If they cannot be compared until layout (`Min width: 150` and `Max width: 20%`) and
-they clash, **the minimum wins**.
+document is read (both measurements or both percentages), a minimum greater than the maximum, or a `Width`/`Height`
+outside them, is an error (`MIN_MAX_CONFLICT`). If they cannot be compared until layout (`Min width: 150` and
+`Max width: 20%`) and they clash, **the minimum wins**.
 
 > **Decision:** a clash between different units is not a layout error: the minimum wins.
 

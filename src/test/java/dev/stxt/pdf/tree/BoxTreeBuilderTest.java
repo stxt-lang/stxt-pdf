@@ -205,8 +205,8 @@ class BoxTreeBuilderTest {
     void theSpecificationExampleIsValid() throws IOException {
         String doc = Files.readString(Path.of("test", "spec", "report.stxt"));
         BoxTreeBuilder.Result r = build(doc);
-        assertEquals(515, r.pageSetup().pageArea().width(), 1e-9);
-        assertEquals(762, r.pageSetup().pageArea().height(), 1e-9);
+        assertEquals(210 * 72 / 25.4 - 80, r.pageSetup().pageArea().width(), 1e-9);
+        assertEquals(297 * 72 / 25.4 - 80, r.pageSetup().pageArea().height(), 1e-9);
     }
 
     /**
@@ -218,10 +218,13 @@ class BoxTreeBuilderTest {
         String head = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n";
         String body = "\tSection:\n\t\tBlock:\n";
         PageSetup a4 = build(head + "\t\tPaper: A4\n\t\tMargin: 40\n" + body).pageSetup();
-        assertEquals(new PageSetup(595, 842, new dev.stxt.pdf.model.Insets(40, 40, 40, 40)), a4);
+        // ISO 216 is exact in millimeters: A4 is 210 × 297 mm.
+        assertEquals(595.28, a4.width(), 0.01);
+        assertEquals(841.89, a4.height(), 0.01);
+        assertEquals(new dev.stxt.pdf.model.Insets(40, 40, 40, 40), a4.margin());
         PageSetup landscape = build(head + "\t\tPaper: A4\n\t\tOrientation: landscape\n" + body).pageSetup();
-        assertEquals(842, landscape.width(), 1e-9);
-        assertEquals(595, landscape.height(), 1e-9);
+        assertEquals(297 * 72 / 25.4, landscape.width(), 1e-9);
+        assertEquals(210 * 72 / 25.4, landscape.height(), 1e-9);
         PageSetup portrait = build(head + "\t\tPaper: Letter\n\t\tOrientation: portrait\n" + body).pageSetup();
         assertEquals(612, portrait.width(), 1e-9);
         assertEquals(792, portrait.height(), 1e-9);
@@ -231,6 +234,43 @@ class BoxTreeBuilderTest {
             PageSetup m = build(head + "\t\tPaper: " + name + "\n" + body).pageSetup();
             assertTrue(m.width() < m.height(), name);
         }
+    }
+
+    /**
+     * Every length allows millimeters (reference/common/values.md): the page, the box, the typography and the tracks.
+     * Factors and degrees have no unit.
+     */
+    @Test
+    void lengthsInMillimeters() {
+        BoxTreeBuilder.Result r = build("Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n"
+                + "\t\tWidth: 210mm\n\t\tHeight: 297mm\n\t\tMargin: 20mm 15\n"
+                + "\tBlock:\n\t\tBox:\n\t\t\tWidth: 50mm\n\t\t\tMargin: -2mm 0\n\t\t\tCorner radius: 1mm\n"
+                + "\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n\t\t\tSize: 3.5mm\n\t\t\tLetter spacing: -0.1mm\n"
+                + "\t\tText: x\n"
+                + "\tGrid:\n\t\tColumn sizes: 30mm between(20mm, *)\n\t\tGap: 5mm\n");
+        assertEquals(595.28, r.pageSetup().width(), 0.01);
+        assertEquals(841.89, r.pageSetup().height(), 0.01);
+        assertEquals(56.69, r.pageSetup().margin().top(), 0.01);
+        assertEquals(15, r.pageSetup().margin().left(), 1e-9);
+        Box block = r.sections().get(0).box().children().get(0);
+        assertEquals(Value.mm(50), block.style().box().width());
+        assertEquals(Value.mm(-2), block.style().box().margin().top());
+        assertEquals(9.92, block.style().typography().fontSize(), 0.01);
+        assertEquals(-0.28, block.style().typography().letterSpacing(), 0.01);
+        Box grid = r.sections().get(0).box().children().get(1);
+        assertEquals(List.of(Value.mm(30), new Value.Between(Value.mm(20), new Value.Fraction(1))),
+                grid.style().grid().columnSizes());
+
+        for (String wrong : List.of("\t\t\tWidth: 50 mm", "\t\t\tWidth: 5cm", "\t\t\tPadding: 2pt")) {
+            InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
+                    "\tBlock:", "\t\tBox:", wrong)));
+            assertEquals(ErrorCode.VALUE_SYNTAX, e.errorCode(), wrong);
+        }
+        InvalidModelException grow = assertThrows(InvalidModelException.class, () -> build(document(
+                "\tStack:", "\t\tItem:", "\t\t\tGrow: 2mm", "\t\t\tBlock:")));
+        assertEquals(ErrorCode.VALUE_SYNTAX, grow.errorCode());
+        // Rotate is a NUMBER in the schema: stxt-core rejects it before the engine reads it.
+        assertThrows(DocumentSyntaxException.class, () -> build(document("\tFrame:", "\t\tRotate: 10mm")));
     }
 
     @Test

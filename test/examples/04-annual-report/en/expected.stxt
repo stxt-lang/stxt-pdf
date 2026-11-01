@@ -1,62 +1,62 @@
 Result:
 	Page: 1
 		Fragment: cover
-			Rect: 0 0 595 842
+			Rect: 0 0 595.28 841.89
 			Fragment: cover-photo
-				Rect: 0 0 595 340
+				Rect: 0 0 595.28 340.16
 			Fragment: cover-fade
-				Rect: 0 250 595 90
+				Rect: 0 250 595.28 90
 	Page: 2
 		Fragment: contents
-			Rect: 56 56 483 229
+			Rect: 56 56 483.28 229
 			Fragment: toc
-				Rect: 56 111 483 174
+				Rect: 56 111 483.28 174
 		Fragment: letter
-			Rect: 56 315 483 442.5
+			Rect: 56 315 483.28 442.5
 			Fragment: milestones
-				Rect: 56 689.5 483 68
+				Rect: 56 689.5 483.28 68
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21
 	Page: 3
 		Fragment: figures
-			Rect: 56 56 483 582.3
+			Rect: 56 56 483.28 582.43
 			Fragment: tiles
-				Rect: 56 111 483 192.5
+				Rect: 56 111 483.28 192.5
 			Fragment: chart-production
-				Rect: 56 343.5 483 220.8
+				Rect: 56 343.5 483.28 220.93
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21
 	Page: 4
 		Fragment: customers
-			Rect: 56 56 483 531.8
+			Rect: 56 56 483.28 531.93
 			Fragment: community
-				Rect: 56 161 483 173.5
+				Rect: 56 161 483.28 173.5
 			Fragment: chart-mix
-				Rect: 56 348.5 483 220.8
+				Rect: 56 348.5 483.28 220.93
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21
 	Page: 5
 		Fragment: results
-			Rect: 56 56 483 492.5
+			Rect: 56 56 483.28 492.5
 			Fragment: accounts
-				Rect: 56 161 483 190
+				Rect: 56 161 483.28 190
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21
 	Page: 6
 		Fragment: environment
-			Rect: 56 56 483 651.3
+			Rect: 56 56 483.28 651.43
 			Fragment: chart-savings
-				Rect: 56 111 483 220.8
+				Rect: 56 111 483.28 220.93
 			Fragment: indicators
-				Rect: 56 572.3 483 135
+				Rect: 56 572.43 483.28 135
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21
 	Page: 7
 		Fragment: governance
-			Rect: 56 56 483 619
+			Rect: 56 56 483.28 619
 			Fragment: board
-				Rect: 56 161 483 162
+				Rect: 56 161 483.28 162
 			Fragment: calendar
-				Rect: 56 503.5 483 135
+				Rect: 56 503.5 483.28 135
 		Fragment: footer
-			Rect: 56 793 483 21
+			Rect: 56 792.89 483.28 21

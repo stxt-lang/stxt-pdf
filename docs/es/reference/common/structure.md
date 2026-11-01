@@ -6,7 +6,8 @@ propiedades que tienen sentido en ellos. El motor calcula la posición y el tama
 
 ## Convenciones
 
-- **Todas las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada). Un A4 mide 595 × 842 pt.
+- **Las medidas están en puntos tipográficos** (1 pt = 1/72 de pulgada) **o en milímetros** (`12mm`), que se pasan a
+  puntos al leer el documento. Un A4 mide 210 × 297 mm, 595,28 × 841,89 pt.
 - **Los nombres de nodos y valores están en inglés**: `Margin`, `Overlay`, `Edges: open`. El texto de un `Text`
   puede estar en cualquier idioma.
 - **Los ejes:** *horizontal* es el de `Width` e *izquierda/derecha*, y *vertical*, el de `Height` y *arriba/abajo*. La

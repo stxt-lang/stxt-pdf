@@ -23,9 +23,12 @@ public final class Messages {
         return text.substring(0, text.offsetByCodePoints(0, EXCERPT)) + "... (" + length + " characters)";
     }
 
-    /** A measure in points with at most two decimals and no trailing zeros: {@code 12.5}, {@code 100}. */
+    /**
+     * A measure in points with at most two decimals, no trailing zeros and the unit: {@code 12.5 pt}, {@code 100 pt}.
+     * The unit is always written, because the document may give its lengths in millimeters.
+     */
     public static String pt(double v) {
         String s = String.format(Locale.ROOT, "%.2f", v);
-        return s.replaceAll("\\.?0+$", "");
+        return s.replaceAll("\\.?0+$", "") + " pt";
     }
 }

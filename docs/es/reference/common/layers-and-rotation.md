@@ -90,9 +90,9 @@ Un `Frame` girado no se parte entre páginas. `Keep together` y `Edges` no tiene
 `Rotate origin` se escribe de una de dos formas:
 
 - **Palabras clave:** una o dos, en cualquier orden (`top left` = `left top`). El eje que no se nombra es `center`.
-- **Dos medidas:** la horizontal y la vertical, desde la esquina de arriba a la izquierda de la caja de borde, en puntos o
-  en porcentaje de su ancho y de su alto (`Rotate origin: 20 50%`). Pueden ser negativas o pasar del tamaño de la caja:
-  el centro del giro puede estar fuera de ella.
+- **Dos medidas:** la horizontal y la vertical, desde la esquina de arriba a la izquierda de la caja de borde, como
+  medidas o en porcentaje de su ancho y de su alto (`Rotate origin: 20 50%`). Pueden ser negativas o pasar del tamaño de
+  la caja: el centro del giro puede estar fuera de ella.
 
 Dos palabras del mismo eje, una sola medida, una palabra clave con una medida, o algo que no es ni una cosa ni la otra,
 es `VALUE_NOT_ALLOWED`.

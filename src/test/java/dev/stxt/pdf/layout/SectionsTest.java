@@ -97,22 +97,22 @@ class SectionsTest {
                 "\tSection:", "\t\tPage:", "\t\t\tPaper: Letter", "\t\t\tMargin: 0", "\t\tBlock:", "\t\t\tId: d");
         assertEquals(4, d.pages().size());
         // Without its own Page, the one of the document.
-        assertEquals(595, d.pages().get(0).pageSetup().width(), 1e-9);
-        assertEquals(842, d.pages().get(0).pageSetup().height(), 1e-9);
+        assertEquals(210 * 72 / 25.4, d.pages().get(0).pageSetup().width(), 1e-9);
+        assertEquals(297 * 72 / 25.4, d.pages().get(0).pageSetup().height(), 1e-9);
         // Only Orientation: the paper of the document rotated, with its margins.
-        assertEquals(842, d.pages().get(1).pageSetup().width(), 1e-9);
-        assertEquals(595, d.pages().get(1).pageSetup().height(), 1e-9);
+        assertEquals(297 * 72 / 25.4, d.pages().get(1).pageSetup().width(), 1e-9);
+        assertEquals(210 * 72 / 25.4, d.pages().get(1).pageSetup().height(), 1e-9);
         assertEquals(40, d.pages().get(1).pageSetup().margin().left(), 1e-9);
         // Only Margin: the size of the document.
-        assertEquals(595, d.pages().get(2).pageSetup().width(), 1e-9);
+        assertEquals(210 * 72 / 25.4, d.pages().get(2).pageSetup().width(), 1e-9);
         assertEquals(10, d.pages().get(2).pageSetup().margin().top(), 1e-9);
         // Its own size and its own margin.
         assertEquals(612, d.pages().get(3).pageSetup().width(), 1e-9);
         assertEquals(0, d.pages().get(3).pageSetup().margin().left(), 1e-9);
         // The page area of each page is that of its medium: the width of the box of the section.
-        assertEquals(515, d.pages().get(0).content().width(), 1e-9);
-        assertEquals(762, d.pages().get(1).content().width(), 1e-9);
-        assertEquals(575, d.pages().get(2).content().width(), 1e-9);
+        assertEquals(210 * 72 / 25.4 - 80, d.pages().get(0).content().width(), 1e-9);
+        assertEquals(297 * 72 / 25.4 - 80, d.pages().get(1).content().width(), 1e-9);
+        assertEquals(210 * 72 / 25.4 - 20, d.pages().get(2).content().width(), 1e-9);
         assertEquals(612, d.pages().get(3).content().width(), 1e-9);
         assertEquals(List.of(0, 1, 2, 3), d.pages().stream().map(Page::section).toList());
         assertEquals(List.of(1, 2, 3, 4), d.pages().stream().map(Page::number).toList());

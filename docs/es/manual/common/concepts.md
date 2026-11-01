@@ -1,13 +1,14 @@
 # Conceptos
 
-## Páginas y puntos
+## Páginas y medidas
 
 Un documento se maqueta siempre en **páginas** de tamaño fijo, como un PDF impreso. El tamaño y los márgenes de la página
 los da `Page` ([Document](../components/document.md)). Lo que queda dentro de los márgenes es el **área útil**: el sitio
 donde va el contenido.
 
-Todas las medidas están en **puntos** (pt): 1 pt = 1/72 de pulgada, unos 0,35 mm. Un A4 mide 595 × 842 pt. Con
-`Margin: 40`, el área útil mide 515 × 762. Las medidas se escriben como números: `Width: 200` son 200 puntos.
+Las medidas se escriben en **puntos** (pt), con el número solo, o en **milímetros**, con `mm` pegado al número:
+`Width: 200` son 200 puntos y `Width: 50mm`, 50 milímetros. Un punto es 1/72 de pulgada, unos 0,35 mm. Un A4 mide
+210 × 297 mm. Con `Margin: 20mm`, el área útil mide 170 × 257 mm.
 
 ## Cajas
 

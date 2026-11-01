@@ -74,6 +74,7 @@ Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de
 | Se escribe | Mide |
 |---|---|
 | `150` | 150 puntos |
+| `40mm` | 40 milímetros |
 | `25%` | una parte del ancho del `Grid` (sin descontar los huecos) |
 | `auto` | lo que pida su contenido |
 | `narrowest`, `natural` | lo más estrecho que puede ser su contenido, o lo que mide sin partir ninguna línea |

@@ -76,16 +76,18 @@ The size of the page and its margins. The size is given in one of two ways, neve
 
 - **With a paper**: `Paper` (`A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter` or `Legal`) and, if it is landscape,
   `Orientation: landscape`.
-- **With measurements**: `Width` and `Height`, in points.
+- **With measurements**: `Width` and `Height`, in points or millimeters.
 
-| `Paper` | Points | | `Paper` | Points |
+| `Paper` | Millimeters | | `Paper` | Millimeters |
 |---|---|---|---|---|
-| `A3` | 842 × 1191 | | `B4` | 709 × 1001 |
-| `A4` | 595 × 842 | | `B5` | 499 × 709 |
-| `A5` | 420 × 595 | | `Letter` | 612 × 792 |
-| `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
+| `A3` | 297 × 420 | | `B4` | 250 × 353 |
+| `A4` | 210 × 297 | | `B5` | 176 × 250 |
+| `A5` | 148 × 210 | | `Letter` | 215.9 × 279.4 |
+| `A6` | 105 × 148 | | `Legal` | 215.9 × 355.6 |
 
-`Margin` is the margins of the page, from 1 to 4 numbers (top, right, bottom, left). What remains inside is the
+`Letter` and `Legal` are 8.5 × 11 and 8.5 × 14 inches: 612 × 792 and 612 × 1008 points.
+
+`Margin` is the margins of the page, from 1 to 4 measurements (top, right, bottom, left). What remains inside is the
 **page area**: where the content goes. The headers and footers go in the margins, with a `Page overlay`
 ([positioned](frame-and-overlays.md#page-overlay)).
 

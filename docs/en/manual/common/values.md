@@ -5,11 +5,16 @@
 | Written | Means | Example |
 |---|---|---|
 | a number | points, with a decimal point and never a comma | `Width: 120`, `Size: 10.5` |
+| a number with `mm` | millimeters, with the unit attached to the number | `Width: 42mm`, `Margin: 12.5mm` |
 | a percentage | a part of another measurement (below) | `Width: 50%` |
 | `auto` | the engine works it out | `Width: auto` |
 | `narrowest` | the narrowest it can be without anything overflowing: the longest word | `Width: narrowest` |
 | `natural` | what it measures without breaking any line | `Width: natural` |
 | `fit` | what its content needs, without going beyond the available space | `Width: fit` |
+
+Points and millimeters can be mixed, also in a single value (`Margin: 20mm 40`). There are no other units: `5cm`,
+`12pt` or `12 mm`, with a space, are an error. `Grow`, `Shrink`, the degrees of `Rotate` and `Aspect ratio` are not
+measurements and carry no unit.
 
 `narrowest`, `natural` and `fit` are widths: they are valid in `Width` and in the columns and rows of a `Grid`. Not in
 `Height`, because `auto` is already the height of the content. Each property accepts only some of these forms, and its
@@ -28,10 +33,10 @@ A percentage is a part of another measurement, almost always of its reference co
 - **Heights**: of the **height** of the container, which has to be known before laying out what is inside.
 - **`Line height`**: of the font size of the box itself.
 
-**A height that is known** is that of the page area, that of a box with `Height` in points (or in a percentage of another
-height that is known) and that of some boxes that stretch (an `Overlay` anchored at the top and the bottom, a `Grid`
-cell). The height of a box that measures what its content measures is not known before laying it out, so a
-`Height: 50%` inside it is an error. To use the percentage, the container needs a `Height`.
+**A height that is known** is that of the page area, that of a box with `Height` in points or millimeters (or in a
+percentage of another height that is known) and that of some boxes that stretch (an `Overlay` anchored at the top and
+the bottom, a `Grid` cell). The height of a box that measures what its content measures is not known before laying it
+out, so a `Height: 50%` inside it is an error. To use the percentage, the container needs a `Height`.
 
 ## Four sides
 

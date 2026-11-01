@@ -24,7 +24,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `TEXT_OVERFLOW` | A word wider than its line | Widening the box, reducing the size or splitting the word |
 | `BOX_OVERFLOW` | A box does not fit in its place: wider than its parent, content taller than its `Height`, or something that goes off the page | Checking the `Width`, the `Height`, the `Offset` or the `Margin` the message names |
 | `PAGE_OVERFLOW` | Something that cannot be split does not fit even on an empty page | Making it smaller or allowing it to be split |
-| `INDEFINITE_PERCENTAGE` | A percentage of a height that is not known | Giving the container a `Height` in points ([Values](values.md#percentages)) |
+| `INDEFINITE_PERCENTAGE` | A percentage of a height that is not known | Giving the container a `Height` in points or millimeters ([Values](values.md#percentages)) |
 | `MARGIN_AUTO_WITHOUT_EFFECT` | A `Margin: auto` that cannot center | Giving the box a `Width`, or removing the `auto` |
 | `STYLE_WITHOUT_RULE` | A style without its `For style` rule | Adding the rule or correcting the typo |
 | `HEADING_LEVEL` | A skipped level (`Heading 3` after `Heading 1`) | Using the next level |

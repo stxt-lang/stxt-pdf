@@ -90,8 +90,8 @@ the row (`Vertical: stretch`), except images, which keep their proportions.
 
 ## Things to keep in mind
 
-- `Grow` in a `Stack` in a column needs the `Stack` to have a height in points. Otherwise there is nothing to share out and
-  it is an error.
+- `Grow` in a `Stack` in a column needs the `Stack` to have a height in points or millimeters. Otherwise there is
+  nothing to share out and it is an error.
 - The items do not accept `Margin: auto`: they are aligned with `Horizontal` and `Vertical`.
 - Across pages, a `Stack` in a column is broken between items, and one in a row, between lines. A row that does not fit on
   a whole page is split together with its items.

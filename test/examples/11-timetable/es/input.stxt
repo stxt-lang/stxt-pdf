@@ -1,4 +1,4 @@
-# Weekly school timetable on one landscape A4 page (Paper: A4 and Orientation: landscape, 842 × 595): a table with
+# Weekly school timetable on one landscape A4 page (Paper: A4 and Orientation: landscape, 297 × 210 mm): a table with
 # the cells separated by a Gap, an hour cell on the left, subjects with their color, and break and lunch
 # bands that span the five days with Span, a legend in a Stack with a line break
 # and some notes in Markdown. Each color is a style in styles.stxt.

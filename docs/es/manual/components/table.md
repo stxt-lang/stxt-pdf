@@ -67,8 +67,8 @@ Document (dev.stxt.pdf):
 
 - `Header rows` (opcional), `Body` (obligatorio) y `Footer rows` (opcional), en ese orden. Cada uno tiene una o varias
   `Row`, y cada fila, sus `Cell` de izquierda a derecha.
-- **`Column sizes`** (obligatorio) son las columnas, con las mismas medidas que un `Grid`: puntos, porcentajes, `auto` (lo que
-  pida su contenido) y fracciones (`*`: una parte de lo que sobra) ([Grid](grid.md)).
+- **`Column sizes`** (obligatorio) son las columnas, con las mismas medidas que un `Grid`: puntos, milímetros,
+  porcentajes, `auto` (lo que pida su contenido) y fracciones (`*`: una parte de lo que sobra) ([Grid](grid.md)).
 - Cada fila llena **exactamente** todas las columnas: una celda vacía se escribe `Cell:`. Una fila con celdas de más o de
   menos es un error.
 - **`Span: filas columnas`** hace que una celda ocupe varias: `Span: 1 3` son tres columnas. Una celda que ocupa varias filas

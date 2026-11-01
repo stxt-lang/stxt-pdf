@@ -57,7 +57,7 @@ Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `E
 
 - Sin `Width` ni `Height`, una imagen mide su **tamaño natural**: cada píxel, 0,75 puntos. Una imagen de 400 × 300 píxeles
   mide 300 × 225 puntos. Un SVG mide lo que dicen su `width` y su `height` (o su `viewBox`), y la página de un PDF, lo que
-  mide la página (un A4, 595 × 842).
+  mide la página (un A4, 210 × 297 mm).
 - No se estira sola al ancho de la página: si no cabe, es un error. Para que ocupe todo el ancho, `Width: 100%`.
 - Con `Width` o `Height`, el otro lado sale de la proporción de la imagen. Con los dos, la caja mide eso y `Fit` decide cómo
   la llena la imagen.

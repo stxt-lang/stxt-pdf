@@ -1,0 +1,13 @@
+# Case: A unit that is not millimeters
+# Code: VALUE_SYNTAX
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Box:
+				Width: 5cm

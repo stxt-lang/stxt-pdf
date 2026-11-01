@@ -1,20 +1,20 @@
 Result:
 	Page: 1
 		Fragment: recipient
-			Rect: 186 168 470 51
+			Rect: 185.94 168 470 51
 		Fragment: signatures
-			Rect: 80 334 682 139.35
+			Rect: 80 334 681.89 139.35
 			Fragment: seal
-				Rect: 362.67 334 116.66 139.35
+				Rect: 362.62 334 116.66 139.35
 		Fragment: paper
-			Rect: 0 0 842 595
+			Rect: 0 0 841.89 595.28
 		Fragment: frame-outer
-			Rect: 18 16 806 563
+			Rect: 18 16 805.89 563.28
 		Fragment: frame-middle
-			Rect: 28 26 786 543
+			Rect: 28 26 785.89 543.28
 		Fragment: frame-inner
-			Rect: 34 32 774 531
+			Rect: 34 32 773.89 531.28
 		Fragment: footer
-			Rect: 80 545 682 16
+			Rect: 80 545.28 681.89 16
 		Fragment: serial
 			Rect: 49 427.5 260 16

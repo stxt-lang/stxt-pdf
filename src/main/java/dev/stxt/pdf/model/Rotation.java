@@ -96,7 +96,7 @@ public record Rotation(double degrees, Value originX, Value originY) {
             }
             if (!(v instanceof Value.Points) && !(v instanceof Value.Percentage)) {
                 throw new IllegalArgumentException("Rotate origin does not allow '" + words[i] + "': it allows top, bottom, "
-                        + "left, right or center, or two measurements in points or as a percentage");
+                        + "left, right or center, or two lengths or percentages");
             }
             origin[i] = v;
         }

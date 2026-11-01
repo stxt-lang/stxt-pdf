@@ -56,19 +56,18 @@ can declare its own, which inherits from the document's by groups ([below](#the-
 | `Orientation` | `portrait`, `landscape` | `portrait` | Only with `Paper`: `landscape` swaps the width and the height. |
 | `Width` | number > 0 | none | Width of the page, without `Paper`. |
 | `Height` | number > 0 | none | Height of the page, without `Paper`. |
-| `Margin` | 1 to 4 numbers | `0` | Page margins. Points only. |
+| `Margin` | 1 to 4 numbers | `0` | Page margins. Measurements only, without percentages. |
 
 The size of the page is declared **in one way only**: a `Paper` (with its `Orientation`, if it is landscape) or a `Width` and
 a `Height`. Declaring `Paper` with `Width` or `Height`, `Orientation` without `Paper`, only one of `Width` and `Height`, or neither
-of the two ways, is `PAGE_SIZE`. So are margins that leave no page area. The named sizes, in whole
-points:
+of the two ways, is `PAGE_SIZE`. So are margins that leave no page area. The named sizes:
 
-| `Paper` | Width × height (pt) | | `Paper` | Width × height (pt) |
-|---|---|---|---|---|
-| `A3` | 842 × 1191 | | `B4` | 709 × 1001 |
-| `A4` | 595 × 842 | | `B5` | 499 × 709 |
-| `A5` | 420 × 595 | | `Letter` | 612 × 792 |
-| `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
+| `Paper` | Width × height | In points | | `Paper` | Width × height | In points |
+|---|---|---|---|---|---|---|
+| `A3` | 297 × 420 mm | 841.89 × 1190.55 | | `B4` | 250 × 353 mm | 708.66 × 1000.63 |
+| `A4` | 210 × 297 mm | 595.28 × 841.89 | | `B5` | 176 × 250 mm | 498.9 × 708.66 |
+| `A5` | 148 × 210 mm | 419.53 × 595.28 | | `Letter` | 8.5 × 11 in | 612 × 792 |
+| `A6` | 105 × 148 mm | 297.64 × 419.53 | | `Legal` | 8.5 × 14 in | 612 × 1008 |
 
 ```
 Page:
@@ -77,13 +76,14 @@ Page:
     Margin: 40
 ```
 
-is a page of 842 × 595, the same as `Width: 842` and `Height: 595`.
+is a page of 297 × 210 mm, the same as `Width: 297mm` and `Height: 210mm`.
 
 The **page area** is the rectangle of the page minus its margins. It is the reference container of the top-level elements
 of each section and of the `Page overlay` elements, and its height is always definite.
 
-> **Decision:** the ISO 216 sizes are rounded to whole points, as they are always used (A4 = 595 × 842), and Letter
-> and Legal are exact. *Rejected alternative:* the values with decimals (A4 = 595.28 × 841.89).
+> **Decision:** the ISO 216 sizes are exact in millimeters (A4 = 210 × 297 mm, 595.28 × 841.89 pt), as in word
+> processors and PDF viewers: a box with `Width: 210mm` measures the same as the sheet. Letter and Legal are exact in
+> inches. *Rejected alternative:* rounding them to whole points (A4 = 595 × 842), which made 210 mm not fit in an A4.
 
 ## `Title` and `Language`
 

@@ -16,13 +16,13 @@ inherit it).
 | `Bold` | `true`, `false` | `false` | Bold: with `false`, weight 400 of the font, and with `true`, 700. |
 | `Italic` | `true`, `false` | `false` | Italic: the italic variant of the font. |
 | `Size` | number > 0 | none | Font size. **Required** in all text, own or inherited (`TEXT_WITHOUT_FONT_SIZE`). |
-| `Line height` | number or % | `120%` | **A number is points** (`15` = 15 pt). For a value relative to `Size`, a percentage (`120%`). |
+| `Line height` | number or % | `120%` | **A number is a measurement** (`15` = 15 pt). For a value relative to `Size`, a percentage (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The last line of a justified paragraph is aligned to the left. |
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |
 | `Line breaking` | `simple`, `balanced` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`balanced`). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
-| `Letter spacing` | number (points) | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
+| `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
@@ -103,7 +103,7 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 ## What is not supported
 
 - Fallback fonts, synthesized bold or italic, weights other than 400 and 700 ([Resources](resources.md#fonts)).
-- Units relative to the font: everything is measured in points or percentages.
+- Units relative to the font: everything is measured in points, millimeters or percentages.
 - Hyphenation when breaking words, kerning, and vertical or right-to-left writing.
 - A different color or size within a line: a run only changes bold, italic, underline and strikethrough
   ([Text formatting](text-formatting.md#runs)).

@@ -38,8 +38,9 @@ Line by line:
 - **`Document (dev.stxt.pdf):`** is the root. The namespace `dev.stxt.pdf` says it is an stxt-pdf document.
 - **`Language`** is the language of the document and **`Title`**, its title. Both are required: the PDF viewer shows the
   title, and a screen reader needs the language to read the text aloud.
-- **`Page`** is the paper: an A4 with a 50-point margin on all four sides. All measurements are in **points**: a point
-  is 1/72 of an inch (about 0.35 mm), and an A4 measures 595 × 842.
+- **`Page`** is the paper: an A4 with a 50-point margin on all four sides. A number alone is **points**: a point is
+  1/72 of an inch, about 0.35 mm. With `mm` attached to the number it is millimeters: `Margin: 18mm` gives almost the
+  same margin.
 - **`Styles`** has the style rules. `For element: Document` gives the font and the size to the whole document. There is
   no default font, so it is always declared. The other two rules give a size to the titles and spacing to the paragraphs.
 - **`Section`** has the content. Everything that is visible goes inside a section.

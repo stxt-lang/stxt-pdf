@@ -255,10 +255,10 @@ class ColumnsLayoutTest {
         // Whole blocks of 40 in columns of 30: they do not fit.
         String one = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 1", "Box:",
                 "\tHeight: 30"), block("A", 40, true)))).getMessage();
-        assertTrue(one.contains("which leaves 1 column of 30:"), one);
+        assertTrue(one.contains("which leaves 1 column of 30 pt:"), one);
         String two = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 2", "Box:",
                 "\tHeight: 30"), block("A", 40, true), block("B", 40, true), block("C", 40, true)))).getMessage();
-        assertTrue(two.contains("which leaves 2 columns of 30:"), two);
+        assertTrue(two.contains("which leaves 2 columns of 30 pt:"), two);
         // Without a page (a stack item is not split) or a height, the column breaks need more columns than there are.
         String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tStack:", "\t\tItem:",
                 "\t\t\tColumns:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",

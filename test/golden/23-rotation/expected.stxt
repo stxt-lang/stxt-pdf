@@ -1,22 +1,22 @@
-# Page 1: tag, intro and stamp, and the Page overlay side. big does not fit whole in the remaining 48 and is not split.
+# Page 1: tag, intro and stamp, and the Page overlay side. big does not fit whole in the remaining 47.64 and is not split.
 # Page 2: big with b1 and b2, the badge image below and side again.
 Result:
 	Page: 1
 		Fragment: intro
-			Rect: 20 20 380 150
+			Rect: 20 20 379.53 150
 		Fragment: stamp
 			Rect: 20 170 120 60
 		Fragment: tag
-			Rect: 320 40 80 20
+			Rect: 319.53 40 80 20
 		Fragment: side
 			Rect: 3 249 200 14
 	Page: 2
 		Fragment: big
-			Rect: 20 20 380 90
+			Rect: 20 20 379.53 90
 			Fragment: b1
-				Rect: 20 20 380 40
+				Rect: 20 20 379.53 40
 			Fragment: b2
-				Rect: 20 60 380 50
+				Rect: 20 60 379.53 50
 		Fragment: badge
 			Rect: 20 110 42.43 42.43
 		Fragment: side

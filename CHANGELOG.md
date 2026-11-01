@@ -7,6 +7,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- Lengths can be written in millimeters, with the unit attached to the number: `Margin: 20mm`, `Width: 42.5mm`,
+  `Column sizes: 30mm *`. A number alone is still points, and both can be mixed (`Margin: 20mm 40`). Any other unit
+  (`5cm`, `12pt`) and a unit separated from the number (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` are factors and
+  do not allow a unit.
+- **The ISO 216 paper sizes are exact in millimeters**: `Paper: A4` measures 210 × 297 mm, 595.28 × 841.89 pt. Before
+  they were rounded to whole points (595 × 842), so a box with `Width: 210mm` did not fit in an A4. A document with
+  `Paper` A3 to B5 now has a page up to half a point larger, and a box that measured the rounded page by hand
+  (`Width: 595`, `Height: 842`) is smaller than it.
+- The error messages give measurements with their unit: «it measures 600 pt and the content of its container measures
+  515 pt».
 - A child whose merged top margins push it past the end of the page is no longer laid out there: the block breaks
   before it. Before, an empty box with a fixed `Height` in that position was `PAGE_OVERFLOW` «it is 0 high».
 - An empty box (no height, border, padding or content) never overflows vertically: its merged margins can leave it past

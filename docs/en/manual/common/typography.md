@@ -24,7 +24,7 @@ Styles:
 |---|---|---|---|
 | `Font` | family name | none | The font. **Required** in all text, own or inherited |
 | `Code font` | family name | none | The font of code ([Text formatting](text-formatting.md#code)). **Required** if there is code |
-| `Size` | number > 0 | none | The size of the letters, in points. **Required** in all text |
+| `Size` | number > 0 | none | The size of the letters. **Required** in all text |
 | `Bold` | `true`, `false` | `false` | Bold |
 | `Italic` | `true`, `false` | `false` | Italic |
 | `Line height` | number or % | `120%` | The height of each line: `15` is 15 points and `140%`, 1.4 times the size |

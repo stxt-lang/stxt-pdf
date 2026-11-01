@@ -75,6 +75,7 @@ Each name in `Areas` must form a rectangle. If an item falls outside the declare
 | Written | Size |
 |---|---|
 | `150` | 150 points |
+| `40mm` | 40 millimeters |
 | `25%` | a share of the width of the `Grid` (without subtracting the gaps) |
 | `auto` | what its content asks for |
 | `narrowest`, `natural` | the narrowest its content can be, or its size without breaking any line |

@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
  * Converts the text of a property into {@link Value} (reference/common/values.md).
  *
  * <ul>
- *   <li>Numbers in points with a decimal point: {@code 12}, {@code 12.5}, {@code -4}.</li>
+ *   <li>Lengths with a decimal point: in points, the number alone ({@code 12}, {@code 12.5}, {@code -4}), or in
+ *   millimeters, with the unit attached ({@code 12mm}, {@code -4.5mm}).</li>
  *   <li>Percentages ({@code 50%}) and fractions ({@code *}, {@code 2*}; {@code *} alone is {@code 1*}).</li>
  *   <li>Words: {@code auto}, {@code narrowest}, {@code natural}, {@code fit}.</li>
  *   <li>Tracks between two sizes: {@code between(a, b)}.</li>
@@ -18,6 +19,11 @@ import java.util.regex.Pattern;
 public final class ValueParser {
 
     private static final Pattern NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
+
+    /** A number followed by letters: a length with a unit. */
+    private static final Pattern WITH_UNIT = Pattern.compile("-?\\d+(\\.\\d+)?\\p{IsAlphabetic}+");
+
+    private static final String MILLIMETERS = "mm";
 
     private ValueParser() {
     }
@@ -56,7 +62,24 @@ public final class ValueParser {
             }
             return new Value.Fraction(fraction);
         }
+        if (t.endsWith(MILLIMETERS)) {
+            String amount = t.substring(0, t.length() - MILLIMETERS.length());
+            if (amount.isEmpty() || Character.isWhitespace(amount.charAt(amount.length() - 1))) {
+                throw new IllegalArgumentException("Invalid value: " + t
+                        + " (the unit goes attached to the number, as in 12mm)");
+            }
+            return Value.mm(number(amount, text));
+        }
+        if (WITH_UNIT.matcher(t).matches()) {
+            throw new IllegalArgumentException("Invalid value: " + t
+                    + " (a length is a number of points, as in 12, or of millimeters, as in 12mm)");
+        }
         return new Value.Points(number(t, text));
+    }
+
+    /** A number without unit, with a decimal point: a factor such as {@code Grow}, not a length. */
+    public static double factor(String text) {
+        return number(text, text);
     }
 
     /** List of values separated by spaces; expands {@code repeat(n, pattern)}. */

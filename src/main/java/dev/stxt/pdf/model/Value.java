@@ -12,7 +12,10 @@ import java.util.OptionalDouble;
  */
 public sealed interface Value {
 
-    /** Absolute length in typographic points. */
+    /**
+     * Absolute length in typographic points. A length written in millimeters ({@code 12mm}) is converted to points
+     * when it is read (reference/common/values.md).
+     */
     record Points(double pt) implements Value {}
 
     /** Percentage of the reference container (or of the font size in {@code Line height}). */
@@ -29,8 +32,15 @@ public sealed interface Value {
 
     Value AUTO = Keyword.AUTO;
 
+    /** Points in a millimeter: 72 points per inch, 25.4 millimeters per inch. */
+    double POINTS_PER_MM = 72 / 25.4;
+
     static Value pt(double points) {
         return new Points(points);
+    }
+
+    static Value mm(double millimeters) {
+        return new Points(millimeters * POINTS_PER_MM);
     }
 
     default boolean isAuto() {

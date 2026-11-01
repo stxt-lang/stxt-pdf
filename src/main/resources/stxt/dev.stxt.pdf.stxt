@@ -4,7 +4,7 @@
 # Each name has a single definition in the whole namespace: the Width of Page and the one of Box are
 # the same node.
 Schema (@stxt.schema): dev.stxt.pdf
-	Description: Documents of stxt-pdf, the layout and PDF generation engine. Manual in docs/en/manual and complete reference in docs/en/reference.
+	Description: Documents of stxt-pdf, the layout and PDF generation engine. Lengths are in points (12) or in millimeters (12mm). Manual in docs/en/manual and complete reference in docs/en/reference.
 
 	# Elements
 
@@ -1033,10 +1033,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: NUMBER
 		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph and Image, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
-		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, in points or as a percentage of its width and its height (20 50%). By default, center.
+		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
 	Node: Paper
 		Type: ENUM
-		Description: Named paper size of the medium, in portrait: A3 (842 × 1191), A4 (595 × 842), A5 (420 × 595), A6 (298 × 420), B4 (709 × 1001), B5 (499 × 709), Letter (612 × 792) or Legal (612 × 1008). It is not declared with Width or Height.
+		Description: Named paper size of the medium, in portrait: A3 (297 × 420 mm), A4 (210 × 297 mm), A5 (148 × 210 mm), A6 (105 × 148 mm), B4 (250 × 353 mm), B5 (176 × 250 mm), Letter (612 × 792 pt) or Legal (612 × 1008 pt). It is not declared with Width or Height.
 		Values:
 			Value: A3
 			Value: A4
@@ -1098,9 +1098,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: BOOLEAN
 		Description: Italic: the italic variant of the font. By default, false.
 	Node: Size
-		Description: Font size, in points. Required in the text, own or inherited (also from Document).
+		Description: Font size, a length. Required in the text, own or inherited (also from Document).
 	Node: Line height
-		Description: Line height. A number is points; a percentage (120%) gives a value relative to the Size.
+		Description: Line height: a length, or a percentage (120%) relative to the Size.
 	Node: Align
 		Type: ENUM
 		Description: Alignment of the lines.
@@ -1132,7 +1132,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: lowercase
 			Value: capitalize
 	Node: Letter spacing
-		Description: Spacing between letters, in points, added to the advance of each character (also in line breaking and in justify); the last character of the line does not get it. It can be negative. By default, 0.
+		Description: Spacing between letters, a length, added to the advance of each character (also in line breaking and in justify); the last character of the line does not get it. It can be negative. By default, 0.
 	Node: Small caps
 		Type: BOOLEAN
 		Description: Small caps: lowercase letters are painted as uppercase at 80 % of the size. By default, false.
@@ -1305,7 +1305,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: INTEGER
 		Description: Number of columns of a Columns (at least 1); with Min column width, the maximum.
 	Node: Min column width
-		Description: Minimum width of the columns, in points: as many fit as the width allows, up to Count if it is declared.
+		Description: Minimum width of the columns: as many fit as the width allows, up to Count if it is declared.
 	Node: Separator
 		Description: Width of the line between the columns of a Columns, centered in Gap, which must be at least as wide.
 	Node: Separator color

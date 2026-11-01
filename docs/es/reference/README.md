@@ -1,6 +1,6 @@
 # Referencia de stxt-pdf
 
-**Versión del modelo:** 0.1 · **Namespace:** `dev.stxt.pdf` · **Unidades:** puntos tipográficos (pt)
+**Versión del modelo:** 0.1 · **Namespace:** `dev.stxt.pdf` · **Unidades:** puntos tipográficos (pt) y milímetros (mm)
 
 La referencia es la **fuente de verdad** del comportamiento del motor: dice qué admite cada elemento, qué significa
 cada propiedad, cómo calcula el motor la posición y el tamaño de cada caja, qué es un error y qué se escribe en el PDF.

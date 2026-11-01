@@ -1,14 +1,14 @@
 Result:
 	Page: 1
 		Fragment: masthead
-			Rect: 44 44 507 51.6
+			Rect: 44 44 507.28 51.6
 		Fragment: parties
-			Rect: 44 125.6 507 105
+			Rect: 44 125.6 507.28 105
 		Fragment: strip
-			Rect: 44 248.6 507 48
+			Rect: 44 248.6 507.28 48
 		Fragment: lines
-			Rect: 44 318.6 507 303.5
+			Rect: 44 318.6 507.28 303.5
 		Fragment: payment
-			Rect: 44 646.1 507 55
+			Rect: 44 646.1 507.28 55
 		Fragment: footer
-			Rect: 44 796.5 507 19.5
+			Rect: 44 796.39 507.28 19.5

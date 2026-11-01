@@ -92,28 +92,28 @@ Document (dev.stxt.pdf):
 
 **Cómo se maqueta:**
 
-- **Área útil:** `Paper: A4` mide 595 × 842, así que quedan 595 − 2·40 = **515 pt** de ancho y 842 − 2·40 = **762 pt** de alto, desde
-  (40, 40).
+- **Área útil:** `Paper: A4` mide 210 × 297 mm, 595,28 × 841,89 pt, así que quedan 595,28 − 2·40 = **515,28 pt** de
+  ancho y 841,89 − 2·40 = **761,89 pt** de alto, desde (40, 40).
 - **Fuentes:** la regla `For element: Document` declara `Font` y `Size`, que heredan todas las cajas.
 - **Reglas** ([Styles](styles.md)): `For element: Page overlay` da a la cabecera y al pie 20 de alto y el cuerpo 8,
   que heredan sus `Text`. `For element: Paragraph` justifica los párrafos del cuerpo, los de `main`. Los textos sueltos
   (título, cabecera, pie y sello) son `Text` y no les llega. El pie y el sello se alinean con su propio `Align`, y el
   estilo `panel` de `side`, a la izquierda. La regla `For id: title` lleva todo el estilo del título, que en el
   documento solo declara su texto y su `Id`. El resultado es el mismo que si cada elemento declarase esas propiedades.
-- **`header`** (`Page overlay`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515 pt.
+- **`header`** (`Page overlay`): izquierda y derecha 0 con ancho `auto`, así que se estira a 515,28 pt.
   Arriba −30 la coloca en y = 40 − 30 = **10**, dentro del margen superior. Se repite en cada
   página.
-- **`footer`** (`Page overlay`): abajo −30 con alto 20 da arriba = 762 + 30 − 20 = 772, es decir,
-  y = 40 + 772 = **812**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
+- **`footer`** (`Page overlay`): abajo −30 con alto 20 da arriba = 761,89 + 30 − 20 = 771,89, es decir,
+  y = 40 + 771,89 = **811,89**, dentro del margen inferior. `{page}` y `{pages}` se sustituyen
   en cada página.
 - **`title`**: primer elemento en flujo, en y = **40**, con una línea de 24 pt. Su margen
   inferior deja el cuerpo en y = 40 + 24 + 16 = **80**. Con `Keep with next: true` en su `Break`, nunca queda
   solo al final de una página.
-- **`body`** (`Grid`): 515 − 20 de hueco = 495 para pistas. La columna fija mide **150** y la
-  fracción recibe **345**. Los dos `Area` no tienen valor y se colocan automáticamente, uno en
+- **`body`** (`Grid`): 515,28 − 20 de hueco = 495,28 para pistas. La columna fija mide **150** y la
+  fracción recibe **345,28**. Los dos `Area` no tienen valor y se colocan automáticamente, uno en
   cada columna: `side` empieza en x = 40 y `main` en x = 40 + 150 + 20 = **210**. `side` no se
   parte (`Keep together: true`). `main` puede partirse entre páginas respetando viudas y
   huérfanas (2 por defecto).
 - **`stamp`** (`Overlay`): no hay ancestro posicionado, así que su contenedor de referencia es el
   área útil. Arriba 0 y derecha 0 con ancho 80 la anclan a la esquina superior derecha:
-  x = 40 + 515 − 80 = **475**, y = **40**. Con `Layer: 1` se pinta por encima del título.
+  x = 40 + 515,28 − 80 = **475,28**, y = **40**. Con `Layer: 1` se pinta por encima del título.

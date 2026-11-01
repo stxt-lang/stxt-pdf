@@ -90,7 +90,7 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
 - Su alto es siempre definido, así que un `Stack` no la estira en el eje cruzado de una fila, ni un `Grid` en vertical. En
   horizontal sí se estira, y el alto sigue a la proporción.
 - **Tamaños intrínsecos:** el ancho más estrecho y el natural son los dos el ancho de su tamaño natural o, si declara
-  `Height` en puntos, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un
+  `Height` con una medida, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un
   ítem de `Stack` sin `Min width`, la imagen no encoge por debajo de él.
 
 Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.

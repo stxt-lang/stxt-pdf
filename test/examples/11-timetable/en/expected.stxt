@@ -1,12 +1,12 @@
 Result:
 	Page: 1
 		Fragment: masthead
-			Rect: 46 40 750 50
+			Rect: 46 40 749.89 50
 		Fragment: timetable
-			Rect: 46 106 750 323
+			Rect: 46 106 749.89 323
 		Fragment: legend
-			Rect: 46 443 750 29.5
+			Rect: 46 443 749.89 29.5
 		Fragment: notes
-			Rect: 46 484.5 750 39
+			Rect: 46 484.5 749.89 39
 		Fragment: footer
-			Rect: 46 566 750 13
+			Rect: 46 566.28 749.89 13

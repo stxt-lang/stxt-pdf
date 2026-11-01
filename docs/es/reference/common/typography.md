@@ -16,13 +16,13 @@ celdas).
 | `Bold` | `true`, `false` | `false` | Negrita: con `false`, el peso 400 de la fuente, y con `true`, el 700. |
 | `Italic` | `true`, `false` | `false` | Cursiva: la variante cursiva de la fuente. |
 | `Size` | número > 0 | sin valor | Cuerpo de la fuente. **Obligatorio** en todo texto, propio o heredado (`TEXT_WITHOUT_FONT_SIZE`). |
-| `Line height` | número o % | `120%` | **Un número son puntos** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
+| `Line height` | número o % | `120%` | **Un número es una medida** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |
 | `Line breaking` | `simple`, `balanced` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`balanced`). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
-| `Letter spacing` | número (puntos) | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
+| `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
@@ -103,7 +103,7 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 ## Lo que no hay
 
 - Fuentes de sustitución, síntesis de negrita o cursiva, pesos distintos de 400 y 700 ([Recursos](resources.md#fuentes)).
-- Unidades relativas a la fuente: todo se mide en puntos o en porcentajes.
+- Unidades relativas a la fuente: todo se mide en puntos, en milímetros o en porcentajes.
 - Guiones al partir palabras, kerning y escritura vertical o de derecha a izquierda.
 - Color o tamaño distintos dentro de una línea: un tramo solo cambia negrita, cursiva, subrayado y tachado
   ([Formato del texto](text-formatting.md#tramos)).

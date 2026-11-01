@@ -89,9 +89,9 @@ replaces it (it is not an error). The padding and the border go outside: they do
   height runs into its minimum or its maximum, the width is deduced again from the limited height: the proportion is kept.
 - Its height is always definite, so a `Stack` does not stretch it in the cross axis of a row, nor does a `Grid` vertically. Horizontally
   it is stretched, and the height follows the proportion.
-- **Intrinsic sizes:** the narrowest width and the natural width are both the width of its natural size or, if it declares
-  `Height` in points, the one that comes from it with the proportion. It is a real minimum: in a `*` track of a grid or in an
-  item of `Stack` without `Min width`, the image does not shrink below it.
+- **Intrinsic sizes:** the narrowest width and the natural width are both the width of its natural size or, if it
+  declares `Height` with a measurement, the one that comes from it with the proportion. It is a real minimum: in a `*`
+  track of a grid or in an item of `Stack` without `Min width`, the image does not shrink below it.
 
 If the minimums and the maximums cannot be met at the same time with the proportion, the width wins and `Fit` places the image.
 

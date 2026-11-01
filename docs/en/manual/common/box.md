@@ -37,8 +37,8 @@ what its content measures. Width goes from the outside in and height, from the i
 ([Values](values.md#percentages)).
 
 **Minimums and maximums.** The maximum is applied first and then the minimum. A minimum larger than the maximum is an
-error if both are in the same units. If one is in points and the other in a percentage and they clash during layout, the
-minimum wins.
+error if both are in the same units. If one is a measurement and the other a percentage and they clash during layout,
+the minimum wins.
 
 **Proportion.** With `Aspect ratio: 16/9` and `Width: 320`, the box is 180 high. With `Width` and `Height` at the same
 time it is an error, because the proportion would have no effect.

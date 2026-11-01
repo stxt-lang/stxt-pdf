@@ -45,6 +45,7 @@ import static dev.stxt.pdf.tree.ValueReader.check;
 import static dev.stxt.pdf.tree.ValueReader.color;
 import static dev.stxt.pdf.tree.ValueReader.colorSides;
 import static dev.stxt.pdf.tree.ValueReader.enumValue;
+import static dev.stxt.pdf.tree.ValueReader.factor;
 import static dev.stxt.pdf.tree.ValueReader.fontFamily;
 import static dev.stxt.pdf.tree.ValueReader.integer;
 import static dev.stxt.pdf.tree.ValueReader.language;
@@ -303,8 +304,8 @@ final class PropertyReader {
             }
             s.declared(PropertyKey.item(name), p.getLine());
             switch (name) {
-                case "grow" -> s.item().setGrow(nonNegative(p));
-                case "shrink" -> s.item().setShrink(nonNegative(p));
+                case "grow" -> s.item().setGrow(factor(p));
+                case "shrink" -> s.item().setShrink(factor(p));
                 case "base-size" -> s.item().setBaseSize(value(p, LENGTH_OR_AUTO, false));
                 case "horizontal" -> s.item().setHorizontal(alignment(p));
                 case "vertical" -> s.item().setVertical(alignment(p));
@@ -338,7 +339,7 @@ final class PropertyReader {
         return label;
     }
 
-    /** {@code Gap} of {@code Columns}: a single value, the gap between columns, in points. */
+    /** {@code Gap} of {@code Columns}: a single length, the gap between columns. */
     private static double columnGap(Node p) {
         if (p.getText().trim().split("\\s+").length > 1) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Gap of a Columns allows a single value, the gap between "

@@ -116,5 +116,6 @@ Lo que se repite en varios ejemplos y cómo se resuelve:
   no sustituye ninguna), pero se dibuja como contornos: no se puede seleccionar. Las fotos y la pantalla
   del móvil (08) siguen siendo PNG o JPEG.
 - **El papel tiene nombre**: los A4 dicen `Paper: A4` (y los apaisados, 10 y 11, además
-  `Orientation: landscape`) en vez de escribir 595 × 842. La carta del restaurante (06) es la única con
-  un tamaño propio (420 × 700), que se sigue escribiendo con `Width` y `Height`.
+  `Orientation: landscape`) en vez de escribir su tamaño. La carta del restaurante (06) es la única con
+  un tamaño propio (420 × 700), que se sigue escribiendo con `Width` y `Height`. Las portadas a sangre del informe
+  anual (04) y del catálogo (09) miden la hoja entera en milímetros: `Width: 210mm` y `Height: 297mm`.

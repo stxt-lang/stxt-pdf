@@ -1,6 +1,6 @@
 # stxt-pdf reference
 
-**Model version:** 0.1 · **Namespace:** `dev.stxt.pdf` · **Units:** typographic points (pt)
+**Model version:** 0.1 · **Namespace:** `dev.stxt.pdf` · **Units:** typographic points (pt) and millimeters (mm)
 
 The reference is the **source of truth** for the behavior of the engine: it says what each element accepts, what each
 property means, how the engine computes the position and the size of each box, what is an error and what is written to

@@ -5,6 +5,7 @@
 | Sintaxis | Significado | Ejemplo |
 |---|---|---|
 | Número | Puntos. Punto decimal, nunca coma. Puede ser negativo donde se indique. | `12`, `12.5`, `-30` |
+| Número con `mm` | Milímetros, con la unidad pegada al número. Vale donde vale un número, salvo en `Grow`, `Shrink`, `Rotate` y `Aspect ratio`. | `12mm`, `-4.5mm` |
 | Porcentaje | Porcentaje de una base (ver [bases de los porcentajes](#bases-de-los-porcentajes)). | `50%` |
 | Fracción | Una parte del espacio libre, con su peso delante (`*` solo es `1*`). Solo en pistas de grid. | `*`, `2*`, `2.5*` |
 | `auto` | El motor calcula el valor según el contexto. | `auto` |
@@ -17,6 +18,18 @@ Cada propiedad admite solo las formas de la columna *Valores* de su tabla. Cualq
 `Max width: natural`, `Gap: auto`, un `between()` fuera de las pistas) es `VALUE_NOT_ALLOWED` y no un `auto`
 silencioso. Solo `Margin`, `Offset` y `Letter spacing` admiten valores negativos. Un porcentaje de un alto que no es
 [definido](#alto-definido) es un error.
+
+Un milímetro son 72 / 25,4 puntos, unos 2,83: la medida se pasa a puntos al leer el documento, y los mensajes de error
+dan las medidas en puntos, con su unidad (`it measures 600 pt`). Puntos y milímetros se mezclan, también en un mismo
+valor (`Margin: 20mm 40`). Cualquier otra unidad (`5cm`, `12pt`, `1in`) y una unidad separada del número (`12 mm`) son
+`VALUE_SYNTAX`. `Grow` y `Shrink` (factores), `Rotate` (grados) y `Aspect ratio` (una proporción) no son medidas: una
+unidad en ellos también es un error.
+
+> **Decisión:** un número solo son puntos y las medidas en milímetros llevan `mm`: los documentos escritos en puntos
+> siguen valiendo igual. Hay una sola unidad más, porque los milímetros y los puntos cubren el papel y la tipografía, y
+> cada medida se escribe de una sola forma. *Alternativa descartada:* `cm`, `in` y un `pt` explícito, que darían dos
+> formas a la misma medida (`1cm` y `10mm`, `12` y `12pt`), y una unidad por documento, que cambiaría el sentido de un
+> número según dónde se lea (también en un documento de estilos aparte).
 
 > **Decisión:** una fracción se escribe con un asterisco y su peso: `120 * 2*` da a la tercera pista el doble de lo que
 > sobra que a la segunda. *Alternativa descartada:* `1fr`, una unidad que solo conoce quien ya la ha usado.
@@ -101,7 +114,7 @@ Los anchos se conocen siempre. Los altos, no. Un porcentaje vertical es un error
 es un **alto definido**, que se decide al leer el documento con esta regla fija:
 
 - el área útil;
-- el de una caja con `Height` en puntos, o en porcentaje de un alto definido;
+- el de una caja con `Height` en puntos o en milímetros, o en porcentaje de un alto definido;
 - el de una caja con `Height: auto` y `Aspect ratio`;
 - el de un `Overlay` o un `Page overlay` con `Height: auto` estirado entre arriba y abajo;
 - el de un ítem de grid con `Height: auto` estirado en su área (`Vertical: stretch`).

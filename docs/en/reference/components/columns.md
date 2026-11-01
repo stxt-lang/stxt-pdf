@@ -22,8 +22,8 @@ Columns:
 | Property | Values | Default | Notes |
 |---|---|---|---|
 | `Count` | integer ≥ 1 | none | Number of columns. With `Min column width`, the maximum. |
-| `Min column width` | number > 0 | none | Minimum width of the columns: as many fit as the width allows. Points only. |
-| `Gap` | number ≥ 0 | `0` | Space between columns: a single value, in points (two values are `VALUE_NOT_ALLOWED`). With `Count: 1` it is an error (`SINGLE_COLUMN`). |
+| `Min column width` | number > 0 | none | Minimum width of the columns: as many fit as the width allows. Measurements only, without percentages. |
+| `Gap` | number ≥ 0 | `0` | Space between columns: a single measurement (two values are `VALUE_NOT_ALLOWED`). With `Count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator` | number > 0 | no line | Thickness of the line between columns, centered in the gap. It does not exceed `Gap` (`SEPARATOR_WIDTH`). With `Count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator color` | color | the text `Color` | Only with `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). It does not affect the layout. |
 | `Balance` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |

@@ -1,13 +1,14 @@
 # Concepts
 
-## Pages and points
+## Pages and measurements
 
 A document is always laid out in **pages** of a fixed size, like a printed PDF. The size and the margins of the page are
 given by `Page` ([Document](../components/document.md)). What lies inside the margins is the **page area**: the place
 where the content goes.
 
-All measurements are in **points** (pt): 1 pt = 1/72 of an inch, about 0.35 mm. An A4 measures 595 × 842 pt. With
-`Margin: 40`, the page area measures 515 × 762. Measurements are written as numbers: `Width: 200` is 200 points.
+Measurements are written in **points** (pt), with the number alone, or in **millimeters**, with `mm` attached to the
+number: `Width: 200` is 200 points and `Width: 50mm`, 50 millimeters. A point is 1/72 of an inch, about 0.35 mm. An A4
+measures 210 × 297 mm. With `Margin: 20mm`, the page area measures 170 × 257 mm.
 
 ## Boxes
 

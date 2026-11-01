@@ -24,7 +24,7 @@ Styles:
 |---|---|---|---|
 | `Font` | nombre de familia | sin valor | La fuente. **Obligatoria** en todo texto, propia o heredada |
 | `Code font` | nombre de familia | sin valor | La fuente del código ([Formato del texto](text-formatting.md#código)). **Obligatoria** si hay código |
-| `Size` | número > 0 | sin valor | El tamaño de la letra, en puntos. **Obligatorio** en todo texto |
+| `Size` | número > 0 | sin valor | El tamaño de la letra. **Obligatorio** en todo texto |
 | `Bold` | `true`, `false` | `false` | Negrita |
 | `Italic` | `true`, `false` | `false` | Cursiva |
 | `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos y `140%`, 1,4 veces el tamaño |

@@ -96,9 +96,9 @@ A rotated `Frame` is not split across pages. `Keep together` and `Edges` have no
 `Rotate origin` is written in one of two ways:
 
 - **Keywords:** one or two, in any order (`top left` = `left top`). The axis that is not named is `center`.
-- **Two measurements:** the horizontal and the vertical one, from the top left corner of the border box, in points or as a
-  percentage of its width and its height (`Rotate origin: 20 50%`). They can be negative or exceed the size of the box:
-  the center of rotation can be outside it.
+- **Two measurements:** the horizontal and the vertical one, from the top left corner of the border box, as
+  measurements or as a percentage of its width and its height (`Rotate origin: 20 50%`). They can be negative or exceed
+  the size of the box: the center of rotation can be outside it.
 
 Two words for the same axis, a single measurement, a keyword with a measurement, or something that is neither one thing
 nor the other, is `VALUE_NOT_ALLOWED`.

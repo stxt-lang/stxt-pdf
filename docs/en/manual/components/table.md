@@ -67,8 +67,8 @@ Document (dev.stxt.pdf):
 
 - `Header rows` (optional), `Body` (required) and `Footer rows` (optional), in that order. Each one has one or more `Row`
   elements, and each row, its `Cell` elements from left to right.
-- **`Column sizes`** (required) are the columns, with the same measurements as a `Grid`: points, percentages, `auto` (what
-  its content asks for) and fractions (`*`: a share of what is left over) ([Grid](grid.md)).
+- **`Column sizes`** (required) are the columns, with the same measurements as a `Grid`: points, millimeters,
+  percentages, `auto` (what its content asks for) and fractions (`*`: a share of what is left over) ([Grid](grid.md)).
 - Each row fills **exactly** all the columns: an empty cell is written `Cell:`. A row with too many or too few cells is an
   error.
 - **`Span: rows columns`** makes a cell span several: `Span: 1 3` is three columns. A cell that spans several rows keeps its

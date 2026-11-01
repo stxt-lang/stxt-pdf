@@ -89,7 +89,8 @@ El reparto de lo que sobra solo actúa si ningún ítem crece. En fila, los íte
 
 ## Cosas a tener en cuenta
 
-- `Grow` en un `Stack` en columna necesita que el `Stack` tenga un alto en puntos. Si no, no hay nada que repartir y es un error.
+- `Grow` en un `Stack` en columna necesita que el `Stack` tenga un alto en puntos o en milímetros. Si no, no hay nada
+  que repartir y es un error.
 - Los ítems no admiten `Margin: auto`: se alinean con `Horizontal` y `Vertical`.
 - Entre páginas, un `Stack` en columna se corta entre ítems, y uno en fila, entre líneas. Una fila que no cabe en una página
   entera se parte con sus ítems a la vez.

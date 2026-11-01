@@ -1,29 +1,29 @@
 Result:
 	Page: 1
 		Fragment: masthead
-			Rect: 44 38 507 89.5
+			Rect: 44 38 507.28 89.5
 		Fragment: lead
-			Rect: 44 141.5 507 542
+			Rect: 44 141.5 507.28 542
 			Fragment: lead-photo
-				Rect: 44 224.5 507 214
+				Rect: 44 224.5 507.28 214
 			Fragment: lead-text
-				Rect: 44 464.5 507 168
+				Rect: 44 464.5 507.28 168
 		Fragment: footer
-			Rect: 44 801.5 507 18.5
+			Rect: 44 801.39 507.28 18.5
 	Page: 2
 		Fragment: trails
-			Rect: 44 38 507 691.5
+			Rect: 44 38 507.28 691.5
 			Fragment: trail-story
-				Rect: 44 91 507 173
+				Rect: 44 91 507.28 173
 				Fragment: trail-photo
 					Rect: 44 91 200 130
 			Fragment: briefs
-				Rect: 44 278 507 158
+				Rect: 44 278 507.28 158
 			Fragment: agenda
-				Rect: 44 466 507 141
+				Rect: 44 466 507.28 141
 			Fragment: classifieds
-				Rect: 44 637 507 92.5
+				Rect: 44 637 507.28 92.5
 		Fragment: running
-			Rect: 44 14 507 13
+			Rect: 44 14 507.28 13
 		Fragment: footer
-			Rect: 44 801.5 507 18.5
+			Rect: 44 801.39 507.28 18.5

@@ -439,7 +439,7 @@ final class ModelValidator {
 
     private static InvalidModelException indefinite(SourceLine line, String what) {
         return error(line, ErrorCode.INDEFINITE_PERCENTAGE, what + " uses a percentage of a height that is not "
-                + "definite: the Height of its reference container is needed, or a measure in points");
+                + "definite: the Height of its reference container is needed, or a length in points or millimeters");
     }
 
     /** A text needs {@code Font} and {@code Size}, its own or inherited; the error points to {@code source}. */

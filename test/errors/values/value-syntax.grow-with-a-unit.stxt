@@ -1,0 +1,14 @@
+# Case: Grow with a unit: it is a factor, not a length
+# Code: VALUE_SYNTAX
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Item:
+				Grow: 2mm
+				Block:

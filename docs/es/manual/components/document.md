@@ -76,16 +76,18 @@ El tamaño de la página y sus márgenes. El tamaño se da de una de dos formas,
 
 - **Con un papel**: `Paper` (`A3`, `A4`, `A5`, `A6`, `B4`, `B5`, `Letter` o `Legal`) y, si es apaisado,
   `Orientation: landscape`.
-- **Con medidas**: `Width` y `Height`, en puntos.
+- **Con medidas**: `Width` y `Height`, en puntos o en milímetros.
 
-| `Paper` | Puntos | | `Paper` | Puntos |
+| `Paper` | Milímetros | | `Paper` | Milímetros |
 |---|---|---|---|---|
-| `A3` | 842 × 1191 | | `B4` | 709 × 1001 |
-| `A4` | 595 × 842 | | `B5` | 499 × 709 |
-| `A5` | 420 × 595 | | `Letter` | 612 × 792 |
-| `A6` | 298 × 420 | | `Legal` | 612 × 1008 |
+| `A3` | 297 × 420 | | `B4` | 250 × 353 |
+| `A4` | 210 × 297 | | `B5` | 176 × 250 |
+| `A5` | 148 × 210 | | `Letter` | 215,9 × 279,4 |
+| `A6` | 105 × 148 | | `Legal` | 215,9 × 355,6 |
 
-`Margin` son los márgenes de la página, de 1 a 4 números (arriba, derecha, abajo, izquierda). Lo que queda dentro es el
+`Letter` y `Legal` son 8,5 × 11 y 8,5 × 14 pulgadas: 612 × 792 y 612 × 1008 puntos.
+
+`Margin` son los márgenes de la página, de 1 a 4 medidas (arriba, derecha, abajo, izquierda). Lo que queda dentro es el
 **área útil**: donde va el contenido. Las cabeceras y los pies van en los márgenes, con un `Page overlay`
 ([posicionados](frame-and-overlays.md#page-overlay)).
 

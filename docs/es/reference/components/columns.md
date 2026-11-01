@@ -22,8 +22,8 @@ Columns:
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Count` | entero ≥ 1 | sin valor | Número de columnas. Con `Min column width`, el máximo. |
-| `Min column width` | número > 0 | sin valor | Ancho mínimo de las columnas: caben tantas como permita el ancho. Solo puntos. |
-| `Gap` | número ≥ 0 | `0` | Separación entre columnas: un solo valor, en puntos (dos valores son `VALUE_NOT_ALLOWED`). Con `Count: 1` es un error (`SINGLE_COLUMN`). |
+| `Min column width` | número > 0 | sin valor | Ancho mínimo de las columnas: caben tantas como permita el ancho. Solo medidas, sin porcentajes. |
+| `Gap` | número ≥ 0 | `0` | Separación entre columnas: una sola medida (dos valores son `VALUE_NOT_ALLOWED`). Con `Count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Gap` (`SEPARATOR_WIDTH`). Con `Count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator color` | color | el `Color` del texto | Solo con `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). No afecta al layout. |
 | `Balance` | `true`, `false` | `true` | `true` iguala las columnas de la última página, y `false` las llena en orden. |

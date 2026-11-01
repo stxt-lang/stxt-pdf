@@ -1,20 +1,20 @@
 Result:
 	Page: 1
 		Fragment: letterhead
-			Rect: 72 44 451 58.5
+			Rect: 72 44 451.28 58.5
 		Fragment: date
-			Rect: 72 126.5 451 16
+			Rect: 72 126.5 451.28 16
 		Fragment: recipient
-			Rect: 72 158.5 451 64
+			Rect: 72 158.5 451.28 64
 		Fragment: subject
-			Rect: 72 238.5 451 33
+			Rect: 72 238.5 451.28 33
 		Fragment: body
-			Rect: 72 285.5 451 344
+			Rect: 72 285.5 451.28 344
 		Fragment: signature
 			Rect: 72 638.5 128 48
 		Fragment: name
-			Rect: 72 688.5 451 16
+			Rect: 72 688.5 451.28 16
 		Fragment: postscript
-			Rect: 72 730.5 451 24
+			Rect: 72 730.5 451.28 24
 		Fragment: footer
-			Rect: 72 804 451 16
+			Rect: 72 803.89 451.28 16

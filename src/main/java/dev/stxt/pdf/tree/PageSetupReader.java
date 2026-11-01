@@ -120,7 +120,8 @@ final class PageSetupReader {
     private static Insets margin(Node n) {
         List<Double> v = parse(n, () -> ValueParser.list(n.getText())).stream().map(x -> {
             if (!(x instanceof Value.Points p)) {
-                throw error(n, ErrorCode.PAGE_SIZE, "The margin of the page only allows points: " + n.getText().trim());
+                throw error(n, ErrorCode.PAGE_SIZE, "The margin of the page only allows lengths in points or "
+                        + "millimeters: " + n.getText().trim());
             }
             return p.pt();
         }).toList();

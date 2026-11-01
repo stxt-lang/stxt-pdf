@@ -70,7 +70,7 @@ línea (**ancho natural**):
 | Elemento | Ancho más estrecho | Ancho natural |
 |---|---|---|
 | `Text` | palabra más ancha | párrafo más largo en una línea |
-| `Image` | ancho natural o, con `Height` en puntos, el que sale de él con la proporción | igual |
+| `Image` | ancho natural o, con un `Height` que es una medida, el que sale de él con la proporción | igual |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del ancho más estrecho de los hijos | máximo del ancho natural de los hijos |
 | `Stack` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
 | `Stack` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
@@ -92,7 +92,7 @@ es definida: una caja de primer nivel de una sección con `Height: 100%` ocupa l
 ### Mínimos y máximos
 
 Se calcula el tamaño provisional, se limita por el máximo y se sube al mínimo. Si se pueden comparar al leer el
-documento (los dos en puntos o los dos en porcentaje), un mínimo mayor que el máximo, o un `Width`/`Height` fuera de
+documento (los dos medidas o los dos porcentajes), un mínimo mayor que el máximo, o un `Width`/`Height` fuera de
 ellos, es un error (`MIN_MAX_CONFLICT`). Si no se pueden comparar hasta maquetar (`Min width: 150` y `Max width: 20%`) y
 chocan, **gana el mínimo**.
 

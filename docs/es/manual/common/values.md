@@ -5,11 +5,16 @@
 | Se escribe | Significa | Ejemplo |
 |---|---|---|
 | un número | puntos, con punto decimal y nunca coma | `Width: 120`, `Size: 10.5` |
+| un número con `mm` | milímetros, con la unidad pegada al número | `Width: 42mm`, `Margin: 12.5mm` |
 | un porcentaje | una parte de otra medida (abajo) | `Width: 50%` |
 | `auto` | lo calcula el motor | `Width: auto` |
 | `narrowest` | lo más estrecho que puede ser sin que nada se salga: la palabra más larga | `Width: narrowest` |
 | `natural` | lo que mide sin partir ninguna línea | `Width: natural` |
 | `fit` | lo que necesita su contenido, sin pasar del espacio disponible | `Width: fit` |
+
+Puntos y milímetros se pueden mezclar, también en un mismo valor (`Margin: 20mm 40`). No hay otras unidades: `5cm`,
+`12pt` o `12 mm`, con espacio, son un error. `Grow`, `Shrink`, los grados de `Rotate` y `Aspect ratio` no son medidas y
+no llevan unidad.
 
 `narrowest`, `natural` y `fit` son anchos: valen en `Width` y en las columnas y filas de un `Grid`. En `Height` no, porque
 `auto` ya es el alto del contenido. Cada propiedad admite solo algunas de estas formas, y su tabla dice cuáles. Cualquier
@@ -27,10 +32,10 @@ Un porcentaje es una parte de otra medida, casi siempre de su contenedor de refe
 - **Altos**: del **alto** del contenedor, que tiene que conocerse antes de maquetar lo de dentro.
 - **`Line height`**: del tamaño de la fuente de la propia caja.
 
-**Un alto que se conoce** es el del área útil de la página, el de una caja con `Height` en puntos (o en porcentaje de otro
-alto que se conoce) y el de algunas cajas que se estiran (un `Overlay` anclado arriba y abajo, una celda de `Grid`). El alto
-de una caja que mide lo que su contenido no se conoce antes de maquetarla, así que un `Height: 50%` dentro de ella es un
-error. Para usar el porcentaje, el contenedor necesita un `Height`.
+**Un alto que se conoce** es el del área útil de la página, el de una caja con `Height` en puntos o en milímetros (o en
+porcentaje de otro alto que se conoce) y el de algunas cajas que se estiran (un `Overlay` anclado arriba y abajo, una
+celda de `Grid`). El alto de una caja que mide lo que su contenido no se conoce antes de maquetarla, así que un
+`Height: 50%` dentro de ella es un error. Para usar el porcentaje, el contenedor necesita un `Height`.
 
 ## Cuatro lados
 

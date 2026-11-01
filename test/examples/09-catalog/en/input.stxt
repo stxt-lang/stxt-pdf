@@ -36,8 +36,8 @@ Document (dev.stxt.pdf):
 		Frame:
 			Id: cover
 			Box:
-				Width: 595
-				Height: 842
+				Width: 210mm
+				Height: 297mm
 				Background: #2B1E15
 			Typography:
 				Color: #FFFFFF

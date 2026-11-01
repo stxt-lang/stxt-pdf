@@ -109,5 +109,6 @@ What several examples have in common and how it is solved:
   paths and gradients and not as pixels. Their text uses the IBM Plex fonts of `fonts/` (the engine substitutes none),
   but it is drawn as outlines: it cannot be selected. The photos and the phone screen (08) are still PNG or JPEG.
 - **Paper has a name**: the A4 documents say `Paper: A4` (and the landscape ones, 10 and 11, also
-  `Orientation: landscape`) instead of writing 595 × 842. The restaurant menu (06) is the only one with a custom size
-  (420 × 700), still written with `Width` and `Height`.
+  `Orientation: landscape`) instead of writing its size. The restaurant menu (06) is the only one with a custom size
+  (420 × 700), still written with `Width` and `Height`. The full-bleed covers of the annual report (04) and of the
+  catalog (09) measure the whole sheet in millimeters: `Width: 210mm` and `Height: 297mm`.

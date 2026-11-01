@@ -5,6 +5,7 @@
 | Syntax | Meaning | Example |
 |---|---|---|
 | Number | Points. Decimal point, never a comma. It can be negative where stated. | `12`, `12.5`, `-30` |
+| Number with `mm` | Millimeters, with the unit attached to the number. Valid wherever a number is, except in `Grow`, `Shrink`, `Rotate` and `Aspect ratio`. | `12mm`, `-4.5mm` |
 | Percentage | Percentage of a base (see [percentage bases](#percentage-bases)). | `50%` |
 | Fraction | A share of the free space, with its weight in front (`*` alone is `1*`). Only in grid tracks. | `*`, `2*`, `2.5*` |
 | `auto` | The engine computes the value from the context. | `auto` |
@@ -17,6 +18,18 @@ Each property accepts only the forms in the *Values* column of its table. Any ot
 `Max width: natural`, `Gap: auto`, a `between()` outside the tracks) is `VALUE_NOT_ALLOWED` and not a silent
 `auto`. Only `Margin`, `Offset` and `Letter spacing` accept negative values. A percentage of a height that is not
 [definite](#definite-height) is an error.
+
+A millimeter is 72 / 25.4 points, about 2.83: the measurement is turned into points when the document is read, and the
+error messages give measurements in points, with their unit (`it measures 600 pt`). Points and millimeters can be mixed,
+also in a single value (`Margin: 20mm 40`). Any other unit (`5cm`, `12pt`, `1in`) and a unit separated from the number
+(`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` (factors), `Rotate` (degrees) and `Aspect ratio` (a proportion) are
+not measurements: a unit in them is also an error.
+
+> **Decision:** a number alone is points and measurements in millimeters carry `mm`: documents written in points stay
+> valid as they are. There is a single extra unit, because millimeters and points cover paper and typography, and each
+> measurement is written in a single way. *Rejected alternative:* `cm`, `in` and an explicit `pt`, which would give two
+> forms to the same measurement (`1cm` and `10mm`, `12` and `12pt`), and a unit per document, which would change the
+> meaning of a number depending on where it is read (also in a separate styles document).
 
 > **Decision:** a fraction is written with an asterisk and its weight: `120 * 2*` gives the third track twice as much of
 > what is left over as the second. *Rejected alternative:* `1fr`, a unit known only to those who have already used it.
@@ -101,7 +114,7 @@ Widths are always known. Heights are not. A vertical percentage is an error (`IN
 a **definite height**, which is decided when the document is read with this fixed rule:
 
 - the page area;
-- that of a box with `Height` in points, or as a percentage of a definite height;
+- that of a box with `Height` in points or millimeters, or as a percentage of a definite height;
 - that of a box with `Height: auto` and `Aspect ratio`;
 - that of an `Overlay` or a `Page overlay` with `Height: auto` stretched between top and bottom;
 - that of a grid item with `Height: auto` stretched in its area (`Vertical: stretch`).

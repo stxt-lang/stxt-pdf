@@ -75,7 +75,7 @@ final class ValueReader {
                     : track(v) || kind(v) == Kind.FRACTION;
             if (!valid) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow " + v + " as a track: it allows "
-                        + "numbers, percentages, fractions (*), auto, narrowest, natural or between(a, b)");
+                        + "lengths, percentages, fractions (*), auto, narrowest, natural or between(a, b)");
             }
             if (isNegative(v)) {
                 throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " does not allow negative tracks: " + p.getText().trim());
@@ -105,7 +105,7 @@ final class ValueReader {
 
     private static String describe(Set<Kind> allowed) {
         return allowed.stream().map(k -> switch (k) {
-            case LENGTH -> "a number or a percentage";
+            case LENGTH -> "a length or a percentage";
             case AUTO -> "auto";
             case INTRINSIC -> "narrowest, natural or fit";
             case FRACTION -> "a fraction";
@@ -223,17 +223,18 @@ final class ValueReader {
     static double points(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p) || p.pt() <= 0) {
-            throw error(n, ErrorCode.PAGE_SIZE, n.getName() + " of the medium must be a positive number of points: "
-                    + n.getText().trim());
+            throw error(n, ErrorCode.PAGE_SIZE, n.getName() + " of the medium must be a positive length in points or "
+                    + "millimeters: " + n.getText().trim());
         }
         return p.pt();
     }
 
-    /** A number of points, positive, zero or negative. */
+    /** A length, positive, zero or negative, in points once read. */
     static double signedPoints(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p)) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a number of points: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a length in points or millimeters: "
+                    + n.getText().trim());
         }
         return p.pt();
     }
@@ -249,9 +250,18 @@ final class ValueReader {
     static double nonNegative(Node n) {
         Value v = parse(n, () -> ValueParser.value(n.getText()));
         if (!(v instanceof Value.Points p) || p.pt() < 0) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a non-negative number: " + n.getText().trim());
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a non-negative length: " + n.getText().trim());
         }
         return p.pt();
+    }
+
+    /** A factor without unit ({@code Grow}, {@code Shrink}): a non-negative number, never a length. */
+    static double factor(Node n) {
+        double v = parse(n, () -> ValueParser.factor(n.getText()));
+        if (v < 0) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " must be a non-negative number: " + n.getText().trim());
+        }
+        return v;
     }
 
     static Sides<Value> nonNegativeSides(Node n, boolean allowsPercentage) {
@@ -261,8 +271,8 @@ final class ValueReader {
                     || (allowsPercentage && v instanceof Value.Percentage q && q.percent() >= 0);
             if (!valid) {
                 throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + (allowsPercentage
-                        ? " only allows non-negative points or percentages"
-                        : " only allows non-negative points"));
+                        ? " only allows non-negative lengths or percentages"
+                        : " only allows non-negative lengths"));
             }
         }
         return sides;
@@ -363,7 +373,7 @@ final class ValueReader {
             boolean valid = (v instanceof Value.Points p && p.pt() >= 0)
                     || (v instanceof Value.Percentage q && q.percent() >= 0);
             if (!valid) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " only allows non-negative points or percentages");
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, n.getName() + " only allows non-negative lengths or percentages");
             }
         }
         return parse(n, () -> Corners.shorthand(list));

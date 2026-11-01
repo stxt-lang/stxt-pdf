@@ -58,7 +58,7 @@ accept `Typography`.
 
 - Without `Width` or `Height`, an image has its **natural size**: each pixel, 0.75 points. An image of 400 × 300 pixels
   measures 300 × 225 points. An SVG measures what its `width` and its `height` (or its `viewBox`) say, and the page of a
-  PDF, what the page measures (an A4, 595 × 842).
+  PDF, what the page measures (an A4, 210 × 297 mm).
 - It does not stretch to the width of the page on its own: if it does not fit, it is an error. To take up the full width,
   `Width: 100%`.
 - With `Width` or `Height`, the other side comes from the proportions of the image. With both, the box has that size and

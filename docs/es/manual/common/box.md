@@ -37,7 +37,7 @@ contenido. El ancho va de fuera adentro y el alto, de dentro afuera.
 ([Valores](values.md#porcentajes)).
 
 **Mínimos y máximos.** Primero se aplica el máximo y luego el mínimo. Un mínimo mayor que el máximo es un error si los dos
-están en las mismas unidades. Si uno es en puntos y otro en porcentaje y chocan al maquetar, gana el mínimo.
+están en las mismas unidades. Si uno es una medida y otro un porcentaje y chocan al maquetar, gana el mínimo.
 
 **Proporción.** Con `Aspect ratio: 16/9` y `Width: 320`, la caja mide 180 de alto. Con `Width` y `Height` a la vez es un
 error, porque la proporción no tendría efecto.

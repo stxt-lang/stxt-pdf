@@ -1,15 +1,16 @@
 # Rotation and named paper (reference/components/document.md, reference/common/layers-and-rotation.md, reference/common/breaks.md and reference/common/overflow.md).
 #
-# Paper: A6 landscape: 420 × 298. Page area of 380 × 258 from (20, 20); it ends at y = 278.
+# Paper: A6 landscape: 148 × 105 mm, 419.53 × 297.64 pt. Page area of 379.53 × 257.64 from (20, 20); it ends at
+# y = 277.64.
 # The rotation of a positioned element only changes the painting: its Rect values are those of the unrotated boxes.
 # A rotated box in flow takes up the rectangle that encloses it: that is its Rect.
-#   tag (Overlay):   Offset 20 0 auto auto, 80 × 20: x = 20 + 380 − 80 = 320, y = 20 + 20 = 40.
-#                     Rotated 45 degrees around its center (360, 50), it is enclosed by a square of
-#                     (80 + 20) × cos 45 = 70.7: from y = 14.6 to 85.4 and from x = 324.6 to 395.4; it fits.
-#   intro:            the first block of the flow, 380 × 150 at (20, 20).
+#   tag (Overlay):   Offset 20 0 auto auto, 80 × 20: x = 20 + 379.53 − 80 = 319.53, y = 20 + 20 = 40.
+#                     Rotated 45 degrees around its center (359.53, 50), it is enclosed by a square of
+#                     (80 + 20) × cos 45 = 70.7: from y = 14.6 to 85.4 and from x = 324.2 to 394.9; it fits.
+#   intro:            the first block of the flow, 379.53 × 150 at (20, 20).
 #   stamp (Frame): 120 × 60 at (20, 170), rotated −8 around its center (80, 200): it is
 #                     enclosed from x = 16.4 to 143.6 and from y = 161.9 to 238.1; it fits.
-#   big (Frame):   rotated 180, it measures 40 + 50 = 90 and on page 1 there remain 278 − 230 = 48. Unrotated
+#   big (Frame):   rotated 180, it measures 40 + 50 = 90 and on page 1 there remain 277.64 − 230 = 47.64. Unrotated
 #                     it would be split between b1 (40, which fits) and b2; rotated it is not split and moves whole to
 #                     page 2: (20, 20), with b1 at y = 20 and b2 at y = 60.
 #   badge (Image):    test/square.png, 30 × 30, rotated 45 around its center: in flow after big, it takes up the

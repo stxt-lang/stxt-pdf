@@ -92,7 +92,8 @@ Document (dev.stxt.pdf):
 
 **How it is laid out:**
 
-- **Page area:** `Paper: A4` measures 595 × 842, so 595 − 2·40 = **515 pt** of width and 842 − 2·40 = **762 pt** of height remain, from
+- **Page area:** `Paper: A4` measures 210 × 297 mm, 595.28 × 841.89 pt, so 595.28 − 2·40 = **515.28 pt** of width and
+  841.89 − 2·40 = **761.89 pt** of height remain, from
   (40, 40).
 - **Fonts:** the `For element: Document` rule declares `Font` and `Size`, which all boxes inherit.
 - **Rules** ([Styles](styles.md)): `For element: Page overlay` gives the header and the footer a height of 20 and a size of 8,
@@ -101,20 +102,20 @@ Document (dev.stxt.pdf):
   aligned with their own `Align`, and the `panel` style of `side`, to the left. The `For id: title` rule carries all the
   style of the title, which in the document only declares its text and its `Id`. The result is the same as if each element
   declared those properties.
-- **`header`** (`Page overlay`): left and right 0 with `auto` width, so it stretches to 515 pt.
+- **`header`** (`Page overlay`): left and right 0 with `auto` width, so it stretches to 515.28 pt.
   Top −30 places it at y = 40 − 30 = **10**, inside the top margin. It is repeated on each
   page.
-- **`footer`** (`Page overlay`): bottom −30 with height 20 gives top = 762 + 30 − 20 = 772, that is,
-  y = 40 + 772 = **812**, inside the bottom margin. `{page}` and `{pages}` are replaced
+- **`footer`** (`Page overlay`): bottom −30 with height 20 gives top = 761.89 + 30 − 20 = 771.89, that is,
+  y = 40 + 771.89 = **811.89**, inside the bottom margin. `{page}` and `{pages}` are replaced
   on each page.
 - **`title`**: first in-flow element, at y = **40**, with a 24 pt line. Its bottom
   margin leaves the body at y = 40 + 24 + 16 = **80**. With `Keep with next: true` in its `Break`, it is never left
   alone at the end of a page.
-- **`body`** (`Grid`): 515 − 20 of gap = 495 for tracks. The fixed column measures **150** and the
-  fraction receives **345**. The two `Area` elements have no value and are placed automatically, one in
+- **`body`** (`Grid`): 515.28 − 20 of gap = 495.28 for tracks. The fixed column measures **150** and the
+  fraction receives **345.28**. The two `Area` elements have no value and are placed automatically, one in
   each column: `side` starts at x = 40 and `main` at x = 40 + 150 + 20 = **210**. `side` is not
   split (`Keep together: true`). `main` can be split across pages respecting widows and
   orphans (2 by default).
 - **`stamp`** (`Overlay`): there is no positioned ancestor, so its reference container is the
   page area. Top 0 and right 0 with width 80 anchor it to the top right corner:
-  x = 40 + 515 − 80 = **475**, y = **40**. With `Layer: 1` it is painted above the title.
+  x = 40 + 515.28 − 80 = **475.28**, y = **40**. With `Layer: 1` it is painted above the title.

@@ -24,6 +24,39 @@ class ValueParserTest {
     }
 
     @Test
+    void millimetersAreConvertedToPoints() {
+        assertEquals(72, ((Value.Points) ValueParser.value("25.4mm")).pt(), 1e-9);
+        assertEquals(595.2756, ((Value.Points) ValueParser.value("210mm")).pt(), 1e-4);
+        assertEquals(-14.1732, ((Value.Points) ValueParser.value("-5mm")).pt(), 1e-4);
+        assertEquals(new Value.Points(0), ValueParser.value("0mm"));
+        List<Value> margin = ValueParser.list("10mm 12");
+        assertEquals(28.3465, ((Value.Points) margin.get(0)).pt(), 1e-4);
+        assertEquals(new Value.Points(12), margin.get(1));
+        Value between = ValueParser.value("between(20mm, *)");
+        assertEquals(new Value.Between(Value.mm(20), new Value.Fraction(1)), between);
+    }
+
+    @Test
+    void theUnitGoesAttachedToTheNumber() {
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("12 mm"));
+        // In a list the space separates values: "mm" alone is not a value.
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ValueParser.list("10 mm"));
+        assertTrue(ex.getMessage().contains("attached"), ex.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("mm"));
+    }
+
+    @Test
+    void otherUnitsAreInvalid() {
+        for (String text : List.of("1cm", "12pt", "1in", "12MM", "12px")) {
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> ValueParser.value(text));
+            assertTrue(ex.getMessage().contains("12mm"), ex.getMessage());
+        }
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("5mm%"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("2mm*"));
+        assertThrows(IllegalArgumentException.class, () -> ValueParser.value("12,5mm"));
+    }
+
+    @Test
     void decimalCommaIsInvalid() {
         assertThrows(IllegalArgumentException.class, () -> ValueParser.value("12,5"));
     }

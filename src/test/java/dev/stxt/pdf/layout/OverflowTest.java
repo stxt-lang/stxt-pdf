@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Overflows (reference/common/overflow.md): the culprit that {@link Overflow} points to and the measurements in its
  * message. The error catalog checks the code and the line of each case; these tests, with {@code FixedMetrics}
- * (each character measures 5 with {@code Size: 10} and a line 12), check what the catalog does not: which box is
+ * (each character measures 5 pt with {@code Size: 10} and a line 12), check what the catalog does not: which box is
  * named and which measurements the message gives (mutation testing).
  */
 class OverflowTest {
@@ -40,7 +40,7 @@ class OverflowTest {
     }
 
     /**
-     * R, an item that does not shrink, measures 600 and overflows; it does not declare a width, so the search goes down
+     * R, an item that does not shrink, measures 600 pt and overflows; it does not declare a width, so the search goes down
      * to what overflows the page: S, from the content of R (border 4 and padding 6) and its margin of 4, spans from 14
      * to 517 in an area of 515.
      */
@@ -52,7 +52,7 @@ class OverflowTest {
                 "\t\t\t\tBlock:", "\t\t\t\t\tId: S", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 503", "\t\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\t\tMargin: 0 0 0 4")));
         assertContains("Box S (line", e);
-        assertContains("does not fit in width: it measures 503 and the content of its container measures 515", e);
+        assertContains("does not fit in width: it measures 503 pt and the content of its container measures 515 pt", e);
     }
 
     /** If what is inside does not overflow the page, the culprit is the box that overflows (S, from 14 to 507). */
@@ -64,7 +64,7 @@ class OverflowTest {
                 "\t\t\t\tBlock:", "\t\t\t\t\tId: S", "\t\t\t\t\tBox:", "\t\t\t\t\t\tWidth: 493", "\t\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\t\tMargin: 0 0 0 4")));
         assertContains("Box R (line", e);
-        assertContains("measures 600 and the content of its container measures 515", e);
+        assertContains("measures 600 pt and the content of its container measures 515 pt", e);
     }
 
     @Test
@@ -73,7 +73,7 @@ class OverflowTest {
         InvalidModelException text = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tText: aaaa bbbb cccc", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 20")));
         assertContains("The content of box T (line", text);
-        assertContains("its text reaches 24 and the box leaves 20", text);
+        assertContains("its text reaches 24 pt and the box leaves 20 pt", text);
         // C, of 30 after a block of 5, in a box of 20: it reaches 35.
         InvalidModelException child = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tBlock:", "\t\tId: H", "\t\tBox:", "\t\t\tHeight: 20",
@@ -81,7 +81,7 @@ class OverflowTest {
                         "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30")));
         assertContains("The content of box H (line", child);
         assertContains("box C (line", child);
-        assertContains("reaches 35 and the box leaves 20", child);
+        assertContains("reaches 35 pt and the box leaves 20 pt", child);
     }
 
     /**
@@ -94,7 +94,7 @@ class OverflowTest {
                 () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tBorder: 3", "\t\t\tPadding: 7",
                         "\t\tText: a", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tLine height: 120")));
         assertContains("Box T (line", e);
-        assertContains("is 120 high and extends 30 beyond the page area", e);
+        assertContains("is 120 pt high and extends 30 pt beyond the page area", e);
         assertEquals(boxLine("T", e) + 3, e.line());
     }
 
@@ -103,7 +103,7 @@ class OverflowTest {
     void pageOverflowOfTheBorderAndPadding() {
         InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tBorder: 30", "\t\t\tPadding: 30")));
-        assertContains("is 120 high and extends 20 beyond the page area", e);
+        assertContains("is 120 pt high and extends 20 pt beyond the page area", e);
         assertEquals(boxLine("B", e) + 4, e.line());
         InvalidModelException border = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOutPaged(PAGE, "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tBorder: 40", "\t\t\tPadding: 20")));
@@ -115,8 +115,8 @@ class OverflowTest {
         InvalidModelException e = overflow(ErrorCode.PAGE_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOutPaged(PAGE, "\tFrame:", "\t\tId: R", "\t\tRotate: 180", "\t\tBox:", "\t\t\tHeight: 120")));
         assertContains("Box R (line", e);
-        assertContains("is rotated, so it is not broken across pages, and it does not fit on one: it is 120 high and "
-                + "extends 20 beyond the page area", e);
+        assertContains("is rotated, so it is not broken across pages, and it does not fit on one: it is 120 pt high and "
+                + "extends 20 pt beyond the page area", e);
     }
 
     @Test
@@ -140,7 +140,7 @@ class OverflowTest {
         InvalidModelException e = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tPreformatted: true")));
         assertContains("A line of a text with Preformatted: true", e);
-        assertContains("the line measures 595 and the box leaves 515", e);
+        assertContains("the line measures 595 pt and the box leaves 515 pt", e);
     }
 
     /** Negative margins leave the border box outside its container, but not the margin box: it does not overflow. */
@@ -164,7 +164,7 @@ class OverflowTest {
                 "\t\t\t\tFrame:", "\t\t\t\t\tId: S", "\t\t\t\t\tOffset: auto auto auto 60", "\t\t\t\t\tBox:",
                 "\t\t\t\t\t\tWidth: 460", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tMargin: 0 0 0 4")));
         assertContains("Box R (line", e);
-        assertContains("measures 600 and the content of its container measures 495", e);
+        assertContains("measures 600 pt and the content of its container measures 495 pt", e);
     }
 
     /** P starts 10 lower (its margin): the line of 120 ends at 10 + 10 + 120 = 140, 40 beyond. */
@@ -175,7 +175,7 @@ class OverflowTest {
                         "\t\t\tMargin: 10 0 0 0",
                         "\t\tText: a", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tLine height: 120")));
         assertContains("Box T (line", e);
-        assertContains("extends 40 beyond the page area", e);
+        assertContains("extends 40 pt beyond the page area", e);
     }
 
     /**
@@ -190,7 +190,7 @@ class OverflowTest {
                         "\t\tFrame:", "\t\t\tOffset: 8 auto auto auto",
                         "\t\t\tText: a", "\t\t\t\tId: T", "\t\t\t\tTypography:", "\t\t\t\t\tLine height: 120")));
         assertContains("Box T (line", e);
-        assertContains("extends 30 beyond the page area", e);
+        assertContains("extends 30 pt beyond the page area", e);
     }
 
     @Test
@@ -198,12 +198,12 @@ class OverflowTest {
         // 50 − 2 − 2 − 8 − 8 = 30 for the word of 35.
         InvalidModelException wide = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tText: aaaaaaa", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tBorder: 2", "\t\t\tPadding: 0 8")));
-        assertContains("the line measures 35 and the box leaves 30", wide);
+        assertContains("the line measures 35 pt and the box leaves 30 pt", wide);
         // Two lines (24) in 30 − 2 − 2 − 5 − 5 = 16.
         InvalidModelException tall = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class,
                 () -> layOut("\tText: aaaa bbbb cccc", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50", "\t\t\tHeight: 30",
                         "\t\t\tBorder: 2", "\t\t\tPadding: 5 0")));
-        assertContains("its text reaches 24 and the box leaves 16", tall);
+        assertContains("its text reaches 24 pt and the box leaves 16 pt", tall);
     }
 
     @Test
@@ -214,6 +214,6 @@ class OverflowTest {
                 "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 60",
                 "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b",
                 "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 50"));
-        assertContains("measure 110 and leave no room for the body", e);
+        assertContains("measure 110 pt and leave no room for the body", e);
     }
 }
