@@ -56,6 +56,7 @@ dark brown modules inside a frame.)
 | `Content` | `>>` block | none | The data of several lines, with the lines as they are. Either the value or `Content`, one of the two. |
 | `Format` | `qr`, `code-128`, `ean-13` | `qr` | The kind of code ([Formats](#formats)). |
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Only in a QR code: the part of the modules that can be damaged while the code can still be read, 7 %, 15 %, 25 % and 30 %. In another format it is an error. |
+| `Quiet zone` | integer from 0 to 40 | that of the format | The light modules on each side of the code ([The modules](#the-modules)). |
 | `Alt` | non-empty text | required | What it is and where it leads, for whoever cannot see it ([Accessibility](#accessibility)). |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates it about its center, like an `Image`. |
 | `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
@@ -98,6 +99,24 @@ margin that the reader needs around the code. It is part of the content box.
 | `code-128` | 10 modules on each side | 0.33 mm wide; the bars, 22.85 mm high |
 | `ean-13` | 11 modules on the left and 7 on the right | 0.33 mm wide; the bars, 22.85 mm high |
 
+Those zones are the ones of each standard, and they apply if no other is declared. `Quiet zone: N` puts `N` light modules
+on each side, in the three formats (in an EAN-13, the same on the left and on the right), from 0 to 40; outside that
+range it is `VALUE_NOT_ALLOWED`. As the zone is part of the natural size, in a box of a given width fewer modules of zone
+give wider modules: a Code 128 150 points wide with `Quiet zone: 5` has wider bars than with the 10 of the standard. With
+`Quiet zone: 0`, the code reaches the edge of the content box, and the light margin has to come from the `Padding` with a
+light background or from whatever is around. A zone smaller than that of the standard can prevent some readers from
+reading it: the engine does not check it.
+
+> **Decision:** `Quiet zone` counts modules, not millimeters, and works the same in the three formats. The standards give
+> it in modules, and so the zone scales with the code. *Rejected alternative:* a length (`Quiet zone: 2mm`), which with the
+> same value would give a different zone depending on the width of the box, and a property only for Code 128, which would
+> leave the QR code and the EAN-13 without the same possibility.
+
+> **Decision:** a zone smaller than that of the standard is accepted, without a warning. Many readers read with less
+> (ZXing, when it draws a Code 128, leaves 5 modules on each side), and whoever prints the code is who knows what reads it.
+> *Rejected alternative:* a minimum per format, which would prevent reproducing documents that are already printed with a
+> smaller zone.
+
 The dark modules are painted in the `Color` of the typography, its own or inherited (black if nobody declares it), and the
 light ones are not painted: the background of the box (`Background`) shows or, without it, whatever is behind. Of its
 `Typography`, a `Barcode` only accepts `Color`: any other property is `BARCODE_PROPERTY_WITHOUT_EFFECT`. What a rule of
@@ -115,8 +134,8 @@ for text): a light code on a light background cannot be read.
 
 ## Size
 
-A `Barcode` is sized like an [`Image`](image.md#sizing) whose natural size is that of its modules, with the quiet zone:
-a QR code of 25 modules (33 with the zone) measures 16.5 × 16.5 mm, and an EAN-13 (113 modules), 37.29 × 22.85 mm. With
+A `Barcode` is sized like an [`Image`](image.md#sizing) whose natural size is that of its modules, with the quiet zone
+(that of the standard or that of `Quiet zone`): a QR code of 25 modules (33 with the zone) measures 16.5 × 16.5 mm, and an EAN-13 (113 modules), 37.29 × 22.85 mm. With
 `Width` or `Height`, the other side follows from that aspect ratio, and `Aspect ratio`, if declared, replaces it. The
 intrinsic sizes are those of an image.
 
@@ -165,6 +184,7 @@ print resolution. The same data in the same format always gives the same modules
 
 - Other formats: Data Matrix, PDF417, Aztec, Code 39, EAN-8, UPC-A, or the function characters of GS1-128.
 - The human-readable text under the bars of an EAN-13 or a Code 128: it goes in a `Text`.
-- Choosing the version or the mask of the QR code, or the size of the quiet zone.
+- Choosing the version or the mask of the QR code.
+- A different quiet zone on each side: `Quiet zone` is the same on both.
 - A logo in the center of a QR code.
 - Checking the contrast of the modules with the background.

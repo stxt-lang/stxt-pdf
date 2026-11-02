@@ -165,6 +165,7 @@ class SchemaCoverageTest {
             // Barcode
             Map.entry("Format", "Format: qr"),
             Map.entry("Error correction", "Error correction: high"),
+            Map.entry("Quiet zone", "Quiet zone: 5"),
             // Styles
             Map.entry("Named color", "Named color: brand #12315A"));
 

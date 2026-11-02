@@ -56,6 +56,7 @@ marrón oscuro dentro de un marco.)
 | `Content` | bloque `>>` | sin valor | Los datos de varias líneas, con las líneas tal cual. O el valor o `Content`, uno de los dos. |
 | `Format` | `qr`, `code-128`, `ean-13` | `qr` | El tipo de código ([Formatos](#formatos)). |
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Solo en un QR: la parte de los módulos que puede estropearse y el código sigue leyéndose, un 7 %, 15 %, 25 % y 30 %. En otro formato es un error. |
+| `Quiet zone` | entero de 0 a 40 | la del formato | Los módulos claros a cada lado del código ([Los módulos](#los-módulos)). |
 | `Alt` | texto no vacío | obligatorio | Qué es y adónde lleva, para quien no lo ve ([Accesibilidad](#accesibilidad)). |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Lo gira sobre su centro, como una `Image`. |
 | `Side` | `left`, `right` | sin valor | Lo hace una caja lateral, como una `Image`: el texto que lo sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
@@ -97,6 +98,24 @@ claro que el lector necesita alrededor del código. Es parte de la caja de conte
 | `code-128` | 10 módulos a cada lado | 0,33 mm de ancho; las barras, 22,85 mm de alto |
 | `ean-13` | 11 módulos a la izquierda y 7 a la derecha | 0,33 mm de ancho; las barras, 22,85 mm de alto |
 
+Esas zonas son las de cada norma, y valen si no se declara otra. `Quiet zone: N` pone `N` módulos claros a cada lado, en
+los tres formatos (en un EAN-13, los mismos a la izquierda y a la derecha), de 0 a 40; fuera de ese intervalo es
+`VALUE_NOT_ALLOWED`. Como la zona es parte del tamaño natural, en una caja de ancho dado menos módulos de zona dan módulos
+más anchos: un Code 128 de 150 puntos de ancho con `Quiet zone: 5` tiene las barras más anchas que con los 10 de la
+norma. Con `Quiet zone: 0`, el código llega al borde de la caja de contenido, y el margen claro tiene que darlo el
+`Padding` con un fondo claro o lo que haya alrededor. Una zona menor que la de la norma puede impedir la lectura con
+algunos lectores: el motor no lo comprueba.
+
+> **Decisión:** `Quiet zone` cuenta módulos, no milímetros, y vale lo mismo en los tres formatos. Las normas la dan en
+> módulos, y así la zona se escala con el código. *Alternativa descartada:* una longitud (`Quiet zone: 2mm`), que con el
+> mismo valor daría una zona distinta según el ancho de la caja, y una propiedad solo para el Code 128, que dejaría el QR
+> y el EAN-13 sin la misma posibilidad.
+
+> **Decisión:** se admite una zona menor que la de la norma, sin aviso. Muchos lectores leen con menos (ZXing, al
+> dibujar un Code 128, deja 5 módulos a cada lado), y quien imprime el código es quien sabe con qué se lee.
+> *Alternativa descartada:* un mínimo por formato, que impediría reproducir documentos que ya se imprimen con una zona
+> menor.
+
 Los módulos oscuros se pintan del `Color` de la tipografía, el suyo o el heredado (negro si nadie lo declara), y los claros
 no se pintan: se ve el fondo de la caja (`Background`) o, sin él, lo que haya detrás. De su `Typography`, un `Barcode`
 solo admite `Color`: cualquier otra propiedad es `BARCODE_PROPERTY_WITHOUT_EFFECT`. Lo que dé una regla de `Styles` no se
@@ -115,7 +134,7 @@ un código claro sobre un fondo claro no se lee.
 ## Tamaño
 
 Un `Barcode` se dimensiona como una [`Image`](image.md#dimensionado) cuyo tamaño natural es el de sus módulos, con la zona
-de silencio: un QR de 25 módulos (33 con la zona) mide 16,5 × 16,5 mm, y un EAN-13 (113 módulos), 37,29 × 22,85 mm. Con
+de silencio (la de la norma o la de `Quiet zone`): un QR de 25 módulos (33 con la zona) mide 16,5 × 16,5 mm, y un EAN-13 (113 módulos), 37,29 × 22,85 mm. Con
 `Width` o `Height`, el otro lado sale de esa proporción, y `Aspect ratio`, si se declara, la sustituye. Los tamaños
 intrínsecos son los de una imagen.
 
@@ -164,6 +183,7 @@ el mismo PDF.
 
 - Otros formatos: Data Matrix, PDF417, Aztec, Code 39, EAN-8, UPC-A, ni los caracteres de función de GS1-128.
 - El texto legible bajo las barras de un EAN-13 o un Code 128: va en un `Text`.
-- Elegir la versión o la máscara del QR, o el tamaño de la zona de silencio.
+- Elegir la versión o la máscara del QR.
+- Una zona de silencio distinta a cada lado: `Quiet zone` es la misma en los dos.
 - Un logotipo en el centro de un QR.
 - Comprobar el contraste de los módulos con el fondo.

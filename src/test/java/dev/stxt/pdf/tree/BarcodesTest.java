@@ -172,6 +172,50 @@ class BarcodesTest {
     }
 
     @Test
+    void quietZoneReplacesThatOfTheFormat() throws Exception {
+        Modules standard = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tFormat: code-128");
+        Modules narrow = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tFormat: code-128",
+                "\t\tQuiet zone: 5");
+        assertEquals(standard.columns() - 10, narrow.columns());
+        for (int q = 0; q < 5; q++) {
+            assertFalse(narrow.isDark(q, 0));
+            assertFalse(narrow.isDark(narrow.columns() - 1 - q, 0));
+        }
+        assertTrue(narrow.isDark(5, 0));
+        assertEquals("STXT-2026-0042", new Code128Reader().decodeRow(0, row(narrow), Map.of()).getText());
+        assertEquals(narrow.columns() * Barcodes.LINEAR_MODULE, narrow.naturalWidth(), 1e-9);
+
+        // In an EAN-13 the same number goes on both sides.
+        Modules ean = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13",
+                "\t\tQuiet zone: 5");
+        assertEquals(105, ean.columns());
+        assertTrue(ean.isDark(5, 0));
+        assertTrue(ean.isDark(99, 0));
+        assertFalse(ean.isDark(100, 0));
+        assertEquals("8412345678905", new EAN13Reader().decodeRow(0, row(ean), Map.of()).getText());
+
+        // A QR code without quiet zone starts with its finder pattern.
+        Modules qr = modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace", "\t\tQuiet zone: 0");
+        assertEquals(25, qr.columns());
+        assertEquals(25, qr.rows());
+        assertTrue(qr.isDark(0, 0));
+        assertTrue(qr.isDark(24, 0));
+        assertTrue(qr.isDark(0, 24));
+    }
+
+    @Test
+    void quietZoneOutOfRange() {
+        InvalidModelException wide = error("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tFormat: code-128",
+                "\t\tQuiet zone: 41");
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, wide.errorCode());
+        assertTrue(wide.getMessage().contains("Quiet zone allows from 0 to 40 modules: 41"), wide.getMessage());
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, error("\tBarcode: STXT", "\t\tAlt: Referencia",
+                "\t\tQuiet zone: -1").errorCode());
+        assertEquals(40 * 2 + 25, modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace", "\t\tQuiet zone: 40")
+                .columns());
+    }
+
+    @Test
     void checkDigit() {
         assertEquals(5, Barcodes.checkDigit("841234567890"));
         assertEquals(1, Barcodes.checkDigit("400638133393"));

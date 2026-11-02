@@ -1,0 +1,14 @@
+# Case: Quiet zone wider than 40 modules
+# Code: VALUE_NOT_ALLOWED
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: AL-2025-0388
+			Alt: Código de barras del albarán
+			Format: code-128
+			Quiet zone: 60

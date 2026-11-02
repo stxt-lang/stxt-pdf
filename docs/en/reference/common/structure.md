@@ -211,7 +211,7 @@ once, and the elements, as many times as needed.
 | `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate`, `Side`, `Clear` |
-| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Format`, `Error correction`, `Rotate`, `Side`, `Clear`, `Content` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |

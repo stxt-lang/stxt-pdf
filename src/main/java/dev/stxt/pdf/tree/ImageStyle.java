@@ -7,7 +7,7 @@ import dev.stxt.pdf.model.Fit;
 /**
  * The properties of the images: of an {@code Image} (reference/components/image.md), the alternative text, how it
  * fills its box and the page of a PDF; of a {@code Barcode} (reference/components/barcode.md), the alternative text,
- * its format and its error correction. They are not inherited.
+ * its format, its error correction and its quiet zone. They are not inherited.
  */
 public final class ImageStyle extends StyleGroup {
 
@@ -18,6 +18,8 @@ public final class ImageStyle extends StyleGroup {
     private int pdfPage = 1;
     private BarcodeFormat format = BarcodeFormat.QR;
     private ErrorCorrection errorCorrection = ErrorCorrection.MEDIUM;
+    /** Quiet zone of a {@code Barcode}, in modules on each side; {@code null} = that of its format. */
+    private Integer quietZone;
 
     ImageStyle() {
     }
@@ -68,5 +70,15 @@ public final class ImageStyle extends StyleGroup {
     void setErrorCorrection(ErrorCorrection v) {
         writable();
         errorCorrection = v;
+    }
+
+    /** The quiet zone of a {@code Barcode}, in modules on each side; {@code null} if it is not declared. */
+    public Integer quietZone() {
+        return quietZone;
+    }
+
+    void setQuietZone(int v) {
+        writable();
+        quietZone = v;
     }
 }

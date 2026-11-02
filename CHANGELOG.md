@@ -7,6 +7,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Quiet zone of a barcode.** New optional `Quiet zone` in `Barcode`: the light modules on each side of the code, from 0
+  to 40 (`VALUE_NOT_ALLOWED` outside that range), in the three formats; in an EAN-13 the same number goes on the left
+  and on the right. Without it, the zones of the standards stay (4 modules in a QR code, 10 in a Code 128, 11 and 7 in
+  an EAN-13), so no document changes. The zone is part of the natural size: in a box of a given width, fewer modules of
+  zone give wider modules. A zone smaller than that of the standard is accepted without a warning.
+  `ImageStyle.quietZone()` gives the declared one, or `null`.
 - **Table columns sized by their content.** The columns of a `Table` share the free space in proportion to their
   content instead of in equal parts: what is left over after the `auto` columns reach their natural width goes to them
   in proportion to that width (with `auto auto`, a column of long texts takes more than one of short labels), and when

@@ -52,6 +52,7 @@ Document (dev.stxt.pdf):
 | *(valor)* | Los datos: una dirección, una referencia, un número. Si tienen varias líneas, van en un bloque `Content >>` |
 | `Format` | `qr` (por defecto), un código QR; `code-128`, un código de barras de letras, cifras y signos; `ean-13`, el código de barras de los productos |
 | `Error correction` | Solo en un QR: cuánto puede estropearse y seguir leyéndose. `low`, `medium` (por defecto), `quartile` o `high`. Cuanto más alto, más módulos para los mismos datos |
+| `Quiet zone` | Los módulos en blanco a cada lado del código, de 0 a 40. Por defecto, los de la norma de cada formato ([El tamaño](#el-tamaño)) |
 | `Alt` | Lo que es y adónde lleva, para quien no lo ve. Obligatorio |
 | `Rotate` | Girarlo sobre su centro, como una imagen ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
 
@@ -94,7 +95,11 @@ Barcode:
 
 - Sin `Width` ni `Height`, mide su **tamaño natural**, el de sus módulos: 0,5 mm cada módulo de un QR, y 0,33 mm de ancho
   por 22,85 mm de alto las barras de un Code 128 o un EAN-13. El margen en blanco que el lector necesita alrededor (la
-  zona de silencio) va incluido.
+  zona de silencio) va incluido: 4 módulos a cada lado en un QR, 10 en un Code 128, y 11 a la izquierda y 7 a la derecha
+  en un EAN-13.
+- `Quiet zone` cambia esa zona por otro número de módulos a cada lado. En una caja del mismo ancho, menos zona deja más
+  sitio a las barras, que salen más anchas: `Quiet zone: 5` en un Code 128 es lo que dejan muchos generadores de
+  códigos. Con menos zona que la norma, algunos lectores pueden no leerlo.
 - Con `Width` o `Height`, el otro lado sale de la proporción, como en una imagen. Lo habitual es dar solo `Width`.
 - Un QR es siempre cuadrado: en una caja que no lo es, se dibuja lo más grande que cabe, centrado. Un código de barras se
   estira a la caja: con `Width` y `Height`, las barras ocupan todo el alto.

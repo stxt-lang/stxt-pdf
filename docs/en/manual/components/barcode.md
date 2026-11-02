@@ -52,6 +52,7 @@ Document (dev.stxt.pdf):
 | *(value)* | The data: an address, a reference, a number. If it has several lines, it goes in a `Content >>` block |
 | `Format` | `qr` (by default), a QR code; `code-128`, a barcode of letters, digits and signs; `ean-13`, the barcode of products |
 | `Error correction` | Only in a QR code: how much of it can be damaged and still be read. `low`, `medium` (by default), `quartile` or `high`. The higher it is, the more modules for the same data |
+| `Quiet zone` | The blank modules on each side of the code, from 0 to 40. By default, those of the standard of each format ([The size](#the-size)) |
 | `Alt` | What it is and where it leads, for whoever cannot see it. Required |
 | `Rotate` | Rotating it about its center, like an image ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
 
@@ -95,7 +96,11 @@ Barcode:
 
 - Without `Width` or `Height`, it measures its **natural size**, that of its modules: 0.5 mm each module of a QR code,
   and 0.33 mm wide by 22.85 mm high the bars of a Code 128 or an EAN-13. The blank margin that the reader needs around it
-  (the quiet zone) is included.
+  (the quiet zone) is included: 4 modules on each side in a QR code, 10 in a Code 128, and 11 on the left and 7 on the
+  right in an EAN-13.
+- `Quiet zone` replaces that zone with another number of modules on each side. In a box of the same width, less zone
+  leaves more room for the bars, which come out wider: `Quiet zone: 5` in a Code 128 is what many barcode generators
+  leave. With less zone than the standard, some readers may not read it.
 - With `Width` or `Height`, the other side follows from the aspect ratio, as in an image. The usual thing is to give only
   `Width`.
 - A QR code is always square: in a box that is not, it is drawn as large as it fits, centered. A barcode is stretched to

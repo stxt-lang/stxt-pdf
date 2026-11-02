@@ -964,7 +964,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Barcode
 		Type: INLINE
-		Description: QR code or barcode that the engine generates from its data, in the Format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
+		Description: QR code or barcode that the engine generates from its data, in the Format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone (Quiet zone) included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
 		Children:
 			Child: Id
 				Max: 1
@@ -983,6 +983,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Format
 				Max: 1
 			Child: Error correction
+				Max: 1
+			Child: Quiet zone
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -1596,6 +1598,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: medium
 			Value: quartile
 			Value: high
+	Node: Quiet zone
+		Type: INTEGER
+		Description: Light modules on each side of a Barcode, which the reader needs around the code, from 0 to 40. By default, those of its standard: 4 in a QR code, 10 in a Code 128, and 11 on the left and 7 on the right in an EAN-13. They are part of its natural size, so in a box of a given size fewer modules of quiet zone give wider modules.
 
 	# Markdown
 

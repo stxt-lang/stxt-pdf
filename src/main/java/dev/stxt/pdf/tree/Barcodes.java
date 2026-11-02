@@ -36,6 +36,8 @@ import static dev.stxt.pdf.tree.Nodes.error;
  *       EAN-13).</li>
  * </ul>
  *
+ * <p>{@code Quiet zone} replaces the quiet zone of the format with that number of modules on each side.</p>
+ *
  * <p>It is deterministic: the same data in the same format gives the same modules, and so the same PDF.</p>
  */
 final class Barcodes implements ImageGenerator {
@@ -50,6 +52,17 @@ final class Barcodes implements ImageGenerator {
     static final double LINEAR_MODULE = 0.33 * Value.POINTS_PER_MM;
     /** Natural height of the bars of a one-dimensional barcode: 22.85 mm, the nominal one of EAN-13. */
     static final double LINEAR_HEIGHT = 22.85 * Value.POINTS_PER_MM;
+    /** Quiet zone of a Code 128, in modules, on each side. */
+    static final int CODE_128_QUIET_ZONE = 10;
+    /** Quiet zone of an EAN-13, in modules, on the left. */
+    static final int EAN_13_QUIET_ZONE_LEFT = 11;
+    /** Quiet zone of an EAN-13, in modules, on the right. */
+    static final int EAN_13_QUIET_ZONE_RIGHT = 7;
+    /**
+     * Most modules of a declared {@code Quiet zone} on each side: more than the widest one of the standards (the
+     * 6.35 mm of a Code 128, about 20 modules of 0.33 mm). A wider light margin is {@code Padding}.
+     */
+    static final int MAX_QUIET_ZONE = 40;
     /** Most characters of a Code 128, as in ZXing. */
     static final int CODE_128_MAX = 80;
 
@@ -59,10 +72,12 @@ final class Barcodes implements ImageGenerator {
     @Override
     public Modules generate(InlineNode n, Style s) {
         String data = data(n);
+        Integer quiet = s.image().quietZone();
         return switch (s.image().format()) {
-            case QR -> qr(n, data, s.image().errorCorrection());
-            case CODE_128 -> code128(n, data);
-            case EAN_13 -> ean13(n, data);
+            case QR -> qr(n, data, s.image().errorCorrection(), quiet == null ? QR_QUIET_ZONE : quiet);
+            case CODE_128 -> code128(n, data, quiet == null ? CODE_128_QUIET_ZONE : quiet);
+            case EAN_13 -> ean13(n, data, quiet == null ? EAN_13_QUIET_ZONE_LEFT : quiet,
+                    quiet == null ? EAN_13_QUIET_ZONE_RIGHT : quiet);
         };
     }
 
@@ -85,7 +100,7 @@ final class Barcodes implements ImageGenerator {
         return data;
     }
 
-    private static Modules qr(InlineNode n, String data, ErrorCorrection correction) {
+    private static Modules qr(InlineNode n, String data, ErrorCorrection correction, int quiet) {
         boolean ascii = data.chars().allMatch(c -> c < 0x80);
         Map<EncodeHintType, Object> hints = ascii ? Map.of() : Map.of(EncodeHintType.CHARACTER_SET, "UTF-8");
         ByteMatrix matrix;
@@ -98,19 +113,19 @@ final class Barcodes implements ImageGenerator {
                     + "QR code with Error correction: " + correction.name().toLowerCase(Locale.ROOT) + ": it has to be "
                     + "shorter" + (correction == ErrorCorrection.LOW ? "" : ", or Error correction lower"));
         }
-        int side = matrix.getWidth() + 2 * QR_QUIET_ZONE;
+        int side = matrix.getWidth() + 2 * quiet;
         BitSet dark = new BitSet();
         for (int y = 0; y < matrix.getHeight(); y++) {
             for (int x = 0; x < matrix.getWidth(); x++) {
                 if (matrix.get(x, y) == 1) {
-                    dark.set((y + QR_QUIET_ZONE) * side + x + QR_QUIET_ZONE);
+                    dark.set((y + quiet) * side + x + quiet);
                 }
             }
         }
         return new Modules(side, side, dark, QR_MODULE, QR_MODULE);
     }
 
-    private static Modules code128(InlineNode n, String data) {
+    private static Modules code128(InlineNode n, String data, int quiet) {
         for (int i = 0; i < data.length(); i++) {
             char c = data.charAt(i);
             if (c < 0x20 || c > 0x7E) {
@@ -122,10 +137,10 @@ final class Barcodes implements ImageGenerator {
             throw error(n, ErrorCode.BARCODE_DATA, "The data of the Barcode has " + data.length() + " characters and a "
                     + "Code 128 holds at most " + CODE_128_MAX + ": a QR code holds more");
         }
-        return linear(new Code128Writer().encode(data), 10, 10);
+        return linear(new Code128Writer().encode(data), quiet, quiet);
     }
 
-    private static Modules ean13(InlineNode n, String data) {
+    private static Modules ean13(InlineNode n, String data, int left, int right) {
         if (!data.matches("[0-9]{12,13}")) {
             throw error(n, ErrorCode.BARCODE_DATA, "An EAN-13 is 12 digits, to which the check digit is added, or 13 "
                     + "with the check digit, and the data of the Barcode is " + data);
@@ -135,7 +150,7 @@ final class Barcodes implements ImageGenerator {
             throw error(n, ErrorCode.BARCODE_DATA, "The check digit of the EAN-13 " + data + " is " + check + ", not "
                     + data.charAt(12));
         }
-        return linear(new EAN13Writer().encode(data.substring(0, 12) + check), 11, 7);
+        return linear(new EAN13Writer().encode(data.substring(0, 12) + check), left, right);
     }
 
     /** The check digit of the 12 digits of an EAN-13: weights 1 and 3 from the left, up to the next ten. */

@@ -148,6 +148,7 @@ final class PropertyReader {
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
             entry("format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
+            entry("quiet-zone", (p, s) -> s.image().setQuietZone(quietZone(p))),
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
             entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
             entry("of", (p, s) -> s.tableOfContents().setOf(enumValue(Listing.class, p))),
@@ -255,6 +256,19 @@ final class PropertyReader {
                     + Style.MAX_DROP_CAP + " lines: " + lines);
         }
         return lines;
+    }
+
+    /**
+     * {@code Quiet zone} of a {@code Barcode} (reference/components/barcode.md): the light modules on each side, from 0
+     * to {@value Barcodes#MAX_QUIET_ZONE}.
+     */
+    private static int quietZone(Node p) {
+        int modules = integer(p);
+        if (modules < 0 || modules > Barcodes.MAX_QUIET_ZONE) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Quiet zone allows from 0 to " + Barcodes.MAX_QUIET_ZONE
+                    + " modules: " + modules);
+        }
+        return modules;
     }
 
     /**
