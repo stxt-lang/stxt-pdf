@@ -53,5 +53,6 @@ nada y las propiedades de un `Markdown` que su contenido no usa. La lista comple
 ## Errores que no son del documento
 
 Una carpeta de recursos que no existe, un fichero de fuente estropeado o un documento que pide demasiado (más de 2000
-páginas, una imagen de más de 25 millones de píxeles) también son errores, sin línea. Desde Java se distinguen por su tipo
+páginas, una imagen de más de 25 millones de píxeles) también son errores, sin línea, y también lo es
+parar una conversión antes de tiempo ([Uso desde Java](java-usage.md#cancelar-una-conversión)). Desde Java se distinguen por su tipo
 ([Uso desde Java](java-usage.md#errores)).

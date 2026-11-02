@@ -3,6 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Attachments;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.PdfA;
@@ -81,6 +82,18 @@ public final class PdfDocumentWriter {
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments) throws IOException {
+        write(document, resources, limits, target, debug, ua, pdfA, attachments, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean, int, PdfA, Attachments)}, stopping
+     * with a {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for it
+     * (reference/implementation/api.md): it is asked at each page before painting it, at each image the first time it
+     * is embedded or drawn, and before saving. Nothing has been written to {@code target} then: the PDF is written
+     * whole at the end.
+     */
+    public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation) throws IOException {
         if (ua != 1 && ua != 2) {
             throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + ua);
         }
@@ -95,16 +108,17 @@ public final class PdfDocumentWriter {
                     + (pdfA == null ? "not PDF/A" : pdfA));
         }
         try {
-            paintAndSave(document, resources, limits, target, debug, ua, pdfA, attachments);
+            paintAndSave(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
     }
 
     private static void paintAndSave(LaidOutDocument document, Resources resources, Limits limits,
-            OutputStream target, boolean debug, int ua, PdfA pdfA, Attachments attachments) throws IOException {
+            OutputStream target, boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation)
+            throws IOException {
         List<Page> pages = document.pages();
-        try (PDDocument doc = new PDDocument(); PdfImages images = new PdfImages(doc, limits)) {
+        try (PDDocument doc = new PDDocument(); PdfImages images = new PdfImages(doc, limits, cancellation)) {
             if (ua == 2) {
                 // The file header and the catalog version.
                 doc.getDocument().setVersion(2.0f);
@@ -123,6 +137,7 @@ public final class PdfDocumentWriter {
                 pdfPages.add(page);
             }
             for (int i = 0; i < pages.size(); i++) {
+                cancellation.check();
                 Page p = pages.get(i);
                 // Each page has the paper of its section (reference/components/document.md).
                 PageSetup pageSetup = p.pageSetup();
@@ -146,6 +161,7 @@ public final class PdfDocumentWriter {
             links.resolve(destinations, structure);
             structure.finish(doc, destinations);
             PdfAttachments.write(doc, attachments);
+            cancellation.check();
             PdfId.prepare(doc);
             ByteArrayOutputStream pdf = new ByteArrayOutputStream();
             doc.save(pdf);

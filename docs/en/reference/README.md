@@ -66,5 +66,5 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [The layout](implementation/layout.md) | `Engine`, `LayoutContext`, the cache, break tokens and pagination |
 | [Painting](implementation/painting.md) | `StackingContext`, the canvases, text, borders and images |
 | [The PDF inside](implementation/pdf.md) | The structure tree of the tagged PDF, the *artifacts*, the link annotations, the bookmarks and the metadata |
-| [Using from Java](implementation/api.md) | `Converter`, `DocumentReader`, the error types, limits and threads |
+| [Using from Java](implementation/api.md) | `Converter`, `DocumentReader`, the error types, limits, cancellation and threads |
 | [Testing](implementation/testing.md) | Reference tests, examples, error catalog, the dump of results and mutation testing |

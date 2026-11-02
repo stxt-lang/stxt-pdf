@@ -108,6 +108,9 @@ the valid cases, and the invalid ones go to the catalog.
 - **Determinism:** `CrossJvmDeterminismTest` checks that a child JVM gives the same PDF, byte for byte, for each example
   and golden case, and `PdfIdTest`, that the identifier comes from the content.
 - **Threads:** `ConcurrentConversionTest` and `EngineContractTest` ([Using from Java](api.md#threads)).
+- **Cancellation:** `CancellationTest` (the ready-made `Cancellation`s) and `ConversionCancellationTest`, which checks
+  that the engine asks in every phase and that, requested in any of them, it stops there without wrapping the error and
+  without writing anything ([Using from Java](api.md#canceling-a-conversion)).
 - **Architecture:** `ArchitectureTest` checks the dependencies between packages ([Architecture](../architecture.md)).
 - **Mutation:** the `pit` profile of the `pom.xml` runs PIT over `layout` and `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min, with the report in

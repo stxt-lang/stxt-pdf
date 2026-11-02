@@ -2,6 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
@@ -69,7 +70,19 @@ public final class ContrastCheck implements Canvas {
      * @throws InvalidModelException {@link ErrorCode#CONTRAST_LOW} on the first text with too little contrast
      */
     public static void check(LaidOutDocument document) {
+        check(document, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #check(LaidOutDocument)}, stopping once {@code cancellation} asks for it, which is asked at each
+     * page.
+     *
+     * @throws InvalidModelException {@link ErrorCode#CONTRAST_LOW} on the first text with too little contrast
+     * @throws dev.stxt.pdf.model.CancelledException if the conversion is cancelled
+     */
+    public static void check(LaidOutDocument document, Cancellation cancellation) {
         for (Page page : document.pages()) {
+            cancellation.check();
             Rect area = page.pageSetup().pageArea();
             StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())
                     .paint(new ContrastCheck());

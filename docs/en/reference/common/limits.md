@@ -23,6 +23,10 @@ only one of its pages is drawn: for one page of a large PDF, the best option is 
 The text of the document also has its own limits: 10 MB, 100 nesting levels and 10,000 characters per line,
 also with a `LIMIT` error.
 
+Time is not a limit: a conversion that takes longer than one wants to wait is cut short with a `Cancellation` (a
+deadline, the interruption of the thread), with an error of kind `CANCELLED` and nothing written
+([Using from Java](../implementation/api.md#canceling-a-conversion)).
+
 > **Decision:** conservative limits, chosen by measuring what each input costs
 > ([details](../implementation/api.md#limits)). *Rejected alternative:* a higher set (10,000 pages, 100 Mpx),
 > which left a service exposed.

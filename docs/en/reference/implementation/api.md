@@ -30,6 +30,7 @@ List<String> svg = converter.toSvg(laidOut);   // one string per page
 | `pdfUa(int)` | The part of PDF/UA the PDF conforms to: 1 (PDF 1.7, by default) or 2 (PDF 2.0) ([The PDF inside](pdf.md#pdfua-2)). Any other value is an `IllegalArgumentException` |
 | `pdfA(PdfA)` | The PDF/A the PDF also conforms to: `A2B`, `A2A`, `A3B` or `A3A` ([below](#pdfa-and-attachments)); by default, none. With `pdfUa(2)`, `build()` is an `IllegalArgumentException` |
 | `exclude(Check...)` | Removes checks. By default all of them are made ([Checks](#checks)) |
+| `cancellation(Cancellation)` | The one that stops every conversion of the `Converter`; by default, none ([Canceling a conversion](#canceling-a-conversion)) |
 
 > **Decision:** the configuration is an immutable object, `Converter`, thread-safe because each conversion creates its
 > own `Engine`, with `layOut`, `toPdf` (of a document or of one already laid out) and `toSvg`. The styles are never `null`: if
@@ -136,6 +137,7 @@ try {
         case INVALID_DOCUMENT -> reply(422, e.code() + " on line " + e.line()
                 + (e.inStyles() ? " of the styles" : "") + ": " + e.getMessage());
         case LIMIT -> reply(413, e.getMessage());
+        case CANCELLED -> reply(503, e.getMessage());            // the service itself asked to stop
         case RESOURCE, INTERNAL -> reply(500, e.getMessage());   // from the configuration or from the engine
     }
 }
@@ -147,6 +149,7 @@ try {
 | `DocumentSyntaxException` (`tree`) | The syntax and the schema of `stxt-core`, with its code and its line and the original exception as the cause. A `LimitException` from the library is `LIMIT` |
 | `ResourceException` (`resources`) | The resources folder (`RESOURCE`), with `ImageFormatException` |
 | `InternalException` (`model`) | A failure of the engine. The original cause is in `getCause()` |
+| `CancelledException` (`model`) | The conversion stopped by its `Cancellation` (`CANCELLED`), without a line ([Canceling a conversion](#canceling-a-conversion)) |
 
 Input and output failures when writing to the destination remain the `IOException` of `toPdf`. `Converter` lets
 the errors of the engine through, turns any other runtime exception into an `InternalException` and does not touch the `IOException`
@@ -199,6 +202,54 @@ header and, in an SVG, the elements and the levels that `SvgInspector` counts wi
 
 > **Decision:** the limits of the STXT text (10 MB, 100 levels, 10,000 characters per line) are those of `stxt-core`, which already
 > gives a `LIMIT` error. `Limits` only has what the engine checks on its own.
+
+## Canceling a conversion
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeconds(60)));   // a deadline per PDF
+```
+
+`Cancellation` (`model`) says whether the conversion has to stop: a functional interface with `requested()`, which the
+engine asks wherever it works. It is passed with the call (`layOut`, `toPdf` and `toSvg` have an overload with it) or,
+for every conversion of a `Converter`, with `Converter.builder().cancellation(...)`; with both, it stops when either
+asks. The first time it answers `true`, the conversion ends with a `CancelledException`, of kind `CANCELLED` and without
+a line ([Errors](../common/errors.md#error-types)), which goes through the engine without anything wrapping it, and
+nothing has been written to the destination: the PDF is written whole at the end.
+
+| `Cancellation` | When it stops |
+|---|---|
+| `NONE` | Never; it is the default |
+| `deadline(Instant)` | From that moment on, measured with the monotonic clock of the JVM from the moment it is created: a later change of the system time does not move it |
+| `timeout(Duration)` | Once that time has passed since it is created; zero or negative, at once |
+| `whenInterrupted()` | While the thread that converts is interrupted (`Thread.isInterrupted()`), without clearing the flag |
+| `a.or(b)` | When either of the two asks |
+| Any `() -> boolean` | When it returns `true`; it has to be cheap and must not block, because it is asked thousands of times |
+
+Where it is asked: `BoxTreeBuilder`, at each element (a `Barcode` is generated when the tree is built); `Engine`, at
+each layout that is not in the cache (`layoutOnce` and `contentIntrinsic`); `Paginator`, at each pass of the convergence
+of the references and at each page, when paginating the flow and when placing the `Page overlay` boxes; `Overflow` and
+`ContrastCheck`, at each page; `PdfDocumentWriter`, at each page it paints and before saving; `PdfImages`, at each image
+it embeds or draws for the first time, and `Converter.toSvg`, at each page. Each question costs one reading of the
+monotonic clock or of the flag of the thread. What is not cut short is a single call to PDFBox, JSVG or ZXing (drawing an
+SVG, generating a code, saving the PDF), which finishes on its own; the [limits](#limits) bound how long each can take.
+
+> **Decision:** the cancellation is an object of its own that the engine asks, and not only the interruption of the
+> thread: a deadline is expressed without threads and tested without them, it does not depend on who interrupts, and
+> `whenInterrupted()` gives the thread's one to whoever wants it. *Rejected alternative:* looking only at
+> `Thread.interrupted()`, which requires one thread per conversion and someone to interrupt it in time.
+
+> **Decision:** it is passed with the call, like the attachments, because a deadline belongs to each conversion and the
+> `Converter` is shared; the `builder` also takes it as a default, for the thread's one, which is the same for all.
+> *Rejected alternative:* only in the `builder`, which would require one `Converter` per deadline.
+
+> **Decision:** `CANCELLED` is a kind of error of its own and not a `LIMIT`: it is neither the document's fault nor the
+> environment's, but a decision of the caller, and a service does not respond the same way (its own deadline is a 503 or
+> a 504; a client that left, nothing). A `switch` over `Kind` has to cover it. *Rejected alternative:* a `LIMIT` without
+> a line, which a service would answer as a 413.
+
+> **Decision:** it is asked where the work is and not between phases: a single page with thousands of QR codes can take
+> seconds to build, and checking only between pages would not cut it short. *Rejected alternative:* checking only
+> between pages in the `Paginator`.
 
 ## Threads
 

@@ -34,6 +34,7 @@ converter.toPdf(doc, out);
 | `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
 | `pdfA` | Ninguno. Con `PdfA.A2B`, `A2A`, `A3B` o `A3A`, el PDF cumple también ese PDF/A, la norma de archivo ([abajo](#pdfa-y-adjuntos)) |
 | `exclude` | Ninguna: se comprueba todo. Quita las comprobaciones que se le dicen (abajo) |
+| `cancellation` | Ninguna. La que para todas las conversiones del `Converter` ([abajo](#cancelar-una-conversión)) |
 
 Por defecto se comprueba todo. Con `exclude` se quitan comprobaciones, que dejan de ser un error:
 
@@ -61,6 +62,17 @@ del PDF. Los adjuntos se pasan en cada llamada a `toPdf`, con su nombre, sus byt
 documento (`ALTERNATIVE` para el XML de una factura), y `withXmp` añade el fragmento de metadatos que Factur-X pide,
 tal como lo da su especificación. Sin PDF/A-3, un adjunto es un error (`ATTACHMENT_REQUIRES_PDFA3`).
 
+## Cancelar una conversión
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeconds(60)));   // un plazo por PDF
+```
+
+Un `Cancellation` dice cuándo parar: cuando pasa un plazo (`timeout`, `deadline`), mientras el hilo está interrumpido
+(`whenInterrupted()`) o cualquier `() -> boolean`. Se pasa en la llamada, para ese documento, o en
+`Converter.builder().cancellation(...)`, para todas las conversiones. Cuando pide parar, la conversión termina en seguida,
+en la fase que esté, con un error de tipo `CANCELLED` (abajo), y no se escribe nada en el destino.
+
 ## Errores
 
 Todo error es un `StxtPdfException`, con tres datos: `kind()` (de quién es la culpa), `code()` (el código) y `line()` (la
@@ -73,6 +85,7 @@ try {
     switch (e.kind()) {
         case INVALID_DOCUMENT -> System.err.println(e.getMessage());   // el documento tiene un error
         case LIMIT -> System.err.println("Demasiado grande: " + e.getMessage());
+        case CANCELLED -> System.err.println("Cancelada");             // lo pidió el propio programa
         case RESOURCE, INTERNAL -> throw e;                            // la configuración o el motor
     }
 }

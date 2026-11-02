@@ -6,6 +6,7 @@ import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.model.Attachments;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Limits;
@@ -55,6 +56,11 @@ import java.util.function.Supplier;
  * <p>What belongs to one document and not to the configuration, the files to embed and their XMP
  * ({@link Attachments}, for Factur-X), goes with each call: {@link #toPdf(InlineNode, OutputStream, Attachments)}.
  * Embedding a file needs {@link Builder#pdfA PDF/A-3}.</p>
+ *
+ * <p>A conversion stops before the end when its {@link Cancellation} asks for it (a deadline, an interrupted
+ * thread): {@link #toPdf(InlineNode, OutputStream, Attachments, Cancellation)} for one, or
+ * {@link Builder#cancellation} for all of them. It ends with a {@link dev.stxt.pdf.model.CancelledException} and
+ * nothing written.</p>
  */
 public final class Converter {
 
@@ -65,6 +71,7 @@ public final class Converter {
     private final Set<Check> excluded;
     private final int pdfUa;
     private final PdfA pdfA;
+    private final Cancellation cancellation;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
@@ -74,6 +81,7 @@ public final class Converter {
         this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
         this.pdfUa = builder.pdfUa;
         this.pdfA = builder.pdfA;
+        this.cancellation = builder.cancellation;
     }
 
     /** A converter with the default configuration: resources in {@code resources/}, no separate styles, no debug. */
@@ -110,6 +118,11 @@ public final class Converter {
         return pdfA;
     }
 
+    /** What stops every conversion of this converter ({@link Builder#cancellation}); {@link Cancellation#NONE} if nothing. */
+    public Cancellation cancellation() {
+        return cancellation;
+    }
+
     /**
      * Lays out an already validated document ({@link DocumentReader}) with the real metrics of the fonts of the
      * resources folder. It fails with the errors of the document (reference/common/errors.md) before anything is
@@ -117,12 +130,22 @@ public final class Converter {
      * of a text and whatever prevents the page of a PDF from being drawn faithfully.
      */
     public LaidOutDocument layOut(InlineNode document) {
+        return layOut(document, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #layOut(InlineNode)}, stopping with a {@link dev.stxt.pdf.model.CancelledException} once
+     * {@code cancellation}, or the one of the converter ({@link Builder#cancellation}), asks for it
+     * (reference/implementation/api.md).
+     */
+    public LaidOutDocument layOut(InlineNode document, Cancellation cancellation) {
         Objects.requireNonNull(document, "document");
+        Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         return guarded(() -> {
-            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded)
+            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded, stop)
                     .layOutDocument(document, styles);
             if (!excluded.contains(Check.CONTRAST)) {
-                ContrastCheck.check(laidOut);
+                ContrastCheck.check(laidOut, stop);
             }
             return laidOut;
         });
@@ -139,9 +162,20 @@ public final class Converter {
      * {@link Builder#pdfA PDF/A-3}: otherwise, {@code ATTACHMENT_REQUIRES_PDFA3}.
      */
     public void toPdf(InlineNode document, OutputStream target, Attachments attachments) throws IOException {
+        toPdf(document, target, attachments, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(InlineNode, OutputStream, Attachments)}, stopping with a
+     * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter
+     * ({@link Builder#cancellation}), asks for it (reference/implementation/api.md), in any phase; nothing has been
+     * written to {@code target} then.
+     */
+    public void toPdf(InlineNode document, OutputStream target, Attachments attachments, Cancellation cancellation)
+            throws IOException {
         Objects.requireNonNull(target, "target");
         Objects.requireNonNull(attachments, "attachments");
-        toPdf(layOut(document), target, attachments);
+        toPdf(layOut(document, cancellation), target, attachments, cancellation);
     }
 
     /**
@@ -157,17 +191,41 @@ public final class Converter {
      * embedded ({@link #toPdf(InlineNode, OutputStream, Attachments)}).
      */
     public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments) throws IOException {
+        toPdf(document, target, attachments, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(LaidOutDocument, OutputStream, Attachments)}, stopping with a
+     * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter
+     * ({@link Builder#cancellation}), asks for it: at each page and at each image, before anything is written.
+     */
+    public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments,
+                      Cancellation cancellation) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
         Objects.requireNonNull(attachments, "attachments");
-        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments));
+        Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
+        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments,
+                stop));
     }
 
     /** The SVG of each page of an already laid out document, in order. */
     public List<String> toSvg(LaidOutDocument document) {
+        return toSvg(document, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #toSvg(LaidOutDocument)}, stopping once {@code cancellation}, or the one of the converter, asks for
+     * it, which is asked at each page.
+     */
+    public List<String> toSvg(LaidOutDocument document, Cancellation cancellation) {
         Objects.requireNonNull(document, "document");
+        Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         return guarded(() -> document.pages().stream()
-                .map((Page page) -> SvgCanvas.page(page, page.pageSetup(), debug, resources))
+                .map((Page page) -> {
+                    stop.check();
+                    return SvgCanvas.page(page, page.pageSetup(), debug, resources);
+                })
                 .toList());
     }
 
@@ -215,6 +273,7 @@ public final class Converter {
         private final Set<Check> excluded = EnumSet.noneOf(Check.class);
         private int pdfUa = 1;
         private PdfA pdfA;
+        private Cancellation cancellation = Cancellation.NONE;
 
         private Builder() {
         }
@@ -288,6 +347,18 @@ public final class Converter {
          */
         public Builder pdfA(PdfA pdfA) {
             this.pdfA = Objects.requireNonNull(pdfA, "pdfA");
+            return this;
+        }
+
+        /**
+         * Stops every conversion of this converter, with a {@link dev.stxt.pdf.model.CancelledException}, once
+         * {@code cancellation} asks for it (reference/implementation/api.md); by default none
+         * ({@link Cancellation#NONE}). All the conversions share it, so it is the place for one that depends on the
+         * thread that converts ({@link Cancellation#whenInterrupted()}); the deadline of one document goes with its
+         * call ({@link Converter#toPdf(InlineNode, OutputStream, Attachments, Cancellation)}), and either stops it.
+         */
+        public Builder cancellation(Cancellation cancellation) {
+            this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
             return this;
         }
 

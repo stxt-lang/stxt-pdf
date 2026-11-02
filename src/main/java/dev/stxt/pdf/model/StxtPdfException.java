@@ -14,6 +14,9 @@ package dev.stxt.pdf.model;
  *   <li>{@link Kind#LIMIT}: the document is valid but asks for more than is allowed (too many pages...).</li>
  *   <li>{@link Kind#INTERNAL}: a failure of the engine, not of the document or the environment. It is reported as a
  *       defect; {@link #getCause()} keeps the original.</li>
+ *   <li>{@link Kind#CANCELLED}: the caller asked to stop before the end ({@link Cancellation}: a deadline that
+ *       passed, a thread that was interrupted). Neither the document's fault nor the environment's, and nothing
+ *       has been written.</li>
  * </ul>
  *
  * <p>Input and output errors when writing to the destination are not part of this family: they are the
@@ -28,7 +31,9 @@ public abstract class StxtPdfException extends RuntimeException {
         INVALID_DOCUMENT,
         RESOURCE,
         LIMIT,
-        INTERNAL
+        INTERNAL,
+        /** The caller asked to stop ({@link Cancellation}) before the conversion finished. */
+        CANCELLED
     }
 
     /** The value of {@link #line()} when the error does not belong to any line of the document. */
@@ -71,8 +76,8 @@ public abstract class StxtPdfException extends RuntimeException {
 
     /**
      * Stable code of the error, as text: that of {@code ErrorCode} ({@code BOX_OVERFLOW}), that of the
-     * {@code stxt-core} library ({@code CHILD_NOT_DECLARED}), {@code RESOURCE}, {@code IMAGE_FORMAT} or
-     * {@code INTERNAL}.
+     * {@code stxt-core} library ({@code CHILD_NOT_DECLARED}), {@code RESOURCE}, {@code IMAGE_FORMAT},
+     * {@code CANCELLED} or {@code INTERNAL}.
      */
     public String code() {
         return code;

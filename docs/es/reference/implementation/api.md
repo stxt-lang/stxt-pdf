@@ -31,6 +31,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)). Otro valor es un `IllegalArgumentException` |
 | `pdfA(PdfA)` | El PDF/A que cumple además el PDF: `A2B`, `A2A`, `A3B` o `A3A` ([abajo](#pdfa-y-adjuntos)); por defecto, ninguno. Con `pdfUa(2)`, `build()` es un `IllegalArgumentException` |
 | `exclude(Check...)` | Quita comprobaciones. Por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
+| `cancellation(Cancellation)` | La que para todas las conversiones del `Converter`; por defecto, ninguna ([Cancelar una conversión](#cancelar-una-conversión)) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si
@@ -134,6 +135,7 @@ try {
         case INVALID_DOCUMENT -> reply(422, e.code() + " en la línea " + e.line()
                 + (e.inStyles() ? " de los estilos" : "") + ": " + e.getMessage());
         case LIMIT -> reply(413, e.getMessage());
+        case CANCELLED -> reply(503, e.getMessage());            // el propio servicio pidió parar
         case RESOURCE, INTERNAL -> reply(500, e.getMessage());   // de la configuración o del motor
     }
 }
@@ -145,6 +147,7 @@ try {
 | `DocumentSyntaxException` (`tree`) | La sintaxis y el schema de `stxt-core`, con su código y su línea y la excepción original como causa. Un `LimitException` de la librería es `LIMIT` |
 | `ResourceException` (`resources`) | La carpeta de recursos (`RESOURCE`), con `ImageFormatException` |
 | `InternalException` (`model`) | Un fallo del motor. La causa original va en `getCause()` |
+| `CancelledException` (`model`) | La conversión parada por su `Cancellation` (`CANCELLED`), sin línea ([Cancelar una conversión](#cancelar-una-conversión)) |
 
 Los fallos de entrada y salida al escribir en el destino siguen siendo la `IOException` de `toPdf`. `Converter` deja pasar
 los errores del motor, convierte cualquier otra excepción de ejecución en `InternalException` y no toca la `IOException`
@@ -197,6 +200,54 @@ cabecera y, en un SVG, los elementos y los niveles que cuenta `SvgInspector` sin
 
 > **Decisión:** los límites del texto STXT (10 MB, 100 niveles, 10 000 caracteres por línea) son los de `stxt-core`, que ya
 > da un error `LIMIT`. `Limits` solo tiene lo que el motor comprueba por su cuenta.
+
+## Cancelar una conversión
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeconds(60)));   // un plazo por PDF
+```
+
+`Cancellation` (`model`) dice si la conversión tiene que parar: una interfaz funcional con `requested()`, que el motor
+consulta allí donde trabaja. Se pasa en la llamada (`layOut`, `toPdf` y `toSvg` tienen una sobrecarga con ella) o, para
+todas las conversiones de un `Converter`, con `Converter.builder().cancellation(...)`; con las dos, para cuando lo pide
+cualquiera. La primera vez que contesta `true`, la conversión termina con un `CancelledException`, de tipo `CANCELLED` y
+sin línea ([Errores](../common/errors.md#tipos-de-error)), que atraviesa el motor sin que nada lo envuelva, y en el
+destino no se ha escrito nada: el PDF se escribe entero al final.
+
+| `Cancellation` | Cuándo para |
+|---|---|
+| `NONE` | Nunca; es el valor por defecto |
+| `deadline(Instant)` | Desde ese momento, medido con el reloj monótono de la JVM desde que se crea: un cambio de la hora del sistema después no lo mueve |
+| `timeout(Duration)` | Cuando pasa ese tiempo desde que se crea; cero o negativo, en seguida |
+| `whenInterrupted()` | Mientras el hilo que convierte está interrumpido (`Thread.isInterrupted()`), sin borrar la marca |
+| `a.or(b)` | Cuando lo pide cualquiera de las dos |
+| Cualquier `() -> boolean` | Cuando devuelve `true`; tiene que ser barata y no bloquear, porque se consulta miles de veces |
+
+Dónde se consulta: `BoxTreeBuilder`, en cada elemento (un `Barcode` se genera al construir el árbol); `Engine`, en cada
+layout que no está en la caché (`layoutOnce` y `contentIntrinsic`); `Paginator`, en cada vuelta de la convergencia de las
+referencias y en cada página, al paginar el flujo y al colocar los `Page overlay`; `Overflow` y `ContrastCheck`, en cada
+página; `PdfDocumentWriter`, en cada página que pinta y antes de guardar; `PdfImages`, en cada imagen que incrusta o dibuja
+por primera vez, y `Converter.toSvg`, en cada página. Cada consulta cuesta una lectura del reloj monótono o de la marca del
+hilo. Lo que no se corta es una sola llamada a PDFBox, a JSVG o a ZXing (dibujar un SVG, generar un código, guardar el
+PDF), que termina sola; los [límites](#límites) acotan lo que puede tardar cada una.
+
+> **Decisión:** la cancelación es un objeto propio que el motor consulta, y no solo la interrupción del hilo: un plazo se
+> expresa sin hilos y se prueba sin ellos, no depende de quién interrumpe, y `whenInterrupted()` da la del hilo a quien
+> la quiere. *Alternativa descartada:* mirar solo `Thread.interrupted()`, que obliga a un hilo por conversión y a alguien
+> que lo interrumpa a tiempo.
+
+> **Decisión:** se pasa en la llamada, como los adjuntos, porque un plazo es de cada conversión y el `Converter` se
+> comparte; el `builder` la admite además como valor por defecto, para la del hilo, que es la misma para todas.
+> *Alternativa descartada:* solo en el `builder`, que obligaría a un `Converter` por plazo.
+
+> **Decisión:** `CANCELLED` es un tipo de error propio y no un `LIMIT`: no es culpa del documento ni del entorno, sino
+> una decisión de quien convierte, y un servicio no contesta lo mismo (su propio plazo es un 503 o un 504; un cliente que
+> se fue, nada). Un `switch` sobre `Kind` tiene que cubrirlo. *Alternativa descartada:* un `LIMIT` sin línea, que un
+> servicio contestaría como un 413.
+
+> **Decisión:** se consulta donde se trabaja y no entre fases: una sola página con miles de códigos QR puede tardar
+> segundos en construirse, y comprobarlo solo entre páginas no la cortaría. *Alternativa descartada:* comprobar solo entre
+> páginas en el `Paginator`.
 
 ## Hilos
 

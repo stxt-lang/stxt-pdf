@@ -181,10 +181,11 @@ Each error says, besides its code and its line, **who is to blame**, which is wh
 | `RESOURCE` | The resources folder is not usable (it does not exist, a broken font or image), the document file cannot be read, or an attachment in a PDF that is not PDF/A-3 | a failure of its configuration (5xx) |
 | `LIMIT` | The document is valid but asks for more than is allowed ([Limits](limits.md)): more pages, an image with too many pixels, an SVG with too many elements or levels, a PDF that is too large, or an STXT text that is too large or too deeply nested | a client error for excess (413 or 422) |
 | `INTERNAL` | A failure of the engine and not of the document or the environment | a server failure (500), which should be reported |
+| `CANCELLED` | The caller asked to stop before the end ([Using from Java](../implementation/api.md#canceling-a-conversion)): a deadline that passed, the thread interrupted, a client that left. Nothing has been written | whatever it decides: its own deadline is a 503 or a 504; a client that left, nothing |
 
 The code is that of the table above, the STXT one for syntax and schema errors (`CHILD_NOT_DECLARED`), `RESOURCE`,
-`IMAGE_FORMAT` or `INTERNAL`. The line is `0` if the error does not belong to a line (a resource, a limit or an internal
-failure). If it belongs to the [separate styles document](styles.md#separate-styles-document), the message says so
+`IMAGE_FORMAT`, `CANCELLED` or `INTERNAL`. The line is `0` if the error does not belong to a line (a resource, a limit, a
+cancellation or an internal failure). If it belongs to the [separate styles document](styles.md#separate-styles-document), the message says so
 (`line 8 of the styles: ...`). How they are seen from Java is in [Using from Java](../implementation/api.md#errors).
 
 > **Decision:** a failure the engine should have avoided (a page that does not advance, a link without a target) is

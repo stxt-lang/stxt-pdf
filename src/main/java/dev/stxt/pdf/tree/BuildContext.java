@@ -1,6 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.Node;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ final class BuildContext {
 
     /** The {@code Styles} rules of the document. */
     final StyleRules rules;
+    /** Whether the conversion has to stop ({@link Cancellation}); asked at each element, before building it. */
+    final Cancellation cancellation;
     /** Line of the {@code Id} of each box, to detect duplicates. */
     final Map<String, Integer> ids = new HashMap<>();
     /**
@@ -74,7 +77,12 @@ final class BuildContext {
     final Footnotes footnotes = new Footnotes();
 
     BuildContext(StyleRules rules) {
+        this(rules, Cancellation.NONE);
+    }
+
+    BuildContext(StyleRules rules, Cancellation cancellation) {
         this.rules = rules;
+        this.cancellation = cancellation;
     }
 
     /** The {@code Id} of a box, which is not repeated in the document. */

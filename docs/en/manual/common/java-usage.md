@@ -34,6 +34,7 @@ converter.toPdf(doc, out);
 | `pdfUa` | `1`: the PDF complies with PDF/UA-1. With `2`, PDF/UA-2, in PDF 2.0, which some old viewers do not open |
 | `pdfA` | None. With `PdfA.A2B`, `A2A`, `A3B` or `A3A`, the PDF also complies with that PDF/A, the archiving standard ([below](#pdfa-and-attachments)) |
 | `exclude` | None: everything is checked. It removes the checks it is given (below) |
+| `cancellation` | None. The one that stops every conversion of the `Converter` ([below](#canceling-a-conversion)) |
 
 By default everything is checked. With `exclude` checks are removed, and what they detect is no longer an error:
 
@@ -62,6 +63,17 @@ their relationship with the document (`ALTERNATIVE` for the XML of an invoice), 
 fragment Factur-X requires, as its specification gives it. Without PDF/A-3, an attachment is an error
 (`ATTACHMENT_REQUIRES_PDFA3`).
 
+## Canceling a conversion
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeconds(60)));   // a deadline per PDF
+```
+
+A `Cancellation` says when to stop: when a deadline passes (`timeout`, `deadline`), while the thread is interrupted
+(`whenInterrupted()`) or any `() -> boolean`. It is passed with the call, for that document, or in
+`Converter.builder().cancellation(...)`, for every conversion. When it asks to stop, the conversion ends at once, in
+whatever phase it is, with an error of kind `CANCELLED` (below), and nothing is written to the destination.
+
 ## Errors
 
 Every error is a `StxtPdfException`, with three pieces of data: `kind()` (whose fault it is), `code()` (the code) and
@@ -75,6 +87,7 @@ try {
     switch (e.kind()) {
         case INVALID_DOCUMENT -> System.err.println(e.getMessage());   // the document has an error
         case LIMIT -> System.err.println("Too large: " + e.getMessage());
+        case CANCELLED -> System.err.println("Canceled");              // the program itself asked for it
         case RESOURCE, INTERNAL -> throw e;                            // the configuration or the engine
     }
 }

@@ -3,6 +3,7 @@ package dev.stxt.pdf.layout;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
@@ -66,7 +67,18 @@ public final class Overflow {
 
     /** @throws InvalidModelException with the first overflow it finds */
     public static void check(List<Page> pages) {
+        check(pages, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #check(List)}, stopping once {@code cancellation} asks for it, which is asked at each page.
+     *
+     * @throws InvalidModelException with the first overflow it finds
+     * @throws dev.stxt.pdf.model.CancelledException if the conversion is cancelled
+     */
+    public static void check(List<Page> pages, Cancellation cancellation) {
         for (Page p : pages) {
+            cancellation.check();
             // Each page has the medium of its section (reference/components/document.md).
             PageSetup pageSetup = p.pageSetup();
             Rect area = pageSetup.pageArea();

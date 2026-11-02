@@ -8,6 +8,7 @@ import com.github.weisj.jsvg.parser.resources.ResourcePolicy;
 import com.github.weisj.jsvg.renderer.NullPlatformSupport;
 import com.github.weisj.jsvg.view.ViewBox;
 import de.rototor.pdfbox.graphics2d.PdfBoxGraphics2D;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
@@ -52,6 +53,8 @@ final class PdfImages implements Closeable {
 
     private final PDDocument doc;
     private final Limits limits;
+    /** Asked before each image is embedded or drawn for the first time, which is where the work is. */
+    private final Cancellation cancellation;
     private final Map<Path, PDImageXObject> bitmaps = new HashMap<>();
     private final Map<Path, PDFormXObject> drawings = new HashMap<>();
     private final Map<Path, PDDocument> sources = new HashMap<>();
@@ -59,8 +62,13 @@ final class PdfImages implements Closeable {
     private final PdfPages imports;
 
     PdfImages(PDDocument doc, Limits limits) {
+        this(doc, limits, Cancellation.NONE);
+    }
+
+    PdfImages(PDDocument doc, Limits limits, Cancellation cancellation) {
         this.doc = doc;
         this.limits = limits;
+        this.cancellation = cancellation;
         this.imports = new PdfPages(doc);
     }
 
@@ -68,6 +76,7 @@ final class PdfImages implements Closeable {
     PDImageXObject bitmap(ImageFile file) throws IOException {
         PDImageXObject image = bitmaps.get(file.path());
         if (image == null) {
+            cancellation.check();
             image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
             bitmaps.put(file.path(), image);
         }
@@ -81,6 +90,7 @@ final class PdfImages implements Closeable {
     PDFormXObject drawing(ImageFile file) throws IOException {
         PDFormXObject form = drawings.get(file.path());
         if (form == null) {
+            cancellation.check();
             form = draw(file);
             drawings.put(file.path(), form);
         }
@@ -96,6 +106,7 @@ final class PdfImages implements Closeable {
         Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file.path(), p -> new HashMap<>());
         PDFormXObject form = forms.get(number);
         if (form == null) {
+            cancellation.check();
             PDDocument source = sources.get(file.path());
             if (source == null) {
                 source = Loader.loadPDF(file.path().toFile());

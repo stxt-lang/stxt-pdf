@@ -107,6 +107,9 @@ los casos válidos, y los inválidos van al catálogo.
 - **Determinismo:** `CrossJvmDeterminismTest` comprueba que una JVM hija da el mismo PDF, byte a byte, de cada ejemplo y
   golden, y `PdfIdTest`, que el identificador sale del contenido.
 - **Hilos:** `ConcurrentConversionTest` y `EngineContractTest` ([Uso desde Java](api.md#hilos)).
+- **Cancelación:** `CancellationTest` (las `Cancellation` de serie) y `ConversionCancellationTest`, que comprueba que el
+  motor pregunta en cada fase y que, pedida en cualquiera de ellas, para allí sin envolver el error y sin escribir nada
+  ([Uso desde Java](api.md#cancelar-una-conversión)).
 - **Arquitectura:** `ArchitectureTest` comprueba las dependencias entre packages ([Arquitectura](../architecture.md)).
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min, con el informe en

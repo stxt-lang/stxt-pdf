@@ -181,10 +181,11 @@ contestar:
 | `RESOURCE` | La carpeta de recursos no es utilizable (no existe, una fuente o una imagen estropeadas), no se puede leer el fichero del documento, o un adjunto en un PDF que no es PDF/A-3 | un fallo de su configuración (5xx) |
 | `LIMIT` | El documento es válido pero pide más de lo que se admite ([Límites](limits.md)): más páginas, una imagen con demasiados píxeles, un SVG con demasiados elementos o niveles, un PDF demasiado grande, o un texto STXT demasiado grande o anidado | un error del cliente por exceso (413 o 422) |
 | `INTERNAL` | Un fallo del motor y no del documento ni del entorno | un fallo del servidor (500), que conviene informar |
+| `CANCELLED` | Quien convierte pidió parar antes de terminar ([Uso desde Java](../implementation/api.md#cancelar-una-conversión)): un plazo que pasó, el hilo interrumpido, un cliente que se fue. No se ha escrito nada | lo que decida: su propio plazo es un 503 o un 504; un cliente que se fue, nada |
 
 El código es el de la tabla de arriba, el de STXT para los errores de sintaxis y de schema (`CHILD_NOT_DECLARED`),
-`RESOURCE`, `IMAGE_FORMAT` o `INTERNAL`. La línea es `0` si el error no es de una línea (un recurso, un límite o un fallo
-interno). Si es del [documento de estilos aparte](styles.md#documento-de-estilos-aparte), el mensaje lo dice (`line 8
+`RESOURCE`, `IMAGE_FORMAT`, `CANCELLED` o `INTERNAL`. La línea es `0` si el error no es de una línea (un recurso, un
+límite, una cancelación o un fallo interno). Si es del [documento de estilos aparte](styles.md#documento-de-estilos-aparte), el mensaje lo dice (`line 8
 of the styles: ...`). Cómo se ven desde Java está en [Uso desde Java](../implementation/api.md#errores).
 
 > **Decisión:** un fallo que el motor debería haber evitado (una página que no avanza, un enlace sin destino) es

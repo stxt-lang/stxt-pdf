@@ -28,12 +28,14 @@ import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Position;
@@ -68,6 +70,22 @@ import dev.stxt.pdf.model.Value;
  * several threads, although each conversion usually creates its own.</p>
  */
 public final class BoxTreeBuilder {
+
+    /** Whether the conversion has to stop ({@link Cancellation}); asked at each element, before building it. */
+    private final Cancellation cancellation;
+
+    /** A builder that is never cancelled. */
+    public BoxTreeBuilder() {
+        this(Cancellation.NONE);
+    }
+
+    /**
+     * A builder that stops with a {@link dev.stxt.pdf.model.CancelledException} at the first element it builds once
+     * {@code cancellation} asks for it (reference/implementation/api.md).
+     */
+    public BoxTreeBuilder(Cancellation cancellation) {
+        this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
+    }
 
     /** BCP 47 language tag: the language (2 or 3 letters) and subtags of 1 to 8 letters or digits. */
 
@@ -134,7 +152,7 @@ public final class BoxTreeBuilder {
         PageSetupReader.Spec documentPageSetup = PageSetupReader.pageSetup(inline(child(document, "page").orElseThrow()), null);
         PageSetup pageSetup = documentPageSetup.pageSetup();
         Metadata metadata = PageSetupReader.metadata(document);
-        BuildContext ctx = new BuildContext(new StyleRules(document, styles));
+        BuildContext ctx = new BuildContext(new StyleRules(document, styles), cancellation);
 
         // The typography of For element: Document is inherited by all boxes.
         Style rootStyle = new Style(ctx.rules.namedColors());
@@ -286,6 +304,7 @@ public final class BoxTreeBuilder {
      * checks, the box and the content; what is specific to each element is done by its {@link ElementReader}.
      */
     Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
+        ctx.cancellation.check();
         Element kind = ctx.codeBlocks.contains(n) ? Element.CODE_BLOCK : Element.of(n.getCanonicalName()).orElseThrow();
         ElementReader reader = ElementReader.of(kind);
         place(ctx, n, kind);

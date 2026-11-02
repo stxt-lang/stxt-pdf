@@ -53,5 +53,6 @@ anything yet and the properties of a `Markdown` that its content does not use. T
 ## Errors that are not in the document
 
 A resources folder that does not exist, a damaged font file or a document that asks for too much (more than 2,000 pages,
-an image of more than 25 million pixels) are also errors, without a line. From Java they are told apart by their type
+an image of more than 25 million pixels) are also errors, without a line, and so is
+stopping a conversion before its end ([Using from Java](java-usage.md#canceling-a-conversion)). From Java they are told apart by their type
 ([Using from Java](java-usage.md#errors)).

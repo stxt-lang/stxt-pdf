@@ -18,6 +18,7 @@ import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.columns.ColumnsLayout;
 import dev.stxt.pdf.layout.position.OverlayLayout;
 import dev.stxt.pdf.layout.table.TableLayout;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
@@ -62,6 +63,7 @@ public final class Engine implements LayoutContext {
     private final TextMeasurer measurer;
     private final Images images;
     private final Limits limits;
+    private final Cancellation cancellation;
     private final InlineLayout inline;
     private final TableLayout table;
     private final OverlayLayout overlays;
@@ -101,8 +103,20 @@ public final class Engine implements LayoutContext {
      * are made during layout (those of the PDF images, {@link Check}).
      */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded) {
+        this(measurer, resources, limits, excluded, Cancellation.NONE);
+    }
+
+    /**
+     * Like {@link #Engine(TextMeasurer, Resources, Limits, Set)}, stopping with a
+     * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for it
+     * (reference/implementation/api.md): at each element when building the tree, at each layout that is not in the
+     * cache and at each page and each pass when paginating and checking.
+     */
+    public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
+                  Cancellation cancellation) {
         this.measurer = measurer;
         this.limits = limits;
+        this.cancellation = cancellation;
         this.images = new Images(resources, limits, excluded);
         this.inline = new InlineLayout(this, measurer);
         GridLayout grid = new GridLayout(this);
@@ -125,7 +139,7 @@ public final class Engine implements LayoutContext {
      * and afterwards that nothing overflows ({@link Overflow}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
-        return layOutDocument(new BoxTreeBuilder().build(document));
+        return layOutDocument(new BoxTreeBuilder(cancellation).build(document));
     }
 
     /**
@@ -134,7 +148,7 @@ public final class Engine implements LayoutContext {
      * document itself (reference/common/styles.md). {@code styles} can be {@code null}.
      */
     public LaidOutDocument layOutDocument(InlineNode document, InlineNode styles) {
-        return layOutDocument(new BoxTreeBuilder().build(document, styles));
+        return layOutDocument(new BoxTreeBuilder(cancellation).build(document, styles));
     }
 
     /**
@@ -149,7 +163,7 @@ public final class Engine implements LayoutContext {
         release();
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
-            Overflow.check(pages);
+            Overflow.check(pages, cancellation);
             return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages);
         } finally {
             release();
@@ -168,6 +182,11 @@ public final class Engine implements LayoutContext {
     /** The limits of this engine, which the {@link Paginator} applies to the number of pages. */
     Limits limits() {
         return limits;
+    }
+
+    /** Whether the conversion has to stop; the {@link Paginator} asks it at each pass and at each page. */
+    Cancellation cancellation() {
+        return cancellation;
     }
 
     /** Layouts this engine has computed since it was created, to measure what the cache saves. */
@@ -265,7 +284,10 @@ public final class Engine implements LayoutContext {
 
     @Override
     public IntrinsicSizes contentIntrinsic(Box box) {
-        return cache.contentIntrinsic(box, () -> algorithm(box).contentIntrinsic(box));
+        return cache.contentIntrinsic(box, () -> {
+            cancellation.check();
+            return algorithm(box).contentIntrinsic(box);
+        });
     }
 
     /**
@@ -358,8 +380,11 @@ public final class Engine implements LayoutContext {
     }
 
     private LayoutResult layoutOnce(Box box, ConstraintSpace space, BreakToken from) {
-        return cache.layout(box, space, from,
-                () -> overlays.resolvePending(box, algorithm(box).layout(box, space, from)));
+        // Each layout that is not in the cache is work: the point where a cancelled conversion stops.
+        return cache.layout(box, space, from, () -> {
+            cancellation.check();
+            return overlays.resolvePending(box, algorithm(box).layout(box, space, from));
+        });
     }
 
     /**

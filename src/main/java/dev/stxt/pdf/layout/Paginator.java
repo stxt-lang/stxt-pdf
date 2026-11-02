@@ -4,6 +4,7 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.inline.PageNumbers;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Reference;
@@ -52,6 +53,9 @@ import java.util.Set;
  * ({@link RunningHeads}), so the {@code Page overlay} boxes that contain one are laid out on each page with the text
  * of that page: before placing them, the engine is told the values of the page and forgets what it stored of those
  * texts. The flow does not change, because a {@code Page overlay} takes up no space.</p>
+ *
+ * <p>The {@link Cancellation} of the engine is asked at each pass of the convergence and at each page, when paginating
+ * the flow and when placing the {@code Page overlay} boxes, besides at each layout the engine computes.</p>
  */
 public final class Paginator {
 
@@ -120,6 +124,7 @@ public final class Paginator {
         String probe = PageNumbers.firstProbe();
         int changes = 0;
         while (true) {
+            engine.cancellation().check();
             pageOverlays.forEach(Map::clear);
             List<List<Fragment>> footnotes = new ArrayList<>();
             List<List<LayoutResult>> results = flow(sections, pageOverlays, footnotes);
@@ -165,6 +170,7 @@ public final class Paginator {
             Section section = sections.get(k);
             List<LayoutResult> own = flow.results().get(k);
             for (int i = 0; i < own.size(); i++) {
+                engine.cancellation().check();
                 int number = pages.size() + 1;
                 int printed = numbering.printed(number);
                 if (heads.any()) {
@@ -390,6 +396,7 @@ public final class Paginator {
             BreakToken token = null;
             FootnoteLayout.Carry carry = null;
             do {
+                engine.cancellation().check();
                 FootnoteLayout.Result page = notes.page(token, carry);
                 LayoutResult r = page.body();
                 BreakToken next = perPage(r.breakToken());

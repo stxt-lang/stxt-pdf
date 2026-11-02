@@ -7,6 +7,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Canceling a conversion.** `Cancellation` (`model`), a `() -> boolean` the engine asks wherever it works: at each
+  element when building the tree, at each layout that is not in the cache, at each page when paginating, checking and
+  painting, and at each image it embeds. It goes with each call (`layOut(doc, cancellation)`, `toPdf(doc, out,
+  attachments, cancellation)`, also with a `LaidOutDocument`, and `toSvg(laidOut, cancellation)`) or with every
+  conversion of a `Converter` (`Converter.builder().cancellation(...)`); with both, either stops it.
+  `Cancellation.deadline(Instant)`, `timeout(Duration)`, `whenInterrupted()` and `or` are the usual ones, and `NONE` the
+  default. When it asks to stop, the conversion ends at once with a `CancelledException` of the new kind
+  `StxtPdfException.Kind.CANCELLED`, code `CANCELLED`, without a line, and nothing has been written to the destination.
+  A `switch` over `Kind` has to cover the new value. `Engine`, `BoxTreeBuilder`, `PdfDocumentWriter.write`,
+  `Overflow.check` and `ContrastCheck.check` take it as a new parameter; the signatures without it still exist.
 - **The bottom margin of the last child has to fit in the box that contains it.** In a box that contains the margins of
   its children (border or padding, `Isolate margins`, the column of a `Columns`), when the last child fits on the page
   and its bottom margin does not, the break now goes before that child, as it does before a child whose top margin

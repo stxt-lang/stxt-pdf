@@ -23,6 +23,10 @@ solo se dibuje una de sus páginas: para una página de un PDF grande, lo mejor 
 El texto del documento tiene además sus propios límites: 10 MB, 100 niveles de anidado y 10 000 caracteres por línea,
 también con error `LIMIT`.
 
+El tiempo no es un límite: una conversión que tarda más de lo que se quiere esperar se corta con una `Cancellation` (un
+plazo, la interrupción del hilo), con un error de tipo `CANCELLED` y sin escribir nada
+([Uso desde Java](../implementation/api.md#cancelar-una-conversión)).
+
 > **Decisión:** límites conservadores, elegidos midiendo lo que cuesta cada entrada
 > ([detalles](../implementation/api.md#límites)). *Alternativa descartada:* un juego más alto (10 000 páginas, 100 Mpx),
 > que dejaba a un servicio expuesto.
