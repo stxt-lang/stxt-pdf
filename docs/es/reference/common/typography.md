@@ -63,6 +63,10 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
   líneas, de modo que las líneas quedan más parejas. Los espacios se estiran hasta la mitad de su ancho y no se encogen,
   y la última línea no cuenta.
 
+Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-laterales-side)) o a una letra capitular
+([Text](../components/text.md#letra-capitular-drop-cap)) son más cortas que la caja de contenido: los dos repartos trabajan
+con el ancho de cada línea, y una palabra que no cabe en una línea corta la deja vacía y pasa a la siguiente.
+
 En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)),
 también con `Hyphenate` si ninguna de sus partes cabe. Las palabras solo se parten con `Hyphenate` o donde el texto
 lleva un guion blando ([Guiones](#guiones-hyphenate)).
@@ -215,5 +219,5 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
   contextuales).
 - Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,
   y cambiar los mínimos de letras a cada lado del guion.
-- Color o tamaño distintos dentro de una línea: un tramo solo cambia negrita, cursiva, subrayado y tachado
-  ([Formato del texto](text-formatting.md#tramos)).
+- Color o tamaño distintos dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo
+  solo cambia negrita, cursiva, subrayado y tachado ([Formato del texto](text-formatting.md#tramos)).

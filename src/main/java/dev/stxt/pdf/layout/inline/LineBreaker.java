@@ -87,22 +87,40 @@ public final class LineBreaker {
     }
 
     /**
-     * A line of the line breaking: its runs, with consecutive ones of the same format joined, and whether it ends
-     * inside a word, with a hyphen (its last run ends with {@link #HYPHEN}).
+     * A line of the line breaking: its runs, with consecutive ones of the same format joined, whether it ends
+     * inside a word, with a hyphen (its last run ends with {@link #HYPHEN}), and the position of the text where it
+     * starts ({@link Paragraph}), from which the rest of the text can be broken again
+     * (reference/components/block.md). A line without runs is an empty one: a line beside a side box where no word
+     * fits, which is left blank.
      */
-    public record Line(List<TextRun> runs, boolean hyphenated) {
+    public record Line(List<TextRun> runs, boolean hyphenated, int start) {
 
         public Line {
             runs = List.copyOf(runs);
         }
 
-        /** A line that ends between words. */
+        /** A line that ends between words, at the start of the text. */
         public Line(List<TextRun> runs) {
-            this(runs, false);
+            this(runs, false, 0);
+        }
+
+        /** A line at the start of the text. */
+        public Line(List<TextRun> runs, boolean hyphenated) {
+            this(runs, hyphenated, 0);
+        }
+
+        /** An empty line at position {@code start}: no word of the text fits in it. */
+        static Line empty(int start) {
+            return new Line(List.of(), false, start);
         }
 
         public String text() {
             return TextRun.text(runs);
+        }
+
+        /** Whether the line has no words. */
+        public boolean isEmpty() {
+            return runs.isEmpty();
         }
     }
 
@@ -151,12 +169,28 @@ public final class LineBreaker {
     public static List<Line> breakLines(List<TextRun> runs, double available, TextMeasurer measurer,
                                         FontFace font, double fontSize, double letterSpacing, LineBreaking wrap,
                                         Hyphenator hyphenator) {
+        Paragraph paragraph = paragraph(runs, measurer, font, fontSize, letterSpacing, hyphenator);
+        return paragraph == null ? List.of() : breakLines(paragraph, 0, LineWidths.uniform(available), wrap);
+    }
+
+    /**
+     * The words of the text with their measures and positions ({@link Paragraph}), ready to be broken into lines
+     * any number of times, from any position and with any line widths; {@code null} if the text has no words.
+     */
+    static Paragraph paragraph(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
+                               double letterSpacing, Hyphenator hyphenator) {
         List<Word> words = words(runs, hyphenator);
-        if (words.isEmpty()) {
-            return List.of();
-        }
-        Paragraph paragraph = new Paragraph(words, measurer, font, fontSize, letterSpacing);
-        return wrap == LineBreaking.BALANCED ? optimal(paragraph, available) : greedy(paragraph, available);
+        return words.isEmpty() ? null : new Paragraph(words, measurer, font, fontSize, letterSpacing);
+    }
+
+    /**
+     * Lines of the text from position {@code from} (0 is its start) with the width of each line given by
+     * {@code widths} (reference/components/block.md): with the greedy algorithm or with Knuth-Plass. In a line narrower
+     * than the ones after it, a word that does not fit alone leaves it empty and goes to the next one, instead of
+     * overflowing.
+     */
+    static List<Line> breakLines(Paragraph p, int from, LineWidths widths, LineBreaking wrap) {
+        return wrap == LineBreaking.BALANCED ? optimal(p, from, widths) : greedy(p, from, widths);
     }
 
     /**
@@ -165,21 +199,23 @@ public final class LineBreaker {
      * next one. The width of a candidate line is the sum of the advances of its words, spaces and hyphen, each one
      * measured once; only when the sum is within {@link Tolerance#MODEL} of the available width is the line built
      * and measured whole, so the decision is the same as measuring it every time, regardless of the rounding of the
-     * sum.
+     * sum. A word that does not fit alone at the start of a line, not even split, takes the line and overflows,
+     * unless a later line is wider (a side box ends): then the line is left empty and the word goes to the next.
      */
-    private static List<Line> greedy(Paragraph p, double available) {
+    private static List<Line> greedy(Paragraph p, int from, LineWidths widths) {
         List<Line> lines = new ArrayList<>();
         int end = p.positions() - 1;
         // The line in progress starts at position a; lastFit is the last word end at which it still fits (-1 if
         // nothing has been added to it yet).
-        int a = 0;
+        int a = from;
         int lastFit = -1;
-        int w = 0;
+        int w = p.word(from);
         while (true) {
             if (w == p.words()) {
                 lines.add(p.line(a, end));
                 return lines;
             }
+            double available = widths.width(lines.size());
             int whole = p.start(w + 1);
             if (p.fitsMeasured(a, whole, available)) {
                 lastFit = whole;
@@ -208,6 +244,11 @@ public final class LineBreaker {
                 lastFit = -1;
                 continue;
             }
+            if (widths.widerLater(lines.size())) {
+                // Alone at the start of a line beside a side box and it does not fit: the line is left empty.
+                lines.add(Line.empty(a));
+                continue;
+            }
             // Alone at the start of the line and it does not fit, not even split: it takes the line and overflows.
             lastFit = whole;
             w++;
@@ -229,41 +270,109 @@ public final class LineBreaker {
      * </ul>
      *
      * <p>The width of a line is the sum of those of its words, spaces and hyphen.</p>
+     *
+     * <p>When the lines have different widths (reference/components/block.md), the state of the dynamic programming
+     * is the position and the number of the line that starts there, up to {@link LineWidths#varying()}: from that
+     * line on, every line has the same width and the number no longer matters. In a line narrower than the ones
+     * after it, a single piece of a word that does not fit may not overflow: the line is left empty, with the
+     * demerits of a line without badness, and the piece goes to the next one.</p>
      */
-    static List<Line> optimal(Paragraph p, double available) {
+    static List<Line> optimal(Paragraph p, int from, LineWidths widths) {
         int positions = p.positions();
         int end = positions - 1;
-        // best[j]: minimum demerits of the lines that end at position j; from[j]: position where the last of
-        // those lines starts.
-        double[] best = new double[positions];
-        int[] from = new int[positions];
-        Arrays.fill(best, Double.POSITIVE_INFINITY);
-        best[0] = 0;
-        for (int j = 1; j <= end; j++) {
-            for (int i = j - 1; i >= 0; i--) {
-                double width = p.advance(i, j) - p.letterSpacing;
-                if (!p.single(i, j) && !fits(width, available)) {
-                    // Starting earlier it would be even wider; a single piece of a word may overflow.
-                    break;
-                }
-                double d = best[i] + demerits(available - width, p.spaces(i, j) * STRETCH, j == end);
-                if (p.hyphen(j)) {
-                    d += HYPHEN_PENALTY * HYPHEN_PENALTY;
-                    if (p.hyphen(i)) {
-                        d += DOUBLE_HYPHEN_DEMERITS;
+        int states = widths.varying() + 1;
+        int uniform = states - 1;
+        // best[j][k]: minimum demerits of the lines that end at position j with line k the next to start there
+        // (k capped at the first uniform line); fromPos and fromLine, the state the last of those lines came from.
+        double[][] best = new double[positions][states];
+        int[][] fromPos = new int[positions][states];
+        int[][] fromLine = new int[positions][states];
+        for (double[] row : best) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
+        }
+        best[from][0] = 0;
+        skipEmpty(p, from, widths, best, fromPos, fromLine);
+        for (int j = from + 1; j <= end; j++) {
+            for (int next = 0; next < states; next++) {
+                // The lines that end at j with next as the following one started at a line k whose successor is next.
+                for (int k = Math.max(0, next - 1); k <= Math.min(next, uniform); k++) {
+                    if (k + 1 != next && !(k == uniform && next == uniform)) {
+                        continue;
+                    }
+                    double available = widths.width(k);
+                    for (int i = j - 1; i >= from; i--) {
+                        if (best[i][k] == Double.POSITIVE_INFINITY) {
+                            continue;
+                        }
+                        double width = p.advance(i, j) - p.letterSpacing;
+                        boolean single = p.single(i, j);
+                        if (!single && !fits(width, available)) {
+                            // Starting earlier it would be even wider; a single piece of a word may overflow.
+                            break;
+                        }
+                        if (single && !fits(width, available) && widths.widerLater(k)) {
+                            // Beside a side box, the piece goes to a wider line instead of overflowing.
+                            continue;
+                        }
+                        double d = best[i][k] + demerits(available - width, p.spaces(i, j) * STRETCH, j == end);
+                        if (p.hyphen(j)) {
+                            d += HYPHEN_PENALTY * HYPHEN_PENALTY;
+                            if (p.hyphen(i)) {
+                                d += DOUBLE_HYPHEN_DEMERITS;
+                            }
+                        }
+                        if (d < best[j][next]) {
+                            best[j][next] = d;
+                            fromPos[j][next] = i;
+                            fromLine[j][next] = k;
+                        }
                     }
                 }
-                if (d < best[j]) {
-                    best[j] = d;
-                    from[j] = i;
-                }
+            }
+            skipEmpty(p, j, widths, best, fromPos, fromLine);
+        }
+        int last = 0;
+        for (int k = 1; k < states; k++) {
+            if (best[end][k] < best[end][last]) {
+                last = k;
             }
         }
         List<Line> lines = new ArrayList<>();
-        for (int j = end; j > 0; j = from[j]) {
-            lines.add(0, p.line(from[j], j));
+        for (int j = end, k = last; j > from || k > 0; ) {
+            int i = fromPos[j][k];
+            int line = fromLine[j][k];
+            lines.add(0, i == j ? Line.empty(j) : p.line(i, j));
+            j = i;
+            k = line;
         }
         return lines;
+    }
+
+    /**
+     * The empty lines that may start at position {@code at}: beside a side box, if the smallest piece of the text
+     * from there does not fit in line {@code k} and a later line is wider, line {@code k} may be left empty and the
+     * text go on in line {@code k + 1}, with the demerits of a line without badness.
+     */
+    private static void skipEmpty(Paragraph p, int at, LineWidths widths, double[][] best, int[][] fromPos,
+                                  int[][] fromLine) {
+        if (at >= p.positions() - 1) {
+            return;
+        }
+        for (int k = 0; k < widths.varying(); k++) {
+            if (best[at][k] == Double.POSITIVE_INFINITY || !widths.widerLater(k)) {
+                continue;
+            }
+            double piece = p.advance(at, at + 1) - p.letterSpacing;
+            if (fits(piece, widths.width(k))) {
+                continue;
+            }
+            double d = best[at][k] + LINE_PENALTY * LINE_PENALTY;
+            if (d < best[at][k + 1]) {
+                best[at][k + 1] = d;
+                fromPos[at][k + 1] = at;
+                fromLine[at][k + 1] = k;
+            }
+        }
     }
 
     /** Demerits of a line with this leftover and this possible stretch. */
@@ -390,6 +499,17 @@ public final class LineBreaker {
      */
     public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double fontSize, double available,
                                  boolean justify, double y, double height, boolean hyphenated) {
+        return place(runs, measurer, s, fontSize, 0, 0, available, justify, y, height, hyphenated);
+    }
+
+    /**
+     * Like {@link #place(List, TextMeasurer, Style, double, double, boolean, double, double, boolean)}, in a line box
+     * that starts {@code left} points after the content box and ends {@code right} points before its end
+     * (reference/components/block.md): {@code available} is the width of that line box, and the line is aligned in it.
+     */
+    public static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double fontSize, double left,
+                                 double right, double available, boolean justify, double y, double height,
+                                 boolean hyphenated) {
         FontFace font = s.typography().fontFace();
         double[] widths = new double[runs.size()];
         double natural = 0;
@@ -413,7 +533,8 @@ public final class LineBreaker {
             placed.add(new TextLine.Run(at, w, r.text(), r.format()));
             at += w;
         }
-        return new TextLine(x, y, natural + spacing * spaces(text), height, fontSize, text, spacing, placed, hyphenated);
+        return new TextLine(left + x, y, natural + spacing * spaces(text), height, fontSize, text, spacing, placed,
+                hyphenated, left, right);
     }
 
     /**
@@ -848,7 +969,7 @@ public final class LineBreaker {
             if (hyphen(b)) {
                 runs.add(HYPHEN, hyphenFormat(words.get(last).parts(), posOffset[b]));
             }
-            return new Line(runs.build(), hyphen(b));
+            return new Line(runs.build(), hyphen(b), a);
         }
     }
 

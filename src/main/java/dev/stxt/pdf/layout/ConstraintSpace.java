@@ -1,7 +1,9 @@
 package dev.stxt.pdf.layout;
 
+import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.tree.PageSetup;
 
+import java.util.List;
 import java.util.OptionalDouble;
 
 /**
@@ -22,6 +24,10 @@ import java.util.OptionalDouble;
  * @param contentHeight           the height of the content is measured: the box ignores its {@code Height}
  *                                and its {@code Aspect ratio} (the automatic minimum of a stack item
  *                                in {@code column}, reference/components/stack.md); it is not passed to its children
+ * @param exclusions              the room the side boxes of the parent take beside the box
+ *                                (reference/components/block.md), measured from its border box: the lines of a text
+ *                                that overlap one shorten, and the children of a block get them in turn; empty in a
+ *                                box with nothing beside it
  */
 public record ConstraintSpace(
         double availableWidth,
@@ -32,7 +38,20 @@ public record ConstraintSpace(
         OptionalDouble percentBaseHeight,
         OptionalDouble fragmentainerRemaining,
         boolean atFragmentainerStart,
-        boolean contentHeight) {
+        boolean contentHeight,
+        List<Exclusion> exclusions) {
+
+    public ConstraintSpace {
+        exclusions = List.copyOf(exclusions);
+    }
+
+    /** A space with nothing beside the box. */
+    public ConstraintSpace(double availableWidth, OptionalDouble availableHeight, boolean fixedWidth,
+                           boolean fixedHeight, double percentBaseWidth, OptionalDouble percentBaseHeight,
+                           OptionalDouble fragmentainerRemaining, boolean atFragmentainerStart, boolean contentHeight) {
+        this(availableWidth, availableHeight, fixedWidth, fixedHeight, percentBaseWidth, percentBaseHeight,
+                fragmentainerRemaining, atFragmentainerStart, contentHeight, List.of());
+    }
 
     /** Space of the root box when a page starts: the whole page area. */
     public static ConstraintSpace forPage(PageSetup pageSetup) {
@@ -81,6 +100,11 @@ public record ConstraintSpace(
         return fragmentainerRemaining.isPresent();
     }
 
+    /** Whether some side box takes room beside the box. */
+    public boolean hasExclusions() {
+        return !exclusions.isEmpty();
+    }
+
     /**
      * The same space with a different remainder of page. It only makes sense if the space fragments:
      * {@link #fragmented} adds the fragmentation.
@@ -95,7 +119,7 @@ public record ConstraintSpace(
     /** The same space, to measure the height of the content without the box's {@code Height}. */
     public ConstraintSpace measuringContentHeight() {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
-                percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, true);
+                percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, true, exclusions);
     }
 
     /**
@@ -104,12 +128,23 @@ public record ConstraintSpace(
      */
     public ConstraintSpace unfragmented() {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
-                percentBaseWidth, percentBaseHeight, OptionalDouble.empty(), atFragmentainerStart, contentHeight);
+                percentBaseWidth, percentBaseHeight, OptionalDouble.empty(), atFragmentainerStart, contentHeight,
+                exclusions);
     }
 
     /** The same space, with fragmentation even if it had none (the items that are broken in parallel). */
     public ConstraintSpace fragmented(double remaining, boolean atStart) {
         return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
-                percentBaseWidth, percentBaseHeight, OptionalDouble.of(remaining), atStart, contentHeight);
+                percentBaseWidth, percentBaseHeight, OptionalDouble.of(remaining), atStart, contentHeight, exclusions);
+    }
+
+    /**
+     * The same space with the room the side boxes of the parent take beside the box
+     * (reference/components/block.md); an empty list, nothing beside it.
+     */
+    public ConstraintSpace withExclusions(List<Exclusion> beside) {
+        return new ConstraintSpace(availableWidth, availableHeight, fixedWidth, fixedHeight,
+                percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, contentHeight,
+                beside);
     }
 }

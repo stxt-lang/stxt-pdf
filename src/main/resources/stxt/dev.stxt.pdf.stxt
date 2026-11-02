@@ -90,7 +90,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Footnote
 	Node: Block
 		Type: GROUP
-		Description: Box that stacks its children vertically (block flow).
+		Description: Box that stacks its children vertically (block flow). With Side, a side box: it goes to one side and the text of the siblings that follow it runs beside it.
 		Children:
 			Child: Id
 				Max: 1
@@ -107,6 +107,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Isolate margins
 				Max: 1
 			Child: Rotate
+				Max: 1
+			Child: Side
+				Max: 1
+			Child: Clear
 				Max: 1
 			Child: Block
 			Child: Stack
@@ -214,9 +218,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
+			Child: Clear
+				Max: 1
 	Node: Paragraph
 		Type: INLINE
-		Description: A paragraph of the content, which For element: Paragraph rules style separately from standalone texts. A single paragraph: no blank lines in Content.
+		Description: A paragraph of the content, which For element: Paragraph rules style separately from standalone texts. A single paragraph: no blank lines in Content. With Drop cap, its first letter is a drop cap.
 		Children:
 			Child: Id
 				Max: 1
@@ -234,6 +240,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
+			Child: Clear
+				Max: 1
+			Child: Drop cap
+				Max: 1
 	Node: Heading 1
 		Type: GROUP
 		Description: Level 1 heading: a block with one or more Text. It appears in the PDF bookmarks and the engine avoids breaking inside it and after it.
@@ -249,6 +259,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Box
 				Max: 1
 			Child: Typography
+				Max: 1
+			Child: Clear
 				Max: 1
 			Child: Text
 				Min: 1
@@ -268,6 +280,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Typography
 				Max: 1
+			Child: Clear
+				Max: 1
 			Child: Text
 				Min: 1
 	Node: Heading 3
@@ -285,6 +299,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Box
 				Max: 1
 			Child: Typography
+				Max: 1
+			Child: Clear
 				Max: 1
 			Child: Text
 				Min: 1
@@ -304,6 +320,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Typography
 				Max: 1
+			Child: Clear
+				Max: 1
 			Child: Text
 				Min: 1
 	Node: Heading 5
@@ -322,6 +340,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Typography
 				Max: 1
+			Child: Clear
+				Max: 1
 			Child: Text
 				Min: 1
 	Node: Heading 6
@@ -339,6 +359,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Box
 				Max: 1
 			Child: Typography
+				Max: 1
+			Child: Clear
 				Max: 1
 			Child: Text
 				Min: 1
@@ -819,6 +841,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Table columns
 				Max: 1
+			Child: Clear
+				Max: 1
 			Child: Content
 				Min: 1
 				Max: 1
@@ -842,7 +866,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Image
 		Type: INLINE
-		Description: PNG, JPEG, SVG or PDF image from the images/ folder of the resources; the value is its path, relative to images/ (logos/acme.png). A box without children with the size and proportions of the file (of a PDF, of its page); it does not break across pages.
+		Description: PNG, JPEG, SVG or PDF image from the images/ folder of the resources; the value is its path, relative to images/ (logos/acme.png). A box without children with the size and proportions of the file (of a PDF, of its page); it does not break across pages. With Side, the text that follows it runs beside it.
 		Children:
 			Child: Id
 				Max: 1
@@ -861,6 +885,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Pdf page
 				Max: 1
 			Child: Rotate
+				Max: 1
+			Child: Side
+				Max: 1
+			Child: Clear
 				Max: 1
 	Node: Barcode
 		Type: INLINE
@@ -885,6 +913,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Error correction
 				Max: 1
 			Child: Rotate
+				Max: 1
+			Child: Side
+				Max: 1
+			Child: Clear
 				Max: 1
 			Child: Content
 				Max: 1
@@ -1133,6 +1165,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
 		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
+	Node: Side
+		Type: ENUM
+		Description: Side box: an Image, a Barcode or a Block (with Width or Max width) in block flow that goes to the left or to the right of its container, at its place in the flow, and the text of the siblings that follow it shortens its lines beside it; its Margin is the separation. A sibling that is not text (a Table, a Stack, a List) goes below it. It is not split across pages: if it does not fit, it moves to the next page with the first line that runs beside it. Not on an item of a Stack or a Grid, nor on a cell.
+		Values:
+			Value: left
+			Value: right
+	Node: Clear
+		Type: BOOLEAN
+		Description: Whether the box goes below the side boxes (Side) before it, instead of running beside them. By default, false. Without a side box before it, it is an error.
+	Node: Drop cap
+		Type: INTEGER
+		Description: Drop cap of a Paragraph: its first letter is taken out of the text and set, in the font of the paragraph, at the size whose capitals are as tall as this number of lines (from 2 to 5), at the left of them. Not in a preformatted Paragraph.
 	Node: Paper
 		Type: ENUM
 		Description: Named paper size of the medium, in portrait: A3 (297 × 420 mm), A4 (210 × 297 mm), A5 (148 × 210 mm), A6 (105 × 148 mm), B4 (250 × 353 mm), B5 (176 × 250 mm), Letter (612 × 792 pt) or Legal (612 × 1008 pt). It is not declared with Width or Height.

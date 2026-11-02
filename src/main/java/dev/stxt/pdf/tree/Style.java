@@ -9,6 +9,7 @@ import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
@@ -39,6 +40,11 @@ import dev.stxt.pdf.model.Value;
  * box ({@link Box#close}) and from then on it is only read, also from several threads.</p>
  */
 public final class Style extends StyleGroup {
+
+    /** The fewest lines a drop cap takes up ({@code Drop cap}, reference/components/text.md). */
+    public static final int MIN_DROP_CAP = 2;
+    /** The most lines a drop cap takes up. */
+    public static final int MAX_DROP_CAP = 5;
 
     private TypographyStyle typography = new TypographyStyle();
     private final BoxStyle box = new BoxStyle();
@@ -81,6 +87,19 @@ public final class Style extends StyleGroup {
      * (reference/components/table-of-contents.md). Not inherited.
      */
     private boolean inTableOfContents = true;
+    /**
+     * {@code Side} of an {@code Image}, a {@code Barcode} or a {@code Block} in block flow (reference/components/block.md):
+     * the box goes to that side and the text of the siblings that follow it runs beside it; {@code null} = in the flow.
+     * Not inherited.
+     */
+    private Side side;
+    /** {@code Clear}: the box goes below the side boxes before it (reference/components/block.md). Not inherited. */
+    private boolean clear;
+    /**
+     * {@code Drop cap} of a {@code Paragraph} (reference/components/text.md): the lines its first letter takes up;
+     * 0 = no drop cap. Not inherited.
+     */
+    private int dropCap;
     /** The names of {@code Named color} with which its colors are read; all the boxes share those of the root. */
     private NamedColors namedColors = NamedColors.NONE;
 
@@ -249,6 +268,40 @@ public final class Style extends StyleGroup {
     void setInTableOfContents(boolean v) {
         writable();
         inTableOfContents = v;
+    }
+
+    /** The side the box goes to; {@code null} if it is in the flow. */
+    public Side side() {
+        return side;
+    }
+
+    void setSide(Side v) {
+        writable();
+        side = v;
+    }
+
+    /** Whether the box is a side box: it goes to a side and the text runs beside it. */
+    public boolean isSideBox() {
+        return side != null;
+    }
+
+    public boolean clear() {
+        return clear;
+    }
+
+    void setClear(boolean v) {
+        writable();
+        clear = v;
+    }
+
+    /** Lines the drop cap of a {@code Paragraph} takes up; 0 without a drop cap. */
+    public int dropCap() {
+        return dropCap;
+    }
+
+    void setDropCap(int v) {
+        writable();
+        dropCap = v;
     }
 
     // --- Lines of the properties --------------------------------------------------------------------

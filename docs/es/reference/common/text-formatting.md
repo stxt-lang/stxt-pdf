@@ -154,7 +154,8 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 ## Lo que no hay
 
-- Tramos con otro tamaño (salvo el superíndice de una nota al pie), otro color u otra familia (salvo el código), ni que
-  quiten la negrita o la cursiva de la caja.
+- Tramos con otro tamaño (salvo el superíndice de una nota al pie y la letra capitular de un `Paragraph`,
+  [Text](../components/text.md#letra-capitular-drop-cap)), otro color u otra familia (salvo el código), ni que quiten la
+  negrita o la cursiva de la caja.
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.

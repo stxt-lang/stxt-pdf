@@ -6,6 +6,7 @@
 | **Box that isolates margins** | Box out of which the margins of its children do not pass: it stops margin merging ([Block](../components/block.md#boxes-that-isolate-margins)). |
 | **Column** | Each fragment container into which a `Columns` splits its content on a page ([Columns](../components/columns.md)). |
 | **Definite** | Size that is known without laying out the content ([Values](values.md#definite-height)). |
+| **Drop cap** (`Drop cap`) | First letter of a `Paragraph` set large, taking up its first lines, which start at its right ([Text](../components/text.md#drop-cap-drop-cap)). |
 | **Element** | A node of the document that is a box: `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`, `Table of contents`, `Image`, `Barcode`, `Frame`, `Overlay` or `Page overlay` ([Structure](structure.md#elements)). |
 | **Fragment** | Part of a box that falls in a fragment container. |
 | **Fragment container** | Where the fragments of the boxes fall: each page and, inside a `Columns`, each column ([Breaks](breaks.md#model)). |
@@ -29,6 +30,7 @@
 | **Rotation** (`Rotate`) | A box that is painted rotated: in flow, around its center and taking up the rectangle that encloses it, and positioned, around its `Rotate origin` and without changing the layout. Rotated content has to fit on the page ([Layers and rotation](layers-and-rotation.md#rotation-rotate)). |
 | **Run** | Part of the text of a box with its formatting (bold, italic, underline, strikethrough, link and, in code, another family) ([Text formatting](text-formatting.md#runs)). |
 | **Section** | Independent part of the document (`Section`): it starts a page and has its own `Page`, its `Page overlay` elements and its numbering ([Document](../components/document.md#section)). |
+| **Side box** (`Side`) | `Image`, `Barcode` or `Block` placed at one side of its container, with the text of the siblings that follow it running beside it ([Block](../components/block.md#side-boxes-side)). |
 | **Small caps** | Lowercase letters painted as smaller capitals (`Small caps`). |
 | **Stacking context** | Group of boxes that is painted as a unit and orders its children by `Layer` ([Layers and rotation](layers-and-rotation.md)). |
 | **Static position** | Where a positioned box would have been if it were in flow ([positioned elements](../components/frame-and-overlays.md#overlay)). |

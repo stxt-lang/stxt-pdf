@@ -1,0 +1,16 @@
+# Case: Keep together in a Block with Side, which is not split
+# Code: BREAK_IN_SIDE_BOX
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Side: left
+			Box:
+				Width: 100
+			Break:
+				Keep together: true

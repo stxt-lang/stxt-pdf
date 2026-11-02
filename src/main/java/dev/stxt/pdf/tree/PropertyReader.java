@@ -21,6 +21,7 @@ import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Pages;
+import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
@@ -132,6 +133,9 @@ final class PropertyReader {
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),
+            entry("side", (p, s) -> s.setSide(enumValue(Side.class, p))),
+            entry("clear", (p, s) -> s.setClear(bool(p))),
+            entry("drop-cap", (p, s) -> s.setDropCap(dropCap(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
@@ -228,6 +232,19 @@ final class PropertyReader {
             throw error(p, ErrorCode.LINK_SCHEME, "Link: " + problem);
         });
         return destination;
+    }
+
+    /**
+     * {@code Drop cap} of a {@code Paragraph} (reference/components/text.md): the lines the first letter takes up, from
+     * {@value Style#MIN_DROP_CAP} to {@value Style#MAX_DROP_CAP}.
+     */
+    private static int dropCap(Node p) {
+        int lines = integer(p);
+        if (lines < Style.MIN_DROP_CAP || lines > Style.MAX_DROP_CAP) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Drop cap allows from " + Style.MIN_DROP_CAP + " to "
+                    + Style.MAX_DROP_CAP + " lines: " + lines);
+        }
+        return lines;
     }
 
     /**

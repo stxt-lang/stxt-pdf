@@ -128,6 +128,21 @@ public enum ErrorCode {
     /** {@code Keep together} or {@code Edges} in an {@code Image} or a {@code Barcode}, which are not split. */
     BREAK_IN_IMAGE,
 
+    // --- Side boxes and drop caps ----------------------------------------------------------------
+    /**
+     * {@code Side} on an item of a {@code Stack} or a {@code Grid}: a side box goes in block flow, with the text that
+     * runs beside it (reference/components/block.md).
+     */
+    SIDE_NOT_IN_BLOCK_FLOW,
+    /** {@code Side} on a {@code Block} with {@code Width: auto} and no {@code Max width}: it would take the whole width. */
+    SIDE_WITHOUT_WIDTH,
+    /** {@code Keep together} or {@code Edges} in a {@code Block} with {@code Side}, which is not split. */
+    BREAK_IN_SIDE_BOX,
+    /** {@code Clear: true} without a side box before the box. */
+    CLEAR_WITHOUT_SIDE,
+    /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
+    DROP_CAP_NOT_ALLOWED,
+
     // --- Barcodes -------------------------------------------------------------------------------
     /**
      * A {@code Barcode} without data, or with data that its {@code Format} cannot encode: characters it does not have,

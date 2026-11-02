@@ -1,0 +1,17 @@
+# Case: Clear without a side box before the paragraph
+# Code: CLEAR_WITHOUT_SIDE
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Paragraph: Hola
+			Clear: true

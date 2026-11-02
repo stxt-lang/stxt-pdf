@@ -1,5 +1,6 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Position;
@@ -412,6 +413,30 @@ public final class Box {
     /** Whether it is the generated box of the marker of a {@code List item}. */
     public boolean isMarker() {
         return element == Element.MARKER;
+    }
+
+    /**
+     * Whether the box can run beside the side boxes of its parent (reference/components/block.md) instead of going
+     * below them: a text box that is not preformatted, or a box in block flow whose children can (a {@code Block}, a
+     * heading, a {@code Markdown}, a list and its items), so that the text inside it runs beside them too. Not a box
+     * with background or border, which would be painted over the side box; not a side box itself, a cleared one
+     * ({@code Clear}), a rotated one or one with {@code Overflow: clip}, which are placed whole; and not a table of
+     * contents or a container, whose entries or items are not text that shortens its lines. A list only runs beside
+     * side boxes on the right: its markers hang at its left, where a side box on the left would be
+     * ({@link dev.stxt.pdf.layout.block.BlockLayout} decides that with the side boxes in sight).
+     */
+    public boolean wrapsBesideSideBoxes() {
+        if (style.isSideBox() || style.clear() || style.position() != Position.STATIC || style.rotation() != null
+                || style.box().clips() || style.box().background() != null
+                || Insets.resolve(style.box().border(), 0).horizontal() + Insets.resolve(style.box().border(), 0).vertical() > 0) {
+            return false;
+        }
+        if (style.layout() == Layout.INLINE) {
+            return !style.typography().preformatted().enabled();
+        }
+        Element.Role r = role();
+        return style.layout() == Layout.BLOCK && (r == Element.Role.BLOCK || r == Element.Role.HEADING
+                || r == Element.Role.LIST || r == Element.Role.LIST_ITEM);
     }
 
     /** Runs of the text: those of {@link #formattedRuns()} or, without formatting, a single run with all the text. */

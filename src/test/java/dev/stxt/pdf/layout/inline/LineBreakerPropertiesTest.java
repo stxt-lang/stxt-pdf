@@ -150,8 +150,11 @@ class LineBreakerPropertiesTest {
                 available = LineBreaker.width(LineBreaker.line(first).runs(), metrics, font, size, spacing)
                         + nudges[random.nextInt(nudges.length)];
             }
-            assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing),
-                    LineBreaker.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE),
+            // The reference does not know the positions of the lines: only their runs are compared.
+            assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing).stream()
+                            .map(LineBreaker.Line::runs).toList(),
+                    LineBreaker.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE).stream()
+                            .map(LineBreaker.Line::runs).toList(),
                     available + " pt, " + size + " pt, letter spacing " + spacing + ": " + runs);
         }
     }

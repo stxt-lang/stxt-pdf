@@ -1,0 +1,14 @@
+# Case: Side on a Stack item
+# Code: SIDE_NOT_IN_BLOCK_FLOW
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Stack:
+			Item:
+				Image: test/square.png
+					Side: left

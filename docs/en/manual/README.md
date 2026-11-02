@@ -38,8 +38,8 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | Page | What it is for |
 |---|---|
 | [`Document` and `Section`](components/document.md) | The document, the page size, the sections and the page numbering |
-| [`Block`](components/block.md) | Grouping elements one below another |
-| [`Text` and `Paragraph`](components/text.md) | Text and paragraphs |
+| [`Block`](components/block.md) | Grouping elements one below another, and placing a box at one side with the text around it |
+| [`Text` and `Paragraph`](components/text.md) | Text and paragraphs, with drop caps |
 | [Headings](components/heading.md) | Chapter and section titles, numbered or not |
 | [`List`](components/list.md) | Bulleted or numbered lists |
 | [`Table`](components/table.md) | Tables with a header and a footer that repeat on each page |

@@ -1,8 +1,9 @@
 # `Block`
 
-Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins` y
-`Rotate`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
+Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
+`Rotate`, `Side` y `Clear`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
 y ocupa el rectángulo que la envuelve ([Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image)).
+Con `Side`, es una [caja lateral](#cajas-laterales-side): el texto que la sigue corre a su lado.
 
 ```
 Block:
@@ -63,6 +64,69 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 > **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
 
+## Cajas laterales (`Side`)
+
+Una `Image`, un `Barcode` o un `Block` en flujo de bloque con `Side: left` o `Side: right` es una **caja lateral**: se
+coloca a ese lado del contenedor, en la posición que tiene el flujo cuando se llega a ella, y no ocupa sitio en vertical.
+Los hermanos que la siguen empiezan donde empezarían sin ella y, mientras solapan con ella en vertical, el texto **acorta
+sus líneas** a su lado. Es la figura junto al texto de un manual, o la foto en una columna de un boletín.
+
+```
+Image: examples/newsletter/trail.jpg
+    Side: left
+    Alt: Un sendero entre prados con montañas al fondo
+    Box:
+        Width: 180
+        Margin: 0 12 6 0
+Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto llegue a su altura, corre a su derecha.
+```
+
+- **El margen es la separación.** Lo que se quita al texto es la caja de margen de la caja lateral: `Margin: 0 12 6 0`
+  deja 12 entre la foto y las líneas y 6 por debajo. Un margen `auto` no tiene efecto y es un error
+  (`MARGIN_AUTO_WITHOUT_EFFECT`).
+- **Quién la rodea.** Los `Text` y `Paragraph` que la siguen y, con el texto que tienen dentro, los `Block`, los
+  encabezados, los `Markdown` y las listas: una línea se acorta si alguna parte de su alto cae a la altura de la caja.
+  Una `List` solo rodea una caja lateral derecha: sus marcadores cuelgan a su izquierda, donde estaría una izquierda,
+  así que con ella va debajo. Lo demás **se coloca debajo** de las cajas laterales: una `Table`, un `Stack`, un `Grid`,
+  un `Columns`, un `Table of contents`, un `Frame`, una caja girada o recortada, un texto preformateado y un texto,
+  bloque o encabezado con `Background` o `Border`, que se pintaría encima de la caja. También va debajo lo que lleva
+  `Clear: true`.
+- **`Clear`.** `Clear: true` en un `Text`, un `Paragraph`, un `Block`, un encabezado, un `Markdown`, una `Image` o un
+  `Barcode` lo baja por debajo de las cajas laterales que hay antes que él, en lugar de rodearlas. Sin una caja lateral
+  antes es un error (`CLEAR_WITHOUT_SIDE`).
+- **Una palabra que no cabe** al lado de la caja deja esa línea vacía y pasa a la siguiente, hasta la primera línea con el
+  ancho entero; solo es un desbordamiento si tampoco cabe ahí (`TEXT_OVERFLOW`). Con `Line breaking: balanced`, el reparto
+  tiene en cuenta el ancho de cada línea.
+- **Varias cajas laterales.** Una segunda caja lateral del mismo lado que solapa con la anterior va debajo de ella; una
+  del otro lado va a su altura, y el texto corre entre las dos.
+- **El alto del contenedor** llega hasta el final de sus cajas laterales si el texto acaba antes, y entonces el margen
+  de abajo de su último hijo no sale de él.
+- **Dónde va.** En flujo de bloque: una sección, un `Block`, un `Frame`, un `Overlay`, un `Page overlay`, una `Cell` con
+  elementos, un `List item`, una columna de un `Columns`. No en un ítem de `Stack` o `Grid`, que coloca la caja él mismo
+  (`SIDE_NOT_IN_BLOCK_FLOW`). Un `Block` con `Side` necesita `Width` o `Max width` (`SIDE_WITHOUT_WIDTH`).
+- **Cortes.** Una caja lateral no se parte: si no cabe en lo que queda de la página pasa a la siguiente, y la primera
+  línea que la rodea va con ella (el corte entre la caja y el hijo que la sigue es tan malo como separar dos cajas con
+  `Keep with next`). Las cajas laterales acaban con la página: el texto que sigue en la página siguiente tiene el ancho
+  entero y se reparte de nuevo en líneas desde donde se cortó. `Keep together` y `Edges` en un `Block` lateral son un
+  error (`BREAK_IN_SIDE_BOX`), y un `Break` dentro de él, también (`BREAK_IN_UNBREAKABLE`).
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Side` | `left`, `right` | sin valor | Hace de la caja una caja lateral. En `Image`, `Barcode` y `Block` (con `Width` o `Max width`). |
+| `Clear` | booleano | `false` | Baja la caja por debajo de las cajas laterales anteriores. En `Text`, `Paragraph`, `Block`, los encabezados, `Markdown`, `Image` y `Barcode`. |
+
+> **Decisión:** la caja lateral es lo único que hace que el texto rodee a otra caja; se coloca en su sitio del flujo y
+> no se mueve. *Alternativa descartada:* los flotantes como mecanismo general de colocación, que `Stack`, `Grid`,
+> `Frame` y `Overlay` ya cubren.
+
+> **Decisión:** lo que no es texto va debajo de la caja lateral, y lo que tiene fondo o borde también, porque se pintaría
+> encima de ella. *Alternativa descartada:* estrechar una tabla o un `Stack` al lado de la caja, o pintar la caja lateral
+> encima de lo que la rodea.
+
+> **Decisión:** la caja lateral y la primera línea que la rodea van juntas, y las cajas laterales acaban con la página:
+> el texto que sigue en la otra página se reparte de nuevo con el ancho entero. *Alternativa descartada:* seguir
+> acortando las líneas de la página siguiente como si la caja estuviera allí.
+
 ## Tamaños intrínsecos
 
 El ancho más estrecho de un `Block` es el máximo de los anchos más estrechos de sus hijos, y su ancho natural, el máximo de
@@ -78,5 +142,7 @@ Un `Block` agrupa su contenido sin anunciarse: un lector de pantalla lee lo que 
 
 ## Lo que no hay
 
-- Cajas que floten a un lado del texto, o texto que rodee a otra caja.
+- Que una tabla, un `Stack`, un texto con fondo o borde, o una lista junto a una caja lateral izquierda, rodeen la caja:
+  van debajo de ella ([Cajas laterales](#cajas-laterales-side)). Tampoco una caja lateral en un ítem de `Stack` o
+  `Grid`.
 - Recorte de lo que se sale (lo que se sale es un [desbordamiento](../common/overflow.md)).

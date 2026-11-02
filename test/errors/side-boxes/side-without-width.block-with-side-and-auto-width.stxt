@@ -1,0 +1,14 @@
+# Case: Side on a Block without Width or Max width
+# Code: SIDE_WITHOUT_WIDTH
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Block:
+			Side: left
+			Box:
+				Padding: 10

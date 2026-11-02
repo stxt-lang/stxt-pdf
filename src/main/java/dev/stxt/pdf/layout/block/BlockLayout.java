@@ -17,9 +17,12 @@ import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.layout.Slice;
 import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Break;
+import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Position;
+import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.tree.Box;
+import dev.stxt.pdf.tree.Element;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +38,34 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * cursor = 0; strut = empty
  * for each child:
  *     if Overlay/Page overlay: record PendingOverlay with the static position; continue
- *     r = context.layout(child, content box as reference container)
+ *     if Side: place it whole at its side, at the flow position, below the side boxes of that side; continue
+ *     r = context.layout(child, content box as reference container, with what the side boxes take beside it)
  *     strut += top margin of the child + those that come out of it at the top
  *     if nothing yet between the top border of the box and the child: the strut comes out of the box
  *     else: cursor += strut                                            // merging
  *     place the fragment at (left margin, cursor)                      // auto margins = center
  *     if Frame: shift the fragment by Offset
  *     cursor += height; strut = bottom margin of the child + those that come out of it at the bottom
- * Height auto = cursor (+ strut if it does not come out at the bottom) + padding + border
+ * Height auto = cursor (+ strut if it does not come out at the bottom) + padding + border, or the bottom of the
+ * side boxes if they go lower
  * </pre>
  *
  * <p>The margins that come out of the box are returned in {@link AdjoiningMargins}: the parent merges them
  * with the box's own margins. An empty child lets its margins through.</p>
+ *
+ * <p><strong>Side boxes</strong> ({@code Side}, reference/components/block.md). A child with {@code Side} does not
+ * take part in the vertical flow: it is placed whole at the left or at the right of the content box, at the position
+ * the flow has when it is reached (below a side box of the same side that is still beside the flow), and the cursor
+ * does not move. From then on, while a child overlaps it vertically, the child runs beside it or goes below it:
+ * a text, and a box whose children can run beside it ({@link Box#wrapsBesideSideBoxes}), receives what the side
+ * boxes take from each of its sides as {@link ConstraintSpace#exclusions()}, measured from its own border box, and
+ * shortens its lines; any other child (a table, a stack, a text with background or border, a child with
+ * {@code Clear}, a list beside a side box on the left) is placed below the side boxes. The exclusions of the space of the box itself, which its parent
+ * gives it when the box runs beside the side boxes of the parent, count like side boxes of its own, except for its
+ * height. A side box is not split: if it does not fit in what is left of the page it moves to the next one, and the
+ * break between it and the child that follows it is as bad as one that separates two boxes kept together, so that
+ * the side box goes with the first line that runs beside it. The exclusions end with the page: on the next one,
+ * the text has the whole width.</p>
  *
  * <p><strong>Fragmentation</strong> (reference/common/breaks.md). Each child receives what is left of the page
  * from its top border. Before each child, if something has already been placed in this fragment, there is a
@@ -102,6 +121,29 @@ public final class BlockLayout implements LayoutAlgorithm {
     private record Mark(int index, BreakToken childToken, int appeal, double cursor, int fragments, int pending) {
     }
 
+    /**
+     * What a side box takes beside the flow, in the coordinates of the content box: the band from {@code top} to
+     * {@code bottom} and the room from the left edge ({@code left}) and from the right edge ({@code right}) of the
+     * content box, margins included (reference/components/block.md). The exclusions the box itself receives from its
+     * parent are here too, without a fragment.
+     *
+     * @param fragment index of the fragment of the side box among the child fragments; -1 if it comes from the parent
+     */
+    private record Beside(double top, double bottom, double left, double right, int fragment) {
+
+        boolean own() {
+            return fragment >= 0;
+        }
+
+        boolean onLeft() {
+            return left > EPSILON;
+        }
+
+        boolean onRight() {
+            return right > EPSILON;
+        }
+    }
+
     /** Layout of one fragment of a box. */
     private final class Run {
         final Box box;
@@ -120,6 +162,8 @@ public final class BlockLayout implements LayoutAlgorithm {
         final List<Fragment> fragments = new ArrayList<>();
         final List<PendingOverlay> pending = new ArrayList<>();
         final List<Mark> marks = new ArrayList<>();
+        /** The side boxes beside the flow, own and inherited from the parent, in the order they were placed. */
+        final List<Beside> beside = new ArrayList<>();
         MarginStrut strut = MarginStrut.EMPTY;
         MarginStrut topOut = MarginStrut.EMPTY;
         /** While it is true, nothing separates the top border of the box from the current child. */
@@ -145,6 +189,27 @@ public final class BlockLayout implements LayoutAlgorithm {
                     ? childSpace.fragmentainerRemaining().getAsDouble() : Double.POSITIVE_INFINITY;
             // In a fragment that continues the box no margin comes out at the top.
             this.atTop = first && !box.isolatesMargins() && model.openAtTop();
+            inherit();
+        }
+
+        /**
+         * The exclusions of the space of the box, measured from its border box, as side boxes of the content box: the
+         * top border and padding of this fragment move them up, and the left and right ones take part of them.
+         */
+        void inherit() {
+            if (!space.hasExclusions()) {
+                return;
+            }
+            double top = Slice.top(model, first);
+            double left = model.border().left() + model.padding().left();
+            double right = model.border().right() + model.padding().right();
+            for (Exclusion e : space.exclusions()) {
+                Beside b = new Beside(e.top() - top, e.bottom() - top, Math.max(0, e.left() - left),
+                        Math.max(0, e.right() - right), -1);
+                if (b.bottom() > EPSILON && (b.onLeft() || b.onRight())) {
+                    beside.add(b);
+                }
+            }
         }
 
         LayoutResult layOut() {
@@ -169,10 +234,15 @@ public final class BlockLayout implements LayoutAlgorithm {
                         return broken(mark(i, BreakRules.forcedAppeal(forced)));
                     }
                     if (progress) {
-                        marks.add(mark(i, BreakRules.between(previous, child)));
+                        // A side box goes with the child that follows it: the break between them is as bad as one
+                        // between boxes kept together (reference/components/block.md).
+                        int appeal = previous.style().isSideBox()
+                                ? Math.min(BreakRules.between(previous, child), BreakAppeal.VIOLATES_KEEP_BETWEEN)
+                                : BreakRules.between(previous, child);
+                        marks.add(mark(i, appeal));
                     }
                 }
-                LayoutResult early = place(i, child);
+                LayoutResult early = child.style().isSideBox() ? placeSide(child) : place(i, child);
                 if (early != null) {
                     return early;
                 }
@@ -187,28 +257,32 @@ public final class BlockLayout implements LayoutAlgorithm {
             // The child that starts a continuation fragment touches the break: its margins are
             // truncated, unless the break was forced. A resumed child no longer has a top margin.
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
+            // A child that does not run beside the side boxes goes below them (reference/components/block.md).
+            double flow = top(MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top()));
+            boolean wraps = wraps(child, flow);
+            double clear = beside.isEmpty() || wraps ? Double.NEGATIVE_INFINITY : clearance();
 
-            double y = top(MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top()));
+            double y = Math.max(flow, clear);
             if (noRoom(y)) {
                 return breakBefore();
             }
-            LayoutResult r = layOutChild(child, y, childToken);
+            LayoutResult r = layOutChild(child, y, childToken, wraps);
             if (r.breakToken() instanceof BreakToken.Before) {
                 return breakBefore();
             }
             AdjoiningMargins adjoining = r.adjoining();
             MarginStrut childTop = noTopMargin ? MarginStrut.EMPTY : adjoining.top().add(margin.top());
             // An empty box also lets its bottom margin merge with those around it.
-            double flowY = adjoining.collapsesThrough()
+            double flowY = Math.max(adjoining.collapsesThrough()
                     ? top(childTop.add(margin.bottom()))
-                    : top(childTop);
-            if (fragmenting && !same(flowY, y)) {
+                    : top(childTop), clear);
+            if (!same(flowY, y) && (fragmenting || wraps)) {
                 // The margins that come out of the child at the top have moved it down: what is left of the page
-                // for it changes, and it may have run out.
+                // for it, and what is beside it, change, and the page may have run out.
                 if (noRoom(flowY)) {
                     return breakBefore();
                 }
-                r = layOutChild(child, flowY, childToken);
+                r = layOutChild(child, flowY, childToken, wraps);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return breakBefore();
                 }
@@ -223,10 +297,9 @@ public final class BlockLayout implements LayoutAlgorithm {
                 if (atTop) {
                     topOut = strut;
                     atTop = false;
-                } else {
-                    cursor += strut.resolve();
                 }
-                cursor += f.height();
+                // Where the child ends: its top merged with the strut or, if it was cleared, the clearance.
+                cursor = flowY + f.height();
                 strut = adjoining.bottom().add(margin.bottom());
             }
 
@@ -262,6 +335,107 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         /**
+         * Places a side box (reference/components/block.md): whole, at its side of the content box, where the flow is
+         * now or below the side boxes of that side (and, with {@code Clear}, of both), with its margins as the
+         * separation from the text. The cursor does not move. If it does not fit in what is left of the page, the
+         * box breaks before it, as before any child that does not fit.
+         */
+        LayoutResult placeSide(Box child) {
+            Insets margin = Insets.resolve(child.style().box().margin(), contentWidth);
+            boolean onLeft = child.style().side() == Side.LEFT;
+            double y = Math.max(top(MarginStrut.EMPTY), clearance(onLeft));
+            if (child.style().clear()) {
+                y = Math.max(y, clearance());
+            }
+            LayoutResult r = context.layout(child, childSpace.unfragmented(), null);
+            Fragment f = r.fragment();
+            double height = margin.top() + f.height() + margin.bottom();
+            if (fragmenting && !fits(y + height, contentRemaining) && !(space.atFragmentainerStart() && !progress)) {
+                return breakBefore();
+            }
+            double x = onLeft ? margin.left() : contentWidth - margin.right() - f.width();
+            double childY = y + margin.top();
+            fragments.add(f.moved(x, childY));
+            double dx = x + f.border().left() + f.padding().left();
+            double dy = childY + f.border().top() + f.padding().top();
+            r.pending().forEach(p -> pending.add(p.translated(dx, dy)));
+            beside.add(new Beside(y, y + height, onLeft ? x + f.width() + margin.right() : 0,
+                    onLeft ? 0 : contentWidth - x + margin.left(), fragments.size() - 1));
+            previous = child;
+            progress = true;
+            return null;
+        }
+
+        /**
+         * Whether the child runs beside the side boxes ({@link Box#wrapsBesideSideBoxes}) from position {@code y}: a
+         * list only beside the ones on the right, because its markers hang at its left, where a side box on the left
+         * would be (reference/components/block.md).
+         */
+        boolean wraps(Box child, double y) {
+            if (!child.wrapsBesideSideBoxes()) {
+                return false;
+            }
+            if (child.role() == Element.Role.LIST) {
+                for (Beside b : beside) {
+                    if (b.onLeft() && b.bottom() > y + EPSILON) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /** The bottom of the side boxes beside the flow: where a child that does not run beside them goes. */
+        double clearance() {
+            double bottom = Double.NEGATIVE_INFINITY;
+            for (Beside b : beside) {
+                bottom = Math.max(bottom, b.bottom());
+            }
+            return bottom;
+        }
+
+        /** The bottom of the side boxes on one side: where a new side box of that side goes. */
+        double clearance(boolean onLeft) {
+            double bottom = Double.NEGATIVE_INFINITY;
+            for (Beside b : beside) {
+                if (onLeft ? b.onLeft() : b.onRight()) {
+                    bottom = Math.max(bottom, b.bottom());
+                }
+            }
+            return bottom;
+        }
+
+        /** The bottom of the side boxes of this fragment among its first {@code count} child fragments, or 0. */
+        double sidesBottom(int count) {
+            double bottom = 0;
+            for (Beside b : beside) {
+                if (b.own() && b.fragment() < count) {
+                    bottom = Math.max(bottom, b.bottom());
+                }
+            }
+            return bottom;
+        }
+
+        /**
+         * What the side boxes take beside a child whose border box starts at ({@code childX}, {@code childY}) and is
+         * {@code childWidth} wide, measured from that border box: the bands that reach below its top.
+         */
+        List<Exclusion> exclusionsFor(double childX, double childY, double childWidth) {
+            List<Exclusion> exclusions = new ArrayList<>();
+            for (Beside b : beside) {
+                if (b.bottom() <= childY + EPSILON) {
+                    continue;
+                }
+                Exclusion e = new Exclusion(b.top() - childY, b.bottom() - childY, Math.max(0, b.left() - childX),
+                        Math.max(0, b.right() - (contentWidth - childX - childWidth)));
+                if (e.intrudes()) {
+                    exclusions.add(e);
+                }
+            }
+            return exclusions;
+        }
+
+        /**
          * Nothing of a child whose top border would be at {@code y} fits on this page. At the start of a page, with
          * nothing placed before it, something is placed anyway (progress guarantee): then there is always room.
          */
@@ -286,10 +460,23 @@ public final class BlockLayout implements LayoutAlgorithm {
             return atTop ? 0 : cursor + strut.add(childTop).resolve();
         }
 
-        LayoutResult layOutChild(Box child, double y, BreakToken childToken) {
+        /**
+         * Layout of a child whose top border is at {@code y}; if it runs beside the side boxes ({@code wraps}), with
+         * what they take from its sides, which depends on where it is placed.
+         */
+        LayoutResult layOutChild(Box child, double y, BreakToken childToken, boolean wraps) {
             ConstraintSpace s = fragmenting
                     ? childSpace.withRemaining(contentRemaining - y, space.atFragmentainerStart() && !progress)
                     : childSpace;
+            if (wraps && !beside.isEmpty()) {
+                double width = BoxModel.resolve(child, s, context).width();
+                double x = Sizing.horizontalMargins(contentWidth, width, child.style().box().margin().left(),
+                        child.style().box().margin().right())[0];
+                List<Exclusion> exclusions = exclusionsFor(x, y, width);
+                if (!exclusions.isEmpty()) {
+                    s = s.withExclusions(exclusions);
+                }
+            }
             return context.layout(child, s, childToken);
         }
 
@@ -309,12 +496,16 @@ public final class BlockLayout implements LayoutAlgorithm {
             return new Mark(index, null, appeal, cursor, fragments.size(), pending.size());
         }
 
-        /** Breaks the box at {@code m}: what follows goes to the next fragment. */
+        /**
+         * Breaks the box at {@code m}: what follows goes to the next fragment. The fragment reaches the bottom of its
+         * side boxes if they go lower than the content placed.
+         */
         LayoutResult broken(Mark m) {
             List<Fragment> kept = fragments.subList(0, m.fragments());
             List<PendingOverlay> keptPending = pending.subList(0, m.pending());
             // The margins that touch the break are truncated: the content ends at the cursor.
-            Slice slice = Slice.of(model, first, consumed, m.cursor(), false, space);
+            double content = Math.max(m.cursor(), sidesBottom(m.fragments()));
+            Slice slice = Slice.of(model, first, consumed, content, false, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), withMarker(kept, slice), List.of(), first, false);
             BreakToken token = new BreakToken.Block(m.index(), m.childToken(), slice.consumed());
@@ -357,6 +548,13 @@ public final class BlockLayout implements LayoutAlgorithm {
                 // The border, the padding, a fixed height or an own context contain the last margin.
                 contentHeight = cursor + strut.resolve();
                 out = new AdjoiningMargins(topOut, MarginStrut.EMPTY, false);
+            }
+            double sides = sidesBottom(fragments.size());
+            if (sides > 0 && sides >= contentHeight + (out.bottom().resolve()) - EPSILON) {
+                // The side boxes go lower than the flow: the box reaches their bottom, and no margin comes out of
+                // it below them (reference/components/block.md).
+                contentHeight = Math.max(contentHeight, sides);
+                out = new AdjoiningMargins(out.top(), MarginStrut.EMPTY, false);
             }
 
             Slice slice = Slice.of(model, first, consumed, contentHeight, true, space);

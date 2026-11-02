@@ -1,0 +1,55 @@
+# Page 1: img1 at (20, 20); p1 at 20 and p2 at 44, 2 lines each; p3 at 68, 3 lines. Page 2: wrap of 60 with img2 at
+#   x = 20 + 260 − 60 = 220; below at 80. Page 3: l3 at 20 and r3 at x = 20 + 260 − 40 = 240; p5 of 8 lines, 96.
+# Page 4: sp. Page 5: img6 and p6 at 20, sp2 at 80. Page 6: img7 (8 high) and p7 at 20. Page 7: sp3, img8 and p8 at
+#   120 with 5 lines. Page 8: the rest of p8, 3 lines.
+Result:
+	Page: 1
+		Fragment: img1
+			Rect: 20 20 60 60
+		Fragment: p1
+			Rect: 20 20 260 24
+		Fragment: p2
+			Rect: 20 44 260 24
+		Fragment: p3
+			Rect: 20 68 260 36
+	Page: 2
+		Fragment: wrap
+			Rect: 20 20 260 60
+			Fragment: img2
+				Rect: 220 20 60 60
+			Fragment: p4
+				Rect: 20 20 260 12
+		Fragment: below
+			Rect: 20 80 260 20
+	Page: 3
+		Fragment: l3
+			Rect: 20 20 60 60
+		Fragment: r3
+			Rect: 240 20 40 100
+		Fragment: p5
+			Rect: 20 20 260 96
+	Page: 4
+		Fragment: sp
+			Rect: 20 20 260 120
+	Page: 5
+		Fragment: img6
+			Rect: 20 20 60 60
+		Fragment: p6
+			Rect: 20 20 260 24
+		Fragment: sp2
+			Rect: 20 80 260 90
+	Page: 6
+		Fragment: img7
+			Rect: 20 20 60 8
+		Fragment: p7
+			Rect: 20 20 260 12
+	Page: 7
+		Fragment: sp3
+			Rect: 20 20 260 100
+		Fragment: img8
+			Rect: 20 120 60 60
+		Fragment: p8
+			Rect: 20 120 260 60
+	Page: 8
+		Fragment: p8
+			Rect: 20 20 260 36

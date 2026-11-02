@@ -1,0 +1,125 @@
+# Side boxes (reference/components/block.md). Pages of 300 × 200 with margins of 20: page area of 260 × 160 from
+# (20, 20), which ends at y = 180. Lines of 12 (Size 10) and 5 pt per character: a word of four letters and its
+# space take 25, so a line of 260 holds 10 words, one of 190 (beside a box of 60 with a margin of 10), 7, one of
+# 210 (beside a box of 40 with a margin of 10), 8, and one of 140 (between the two), 5.
+#
+# Section 1: img1 (60 × 60, right margin 10) at the left; p1 (14 words) and p2 (14 words) run beside it with 7
+#   words per line (lines of 12 from 20 to 68), and p3 (20 words) starts at 68: its first line still overlaps the
+#   box (which ends at 80) and has 7 words, the next two have the whole width, 10 and 3 words: 3 lines, 36.
+# Section 2: in wrap, img2 (60 × 60, left margin 10) at the right and p4, 7 words, one line beside it; wrap
+#   measures 60, the bottom of its side box, and below, a Block with a background, comes after it at 80.
+# Section 3: l3 (60 × 60, right margin 10) at the left and r3 (40 × 100, left margin 10) at the right, both at the
+#   top; p5 (45 words): 5 lines of 5 words between the two (up to 80), 2 of 8 beside r3 and the last one with 4.
+# Section 4: sp (120) leaves 40 and img6 (60) does not fit: the break goes before it and page 5 starts with it and
+#   p6 (14 words, 2 lines of 7). sp2 (90), which does not run beside it, goes below it, at 80, up to 170. img7
+#   (60 × 8) fits in the 10 left, but the first line of p7 (7 words) does not: the break goes before the side box,
+#   which goes with the line, and page 6 starts with both.
+# Section 5: sp3 (100) and img8 (60 × 60) at 120, which fits exactly. p8 (60 words) has room for 5 lines, of 7
+#   words beside the box; the rest, 25 words, is broken again on page 8 at the whole width: 10, 10 and 5.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: spacer
+			Box:
+				Background: #DDDDDD
+	Section:
+		Image: test/square.png
+			Id: img1
+			Side: left
+			Box:
+				Width: 60
+				Height: 60
+				Margin: 0 10 0 0
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p1
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p2
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p3
+	Section:
+		Block:
+			Id: wrap
+			Image: test/square.png
+				Id: img2
+				Side: right
+				Box:
+					Width: 60
+					Height: 60
+					Margin: 0 0 0 10
+			Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+				Id: p4
+		Block:
+			Id: below
+			Style: spacer
+			Box:
+				Height: 20
+	Section:
+		Image: test/square.png
+			Id: l3
+			Side: left
+			Box:
+				Width: 60
+				Height: 60
+				Margin: 0 10 0 0
+		Image: test/tall.jpg
+			Id: r3
+			Side: right
+			Box:
+				Width: 40
+				Height: 100
+				Margin: 0 0 0 10
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p5
+	Section:
+		Block:
+			Id: sp
+			Style: spacer
+			Box:
+				Height: 120
+		Image: test/square.png
+			Id: img6
+			Side: left
+			Box:
+				Width: 60
+				Height: 60
+				Margin: 0 10 0 0
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p6
+		Block:
+			Id: sp2
+			Style: spacer
+			Box:
+				Height: 90
+		Image: test/wide.png
+			Id: img7
+			Side: left
+			Box:
+				Width: 60
+				Height: 8
+				Margin: 0 10 0 0
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p7
+	Section:
+		Block:
+			Id: sp3
+			Style: spacer
+			Box:
+				Height: 100
+		Image: test/square.png
+			Id: img8
+			Side: left
+			Box:
+				Width: 60
+				Height: 60
+				Margin: 0 10 0 0
+		Paragraph: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
+			Id: p8

@@ -38,8 +38,8 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | Página | Para qué sirve |
 |---|---|
 | [`Document` y `Section`](components/document.md) | El documento, el tamaño de página, las secciones y la numeración de las páginas |
-| [`Block`](components/block.md) | Agrupar elementos uno debajo de otro |
-| [`Text` y `Paragraph`](components/text.md) | Texto y párrafos |
+| [`Block`](components/block.md) | Agrupar elementos uno debajo de otro, y poner una caja a un lado con el texto alrededor |
+| [`Text` y `Paragraph`](components/text.md) | Texto y párrafos, con letra capitular |
 | [Encabezados](components/heading.md) | Títulos de capítulo y apartado, numerados o no |
 | [`List`](components/list.md) | Listas con viñetas o numeradas |
 | [`Table`](components/table.md) | Tablas con cabecera y pie que se repiten en cada página |

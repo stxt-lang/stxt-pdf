@@ -39,10 +39,39 @@ Text:
 
 ## `Paragraph`
 
-Un párrafo del contenido: admite lo mismo que un `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` y
-el texto en el valor o en `Content`) y se maqueta igual. Es **un solo párrafo**: una línea en blanco en su `Content` es un
-error (`TEXT_BLANK_LINE`), también en un texto preformateado. Para varios párrafos se usan varios `Paragraph`. Las reglas
-`For element: Paragraph` estilan los párrafos sin tocar los textos sueltos.
+Un párrafo del contenido: admite lo mismo que un `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate`,
+`Clear` y el texto en el valor o en `Content`), y además `Drop cap`, y se maqueta igual. Es **un solo párrafo**: una línea
+en blanco en su `Content` es un error (`TEXT_BLANK_LINE`), también en un texto preformateado. Para varios párrafos se
+usan varios `Paragraph`. Las reglas `For element: Paragraph` estilan los párrafos sin tocar los textos sueltos.
+
+### Letra capitular (`Drop cap`)
+
+Con `Drop cap: N` (de 2 a 5), la primera letra del párrafo es una **letra capitular**: sale del texto y se compone, con la
+fuente del párrafo (su familia, su peso y su cursiva, y el formato del tramo al que pertenece), al cuerpo cuya altura de
+mayúsculas va de la altura de mayúsculas de la primera línea a la línea base de la línea `N`; las `N` primeras líneas
+empiezan a su derecha, separadas de ella por un espacio del párrafo. El párrafo mide al menos esas `N` líneas, y un corte
+de página no cae entre ellas: si no caben en la página con la letra, el párrafo pasa entero a la siguiente.
+
+```
+Paragraph: Había una vez, en un valle entre hayedos, un pueblo que cada otoño llenaba su plaza de castañas.
+    Drop cap: 3
+```
+
+El texto que se lee y se copia es el mismo: la letra sigue siendo la primera de su palabra. La altura de mayúsculas es la
+de la fuente (su tabla `OS/2`) y, sin ella, el 70 % del cuerpo. Es el primer carácter tal cual: con `Case: uppercase` se
+pone en mayúscula como el resto, y si el párrafo empieza por una comilla, la capitular es la comilla. No va en un párrafo
+preformateado (`DROP_CAP_NOT_ALLOWED`) ni fuera de 2 a 5 (`VALUE_NOT_ALLOWED`). Junto a una caja lateral
+([Block](block.md#cajas-laterales-side)), la capitular va después de lo que la caja quita a las líneas.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Drop cap` | entero de 2 a 5 | sin valor | Líneas que ocupa la letra capitular. Solo en `Paragraph`. |
+
+> **Decisión:** la capitular se dimensiona por la altura de mayúsculas, con su cima a la altura de las mayúsculas de la
+> primera línea y su base en la línea base de la última que ocupa, como en los procesadores de texto; es la primera
+> letra, en la fuente del párrafo, separada del texto un espacio. *Alternativa descartada:* una fuente, un color o varias
+> letras propios de la capitular, que piden tramos con otro tamaño
+> ([Formato del texto](../common/text-formatting.md#lo-que-no-hay)).
 
 ## Dónde va el texto
 

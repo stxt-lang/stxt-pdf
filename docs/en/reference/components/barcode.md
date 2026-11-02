@@ -58,6 +58,8 @@ dark brown modules inside a frame.)
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Only in a QR code: the part of the modules that can be damaged while the code can still be read, 7 %, 15 %, 25 % and 30 %. In another format it is an error. |
 | `Alt` | non-empty text | required | What it is and where it leads, for whoever cannot see it ([Accessibility](#accessibility)). |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates it about its center, like an `Image`. |
+| `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
+| `Clear` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
 They do not go in the rules of `Styles`, which only accept the groups.
 

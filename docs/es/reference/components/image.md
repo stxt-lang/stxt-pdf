@@ -49,6 +49,8 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | `Fit` | `inside`, `fill`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
+| `Side` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
+| `Clear` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 

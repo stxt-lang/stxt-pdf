@@ -5,7 +5,9 @@ import static dev.stxt.pdf.tree.ListBuilder.marker;
 import static dev.stxt.pdf.tree.ListBuilder.markerLine;
 import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
+import static dev.stxt.pdf.tree.ModelValidator.validateClear;
 import static dev.stxt.pdf.tree.ModelValidator.validateClip;
+import static dev.stxt.pdf.tree.ModelValidator.validateDropCap;
 import static dev.stxt.pdf.tree.ModelValidator.validateOverflow;
 import static dev.stxt.pdf.tree.ModelValidator.validateShrink;
 import static dev.stxt.pdf.tree.ModelValidator.validateContainer;
@@ -299,6 +301,8 @@ public final class BoxTreeBuilder {
         withoutEffect(ctx, n, wrapper, s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
+        validateClear(s, parent);
+        validateDropCap(s);
         if (kind.headingLevel() > 0) {
             // The engine avoids breaking inside the heading and after it (reference/components/heading.md); it is not
             // declared.
@@ -368,6 +372,10 @@ public final class BoxTreeBuilder {
     private static String unbreakable(Style s) {
         if (s.box().clips()) {
             return "a box with Overflow: clip";
+        }
+        if (s.isSideBox()) {
+            // A side box goes whole to a side of the text (reference/components/block.md).
+            return "a box with Side";
         }
         return switch (s.position()) {
             case OVERLAY -> "an Overlay";

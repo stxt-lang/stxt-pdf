@@ -1,0 +1,14 @@
+# Case: Margin auto in an Image with Side
+# Code: MARGIN_AUTO_WITHOUT_EFFECT
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Image: test/square.png
+			Side: right
+			Box:
+				Margin: 0 auto

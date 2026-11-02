@@ -1,0 +1,22 @@
+# Case: Break inside a Block with Side, which is not split
+# Code: BREAK_IN_UNBREAKABLE
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Side: left
+			Box:
+				Width: 100
+			Paragraph: Hola
+				Break:
+					Before: page

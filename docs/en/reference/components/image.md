@@ -49,6 +49,8 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 | `Fit` | `inside`, `fill`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
 | `Pdf page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates the image around its center (a seal) and takes up the rectangle that encloses it rotated. |
+| `Side` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
+| `Clear` | boolean | `false` | Moves the image below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
 They do not go in the rules of `Styles`, which only accept the groups.
 

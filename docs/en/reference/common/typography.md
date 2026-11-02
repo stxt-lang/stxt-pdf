@@ -63,6 +63,10 @@ Text is broken into **lines** as wide as the content box:
   lines are chosen, so that the lines are more even. Spaces stretch up to half their width and do not shrink,
   and the last line does not count.
 
+The lines beside a side box ([Block](../components/block.md#side-boxes-side)) or a drop cap
+([Text](../components/text.md#drop-cap-drop-cap)) are shorter than the content box: both algorithms work with the width
+of each line, and a word that does not fit in a short line leaves it empty and goes to the next one.
+
 In both cases, a word wider than the line is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)), also with
 `Hyphenate` if none of its parts fits. Words are only split with `Hyphenate` or where the text has a soft hyphen
 ([Hyphenation](#hyphenation-hyphenate)).
@@ -219,5 +223,5 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 - Vertical or right-to-left writing, and, of `GPOS`, what is not horizontal kerning (marks, contextual positioning).
 - Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the
   document's own, and changing the minimum letters on each side of the hyphen.
-- A different color or size within a line: a run only changes bold, italic, underline and strikethrough
-  ([Text formatting](text-formatting.md#runs)).
+- A different color or size within a line (except the drop cap and the superscript of a footnote): a run only changes
+  bold, italic, underline and strikethrough ([Text formatting](text-formatting.md#runs)).

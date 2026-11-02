@@ -117,34 +117,33 @@ Document (dev.stxt.pdf):
 				Style: kicker
 			Heading 1:
 				Text: Tres caminos para no perderse el hayedo
-			Stack:
+			Block:
 				Id: trail-story
-				Gap: 16
 				Box:
 					Margin: 0 0 14 0
-				Item:
-					Block:
+				Block:
+					Id: trail-figure
+					Side: right
+					Box:
+						Width: 200
+						Margin: 0 0 4 16
+					Image: examples/newsletter/trail.jpg
+						Id: trail-photo
+						Alt: Un sendero entre prados con montañas al fondo
 						Box:
-							Width: 200
-						Image: examples/newsletter/trail.jpg
-							Id: trail-photo
-							Alt: Un sendero entre prados con montañas al fondo
-							Box:
-								Width: 100%
-						Text: El sendero del Pla de les Eres, un domingo de octubre. Foto: Joan Casas.
-							Style: caption
-				Item:
-					Grow: 1
-					Markdown:
-						Bullet markers: dash
-						Content >>
-							Octubre es el mes del hayedo. Estas son tres salidas para disfrutarlo sin multitudes, de la más corta a la más exigente:
+							Width: 100%
+					Text: El sendero del Pla de les Eres, un domingo de octubre. Foto: Joan Casas.
+						Style: caption
+				Markdown:
+					Bullet markers: dash
+					Content >>
+						Octubre es el mes del hayedo. Estas son tres salidas para disfrutarlo sin multitudes, de la más corta a la más exigente:
 
-							- **El camino del Molí** (1 h 30 min, 4 km, apto para niños): sale del aparcamiento de la fábrica y sigue el río hasta una cascada pequeña.
-							- **La vuelta al Pla de les Eres** (3 h, 9 km): praderas, masías y un mirador sobre toda la comarca.
-							- **La cresta de Sant Roc** (5 h, 14 km): solo con buen tiempo y calzado de montaña; ++recomendable salir antes de las ocho++.
+						- **El camino del Molí** (1 h 30 min, 4 km, apto para niños): sale del aparcamiento de la fábrica y sigue el río hasta una cascada pequeña.
+						- **La vuelta al Pla de les Eres** (3 h, 9 km): praderas, masías y un mirador sobre toda la comarca.
+						- **La cresta de Sant Roc** (5 h, 14 km): solo con buen tiempo y calzado de montaña; ++recomendable salir antes de las ocho++.
 
-							Recuerden llevar agua, no salirse de los senderos señalizados y llevarse de vuelta cualquier residuo que generen.
+						Recuerden llevar agua, no salirse de los senderos señalizados y llevarse de vuelta cualquier residuo que generen.
 			Columns:
 				Id: briefs
 				Count: 2

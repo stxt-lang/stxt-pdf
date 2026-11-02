@@ -154,7 +154,8 @@ underline goes below the text and the strikethrough, over it. A screen reader do
 
 ## What is not supported
 
-- Runs with another size (except the superscript of a footnote), another color or another family (except code), nor
-  ones that remove the bold or the italic of the box.
+- Runs with another size (except the superscript of a footnote and the drop cap of a `Paragraph`,
+  [Text](../components/text.md#drop-cap-drop-cap)), another color or another family (except code), nor ones that remove
+  the bold or the italic of the box.
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.

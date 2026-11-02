@@ -117,34 +117,33 @@ Document (dev.stxt.pdf):
 				Style: kicker
 			Heading 1:
 				Text: Three trails to enjoy the beech forest
-			Stack:
+			Block:
 				Id: trail-story
-				Gap: 16
 				Box:
 					Margin: 0 0 14 0
-				Item:
-					Block:
+				Block:
+					Id: trail-figure
+					Side: right
+					Box:
+						Width: 200
+						Margin: 0 0 4 16
+					Image: examples/newsletter/trail.jpg
+						Id: trail-photo
+						Alt: A path between meadows with mountains in the background
 						Box:
-							Width: 200
-						Image: examples/newsletter/trail.jpg
-							Id: trail-photo
-							Alt: A path between meadows with mountains in the background
-							Box:
-								Width: 100%
-						Text: The Pla de les Eres trail on an October Sunday. Photo: Joan Casas.
-							Style: caption
-				Item:
-					Grow: 1
-					Markdown:
-						Bullet markers: dash
-						Content >>
-							October is beech forest month. Here are three outings to enjoy it without the crowds, from the shortest to the most demanding:
+							Width: 100%
+					Text: The Pla de les Eres trail on an October Sunday. Photo: Joan Casas.
+						Style: caption
+				Markdown:
+					Bullet markers: dash
+					Content >>
+						October is beech forest month. Here are three outings to enjoy it without the crowds, from the shortest to the most demanding:
 
-							- **The Molí path** (1 h 30 min, 4 km, suitable for children): starts at the factory parking lot and follows the river up to a small waterfall.
-							- **The Pla de les Eres loop** (3 h, 9 km): meadows, farmhouses and a viewpoint over the whole area.
-							- **The Sant Roc ridge** (5 h, 14 km): only in good weather and with hiking boots; ++best to set off before eight++.
+						- **The Molí path** (1 h 30 min, 4 km, suitable for children): starts at the factory parking lot and follows the river up to a small waterfall.
+						- **The Pla de les Eres loop** (3 h, 9 km): meadows, farmhouses and a viewpoint over the whole area.
+						- **The Sant Roc ridge** (5 h, 14 km): only in good weather and with hiking boots; ++best to set off before eight++.
 
-							Remember to carry water, stay on the marked trails and take back with you any waste you produce.
+						Remember to carry water, stay on the marked trails and take back with you any waste you produce.
 			Columns:
 				Id: briefs
 				Count: 2

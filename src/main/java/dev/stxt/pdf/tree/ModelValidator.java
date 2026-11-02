@@ -52,6 +52,9 @@ import static dev.stxt.pdf.tree.PropertyKey.OFFSET;
 import static dev.stxt.pdf.tree.PropertyKey.OVERFLOW;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE_ORIGIN;
+import static dev.stxt.pdf.tree.PropertyKey.SIDE;
+import static dev.stxt.pdf.tree.PropertyKey.CLEAR;
+import static dev.stxt.pdf.tree.PropertyKey.DROP_CAP;
 import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
 import static dev.stxt.pdf.tree.ValueReader.amount;
 import static dev.stxt.pdf.tree.ValueReader.comparable;
@@ -300,6 +303,7 @@ final class ModelValidator {
         if (stackItem) {
             validateStackItem(s, parent);
         }
+        validateSide(s, stackItem, gridItem);
         validateOffset(s);
         validateMargins(s, parentLayout, stackItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
@@ -311,6 +315,71 @@ final class ModelValidator {
         validatePercentages(ctx, s, parent, stackItem, gridItem);
         validateColumnBreaks(ctx, s);
         validateKeeps(s);
+    }
+
+    /**
+     * A side box ({@code Side}, reference/components/block.md) only makes sense in block flow, where there is text to
+     * run beside it: not as an item of a {@code Stack} or a {@code Grid}, which place it themselves (inside a cell with
+     * elements, which is block flow, it can go). A {@code Block} with {@code Side} needs a width ({@code Width} or {@code Max width}): with
+     * {@code auto} it would take the whole width and leave no room for the text. And like an image, it is not split
+     * across pages, so {@code Keep together} and {@code Edges} have no effect on it (also from a rule).
+     */
+    static void validateSide(Style s, boolean stackItem, boolean gridItem) {
+        if (!s.isSideBox()) {
+            return;
+        }
+        if (stackItem || gridItem) {
+            throw error(s.line(SIDE), ErrorCode.SIDE_NOT_IN_BLOCK_FLOW, "Side has no effect on an item of a "
+                    + (stackItem ? "Stack" : "Grid") + ", which places the box itself: a side box goes in block flow "
+                    + "(a Section, a Block, a Columns, a Cell with elements...), followed by the text that runs beside it");
+        }
+        if (s.layout() != Layout.IMAGE && s.box().width().isAuto() && s.box().maxWidth() == null) {
+            throw error(s.line(SIDE), ErrorCode.SIDE_WITHOUT_WIDTH, "A Block with Side needs Width or Max width: with "
+                    + "Width auto it takes up the whole width and leaves no room for the text beside it");
+        }
+        if (s.layout() == Layout.IMAGE) {
+            // An image already rejects them (BREAK_IN_IMAGE), with its own message.
+            return;
+        }
+        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
+            if (s.isDeclared(p)) {
+                throw error(s.line(p), ErrorCode.BREAK_IN_SIDE_BOX, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
+                        + " has no effect on a box with Side, which does not split across pages: it is not needed");
+            }
+        }
+    }
+
+    /**
+     * {@code Clear: true} (reference/components/block.md) only has an effect with a side box before the box: among
+     * the siblings before it or, if its parent is a box whose text runs beside the side boxes of its own parent (a
+     * {@code Block} without background or border, a heading, a {@code Markdown}), among the ones before that parent,
+     * and so on up.
+     */
+    static void validateClear(Style s, Box parent) {
+        if (!s.clear()) {
+            return;
+        }
+        for (Box p = parent; p != null; p = p.parent()) {
+            if (p.children().stream().anyMatch(c -> c.style().isSideBox())) {
+                return;
+            }
+            if (!p.wrapsBesideSideBoxes() || p.parent() == null) {
+                break;
+            }
+        }
+        throw error(s.line(CLEAR), ErrorCode.CLEAR_WITHOUT_SIDE, "Clear has no effect without a side box (Side) before "
+                + "the box among its siblings: the side box is missing or Clear is not needed");
+    }
+
+    /**
+     * A drop cap ({@code Drop cap}, reference/components/text.md) takes the first letter out of a text that is broken
+     * into lines: a preformatted {@code Paragraph} keeps its lines as they are written, so it has no effect there.
+     */
+    static void validateDropCap(Style s) {
+        if (s.dropCap() > 0 && s.typography().preformatted().enabled()) {
+            throw error(s.line(DROP_CAP), ErrorCode.DROP_CAP_NOT_ALLOWED, "Drop cap has no effect on a preformatted "
+                    + "Paragraph (Preformatted: true or wrap), whose lines are the ones written: it is not needed");
+        }
     }
 
     /**
@@ -419,6 +488,10 @@ final class ModelValidator {
         if (stackItem || gridItem) {
             throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto has no effect on items of a Stack or "
                     + "Grid: they are aligned with Horizontal and Vertical");
+        }
+        if (s.isSideBox()) {
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto has no effect on a box with Side, "
+                    + "which is placed at its side: its margins are the separation from the text, and need a number");
         }
         if (s.isOutOfFlow()) {
             validateOutOfFlowMargins(s, line, horizontalAuto, verticalAuto);

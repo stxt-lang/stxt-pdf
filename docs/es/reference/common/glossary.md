@@ -5,6 +5,7 @@
 | **Ancho más estrecho / ancho natural** | El menor ancho sin que nada se salga / el ancho sin ningún salto de línea ([La caja](box.md#tamaños-intrínsecos)). |
 | **Área útil** | Rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer nivel de una sección y de los `Page overlay`. Cada sección tiene la suya ([Document](../components/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](box.md#las-cuatro-cajas)). |
+| **Caja lateral** (`Side`) | `Image`, `Barcode` o `Block` colocado a un lado de su contenedor, con el texto de los hermanos que la siguen corriendo a su lado ([Block](../components/block.md#cajas-laterales-side)). |
 | **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta la fusión de márgenes ([Block](../components/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes. Los recursos se buscan solo hacia abajo ([Recursos](resources.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Columns` reparte su contenido en una página ([Columns](../components/columns.md)). |
@@ -25,6 +26,7 @@
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../components/image.md)). |
 | **Índice** | Elemento `Table of contents`: una entrada por encabezado con su título, una guía y su página ([Table of contents](../components/table-of-contents.md)). |
+| **Letra capitular** (`Drop cap`) | Primera letra de un `Paragraph` compuesta en grande, ocupando sus primeras líneas, que empiezan a su derecha ([Text](../components/text.md#letra-capitular-drop-cap)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas, bloques de código e imágenes ([Markdown](../components/markdown.md)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4` o `Letter`), en vertical o, con `Orientation: landscape`, apaisado. |
 | **Pista** | Columna o fila de un `Grid` o una `Table`. |

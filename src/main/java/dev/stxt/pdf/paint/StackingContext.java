@@ -508,9 +508,11 @@ public final class StackingContext {
             TextLine l = lines.get(n);
             // The line break swallows the space: it is written invisible after the last word, so that whoever
             // joins the text of the lines (screen reader, extraction, search) does not run the words together. A
-            // line split inside a word has no space: its two parts are one word.
+            // line split inside a word has no space: its two parts are one word, and neither does the drop cap
+            // (the first line of a Paragraph with Drop cap, reference/components/text.md), which is the first
+            // letter of the word that starts the line after it.
             boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE
-                    && !l.hyphenated();
+                    && !l.hyphenated() && !(n == 0 && s.dropCap() > 0);
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
             List<TextLine.Run> runs = l.runs();
             for (int i = 0; i < runs.size(); i++) {

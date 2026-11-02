@@ -56,10 +56,39 @@ El margen de arriba del primer hijo (y el de abajo del último) sale fuera del `
 en ese lado: queda como margen del propio `Block`. Con `Isolate margins: true`, los márgenes de los hijos se quedan dentro. Un
 `Block` que es ítem de un `Stack` o un `Grid` ya los deja dentro, así que ahí `Isolate margins: true` es un error.
 
+## Una caja a un lado y el texto alrededor (`Side`)
+
+Con `Side: left` o `Side: right`, una `Image`, un `Barcode` o un `Block` con `Width` se coloca a ese lado y los párrafos
+que vienen detrás corren a su lado, con las líneas más cortas, hasta que la caja acaba. Es la foto de una noticia o la
+figura de un manual. El margen de la caja es la separación con el texto.
+
+```
+Block:
+    Side: right
+    Box:
+        Width: 180
+        Margin: 0 0 6 14
+    Image: examples/newsletter/trail.jpg
+        Alt: Un sendero entre prados con montañas al fondo
+        Box:
+            Width: 100%
+    Text: El sendero del Pla de les Eres. Foto: Joan Casas.
+        Typography:
+            Size: 7.5
+Paragraph: Octubre es el mes del hayedo, y estas son tres salidas para disfrutarlo sin multitudes...
+Paragraph: El camino del Molí sale del aparcamiento de la fábrica y sigue el río hasta una cascada pequeña.
+```
+
+Rodean la caja los párrafos y los textos, también los de un `Block`, un encabezado, un `Markdown` o una lista (una lista,
+solo si la caja está a la derecha: sus marcadores van a la izquierda). Una tabla, un `Stack` o un texto con fondo o borde
+van debajo de la caja, y cualquier cosa con `Clear: true` también. La caja no se parte entre páginas: si no cabe, pasa a
+la siguiente con la primera línea que la rodea.
+
 ## Recetas
 
 - **Un recuadro:** un `Block` con `Padding`, `Border` y `Background`.
 - **Que no se parta:** `Break` con `Keep together: true` (el bloque de firmas de un contrato).
 - **Empezar en página nueva:** `Break` con `Before: page`.
+- **Una foto con el texto alrededor:** `Side: left` o `right` en la imagen (o en un `Block` con la foto y su pie).
 
 Más detalle en la [referencia](../../reference/components/block.md).

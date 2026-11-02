@@ -12,17 +12,19 @@ Result:
 			Rect: 44 801.39 507.28 18.5
 	Page: 2
 		Fragment: trails
-			Rect: 44 38 507.28 728.5
+			Rect: 44 38 507.28 722.5
 			Fragment: trail-story
-				Rect: 44 121 507.28 173
-				Fragment: trail-photo
-					Rect: 44 121 200 130
+				Rect: 44 121 507.28 167
+				Fragment: trail-figure
+					Rect: 351.28 121 200 159
+					Fragment: trail-photo
+						Rect: 351.28 121 200 130
 			Fragment: briefs
-				Rect: 44 308 507.28 165
+				Rect: 44 302 507.28 165
 			Fragment: agenda
-				Rect: 44 503 507.28 141
+				Rect: 44 497 507.28 141
 			Fragment: classifieds
-				Rect: 44 674 507.28 92.5
+				Rect: 44 668 507.28 92.5
 		Fragment: running
 			Rect: 44 14 507.28 13
 		Fragment: footer

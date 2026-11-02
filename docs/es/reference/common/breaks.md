@@ -140,6 +140,9 @@ se parte. Las tablas repiten además su cabecera y su pie ([Table](../components
   página siguiente, con el alto del rectángulo que lo envuelve.
 - **Recortadas.** Una caja con `Overflow: clip` tampoco: entera o en la página siguiente
   ([Desbordamiento](overflow.md#recortar-clip)).
+- **Cajas laterales.** Una `Image`, un `Barcode` o un `Block` con `Side` tampoco: pasa a la página siguiente con la
+  primera línea que la rodea, y las líneas acortadas a su lado acaban con la página: en la siguiente, el texto tiene el
+  ancho entero ([Block](../components/block.md#cajas-laterales-side)).
 
 ## Números de página: `{page}` y `{pages}`
 

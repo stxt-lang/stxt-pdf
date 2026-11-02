@@ -58,6 +58,8 @@ marrón oscuro dentro de un marco.)
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Solo en un QR: la parte de los módulos que puede estropearse y el código sigue leyéndose, un 7 %, 15 %, 25 % y 30 %. En otro formato es un error. |
 | `Alt` | texto no vacío | obligatorio | Qué es y adónde lleva, para quien no lo ve ([Accesibilidad](#accesibilidad)). |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Lo gira sobre su centro, como una `Image`. |
+| `Side` | `left`, `right` | sin valor | Lo hace una caja lateral, como una `Image`: el texto que lo sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
+| `Clear` | booleano | `false` | Lo baja por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
 

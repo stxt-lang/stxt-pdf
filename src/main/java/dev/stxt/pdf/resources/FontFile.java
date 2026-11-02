@@ -95,8 +95,11 @@ public final class FontFile {
         this.cff = ttf.getTableMap().containsKey("CFF ");
         this.cmap = ttf.getUnicodeCmapLookup();
         this.unitsPerEm = ttf.getUnitsPerEm();
+        // The cap height is in the OS/2 table from its version 2; a font without it gets the approximation.
+        double capHeight = ttf.getOS2Windows().getCapHeight() > 0
+                ? ttf.getOS2Windows().getCapHeight() / unitsPerEm : VerticalMetrics.APPROXIMATE_CAP_HEIGHT;
         this.vertical = new VerticalMetrics(ttf.getHorizontalHeader().getAscender() / unitsPerEm,
-                -ttf.getHorizontalHeader().getDescender() / unitsPerEm);
+                -ttf.getHorizontalHeader().getDescender() / unitsPerEm, capHeight);
         this.decoration = new DecorationMetrics(ttf.getPostScript().getUnderlinePosition() / unitsPerEm,
                 ttf.getPostScript().getUnderlineThickness() / unitsPerEm,
                 ttf.getOS2Windows().getStrikeoutPosition() / unitsPerEm,

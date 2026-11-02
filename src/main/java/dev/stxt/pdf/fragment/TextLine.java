@@ -21,9 +21,14 @@ import java.util.List;
  * @param hyphenated  whether the line ends inside a word, with a hyphen that the line breaking added
  *                    (reference/common/typography.md): the last run ends with it, the text that is read does not
  *                    (reference/implementation/pdf.md)
+ * @param left        room taken from the left of the content box by a side box or a drop cap
+ *                    (reference/components/block.md), already included in {@code x}; 0 in a line that has the whole
+ *                    width
+ * @param right       room taken from the right of the content box by a side box; 0 otherwise. The line box is the
+ *                    content width minus {@code left} and {@code right}, and the line is aligned within it
  */
 public record TextLine(double x, double y, double width, double height, double fontSize, String text,
-                       double wordSpacing, List<Run> runs, boolean hyphenated) {
+                       double wordSpacing, List<Run> runs, boolean hyphenated, double left, double right) {
 
     /**
      * A run of the line with its format.
@@ -36,6 +41,12 @@ public record TextLine(double x, double y, double width, double height, double f
 
     public TextLine {
         runs = List.copyOf(runs);
+    }
+
+    /** A line with the whole width of the content box. */
+    public TextLine(double x, double y, double width, double height, double fontSize, String text,
+                    double wordSpacing, List<Run> runs, boolean hyphenated) {
+        this(x, y, width, height, fontSize, text, wordSpacing, runs, hyphenated, 0, 0);
     }
 
     /** A line that ends between words. */
@@ -53,5 +64,10 @@ public record TextLine(double x, double y, double width, double height, double f
     /** Line without format or extra spacing. */
     public TextLine(double x, double y, double width, double height, double fontSize, String text) {
         this(x, y, width, height, fontSize, text, 0);
+    }
+
+    /** Whether the line has no words: a line beside a side box where no word fits (reference/components/block.md). */
+    public boolean isEmpty() {
+        return text.isEmpty();
     }
 }

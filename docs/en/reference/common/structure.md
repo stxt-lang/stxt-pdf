@@ -106,6 +106,9 @@ Text: Quarterly results
 | `In table of contents` | `true`, `false` | `true` | Headings | Whether the heading has an entry in the tables of contents ([Headings](../components/heading.md#outside-the-table-of-contents)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` or `#id` | none | Elements except `Markdown` and `Table of contents` | Makes the whole box clickable ([Links](links.md)). It is not inherited and does not change the appearance. |
 | `Isolate margins` | boolean | `false` | `Block`, `Frame` | Stops margin merging with the children ([Block](../components/block.md#margin-merging)). |
+| `Side` | `left`, `right` | none | `Image`, `Barcode`, `Block` | Side box: the text that follows it runs beside it ([Block](../components/block.md#side-boxes-side)). |
+| `Clear` | boolean | `false` | `Text`, `Paragraph`, `Block`, headings, `Markdown`, `Image`, `Barcode` | Moves the box below the side boxes before it ([Block](../components/block.md#side-boxes-side)). |
+| `Drop cap` | integer from 2 to 5 | none | `Paragraph` | Drop cap of that many lines ([Text](../components/text.md#drop-cap-drop-cap)). |
 
 ## Order and text
 
@@ -187,11 +190,11 @@ once, and the elements, as many times as needed.
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`; elements |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`, `Side`, `Clear`; elements |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
-| `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate` |
-| `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`; `Text` (at least one) |
+| `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, besides, `Drop cap` |
+| `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (at least one) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required), `Start`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elements except headings (at least one) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required), `Column align`, `Gap`; `Header rows`, `Body` (required), `Footer rows` |
@@ -199,11 +202,11 @@ once, and the elements, as many times as needed.
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elements except headings |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
-| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Content` (required) |
+| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Clear`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Levels`, `Leader` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate` |
-| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Format`, `Error correction`, `Rotate`, `Content` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate`, `Side`, `Clear` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Format`, `Error correction`, `Rotate`, `Side`, `Clear`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |

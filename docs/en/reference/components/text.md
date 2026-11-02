@@ -39,10 +39,39 @@ Text:
 
 ## `Paragraph`
 
-A paragraph of the content: it accepts the same as a `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` and
-the text in the value or in `Content`) and is laid out in the same way. It is **a single paragraph**: a blank line in its `Content` is an
-error (`TEXT_BLANK_LINE`), also in preformatted text. For several paragraphs, several `Paragraph` elements are used. The
-`For element: Paragraph` rules style the paragraphs without touching standalone text.
+A paragraph of the content: it accepts the same as a `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate`,
+`Clear` and the text in the value or in `Content`), and `Drop cap` besides, and is laid out in the same way. It is **a single
+paragraph**: a blank line in its `Content` is an error (`TEXT_BLANK_LINE`), also in preformatted text. For several
+paragraphs, several `Paragraph` elements are used. The `For element: Paragraph` rules style the paragraphs without touching
+standalone text.
+
+### Drop cap (`Drop cap`)
+
+With `Drop cap: N` (from 2 to 5), the first letter of the paragraph is a **drop cap**: it is taken out of the text and set,
+in the font of the paragraph (its family, weight and italic, and the format of the run it belongs to), at the size whose
+cap height goes from the cap height of the first line to the baseline of line `N`; the first `N` lines start at its right,
+separated from it by a space of the paragraph. The paragraph is at least those `N` lines tall, and a page break does not
+fall among them: if they do not fit on the page with the letter, the whole paragraph moves to the next one.
+
+```
+Paragraph: Once upon a time, in a valley among beech forests, a village filled its square with chestnuts every autumn.
+    Drop cap: 3
+```
+
+The text that is read and copied is the same: the letter is still the first one of its word. The cap height is that of
+the font (its `OS/2` table) or, without it, 70 % of the size. It is the first character as it is: with `Case: uppercase`
+it is capitalized like the rest, and if the paragraph starts with a quotation mark, the drop cap is the quotation mark.
+It does not go in a preformatted paragraph (`DROP_CAP_NOT_ALLOWED`) nor outside 2 to 5 (`VALUE_NOT_ALLOWED`). Beside a
+side box ([Block](block.md#side-boxes-side)), the drop cap goes after what the box takes from the lines.
+
+| Property | Values | Default | Notes |
+|---|---|---|---|
+| `Drop cap` | integer from 2 to 5 | none | Lines the drop cap takes up. Only in `Paragraph`. |
+
+> **Decision:** the drop cap is sized by the cap height, with its top at the height of the capitals of the first line and
+> its base on the baseline of the last line it takes up, as word processors do; it is the first letter, in the font of
+> the paragraph, a space away from the text. *Rejected alternative:* a font, a color or several letters of the drop cap's
+> own, which call for runs with another size ([Text formatting](../common/text-formatting.md#what-is-not-supported)).
 
 ## Where text goes
 

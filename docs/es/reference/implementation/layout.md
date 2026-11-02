@@ -152,6 +152,32 @@ donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas s
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`).
 
+**Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
+a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita
+por cada lado, con sus márgenes). A cada hijo que rodea las cajas (`Box.wrapsBesideSideBoxes`: textos no preformateados,
+`Block`, encabezados, `Markdown` y listas sin fondo ni borde; las listas, solo junto a cajas derechas) le pasa en el
+`ConstraintSpace` las **exclusiones** (`model.Exclusion`: banda y lo que quita por cada lado, medidas desde la caja de
+borde del hijo), que forman parte de la clave de la caché; los demás hijos bajan hasta el final de las cajas laterales. Un
+`Block` que recibe exclusiones las trata como cajas laterales heredadas para sus propios hijos, sin que cuenten para su
+alto. `InlineLayout` las pasa a la caja de contenido y `LineWidths` da a cada línea su caja de línea (desde dónde empieza
+y cuánto mide, con `varying()` como la primera línea de ancho entero); `LineBreaker` reparte con el ancho de cada línea,
+el voraz línea a línea y Knuth-Plass con el número de línea en el estado de la programación dinámica (hasta `varying()`),
+y una palabra que no cabe sola en una línea corta la deja vacía (`Line.isEmpty`) y pasa a la siguiente. Cada `Line` lleva la
+posición del texto donde empieza (`start`), y el `BreakToken.Line` lleva las exclusiones y la posición inicial del reparto
+con que se colocó el fragmento: el fragmento siguiente, si hay exclusiones en alguno de los dos, vuelve a repartir el
+resto del texto desde la posición de su primera línea con las suyas (normalmente ninguna: las cajas laterales acaban con
+la página), y el reparto memorizado se indexa por exclusiones y posición. Las viudas de un texto cortado junto a una
+caja se cuentan con las líneas que tendrá el resto a ancho entero. `TextLine.left` y `right` guardan la caja de línea para
+volver a colocar la línea al numerar las páginas.
+
+**Letra capitular** ([Text](../components/text.md#letra-capitular-drop-cap)). `InlineLayout` quita la primera letra de los
+tramos de un `Paragraph` con `Drop cap` en todos los fragmentos (así las posiciones del texto no cambian), la compone al
+cuerpo que da la altura de mayúsculas de la fuente (`VerticalMetrics.capHeight`, de la tabla `OS/2`, o 0,7 sin ella) y la
+coloca como la primera `TextLine` del primer fragmento, con la base en la de la línea `N − 1`; las `N` primeras líneas
+reciben su ancho como una exclusión más (`LineWidths.withDropCap`), el párrafo mide al menos `N` líneas y `cutLines` recibe
+`Orphans` ≥ `N`. `StackingContext` no escribe el espacio invisible tras la línea de la capitular, para que el texto que se
+lee siga siendo una palabra.
+
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
 (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones
 del recurso del idioma, con una caché por palabra. `LineBreaker.words` da a cada palabra sus puntos de corte (los de sus

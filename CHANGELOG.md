@@ -7,6 +7,29 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Side boxes.** `Side: left | right` on an `Image`, a `Barcode` or a `Block` (with `Width` or `Max width`) in block
+  flow places it at that side of its container, at its position in the flow, and the text of the siblings that follow
+  it shortens its lines beside it while they overlap it: the `Text` and `Paragraph` elements and, with the text inside
+  them, the `Block` elements, the headings, the `Markdown` elements and the lists (a list only beside a box on the
+  right, where its markers do not hang). The margin of the side box is the separation. Anything else (a table, a
+  stack, a grid, a text with background or border...) goes below the side boxes, and so does a `Text`, `Paragraph`,
+  `Block`, heading, `Markdown`, `Image` or `Barcode` with `Clear: true`. A word that does not fit beside the box leaves
+  the line empty and goes on in the next one; a second side box on the same side goes below the first; the container
+  reaches the bottom of its side boxes; a side box is not split across pages and moves to the next page with the first
+  line that runs beside it, and the text that goes on on the next page has the whole width again. Both line breaking
+  algorithms work with the width of each line. New codes `SIDE_NOT_IN_BLOCK_FLOW` (on an item of a `Stack` or a
+  `Grid`), `SIDE_WITHOUT_WIDTH`, `BREAK_IN_SIDE_BOX`, `CLEAR_WITHOUT_SIDE`; `Margin: auto` on a side box is
+  `MARGIN_AUTO_WITHOUT_EFFECT` and a `Break` inside one, `BREAK_IN_UNBREAKABLE`.
+- **Drop caps.** `Drop cap: N` (from 2 to 5) in a `Paragraph` sets its first letter, in the font of the paragraph, at
+  the size whose capitals span the first `N` lines (from the cap height of the first one to the baseline of the last
+  one, with the cap height of the font or 70 % of the size without it), and those lines start at its right, a space
+  away; the paragraph is at least `N` lines tall and a page break does not fall among them. The text that is read and
+  copied does not change. Not in a preformatted paragraph (`DROP_CAP_NOT_ALLOWED`, new code).
+- `TextLine` has two more components, `left` and `right`, the room taken from the content box on each side of the
+  line, and `BreakToken.Line`, the position and the exclusions of the line breaking it refers to; `VerticalMetrics`
+  has the cap height; `ConstraintSpace` has the exclusions. The constructors without them still exist.
+- The newsletter example (`test/examples/05-newsletter`) has the photo of the trails story as a side box, with the
+  text around it.
 - **Footnotes.** New element `Footnote`: the content of a note, with a required `Id`, written anywhere in its section
   (where an in-flow element goes) without taking room there, and placed by the engine at the bottom of the page where
   the text calls it with `[^id]` (in a text with `Markup: markdown` or in a `Markdown`), under a rule. The call is a

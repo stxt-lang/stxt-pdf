@@ -54,6 +54,10 @@ class SchemaCoverageTest {
             Map.entry("Pages", "Pages: not-first"),
             Map.entry("Rotate", "Rotate: -8"),
             Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
+            // A Block with Side needs a width; an image does not mind it.
+            Map.entry("Side", "Side: left\nBox:\n\tWidth: 100"),
+            Map.entry("Clear", "Clear: true"),
+            Map.entry("Drop cap", "Drop cap: 3"),
             // Page
             Map.entry("Paper", "Paper: A4"),
             Map.entry("Orientation", "Orientation: landscape"),
@@ -239,6 +243,14 @@ class SchemaCoverageTest {
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
+        // Clear needs a side box before the element: the template of each element, with one in front.
+        String side = "\tImage: test/square.png\n\t\tSide: left\n";
+        for (String element : List.of("Block", "Text", "Paragraph", "Heading 1", "Heading 2", "Heading 3", "Heading 4",
+                "Heading 5", "Heading 6", "Markdown", "Image", "Barcode")) {
+            Template base = t.get(element);
+            t.put(element + " > Clear", new Template(HEADER + side + base.document().substring(HEADER.length()),
+                    base.present()));
+        }
         return t;
     }
 

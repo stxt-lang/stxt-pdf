@@ -1,13 +1,24 @@
 package dev.stxt.pdf.model;
 
 /**
- * Ascent and descent of a font, in fractions of the font size (both positive). They place
- * the baseline within a line (reference/common/typography.md).
+ * Ascent, descent and cap height of a font, in fractions of the font size (all positive). They place
+ * the baseline within a line (reference/common/typography.md) and size a drop cap (reference/components/text.md).
  */
-public record VerticalMetrics(double ascent, double descent) {
+public record VerticalMetrics(double ascent, double descent, double capHeight) {
 
-    /** Approximation without a font: 80% of the font size above the baseline and 20% below. */
-    public static final VerticalMetrics APPROXIMATE = new VerticalMetrics(0.8, 0.2);
+    /** Cap height assumed when the font does not say it: 70% of the font size. */
+    public static final double APPROXIMATE_CAP_HEIGHT = 0.7;
+
+    /**
+     * Approximation without a font: 80% of the font size above the baseline and 20% below, and capitals of
+     * {@value #APPROXIMATE_CAP_HEIGHT} of the size.
+     */
+    public static final VerticalMetrics APPROXIMATE = new VerticalMetrics(0.8, 0.2, APPROXIMATE_CAP_HEIGHT);
+
+    /** Metrics with the approximate cap height. */
+    public VerticalMetrics(double ascent, double descent) {
+        this(ascent, descent, APPROXIMATE_CAP_HEIGHT);
+    }
 
     /**
      * Baseline of a line that starts at {@code lineTop} and measures {@code lineHeight}: the box

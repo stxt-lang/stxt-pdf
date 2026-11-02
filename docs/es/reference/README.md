@@ -41,8 +41,8 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | Página | Elementos |
 |---|---|
 | [`Document`](components/document.md) | `Document`, `Page`, `Title`, `Language` y `Section` |
-| [`Block`](components/block.md) | `Block` y el flujo de bloque, que comparten todos los bloques |
-| [`Text`](components/text.md) | `Text` y `Paragraph` |
+| [`Block`](components/block.md) | `Block`, el flujo de bloque, que comparten todos los bloques, y las cajas laterales (`Side`, `Clear`) |
+| [`Text`](components/text.md) | `Text` y `Paragraph`, con la letra capitular (`Drop cap`) |
 | [Encabezados](components/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](components/list.md) | `List` y `List item` |
 | [`Table`](components/table.md) | `Table`, `Header rows`, `Body`, `Footer rows`, `Row` y `Cell` |

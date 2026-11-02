@@ -152,6 +152,33 @@ where they are content): `BreakRules.cutLines` applies widows and orphans to all
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
 `List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`).
 
+**Side boxes** ([Block](../components/block.md#side-boxes-side)). `BlockLayout` places a child with `Side` whole, at its
+side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and
+what it takes from each side, margins included). To each child that runs beside the boxes (`Box.wrapsBesideSideBoxes`:
+texts that are not preformatted, `Block`, headings, `Markdown` and lists without background or border; lists, only
+beside boxes on the right) it passes in the `ConstraintSpace` the **exclusions** (`model.Exclusion`: band and what it
+takes from each side, measured from the border box of the child), which are part of the key of the cache; the other
+children go down to the bottom of the side boxes. A `Block` that receives exclusions treats them as inherited side boxes
+for its own children, without counting them for its height. `InlineLayout` moves them to the content box and
+`LineWidths` gives each line its line box (where it starts and how wide it is, with `varying()` as the first line with
+the whole width); `LineBreaker` breaks with the width of each line, the greedy algorithm line by line and Knuth-Plass
+with the line number in the state of the dynamic programming (up to `varying()`), and a word that does not fit alone in
+a short line leaves it empty (`Line.isEmpty`) and goes to the next one. Each `Line` carries the position of the text it
+starts at (`start`), and the `BreakToken.Line` carries the exclusions and the starting position of the line breaking
+the fragment was placed with: the next fragment, if either has exclusions, breaks the rest of the text again from the
+position of its first line with its own (usually none: the side boxes end with the page), and the memoized line
+breaking is keyed by exclusions and position. The widows of a text cut beside a box are counted with the lines the
+rest will take at the whole width. `TextLine.left` and `right` keep the line box to place the line again when the
+pages are numbered.
+
+**Drop cap** ([Text](../components/text.md#drop-cap-drop-cap)). `InlineLayout` takes the first letter out of the runs of
+a `Paragraph` with `Drop cap` in every fragment (so the positions of the text do not change), sets it at the size the
+cap height of the font gives (`VerticalMetrics.capHeight`, from the `OS/2` table, or 0.7 without it) and places it as the
+first `TextLine` of the first fragment, with its baseline on that of line `N − 1`; the first `N` lines get its width as
+one more exclusion (`LineWidths.withDropCap`), the paragraph is at least `N` lines tall and `cutLines` gets
+`Orphans` ≥ `N`. `StackingContext` does not write the invisible space after the line of the drop cap, so that the text
+that is read is still one word.
+
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
 box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns
 of the resource of the language, with a cache per word. `LineBreaker.words` gives each word its break points (those of

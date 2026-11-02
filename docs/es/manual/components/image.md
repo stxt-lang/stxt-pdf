@@ -50,6 +50,8 @@ Document (dev.stxt.pdf):
 | `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `inside` (entera, con espacio a los lados), `fill` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `Pdf page` | La página de un PDF que se dibuja, desde 1. Sin `Pdf page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
+| `Side` | `left` o `right`: la imagen se coloca a ese lado y el texto que la sigue corre a su lado ([Block](block.md#una-caja-a-un-lado-y-el-texto-alrededor-side)) |
+| `Clear` | `true` baja la imagen por debajo de las cajas laterales que hay antes |
 
 Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `Edges`: no se parte). No admite `Typography`.
 

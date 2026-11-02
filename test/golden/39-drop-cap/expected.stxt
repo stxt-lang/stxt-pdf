@@ -1,0 +1,21 @@
+# Page 1: d1 at 20, 5 lines; d2 at 80, 24 high with one line; p3 at 104. Page 2: img and d4 at 20, 7 lines.
+# Page 3: sp. Page 4: d5 at 20, 5 lines.
+Result:
+	Page: 1
+		Fragment: d1
+			Rect: 20 20 260 60
+		Fragment: d2
+			Rect: 20 80 260 24
+		Fragment: p3
+			Rect: 20 104 260 12
+	Page: 2
+		Fragment: img
+			Rect: 20 20 60 60
+		Fragment: d4
+			Rect: 20 20 260 84
+	Page: 3
+		Fragment: sp
+			Rect: 20 20 260 130
+	Page: 4
+		Fragment: d5
+			Rect: 20 20 260 60

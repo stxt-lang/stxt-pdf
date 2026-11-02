@@ -56,10 +56,39 @@ neither border nor padding on that side: it becomes a margin of the `Block` itse
 margins of the children stay inside. A `Block` that is an item of a `Stack` or a `Grid` already keeps them inside, so
 there `Isolate margins: true` is an error.
 
+## A box at one side with the text around it (`Side`)
+
+With `Side: left` or `Side: right`, an `Image`, a `Barcode` or a `Block` with `Width` is placed at that side and the
+paragraphs that come after it run beside it, with shorter lines, until the box ends. It is the photo of a news story
+or the figure of a manual. The margin of the box is the separation from the text.
+
+```
+Block:
+    Side: right
+    Box:
+        Width: 180
+        Margin: 0 0 6 14
+    Image: examples/newsletter/trail.jpg
+        Alt: A path between meadows with mountains in the background
+        Box:
+            Width: 100%
+    Text: The Pla de les Eres trail. Photo: Joan Casas.
+        Typography:
+            Size: 7.5
+Paragraph: October is beech forest month, and here are three outings to enjoy it without the crowds...
+Paragraph: The Molí path starts at the factory parking lot and follows the river up to a small waterfall.
+```
+
+Paragraphs and texts run beside the box, also those of a `Block`, a heading, a `Markdown` or a list (a list, only if
+the box is on the right: its markers go on the left). A table, a `Stack` or a text with background or border go below
+the box, and so does anything with `Clear: true`. The box is not split across pages: if it does not fit, it moves to
+the next one with the first line that runs beside it.
+
 ## Recipes
 
 - **A boxed panel:** a `Block` with `Padding`, `Border` and `Background`.
 - **Not split:** `Break` with `Keep together: true` (the signature block of a contract).
 - **Start on a new page:** `Break` with `Before: page`.
+- **A photo with the text around it:** `Side: left` or `right` on the image (or on a `Block` with the photo and its caption).
 
 More detail in the [reference](../../reference/components/block.md).

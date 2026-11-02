@@ -143,6 +143,9 @@ split. Tables also repeat their header and their footer ([Table](../components/t
   the next page, with the height of the rectangle that encloses it.
 - **Clipped boxes.** A box with `Overflow: clip` is not split either: whole or on the next page
   ([Overflow](overflow.md#clipping-clip)).
+- **Side boxes.** An `Image`, a `Barcode` or a `Block` with `Side` is not split either: it moves to the next page with
+  the first line that runs beside it, and the lines shortened beside it end with the page: on the next one, the text
+  has the whole width ([Block](../components/block.md#side-boxes-side)).
 
 ## Page numbers: `{page}` and `{pages}`
 
