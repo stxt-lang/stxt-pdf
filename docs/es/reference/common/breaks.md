@@ -85,6 +85,13 @@ En un corte no forzado, los márgenes que tocan el corte se truncan a cero: tras
 hijo de la página y los que salen de él por arriba. Un fragmento de continuación no deja salir márgenes por arriba. En un
 corte forzado, se trunca el margen anterior al corte y se conserva el posterior.
 
+Una caja que contiene los márgenes de sus hijos (una caja con borde o relleno, con `Isolate margins`, la columna de un
+`Columns`) contiene también en su alto el margen inferior de su último hijo, así que ese margen tiene que caber en la
+página como cabe el hijo: si el hijo cabe y su margen no, el corte va antes del hijo (o antes, si ese corte es mejor), y
+antes de la caja si dentro de ella no puede cortar nada. El área de página es la excepción: su final es el final de la
+página, y el margen inferior de su último hijo se trunca ahí. Una caja con `Height` tiene el alto que tiene, haga lo que
+haga su contenido.
+
 ## Bordes y relleno en los cortes
 
 Con `Edges: open`, el primer fragmento no tiene borde ni relleno inferiores y los siguientes no tienen los

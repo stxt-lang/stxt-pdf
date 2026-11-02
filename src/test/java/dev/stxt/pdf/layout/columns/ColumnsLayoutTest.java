@@ -105,6 +105,38 @@ class ColumnsLayoutTest {
         assertRect(305, 55, 250, 30, l.rect("C"));
     }
 
+    /**
+     * The bottom margin of the last block is part of the content (the flow isolates margins): 320 in one column, 200 in
+     * two. A spacer leaves 630 for the Columns, so the first probe of the balancing, 315, is between the content (300)
+     * and the content with the margin (320): C and its margin do not fit in the first column, C opens the second one,
+     * the probe fits and the search goes on down to 200. Before, the first column took C and measured 320 in a height
+     * of 315, the probe failed, the search went up and the Columns was left with a single column.
+     */
+    @Test
+    void balanceWithATrailingMarginThatDoesNotFitAProbe() {
+        List<String> columns = new ArrayList<>(List.of(columnsElement(TWO, block("A", 100, true), block("B", 100, true),
+                sized("C", true, "Height: 100", "Margin: 0 0 20 0"))));
+        List<String> lines = new ArrayList<>(List.of("	Block:", "		Id: S", "		Box:", "			Height: 132", "		Break:",
+                "			Keep together: true"));
+        lines.addAll(columns);
+        LayoutFixture l = layOut(lines.toArray(String[]::new));
+        assertRect(40, 172, 515, 200, l.rect("M"));
+        assertRect(305, 172, 250, 100, l.rect("C"));
+    }
+
+    /** The same at the end of the page without balancing: C goes to the second column instead of past the page. */
+    @Test
+    void trailingMarginThatDoesNotFitTheColumnOpensTheNextOne() {
+        List<String> lines = new ArrayList<>(List.of("	Block:", "		Id: S", "		Box:", "			Height: 447", "		Break:",
+                "			Keep together: true"));
+        lines.addAll(List.of(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 100, true),
+                block("B", 100, true), sized("C", true, "Height: 100", "Margin: 0 0 20 0"))));
+        LayoutFixture l = layOut(lines.toArray(String[]::new));
+        assertEquals(1, l.pages());
+        assertRect(40, 487, 515, 200, l.rect("M"));
+        assertRect(305, 487, 250, 100, l.rect("C"));
+    }
+
     @Test
     void columnWidthFitsAsManyColumnsAsPossible() {
         // Three columns of 165 with gaps of 10.

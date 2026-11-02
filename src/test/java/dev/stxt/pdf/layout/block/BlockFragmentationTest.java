@@ -220,6 +220,39 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void trailingMarginOfTheLastChildHasToFitInTheBoxThatContainsIt() {
+        // P isolates margins, so the bottom margin of C (30) is part of its height: 50 + 20 + 20 fit, the margin does
+        // not, and the break goes before C, as before a child whose top margin pushes it past the page.
+        LayoutFixture l = layOutPaged(PAGE,
+                "	Block:", "		Id: A", "		Box:", "			Height: 50",
+                "	Block:", "		Id: P", "		Isolate margins: true",
+                "		Block:", "			Id: B", "			Box:", "				Height: 20", "			Break:", "				Keep together: true",
+                "		Block:", "			Id: C", "			Box:", "				Height: 20", "				Margin: 0 0 30 0", "			Break:",
+                "				Keep together: true");
+        assertEquals(2, l.pages());
+        assertRect(40, 90, 515, 20, l.rect(1, "P"));
+        assertRect(40, 90, 515, 20, l.rect(1, "B"));
+        assertRect(40, 40, 515, 50, l.rect(2, "P"));
+        assertRect(40, 40, 515, 20, l.rect(2, "C"));
+        // With a single child nothing can break: P goes whole to the next page, as any box that does not fit.
+        LayoutFixture s = layOutPaged(PAGE,
+                "	Block:", "		Id: A", "		Box:", "			Height: 70",
+                "	Block:", "		Id: P", "		Isolate margins: true",
+                "		Block:", "			Id: C", "			Box:", "				Height: 20", "				Margin: 0 0 30 0", "			Break:",
+                "				Keep together: true");
+        assertEquals(2, s.pages());
+        assertFalse(s.has(1, "P"));
+        assertRect(40, 40, 515, 50, s.rect(2, "P"));
+        // The root is the page area: the margin of its last child is truncated at the end of the page.
+        LayoutFixture r = layOutPaged(PAGE,
+                "	Block:", "		Id: A", "		Box:", "			Height: 70",
+                "	Block:", "		Id: C", "		Box:", "			Height: 20", "			Margin: 0 0 30 0", "		Break:",
+                "			Keep together: true");
+        assertEquals(1, r.pages());
+        assertRect(40, 110, 515, 20, r.rect(1, "C"));
+    }
+
+    @Test
     void emptyBoxBeforeTheBreakDoesNotOverflow() {
         // E (no height) sits at 90, where B would start, past the 70 of the fragment of P: it is not an overflow.
         LayoutFixture l = layOutPaged(PAGE,

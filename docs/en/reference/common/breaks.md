@@ -86,6 +86,13 @@ At an unforced break, the margins that touch the break are truncated to zero: af
 child of the page and the ones that come out of it at the top. A continuation fragment lets no margins out at the top. At
 a forced break, the margin before the break is truncated and the one after it is kept.
 
+A box that contains the margins of its children (a box with border or padding, with `Isolate margins`, the column of a
+`Columns`) also contains the bottom margin of its last child in its height, so that margin has to fit on the page as the
+child does: if the child fits and its margin does not, the break goes before the child (or earlier, if that break is
+better), and before the box if nothing inside it can break. The page area is the exception: its bottom is the end of the
+page, and the bottom margin of its last child is truncated there. A box with `Height` has the height it has, whatever its
+content does.
+
 ## Borders and padding at breaks
 
 With `Edges: open`, the first fragment has no bottom border or padding and the following ones have no top ones. With

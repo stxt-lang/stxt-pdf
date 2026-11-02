@@ -7,6 +7,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **The bottom margin of the last child has to fit in the box that contains it.** In a box that contains the margins of
+  its children (border or padding, `Isolate margins`, the column of a `Columns`), when the last child fits on the page
+  and its bottom margin does not, the break now goes before that child, as it does before a child whose top margin
+  pushes it past the page; before, the box ended past the page by that margin. This fixes the balancing of `Columns`:
+  a column whose content fit but whose last margin did not measured more than the height probed, the balancing took
+  the probe as failed and, depending on the height left on the page, the `Columns` was left with a single unbalanced
+  column. The page area is the exception: the margin of its last child is truncated at the end of the page, as before.
 - **Figures with a caption.** New element `Figure`: a block with exactly one element (an `Image`, a `Barcode`, a `Table`
   or a `Block`) and a `Caption`, a text (value or `Content >>`, with `Markup: markdown` if wanted) that goes below the
   content or above a table, wherever it is written (`Caption position: top | bottom` changes it). A figure is numbered

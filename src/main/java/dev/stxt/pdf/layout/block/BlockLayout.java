@@ -534,6 +534,18 @@ public final class BlockLayout implements LayoutAlgorithm {
         /** All children placed. */
         LayoutResult finished() {
             boolean openAtBottom = !box.isolatesMargins() && model.openAtBottom();
+            if (!openAtBottom && !atTop && fragmenting && model.height().isEmpty() && box.parent() != null
+                    && fits(cursor, contentRemaining) && !fits(cursor + strut.resolve(), contentRemaining)) {
+                // The box contains the margin at the end of its content, so the margin has to fit on the page like the
+                // content does (reference/common/breaks.md): the break goes before the last child or, if nothing can
+                // break, before the box. Not the root: its bottom is the end of the page, and the margin is truncated.
+                if (!marks.isEmpty()) {
+                    return broken(BreakRules.best(marks, Mark::appeal));
+                }
+                if (!space.atFragmentainerStart()) {
+                    return LayoutResult.before(box);
+                }
+            }
             double contentHeight;
             AdjoiningMargins out;
             if (atTop) {
