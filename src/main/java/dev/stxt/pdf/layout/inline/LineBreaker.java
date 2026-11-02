@@ -63,7 +63,7 @@ public final class LineBreaker {
     /** The hyphen painted where a word is split: U+002D, the one every font has. */
     public static final String HYPHEN = "-";
     /** The soft hyphen of the text: a break point written by the author, which is never painted. */
-    public static final char SOFT_HYPHEN = '­';
+    public static final char SOFT_HYPHEN = '\u00AD';
     private static final int[] NO_BREAKS = new int[0];
 
     /**
