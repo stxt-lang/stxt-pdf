@@ -111,8 +111,10 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`Canvas`**: la interfaz de los lienzos, que solo dibujan. Cada lienzo da su `Tagging`: el etiquetado del PDF, y en el
   SVG, nada.
 - **`PdfDocumentWriter`**: escribe el documento PDF: páginas, etiquetado (`PdfStructure`), marcadores, destinos
-  (`PdfDestinations`), enlaces (`PdfLinks`), metadatos y PDF/A (`PdfMetadata`), adjuntos (`PdfAttachments`) y guardado. `PdfCanvas` dibuja una página, con `PdfContent`, `PdfFonts`,
-  `PdfGradients` y `PdfImages`.
+  (`PdfDestinations`), enlaces (`PdfLinks`), metadatos y PDF/A (`PdfMetadata`), adjuntos (`PdfAttachments`) y guardado,
+  o lo deja en un `PDDocument` abierto que guarda quien lo abrió. `PdfCanvas` dibuja una página, con `PdfContent`, `PdfFonts`,
+  `PdfGradients` y `PdfImages`. **`PdfPainter`** pinta una página maquetada sobre una página de un documento ajeno, sin
+  etiquetar ([Uso desde Java](implementation/api.md#integración-con-pdfbox)).
 - **`SvgCanvas`**: el SVG de depuración de los tests ([El pintado](implementation/painting.md)).
 - **`ContrastCheck`**: el contraste del texto con lo que tiene debajo ([El pintado](implementation/painting.md#el-contraste)).
 

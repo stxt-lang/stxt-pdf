@@ -210,7 +210,8 @@ converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeco
 ```
 
 `Cancellation` (`model`) says whether the conversion has to stop: a functional interface with `requested()`, which the
-engine asks wherever it works. It is passed with the call (`layOut`, `toPdf` and `toSvg` have an overload with it) or,
+engine asks wherever it works. It is passed with the call (`layOut`, `toPdf` and `toSvg` have an overload with it, and
+another with it and a [`Progress`](#progress)) or,
 for every conversion of a `Converter`, with `Converter.builder().cancellation(...)`; with both, it stops when either
 asks. The first time it answers `true`, the conversion ends with a `CancelledException`, of kind `CANCELLED` and without
 a line ([Errors](../common/errors.md#error-types)), which goes through the engine without anything wrapping it, and
@@ -251,6 +252,117 @@ SVG, generating a code, saving the PDF), which finishes on its own; the [limits]
 > seconds to build, and checking only between pages would not cut it short. *Rejected alternative:* checking only
 > between pages in the `Paginator`.
 
+## Progress
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.NONE, new Progress() {
+    @Override
+    public void pagePainted(int number, int pages) {
+        bar.set(number, pages);   // a progress bar
+    }
+});
+```
+
+`Progress` (`model`) is who the conversion tells how it goes. It is passed with the call (`layOut`, `toPdf` and `toSvg`
+have an overload with it, after the `Cancellation`) and the engine calls it, on the thread that converts, as the work
+advances. All its methods have an empty implementation: only what is listened to is overridden, and `Progress.NONE`
+listens to nothing.
+
+| `Progress` | When it is called |
+|---|---|
+| `pageLaidOut(number)` | The `Paginator` has laid out a page of the flow: `number`, from 1, within the current pass. A document with references (`{page of: id}`) or whose total of pages (`{pages}`) changes what has been laid out is paginated again ([References](../common/references.md)), and the count starts from 1 again in each pass |
+| `laidOut(pages)` | The layout has finished, with that total of pages, before anything is painted. It is the end of `layOut` |
+| `pagePainted(number, pages)` | A page is painted in the PDF, or its SVG made |
+| `done()` | The conversion has finished: the PDF is written to the destination (or into the `PDDocument`), or every SVG is made. `layOut` alone does not call it |
+
+What an implementation throws ends the conversion as an `InternalException`, with what was thrown as its cause: it is
+neither an error of the engine nor of the document, and a progress bar has no reason to stop anything.
+
+> **Decision:** it is passed only with the call and not in the `builder`: a `Converter` is shared across conversions
+> and across threads, and a notice that does not say which conversion it is about is of no use to a progress bar.
+> *Rejected alternative:* a `progress(...)` in the `builder`, like the cancellation, which does make sense there because
+> the thread's one is the same for all.
+
+> **Decision:** `pageLaidOut` counts every page of every pass and not only those of the last one: during the first pass
+> it is not known whether there will be another, and a bar that advances and starts over tells the truth. *Rejected
+> alternative:* telling only in the final phase of the `Paginator`, which is fast because the flow is already in the
+> cache, and would not count what takes time.
+
+## Integration with PDFBox
+
+Two ways of using the engine from a program that already works with PDFBox: writing the document into an open
+`PDDocument`, which the caller saves after adding what the engine does not write, and painting a laid-out page on a
+page of any document.
+
+### Into an open `PDDocument`
+
+```java
+try (PDDocument pdf = new PDDocument()) {
+    converter.toPdf(laidOut, pdf);                                      // or toPdf(doc, pdf)
+    pdf.getDocumentInformation().setCustomMetadataValue("poliza", "123");   // what the engine does not write
+    stamp(pdf);                                                         // a watermark on every page
+    pdf.protect(policy);                                                // encryption
+    pdf.save(out);
+}
+```
+
+`toPdf(document, PDDocument)` writes into the document the same as into a file: the pages, the fonts, the structure
+tree, the bookmarks, the links, the page labels, the metadata and the PDF/A declaration, and with the long overload
+(`Attachments`, `Cancellation`, `Progress`), the attachments. Two differences: **it does not save it**, the caller does,
+and so the file identifier (`/ID`) is the one PDFBox gives it when saving and not the one of the content
+([The PDF inside](pdf.md#pages-fonts-and-metadata)): two saves do not give the same bytes. The `PDDocument` has to be
+**without pages** (anything else is an `IllegalArgumentException`): a document is written whole, because its structure
+tree, its page labels and its metadata belong to the whole PDF. What the `PDDocument` had (keys of the `Info`
+dictionary) is kept, except what the document writes: the title, the subject, the language and the XMP packet, which is
+replaced whole; that is why the caller's own keys are set afterwards. If the conversion is canceled, the document is
+left half written. Underneath, `PdfDocumentWriter.write` has the same overload with a `PDDocument`.
+
+> **Decision:** the `PDDocument` has to be empty, and what already has pages is done with `PdfPainter`: adding a tagged
+> document to another that already has a structure tree is merging the two trees, their `ParentTree`, their `RoleMap`
+> and their `IDTree`, which is what PDFBox's `PDFMergerUtility` does from two PDFs already saved. *Rejected alternative:*
+> adding the pages at the end of a document with pages, with or without tagging.
+
+> **Decision:** the caller's own `Info` keys and the blend mode of a watermark do not go into the engine: with the open
+> `PDDocument` they are written with PDFBox before saving, without reopening the file, and the engine does not have to
+> know about document management systems or watermarks. *Rejected alternative:* a `Meta` in `Document` and a `Blend` in
+> `Page overlay`, which is what the first consumer of the engine asked for.
+
+### A page on a page of another document
+
+```java
+try (PDDocument form = Loader.loadPDF(formFile);
+     PdfPainter painter = new PdfPainter(form, converter.resources(), converter.limits())) {
+    painter.paint(laidOut.pages().get(0), form.getPage(0));   // the first page, on the form
+    form.save(out);
+}
+```
+
+`PdfPainter` (`paint`) paints laid-out pages, one at a time, on pages of a document that is not the engine's: to stamp a
+page on a form, or to put the pages of a document in another PDF. Each `paint(page, PDPage)` appends the content of the
+page **after** what the PDF page already has, with the top left corner of the laid-out page at the top left corner of
+the `MediaBox` of the `PDPage` (its `Rotate` is not taken into account), and adds its link annotations to those of the
+page. The fonts and the images are embedded once per painter. The page is laid out by the engine (`laidOut.pages()`)
+with the same `Resources` the painter is given.
+
+**Nothing is tagged.** The document the pages are painted on has its own structure tree, or none, and the engine does
+not touch it: every content is an *artifact* (the text is still copied and searched) and the link annotations hang from
+no `Link`. A document that has to be PDF/UA is written whole, with `toPdf`.
+
+The links to a URL work from the start. The links to a box of the document (`#id`) get their destination when the
+painter is **closed**, if the page that has it was painted with that same painter; otherwise their annotation is
+removed. Closing the painter also closes the PDFs it drew pages of; the document is not saved, the caller saves it. A
+painter belongs to one document and one thread. It takes a `Cancellation`, which is asked before each page and at each
+image.
+
+> **Decision:** on a page of another document nothing is tagged: tagging would require merging the structure tree of
+> that document with the engine's, and without a tree the PDF is still valid (an *artifact* is legitimate content of a
+> tagged PDF). Whoever wants PDF/UA writes the whole document. *Rejected alternative:* creating the structure tree when
+> the other document has none, which would leave a half-tagged PDF.
+
+> **Decision:** an internal link whose destination was not painted is removed and not left without a destination: a
+> link annotation without an action or a destination looks like a link and leads nowhere. *Rejected alternative:* an
+> error, which would prevent painting a single page of a document with links between its pages.
+
 ## Threads
 
 The recommended way is to create **one `Converter` and share it**: it is immutable and each conversion creates its own engine, so
@@ -262,6 +374,7 @@ two threads converting at the same time share no state that changes.
 | `LaidOutDocument` (what `layOut` returns) | Yes, to paint it: the same laid-out document can be written to PDF and to SVG from several threads. It is handed to the other threads with a `Future`, an executor or a `volatile` field |
 | `Engine` | **No.** It keeps the layout cache and the numbering state. One per conversion, and reusing it in sequence is safe (it releases everything at the end of each document) |
 | `Box` and `Style` (the box tree) | Read-only once built |
+| `PdfPainter` | **No.** It belongs to a `PDDocument`, which PDFBox does not share across threads |
 
 `ConcurrentConversionTest` checks, with eight threads converting the eleven examples, that the PDF is the same, byte for byte, as
 in the sequential conversion, and `EngineContractTest`, that a reused `Engine` gives the same as a new one. The text of an

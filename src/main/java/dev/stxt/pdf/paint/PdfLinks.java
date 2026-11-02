@@ -56,12 +56,7 @@ final class PdfLinks {
      * destination ({@link PdfStructure#goTo}).
      */
     void resolve(Map<Box, PDPageXYZDestination> destinations, PdfStructure structure) {
-        Map<String, Box> byKey = new java.util.HashMap<>();
-        destinations.forEach((box, d) -> {
-            if (box.key() != null) {
-                byKey.put(box.key(), box);
-            }
-        });
+        Map<String, Box> byKey = byKey(destinations);
         for (Internal link : internal) {
             Box box = byKey.get(link.id());
             if (box == null) {
@@ -75,5 +70,34 @@ final class PdfLinks {
                 link.annotation().setDestination(destinations.get(box));
             }
         }
+    }
+
+    /**
+     * Gives the internal links whose box is in {@code destinations} its destination, and returns the annotations of
+     * the others: those of the pages painted one by one ({@link PdfPainter}) whose destination is on a page that was
+     * not painted.
+     */
+    List<PDAnnotationLink> resolve(Map<Box, PDPageXYZDestination> destinations) {
+        Map<String, Box> byKey = byKey(destinations);
+        List<PDAnnotationLink> unresolved = new ArrayList<>();
+        for (Internal link : internal) {
+            Box box = byKey.get(link.id());
+            if (box == null) {
+                unresolved.add(link.annotation());
+            } else {
+                link.annotation().setDestination(destinations.get(box));
+            }
+        }
+        return unresolved;
+    }
+
+    private static Map<String, Box> byKey(Map<Box, PDPageXYZDestination> destinations) {
+        Map<String, Box> byKey = new java.util.HashMap<>();
+        destinations.forEach((box, d) -> {
+            if (box.key() != null) {
+                byKey.put(box.key(), box);
+            }
+        });
+        return byKey;
     }
 }

@@ -23,6 +23,7 @@ import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.Progress;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.resources.Resources;
@@ -64,6 +65,7 @@ public final class Engine implements LayoutContext {
     private final Images images;
     private final Limits limits;
     private final Cancellation cancellation;
+    private final Progress progress;
     private final InlineLayout inline;
     private final TableLayout table;
     private final OverlayLayout overlays;
@@ -114,9 +116,19 @@ public final class Engine implements LayoutContext {
      */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
                   Cancellation cancellation) {
+        this(measurer, resources, limits, excluded, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #Engine(TextMeasurer, Resources, Limits, Set, Cancellation)}, telling {@code progress} each page of
+     * the flow it lays out and, at the end, the number of pages (reference/implementation/api.md).
+     */
+    public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
+                  Cancellation cancellation, Progress progress) {
         this.measurer = measurer;
         this.limits = limits;
         this.cancellation = cancellation;
+        this.progress = progress;
         this.images = new Images(resources, limits, excluded);
         this.inline = new InlineLayout(this, measurer);
         GridLayout grid = new GridLayout(this);
@@ -164,6 +176,7 @@ public final class Engine implements LayoutContext {
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
             Overflow.check(pages, cancellation);
+            progress.laidOut(pages.size());
             return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages);
         } finally {
             release();
@@ -187,6 +200,11 @@ public final class Engine implements LayoutContext {
     /** Whether the conversion has to stop; the {@link Paginator} asks it at each pass and at each page. */
     Cancellation cancellation() {
         return cancellation;
+    }
+
+    /** Who is told the progress; the {@link Paginator} tells it each page of the flow it lays out. */
+    Progress progress() {
+        return progress;
     }
 
     /** Layouts this engine has computed since it was created, to measure what the cache saves. */

@@ -50,7 +50,8 @@ SVG): the marked text of the tagged PDF and the links.
 
 | Class | What it does |
 |---|---|
-| `PdfDocumentWriter` | The document: creates all the pages before painting, paints each one, writes the structure, the bookmarks, the destinations and the page labels, and saves. Its `write` is the entry point |
+| `PdfDocumentWriter` | The document: creates all the pages before painting, paints each one, writes the structure, the bookmarks, the destinations and the page labels, and saves, or leaves it in an open `PDDocument` that the caller saves. Its `write` is the entry point |
+| `PdfPainter` | A laid-out page on a page of another document, untagged ([Using from Java](api.md#integration-with-pdfbox)) |
 | `PdfCanvas` | The drawing of a page |
 | `PdfContent` | The stream of a page with the origin at the bottom: paths, color, rotations and `io`, the only point that converts the `IOException` |
 | `PdfTagging` | The marked content and the annotations of a page |

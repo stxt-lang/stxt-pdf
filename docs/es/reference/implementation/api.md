@@ -208,7 +208,8 @@ converter.toPdf(doc, out, Attachments.NONE, Cancellation.timeout(Duration.ofSeco
 ```
 
 `Cancellation` (`model`) dice si la conversión tiene que parar: una interfaz funcional con `requested()`, que el motor
-consulta allí donde trabaja. Se pasa en la llamada (`layOut`, `toPdf` y `toSvg` tienen una sobrecarga con ella) o, para
+consulta allí donde trabaja. Se pasa en la llamada (`layOut`, `toPdf` y `toSvg` tienen una sobrecarga con ella, y otra
+con ella y un [`Progress`](#progreso)) o, para
 todas las conversiones de un `Converter`, con `Converter.builder().cancellation(...)`; con las dos, para cuando lo pide
 cualquiera. La primera vez que contesta `true`, la conversión termina con un `CancelledException`, de tipo `CANCELLED` y
 sin línea ([Errores](../common/errors.md#tipos-de-error)), que atraviesa el motor sin que nada lo envuelva, y en el
@@ -249,6 +250,115 @@ PDF), que termina sola; los [límites](#límites) acotan lo que puede tardar cad
 > segundos en construirse, y comprobarlo solo entre páginas no la cortaría. *Alternativa descartada:* comprobar solo entre
 > páginas en el `Paginator`.
 
+## Progreso
+
+```java
+converter.toPdf(doc, out, Attachments.NONE, Cancellation.NONE, new Progress() {
+    @Override
+    public void pagePainted(int number, int pages) {
+        bar.set(number, pages);   // una barra de progreso
+    }
+});
+```
+
+`Progress` (`model`) es a quien la conversión cuenta cómo va. Se pasa en la llamada (`layOut`, `toPdf` y `toSvg` tienen
+una sobrecarga con él, detrás de la `Cancellation`) y el motor lo llama, en el hilo que convierte, a medida que avanza.
+Todos sus métodos tienen una implementación vacía: se sobreescribe solo lo que se escucha, y `Progress.NONE` no
+escucha nada.
+
+| `Progress` | Cuándo se llama |
+|---|---|
+| `pageLaidOut(número)` | El `Paginator` ha maquetado una página del flujo: la `número`, desde 1, dentro de la pasada en curso. Un documento con referencias (`{page of: id}`) o cuyo total de páginas (`{pages}`) cambia lo maquetado se pagina otra vez ([Referencias](../common/references.md)), y la cuenta vuelve a empezar en 1 en cada pasada |
+| `laidOut(páginas)` | El layout ha terminado, con ese total de páginas, antes de pintar nada. Es el final de `layOut` |
+| `pagePainted(número, páginas)` | Una página está pintada en el PDF, o su SVG hecho |
+| `done()` | La conversión ha terminado: el PDF está escrito en el destino (o en el `PDDocument`), o todos los SVG están hechos. `layOut` solo no lo llama |
+
+Lo que lanza una implementación termina la conversión como un `InternalException`, con lo lanzado como causa: no es
+un error del motor ni del documento, y una barra de progreso no tiene por qué parar nada.
+
+> **Decisión:** se pasa solo en la llamada y no en el `builder`: un `Converter` se comparte entre conversiones y entre
+> hilos, y un aviso sin decir de qué conversión es no sirve para una barra de progreso. *Alternativa descartada:* un
+> `progress(...)` en el `builder`, como la cancelación, que allí sí tiene sentido porque la del hilo es la misma para
+> todas.
+
+> **Decisión:** `pageLaidOut` cuenta cada página de cada pasada y no solo las de la última: durante la primera pasada no
+> se sabe si habrá otra, y una barra que avanza y vuelve a empezar dice la verdad. *Alternativa descartada:* avisar solo
+> en la fase final del `Paginator`, que es rápida porque el flujo ya está en la caché, y no contaría lo que tarda.
+
+## Integración con PDFBox
+
+Dos formas de usar el motor desde un programa que ya trabaja con PDFBox: escribir el documento en un `PDDocument`
+abierto, que guarda quien lo abrió después de añadirle lo que el motor no escribe, y pintar una página maquetada sobre
+una página de cualquier documento.
+
+### En un `PDDocument` abierto
+
+```java
+try (PDDocument pdf = new PDDocument()) {
+    converter.toPdf(laidOut, pdf);                                      // o toPdf(doc, pdf)
+    pdf.getDocumentInformation().setCustomMetadataValue("poliza", "123");   // lo que el motor no escribe
+    stamp(pdf);                                                         // una marca de agua en cada página
+    pdf.protect(policy);                                                // el cifrado
+    pdf.save(out);
+}
+```
+
+`toPdf(documento, PDDocument)` escribe en el documento lo mismo que en un fichero: las páginas, las fuentes, el árbol de
+estructura, los marcadores, los enlaces, las etiquetas de página, los metadatos y la declaración de PDF/A, y con la
+sobrecarga larga (`Attachments`, `Cancellation`, `Progress`), los adjuntos. Dos diferencias: **no lo guarda**, lo guarda
+quien lo abrió, y por eso el identificador del fichero (`/ID`) es el que PDFBox le pone al guardar y no el del contenido
+([El PDF por dentro](pdf.md#páginas-fuentes-y-metadatos)): dos guardados no dan los mismos bytes. El `PDDocument` tiene
+que estar **sin páginas** (otra cosa es un `IllegalArgumentException`): un documento se escribe entero, porque su árbol de
+estructura, sus etiquetas de página y sus metadatos son de todo el PDF. Lo que el `PDDocument` tuviera (claves del
+diccionario `Info`) se queda, salvo lo que el documento escribe: el título, el asunto, el idioma y el paquete XMP, que
+se sustituye entero; por eso las claves propias se ponen después. Si la conversión se cancela, el documento queda a
+medias. Por debajo, `PdfDocumentWriter.write` tiene la misma sobrecarga con un `PDDocument`.
+
+> **Decisión:** el `PDDocument` tiene que estar vacío, y lo que ya tiene páginas se hace con `PdfPainter`: añadir un
+> documento etiquetado a otro que ya tiene árbol de estructura es fusionar los dos árboles, su `ParentTree`, sus
+> `RoleMap` y sus `IDTree`, que es lo que hace `PDFMergerUtility` de PDFBox a partir de dos PDF ya guardados.
+> *Alternativa descartada:* añadir las páginas al final de un documento con páginas, con o sin etiquetado.
+
+> **Decisión:** las claves propias del `Info` y el modo de fusión de una marca de agua no entran en el motor: con el
+> `PDDocument` abierto se escriben con PDFBox antes de guardar, sin reabrir el fichero, y el motor no tiene que saber de
+> gestores documentales ni de marcas de agua. *Alternativa descartada:* un `Meta` en `Document` y un `Blend` en
+> `Page overlay`, que eran lo que pedía el primer consumidor del motor.
+
+### Una página sobre una página ajena
+
+```java
+try (PDDocument form = Loader.loadPDF(formFile);
+     PdfPainter painter = new PdfPainter(form, converter.resources(), converter.limits())) {
+    painter.paint(laidOut.pages().get(0), form.getPage(0));   // la primera página, sobre el formulario
+    form.save(out);
+}
+```
+
+`PdfPainter` (`paint`) pinta páginas maquetadas, de una en una, sobre páginas de un documento que no es del motor: para
+estampar una página sobre un formulario, o para poner las páginas de un documento en otro PDF. Cada `paint(página,
+PDPage)` añade el contenido de la página **detrás** de lo que la del PDF ya tiene, con la esquina superior izquierda de
+la página maquetada en la esquina superior izquierda de la `MediaBox` del `PDPage` (su `Rotate` no se tiene en cuenta),
+y añade sus anotaciones de enlace a las de la página. Las fuentes y las imágenes se incrustan una vez por pintor. La
+página la maqueta el motor (`laidOut.pages()`) con las mismas `Resources` que se dan al pintor.
+
+**Nada se etiqueta.** El documento sobre el que se pinta tiene su propio árbol de estructura, o ninguno, y el motor no
+lo toca: todo el contenido es un *artifact* (el texto se copia y se busca igual) y las anotaciones de enlace no cuelgan
+de ningún `Link`. Un documento que tenga que ser PDF/UA se escribe entero, con `toPdf`.
+
+Los enlaces a una URL funcionan desde el principio. Los enlaces a una caja del documento (`#id`) reciben su destino al
+**cerrar** el pintor, si la página que la tiene se ha pintado con ese mismo pintor; si no, su anotación se quita. Cerrar
+el pintor cierra también los PDF de los que dibujó páginas; el documento no se guarda, lo guarda quien lo abrió. Un
+pintor es de un documento y de un hilo. Admite una `Cancellation`, que se consulta antes de cada página y en cada imagen.
+
+> **Decisión:** sobre una página ajena no se etiqueta nada: etiquetar obligaría a fusionar el árbol de estructura del
+> documento ajeno con el del motor, y sin árbol el PDF sigue siendo válido (un *artifact* es contenido legítimo de un PDF
+> etiquetado). Quien quiera PDF/UA escribe el documento entero. *Alternativa descartada:* crear el árbol de estructura si
+> el documento ajeno no tiene, que dejaría un PDF etiquetado a medias.
+
+> **Decisión:** un enlace interno cuyo destino no se ha pintado se quita y no se deja sin destino: una anotación de
+> enlace sin acción ni destino se ve como un enlace y no lleva a nada. *Alternativa descartada:* un error, que impediría
+> pintar una sola página de un documento con enlaces entre sus páginas.
+
 ## Hilos
 
 La forma recomendada es crear **un `Converter` y compartirlo**: es inmutable y cada conversión crea su propio motor, así que
@@ -260,6 +370,7 @@ dos hilos que convierten a la vez no comparten ningún estado que cambie.
 | `LaidOutDocument` (lo que devuelve `layOut`) | Sí, para pintarlo: un mismo documento maquetado se puede escribir a PDF y a SVG desde varios hilos. Se entrega a los demás hilos con un `Future`, un ejecutor o un campo `volatile` |
 | `Engine` | **No.** Guarda la caché del layout y el estado de la numeración. Uno por conversión, y reutilizarlo en secuencia es seguro (lo suelta todo al terminar cada documento) |
 | `Box` y `Style` (el árbol de cajas) | Solo lectura una vez construido |
+| `PdfPainter` | **No.** Es de un `PDDocument`, que PDFBox no comparte entre hilos |
 
 `ConcurrentConversionTest` comprueba con ocho hilos convirtiendo los once ejemplos que el PDF es el mismo, byte a byte, que
 en la conversión secuencial, y `EngineContractTest`, que un `Engine` reutilizado da lo mismo que uno nuevo. El texto de un

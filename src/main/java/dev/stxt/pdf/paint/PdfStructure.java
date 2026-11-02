@@ -121,6 +121,12 @@ final class PdfStructure {
 
     /** The part of PDF/UA the PDF complies with: 1 or 2 (reference/implementation/pdf.md). */
     private final int ua;
+    /**
+     * Whether nothing is tagged ({@link #none}): the pages are painted on a document that is not the engine's
+     * ({@link PdfPainter}), whose structure tree, if it has one, is not touched, so every content is an
+     * <em>artifact</em> and the link annotations hang from no {@code Link}.
+     */
+    private final boolean untagged;
     /** With PDF/UA-2, the PDF 2.0 namespace of the elements; with PDF/UA-1, {@code null}. */
     private final COSDictionary pdf2;
     /** With PDF/UA-2, the {@code TOCI} of each table of contents entry, pointing to its heading with {@code Ref}. */
@@ -140,10 +146,23 @@ final class PdfStructure {
     private PDPage page;
     private COSArray pageParents;
 
+    /** The structure of pages painted on a document that is not the engine's: nothing is tagged. */
+    static PdfStructure none() {
+        return new PdfStructure();
+    }
+
+    private PdfStructure() {
+        this.root = null;
+        this.ua = 1;
+        this.pdf2 = null;
+        this.untagged = true;
+    }
+
     /** {@code ua}: the part of PDF/UA, 1 or 2. */
     PdfStructure(PDDocument doc, Box root, int ua) {
         this.root = root;
         this.ua = ua;
+        this.untagged = false;
         if (ua == 2) {
             pdf2 = new COSDictionary();
             pdf2.setItem(COSName.TYPE, COSName.getPDFName("Namespace"));
@@ -560,6 +579,9 @@ final class PdfStructure {
     /** Starts the content of a page. */
     void startPage(PDPage page) {
         this.page = page;
+        if (untagged) {
+            return;
+        }
         pageParents = new COSArray();
         int key = parents.size();
         page.setStructParents(key);
@@ -573,7 +595,7 @@ final class PdfStructure {
      */
     int mark(Box box) {
         PDStructureElement e = holders.containsKey(box) ? holders.get(box) : elements.get(box);
-        if (e == null || !isContent(box)) {
+        if (untagged || e == null || !isContent(box)) {
             return -1;
         }
         return reference(e);
@@ -587,7 +609,7 @@ final class PdfStructure {
     int markLink(Box box) {
         inline = null;
         PDStructureElement holder = holders.containsKey(box) ? holders.get(box) : elements.get(box);
-        if (holder == null || !isContent(box)) {
+        if (untagged || holder == null || !isContent(box)) {
             return -1;
         }
         PDStructureElement link = element("Link", holder);
@@ -605,7 +627,7 @@ final class PdfStructure {
     int markFootnoteCall(Box box, String footnote) {
         PDStructureElement holder = holders.containsKey(box) ? holders.get(box) : elements.get(box);
         PDStructureElement note = elements.get(notes.get(footnote));
-        if (holder == null || note == null || !isContent(box)) {
+        if (untagged || holder == null || note == null || !isContent(box)) {
             return -1;
         }
         PDStructureElement reference = element("Reference", holder);
@@ -632,6 +654,9 @@ final class PdfStructure {
      * (reference/components/footnote.md); gives its {@code MCID}, or -1 if it is not inside a note.
      */
     int markFootnoteLabel(Box box) {
+        if (untagged) {
+            return -1;
+        }
         for (Box b = box; b != null; b = b.parent()) {
             if (labels.containsKey(b)) {
                 return reference(labels.get(b));
@@ -671,6 +696,9 @@ final class PdfStructure {
      * repeated rows of a table, to that of the first page.
      */
     void link(Box box, String destination, PDAnnotationLink annotation, String description) {
+        if (untagged) {
+            return;
+        }
         PDStructureElement parent = elements.get(box);
         if (parent == null) {
             outside(box, destination, annotation, description);
@@ -697,6 +725,9 @@ final class PdfStructure {
      * the repeated rows of a table, to that of the first page.
      */
     void inlineLink(Box box, String destination, PDAnnotationLink annotation, String description) {
+        if (untagged) {
+            return;
+        }
         if (inline != null) {
             firstLinks.computeIfAbsent(box, k -> new HashMap<>()).putIfAbsent(destination, inline);
             attach(inline, annotation);
@@ -800,7 +831,7 @@ final class PdfStructure {
      */
     void figureBox(Box box, PDRectangle r) {
         PDStructureElement e = elements.get(box);
-        if (e == null) {
+        if (untagged || e == null) {
             return;
         }
         if (!"Figure".equals(e.getStructureType()) && e.getParent() instanceof PDStructureElement figure) {

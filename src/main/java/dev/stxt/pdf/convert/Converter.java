@@ -11,16 +11,19 @@ import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.PdfA;
+import dev.stxt.pdf.model.Progress;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.paint.PdfDocumentWriter;
 import dev.stxt.pdf.paint.SvgCanvas;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -60,7 +63,13 @@ import java.util.function.Supplier;
  * <p>A conversion stops before the end when its {@link Cancellation} asks for it (a deadline, an interrupted
  * thread): {@link #toPdf(InlineNode, OutputStream, Attachments, Cancellation)} for one, or
  * {@link Builder#cancellation} for all of them. It ends with a {@link dev.stxt.pdf.model.CancelledException} and
- * nothing written.</p>
+ * nothing written. A {@link Progress} given with the call is told each page laid out and painted, for a progress
+ * bar: {@link #toPdf(InlineNode, OutputStream, Attachments, Cancellation, Progress)}.</p>
+ *
+ * <p>To add to the PDF what the engine does not write (keys of its own in the information dictionary, a stamp,
+ * encryption), the document is written into an open {@link PDDocument} that the caller saves afterwards:
+ * {@link #toPdf(LaidOutDocument, PDDocument)}. A single laid out page is painted on a page of any document with
+ * {@link dev.stxt.pdf.paint.PdfPainter}.</p>
  */
 public final class Converter {
 
@@ -139,11 +148,20 @@ public final class Converter {
      * (reference/implementation/api.md).
      */
     public LaidOutDocument layOut(InlineNode document, Cancellation cancellation) {
+        return layOut(document, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #layOut(InlineNode, Cancellation)}, telling {@code progress} each page of the flow it lays out and,
+     * at the end, the number of pages (reference/implementation/api.md).
+     */
+    public LaidOutDocument layOut(InlineNode document, Cancellation cancellation, Progress progress) {
         Objects.requireNonNull(document, "document");
+        Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         return guarded(() -> {
-            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded, stop)
-                    .layOutDocument(document, styles);
+            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded, stop,
+                    progress).layOutDocument(document, styles);
             if (!excluded.contains(Check.CONTRAST)) {
                 ContrastCheck.check(laidOut, stop);
             }
@@ -173,9 +191,38 @@ public final class Converter {
      */
     public void toPdf(InlineNode document, OutputStream target, Attachments attachments, Cancellation cancellation)
             throws IOException {
+        toPdf(document, target, attachments, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(InlineNode, OutputStream, Attachments, Cancellation)}, telling {@code progress} each page
+     * laid out and painted and, once the PDF is written, that it is done (reference/implementation/api.md).
+     */
+    public void toPdf(InlineNode document, OutputStream target, Attachments attachments, Cancellation cancellation,
+                      Progress progress) throws IOException {
         Objects.requireNonNull(target, "target");
         Objects.requireNonNull(attachments, "attachments");
-        toPdf(layOut(document, cancellation), target, attachments, cancellation);
+        toPdf(layOut(document, cancellation, progress), target, attachments, cancellation, progress);
+    }
+
+    /**
+     * Lays out {@code document} and writes the PDF into {@code target}, an open PDFBox document without pages, which
+     * the caller saves ({@link #toPdf(LaidOutDocument, PDDocument)}).
+     */
+    public void toPdf(InlineNode document, PDDocument target) throws IOException {
+        toPdf(document, target, Attachments.NONE, Cancellation.NONE, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(InlineNode, PDDocument)}, with the files and the XMP of {@code attachments} embedded,
+     * stopping once {@code cancellation} asks for it and telling {@code progress} how it goes
+     * ({@link #toPdf(LaidOutDocument, PDDocument, Attachments, Cancellation, Progress)}).
+     */
+    public void toPdf(InlineNode document, PDDocument target, Attachments attachments, Cancellation cancellation,
+                      Progress progress) throws IOException {
+        Objects.requireNonNull(target, "target");
+        Objects.requireNonNull(attachments, "attachments");
+        toPdf(layOut(document, cancellation, progress), target, attachments, cancellation, progress);
     }
 
     /**
@@ -201,12 +248,61 @@ public final class Converter {
      */
     public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments,
                       Cancellation cancellation) throws IOException {
+        toPdf(document, target, attachments, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(LaidOutDocument, OutputStream, Attachments, Cancellation)}, telling {@code progress} each
+     * page painted and, once the PDF is written, that it is done (reference/implementation/api.md).
+     */
+    public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments,
+                      Cancellation cancellation, Progress progress) throws IOException {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(target, "target");
         Objects.requireNonNull(attachments, "attachments");
+        Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments,
-                stop));
+                stop, progress));
+    }
+
+    /**
+     * Writes the PDF of a document already laid out by this converter into {@code target}, an open PDFBox document
+     * without pages, instead of into a file (reference/implementation/api.md): the same pages, fonts, structure
+     * tree, bookmarks, links, page labels, metadata and PDF/A declaration as
+     * {@link #toPdf(LaidOutDocument, OutputStream)}, but the document is not saved. The caller adds what the engine
+     * does not write (keys of its own in the information dictionary, a stamp on every page, encryption) and saves it;
+     * the file identifier is then the one PDFBox gives it, not the one of the content, so two saves do not give the
+     * same bytes. What {@code target} had before is kept, except what the document writes (its title, subject,
+     * language and XMP packet). A single page is painted on a page of any document with
+     * {@link dev.stxt.pdf.paint.PdfPainter}.
+     *
+     * @throws IllegalArgumentException if {@code target} already has pages
+     */
+    public void toPdf(LaidOutDocument document, PDDocument target) throws IOException {
+        toPdf(document, target, Attachments.NONE, Cancellation.NONE, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #toPdf(LaidOutDocument, PDDocument)}, with the files and the XMP of {@code attachments} embedded
+     * ({@link #toPdf(InlineNode, OutputStream, Attachments)}), stopping with a
+     * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter, asks for
+     * it (the document is then half written) and telling {@code progress} each page painted and, at the end, that it
+     * is done.
+     */
+    public void toPdf(LaidOutDocument document, PDDocument target, Attachments attachments, Cancellation cancellation,
+                      Progress progress) throws IOException {
+        Objects.requireNonNull(document, "document");
+        Objects.requireNonNull(target, "target");
+        Objects.requireNonNull(attachments, "attachments");
+        Objects.requireNonNull(progress, "progress");
+        if (target.getNumberOfPages() > 0) {
+            throw new IllegalArgumentException("The document is written into a PDDocument without pages, and this "
+                    + "one has " + target.getNumberOfPages() + "; one page at a time goes with PdfPainter");
+        }
+        Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
+        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments,
+                stop, progress));
     }
 
     /** The SVG of each page of an already laid out document, in order. */
@@ -219,14 +315,29 @@ public final class Converter {
      * it, which is asked at each page.
      */
     public List<String> toSvg(LaidOutDocument document, Cancellation cancellation) {
+        return toSvg(document, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #toSvg(LaidOutDocument, Cancellation)}, telling {@code progress} each page made and, at the end,
+     * that it is done.
+     */
+    public List<String> toSvg(LaidOutDocument document, Cancellation cancellation, Progress progress) {
         Objects.requireNonNull(document, "document");
+        Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
-        return guarded(() -> document.pages().stream()
-                .map((Page page) -> {
-                    stop.check();
-                    return SvgCanvas.page(page, page.pageSetup(), debug, resources);
-                })
-                .toList());
+        return guarded(() -> {
+            List<Page> pages = document.pages();
+            List<String> svg = new ArrayList<>(pages.size());
+            for (int i = 0; i < pages.size(); i++) {
+                stop.check();
+                Page page = pages.get(i);
+                svg.add(SvgCanvas.page(page, page.pageSetup(), debug, resources));
+                progress.pagePainted(i + 1, pages.size());
+            }
+            progress.done();
+            return List.copyOf(svg);
+        });
     }
 
     /** A job that writes to a destination. */

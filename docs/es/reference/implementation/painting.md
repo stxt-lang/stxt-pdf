@@ -50,7 +50,8 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 
 | Clase | Qué hace |
 |---|---|
-| `PdfDocumentWriter` | El documento: crea todas las páginas antes de pintar, pinta cada una, escribe la estructura, los marcadores, los destinos y las etiquetas de página, y guarda. Su `write` es la entrada |
+| `PdfDocumentWriter` | El documento: crea todas las páginas antes de pintar, pinta cada una, escribe la estructura, los marcadores, los destinos y las etiquetas de página, y guarda, o lo deja en un `PDDocument` abierto que guarda quien lo abrió. Su `write` es la entrada |
+| `PdfPainter` | Una página maquetada sobre una página de un documento ajeno, sin etiquetar ([Uso desde Java](api.md#integración-con-pdfbox)) |
 | `PdfCanvas` | El dibujo de una página |
 | `PdfContent` | El flujo de una página con el origen abajo: caminos, color, giros y `io`, el único punto que convierte las `IOException` |
 | `PdfTagging` | El contenido marcado y las anotaciones de una página |

@@ -405,6 +405,7 @@ public final class Paginator {
                             + ": the progress guarantee has been broken (reference/common/breaks.md)");
                 }
                 results.add(r);
+                engine.progress().pageLaidOut(pages + results.size());
                 areas.add(page.footnotes());
                 carry = page.carry();
                 int section0 = k;

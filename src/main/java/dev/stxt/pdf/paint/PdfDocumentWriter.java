@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.PdfA;
+import dev.stxt.pdf.model.Progress;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
@@ -36,6 +37,10 @@ import java.util.Map;
  * files ({@link PdfAttachments}) before saving it.
  * One PDF page per page of the result, in pt, with the size of the paper of its section. The file identifier comes from
  * the content ({@link PdfId}): the same document gives the same bytes.
+ *
+ * <p>The document can also be written into a {@link PDDocument} the caller has open and saves afterwards
+ * ({@link #write(LaidOutDocument, Resources, Limits, PDDocument, boolean, int, PdfA, Attachments, Cancellation,
+ * Progress)}), and a single page can be painted on a page of any document with {@link PdfPainter}.</p>
  *
  * <p><strong>Threads:</strong> {@link #write} is static and all its state (the PDF document, the embedded
  * fonts, the structure, the links) belongs to that call, so it can be called concurrently from several
@@ -94,6 +99,65 @@ public final class PdfDocumentWriter {
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation) throws IOException {
+        write(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation, Progress.NONE);
+    }
+
+    /**
+     * Like {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean, int, PdfA, Attachments,
+     * Cancellation)}, telling {@code progress} each page painted and, once the PDF is written, that it is done
+     * (reference/implementation/api.md).
+     */
+    public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
+            throws IOException {
+        check(ua, pdfA, attachments);
+        try (PDDocument doc = new PDDocument()) {
+            paint(document, resources, limits, doc, debug, ua, pdfA, attachments, cancellation, progress);
+            cancellation.check();
+            PdfId.prepare(doc);
+            ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+            doc.save(pdf);
+            byte[] bytes = pdf.toByteArray();
+            PdfId.fill(bytes);
+            target.write(bytes);
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+        progress.done();
+    }
+
+    /**
+     * Writes the document into {@code target}, a PDFBox document that is open and has no pages yet, instead of into a
+     * file (reference/implementation/api.md): the same pages, fonts, structure tree, bookmarks, links, page labels,
+     * metadata, PDF/A declaration and embedded files as
+     * {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean, int, PdfA, Attachments, Cancellation,
+     * Progress)}, with two differences. The document is not saved: the caller saves it, after adding what the engine
+     * does not write (its own keys in the information dictionary, a stamp on every page, encryption...). And the file
+     * identifier is the one PDFBox gives it when saved, not the one of the content ({@link PdfId}), so two saves do
+     * not give the same bytes. Besides the pages, what was in {@code target} before is kept, except what the document
+     * writes (its title, subject, language and XMP packet). On a {@link dev.stxt.pdf.model.CancelledException}, the
+     * document is left half written.
+     *
+     * @throws IllegalArgumentException if {@code target} already has pages: a document is written whole, into a new
+     *         {@link PDDocument}
+     */
+    public static void write(LaidOutDocument document, Resources resources, Limits limits, PDDocument target,
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
+            throws IOException {
+        if (target.getNumberOfPages() > 0) {
+            throw new IllegalArgumentException("The document is written into a PDDocument without pages, and this "
+                    + "one has " + target.getNumberOfPages() + "; one page at a time goes with PdfPainter");
+        }
+        check(ua, pdfA, attachments);
+        try {
+            paint(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation, progress);
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+        progress.done();
+    }
+
+    private static void check(int ua, PdfA pdfA, Attachments attachments) {
         if (ua != 1 && ua != 2) {
             throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + ua);
         }
@@ -107,18 +171,14 @@ public final class PdfDocumentWriter {
                     + "Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is "
                     + (pdfA == null ? "not PDF/A" : pdfA));
         }
-        try {
-            paintAndSave(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation);
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
-        }
     }
 
-    private static void paintAndSave(LaidOutDocument document, Resources resources, Limits limits,
-            OutputStream target, boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation)
+    /** Everything but saving: the pages, their content and what hangs from the catalog. */
+    private static void paint(LaidOutDocument document, Resources resources, Limits limits, PDDocument doc,
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
             throws IOException {
         List<Page> pages = document.pages();
-        try (PDDocument doc = new PDDocument(); PdfImages images = new PdfImages(doc, limits, cancellation)) {
+        try (PdfImages images = new PdfImages(doc, limits, cancellation)) {
             if (ua == 2) {
                 // The file header and the catalog version.
                 doc.getDocument().setVersion(2.0f);
@@ -155,19 +215,13 @@ public final class PdfDocumentWriter {
                     // Annotations are traversed in structure order (PDF/UA, 7.18.3).
                     page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
+                progress.pagePainted(i + 1, pages.size());
             }
             labels(doc, pages);
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations, structure);
             structure.finish(doc, destinations);
             PdfAttachments.write(doc, attachments);
-            cancellation.check();
-            PdfId.prepare(doc);
-            ByteArrayOutputStream pdf = new ByteArrayOutputStream();
-            doc.save(pdf);
-            byte[] bytes = pdf.toByteArray();
-            PdfId.fill(bytes);
-            target.write(bytes);
         }
     }
 

@@ -7,6 +7,28 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Progress of a conversion.** New `Progress` (`model`), passed with the call after the `Cancellation` (`layOut`,
+  `toPdf` and `toSvg` have an overload with both): the engine tells it, on the thread that converts, each page of the
+  flow laid out (`pageLaidOut`, counting from 1 again in each pagination pass), the end of the layout with the number
+  of pages (`laidOut`), each page painted to the PDF or made as SVG (`pagePainted`) and the end (`done`). Every method
+  has an empty default; `Progress.NONE` listens to nothing. What a listener throws ends the conversion as an
+  `InternalException`. `Engine` has a constructor with it and `PdfDocumentWriter.write` an overload.
+- **Writing into an open PDFBox document.** `Converter.toPdf(document, PDDocument)` (from an `InlineNode` or a
+  `LaidOutDocument`, with the long overload taking `Attachments`, `Cancellation` and `Progress`) writes the document into
+  a `PDDocument` without pages instead of into a file: the same pages, fonts, structure tree, bookmarks, links, page
+  labels, metadata, PDF/A declaration and attachments, but it does not save it. The caller adds what the engine does
+  not write (its own `Info` keys, a watermark, encryption) and saves; the file identifier is then the one PDFBox gives
+  when saving, not the one of the content. A `PDDocument` with pages is an `IllegalArgumentException`.
+  `PdfDocumentWriter.write` has the same overload.
+- **A page on a page of another document.** New `PdfPainter` (`paint`), a `Closeable` over a `PDDocument` with the
+  `Resources` and `Limits` of the conversion (and a `Cancellation`): `paint(page, PDPage)` appends the content of a
+  laid-out `Page` to a page of that document, after what it already has, with the top left corner of the page at the
+  top left corner of the media box of the `PDPage`, and adds its link annotations; fonts and images are embedded once
+  per painter. Nothing is tagged (every content is an artifact; the structure tree of the other document is not
+  touched). The links to a URL work at once; those to a box of the document get their destination when the painter is
+  closed if the page that has it was painted with the same painter, and are removed otherwise. Closing the painter
+  closes the PDFs it drew pages of and does not save the document.
+
 - **Merged borders in tables.** New optional `Merge borders` in the `Box` group, `false` by default, which only has an
   effect on a `Table`: being in a group, a rule of `Styles` gives it to every table (`For element: Table`), also to those
   of a `Markdown`. Written in the `Box` of another element it is `MERGE_BORDERS_WITHOUT_EFFECT`; from a rule, the other

@@ -66,5 +66,5 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [El layout](implementation/layout.md) | `Engine`, `LayoutContext`, la caché, los tokens de corte y la paginación |
 | [El pintado](implementation/painting.md) | `StackingContext`, los lienzos, el texto, los bordes y las imágenes |
 | [El PDF por dentro](implementation/pdf.md) | El árbol de estructura del PDF etiquetado, los *artifacts*, las anotaciones de enlace, los marcadores y los metadatos |
-| [Uso desde Java](implementation/api.md) | `Converter`, `DocumentReader`, los tipos de error, los límites, la cancelación y los hilos |
+| [Uso desde Java](implementation/api.md) | `Converter`, `DocumentReader`, los tipos de error, los límites, la cancelación, el progreso, la integración con PDFBox y los hilos |
 | [Pruebas](implementation/testing.md) | Tests de referencia, ejemplos, catálogo de errores, el volcado de resultados y las pruebas de mutación |

@@ -32,11 +32,25 @@ final class PdfDestinations {
      * PDF pages, in the same order as {@code pages}; each one has the paper of its section.
      */
     static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages) {
+        double[] lefts = new double[pages.size()];
+        double[] tops = new double[pages.size()];
+        for (int i = 0; i < pages.size(); i++) {
+            tops[i] = pages.get(i).pageSetup().height();
+        }
+        return find(pages, pdfPages, lefts, tops);
+    }
+
+    /**
+     * Like {@link #find(List, List)}, with the top left corner of each page painted at ({@code lefts[i]},
+     * {@code tops[i]}) of its PDF page, in PDF coordinates ({@link PdfPainter}).
+     */
+    static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages, double[] lefts,
+                                               double[] tops) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
         for (int i = 0; i < pages.size(); i++) {
             Rect area = pages.get(i).pageSetup().pageArea();
-            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i),
-                    pages.get(i).pageSetup().height(), targets);
+            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), lefts[i],
+                    tops[i], targets);
         }
         return targets;
     }
@@ -44,10 +58,11 @@ final class PdfDestinations {
     /**
      * {@code x}, {@code y}: the corner of the border box of the fragment on the page, unrotated;
      * {@code turn}, the rotations of its ancestors (reference/common/box.md). The corner of a rotated box, or of one
-     * inside a rotated one, is that of the rectangle that encloses what is painted.
+     * inside a rotated one, is that of the rectangle that encloses what is painted. {@code left} and {@code top},
+     * where the top left corner of the page is on the PDF page.
      */
-    private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double pageHeight,
-                             Map<Box, PDPageXYZDestination> targets) {
+    private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double left,
+                             double top, Map<Box, PDPageXYZDestination> targets) {
         Box box = f.box();
         Rect borderBox = f.borderBox(x, y);
         Rotation rotation = box.style().rotation();
@@ -59,13 +74,13 @@ final class PdfDestinations {
             Rect painted = turn.isIdentity() ? borderBox : Rotation.envelope(turn, borderBox);
             PDPageXYZDestination d = new PDPageXYZDestination();
             d.setPage(page);
-            d.setLeft((int) Math.floor(painted.x()));
-            d.setTop((int) Math.ceil(pageHeight - painted.y()));
+            d.setLeft((int) Math.floor(left + painted.x()));
+            d.setTop((int) Math.ceil(top - painted.y()));
             targets.put(box, d);
         }
         Rect content = borderBox.shrink(f.border()).shrink(f.padding());
         for (Fragment c : f.children()) {
-            find(c, content.x() + c.x(), content.y() + c.y(), turn, page, pageHeight, targets);
+            find(c, content.x() + c.x(), content.y() + c.y(), turn, page, left, top, targets);
         }
     }
 }
