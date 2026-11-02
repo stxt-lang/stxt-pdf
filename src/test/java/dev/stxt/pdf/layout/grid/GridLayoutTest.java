@@ -50,6 +50,23 @@ class GridLayoutTest {
     }
 
     @Test
+    void autoColumnsOfATableShareTheSpaceByContent() {
+        // Natural widths 20 and 80; 415 left over. The table gives 20% and 80% of it (103 and 412); the grid, half
+        // to each one (227.5 and 287.5).
+        LayoutFixture l = layOut(
+                "\tTable:", "\t\tColumn sizes: auto auto",
+                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: aaaa", "\t\t\t\t\tId: T1",
+                "\t\t\t\tCell: bbbbbbbbbbbbbbbb", "\t\t\t\t\tId: T2",
+                "\tGrid:", "\t\tColumn sizes: auto auto",
+                "\t\tArea:", "\t\t\tText: aaaa", "\t\t\t\tId: G1",
+                "\t\tArea:", "\t\t\tText: bbbbbbbbbbbbbbbb", "\t\t\t\tId: G2");
+        assertRect(40, 40, 103, 12, l.rect("T1"));
+        assertRect(143, 40, 412, 12, l.rect("T2"));
+        assertRect(40, 52, 227.5, 12, l.rect("G1"));
+        assertRect(267.5, 52, 287.5, 12, l.rect("G2"));
+    }
+
+    @Test
     void alignmentInTheArea() {
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",

@@ -33,7 +33,7 @@ Table:
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Column sizes` | lista de pistas | obligatorio | `Table` | Las columnas, como en `Grid` ([Grid](grid.md#dimensionado-de-pistas)). |
+| `Column sizes` | lista de pistas | obligatorio | `Table` | Las columnas, como en `Grid` ([Grid](grid.md#dimensionado-de-pistas)), con el espacio repartido por su contenido ([Ancho de las columnas](#ancho-de-las-columnas)). |
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | sin valor | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Split rows` | `true`, `false` | `true` | `Table` | Una fila que no cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo; con `false`, pasa entera a la siguiente ([Cortes](#cortes)). |
@@ -59,6 +59,28 @@ celda de una fila de arriba con un `Span` de varias filas. Cada fila llena **exa
 (de `Header rows` a `Body`, de `Body` a `Footer rows`) ni se solapa con otra celda (`TABLE_SPAN`).
 
 `Span: 1 1` explícito se admite: es el valor por defecto escrito y no una contradicción.
+
+### Ancho de las columnas
+
+Las columnas se dimensionan con los pasos de `Grid` ([dimensionado de pistas](grid.md#dimensionado-de-pistas)), salvo en
+cómo se reparte el espacio, que en una tabla va **en proporción al contenido** y no a partes iguales:
+
+- **Maximizar** (paso 3): el espacio libre se reparte entre las columnas no flexibles en proporción a lo que le falta a cada
+  una hasta su límite, de modo que todas recorren la misma fracción del camino de su ancho más estrecho a su ancho
+  natural. Con dos columnas `auto` que van de 60 a 140 y de 50 a 90 y 60 libres, la primera recibe 40 y la segunda 20.
+- **Estirar** (paso 5): sin fracciones, lo que sobra se reparte entre las columnas `auto` en proporción a su ancho
+  natural. Con `auto auto`, anchos naturales de 20 y 60 y 180 de sobra, las columnas miden 65 y 195. Si todas están
+  vacías, a partes iguales.
+
+Los anchos fijos, los porcentajes, `between(a, b)` y las fracciones no cambian: `Column sizes: 40mm auto auto` deja la
+primera columna en 40 mm y reparte el resto entre las otras dos por su contenido, y `auto *` da a la `auto` su ancho
+natural y a la fracción lo que queda. Las filas se dimensionan como en `Grid`.
+
+> **Decisión:** las columnas de una tabla reparten el espacio en proporción a su contenido, y las de un `Grid`, a partes
+> iguales. En una tabla, una columna con textos largos necesita más sitio que una de etiquetas cortas; en un `Grid` de
+> maquetación, dos columnas `auto` iguales se esperan iguales. No hay propiedad para elegir: quien quiere otro reparto
+> fija los anchos o usa fracciones. *Alternativa descartada:* una propiedad en `Table` para elegir el reparto, o el
+> mismo reparto en `Grid`.
 
 ## Celdas
 

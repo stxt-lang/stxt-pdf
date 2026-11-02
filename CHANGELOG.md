@@ -7,6 +7,15 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Table columns sized by their content.** The columns of a `Table` share the free space in proportion to their
+  content instead of in equal parts: what is left over after the `auto` columns reach their natural width goes to them
+  in proportion to that width (with `auto auto`, a column of long texts takes more than one of short labels), and when
+  there is not enough room for all of them, each one grows from its narrowest width in proportion to what it lacks to
+  reach its natural width. Fixed widths, percentages, `between(a, b)` and fractions do not change, and neither does
+  `Grid`, whose `auto` tracks still share the space in equal parts. Markdown tables with `Table columns: auto` change
+  too: the annual report (04) and the manual (08) have new pages. `TrackSizing.size` has a variant with a
+  `Distribution` (`EQUAL` or `CONTENT`). Golden `44-table-columns`.
+
 - **Styled runs.** With `Markup: markdown`, or in a `Markdown`, `[text]{name}` is a run that takes from the
   `For style: name` rule what changes how its letters look and not the height of the line: `Font`, `Code font` (for the
   code inside it), `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps` and `Letter spacing`. What the rule declares

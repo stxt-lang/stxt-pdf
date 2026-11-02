@@ -85,7 +85,10 @@ Cada pista tiene una función mínima y una máxima:
    `auto` alcanza su ancho natural antes de que las fracciones reciban nada.
 4. **Fracciones:** el resto se divide entre las fracciones de forma proporcional. Si una fracción necesita más que su parte
    por su ancho más estrecho, se fija en su base y se repite el reparto.
-5. **Estirar:** si no hay fracciones y sobra espacio, se reparte entre las pistas `auto`.
+5. **Estirar:** si no hay fracciones y sobra espacio, se reparte a partes iguales entre las pistas `auto`.
+
+Las columnas de una `Table` reparten el espacio de los pasos 3 y 5 en proporción a su contenido
+([Table](table.md#ancho-de-las-columnas)).
 
 Las **columnas** se dimensionan primero, con el ancho más estrecho y el natural de los ítems. Las **filas** después, con
 la altura de cada ítem maquetado al ancho de sus columnas. Con `Height: auto` en el contenedor, las filas en fracción no

@@ -1,0 +1,25 @@
+# t1: columns of 20 + 180 × 1/4 = 65 and 60 + 180 × 3/4 = 195, at x = 20 and 85.
+# g: columns of 20 + 90 = 110 and 60 + 90 = 150, at x = 20 and 130; the blocks keep their Width.
+# t2: columns of 40, 10 + 160 × 1/4 = 50 and 30 + 160 × 3/4 = 150, at x = 20, 70 and 130.
+Result:
+	Page: 1
+		Fragment: t1
+			Rect: 20 20 260 20
+			Fragment: t1a
+				Rect: 20 20 65 20
+			Fragment: t1b
+				Rect: 85 20 195 20
+		Fragment: g
+			Rect: 20 40 260 20
+			Fragment: g1
+				Rect: 20 40 20 20
+			Fragment: g2
+				Rect: 130 40 60 20
+		Fragment: t2
+			Rect: 20 60 260 20
+			Fragment: t2a
+				Rect: 20 60 40 20
+			Fragment: t2b
+				Rect: 70 60 50 20
+			Fragment: t2c
+				Rect: 130 60 150 20

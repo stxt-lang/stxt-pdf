@@ -69,6 +69,9 @@ Document (dev.stxt.pdf):
   elements, and each row, its `Cell` elements from left to right.
 - **`Column sizes`** (required) are the columns, with the same measurements as a `Grid`: points, millimeters,
   percentages, `auto` (what its content asks for) and fractions (`*`: a share of what is left over) ([Grid](grid.md)).
+  What is left over in a table without fractions is shared among the `auto` columns by how much their content measures:
+  with `auto auto`, the column of the long texts takes more than the one of the labels. A fixed width
+  (`Column sizes: 40mm auto`) does not change.
 - Each row fills **exactly** all the columns: an empty cell is written `Cell:`. A row with too many or too few cells is an
   error.
 - **`Span: rows columns`** makes a cell span several: `Span: 1 3` is three columns. A cell that spans several rows keeps its

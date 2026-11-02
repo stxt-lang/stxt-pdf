@@ -22,6 +22,7 @@ import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
+import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.Style;
@@ -36,7 +37,8 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * Layout {@code grid} (reference/components/grid.md). Steps:
  * <ol>
  *   <li>Placement: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} and {@link Placement}.</li>
- *   <li>Columns: {@link TrackSizing} with the narrowest and natural widths.</li>
+ *   <li>Columns: {@link TrackSizing} with the narrowest and natural widths; those of a table share the free space in
+ *       proportion to their content.</li>
  *   <li>Rows: {@link TrackSizing} with the height of each item at the width of its columns.</li>
  *   <li>Align each item in its area ({@code Horizontal}, {@code Vertical}); stretching = re-layout.</li>
  * </ol>
@@ -161,7 +163,9 @@ public final class GridLayout implements LayoutAlgorithm {
             Area a = g.areas().get(i);
             widths.add(new ItemContribution(a.column() - 1, a.columns(), is.narrowest(), is.natural()));
         }
-        double[] columns = TrackSizing.size(g.columns(), widths, contentWidth, columnGap);
+        // The columns of a table share the space in proportion to their content (reference/components/table.md).
+        double[] columns = TrackSizing.size(g.columns(), widths, contentWidth, columnGap,
+                box.role() == Element.Role.TABLE ? TrackSizing.Distribution.CONTENT : TrackSizing.Distribution.EQUAL);
         double[] x = offsets(columns, columnGap);
 
         // Width of each item in its area and its height at that width.

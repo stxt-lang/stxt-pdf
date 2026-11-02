@@ -85,7 +85,11 @@ Each track has a minimum and a maximum function:
    track reaches its natural width before the fractions receive anything.
 4. **Fractions:** the rest is divided among the fractions proportionally. If a fraction needs more than its share
    because of its narrowest width, it is fixed at its base and the distribution is repeated.
-5. **Stretch:** if there are no fractions and there is space left over, it is distributed among the `auto` tracks.
+5. **Stretch:** if there are no fractions and there is space left over, it is distributed in equal parts among the
+   `auto` tracks.
+
+The columns of a `Table` share the space of steps 3 and 5 in proportion to their content
+([Table](table.md#column-widths)).
 
 The **columns** are sized first, with the narrowest and natural widths of the items. The **rows** afterwards, with
 the height of each item laid out at the width of its columns. With `Height: auto` on the container, the fraction rows have

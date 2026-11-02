@@ -1,5 +1,6 @@
 package dev.stxt.pdf.layout.grid;
 
+import dev.stxt.pdf.layout.grid.TrackSizing.Distribution;
 import dev.stxt.pdf.model.ValueParser;
 import org.junit.jupiter.api.Test;
 
@@ -14,12 +15,16 @@ class TrackSizingTest {
     private static final double[][] CONTENT = {{60, 140}, {50, 90}, {80, 220}, {40, 120}};
 
     private static double[] columns(String tracks, double available) {
+        return columns(tracks, available, Distribution.EQUAL);
+    }
+
+    private static double[] columns(String tracks, double available, Distribution distribution) {
         List<Track> t = ValueParser.list(tracks).stream().map(Track::of).toList();
         List<ItemContribution> items = new ArrayList<>();
         for (int i = 0; i < t.size(); i++) {
             items.add(new ItemContribution(i, 1, CONTENT[i % 4][0], CONTENT[i % 4][1]));
         }
-        return TrackSizing.size(t, items, available, 20);
+        return TrackSizing.size(t, items, available, 20, distribution);
     }
 
     @Test
@@ -38,6 +43,34 @@ class TrackSizingTest {
     void withoutFractionsAutoTracksStretch() {
         // 495: base 140 + 90 = 230; 265 left over, 132.5 for each one.
         assertArrayEquals(new double[]{272.5, 222.5}, columns("auto auto", 515), 1e-9);
+    }
+
+    @Test
+    void byContentAutoTracksStretchInProportionToTheirNaturalWidth() {
+        // 495: base 140 + 90 = 230; the 265 left over go 140/230 and 90/230, so each one measures 495 × natural / 230.
+        assertArrayEquals(new double[]{495.0 * 140 / 230, 495.0 * 90 / 230},
+                columns("auto auto", 515, Distribution.CONTENT), 1e-9);
+    }
+
+    @Test
+    void byContentTracksGrowInProportionToWhatTheyLack() {
+        // 170 for tracks: from the narrowest widths (60 + 50) there are 60 to share, and they lack 80 and 40 to reach
+        // their natural width: half of it each, 100 and 70. In equal parts they would be 90 and 80.
+        assertArrayEquals(new double[]{100, 70}, columns("auto auto", 190, Distribution.CONTENT), 1e-9);
+        assertArrayEquals(new double[]{90, 80}, columns("auto auto", 190), 1e-9);
+    }
+
+    @Test
+    void byContentFixedTracksAndFractionsDoNotChange() {
+        assertArrayEquals(new double[]{150, 90, 235}, columns("150 auto *", 515, Distribution.CONTENT), 1e-9);
+        assertArrayEquals(new double[]{150, 345}, columns("150 auto", 515, Distribution.CONTENT), 1e-9);
+    }
+
+    @Test
+    void byContentEmptyAutoTracksStretchInEqualParts() {
+        List<Track> t = ValueParser.list("auto auto").stream().map(Track::of).toList();
+        assertArrayEquals(new double[]{247.5, 247.5}, TrackSizing.size(t, List.of(), 515, 20, Distribution.CONTENT),
+                1e-9);
     }
 
     @Test

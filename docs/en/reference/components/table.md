@@ -33,7 +33,7 @@ Table:
 
 | Property | Values | Default | Elements | Notes |
 |---|---|---|---|---|
-| `Column sizes` | list of tracks | required | `Table` | The columns, as in `Grid` ([Grid](grid.md#track-sizing)). |
+| `Column sizes` | list of tracks | required | `Table` | The columns, as in `Grid` ([Grid](grid.md#track-sizing)), with the space shared by their content ([Column widths](#column-widths)). |
 | `Column align` | one alignment per column: `left`, `center`, `right` or `justify` | none | `Table` | The default alignment of the cells of each column. As many as `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 or 2 lengths (rows columns) | `0` | `Table` | Spacing between cells, as in `Grid`. |
 | `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
@@ -59,6 +59,29 @@ cell of a row above with a `Span` of several rows. Each row fills **exactly** al
 (from `Header rows` to `Body`, from `Body` to `Footer rows`) and does not overlap another cell (`TABLE_SPAN`).
 
 An explicit `Span: 1 1` is accepted: it is the default value written out and not a contradiction.
+
+### Column widths
+
+The columns are sized with the steps of `Grid` ([track sizing](grid.md#track-sizing)), except for how the space is
+shared, which in a table goes **in proportion to the content** and not in equal parts:
+
+- **Maximize** (step 3): the free space is shared among the non-flexible columns in proportion to what each one lacks to
+  reach its limit, so that all of them cover the same fraction of the way from their narrowest width to their natural
+  width. With two `auto` columns that go from 60 to 140 and from 50 to 90 and 60 free, the first one receives 40 and the
+  second one 20.
+- **Stretch** (step 5): without fractions, what is left over is shared among the `auto` columns in proportion to their
+  natural width. With `auto auto`, natural widths of 20 and 60 and 180 left over, the columns measure 65 and 195. If all
+  of them are empty, in equal parts.
+
+Fixed widths, percentages, `between(a, b)` and fractions do not change: `Column sizes: 40mm auto auto` keeps the first
+column at 40 mm and shares the rest between the other two by their content, and `auto *` gives the `auto` one its
+natural width and the fraction what remains. The rows are sized as in `Grid`.
+
+> **Decision:** the columns of a table share the space in proportion to their content, and those of a `Grid`, in equal
+> parts. In a table, a column with long texts needs more room than one with short labels; in a layout `Grid`, two equal
+> `auto` columns are expected to be equal. There is no property to choose: whoever wants another distribution fixes the
+> widths or uses fractions. *Rejected alternative:* a property in `Table` to choose the distribution, or the same
+> distribution in `Grid`.
 
 ## Cells
 

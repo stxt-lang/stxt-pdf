@@ -1,0 +1,74 @@
+# auto columns of a Table and of a Grid (reference/components/table.md#column-widths). Page area of 260 × 160 from
+# (20, 20). Every cell holds a block of a fixed width, which is its narrowest and natural width.
+#
+# t1: auto auto with blocks of 20 and 60. 180 left over, shared in proportion to the natural widths (1/4 and 3/4):
+#   columns of 65 and 195.
+# g: the same columns in a Grid, which shares the 180 in equal parts: 110 and 150.
+# t2: 40 auto auto with a gap of 10 and blocks of 10 and 30. 240 for the tracks; 40 fixed, and the 160 left over go
+#   1/4 and 3/4 to the auto ones: 50 and 150, at x = 70 and 130.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Block
+			Box:
+				Height: 20
+				Background: #B5D4F4
+	Section:
+		Table:
+			Id: t1
+			Column sizes: auto auto
+			Body:
+				Row:
+					Cell:
+						Id: t1a
+						Block:
+							Box:
+								Width: 20
+					Cell:
+						Id: t1b
+						Block:
+							Box:
+								Width: 60
+		Grid:
+			Id: g
+			Column sizes: auto auto
+			Area:
+				Block:
+					Id: g1
+					Box:
+						Width: 20
+			Area:
+				Block:
+					Id: g2
+					Box:
+						Width: 60
+		Table:
+			Id: t2
+			Column sizes: 40 auto auto
+			Gap: 10
+			Body:
+				Row:
+					Cell:
+						Id: t2a
+						Block:
+							Box:
+								Width: 40
+					Cell:
+						Id: t2b
+						Block:
+							Box:
+								Width: 10
+					Cell:
+						Id: t2c
+						Block:
+							Box:
+								Width: 30

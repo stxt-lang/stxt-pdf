@@ -22,24 +22,46 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  *   <li>If there are no fractions, stretch the {@code auto} tracks with the leftover space.</li>
  * </ol>
  *
+ * <p>Steps 3 and 5 share the space in equal parts or in proportion to the content ({@link Distribution}).</p>
+ *
  * <p>Simplification: {@code fit} is treated as {@code auto}.</p>
  */
 public final class TrackSizing {
 
+    /**
+     * How steps 3 and 5 share the free space among the tracks (reference/components/table.md).
+     */
+    public enum Distribution {
+        /** In equal parts: the tracks of a {@code Grid}. */
+        EQUAL,
+        /**
+         * In proportion to the content: in step 3, to what each track lacks to reach its limit; in step 5, to the
+         * natural width of each {@code auto} track. The columns of a {@code Table}.
+         */
+        CONTENT
+    }
+
     private TrackSizing() {
     }
 
+    /** Sizing with the free space in equal parts ({@link Distribution#EQUAL}). */
+    public static double[] size(List<Track> declared, List<ItemContribution> items,
+                                double available, double gap) {
+        return size(declared, items, available, gap, Distribution.EQUAL);
+    }
+
     /**
-     * @param declared  definitions of the tracks (explicit and implicit)
-     * @param items     contributions of the placed items
-     * @param available size of the content box of the container on this axis;
-     *                  {@link Double#POSITIVE_INFINITY} if indefinite (the percentages of the
-     *                  tracks then behave as {@code auto})
-     * @param gap       spacing between tracks
+     * @param declared     definitions of the tracks (explicit and implicit)
+     * @param items        contributions of the placed items
+     * @param available    size of the content box of the container on this axis;
+     *                     {@link Double#POSITIVE_INFINITY} if indefinite (the percentages of the
+     *                     tracks then behave as {@code auto})
+     * @param gap          spacing between tracks
+     * @param distribution how the free space is shared in steps 3 and 5
      * @return size of each track
      */
     public static double[] size(List<Track> declared, List<ItemContribution> items,
-                                double available, double gap) {
+                                double available, double gap, Distribution distribution) {
         boolean finite = Double.isFinite(available);
         List<Track> tracks = finite ? declared : declared.stream().map(Track::withoutPercentBase).toList();
         int n = tracks.size();
@@ -126,6 +148,24 @@ public final class TrackSizing {
         for (int i = 0; i < n; i++) {
             active[i] = !tracks.get(i).flexible() && base[i] < limit[i];
         }
+        if (distribution == Distribution.CONTENT && free > EPSILON) {
+            // In proportion to what each track lacks: all of them reach the same fraction of their way to the limit.
+            double lacking = 0;
+            for (int i = 0; i < n; i++) {
+                if (active[i]) {
+                    lacking += limit[i] - base[i];
+                }
+            }
+            double share = Math.min(1, free / lacking);
+            for (int i = 0; i < n; i++) {
+                if (active[i]) {
+                    double d = (limit[i] - base[i]) * share;
+                    base[i] += d;
+                    free -= d;
+                    active[i] = false;
+                }
+            }
+        }
         while (free > EPSILON && count(active) > 0) {
             double share = free / count(active);
             for (int i = 0; i < n; i++) {
@@ -180,15 +220,20 @@ public final class TrackSizing {
             // 5. Stretch auto tracks.
             free = space - Sizing.sum(base);
             int autoTracks = 0;
-            for (Track t : tracks) {
-                if (t.max().isAuto()) {
+            double natural = 0;
+            for (int i = 0; i < n; i++) {
+                if (tracks.get(i).max().isAuto()) {
                     autoTracks++;
+                    natural += base[i];
                 }
             }
+            // In proportion to the natural width, which the auto tracks already have; if all of them are empty, in
+            // equal parts.
+            boolean proportional = distribution == Distribution.CONTENT && natural > EPSILON;
             if (free > EPSILON && autoTracks > 0) {
                 for (int i = 0; i < n; i++) {
                     if (tracks.get(i).max().isAuto()) {
-                        base[i] += free / autoTracks;
+                        base[i] += proportional ? free * base[i] / natural : free / autoTracks;
                     }
                 }
             }
