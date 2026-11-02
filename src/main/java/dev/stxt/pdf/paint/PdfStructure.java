@@ -3,6 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextTransform;
 import dev.stxt.pdf.model.Cell;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Position;
@@ -620,6 +621,43 @@ final class PdfStructure {
     }
 
     /**
+     * Records an image inside the text of the box (reference/common/text-formatting.md) on the current page and
+     * gives its {@code MCID}: with alternative text, the content of a new {@code Figure}, with that text as
+     * {@code Alt} and its {@code BBox}, child of the element of the box (or of its {@code Link}); -1 if the image is
+     * decorative or the text is not content. In a link ({@code linked}), a new {@code Link} is the parent of the
+     * figure and receives the annotation of the image ({@link #inlineLink}); a decorative image in a link has the
+     * {@code Link} alone, read by its {@code Alt}.
+     */
+    int markInlineImage(Box box, InlineImage image, boolean linked, PDRectangle bbox) {
+        inline = null;
+        PDStructureElement holder = holders.containsKey(box) ? holders.get(box) : elements.get(box);
+        if (untagged || holder == null || !isContent(box)) {
+            return -1;
+        }
+        if (linked) {
+            PDStructureElement link = element("Link", holder);
+            link.setPage(page);
+            holder.appendKid(link);
+            inline = link;
+            holder = link;
+            if (image.decorative()) {
+                emptyLinks.add(link);
+            }
+        }
+        if (image.decorative()) {
+            return -1;
+        }
+        PDStructureElement figure = element("Figure", holder);
+        figure.setPage(page);
+        figure.setAlternateDescription(image.alt());
+        PDLayoutAttributeObject layout = new PDLayoutAttributeObject();
+        layout.setBBox(bbox);
+        figure.addAttribute(layout);
+        holder.appendKid(figure);
+        return reference(figure);
+    }
+
+    /**
      * Records the call of a footnote in the text of the box (reference/components/footnote.md) as the content of a
      * new {@code Reference}, child of the element of the box, that points with {@code Ref} to the note, which points
      * back to it; gives its {@code MCID}, or -1 if the text is not content.
@@ -730,6 +768,9 @@ final class PdfStructure {
         }
         if (inline != null) {
             firstLinks.computeIfAbsent(box, k -> new HashMap<>()).putIfAbsent(destination, inline);
+            if (emptyLinks.contains(inline)) {
+                describe(inline, annotation, description);
+            }
             attach(inline, annotation);
             return;
         }

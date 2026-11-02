@@ -278,6 +278,11 @@ public final class Engine implements LayoutContext {
         return images.natural(box);
     }
 
+    @Override
+    public double imageRatio(String path) {
+        return images.ratio(path);
+    }
+
     /**
      * {@inheritDoc}
      *

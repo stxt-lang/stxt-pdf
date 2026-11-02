@@ -299,7 +299,8 @@ a vector drawing, sharp at any size (`stretch` distorts the drawing).
 ## What is not supported
 
 - GIF, WebP, TIFF and other formats.
-- Images inside a line of text.
+- An `Image` inside a line of text: an inline image is Markdown, `![alt](path)`, and measures what the letters do
+  ([Text formatting](../common/text-formatting.md#images-inside-a-text)).
 - Several resolutions of one image.
 - Placing the image inside its box somewhere other than the center, or at its natural size without scaling.
 - In SVG files: patterns, masks, filters, markers, images, style sheets and links to other files.

@@ -6,6 +6,7 @@ import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Paint;
@@ -366,6 +367,28 @@ public final class SvgCanvas implements Canvas {
         if (rounded) {
             svg.append("</g>\n");
         }
+    }
+
+    @Override
+    public void inlineImage(Box box, InlineImage image, String link, Rect area) {
+        if (resources == null) {
+            return;
+        }
+        ImageFile file = resources.images().find(image.path());
+        String data;
+        try {
+            data = Base64.getEncoder().encodeToString(Files.readAllBytes(file.path()));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        String mime = switch (file.format()) {
+            case PNG, PDF -> "image/png";
+            case JPEG -> "image/jpeg";
+            case SVG -> "image/svg+xml";
+        };
+        svg.append(String.format(Locale.ROOT, "<image x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" "
+                        + "preserveAspectRatio=\"none\" href=\"data:%s;base64,%s\"/>\n",
+                area.x(), area.y(), area.width(), area.height(), mime, data));
     }
 
     /**

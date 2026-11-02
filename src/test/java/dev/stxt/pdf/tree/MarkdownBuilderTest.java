@@ -3,6 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -265,11 +266,30 @@ class MarkdownBuilderTest {
     }
 
     @Test
-    void linkReferenceDefinitionsAndImagesInsideALinkStayUnsupported() {
+    void linkReferenceDefinitionsStayUnsupported() {
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
                 () -> translate("[a][r]", "", "[r]: https://stxt.dev")).errorCode());
-        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, assertThrows(InvalidModelException.class,
-                () -> translate("[![logo](test/wide.png)](https://stxt.dev) texto")).errorCode());
+    }
+
+    /**
+     * An image inside a text (reference/common/text-formatting.md) is a run that is the image, in the format of the
+     * text around it; one alone in its paragraph is still an {@code Image}; a title is still an error.
+     */
+    @Test
+    void anImageInsideATextIsARun() {
+        MarkdownBuilder.Translation t = translate("Ver ![el logo](test/wide.png) y [![Web](test/wide.png)](https://stxt.dev) **![](test/wide.png)**");
+        InlineNode p = t.elements().get(0);
+        assertEquals(List.of("Paragraph: Ver \uFFFC y \uFFFC \uFFFC @15"), outline(p));
+        List<TextRun> runs = t.runs().get(p);
+        assertEquals(new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/wide.png",
+                "el logo"))), runs.get(1));
+        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false, "https://stxt.dev")
+                .withImage(new InlineImage("test/wide.png", "Web"))), runs.get(3));
+        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(true, false, false, false)
+                .withImage(new InlineImage("test/wide.png", null))), runs.get(5));
+        InvalidModelException title = assertThrows(InvalidModelException.class,
+                () -> translate("Ver ![logo](test/wide.png \"Logo\")"));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.errorCode());
     }
 
     /** {@code {#id}} at the end of a heading gives it its {@code Id} and is removed from the text. */

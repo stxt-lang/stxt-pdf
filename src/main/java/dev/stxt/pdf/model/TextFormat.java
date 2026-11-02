@@ -29,10 +29,15 @@ package dev.stxt.pdf.model;
  * weight, its style, its letter spacing, its case and its small caps replace those of the box, and its family (or that
  * of its code) is in {@code family}. The marks of the run (bold, italic) add to the style as they add to the box,
  * wherever they are written.</p>
+ *
+ * <p>{@code image} marks a run that is an image ({@link InlineImage}, reference/common/text-formatting.md), whose
+ * text is the single {@link TextRun#OBJECT_REPLACEMENT}: the layout measures it as the image, as tall as the size of
+ * the box, and the painting draws it in its place; it has no letter spacing. The rest of the format is kept
+ * (a link, for an image that is clicked), but the font and the decorations do not apply to it.</p>
  */
 public record TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
                          boolean smallCaps, boolean code, String family, String footnote, boolean label,
-                         RunStyle style) {
+                         RunStyle style, InlineImage image) {
 
     /** Size of the small caps relative to that of the box. */
     public static final double SMALL_CAPS_SCALE = 0.8;
@@ -74,6 +79,13 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
         this(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, null);
     }
 
+    /** A format that is not an image. */
+    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
+                      boolean smallCaps, boolean code, String family, String footnote, boolean label,
+                      RunStyle style) {
+        this(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, style, null);
+    }
+
     /**
      * The font of the run, derived from that of the box: with the family, the weight and the style of its
      * {@link #style()}, if it declares them, and its marks on top. A run with letter spacing has no ligatures, like a
@@ -101,6 +113,9 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
      * {@code box}.
      */
     public double letterSpacing(double box) {
+        if (image != null) {
+            return 0;
+        }
         return style != null && style.letterSpacing() != null ? style.letterSpacing() : box;
     }
 
@@ -119,13 +134,13 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
 
     /** The same format with those marks: bold, italic, underline and strikethrough. */
     public TextFormat withMarks(boolean b, boolean i, boolean u, boolean s) {
-        return new TextFormat(b, i, u, s, link, smallCaps, code, family, footnote, label, style);
+        return new TextFormat(b, i, u, s, link, smallCaps, code, family, footnote, label, style, image);
     }
 
     /** The same format with the style of a styled run ({@code [text]{name}}). */
     public TextFormat withStyle(RunStyle runStyle) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label,
-                runStyle);
+                runStyle, image);
     }
 
     /** Whether it has underline or strikeout, which are painted apart from the text. */
@@ -135,33 +150,43 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
 
     /** The same format with that link. */
     public TextFormat withLink(String destination) {
-        return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family, footnote, label, style);
+        return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family, footnote, label,
+                style, image);
     }
 
     /** The same format with small caps turned on or off. */
     public TextFormat withSmallCaps(boolean small) {
         return small == smallCaps ? this
-                : new TextFormat(bold, italic, underline, strike, link, small, code, family, footnote, label, style);
+                : new TextFormat(bold, italic, underline, strike, link, small, code, family, footnote, label, style,
+                        image);
     }
 
     /** The same format as inline code, still without its family. */
     public TextFormat asCode() {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family, footnote, label, style);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family, footnote, label, style,
+                image);
     }
 
     /** The same format with that font family. */
     public TextFormat withFamily(String fontFamily) {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily, footnote, label, style);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily, footnote, label,
+                style, image);
     }
 
     /** The same format as the call of the footnote with that {@code Id}: a superscript. */
     public TextFormat withFootnote(String id) {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, id, false, style);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, id, false, style, image);
     }
 
     /** The same format as the label that opens a footnote: a superscript. */
     public TextFormat asLabel() {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, null, true, style);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, null, true, style, image);
+    }
+
+    /** The same format as a run that is that image, whose text is {@link TextRun#IMAGE}. */
+    public TextFormat withImage(InlineImage inlineImage) {
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, style,
+                inlineImage);
     }
 
     /** Whether the run is a superscript: the call or the label of a footnote. */

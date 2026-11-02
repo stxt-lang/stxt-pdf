@@ -87,9 +87,10 @@ as follows:
 | `\` at the end of the line | a forced line break: the line ends there, within the same paragraph ([below](#forced-line-breaks)) |
 | Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |
 | `![Alt](path)`, alone in its paragraph | `Image` with that path and its `Alt`, or decorative with `![](path)` ([Image](image.md)) |
+| `![Alt](path)`, inside a text | inline image: a run that is the image, as tall as the letters ([Text formatting](../common/text-formatting.md#images-inside-a-text)) |
 
-Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](target "title")`), images inside a text
-(also inside a link) or with a title (`![Alt](path "title")`), the language tag of a code block
+Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](target "title")`), images with a title
+(`![Alt](path "title")`), the language tag of a code block
 (```` ```java ````: there is no highlighting), block quotes, HTML, horizontal rules, a forced line break without text
 before it on its line ([below](#forced-line-breaks)) and link definitions (`[x][ref]` with `[ref]: target`: the target is
 written in the link itself).
@@ -97,7 +98,7 @@ A heading cannot go inside a list item either, as in a `List item`, nor can a ta
 the header. A `Markdown` without content, or a heading or a paragraph without text, is `TEXT_CONTENT`.
 
 A `Bullet markers` or a `Number markers` with a marker of the other type is `VALUE_NOT_ALLOWED`. A clickable image is an `Image` with
-`Link`.
+`Link` or, inside a text, an inline image inside a link (`[![Alt](path)](target)`).
 
 > **Decision:** what would have no effect (the language tag of a code block, the title of a link) is an
 > error and is not ignored.
@@ -238,6 +239,6 @@ What is generated is read like what is written by hand: headings, paragraphs, li
 
 - Block quotes, HTML, horizontal rules, task lists and code highlighting. Footnotes are called with
   `[^id]`, but their content is a `Footnote`, not a definition `[^id]: ...` ([Footnote](footnote.md)).
-- Images inside a text and links with a title or with a separate definition.
+- Links with a title or with a separate definition, and images with a title.
 - Two spaces at the end of the line as a forced line break: STXT removes them.
 - `Id` in what is generated, except in the headings (`{#id}`), and `Style`.

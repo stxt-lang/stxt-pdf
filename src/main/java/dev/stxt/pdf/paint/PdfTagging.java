@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.tree.Box;
@@ -60,6 +61,7 @@ final class PdfTagging implements Tagging {
 
     @Override
     public void beginText(Box box) {
+        linkText = false;
         io(() -> {
             int mcid = structure.mark(box);
             if (mcid < 0) {
@@ -83,6 +85,24 @@ final class PdfTagging implements Tagging {
             } else {
                 out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
                 structure.figureBox(box, content.turnedRect(area));
+            }
+        });
+    }
+
+    /**
+     * Starts an image inside the text of the box (reference/common/text-formatting.md), which ends with the
+     * {@code EMC} of the canvas: with alternative text, the content of a new {@code Figure} that hangs from the
+     * element of the text, or from a new {@code Link} inside it if the image is in a link ({@code link}), whose
+     * annotation ({@link #link}) hangs from that {@code Link}; without it, an <em>artifact</em>.
+     */
+    void beginInlineImage(Box box, InlineImage image, String link, Rect area) {
+        linkText = link != null;
+        io(() -> {
+            int mcid = structure.markInlineImage(box, image, link != null, content.turnedRect(area));
+            if (mcid < 0) {
+                out.beginMarkedContent(COSName.ARTIFACT);
+            } else {
+                out.beginMarkedContent(COSName.getPDFName("Figure"), mcid);
             }
         });
     }

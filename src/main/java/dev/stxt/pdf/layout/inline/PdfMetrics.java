@@ -120,6 +120,11 @@ public final class PdfMetrics implements TextMeasurer {
         boolean hyphens = s.typography().hyphenate() || box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0;
         int start = 0;
         for (TextRun run : box.runs()) {
+            if (run.format().image() != null) {
+                // An image inside the text (reference/common/text-formatting.md): nothing to paint with a font.
+                start += run.text().length();
+                continue;
+            }
             FontFile font = font(box, fonts, run, start);
             String text = run.text();
             if (hyphens) {

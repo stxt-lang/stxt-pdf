@@ -4,6 +4,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@code Markup: markdown}: inline formatting inside a {@code Text}, a {@code Paragraph} or a {@code Cell}
@@ -122,14 +124,45 @@ class InlineFormatTest {
     @Test
     void errorsPointToTheLineOfTheParagraph() {
         InvalidModelException image = assertThrows(InvalidModelException.class,
-                () -> buildInline("\tText: Uno", "\tText: Ver ![logo](logo.png)"));
+                () -> buildInline("\tText: Uno", "\tText: Ver ![logo](logo.png \"Logo\")"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, image.errorCode());
         assertEquals(15, image.line());
         // In a block, the line of the text, the first of the block.
         InvalidModelException block = assertThrows(InvalidModelException.class,
-                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "\t\t\tver ![logo](logo.png)"));
+                () -> buildInline("\tText:", "\t\tContent >>", "\t\t\tUno", "\t\t\tver ![logo](logo.png \"Logo\")"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, block.errorCode());
         assertEquals(16, block.line());
+    }
+
+    /**
+     * An image inside the text (reference/common/text-formatting.md): a run that is the image, with its path and its
+     * alternative text, or decorative without it; inside a link, with the link.
+     */
+    @Test
+    void anImageInTheTextIsARun() {
+        Box text = buildInline("\tText: Ver ![el logo](test/square.png) y ![](test/check.svg) o "
+                + "[![Web](test/shapes.svg)](https://stxt.dev)").children().get(0);
+        assertEquals("Ver \uFFFC y \uFFFC o \uFFFC", text.text());
+        List<TextRun> runs = text.runs();
+        assertEquals(6, runs.size());
+        assertEquals(new TextRun("Ver ", TextFormat.PLAIN), runs.get(0));
+        assertEquals(new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/square.png",
+                "el logo"))), runs.get(1));
+        assertEquals(new TextRun(" y ", TextFormat.PLAIN), runs.get(2));
+        assertEquals(new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/check.svg", null))),
+                runs.get(3));
+        assertTrue(runs.get(3).format().image().decorative());
+        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false, "https://stxt.dev")
+                .withImage(new InlineImage("test/shapes.svg", "Web"))), runs.get(5));
+    }
+
+    /** Two images one after the other are two runs, each one drawn where its run is. */
+    @Test
+    void twoImagesTogetherAreTwoRuns() {
+        Box text = buildInline("\tText: ![a](test/square.png)![a](test/square.png)").children().get(0);
+        assertEquals(2, text.runs().size());
+        assertEquals(TextRun.IMAGE, text.runs().get(0).text());
+        assertEquals(TextRun.IMAGE, text.runs().get(1).text());
     }
 
     /** What would start a block in a Markdown is text, without escaping it (reference/common/text-formatting.md). */

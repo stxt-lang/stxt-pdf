@@ -5,6 +5,7 @@ import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
@@ -72,6 +73,11 @@ class StackingContextTest {
         public void image(Box box, Rect content, Radii radii) {
             imageRadii.add(corners(radii));
             events.add("image");
+        }
+
+        @Override
+        public void inlineImage(Box box, InlineImage image, String link, Rect area) {
+            events.add("inline image " + image.path() + " " + round(area));
         }
 
         @Override
@@ -313,6 +319,23 @@ class StackingContextTest {
                 "\t\tText: uno   dos", "\tText: fin", "\t\tId: fin");
         assertEquals(List.of("#fin " + new Rect(40, 40, 515, 22) + " uno dos"), r.links);
         assertEquals(List.of("link #fin", "text 'uno dos' normal", "text 'fin' normal"), r.events);
+    }
+
+    /**
+     * An image inside the text (reference/common/text-formatting.md): drawn where its run is, as tall as the size of
+     * the line and centered on the capitals on the baseline (baseline 9 below the top of a line of 12, capitals of 7:
+     * its top is 0.5 below the top of the line), outside the text sequences; inside a link, with its area.
+     */
+    @Test
+    void anImageInTheTextIsDrawnInItsPlace() {
+        Recorder r = record(FONT, "\tText: ab ![Un cuadrado](test/square.png) cd [![Web](test/shapes.svg)](https://stxt.dev)",
+                "\t\tId: T", "\t\tTypography:", "\t\t\tMarkup: markdown");
+        assertEquals(List.of("text 'ab ' normal", "inline image test/square.png " + new Rect(55, 40.5, 10, 10),
+                "text ' cd ' normal", "inline image test/shapes.svg " + new Rect(85, 40.5, 20, 10),
+                "link https://stxt.dev"), r.events.stream()
+                .filter(e -> e.startsWith("link") || e.startsWith("text") || e.startsWith("inline")).toList());
+        assertEquals(List.of("[text", "'ab '", "]", "[text", "' cd '", "]"), r.sequences);
+        assertEquals(List.of("https://stxt.dev " + new Rect(85, 40, 20, 12) + " Web"), r.links);
     }
 
     /**

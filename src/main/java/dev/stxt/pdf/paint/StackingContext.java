@@ -7,6 +7,7 @@ import dev.stxt.pdf.layout.inline.LineBreaker;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Position;
@@ -558,6 +559,31 @@ public final class StackingContext {
             for (int i = 0; i < runs.size(); i++) {
                 TextLine.Run r = runs.get(i);
                 String link = r.format().link();
+                if (r.format().image() != null) {
+                    // An image inside the text (reference/common/text-formatting.md): as tall as the size of the
+                    // line, centered on the capitals on the baseline, like the image marker of a list; outside any
+                    // text sequence, with its own marked content.
+                    if (open) {
+                        tags.endText();
+                        open = false;
+                    }
+                    double height = l.fontSize();
+                    double capitals = metrics.capHeight() * l.fontSize();
+                    double x = content.x() + l.x() + r.x();
+                    canvas.inlineImage(box, r.format().image(), link,
+                            new Rect(x, baseline - capitals / 2 - height / 2, r.width(), height));
+                    if (link != null) {
+                        paintLinkZone(tags, box, content, l, i, link);
+                    }
+                    if (spaceAfter && i == runs.size() - 1) {
+                        // The invisible space of the line break, which the image cannot carry.
+                        tags.beginText(box);
+                        canvas.text(x + r.width(), baseline, " ", font, l.fontSize(),
+                                r.format().color(s.typography().color()), 0, 0);
+                        tags.endText();
+                    }
+                    continue;
+                }
                 String sequence = sequence(r.format());
                 if (!open || !Objects.equals(sequence, current)) {
                     if (open) {
@@ -652,8 +678,9 @@ public final class StackingContext {
         return f.link() == null ? null : "link:" + f.link();
     }
 
+    /** Whether two runs are in the same sequence; an image is a sequence of its own. */
     private static boolean sameSequence(TextFormat a, TextFormat b) {
-        return Objects.equals(sequence(a), sequence(b));
+        return a.image() == null && b.image() == null && Objects.equals(sequence(a), sequence(b));
     }
 
     /**
@@ -665,8 +692,11 @@ public final class StackingContext {
         List<TextLine.Run> runs = l.runs();
         StringBuilder text = new StringBuilder();
         int end = first;
-        while (end < runs.size() && sameSequence(runs.get(first).format(), runs.get(end).format())) {
-            text.append(runs.get(end).text());
+        while (end < runs.size() && (end == first
+                || sameSequence(runs.get(first).format(), runs.get(end).format()))) {
+            // An image says its alternative text, if it has one; what is read of a link is its text.
+            InlineImage image = runs.get(end).format().image();
+            text.append(image != null ? (image.alt() != null ? image.alt() : "") : runs.get(end).text());
             end++;
         }
         TextLine.Run last = runs.get(end - 1);
@@ -681,7 +711,8 @@ public final class StackingContext {
         for (TextLine l : p.f().lines()) {
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
             for (TextLine.Run r : l.runs()) {
-                if (underline ? !r.format().underline() : !r.format().strike()) {
+                // An image is neither underlined nor struck out, not even inside a link.
+                if (r.format().image() != null || (underline ? !r.format().underline() : !r.format().strike())) {
                     continue;
                 }
                 DecorationMetrics d = canvas.decoration(r.format().face(s.typography().fontFace()));

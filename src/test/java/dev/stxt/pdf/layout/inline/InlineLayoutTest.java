@@ -42,6 +42,40 @@ class InlineLayoutTest {
         assertEquals(24, f.height(), 1e-9);
     }
 
+    /**
+     * An image inside the text (reference/common/text-formatting.md) is measured as a word: as tall as the size and
+     * as wide as its proportion gives (square.png is square, shapes.svg is 200 × 100), with no letter spacing.
+     */
+    @Test
+    void anImageInTheTextMeasuresAsAWord() {
+        LayoutFixture l = layOut("\tText: ab ![x](test/square.png) cd", "\t\tId: S", "\t\tTypography:",
+                "\t\t\tMarkup: markdown",
+                "\tText: ab ![x](test/shapes.svg) cd", "\t\tId: W", "\t\tTypography:", "\t\t\tMarkup: markdown",
+                "\tText: Pega![x](test/square.png)do", "\t\tId: G", "\t\tTypography:", "\t\t\tMarkup: markdown");
+        TextLine square = l.fragment("S").lines().get(0);
+        assertEquals("ab \uFFFC cd", square.text());
+        assertEquals(40, square.width(), 1e-9);
+        assertEquals(List.of(0.0, 15.0, 25.0), square.runs().stream().map(TextLine.Run::x).toList());
+        assertEquals(List.of(15.0, 10.0, 15.0), square.runs().stream().map(TextLine.Run::width).toList());
+        assertEquals("test/square.png", square.runs().get(1).format().image().path());
+        TextLine wide = l.fragment("W").lines().get(0);
+        assertEquals(50, wide.width(), 1e-9);
+        assertEquals(20, wide.runs().get(1).width(), 1e-9);
+        // Glued to the letters it is part of their word: one line of 20 + 10 + 10.
+        TextLine glued = l.fragment("G").lines().get(0);
+        assertEquals(40, glued.width(), 1e-9);
+        assertEquals(3, glued.runs().size());
+    }
+
+    @Test
+    void anImageWrapsLikeAWord() {
+        LayoutFixture l = layOut("\tText: aaa ![x](test/shapes.svg) b", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30",
+                "\t\tTypography:", "\t\t\tMarkup: markdown");
+        List<TextLine> lines = l.fragment("T").lines();
+        assertEquals(List.of("aaa", "\uFFFC b"), lines.stream().map(TextLine::text).toList());
+        assertEquals(30, lines.get(1).width(), 1e-9);
+    }
+
     @Test
     void lineBreakingBalancedIsInheritedAndUsesKnuthPlass() {
         // The example of LineBreakerTest.prettyMinimizesTheDemerits at scale 5: width 50.

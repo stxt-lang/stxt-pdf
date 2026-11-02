@@ -6,6 +6,7 @@ import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
@@ -106,6 +107,11 @@ public final class ContrastCheck implements Canvas {
     @Override
     public void image(Box box, Rect content, Radii radii) {
         add(content, null);
+    }
+
+    @Override
+    public void inlineImage(Box box, InlineImage image, String link, Rect area) {
+        add(area, null);
     }
 
     private void add(Rect r, List<float[]> colors) {

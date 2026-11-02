@@ -161,7 +161,12 @@ where they are content): `BreakRules.cutLines` applies widows and orphans to all
 `InlineLayout.runs` replaces the references with their value and applies `TextTransform` to the runs **before** breaking them into lines,
 with the `Case` and the `Small caps` of each styled run (`TextFormat.textCase`, `smallCaps`). `LineBreaker` measures each
 character with the letter spacing of its run (`TextFormat.letterSpacing`, in `advance`) and takes from a line that of its
-last character (`trailing`, `Paragraph.width`), which is that of its run.
+last character (`trailing`, `Paragraph.width`), which is that of its run. A run that is an image (`TextFormat.image`,
+with the text `TextRun.IMAGE`, U+FFFC) measures in `advance` what `TextMeasurer.imageWidth` gives: as tall as the size of
+the line and as wide as its proportion, which `InlineLayout.WithImages` reads from the file through
+`LayoutContext.imageRatio` (so the image measures what it is also with `FixedMetrics`), and `PageNumbers.probing`
+delegates. `Images.validate` checks the images of the runs beforehand like those of the `Image` boxes (format, limits),
+with the line of the text.
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
 `List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`); an image marker is as
 tall as `Height` or the `Size` of the item and as wide as its proportion gives (`LayoutContext.natural`), carries the

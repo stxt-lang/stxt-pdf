@@ -1,0 +1,32 @@
+# Images inside a text (reference/common/text-formatting.md#images-inside-a-text). Pages of 595 × 300 with margins
+# of 40: page area of 515 × 220 from (40, 40). Lines of 12 (Size 10), baseline 9 below the top of the line and
+# capitals of 0.7 × 10 = 7, so an image is centered 3.5 above the baseline: 5.5 below the top of the line.
+#
+# An image is as tall as the Size (10) and as wide as its proportion gives (square.png is square, shapes.svg is
+# 200 × 100), measured as a word: p1 is one line, "Marca " (30) + 20 + " y fin" (30). p2 is 60 wide: "aaa " (20) +
+# 10 + " bbb" (20) = 50 fit, "ccc" does not: two lines. In p3 the image is glued to its letters: one word of
+# 20 + 10 + 10. In p4 the image is inside a link (clickable, with its Alt) and followed by " web".
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Text: Marca ![Logo](test/shapes.svg) y fin
+			Id: p1
+		Text: aaa ![Un cuadrado](test/square.png) bbb ccc
+			Id: p2
+			Box:
+				Width: 60
+		Text: Pega![](test/square.png)do
+			Id: p3
+		Text: [![Web](test/check.svg)](https://stxt.dev) web
+			Id: p4

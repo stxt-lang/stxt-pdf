@@ -17,6 +17,7 @@ import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
 import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.Tolerance;
@@ -128,8 +129,36 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     public InlineLayout(LayoutContext context, TextMeasurer measurer) {
         this.context = context;
-        this.real = measurer;
+        this.real = new WithImages(measurer, context);
         reset();
+    }
+
+    /**
+     * The measurer of the layout, which measures an image inside a text ({@link TextMeasurer#imageWidth}) with the
+     * proportion the context reads from its file ({@link LayoutContext#imageRatio}), whatever the measurer of the
+     * text (also {@link FixedMetrics}, so that the tests draw the real image in its place).
+     */
+    private record WithImages(TextMeasurer text, LayoutContext context) implements TextMeasurer {
+
+        @Override
+        public double width(String s, FontFace font, double fontSize) {
+            return text.width(s, font, fontSize);
+        }
+
+        @Override
+        public double imageWidth(InlineImage image, double height) {
+            return height * context.imageRatio(image.path());
+        }
+
+        @Override
+        public VerticalMetrics vertical(FontFace font) {
+            return text.vertical(font);
+        }
+
+        @Override
+        public void validate(Box root) {
+            text.validate(root);
+        }
     }
 
     /** Returns to the state before the layout: the default probe digits, no references, no memorized line breaking. */

@@ -50,6 +50,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.pdf.model.Links;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
@@ -59,7 +60,8 @@ import dev.stxt.pdf.model.TextRun;
  * Translates a {@code Markdown} (reference/components/markdown.md) into the STXT nodes of the elements that already
  * exist: headings to {@code Heading 1}...{@code Heading 6} with a {@code Text}, paragraphs to {@code Paragraph}, lists
  * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
- * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md). A
+ * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md); an
+ * image inside a text is a run that is the image ({@link InlineImage}, reference/common/text-formatting.md). A
  * link is an underlined run with its target (reference/common/links.md); inline code, a code run, which gets the
  * family of {@code Code font} when its box is built; a styled run ({@code [text]{name}}), a run with the name of its
  * style ({@link RunStyle#named}), which also gets the values of its rule when its box is built; a line break ({@code \} at the end of the line), a
@@ -101,8 +103,9 @@ final class MarkdownBuilder {
     private static final Pattern FOOTNOTE_CALL = Pattern.compile("\\[\\^([^\\[\\]\\s]+)]");
 
     private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
-            + "images alone in their paragraph and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
-            + "`code`, [links](target), [styled runs]{style} and line breaks (\\ at the end of the line) are allowed";
+            + "images and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
+            + "`code`, [links](target), ![images](path), [styled runs]{style} and line breaks (\\ at the end of the "
+            + "line) are allowed";
 
     private static final String INLINE_SUBSET = "a text with Markup: markdown only allows text with **bold**, "
             + "*italic*, ++underline++, ~~strikethrough~~, [links](target), [styled runs]{style} and line breaks (\\ at "
@@ -294,17 +297,35 @@ final class MarkdownBuilder {
          * effect and is an error.
          */
         private InlineNode image(Image i, int line) {
+            InlineNode image = node("Image", i.getDestination(), line);
+            String alt = alt(i, line);
+            if (alt != null) {
+                image.addChild(node("Alt", alt, line));
+            }
+            return image;
+        }
+
+        /**
+         * The alternative text of an image, without formatting; {@code null} if it has none (the image is
+         * decorative). A line break in it is a space: the text is read, not laid out. The title ({@code "..."}) would
+         * have no effect and is an error.
+         */
+        private String alt(Image i, int line) {
             if (i.getTitle() != null && !i.getTitle().isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow the title of an image "
                         + "(\"" + i.getTitle() + "\"): the image is described in its alternative text, ![...]");
             }
-            InlineNode image = node("Image", i.getDestination(), line);
-            // A line break in the alternative text is a space: the text is read, not laid out.
-            String alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ').strip();
-            if (!alt.isEmpty()) {
-                image.addChild(node("Alt", alt, line));
-            }
-            return image;
+            String alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ')
+                    .replace(TextRun.OBJECT_REPLACEMENT, ' ').strip();
+            return alt.isEmpty() ? null : alt;
+        }
+
+        /**
+         * An image inside a text (reference/common/text-formatting.md): a run that is the image, with its path and
+         * its alternative text, in the format of the text around it (a link, for an image that is clicked).
+         */
+        private InlineImage inlineImage(Image i, int line) {
+            return new InlineImage(i.getDestination(), alt(i, line));
         }
 
         private InlineNode list(ListBlock l, int line) {
@@ -521,6 +542,8 @@ final class MarkdownBuilder {
                     inline(n, link(l, f, line), out, line);
                 } else if (n instanceof Code c) {
                     out.add(RunMarks.unmark(c.getLiteral(), styleNames), styled(f).asCode());
+                } else if (n instanceof Image i) {
+                    out.add(TextRun.IMAGE, styled(f).withImage(inlineImage(i, line)));
                 } else {
                     throw unsupported(n, line);
                 }
@@ -641,10 +664,7 @@ final class MarkdownBuilder {
 
         InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
-            if (n instanceof Image) {
-                what = inlineOnly ? "images (an image goes in an Image)"
-                        : "images inside a text (an image goes alone in its paragraph)";
-            } else if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
+            if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
                 what = "code";
             } else if (n instanceof BlockQuote) {
                 what = "quotes (>)";

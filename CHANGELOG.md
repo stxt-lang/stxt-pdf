@@ -7,6 +7,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Images inside a text.** With `Markup: markdown`, or in a `Markdown`, `![alt](path)` inside a text is an inline
+  image (an icon in a sentence, a small logo in a heading) instead of `MARKDOWN_UNSUPPORTED`: a run that is the image
+  (`TextFormat.image`, `InlineImage`, whose text is the object replacement character U+FFFC), as tall as the size the
+  line is set at and as wide as its proportion gives, measured as a word (glued to letters it is part of their word;
+  wider than the line it overflows like one), with no letter spacing, painted centered on the capitals on the baseline
+  like the image marker of a list, without changing the height of the line. Only PNG, JPEG and SVG (the page of a PDF
+  is `IMAGE_FORMAT`; a path that does not exist, `IMAGE_UNKNOWN`, with the line of the text), checked before the layout
+  like the `Image` boxes. In the PDF it is a `Figure` with its `Alt` and its `BBox` inside the element of the text, in
+  reading order, or under a `Link` if it is inside a link (`[![alt](path)](target)`, clickable, with the `Alt` as what is
+  read); without `Alt` it is an artifact. It is never a character of the text: not copied, not searched, not in the
+  bookmarks or the running heads. An image with a title is still an error, and one alone in its paragraph of a
+  `Markdown` is still an `Image`. `TextMeasurer.imageWidth` measures it (a square without resources;
+  `LayoutContext.imageRatio` gives the proportion from the file), `Canvas.inlineImage` draws it. Golden
+  `46-inline-images`.
+
 - **Progress of a conversion.** New `Progress` (`model`), passed with the call after the `Cancellation` (`layOut`,
   `toPdf` and `toSvg` have an overload with both): the engine tells it, on the thread that converts, each page of the
   flow laid out (`pageLaidOut`, counting from 1 again in each pagination pass), the end of the layout with the number

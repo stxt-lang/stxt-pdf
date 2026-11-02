@@ -21,6 +21,7 @@ which can be combined. Each part is a **run**. They are written with `Markup: ma
   inside its run, but not the one between two runs that do not carry it. With `justify`, the extra space belongs to the run
   of its space.
 - A run can carry the target of a link ([Links](links.md)), which changes neither how it is measured nor how it looks.
+- A run can be an image ([below](#images-inside-a-text)).
 
 > **Decision:** a run is a set of marks and not a weight and a style of its own: this way `Styles` can change the font
 > of the box without touching the runs. *Rejected alternative:* runs with explicit `Bold` and `Italic`, which could undo
@@ -124,6 +125,43 @@ for the whole document. Inside a [styled run](#styled-runs) the `Code font` of i
 Without any, code is an error (`CODE_WITHOUT_FONT`), with the line where the text starts (in a `Markdown`, that of the
 paragraph). If the family does not exist, it is `FONT_UNKNOWN`, with the line of `Code font`.
 
+## Images inside a text
+
+With `Markup: markdown`, or in a `Markdown`, `![alt](path)` inside a text is an **inline image**: an icon in a
+sentence, a small logo in a heading. The path is relative to `images/` of the resources folder, like that of an
+`Image` ([Image](../components/image.md#file)); only PNG, JPEG and SVG (the page of a PDF is `IMAGE_FORMAT`, and a path
+that does not exist, `IMAGE_UNKNOWN`, with the line of the text). Alone in its paragraph of a `Markdown` it is still an
+`Image` ([Markdown](../components/markdown.md#the-subset)).
+
+- **It measures as a word.** It is as tall as the size of the line (`Size`; with `Overflow: shrink`, the size the text
+  shrinks to) and as wide as its proportion gives; it has no letter spacing. Glued to some letters it forms one word
+  with them, which is not broken; between spaces it is one more word, which goes to the next line if it does not fit.
+  An image wider than the line overflows, like a word ([Overflow](overflow.md)).
+- **It is painted in its place**, centered on the capitals of the font on the baseline, like the image marker of a
+  list ([List](../components/list.md#image-markers)). It does not change the height of the line.
+- The alternative text is the `Alt` of its `Figure` in the tagged PDF, inside the element of the text, in reading
+  order; without it (`![](path)`) the image is decorative, an *artifact* ([The PDF inside](../implementation/pdf.md#figures)).
+  It is not part of the text: it is not copied, not searched, and does not appear in the bookmarks or in the running
+  heads of a heading.
+- Inside a link, `[![alt](path)](target)`, the image is clickable and its `Alt` is what is read of the link. Neither the
+  underline of the link nor a strikethrough is painted over an image. The rest of the format of the run (bold, a styled
+  run) does not affect it.
+- The Markdown title (`![alt](path "title")`) is an error, as in an `Image`.
+
+```stxt
+Paragraph: Included ![Yes](icons/check.svg) in every plan.
+	Typography:
+		Markup: markdown
+```
+
+> **Decision:** the image measures what the letters do and is aligned like the image marker, without properties: an
+> inline image is an icon, and a size or an alignment of its own would need a syntax Markdown does not have.
+> *Rejected alternative:* a height in the `Alt` or in the title, which mixes the measure with the text that is read.
+
+> **Decision:** an inline image is a run whose text is the object replacement character (U+FFFC), which is never
+> painted nor read: so it goes through the line breaking, the runs and the links like any other run. *Rejected
+> alternative:* an `Image` box inside the inline flow, which required a second line model.
+
 ## Capitalization (`Case`)
 
 `Case` changes **what is painted and not what is written**: a label is written as a normal phrase and a rule puts it
@@ -213,3 +251,5 @@ underline goes below the text and the strikethrough, over it. A screen reader do
   remove bold or italic (a styled run can, with `Weight` or `Italic: false`).
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.
+- Inline images with another size than that of the letters or aligned otherwise, and the page of a PDF or a barcode
+  inside a text.

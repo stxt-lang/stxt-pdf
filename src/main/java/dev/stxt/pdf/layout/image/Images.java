@@ -1,7 +1,9 @@
 package dev.stxt.pdf.layout.image;
 
 import dev.stxt.pdf.model.Check;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
 import dev.stxt.pdf.resources.ResourceException;
@@ -53,6 +55,13 @@ public final class Images {
             checkLimits(file, box);
             checkPage(file, box);
         }
+        if (box.hasText()) {
+            for (TextRun run : box.runs()) {
+                if (run.format().image() != null) {
+                    checkInline(run.format().image(), box);
+                }
+            }
+        }
         if (box.marker() != null) {
             validate(box.marker());
         }
@@ -64,19 +73,23 @@ public final class Images {
      * without drawing it.
      */
     private void checkLimits(ImageFile file, Box box) {
+        checkLimits(file, box.line(), box.image());
+    }
+
+    private void checkLimits(ImageFile file, int line, String path) {
         if (file.pixels() > limits.maxImagePixels()) {
-            throw new InvalidModelException(box.line(), ErrorCode.IMAGE_TOO_LARGE, "The image " + box.image() + " has "
+            throw new InvalidModelException(line, ErrorCode.IMAGE_TOO_LARGE, "The image " + path + " has "
                     + (long) file.pixelWidth() + " × " + (long) file.pixelHeight() + " pixels ("
                     + megapixels(file.pixels()) + ") and the maximum is " + megapixels(limits.maxImagePixels())
                     + ": its resolution has to be reduced (Limits.maxImagePixels changes it)");
         }
         if (file.svgDepth() > limits.maxSvgDepth()) {
-            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "The SVG " + box.image() + " nests "
+            throw new InvalidModelException(line, ErrorCode.SVG_TOO_COMPLEX, "The SVG " + path + " nests "
                     + file.svgDepth() + " levels and the maximum is " + limits.maxSvgDepth()
                     + ": it has to be flattened (Limits.maxSvgDepth changes it)");
         }
         if (file.svgElements() > limits.maxSvgElements()) {
-            throw new InvalidModelException(box.line(), ErrorCode.SVG_TOO_COMPLEX, "The SVG " + box.image() + " draws "
+            throw new InvalidModelException(line, ErrorCode.SVG_TOO_COMPLEX, "The SVG " + path + " draws "
                     + (file.svgElements() >= (1L << 50) ? "an absurdly large number of" : String.valueOf(file.svgElements()))
                     + " elements, counting each time a <use> repeats a part, and the maximum is "
                     + limits.maxSvgElements() + ": it has to be simplified (Limits.maxSvgElements changes it)");
@@ -144,6 +157,35 @@ public final class Images {
             throw new InvalidModelException(box.line(), ErrorCode.IMAGE_UNKNOWN, e.getMessage()
                     + " (the path of an Image is relative to the images/ folder of the resources)");
         }
+    }
+
+    /**
+     * That an image inside the text of the box ({@code ![alt](path)}, reference/common/text-formatting.md) exists,
+     * is a PNG, a JPEG or an SVG, and does not exceed the limits; with the line of the text.
+     */
+    private void checkInline(InlineImage image, Box box) {
+        ImageFile file;
+        try {
+            file = resources.images().find(image.path());
+        } catch (ImageFormatException e) {
+            throw new InvalidModelException(box.textLine(), ErrorCode.IMAGE_FORMAT, e.getMessage());
+        } catch (ResourceException e) {
+            throw new InvalidModelException(box.textLine(), ErrorCode.IMAGE_UNKNOWN, e.getMessage()
+                    + " (the path of an image inside a text, ![alt](path), is relative to the images/ folder of the "
+                    + "resources)");
+        }
+        if (file.format() == ImageFile.Format.PDF) {
+            throw new InvalidModelException(box.textLine(), ErrorCode.IMAGE_FORMAT, "The image inside the text, "
+                    + image.path() + ", is a PDF: an image inside a text is a PNG, a JPEG or an SVG, and the page "
+                    + "of a PDF goes in an Image");
+        }
+        checkLimits(file, box.textLine(), image.path());
+    }
+
+    /** Width divided by height of an image inside a text, already checked by {@link #validate}. */
+    public double ratio(String path) {
+        ImageFile file = resources.images().find(path);
+        return file.width() / file.height();
     }
 
     /**

@@ -90,10 +90,11 @@ of the `Markdown` or, once for the whole document, in `For element: Document`, a
 | `[text]{name}` | A part with the color or the font of the `For style: name` rule ([Text formatting](../common/text-formatting.md#parts-in-another-color-or-font)) |
 | A code block (between ```` ``` ```` or `~~~`, or indented four spaces) | A preformatted block with `Code font`, styled with `For element: Code block` |
 | `![alt text](path)`, alone in its paragraph | An `Image` |
+| `![alt text](path)`, inside a paragraph | A small image in the sentence, as tall as the letters ([Text formatting](../common/text-formatting.md#images-in-the-sentence)) |
 | `\` at the end of the line | A line break within the paragraph, like the one of the signature in the example |
 
-Anything else is an error, so that nothing is lost silently. For example: quotes, HTML, horizontal rules, images inside a
-paragraph, links with a title or the language tag of a code block (there is no highlighting).
+Anything else is an error, so that nothing is lost silently. For example: quotes, HTML, horizontal rules, images or
+links with a title, or the language tag of a code block (there is no highlighting).
 
 ## Style
 

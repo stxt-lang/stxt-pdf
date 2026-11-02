@@ -143,6 +143,11 @@ has a single `THead` and a single `TFoot`.
 The `BBox` of the `Figure` of an image is its content box on the page and not the visible part with `Fit: inside`. That of
 a rotated image is the rectangle that encloses it.
 
+An inline image ([Text formatting](../common/text-formatting.md#images-inside-a-text)) is a `Figure` with its `Alt` and
+its `BBox` inside the element of its text (`P`, `Span`, `TD`...), among the marked contents of the text, in reading
+order; inside a link, the `Figure` hangs from a `Link` that receives the annotation of the image. Without `Alt` it is an
+*artifact*, and the marked text around it is split in two.
+
 A `Figure` with a caption ([Figure](../components/figure.md)) with an image inside is **a single** `Figure`: that of the
 figure, with the `Alt` of the image, the `BBox` of the image and the caption in a `Caption`; the image has no element of
 its own and its content hangs from the `Figure` (or from a `Link`, if it carries `Link`). With a `Block` inside, the
@@ -176,8 +181,8 @@ wraps the two `Span`.
 ## *Artifacts*
 
 They are not part of the content: backgrounds, borders, gradients, text lines (underline and strikethrough), the leaders
-of a table of contents, the lines between columns, images without `Alt`, the repeated rows of a table from its second page on,
-and everything inside a `Page overlay`.
+of a table of contents, the lines between columns, images without `Alt` (inline images too), the repeated rows of a
+table from its second page on, and everything inside a `Page overlay`.
 
 ## Links
 

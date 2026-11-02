@@ -617,6 +617,11 @@ public final class LineBreaker {
      */
     static double advance(String text, TextFormat format, TextMeasurer measurer, FontFace font, double fontSize,
                           double letterSpacing) {
+        if (format.image() != null) {
+            // An image is as tall as the size the line is set at, and as wide as its proportion gives; it has no
+            // letter spacing (reference/common/text-formatting.md).
+            return measurer.imageWidth(format.image(), fontSize);
+        }
         return measurer.width(text, format.face(font), fontSize * format.scale())
                 + format.letterSpacing(letterSpacing) * text.codePointCount(0, text.length());
     }

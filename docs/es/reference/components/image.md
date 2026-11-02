@@ -298,7 +298,8 @@ siendo un dibujo vectorial nítido a cualquier tamaño (`stretch` deforma el dib
 ## Lo que no hay
 
 - GIF, WebP, TIFF y otros formatos.
-- Imágenes dentro de una línea de texto.
+- Una `Image` dentro de una línea de texto: una imagen en línea es Markdown, `![alt](ruta)`, y mide lo que la letra
+  ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)).
 - Varias resoluciones de una imagen.
 - Colocar la imagen dentro de su caja en otro sitio que el centro, o a su tamaño natural sin escalar.
 - En los SVG: patrones, máscaras, filtros, marcadores, imágenes, hojas de estilo y enlaces a otros ficheros.

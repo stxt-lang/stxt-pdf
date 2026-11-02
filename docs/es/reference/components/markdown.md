@@ -87,9 +87,10 @@ así:
 | `\` al final de la línea | un salto de línea forzado: la línea acaba ahí, dentro del mismo párrafo ([abajo](#saltos-de-línea-forzados)) |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
+| `![Alt](ruta)`, dentro de un texto | imagen en línea: un tramo que es la imagen, tan alta como la letra ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) |
 
-Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes dentro de un texto
-(también dentro de un enlace) o con título (`![Alt](ruta "título")`), la etiqueta de lenguaje de un bloque de código
+Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes con título
+(`![Alt](ruta "título")`), la etiqueta de lenguaje de un bloque de código
 (```` ```java ````: no hay resaltado), citas, HTML, líneas horizontales, un salto de línea forzado sin texto antes en su
 línea ([abajo](#saltos-de-línea-forzados)) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se
 escribe en el propio enlace).
@@ -97,7 +98,7 @@ Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List ite
 la cabecera. Un `Markdown` sin contenido, o un encabezado o un párrafo sin texto, es `TEXT_CONTENT`.
 
 Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
-`Link`.
+`Link` o, dentro de un texto, una imagen en línea dentro de un enlace (`[![Alt](ruta)](destino)`).
 
 > **Decisión:** lo que no tendría efecto (la etiqueta de lenguaje de un bloque de código, el título de un enlace) es un
 > error y no se ignora.
@@ -237,6 +238,6 @@ Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tabl
 
 - Citas, HTML, líneas horizontales, listas de tareas y resaltado de código. Las notas al pie se
   llaman con `[^id]`, pero su contenido es una `Footnote`, no una definición `[^id]: ...` ([Footnote](footnote.md)).
-- Imágenes dentro de un texto y enlaces con título o con definición aparte.
+- Enlaces con título o con definición aparte, e imágenes con título.
 - Dos espacios al final de la línea como salto de línea forzado: STXT los quita.
 - `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Style`.

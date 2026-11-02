@@ -151,7 +151,11 @@ clockwise (in the PDF, with the origin at the bottom, the angle changes sign).
 `PdfImages` embeds the PNG and the JPEG with PDFBox and the SVG with JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) drawing on a
 `PdfBoxGraphics2D` (`pdfbox-graphics2d` 3.0.5), which gives a form of the natural size, once per file.
 `PdfCanvas.image` places it with a scaling `cm` matrix where `ImageFit` says and resets the dash pattern before
-drawing it. JSVG draws the text as outlines.
+drawing it. JSVG draws the text as outlines. `PdfCanvas.inlineImage` draws an inline image
+([Text formatting](../common/text-formatting.md#images-inside-a-text)) in the rectangle of its run, which
+`StackingContext` computes like that of the image marker (centered on the capitals on the baseline), outside the text
+sequences and without underline or strikethrough; the `Figure` or the *artifact* is opened by
+`PdfTagging.beginInlineImage`.
 
 > **Decision:** the text of an SVG is outlines and not PDF text, because JSVG allows nothing else. *Rejected
 > alternative:* having the engine draw the text of the SVGs with its own fonts, which required reimplementing
@@ -216,7 +220,9 @@ The font cache of JSVG is JVM-wide and not synchronized: an SVG with text is dra
 borders and the `Page overlay` are *artifacts*) and the bookmarks. `PdfStructure.type` is an exhaustive `switch` over `Element.Role`, so a
 new element with a role that already exists does not touch `paint`. `PdfStructure.build` creates the `Link` of a box with `Link` as
 a child of its element and parent of its content, `PdfStructure.markLink`, that of a text link, and
-`PdfStructure.outside`, the loose `Link` of what is not content.
+`PdfStructure.outside`, the loose `Link` of what is not content, and `PdfStructure.markInlineImage`, the `Figure` of an
+inline image when it is painted, with its `Alt` and its `BBox`, under the element of the text or under a new `Link` if
+it is in a link.
 
 > **Decision:** `Element.Role` is the role of a box, shared by several elements, and it is the only thing painting looks at:
 > the names of the PDF tags are in `PdfStructure`. *Rejected alternative:* PDF methods in `Element`, which

@@ -401,8 +401,9 @@ public final class Box {
      * caption, the only child with text.
      */
     public String headingText() {
+        // An image inside the text (reference/common/text-formatting.md) is not read: its place is a space.
         return children.stream().filter(Box::hasText).map(b -> b.text.strip())
-                .collect(Collectors.joining(" ")).replaceAll("[\\s\\u2028]+", " ");
+                .collect(Collectors.joining(" ")).replaceAll("[\\s\\u2028\\uFFFC]+", " ").strip();
     }
 
     /** Children that take part in the flow of the parent (in flow and {@code Frame}). */

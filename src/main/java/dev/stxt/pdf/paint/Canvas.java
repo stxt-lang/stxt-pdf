@@ -2,6 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
@@ -69,6 +70,15 @@ public interface Canvas {
      * of its typography, placed according to {@link dev.stxt.pdf.model.Modules#fit()}.
      */
     void image(Box box, Rect content, Radii radii);
+
+    /**
+     * An image inside the text of the box ({@link InlineImage}, reference/common/text-formatting.md), drawn in
+     * {@code area}, the rectangle its run takes: as tall as the size of the line, centered on the capitals. With
+     * alternative text it is the content of a {@code Figure}; without it, an <em>artifact</em>. {@code link} is the
+     * destination of the link the image is in, or {@code null}: the clickable area is painted apart
+     * ({@link Tagging#link}), but the structure needs to know that the figure hangs from a {@code Link}.
+     */
+    void inlineImage(Box box, InlineImage image, String link, Rect area);
 
     /**
      * Starts painting rotated (reference/common/layers-and-rotation.md): everything painted until

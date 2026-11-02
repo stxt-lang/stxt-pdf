@@ -16,6 +16,7 @@ By default text is literal: an asterisk is an asterisk. With `Markup: markdown`,
 | `[text](https://...)` | a link, underlined ([References and links](references-and-links.md)) |
 | `` `code` `` | code, in the font of `Code font` ([below](#code)) |
 | `[text]{price}` | the text with the color, the font and the rest of the `For style: price` rule ([below](#parts-in-another-color-or-font)) |
+| `![alt text](path)` | a small image within the sentence, as tall as the letters ([below](#images-in-the-sentence)) |
 
 ```
 Styles:
@@ -74,6 +75,23 @@ Document (dev.stxt.pdf):
   but a styled part cannot go inside another.
 - A name without its rule is an error (`STYLE_WITHOUT_RULE`). Brackets that are not followed by a name in braces are
   text, and `\[` writes them as they are.
+
+## Images in the sentence
+
+An icon between the words, or a small logo in a heading, is written as in Markdown, with the path of the image in
+`images/` of the resources folder ([Resources](resources.md)):
+
+```
+Paragraph: Included ![Yes](icons/check.svg) in every plan.
+	Typography:
+		Markup: markdown
+```
+
+The image is as tall as the letters and aligned with them; its width comes from its proportion. It behaves like one
+more word: if it does not fit, it goes to the next line. A PNG, a JPEG or an SVG works. The text between the brackets
+is what a screen reader reads; with empty brackets, `![](path)`, the image is decorative and is not read. Inside a
+link, `[![text](path)](target)`, it can be clicked. An image with a size of its own, or alone, is an
+[`Image`](../components/image.md).
 
 ## Code
 

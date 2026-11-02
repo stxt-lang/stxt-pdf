@@ -17,6 +17,15 @@ public record TextRun(String text, TextFormat format) {
      */
     public static final char LINE_SEPARATOR = '\u2028';
 
+    /**
+     * The text of a run that is an image ({@link TextFormat#image()}, reference/common/text-formatting.md): the object
+     * replacement character, which stands for the image in the text and is never painted nor read.
+     */
+    public static final char OBJECT_REPLACEMENT = '\uFFFC';
+
+    /** The text of a run that is an image: a single {@link #OBJECT_REPLACEMENT}. */
+    public static final String IMAGE = String.valueOf(OBJECT_REPLACEMENT);
+
     public TextRun {
         Objects.requireNonNull(text, "text");
         Objects.requireNonNull(format, "format");
@@ -44,7 +53,8 @@ public record TextRun(String text, TextFormat format) {
         private TextFormat format;
 
         public Joiner add(String s, TextFormat f) {
-            if (format != null && !format.equals(f)) {
+            // Two images with the same format are two runs: each one is drawn where its own run is.
+            if (format != null && (!format.equals(f) || f.image() != null)) {
                 flush();
             }
             format = f;

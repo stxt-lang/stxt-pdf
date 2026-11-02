@@ -3,6 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Paint;
@@ -252,6 +253,36 @@ public final class PdfCanvas implements Canvas {
             } else {
                 out.drawImage(images.bitmap(file), (float) target.x(), (float) (pageHeight - target.bottom()),
                         (float) target.width(), (float) target.height());
+            }
+            out.restoreGraphicsState();
+            out.endMarkedContent();
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Drawn exactly in {@code area}, which already has the proportion of the file; a PDF page cannot be one
+     * ({@link dev.stxt.pdf.layout.image.Images}).</p>
+     */
+    @Override
+    public void inlineImage(Box box, InlineImage image, String link, Rect area) {
+        if (area.width() <= 0 || area.height() <= 0) {
+            return;
+        }
+        io(() -> {
+            ImageFile file = resources.images().find(image.path());
+            tagging.beginInlineImage(box, image, link, area);
+            out.saveGraphicsState();
+            if (file.isVector()) {
+                out.transform(new Matrix((float) (area.width() / file.width()), 0, 0,
+                        (float) (area.height() / file.height()), (float) area.x(),
+                        (float) (pageHeight - area.bottom())));
+                out.setLineDashPattern(new float[0], 0);
+                out.drawForm(images.drawing(file));
+            } else {
+                out.drawImage(images.bitmap(file), (float) area.x(), (float) (pageHeight - area.bottom()),
+                        (float) area.width(), (float) area.height());
             }
             out.restoreGraphicsState();
             out.endMarkedContent();

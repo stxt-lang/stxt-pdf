@@ -151,7 +151,10 @@ de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de si
 `PdfImages` incrusta el PNG y el JPEG con PDFBox y el SVG con JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) dibujando en un
 `PdfBoxGraphics2D` (`pdfbox-graphics2d` 3.0.5), que da un formulario del tamaño natural, una vez por fichero.
 `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde manda `ImageFit` y restablece los guiones antes de
-dibujarlo. JSVG dibuja el texto como contornos.
+dibujarlo. JSVG dibuja el texto como contornos. `PdfCanvas.inlineImage` dibuja una imagen en línea
+([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) en el rectángulo de su tramo, que
+`StackingContext` calcula como el del marcador con imagen (centrado en las mayúsculas sobre la línea base), fuera de las
+secuencias de texto y sin subrayado ni tachado; el `Figure` o el *artifact* lo abre `PdfTagging.beginInlineImage`.
 
 > **Decisión:** el texto de un SVG son contornos y no texto del PDF, porque JSVG no permite otra cosa. *Alternativa
 > descartada:* que el motor dibujara el texto de los SVG con sus propias fuentes, que obligaba a reimplementar la
@@ -216,7 +219,9 @@ La caché de fuentes de JSVG es de toda la JVM y no está sincronizada: un SVG c
 bordes y los `Page overlay` son *artifacts*) y los marcadores. `PdfStructure.type` es un `switch` exhaustivo sobre `Element.Role`, así que un
 elemento nuevo con un papel que ya existe no toca `paint`. `PdfStructure.build` crea el `Link` de una caja con `Link` como
 hijo de su elemento y padre de su contenido, `PdfStructure.markLink`, el de un enlace de texto, y
-`PdfStructure.outside`, el `Link` suelto de lo que no es contenido.
+`PdfStructure.outside`, el `Link` suelto de lo que no es contenido, y `PdfStructure.markInlineImage`, el `Figure` de una
+imagen en línea al pintarla, con su `Alt` y su `BBox`, bajo el elemento del texto o bajo un `Link` nuevo si está en un
+enlace.
 
 > **Decisión:** `Element.Role` es el papel de una caja, compartido por varios elementos, y es lo único que el pintado mira:
 > los nombres de las etiquetas del PDF están en `PdfStructure`. *Alternativa descartada:* métodos del PDF en `Element`, que

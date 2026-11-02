@@ -21,6 +21,7 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
   de dentro de su tramo, pero no el que hay entre dos tramos que no lo llevan. Con `justify`, el espacio extra es del tramo
   de su espacio.
 - Un tramo puede llevar el destino de un enlace ([Enlaces](links.md)), que no cambia cómo se mide ni cómo se ve.
+- Un tramo puede ser una imagen ([abajo](#imágenes-en-línea)).
 
 > **Decisión:** un tramo es un conjunto de marcas y no un peso y un estilo propios: así `Styles` puede cambiar la fuente
 > de la caja sin tocar los tramos. *Alternativa descartada:* tramos con `Bold` e `Italic` explícitos, que podrían deshacer
@@ -125,6 +126,43 @@ para todo el documento. Dentro de un [tramo con estilo](#tramos-con-estilo) vale
 declara. Sin ninguna, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en un
 `Markdown`, la del párrafo). Si la familia no existe, es `FONT_UNKNOWN`, con la línea de `Code font`.
 
+## Imágenes en línea
+
+Con `Markup: markdown`, o en un `Markdown`, `![alt](ruta)` dentro de un texto es una **imagen en línea**: un icono en una
+frase, un logotipo pequeño en un título. La ruta es relativa a `images/` de la carpeta de recursos, como la de una
+`Image` ([Image](../components/image.md#fichero)); solo PNG, JPEG y SVG (la página de un PDF es `IMAGE_FORMAT`, y una
+ruta que no existe, `IMAGE_UNKNOWN`, con la línea del texto). Sola en su párrafo de un `Markdown` sigue siendo una
+`Image` ([Markdown](../components/markdown.md#el-subconjunto)).
+
+- **Mide como una palabra.** Es tan alta como el tamaño de la línea (`Size`; con `Overflow: shrink`, el tamaño al que se
+  reduce el texto) y tan ancha como su proporción da; no tiene interletraje. Pegada a unas letras forma una palabra con
+  ellas, que no se parte; entre espacios es una palabra más, que pasa a la línea siguiente si no cabe. Una imagen más
+  ancha que la línea desborda, como una palabra ([Desbordamientos](overflow.md)).
+- **Se pinta en su sitio**, centrada en las mayúsculas de la fuente sobre la línea base, como el marcador con imagen de
+  una lista ([List](../components/list.md#marcadores-con-imagen)). No cambia el alto de la línea.
+- El texto alternativo es el `Alt` de su `Figure` en el PDF etiquetado, dentro del elemento del texto, en el orden de
+  lectura; sin él (`![](ruta)`) la imagen es decorativa, un *artifact* ([El PDF por dentro](../implementation/pdf.md#figuras)).
+  No forma parte del texto: no se copia, no se busca y no sale en los marcadores ni en los títulos corridos de un
+  encabezado.
+- Dentro de un enlace, `[![alt](ruta)](destino)`, la imagen es clicable y su `Alt` es lo que se lee del enlace. Ni el
+  subrayado del enlace ni el tachado se pintan sobre una imagen. El resto del formato del tramo (negrita, un tramo con
+  estilo) no le afecta.
+- El título de Markdown (`![alt](ruta "título")`) es un error, como en una `Image`.
+
+```stxt
+Paragraph: Incluido ![Sí](icons/check.svg) en todos los planes.
+	Typography:
+		Markup: markdown
+```
+
+> **Decisión:** la imagen mide lo que la letra y se alinea como el marcador con imagen, sin propiedades: una imagen
+> en línea es un icono, y un tamaño propio o una alineación propia pedirían una sintaxis que Markdown no tiene.
+> *Alternativa descartada:* un alto en el `Alt` o en el título, que mezcla la medida con el texto que se lee.
+
+> **Decisión:** una imagen en línea es un tramo cuyo texto es el carácter de sustitución de objeto (U+FFFC), que
+> nunca se pinta ni se lee: así pasa por el reparto en líneas, los tramos y los enlaces como cualquier otro tramo.
+> *Alternativa descartada:* una caja `Image` dentro del flujo en línea, que obligaba a un segundo modelo de línea.
+
 ## Mayúsculas (`Case`)
 
 `Case` cambia **lo que se pinta y no lo que se escribe**: un rótulo se escribe como una frase normal y una regla lo pone
@@ -216,3 +254,5 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
   marcas que quiten la negrita o la cursiva (un tramo con estilo sí puede, con `Weight` o `Italic: false`).
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.
+- Imágenes en línea con otro tamaño que el de la letra o alineadas de otra forma, y la página de un PDF o un código de
+  barras dentro de un texto.

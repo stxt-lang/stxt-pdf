@@ -367,6 +367,11 @@ class ImageLayoutTest {
             public NaturalSize natural(Box box) {
                 return new NaturalSize(120, 60);
             }
+
+            @Override
+            public double imageRatio(String path) {
+                throw new AssertionError("an image has no text");
+            }
         };
         Box image = new StyleEditor().box("I", Element.IMAGE);
         LayoutResult r = new ImageLayout(context).layout(image,

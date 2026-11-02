@@ -16,6 +16,7 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Markup: mark
 | `[texto](https://...)` | un enlace, subrayado ([Referencias y enlaces](references-and-links.md)) |
 | `` `código` `` | código, en la fuente de `Code font` ([abajo](#código)) |
 | `[texto]{precio}` | el texto con el color, la fuente y el resto de la regla `For style: precio` ([abajo](#partes-con-otro-color-u-otra-fuente)) |
+| `![texto alternativo](ruta)` | una imagen pequeña dentro de la frase, tan alta como la letra ([abajo](#imágenes-en-la-frase)) |
 
 ```
 Styles:
@@ -74,6 +75,23 @@ Document (dev.stxt.pdf):
   puede llevar un enlace, pero una parte con estilo no puede ir dentro de otra.
 - Un nombre sin su regla es un error (`STYLE_WITHOUT_RULE`). Unos corchetes que no van seguidos de un nombre entre llaves
   son texto, y `\[` los escribe sin más.
+
+## Imágenes en la frase
+
+Un icono entre las palabras, o un logotipo pequeño en un título, se escribe como en Markdown, con la ruta de la imagen
+en `images/` de la carpeta de recursos ([Recursos](resources.md)):
+
+```
+Paragraph: Incluido ![Sí](icons/check.svg) en todos los planes.
+	Typography:
+		Markup: markdown
+```
+
+La imagen es tan alta como la letra y se alinea con ella; su ancho sale de su proporción. Se comporta como una palabra
+más: si no cabe, pasa a la línea siguiente. Vale un PNG, un JPEG o un SVG. El texto entre corchetes es lo que lee un
+lector de pantalla; con los corchetes vacíos, `![](ruta)`, la imagen es decorativa y no se lee. Dentro de un enlace,
+`[![texto](ruta)](destino)`, se puede pulsar. Una imagen con su propio tamaño, o sola, es una
+[`Image`](../components/image.md).
 
 ## Código
 

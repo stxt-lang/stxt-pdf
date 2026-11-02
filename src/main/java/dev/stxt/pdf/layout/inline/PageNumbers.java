@@ -1,5 +1,8 @@
 package dev.stxt.pdf.layout.inline;
 
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
+
 /**
  * Page numbering in the text: {@code {page}} and {@code {pages}}
  * (reference/common/breaks.md#page-numbers-page-and-pages and reference/components/document.md#page-numbering). It is
@@ -59,9 +62,22 @@ public final class PageNumbers {
         return String.valueOf(c).repeat(Math.max(current.length(), needed.length()));
     }
 
-    /** Measures the markers as the probe number {@code probe} (first phase). */
+    /**
+     * Measures the markers as the probe number {@code probe} (first phase); an image inside the text
+     * ({@link TextMeasurer#imageWidth}) measures what {@code measurer} says.
+     */
     public static TextMeasurer probing(TextMeasurer measurer, String probe) {
-        return (text, font, fontSize) -> measurer.width(
-                contains(text) ? text.replace(PAGES, probe).replace(PAGE, probe) : text, font, fontSize);
+        return new TextMeasurer() {
+            @Override
+            public double width(String text, FontFace font, double fontSize) {
+                return measurer.width(contains(text) ? text.replace(PAGES, probe).replace(PAGE, probe) : text, font,
+                        fontSize);
+            }
+
+            @Override
+            public double imageWidth(InlineImage image, double height) {
+                return measurer.imageWidth(image, height);
+            }
+        };
     }
 }

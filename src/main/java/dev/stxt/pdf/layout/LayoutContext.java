@@ -34,4 +34,10 @@ public interface LayoutContext {
 
     /** Natural size of an {@code Image}, from its file (reference/components/image.md). */
     NaturalSize natural(Box box);
+
+    /**
+     * Width divided by height of an image inside a text ({@code ![alt](path)}, reference/common/text-formatting.md),
+     * already checked before the layout.
+     */
+    double imageRatio(String path);
 }

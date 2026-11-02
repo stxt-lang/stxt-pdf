@@ -138,6 +138,11 @@ tiene una sola `THead` y una sola `TFoot`.
 El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Fit: inside`. El de
 una imagen girada es el rectángulo que la envuelve.
 
+Una imagen en línea ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) es un `Figure` con su `Alt` y
+su `BBox` dentro del elemento de su texto (`P`, `Span`, `TD`...), entre los contenidos marcados del texto, en el orden de
+lectura; dentro de un enlace, el `Figure` cuelga de un `Link` que recibe la anotación de la imagen. Sin `Alt` es un
+*artifact*, y el texto marcado de alrededor queda partido en dos.
+
 Una `Figure` con pie ([Figure](../components/figure.md)) con una imagen dentro es **un solo** `Figure`: el de la figura,
 con el `Alt` de la imagen, el `BBox` de la imagen y el pie en un `Caption`; la imagen no tiene elemento propio y su
 contenido cuelga del `Figure` (o de un `Link`, si lleva `Link`). Con un `Block` dentro, el `Figure` lleva el `Alt` propio
@@ -170,8 +175,8 @@ envuelve los dos `Span`.
 ## *Artifacts*
 
 No forman parte del contenido: los fondos, los bordes, los degradados, las rayas del texto (subrayado y tachado), las guías
-de un índice, las líneas entre columnas, las imágenes sin `Alt`, las filas repetidas de una tabla desde su segunda página
-y todo lo que hay dentro de un `Page overlay`.
+de un índice, las líneas entre columnas, las imágenes sin `Alt` (también las imágenes en línea), las filas repetidas de
+una tabla desde su segunda página y todo lo que hay dentro de un `Page overlay`.
 
 ## Enlaces
 

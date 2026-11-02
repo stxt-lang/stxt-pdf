@@ -1,6 +1,7 @@
 package dev.stxt.pdf.layout.inline;
 
 import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
 
@@ -15,6 +16,15 @@ import dev.stxt.pdf.tree.Box;
 public interface TextMeasurer {
 
     double width(String text, FontFace font, double fontSize);
+
+    /**
+     * Width of an image inside a text ({@link InlineImage}, reference/common/text-formatting.md) drawn
+     * {@code height} tall: as wide as its proportion gives. By default a square, the approximation of a measurer
+     * without the resources folder; {@link dev.stxt.pdf.layout.Engine} measures it with the file.
+     */
+    default double imageWidth(InlineImage image, double height) {
+        return height;
+    }
 
     /**
      * Ascent and descent of the font, to align baselines during the layout (the marker of
