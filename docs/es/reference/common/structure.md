@@ -194,13 +194,13 @@ vez, y los elementos, las veces que se quiera.
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`, `Side`, `Clear`; elementos |
-| `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`; `Item`, `Overlay`, `Page overlay` |
-| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`; `Area`, `Overlay`, `Page overlay` |
+| `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
+| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, además, `Drop cap` |
 | `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`; `Header rows`, `Body` (obligatorio), `Footer rows` |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (obligatorio), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elementos salvo los encabezados |

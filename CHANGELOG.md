@@ -7,6 +7,23 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Rows and lines are split on the page they are on.** New `Split rows` (`Grid`, `Table`) and `Split items` (`Stack`),
+  `true` by default: a row of a grid or a table, or a line of a horizontal stack (in a vertical one, an item), that does
+  not fit in what is left of the page is now broken in parallel on that page, each item on its own, and continues on the
+  next one with the items that have not finished, instead of moving whole to the next page. Until 0.8.0 a row was only
+  broken when it did not fit on a whole page, and a row that fit left the page before it almost empty (two parallel
+  columns of text, for instance). Splitting the row is one more break, which competes with the breaks between rows by the
+  usual rules: a row whose items cannot respect their widows and orphans or a `Keep together` (in a table, that of the
+  `Row`, which its cells carry), or in which some item cannot place anything, still moves whole. With `Split rows: false`
+  (`Split items: false`) every row that does not fit moves whole, as before. `Split items` in a vertical `Stack` with
+  `Wrap`, which is never split, is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). `UnitBreaker.Units` has a new `split`
+  component. Golden `41-split-rows`; goldens 06 and 07 keep their scenario with `Split rows: false`.
+- **The gap of a broken box with a definite height is not consumed by the boxes that contain it either.** A broken
+  fragment of a box with a definite height reaches the end of the page but only consumes what its content takes up;
+  the boxes that contained it, however, counted the whole fragment, so a column stretched to its row that contained a
+  text stretched to its own row (a list item with an icon and a text, for instance) ran out of room on the next page
+  (`BOX_OVERFLOW`). `LayoutResult.occupied(from)` gives what a fragment takes up for its parent, and `Slice.of` takes
+  it apart from the visible height of the content.
 - **Canceling a conversion.** `Cancellation` (`model`), a `() -> boolean` the engine asks wherever it works: at each
   element when building the tree, at each layout that is not in the cache, at each page when paginating, checking and
   painting, and at each image it embeds. It goes with each call (`layOut(doc, cancellation)`, `toPdf(doc, out,

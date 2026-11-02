@@ -1,0 +1,119 @@
+# Split rows and Split items (reference/common/breaks.md#breaks-in-stack-grid-and-table). Page area of 260 × 160
+# from (20, 20); grid columns of (260 − 10) / 2 = 125 at x = 20 and 155.
+#
+# Page 1: head (100) leaves 60. The first row of g (g1 200, g2 30) does not fit in them and, with Split rows by
+#   default, is split on this page: g1 places 60 and g2 fits whole.
+# Page 2: g1 continues from the top (60) and the second row (g3) goes after it, with the gap of 10: at 70.
+#   g ends at 90 and leaves 70 to h, whose first row (100) does not fit: with Split rows: false it moves whole.
+# Page 3: h (100, with h1 and h2) leaves 60. The line of s (s1 90, s2 20) does not fit and is split: s1 places 60
+#   and s2 fits whole (Split items by default).
+# Page 4: s1 continues (30). The table t leaves its first row (40) on this page; the second (t3 120, t4 20) does not
+#   fit in the 90 left, and its Row has Keep together: true, so its cells cannot be split: the break before the row
+#   is better and the row moves whole.
+# Page 5: the second row of t, whole: t3 120 and t4 20 in cells stretched to the row.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Id: head
+			Box:
+				Height: 100
+				Background: #F1EFE8
+		Grid:
+			Id: g
+			Column sizes: * *
+			Gap: 10
+			Area:
+				Block:
+					Id: g1
+					Box:
+						Height: 120
+						Background: #E1F0E8
+			Area:
+				Block:
+					Id: g2
+					Box:
+						Height: 30
+						Background: #E1E8F0
+			Area:
+				Block:
+					Id: g3
+					Box:
+						Height: 20
+						Background: #F0E8E1
+		Grid:
+			Id: h
+			Column sizes: * *
+			Gap: 10
+			Split rows: false
+			Area:
+				Block:
+					Id: h1
+					Box:
+						Height: 100
+						Background: #E1F0E8
+			Area:
+				Block:
+					Id: h2
+					Box:
+						Height: 30
+						Background: #E1E8F0
+		Stack:
+			Id: s
+			Gap: 10
+			Item:
+				Block:
+					Id: s1
+					Box:
+						Width: 100
+						Height: 90
+						Background: #E1F0E8
+			Item:
+				Block:
+					Id: s2
+					Box:
+						Width: 100
+						Height: 20
+						Background: #E1E8F0
+		Table:
+			Id: t
+			Column sizes: * *
+			Body:
+				Row:
+					Cell:
+						Block:
+							Id: t1
+							Box:
+								Height: 40
+								Background: #E1F0E8
+					Cell:
+						Block:
+							Id: t2
+							Box:
+								Height: 40
+								Background: #E1E8F0
+				Row:
+					Break:
+						Keep together: true
+					Cell:
+						Block:
+							Id: t3
+							Box:
+								Height: 120
+								Background: #E1F0E8
+					Cell:
+						Block:
+							Id: t4
+							Box:
+								Height: 20
+								Background: #E1E8F0

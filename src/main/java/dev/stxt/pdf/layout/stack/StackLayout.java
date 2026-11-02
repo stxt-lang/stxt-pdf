@@ -57,8 +57,9 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * measured without that {@code Height}, never more than it ({@link ConstraintSpace#measuringContentHeight}).</p>
  *
  * <p>Across pages (reference/common/breaks.md) the break goes between lines in horizontal and between items in
- * vertical, with {@link UnitBreaker}; a line (in vertical, an item) that does not fit on
- * a page is split in parallel. A vertical container with {@code Wrap} is not split.</p>
+ * vertical, with {@link UnitBreaker}; a line (in vertical, an item) that does not fit in what is left of the page is
+ * split in parallel on that page ({@code Split items}, by default) or, with {@code Split items: false}, only if it
+ * does not fit on a whole page. A vertical container with {@code Wrap} is not split.</p>
  */
 public final class StackLayout implements LayoutAlgorithm {
 
@@ -287,7 +288,7 @@ public final class StackLayout implements LayoutAlgorithm {
                 units.add(new Unit(span.start(), span.end(), BreakRules.between(before, span.boxes()),
                         BreakRules.forcedBetween(before, span.boxes())));
             }
-            return new UnitBreaker.Units(units, extent, row || !multiLine);
+            return new UnitBreaker.Units(units, extent, row || !multiLine, s.stack().splitItems());
         }
 
         // --- Steps 2 and 3: base, minimum and maximum of each item ------------------------------

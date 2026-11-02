@@ -5,7 +5,8 @@
 #   title (quality 1). Breaking before title violates nothing (quality 3): it wins.
 # Page 2: title at the top, without its top margin (unforced break), and text whole at 30.
 #   grid has Before: page in its Break.
-# Page 3: grid rows at 0..50, 60..110 and 120..170; the first two fit.
+# Page 3: grid rows at 0..50, 60..110 and 120..170; the first two fit. With Split rows: false the third is not
+#   split on this page (that is golden 41).
 # Page 4: the third row, without the gap that separated it from the second, and end.
 Document (dev.stxt.pdf):
 	Language: es
@@ -58,6 +59,7 @@ Document (dev.stxt.pdf):
 				Before: page
 			Column sizes: * *
 			Gap: 10
+			Split rows: false
 			Area:
 				Block:
 					Id: g1

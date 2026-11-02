@@ -34,6 +34,7 @@ import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_LINE_DISTRIBUTION;
+import static dev.stxt.pdf.tree.PropertyKey.STACK_SPLIT_ITEMS;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_ROWS;
@@ -93,6 +94,12 @@ final class ModelValidator {
         if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrap()) {
             throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.LINE_DISTRIBUTION_WITHOUT_WRAP,
                     "Line distribution only has an effect with Wrap: true, because without Wrap there is a single line");
+        }
+        // A vertical Stack with Wrap is never broken across pages (reference/components/stack.md).
+        if (s.isDeclared(STACK_SPLIT_ITEMS) && !s.stack().isHorizontal() && s.stack().wrap()) {
+            throw error(s.line(STACK_SPLIT_ITEMS), ErrorCode.SPLIT_ITEMS_WITHOUT_EFFECT, "Split items has no effect in a "
+                    + "vertical Stack with Wrap: true, which is never broken across pages: its lines go side by side "
+                    + "and the whole Stack moves to the next page if it does not fit");
         }
         // Without Wrap there is a single line: no gap between rows in horizontal or between columns in vertical.
         if (s.stack().gapPair() && !s.stack().wrap()) {

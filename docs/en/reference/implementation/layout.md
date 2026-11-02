@@ -118,11 +118,17 @@ definite `Height` is the total of all the fragments, and a broken fragment only 
 by comparing tokens. The token of the root does not accumulate height: each page has the whole page area.
 
 `Slice` computes the height, the border and the padding of each fragment (`Edges: open` and `closed`), and `Slice.contentRemaining`
-gives what is left for the content. Stack and grid break between units (lines, items or rows, which are `fragment.Unit`) with `UnitBreaker`: they are
+gives what is left for the content. A fragment of a box with a definite height that does not end reaches the end of the
+page but only consumes what its content takes up, and the same holds upwards: `LayoutResult.occupied(from)` gives what a
+fragment takes up for its parent (what its token consumed in that fragment, not its height), and `BlockLayout` (in the
+`Mark` of the broken child) and `UnitBreaker` (in `Split`) pass it to `Slice.of` as `occupied`, apart from the visible
+height of the content. Stack and grid break between units (lines, items or rows, which are `fragment.Unit`) with `UnitBreaker`: they are
 laid out whole without fragmenting (`UnitBreaker.Arranged`: placed items and `Units`) and `UnitBreaker.fragment` keeps what
-fits on the page. A unit that does not fit even at the start of a page splits its items in parallel, repeating their layout with
-`ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`, and the `BreakToken.Container` carries the token of
-each item. With `atFragmentainerStart` something has to be placed even if it overflows (progress guarantee). Tables repeat
+fits on the page. A unit that does not fit in what is left of the page splits its items in parallel on that page
+(`Units.split`, from `Split rows` and `Split items`; with `false`, only the one that does not fit even at the start of a page,
+`Units.splittable`), repeating their layout with `ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`;
+`UnitBreaker.splitOnThisPage` compares the quality of that break with that of the best break between units
+(`BreakRules.cutUnits`) and keeps the last of the best ones, and the `BreakToken.Container` carries the token of each item. With `atFragmentainerStart` something has to be placed even if it overflows (progress guarantee). Tables repeat
 header and footer with `UnitBreaker.Repeat`. The bands of the rows (`Box.rows()`, `Element.ROW`) are `UnitBreaker.Band`:
 `GridLayout.arrange` creates them with the width of the columns, `TableLayout` places those of the header and the footer in the
 `Repeat` and leaves those of the body in their unit, and `UnitBreaker` puts them in each fragment before the items (whole,

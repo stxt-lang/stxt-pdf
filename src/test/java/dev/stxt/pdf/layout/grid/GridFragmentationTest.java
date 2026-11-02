@@ -34,14 +34,28 @@ class GridFragmentationTest {
 
     @Test
     void breaksBetweenRows() {
-        // Rows of 40 at 0, 40 and 80: the third moves to page 2.
-        LayoutFixture l = layOutPaged(PAGE, concat(GRID,
+        // Rows of 40 at 0, 40 and 80: with Split rows: false, the third moves whole to page 2.
+        LayoutFixture l = layOutPaged(PAGE, concat(GRID, new String[]{"\t\tSplit rows: false"},
                 cell("A", "1 1"), cell("B", "1 2"), cell("C", "2 1"), cell("D", "2 2"), cell("E", "3 1")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "G"));
         assertRect(297.5, 80, 257.5, 40, l.rect(1, "D"));
         assertRect(40, 40, 515, 40, l.rect(2, "G"));
         assertRect(40, 40, 257.5, 40, l.rect(2, "E"));
+    }
+
+    @Test
+    void splitsTheRowThatDoesNotFitOnThisPage() {
+        // Rows of 40 at 0, 40 and 80: the third does not fit in the 20 left and is split, 20 + 20 (Split rows by
+        // default).
+        LayoutFixture l = layOutPaged(PAGE, concat(GRID,
+                cell("A", "1 1"), cell("B", "1 2"), cell("C", "2 1"), cell("D", "2 2"), cell("E", "3 1")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "G"));
+        assertRect(297.5, 80, 257.5, 40, l.rect(1, "D"));
+        assertRect(40, 120, 257.5, 20, l.rect(1, "E"));
+        assertRect(40, 40, 515, 20, l.rect(2, "G"));
+        assertRect(40, 40, 257.5, 20, l.rect(2, "E"));
     }
 
     private static String[] box(String id, String height, String cell) {
@@ -67,12 +81,39 @@ class GridFragmentationTest {
     }
 
     @Test
-    void rowThatFitsInAPageIsNotBrokenInParallel() {
-        // After X (30), the row of 80 does not fit in what remains of the page but does fit in a whole one: it moves
-        // whole to page 2 (like breaksBetweenRows).
+    void rowThatFitsInAPageMovesWholeWithoutSplitRows() {
+        // After X (30), the row of 80 does not fit in what remains of the page but does fit in a whole one: with
+        // Split rows: false it moves whole to page 2 (like breaksBetweenRows).
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
+                new String[]{"\t\tSplit rows: false"}, box("A", "80", "1 1"), box("B", "40", "1 2")));
+        assertEquals(2, l.pages());
+        assertFalse(l.has(1, "G"));
+        assertRect(40, 40, 257.5, 80, l.rect(2, "A"));
+    }
+
+    @Test
+    void rowThatDoesNotFitIsSplitOnThisPage() {
+        // After X (30), the row of 80 does not fit in the 70 left: A is split (70 + 10) and B (40) fits whole.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
                 box("A", "80", "1 1"), box("B", "40", "1 2")));
+        assertEquals(2, l.pages());
+        assertRect(40, 70, 515, 70, l.rect(1, "G"));
+        assertRect(40, 70, 257.5, 70, l.rect(1, "A"));
+        assertRect(297.5, 70, 257.5, 40, l.rect(1, "B"));
+        assertRect(40, 40, 515, 10, l.rect(2, "G"));
+        assertRect(40, 40, 257.5, 10, l.rect(2, "A"));
+        assertFalse(l.has(2, "B"));
+    }
+
+    @Test
+    void splitRowsRespectKeepTogetherOfAnItem() {
+        // The same row, but A cannot be split: the break before the row is better, and the row moves whole.
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
+                box("A", "80", "1 1"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep together: true"},
+                box("B", "40", "1 2")));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "G"));
         assertRect(40, 40, 257.5, 80, l.rect(2, "A"));
@@ -93,8 +134,9 @@ class GridFragmentationTest {
 
     @Test
     void doesNotBreakInsideASpanningItem() {
-        // S spans rows 2 and 3: a break between them is not possible, so the break goes before row 2.
-        LayoutFixture l = layOutPaged(PAGE, concat(GRID,
+        // S spans rows 2 and 3: a break between them is not possible, so with Split rows: false the break goes
+        // before row 2.
+        LayoutFixture l = layOutPaged(PAGE, concat(GRID, new String[]{"\t\tSplit rows: false"},
                 cell("A", "1 1"), cell("B", "1 2"), cell("S", "2 1 2 1"), cell("D", "2 2"), cell("E", "3 2")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 40, l.rect(1, "G"));
@@ -102,6 +144,22 @@ class GridFragmentationTest {
         assertRect(40, 40, 257.5, 40, l.rect(2, "S"));
         assertRect(297.5, 40, 257.5, 40, l.rect(2, "D"));
         assertRect(297.5, 80, 257.5, 40, l.rect(2, "E"));
+    }
+
+    @Test
+    void splitsTheGroupOfRowsOfASpanningItemOnThisPage() {
+        // The same grid with Split rows: the group of rows 2 and 3 (40 to 120) does not fit in the 60 left and is
+        // split in parallel: S (40, not stretched) and D fit whole, and E (80 to 120) is split, 20 + 20.
+        LayoutFixture l = layOutPaged(PAGE, concat(GRID,
+                cell("A", "1 1"), cell("B", "1 2"), cell("S", "2 1 2 1"), cell("D", "2 2"), cell("E", "3 2")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "G"));
+        assertRect(40, 80, 257.5, 40, l.rect(1, "S"));
+        assertRect(297.5, 80, 257.5, 40, l.rect(1, "D"));
+        assertRect(297.5, 120, 257.5, 20, l.rect(1, "E"));
+        assertRect(40, 40, 515, 20, l.rect(2, "G"));
+        assertRect(297.5, 40, 257.5, 20, l.rect(2, "E"));
+        assertFalse(l.has(2, "S"));
     }
 
     @Test
@@ -135,14 +193,14 @@ class GridFragmentationTest {
     }
 
     /**
-     * The second row (20 lines of 12 in a column of 30) does not fit on any page: it starts on page 2, where it is
-     * split in parallel from the top even though in the whole grid it starts at 30 (mutation testing). T does not
-     * stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and 40.
+     * The second row (20 lines of 12 in a column of 30) does not fit on any page: with Split rows: false it starts
+     * on page 2, where it is split in parallel from the top even though in the whole grid it starts at 30 (mutation
+     * testing). T does not stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and 40.
      */
     @Test
     void aTallRowAfterTheFirstPageIsSplitFromTheTop() {
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
-        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100",
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100", "\t\tSplit rows: false",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tVertical: start", "\t\t\tText: " + text, "\t\t\t\tId: T",
@@ -155,13 +213,42 @@ class GridFragmentationTest {
     }
 
     /**
+     * A column of a grid that is split on the page it is on (Split rows) contains a grid whose text, stretched to its
+     * row, reaches the end of page 1 (70) with 5 of its 10 lines (60): the gap of 10 is not taken from the column
+     * either, which has the height of the row (120: C is the taller item) and still has 60 for the other 5 lines on
+     * page 2 (it used to be BOX_OVERFLOW).
+     */
+    @Test
+    void aStretchedTextInASplitRowDoesNotOverflowItsColumn() {
+        String text = String.join(" ", java.util.Collections.nCopies(10, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30",
+                "\tGrid:", "\t\tId: G", "\t\tColumn sizes: * *",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 100",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: C",
+                "\t\t\t\tGrid:", "\t\t\t\t\tColumn sizes: 20 30",
+                "\t\t\t\t\tArea:", "\t\t\t\t\t\tVertical: start", "\t\t\t\t\t\tBlock:", "\t\t\t\t\t\t\tBox:",
+                "\t\t\t\t\t\t\t\tHeight: 10",
+                "\t\t\t\t\tArea:", "\t\t\t\t\t\tText: " + text, "\t\t\t\t\t\t\tId: T");
+        assertEquals(2, l.pages());
+        assertRect(40, 70, 515, 70, l.rect(1, "G"));
+        assertRect(40, 70, 257.5, 70, l.rect(1, "A"));
+        assertRect(297.5, 70, 257.5, 70, l.rect(1, "C"));
+        assertEquals(5, l.fragment(1, "T").lines().size());
+        assertRect(40, 40, 515, 60, l.rect(2, "G"));
+        assertRect(40, 40, 257.5, 30, l.rect(2, "A"));
+        assertRect(297.5, 40, 257.5, 60, l.rect(2, "C"));
+        assertEquals(5, l.fragment(2, "T").lines().size());
+    }
+
+    /**
      * A text stretched to a row that is split has the height of the row (240) and its lines leave 4 at the end of each
      * page: that gap is not taken from it, and its last 4 lines fit on page 4 (it used to be BOX_OVERFLOW).
      */
     @Test
     void aStretchedTextInATallRowFitsItsLines() {
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
-        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100",
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100", "\t\tSplit rows: false",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tText: " + text, "\t\t\t\tId: T",

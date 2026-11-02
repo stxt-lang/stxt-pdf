@@ -22,15 +22,18 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  *
  * <p>The container does its complete layout without fragmenting and then {@link #fragment} keeps
  * the units that fit on the page ({@link BreakRules#cutUnits}), shifted so that the
- * fragment starts at the first one. A unit that does not fit in what is left of the page goes whole
- * to the next one.</p>
+ * fragment starts at the first one. A unit that does not fit in what is left of the page is broken
+ * <strong>in parallel</strong> on that page ({@code Split rows} and {@code Split items}, {@link Units#split}): each
+ * item is laid out with fragmentation from its position, and the unit continues on the next page with the items that
+ * have not finished, all from the top and without their top margin; it measures what the longest of them does and the
+ * following units go after it. The units between which no break is possible (the rows taken up by the same item) are
+ * broken together, as a <em>group</em>. The quality of the break is the worst of the items that are broken, and the
+ * break between units wins if it is better: a unit whose items cannot respect their widows and orphans or a
+ * {@code Keep together}, or in which some item cannot place anything, goes whole to the next page.</p>
  *
- * <p>If a unit does not fit at the start of a page either, its items are broken <strong>in
- * parallel</strong>: each one is laid out with fragmentation from its position, and the unit
- * continues on the next page with the items that have not finished, all from the top and without
- * their top margin; it measures what the longest of them does and the following units go after it.
- * The units between which no break is possible (the rows taken up by the same item) are broken
- * together, as a <em>group</em>. The quality of the break is the worst of the items that are broken.</p>
+ * <p>With {@code Split rows: false} ({@code Split items: false}) every unit that does not fit goes whole to the next
+ * page, and its items are only broken in parallel if it does not fit at the start of a page either, as the last
+ * resort before overflowing ({@link Units#splittable}).</p>
  *
  * <p>A table repeats its header and footer in each fragment ({@link Repeat}): they go outside
  * the units, whole, and the units are broken in what they leave. The rows of a table with appearance or
@@ -63,10 +66,12 @@ public final class UnitBreaker {
      *
      * @param list       the units, in order
      * @param extent     height of the complete content
-     * @param splittable the items of a unit that does not fit on a page can be broken in
-     *                   parallel
+     * @param splittable the items of a unit that does not fit at the start of a page can be broken in parallel, as the
+     *                   last resort
+     * @param split      {@code Split rows} or {@code Split items}: a unit that does not fit in what is left of the page
+     *                   is broken in parallel on that page instead of going whole to the next one
      */
-    public record Units(List<Unit> list, double extent, boolean splittable) {
+    public record Units(List<Unit> list, double extent, boolean splittable, boolean split) {
 
         public Units {
             list = List.copyOf(list);
@@ -86,7 +91,7 @@ public final class UnitBreaker {
          */
         public Units slice(int from, int to, double origin) {
             List<Unit> slice = list.subList(from, to).stream().map(u -> u.shifted(origin)).toList();
-            return new Units(slice, list.get(to - 1).end() - origin, splittable);
+            return new Units(slice, list.get(to - 1).end() - origin, splittable, split);
         }
     }
 
@@ -192,12 +197,14 @@ public final class UnitBreaker {
     /**
      * The items of a group broken in parallel.
      *
-     * @param pieces index in {@code placed} → item placed on this page
-     * @param tokens token of each item of the group, in order; {@code null} if it has finished
-     * @param bottom end of the longest one, from the content box of the fragment
-     * @param broken some item continues on the next page
+     * @param pieces   index in {@code placed} → item placed on this page
+     * @param tokens   token of each item of the group, in order; {@code null} if it has finished
+     * @param bottom   end of the longest one, from the content box of the fragment
+     * @param occupied end of what the items take up ({@link LayoutResult#occupied}); at most {@code bottom}
+     * @param broken   some item continues on the next page
      */
-    private record Split(Piece[] pieces, List<BreakToken> tokens, int appeal, double bottom, boolean broken) {
+    private record Split(Piece[] pieces, List<BreakToken> tokens, int appeal, double bottom, double occupied,
+                         boolean broken) {
     }
 
     /** A fragment of a container. */
@@ -276,7 +283,7 @@ public final class UnitBreaker {
          */
         LayoutResult continueGroup() {
             int end = groupEnd(next);
-            Split s = split(next, end, from.itemTokens(), 0);
+            Split s = split(next, end, from.itemTokens(), 0, space.atFragmentainerStart());
             if (s == null) {
                 return LayoutResult.before(box);
             }
@@ -288,7 +295,7 @@ public final class UnitBreaker {
                 }
             }
             if (s.broken()) {
-                return result(s.bottom(), false, next, s.tokens(), s.appeal());
+                return result(s.bottom(), s.occupied(), false, next, s.tokens(), s.appeal());
             }
             origin = bottom(next, end) - s.bottom();
             top = s.bottom();
@@ -299,66 +306,115 @@ public final class UnitBreaker {
 
         /**
          * The units from {@code next} that fit in what is left of the page. If the first group
-         * does not fit even at the start of a page, its items are broken in parallel.
+         * does not fit even at the start of a page, its items are broken in parallel; with {@link Units#split}, so
+         * is the group that does not fit in what is left of the page.
          */
         LayoutResult cut() {
             boolean mustPlace = space.atFragmentainerStart() && !continued;
             int groupEnd = groupEnd(next);
             if (mustPlace && units.splittable() && !fits(bottom(next, groupEnd) - origin, remaining)) {
-                Split s = split(next, groupEnd, null, origin);
+                Split s = split(next, groupEnd, null, origin, space.atFragmentainerStart());
                 if (s != null && s.broken()) {
                     commit(s);
                     splitBands(next, groupEnd, s.bottom());
-                    return result(s.bottom(), false, next, s.tokens(), s.appeal());
+                    return result(s.bottom(), s.occupied(), false, next, s.tokens(), s.appeal());
                 }
             }
             BreakRules.Cut cut = BreakRules.cutUnits(units.list(), next,
                     remaining - (units.get(next).start() - origin), mustPlace);
+            if (units.split() && units.splittable() && cut.end() < n) {
+                LayoutResult r = splitOnThisPage(cut, mustPlace);
+                if (r != null) {
+                    return r;
+                }
+            }
             if (cut.end() == next) {
                 // Only the continuation of the group fits, if there is one: the break goes after it.
                 return continued
-                        ? result(top, false, next, List.of(), units.get(next).appealBefore())
+                        ? result(top, top, false, next, List.of(), units.get(next).appealBefore())
                         : LayoutResult.before(box);
             }
             return place(cut.end(), cut.appeal());
         }
 
-        /** Places the units {@code [next, end)} whole and closes the fragment. */
-        LayoutResult place(int end, int appeal) {
+        /**
+         * {@code Split rows} and {@code Split items}: the group with the first unit that does not fit in what is
+         * left of the page is broken in parallel on this page, with the units before it placed whole, if every item
+         * can place something and the break is at least as good as {@code cut}, the best one between units: being
+         * the last one, it then wins (reference/common/breaks.md). {@code null} if the units are cut as {@code cut}
+         * says.
+         *
+         * @param mustPlace the first group was already tried at the start of the page, as the last resort
+         */
+        LayoutResult splitOnThisPage(BreakRules.Cut cut, boolean mustPlace) {
+            int first = next;
+            while (first < n && fits(units.get(first).end() - origin, remaining)) {
+                first++;
+            }
+            if (first == n) {
+                return null;
+            }
+            int start = first;
+            while (start > next && !units.get(start).breakableBefore()) {
+                start--;
+            }
+            if (start == next && mustPlace) {
+                return null;
+            }
+            int end = groupEnd(start);
+            Split s = split(start, end, null, origin, false);
+            if (s == null || !s.broken() || s.appeal() < cut.appeal()) {
+                return null;
+            }
+            placeWhole(next, start);
+            commit(s);
+            splitBands(start, end, s.bottom());
+            return result(s.bottom(), s.occupied(), false, start, s.tokens(), s.appeal());
+        }
+
+        /** Places the units {@code [from, to)} whole, with their bands. */
+        void placeWhole(int from, int to) {
             for (int k = 0; k < placed.size(); k++) {
                 Placed p = placed.get(k);
-                if (p.unit() >= next && p.unit() < end) {
+                if (p.unit() >= from && p.unit() < to) {
                     pieces[k] = piece(p, p.result(), p.y() - origin + repeat.headHeight());
                 }
             }
             for (int b = 0; b < bands.size(); b++) {
                 int u = bands.get(b).unit();
-                if (u >= next && u < end) {
+                if (u >= from && u < to) {
                     Unit unit = units.get(u);
                     bandPieces[b] = bands.get(b).fragment(unit.start() - origin + repeat.headHeight(),
                             unit.end() - unit.start(), true, true);
                 }
             }
+        }
+
+        /** Places the units {@code [next, end)} whole and closes the fragment. */
+        LayoutResult place(int end, int appeal) {
+            placeWhole(next, end);
             boolean contentFinished = end == n;
             double contentHeight = contentFinished
                     ? Math.max(top, units.extent() - origin)
                     : bottom(next, end) - origin;
-            return result(contentHeight, contentFinished, end, List.of(), appeal);
+            return result(contentHeight, contentHeight, contentFinished, end, List.of(), appeal);
         }
 
         /**
          * Breaks in parallel the items of the units {@code [start, end)}; {@code null} if any of them
          * cannot place anything.
          *
-         * @param tokens token of each item to resume them from the top; {@code null} if the group
-         *               starts on this page, each item at its position
-         * @param origin see {@link #origin}; only if the group starts on this page
+         * @param tokens  token of each item to resume them from the top; {@code null} if the group
+         *                starts on this page, each item at its position
+         * @param origin  see {@link #origin}; only if the group starts on this page
+         * @param atStart the items start the page: they have to place something even if it overflows
          */
-        Split split(int start, int end, List<BreakToken> tokens, double origin) {
+        Split split(int start, int end, List<BreakToken> tokens, double origin, boolean atStart) {
             Piece[] split = new Piece[placed.size()];
             List<BreakToken> next = new ArrayList<>();
             int appeal = BreakAppeal.PERFECT_BREAK;
             double bottom = 0;
+            double occupied = 0;
             boolean broken = false;
             int j = 0;
             for (int k = 0; k < placed.size(); k++) {
@@ -377,8 +433,7 @@ public final class UnitBreaker {
                 // afterwards (reference/components/frame-and-overlays.md).
                 double dy = p.frameOffset().dy();
                 double y = tokens == null ? p.y() - dy - origin : 0;
-                LayoutResult r = context.layout(p.box(),
-                        p.space().fragmented(remaining - y, space.atFragmentainerStart()), token);
+                LayoutResult r = context.layout(p.box(), p.space().fragmented(remaining - y, atStart), token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return null;
                 }
@@ -389,8 +444,9 @@ public final class UnitBreaker {
                     appeal = Math.min(appeal, BreakRules.inside(p.box(), r.breakAppeal()));
                 }
                 bottom = Math.max(bottom, y + r.fragment().height());
+                occupied = Math.max(occupied, y + r.occupied(token));
             }
-            return new Split(split, next, appeal, bottom, broken);
+            return new Split(split, next, appeal, bottom, occupied, broken);
         }
 
         /**
@@ -462,11 +518,13 @@ public final class UnitBreaker {
         /**
          * The fragment with the placed items.
          *
-         * @param nextLine   unit at which the container continues if it does not finish
-         * @param itemTokens tokens of the items of a group broken in parallel, or empty
+         * @param contentHeight end of the items placed, from the content box of the fragment
+         * @param occupied      end of what they take up ({@link LayoutResult#occupied}); at most {@code contentHeight}
+         * @param nextLine      unit at which the container continues if it does not finish
+         * @param itemTokens    tokens of the items of a group broken in parallel, or empty
          */
-        LayoutResult result(double contentHeight, boolean contentFinished, int nextLine, List<BreakToken> itemTokens,
-                            int appeal) {
+        LayoutResult result(double contentHeight, double occupied, boolean contentFinished, int nextLine,
+                            List<BreakToken> itemTokens, int appeal) {
             List<Fragment> fragments = new ArrayList<>();
             List<PendingOverlay> pending = new ArrayList<>(first ? outOfFlow : List.of());
             double units = Math.max(0, contentHeight);
@@ -493,7 +551,8 @@ public final class UnitBreaker {
                 repeated(piece(p, p.result(), repeat.headHeight() + units + p.y()), fragments, pending);
             }
             Slice slice = Slice.of(model, first, BreakToken.consumed(from),
-                    repeat.headHeight() + units + repeat.footHeight(), contentFinished, space);
+                    repeat.headHeight() + units + repeat.footHeight(),
+                    repeat.headHeight() + Math.max(0, occupied) + repeat.footHeight(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
             // The margins of the items never merge with those of the container (reference/components/block.md).

@@ -50,7 +50,8 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
  * {@code Frame} items are shifted with {@link FrameOffset} after being aligned.</p>
  *
  * <p>Across pages (reference/common/breaks.md) the break goes between rows with {@link UnitBreaker}; the items of a
- * row that does not fit on a page are split in parallel.</p>
+ * row that does not fit in what is left of the page are split in parallel on that page ({@code Split rows}, by
+ * default) or, with {@code Split rows: false}, only if the row does not fit on a whole page.</p>
  */
 public final class GridLayout implements LayoutAlgorithm {
 
@@ -220,7 +221,8 @@ public final class GridLayout implements LayoutAlgorithm {
         List<UnitBreaker.Band> bands = box.rows().stream().map(r -> new UnitBreaker.Band(r,
                 r.style().item().area().row() - 1, 0, width, Insets.resolve(r.style().box().border(), contentWidth)))
                 .toList();
-        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent), bands);
+        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent, s.grid().splitRows()),
+                bands);
     }
 
     /**
@@ -228,12 +230,12 @@ public final class GridLayout implements LayoutAlgorithm {
      * same item spans; between the others, the quality of the break comes from the items that end
      * before and the ones that start after.
      */
-    private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent) {
+    private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent, boolean split) {
         List<Unit> units = new ArrayList<>();
         for (int r = 0; r < rows.length; r++) {
             units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, Break.AUTO) : rowUnit(g, r, y[r], y[r] + rows[r]));
         }
-        return new UnitBreaker.Units(units, extent, true);
+        return new UnitBreaker.Units(units, extent, true, split);
     }
 
     /** The row of index {@code r} (not the first) as a unit, with the quality of the break before it. */

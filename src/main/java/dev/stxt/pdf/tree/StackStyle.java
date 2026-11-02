@@ -22,6 +22,11 @@ public final class StackStyle extends StyleGroup {
     private Value columnGap = Value.pt(0);
     /** Whether {@code Gap} was written with two values. */
     private boolean gapPair;
+    /**
+     * {@code Split items}: a line (in vertical, an item) that does not fit in what is left of the page is broken in
+     * parallel on that page instead of moving whole to the next one (reference/common/breaks.md).
+     */
+    private boolean splitItems = true;
 
     StackStyle() {
     }
@@ -42,6 +47,15 @@ public final class StackStyle extends StyleGroup {
     void setWrap(boolean v) {
         writable();
         wrap = v;
+    }
+
+    public boolean splitItems() {
+        return splitItems;
+    }
+
+    void setSplitItems(boolean v) {
+        writable();
+        splitItems = v;
     }
 
     /** Whether the main axis is the horizontal one ({@code Direction: horizontal}). */

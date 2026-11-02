@@ -34,6 +34,7 @@ Stack:
 | `Horizontal` | en el eje principal: `start`, `end`, `center`, `justify`, `around`, `distribute`; en el cruzado: `start`, `end`, `center`, `stretch` | `start` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
 | `Vertical` | como `Horizontal` | como `Horizontal` | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 > **Decisión:** los ejes se nombran por su dirección en la página, `Horizontal` y `Vertical`, como en `Grid`, y no por su
 > papel. Qué hace cada uno lo dice `Direction`: el del eje principal reparte el sobrante y el del cruzado alinea los ítems,
@@ -132,9 +133,10 @@ los intrínsecos de cada ítem tal cual, sin `Base size`, `Grow` ni `Shrink` ([L
 
 ## Cortes
 
-En vertical, el corte se hace entre ítems, y en horizontal, entre líneas. Una línea o un ítem que no cabe en una página entera se
-parte en paralelo ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)). Un `Stack` vertical con `Wrap` no se
-parte.
+En vertical, el corte se hace entre ítems, y en horizontal, entre líneas. Una línea o un ítem que no cabe en lo que queda de
+página se parte en paralelo en esa página ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)); con
+`Split items: false` pasa entero a la siguiente, y solo se parte si no cabe ni en una página entera. Un `Stack` vertical con
+`Wrap` no se parte.
 
 ## Posicionadas
 

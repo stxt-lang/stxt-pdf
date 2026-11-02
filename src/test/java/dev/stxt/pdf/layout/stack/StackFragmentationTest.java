@@ -54,8 +54,9 @@ class StackFragmentationTest {
 
     @Test
     void columnBreaksBetweenItems() {
+        // With Split items: false, C (80 to 120) moves whole to page 2.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical", "\t\tSplit items: false"},
                 item("A"), item("B"), item("C")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "F"));
@@ -65,11 +66,26 @@ class StackFragmentationTest {
     }
 
     @Test
-    void columnRespectsKeepsBetweenItems() {
-        // Breaking before C violates its Keep with previous: the break goes before B.
+    void columnSplitsTheItemThatDoesNotFit() {
+        // By default C, which does not fit in the 20 left, is split: 20 + 20.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
-                item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true"}));
+                item("A"), item("B"), item("C")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "F"));
+        assertRect(40, 120, 515, 20, l.rect(1, "C"));
+        assertRect(40, 40, 515, 20, l.rect(2, "F"));
+        assertRect(40, 40, 515, 20, l.rect(2, "C"));
+    }
+
+    @Test
+    void columnRespectsKeepsBetweenItems() {
+        // Breaking before C violates its Keep with previous, and inside it, its Keep together: the break goes before
+        // B.
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tStack:", "\t\tId: F", "\t\tDirection: vertical"},
+                item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true",
+                        "\t\t\t\t\tKeep together: true"}));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "B"));
         assertRect(40, 40, 515, 40, l.rect(2, "B"));
@@ -109,14 +125,33 @@ class StackFragmentationTest {
 
     @Test
     void containerThatDoesNotFitMovesToTheNextPage() {
-        // After X (70) not even the first line fits: the whole container moves to page 2.
+        // After X (70) not even the first line fits: with Split items: false the whole container moves to page 2.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70"},
-                new String[]{"\tStack:", "\t\tId: F"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tSplit items: false"},
                 item("A")));
         assertEquals(2, l.pages());
         assertFalse(l.has(1, "F"));
         assertRect(40, 40, 515, 40, l.rect(2, "F"));
+    }
+
+    @Test
+    void rowLineThatDoesNotFitIsSplitOnThisPage() {
+        // After X (70) the line does not fit in the 30 left: by default its items are split in parallel on this page,
+        // A (60) as 30 + 30 and B (40) as 30 + 10, and the line continues with the height of the longest one.
+        LayoutFixture l = layOutPaged(PAGE, concat(
+                new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 70"},
+                new String[]{"\tStack:", "\t\tId: F"},
+                new String[]{"\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 60",
+                        "\t\t\t\t\tWidth: 100"},
+                item("B", "Width: 100")));
+        assertEquals(2, l.pages());
+        assertRect(40, 110, 515, 30, l.rect(1, "F"));
+        assertRect(40, 110, 100, 30, l.rect(1, "A"));
+        assertRect(140, 110, 100, 30, l.rect(1, "B"));
+        assertRect(40, 40, 515, 30, l.rect(2, "F"));
+        assertRect(40, 40, 100, 30, l.rect(2, "A"));
+        assertRect(140, 40, 100, 10, l.rect(2, "B"));
     }
 
     /**

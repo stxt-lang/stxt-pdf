@@ -118,7 +118,8 @@ public final class BlockLayout implements LayoutAlgorithm {
      * @param fragments  child fragments that are kept
      * @param pending    Overlay boxes that are kept
      */
-    private record Mark(int index, BreakToken childToken, int appeal, double cursor, int fragments, int pending) {
+    private record Mark(int index, BreakToken childToken, int appeal, double cursor, double occupied, int fragments,
+                        int pending) {
     }
 
     /**
@@ -323,8 +324,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             if (r.breakToken() != null) {
                 // Break inside the child: it competes with the previous breaks between children.
+                // What the child takes up may be less than it measures (LayoutResult.occupied).
                 marks.add(new Mark(i, r.breakToken(), BreakRules.inside(child, r.breakAppeal()),
-                        cursor, fragments.size(), pending.size()));
+                        cursor, flowY + r.occupied(childToken), fragments.size(), pending.size()));
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
             if (hadProgress && !fits(flowY + f.height(), contentRemaining)) {
@@ -493,7 +495,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         Mark mark(int index, int appeal) {
-            return new Mark(index, null, appeal, cursor, fragments.size(), pending.size());
+            return new Mark(index, null, appeal, cursor, cursor, fragments.size(), pending.size());
         }
 
         /**
@@ -504,8 +506,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             List<Fragment> kept = fragments.subList(0, m.fragments());
             List<PendingOverlay> keptPending = pending.subList(0, m.pending());
             // The margins that touch the break are truncated: the content ends at the cursor.
-            double content = Math.max(m.cursor(), sidesBottom(m.fragments()));
-            Slice slice = Slice.of(model, first, consumed, content, false, space);
+            double sides = sidesBottom(m.fragments());
+            double content = Math.max(m.cursor(), sides);
+            Slice slice = Slice.of(model, first, consumed, content, Math.max(m.occupied(), sides), false, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), withMarker(kept, slice), List.of(), first, false);
             BreakToken token = new BreakToken.Block(m.index(), m.childToken(), slice.consumed());

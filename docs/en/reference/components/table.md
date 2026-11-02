@@ -36,6 +36,7 @@ Table:
 | `Column sizes` | list of tracks | required | `Table` | The columns, as in `Grid` ([Grid](grid.md#track-sizing)). |
 | `Column align` | one alignment per column: `left`, `center`, `right` or `justify` | none | `Table` | The default alignment of the cells of each column. As many as `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 or 2 lengths (rows columns) | `0` | `Table` | Spacing between cells, as in `Grid`. |
+| `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
 | `Span` | `rows columns`, two positive integers | `1 1` | `Cell` | Rows and columns that the cell takes up. |
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
@@ -153,8 +154,10 @@ The `Id` of a row is an `Id` of the document, unique like any other: it is the t
 ## Breaks
 
 A table breaks between rows, like a grid ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)): a row that does not
-fit in what is left of the page moves whole to the next one, and it is only split, with its cells in parallel, if it does not fit even on an
-empty page.
+fit in what is left of the page is split on that page, with its cells in parallel, unless its `Row` declares
+`Keep together: true` (the `Break` of the row is that of its cells) or some cell cannot place anything: then it moves whole
+to the next one. With `Split rows: false` on the `Table`, every row that does not fit moves whole, and it is only split if it
+does not fit even on an empty page.
 
 A row that is split across pages also splits its band: on each page it goes from the beginning to the end of what there is of
 the row, and its border is broken like that of any box, according to the `Edges` of its `Break` ([Breaks](../common/breaks.md)).

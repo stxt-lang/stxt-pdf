@@ -29,7 +29,8 @@ contenedor de fragmentos en el que aparece.
 
 - entre cajas hermanas en flujo de bloque;
 - entre líneas de texto;
-- entre líneas de un `Stack` y entre filas de un `Grid` o una `Table`.
+- entre líneas de un `Stack` y entre filas de un `Grid` o una `Table`, y dentro de una línea o una fila, partiendo sus
+  ítems en paralelo ([abajo](#cortes-en-stack-grid-y-table)).
 
 Siempre se intenta cortar en el punto más alto del árbol posible. Solo si no cabe se corta dentro de un hijo.
 
@@ -117,6 +118,10 @@ superiores): el hueco que dejan las líneas o los hijos al final de la página n
 una caja con `Height` igual al alto de su contenido no desborda al partirse, y el alto que se ve puede pasar del `Height`
 en lo que suman esos huecos.
 
+Ese hueco tampoco se lo quita a las cajas que la contienen: para ellas, lo que ocupa el fragmento es lo que ocupa su
+contenido, aunque se vea hasta el final de la página. Así, una columna estirada a su fila que contiene un texto
+estirado a la suya sigue teniendo sitio en la página siguiente para las líneas que le quedan.
+
 > **Decisión:** un fragmento cortado consume solo lo que ocupa su contenido, para que una caja (o un ítem de grid
 > estirado) no desborde por partirse, a cambio de que el alto que se ve pueda pasar del `Height`.
 > *Alternativa descartada:* un fragmento que mide solo lo que ocupa su contenido (no llega al final de la página), o dejar que el contenido desborde el último fragmento.
@@ -124,15 +129,28 @@ en lo que suman esos huecos.
 ## Cortes en `Stack`, `Grid` y `Table`
 
 En un `Stack` vertical, el corte se hace entre ítems. En uno horizontal y en un `Grid`, entre líneas o filas. Una línea, fila o
-ítem que no cabe en lo que queda de página pasa entero a la siguiente. Si tampoco cabe al principio de una página, sus
-ítems se parten **en paralelo**: cada uno se parte por su cuenta y la fila continúa en la página siguiente con los ítems
-que no han terminado, todos desde arriba, y con la altura del más largo de ellos. Las filas siguientes van detrás, con el
-hueco que las separaba. Las filas que ocupa un mismo ítem se parten juntas, cada ítem desde su posición. Un ítem estirado
-reparte entre las páginas el alto que le impone su línea o su área, así que puede terminar antes o después que el texto de
-sus hermanos. Si algún ítem no puede colocar nada, la fila no se parte, y si no cabe es un error.
+ítem que no cabe en lo que queda de página se parte **en paralelo** en esa página (`Split rows` en `Grid` y `Table`,
+`Split items` en `Stack`; los dos, `true` por defecto): cada ítem se parte por su cuenta y la fila continúa en la página
+siguiente con los ítems que no han terminado, todos desde arriba, y con la altura del más largo de ellos. Las filas
+siguientes van detrás, con el hueco que las separaba. Las filas que ocupa un mismo ítem se parten juntas, cada ítem desde
+su posición. Un ítem estirado reparte entre las páginas el alto que le impone su línea o su área, así que puede terminar
+antes o después que el texto de sus hermanos.
 
-Al elegir el corte, una fila partida cuenta como el peor de los cortes de sus ítems. Un `Stack` vertical con `Wrap` no
-se parte. Las tablas repiten además su cabecera y su pie ([Table](../components/table.md#cortes)).
+Partir la fila es un corte más, que compite con los cortes entre filas por las reglas de la [elección del
+corte](#elección-del-corte): su calidad es la peor de la de sus ítems, así que una fila cuyos ítems no pueden respetar
+sus viudas y huérfanas o un `Keep together` (en una `Table`, el de la `Row`, que es el de sus celdas) pasa entera a la
+página siguiente si el corte antes de ella es mejor. Si algún ítem no puede colocar nada, la fila tampoco se parte. Con
+`Split rows: false` (`Split items: false`), toda fila que no cabe pasa entera a la página siguiente, y solo se parte en
+paralelo si no cabe ni al principio de una página; si entonces algún ítem no puede colocar nada, es un error.
+
+> **Decisión:** las filas se parten en la página en la que están, por defecto, como en los procesadores de textos y como
+> los hijos de un `Block`: dos columnas paralelas de texto siguen cada una por su lado y no dejan media página en blanco,
+> y una fila corta no se parte igualmente, porque sus viudas y huérfanas lo impiden. Quien quiere filas enteras (una
+> rejilla de tarjetas) lo dice con `Split rows: false`. *Alternativa descartada:* partir solo la fila que no cabe en una
+> página entera, que fue la regla hasta la 0.8.0: una fila que cabía en una página dejaba la anterior casi vacía.
+
+Un `Stack` vertical con `Wrap` no se parte. Las tablas repiten además su cabecera y su pie
+([Table](../components/table.md#cortes)).
 
 ## Lo que no se parte
 

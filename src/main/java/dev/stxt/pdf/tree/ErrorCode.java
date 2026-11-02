@@ -277,6 +277,8 @@ public enum ErrorCode {
     LINE_DISTRIBUTION_WITHOUT_WRAP,
     /** Two-value {@code Gap} in a {@code Stack} without {@code Wrap: true}. */
     GAP_WITHOUT_WRAP,
+    /** {@code Split items} in a vertical {@code Stack} with {@code Wrap: true}, which is never broken across pages. */
+    SPLIT_ITEMS_WITHOUT_EFFECT,
     /** {@code Grow} in a vertical {@code Stack} without a definite height. */
     GROW_WITHOUT_EFFECT,
     /** {@code Horizontal} or {@code Vertical} of an {@code Item} on the main axis of its {@code Stack}. */

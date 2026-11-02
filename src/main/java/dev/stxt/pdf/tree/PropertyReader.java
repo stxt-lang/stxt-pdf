@@ -83,9 +83,11 @@ final class PropertyReader {
     /**
      * Properties of the {@code Stack} element (the full structure is in the schema, reference/common/structure.md).
      */
-    static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution");
+    static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution",
+            "split-items");
     /** Properties of the {@code Grid} and {@code Table} elements. */
-    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical");
+    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical",
+            "split-rows");
     /** Properties of the {@code Columns} element. */
     static final Set<String> COLUMNS = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
@@ -296,6 +298,7 @@ final class PropertyReader {
             case "horizontal" -> s.stack().setHorizontal(enumValue(Distribution.class, p));
             case "vertical" -> s.stack().setVertical(enumValue(Distribution.class, p));
             case "line-distribution" -> s.stack().setLineDistribution(enumValue(Distribution.class, p));
+            case "split-items" -> s.stack().setSplitItems(bool(p));
             default -> throw unread(p);
         }
     }
@@ -314,6 +317,7 @@ final class PropertyReader {
             case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
+            case "split-rows" -> s.grid().setSplitRows(bool(p));
             default -> throw unread(p);
         }
     }

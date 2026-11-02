@@ -1,0 +1,53 @@
+# Page 1: g at y = 20 + 100 = 120, 60 high; g1 60 of its 120, g2 whole (30).
+# Page 2: g1 continues 60 from the top; g3 at 60 + 10 = 70 (y = 90); g measures 90. h does not fit in the 70 left.
+# Page 3: h whole (100); s at y = 120, 60 high: s1 60 of its 90, s2 whole (20) at x = 20 + 100 + 10 = 130.
+# Page 4: s1 continues 30; t at y = 50 with its first row (40), columns of 130 at x = 20 and 150.
+# Page 5: the second row of t, whole (120).
+Result:
+	Page: 1
+		Fragment: head
+			Rect: 20 20 260 100
+		Fragment: g
+			Rect: 20 120 260 60
+			Fragment: g1
+				Rect: 20 120 125 60
+			Fragment: g2
+				Rect: 155 120 125 30
+	Page: 2
+		Fragment: g
+			Rect: 20 20 260 90
+			Fragment: g1
+				Rect: 20 20 125 60
+			Fragment: g3
+				Rect: 20 90 125 20
+	Page: 3
+		Fragment: h
+			Rect: 20 20 260 100
+			Fragment: h1
+				Rect: 20 20 125 100
+			Fragment: h2
+				Rect: 155 20 125 30
+		Fragment: s
+			Rect: 20 120 260 60
+			Fragment: s1
+				Rect: 20 120 100 60
+			Fragment: s2
+				Rect: 130 120 100 20
+	Page: 4
+		Fragment: s
+			Rect: 20 20 260 30
+			Fragment: s1
+				Rect: 20 20 100 30
+		Fragment: t
+			Rect: 20 50 260 40
+			Fragment: t1
+				Rect: 20 50 130 40
+			Fragment: t2
+				Rect: 150 50 130 40
+	Page: 5
+		Fragment: t
+			Rect: 20 20 260 120
+			Fragment: t3
+				Rect: 20 20 130 120
+			Fragment: t4
+				Rect: 150 20 130 20

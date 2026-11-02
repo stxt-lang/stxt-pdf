@@ -23,6 +23,11 @@ public final class GridStyle extends StyleGroup {
     /** {@code Gap}: between rows ({@code row}) and between columns ({@code column}). */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
+    /**
+     * {@code Split rows}: a row that does not fit in what is left of the page is broken in parallel on that page
+     * instead of moving whole to the next one (reference/common/breaks.md).
+     */
+    private boolean splitRows = true;
 
     GridStyle() {
     }
@@ -61,6 +66,15 @@ public final class GridStyle extends StyleGroup {
     void setFlow(Direction v) {
         writable();
         flow = v;
+    }
+
+    public boolean splitRows() {
+        return splitRows;
+    }
+
+    void setSplitRows(boolean v) {
+        writable();
+        splitRows = v;
     }
 
     public Alignment horizontal() {

@@ -47,6 +47,11 @@ public final class StyleEditor {
         return this;
     }
 
+    public StyleEditor keepTogether(boolean v) {
+        style.breaks().setKeepTogether(v);
+        return this;
+    }
+
     public StyleEditor font(String v) {
         style.typography().setFont(v);
         return this;

@@ -3,7 +3,8 @@
 # Page 1: card (Edges: closed, border 2 and padding 3) leaves 160 − 10 = 150 to the content:
 #   150 of the 200 of c1 fit.
 # Page 2: card has border and padding at the top again; the remaining 50 of c1 (card measures 60).
-#   The grid row (200) does not fit in the remaining 100: grid moves to the next page.
+#   The grid row (200) does not fit in the remaining 100: with Split rows: false, grid moves to the next page
+#   (the split on this page is golden 41).
 # Page 3: the row does not fit at the start of a page either: its items are split in parallel.
 #   g1 places 160 and g2 fits whole (50).
 # Page 4: g1 continues from the top (40) and end goes after it.
@@ -47,6 +48,7 @@ Document (dev.stxt.pdf):
 			Id: grid
 			Column sizes: * *
 			Gap: 10
+			Split rows: false
 			Area:
 				Block:
 					Id: g1

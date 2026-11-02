@@ -36,6 +36,7 @@ Table:
 | `Column sizes` | lista de pistas | obligatorio | `Table` | Las columnas, como en `Grid` ([Grid](grid.md#dimensionado-de-pistas)). |
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | sin valor | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
+| `Split rows` | `true`, `false` | `true` | `Table` | Una fila que no cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo; con `false`, pasa entera a la siguiente ([Cortes](#cortes)). |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
@@ -153,8 +154,10 @@ El `Id` de una fila es un `Id` del documento, único como cualquier otro: es des
 ## Cortes
 
 Una tabla se corta entre filas, como un grid ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)): una fila que no
-cabe en lo que queda de página pasa entera a la siguiente, y solo se parte, con sus celdas en paralelo, si no cabe ni en una
-página vacía.
+cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo, salvo que su `Row` declare
+`Keep together: true` (el `Break` de la fila es el de sus celdas) o que alguna celda no pueda colocar nada: entonces pasa
+entera a la siguiente. Con `Split rows: false` en la `Table`, toda fila que no cabe pasa entera, y solo se parte si no cabe
+ni en una página vacía.
 
 Una fila que se parte entre páginas parte también su franja: en cada página va del principio al final de lo que hay de
 la fila, y su borde se corta como el de cualquier caja, según el `Edges` de su `Break` ([Cortes](../common/breaks.md)).

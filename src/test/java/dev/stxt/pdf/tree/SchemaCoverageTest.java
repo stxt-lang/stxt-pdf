@@ -121,6 +121,8 @@ class SchemaCoverageTest {
             // Stack and Item
             Map.entry("Direction", "Direction: vertical"),
             Map.entry("Wrap", "Wrap: true"),
+            Map.entry("Split items", "Split items: false"),
+            Map.entry("Split rows", "Split rows: false"),
             Map.entry("Gap", "Gap: 5"),
             Map.entry("Line distribution", "Line distribution: center"),
             Map.entry("Grow", "Grow: 1"),

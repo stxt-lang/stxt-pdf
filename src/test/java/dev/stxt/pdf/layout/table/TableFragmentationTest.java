@@ -12,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Repeated header and footer (reference/components/table.md). Pages of 180 pt with margins of 40: page
- * area of 515 × 100 from (40, 40). The tables have one column and cells of fixed height.
+ * area of 515 × 100 from (40, 40). The tables have one column and cells of fixed height, and, unless the test says
+ * otherwise, {@code Split rows: false}: a body row that does not fit moves whole, which is what these cases are about.
  */
 class TableFragmentationTest {
 
@@ -27,6 +28,11 @@ class TableFragmentationTest {
     }
 
     private static String[] table(String gap) {
+        return concat(splitTable(gap), new String[]{"\t\tSplit rows: false"});
+    }
+
+    /** A table with {@code Split rows} by default. */
+    private static String[] splitTable(String gap) {
         return gap == null
                 ? new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: *"}
                 : new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tGap: " + gap};
@@ -193,6 +199,36 @@ class TableFragmentationTest {
                 group("Body"), row("B1", 40), row("B2", 40), row("B3", 40)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "T"));
+        assertRect(40, 40, 515, 40, l.rect(2, "B3"));
+    }
+
+    @Test
+    void bodyRowThatDoesNotFitIsSplitWithTheFooterAfterIt() {
+        // Split rows by default: B3 (60 to 90 of the 70 the header and the footer leave) is split, 10 + 20, and the
+        // footer goes after each part.
+        LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
+                group("Header rows"), row("H", 20),
+                group("Body"), row("B1", 30), row("B2", 30), row("B3", 30),
+                group("Footer rows"), row("F", 10)));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "T"));
+        assertRect(40, 120, 515, 10, l.rect(1, "B3"));
+        assertRect(40, 130, 515, 10, l.rect(1, "F"));
+        assertRect(40, 40, 515, 50, l.rect(2, "T"));
+        assertRect(40, 40, 515, 20, l.rect(2, "H"));
+        assertRect(40, 60, 515, 20, l.rect(2, "B3"));
+        assertRect(40, 80, 515, 10, l.rect(2, "F"));
+    }
+
+    @Test
+    void keepTogetherOnARowMovesItWhole() {
+        // The Break of a Row is that of its cells: B3 cannot be split, and the break before it is better.
+        LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
+                group("Body"), row("B1", 40), row("B2", 40),
+                row("B3", 40, "\t\t\t\tBreak:", "\t\t\t\t\tKeep together: true")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 80, l.rect(1, "T"));
+        assertFalse(l.has(1, "B3"));
         assertRect(40, 40, 515, 40, l.rect(2, "B3"));
     }
 }

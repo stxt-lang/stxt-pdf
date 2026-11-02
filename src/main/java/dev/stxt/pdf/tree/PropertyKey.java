@@ -73,6 +73,7 @@ public final class PropertyKey {
     public static final String STACK_VERTICAL = "stack.vertical";
     public static final String STACK_LINE_DISTRIBUTION = "stack.line-distribution";
     public static final String STACK_GAP = "stack.gap";
+    public static final String STACK_SPLIT_ITEMS = "stack.split-items";
     public static final String GRID_ROWS = "grid.row-sizes";
     public static final String GRID_GAP = "grid.gap";
     public static final String ITEM_GROW = "item.grow";

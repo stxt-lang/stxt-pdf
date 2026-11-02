@@ -118,11 +118,17 @@ huérfanas devuelve igualmente un corte (`VIOLATES_WIDOWS`) en lugar de `BEFORE`
 comparando tokens. El token de la raíz no acumula alto: cada página tiene el área útil entera.
 
 `Slice` calcula el alto, el borde y el relleno de cada fragmento (`Edges: open` y `closed`), y `Slice.contentRemaining`
-da lo que queda al contenido. Stack y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
+da lo que queda al contenido. Un fragmento de una caja con alto definido que no termina llega al final de la página pero
+solo consume lo que ocupa su contenido, y lo mismo vale hacia arriba: `LayoutResult.occupied(from)` da lo que un fragmento
+ocupa para su padre (lo consumido por su token en ese fragmento, y no su alto), y `BlockLayout` (en la `Mark` del hijo
+partido) y `UnitBreaker` (en `Split`) lo pasan a `Slice.of` como `occupied`, aparte del alto visible del contenido.
+Stack y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
-que cabe en la página. Una unidad que no cabe ni al principio de página parte sus ítems en paralelo, repitiendo su layout con
-`ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`, y el `BreakToken.Container` lleva el token de
-cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso). Las tablas repiten
+que cabe en la página. Una unidad que no cabe en lo que queda de página parte sus ítems en paralelo en esa página
+(`Units.split`, de `Split rows` y `Split items`; con `false`, solo la que no cabe ni al principio de página,
+`Units.splittable`), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
+`UnitBreaker.splitOnThisPage` compara la calidad de ese corte con la del mejor corte entre unidades (`BreakRules.cutUnits`)
+y se queda con el último de los mejores, y el `BreakToken.Container` lleva el token de cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso). Las tablas repiten
 cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`, `Element.ROW`) son `UnitBreaker.Band`:
 `GridLayout.arrange` las crea con el ancho de las columnas, `TableLayout` coloca las de la cabecera y el pie en el
 `Repeat` y deja las del cuerpo en su unidad, y `UnitBreaker` las pone en cada fragmento delante de los ítems (enteras,

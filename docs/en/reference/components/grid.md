@@ -24,6 +24,7 @@ Grid:
 | `Flow` | `horizontal`, `vertical` | `horizontal` | Direction of automatic placement: `horizontal` fills the rows one by one, and `vertical`, the columns. |
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Horizontal alignment of the items in their area. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
+| `Split rows` | boolean | `true` | A row that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). |
 
 Valid tracks: number, %, `auto`, `narrowest`, `natural`, fraction, `between(a, b)` and `repeat(n, pattern)`.
 `fit` is not a track (`FIT_TRACK`), because `auto` already fits the content.
@@ -118,8 +119,9 @@ gaps ([The box](../common/box.md#intrinsic-sizes)).
 
 ## Breaks
 
-A `Grid` breaks between rows. A row that does not fit on a whole page breaks with its items in parallel, and the rows
-occupied by the same item break together ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)).
+A `Grid` breaks between rows. A row that does not fit in what is left of the page breaks on that page with its items in
+parallel, and the rows occupied by the same item break together ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)).
+With `Split rows: false`, the row moves whole to the next page and is only split if it does not fit on a whole page either.
 
 ## Positioned elements
 

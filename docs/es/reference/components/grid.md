@@ -24,6 +24,7 @@ Grid:
 | `Flow` | `horizontal`, `vertical` | `horizontal` | Dirección de la colocación automática: `horizontal` llena las filas una a una, y `vertical`, las columnas. |
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
+| `Split rows` | booleano | `true` | Una fila que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). |
 
 Pistas válidas: número, %, `auto`, `narrowest`, `natural`, fracción, `between(a, b)` y `repeat(n, patrón)`.
 `fit` no es una pista (`FIT_TRACK`), porque `auto` ya se ajusta al contenido.
@@ -118,8 +119,9 @@ huecos ([La caja](../common/box.md#tamaños-intrínsecos)).
 
 ## Cortes
 
-Un `Grid` se corta entre filas. Una fila que no cabe en una página entera se parte con sus ítems en paralelo, y las filas
-que ocupa un mismo ítem se parten juntas ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)).
+Un `Grid` se corta entre filas. Una fila que no cabe en lo que queda de página se parte en esa página con sus ítems en
+paralelo, y las filas que ocupa un mismo ítem se parten juntas ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)).
+Con `Split rows: false`, la fila pasa entera a la página siguiente y solo se parte si no cabe ni en una página entera.
 
 ## Posicionadas
 

@@ -164,6 +164,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Line distribution
 				Max: 1
+			Child: Split items
+				Max: 1
 			Child: Item
 			Child: Overlay
 			Child: Page overlay
@@ -196,6 +198,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Horizontal
 				Max: 1
 			Child: Vertical
+				Max: 1
+			Child: Split rows
 				Max: 1
 			Child: Area
 			Child: Overlay
@@ -754,6 +758,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Column align
 				Max: 1
 			Child: Gap
+				Max: 1
+			Child: Split rows
 				Max: 1
 			Child: Header rows
 				Max: 1
@@ -1434,6 +1440,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Wrap
 		Type: BOOLEAN
 		Description: Allows the items to be distributed over several lines.
+	Node: Split items
+		Type: BOOLEAN
+		Description: With true (by default), a line of a Stack (in vertical, an item) that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
 	Node: Gap
 		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
 	Node: Line distribution
@@ -1468,6 +1477,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Values:
 			Value: horizontal
 			Value: vertical
+	Node: Split rows
+		Type: BOOLEAN
+		Description: With true (by default), a row of a Grid or a Table that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
 	Node: Horizontal
 		Type: ENUM
 		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (start, end, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (start, end, center, justify, around or distribute); if not, the alignment of all the items (start, end, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.

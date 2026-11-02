@@ -34,6 +34,7 @@ Stack:
 | `Horizontal` | on the main axis: `start`, `end`, `center`, `justify`, `around`, `distribute`; on the cross axis: `start`, `end`, `center`, `stretch` | `start` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
 | `Vertical` | as `Horizontal` | as `Horizontal` | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 > **Decision:** the axes are named by their direction on the page, `Horizontal` and `Vertical`, as in `Grid`, and not by their
 > role. What each one does is set by `Direction`: the one on the main axis distributes the leftover space and the one on the cross axis aligns the items,
@@ -132,9 +133,10 @@ intrinsic sizes of each item are used as they are, without `Base size`, `Grow` o
 
 ## Breaks
 
-In vertical, the break is made between items, and in horizontal, between lines. A line or an item that does not fit on a whole page
-breaks in parallel ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)). A vertical `Stack` with `Wrap` does not
-break.
+In vertical, the break is made between items, and in horizontal, between lines. A line or an item that does not fit in what is
+left of the page breaks in parallel on that page ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)); with
+`Split items: false` it moves whole to the next one, and it is only split if it does not fit on a whole page either. A
+vertical `Stack` with `Wrap` does not break.
 
 ## Positioned elements
 

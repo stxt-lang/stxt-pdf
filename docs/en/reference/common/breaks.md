@@ -119,6 +119,10 @@ its top border and padding): the gap that the lines or the children leave at the
 content that follows. This way, a box with a `Height` equal to the height of its content does not overflow when it is
 split, and the visible height can exceed the `Height` by the sum of those gaps.
 
+That gap is not taken from the boxes that contain it either: for them, what the fragment takes up is what its content
+takes up, even if it is seen up to the end of the page. So a column stretched to its row that contains a text
+stretched to its own row still has room on the next page for the lines it has left.
+
 > **Decision:** a broken fragment consumes only what its content takes up, so that a box (or a stretched grid item) does
 > not overflow because it is split, at the cost that the visible height can exceed the `Height`.
 > *Rejected alternative:* a fragment that measures only what its content takes up (does not reach the end of the page), or letting the content overflow the last fragment.
@@ -126,13 +130,25 @@ split, and the visible height can exceed the `Height` by the sum of those gaps.
 ## Breaks in `Stack`, `Grid` and `Table`
 
 In a vertical `Stack`, the break is made between items. In a horizontal one and in a `Grid`, between lines or rows. A line,
-row or item that does not fit in what is left of the page moves whole to the next one. If it does not fit at the start of
-a page either, its items are split **in parallel**: each one is split on its own and the row continues on the next page
-with the items that have not finished, all from the top, and with the height of the longest of them. The following rows
-come after, with the gap that separated them. The rows taken up by the same item are split together, each item from its
-position. A stretched item distributes across the pages the height its line or area imposes on it, so it can end before
-or after the text of its siblings. If any item cannot place anything, the row is not split, and if it does not fit it is
-an error.
+row or item that does not fit in what is left of the page is split **in parallel** on that page (`Split rows` in `Grid` and
+`Table`, `Split items` in `Stack`; both `true` by default): each item is split on its own and the row continues on the next
+page with the items that have not finished, all from the top, and with the height of the longest of them. The following
+rows come after, with the gap that separated them. The rows taken up by the same item are split together, each item from
+its position. A stretched item distributes across the pages the height its line or area imposes on it, so it can end
+before or after the text of its siblings.
+
+Splitting the row is one more break, which competes with the breaks between rows by the rules of the [choice of the
+break](#choice-of-the-break): its quality is the worst of that of its items, so a row whose items cannot respect their
+widows and orphans or a `Keep together` (in a `Table`, that of the `Row`, which is that of its cells) moves whole to the
+next page if the break before it is better. If any item cannot place anything, the row is not split either. With
+`Split rows: false` (`Split items: false`), every row that does not fit moves whole to the next page, and it is only split
+in parallel if it does not fit at the start of a page either; if then some item cannot place anything, it is an error.
+
+> **Decision:** rows are split on the page they are on, by default, as in word processors and as the children of a
+> `Block` are: two parallel columns of text each go on on their own and do not leave half a page blank, and a short row
+> is not split anyway, because its widows and orphans prevent it. Whoever wants whole rows (a grid of cards) says so with
+> `Split rows: false`. *Rejected alternative:* splitting only the row that does not fit on a whole page, which was the
+> rule until 0.8.0: a row that fit on a page left the previous one almost empty.
 
 When choosing the break, a split row counts as the worst of the breaks of its items. A vertical `Stack` with `Wrap` is not
 split. Tables also repeat their header and their footer ([Table](../components/table.md#breaks)).

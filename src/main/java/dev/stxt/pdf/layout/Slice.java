@@ -61,12 +61,26 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
      */
     public static Slice of(BoxModel model, boolean first, double consumed, double content,
                            boolean contentFinished, ConstraintSpace space) {
+        return of(model, first, consumed, content, content, contentFinished, space);
+    }
+
+    /**
+     * Like {@link #of(BoxModel, boolean, double, double, boolean, ConstraintSpace)}, when the content placed takes up
+     * less than it measures: a child with a definite height that reaches the end of the page while its content goes
+     * on ({@link LayoutResult#occupied}). The fragment measures {@code content}, but only {@code occupied} is
+     * consumed, so that the gap is not taken away from what follows in the box either.
+     *
+     * @param occupied height of the content placed that counts as consumed; at most {@code content}
+     */
+    public static Slice of(BoxModel model, boolean first, double consumed, double content, double occupied,
+                           boolean contentFinished, ConstraintSpace space) {
         content = Math.max(0, content);
+        occupied = Math.min(content, Math.max(0, occupied));
         if (!space.fragmenting()) {
             return new Slice(model.usedHeight(content), model.border(), model.padding(), true, 0);
         }
         if (model.clones()) {
-            return cloned(model, consumed, content, contentFinished, space);
+            return cloned(model, consumed, content, occupied, contentFinished, space);
         }
         double remaining = space.fragmentainerRemaining().getAsDouble();
         double top = top(model, first);
@@ -94,15 +108,15 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
         // It reaches the end of the page, but only consumes what its content takes up: the gap that the lines or
         // the children leave at the end of the page is not taken away from the content that follows.
         return new Slice(h, sides(model.border(), first, false), sides(model.padding(), first, false), false,
-                consumed + upToContent);
+                consumed + top + occupied);
     }
 
     /**
      * {@code Edges: closed}: the distribution is done with the height of the content box, and each
      * fragment adds the full border and padding to it.
      */
-    private static Slice cloned(BoxModel model, double consumed, double content, boolean contentFinished,
-                                ConstraintSpace space) {
+    private static Slice cloned(BoxModel model, double consumed, double content, double occupied,
+                                boolean contentFinished, ConstraintSpace space) {
         double decoration = model.border().vertical() + model.padding().vertical();
         double available = space.fragmentainerRemaining().getAsDouble() - decoration;
         double h = content;
@@ -122,9 +136,10 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
             double total = Math.max(0, model.height().getAsDouble() - decoration);
             // As with open: up to the end of the page, consuming only the content.
             h = Math.max(h, Math.min(available, total - consumed));
-            return new Slice(decoration + h, model.border(), model.padding(), false, consumed + content);
+            return new Slice(decoration + h, model.border(), model.padding(), false, consumed + occupied);
         }
-        return new Slice(decoration + h, model.border(), model.padding(), finished, consumed + h);
+        return new Slice(decoration + h, model.border(), model.padding(), finished,
+                consumed + (contentFinished ? h : occupied));
     }
 
     /** Fragment that is not the last one: without bottom border or padding. */
