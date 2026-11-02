@@ -21,8 +21,8 @@ The PDF is **tagged**: besides what is seen, it carries the structure of the doc
 and what gives the text when it is copied or when the view size changes.
 
 - **Reading order:** that of the document. Each box is an element: headings are announced as headings of their level,
-  lists as lists with their number of items, tables as tables with their headers, images with `Alt` as figures, and a
-  `Table of contents` as a table of contents.
+  lists as lists with their number of items, tables as tables with their headers, images with `Alt` as figures, a
+  `Figure` as a figure with its caption, and a `Table of contents` as a table of contents.
 - **Decoration:** backgrounds, borders, text lines, the leaders of a table of contents, the lines between columns, images
   without `Alt`, the repeated rows of a table and everything in a `Page overlay` are not read.
 - **Language:** the `Language` of `Document` is that of all the content. A box that declares another one is read in that

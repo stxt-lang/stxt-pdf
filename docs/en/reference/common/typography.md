@@ -31,15 +31,15 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Kerning` | `true`, `false` | `false` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
 | `Tab size` | integer ≥ 1 | `4` | With `Preformatted: true` or `wrap`, the columns of a tab. |
-| `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). |
-| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How the number of the level of a heading is written ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
-| `Number label` | text with `{number}` | the number | What goes in front of the title of a numbered heading ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
+| `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). A `Figure` is numbered unless it, or a rule of its own, declares otherwise ([Figure](../components/figure.md#numbering)). |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How the number of the level of a heading, or that of a figure, is written ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
+| `Number label` | text with `{number}` | the number | What goes in front of the title of a numbered heading, or of the caption of a figure ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
 | `Widows` | integer ≥ 1 | `2` | Minimum number of lines of a paragraph that go to the next page ([Breaks](breaks.md#choosing-the-break)). |
 | `Orphans` | integer ≥ 1 | `2` | Minimum number of lines of a paragraph that stay at the bottom of a page. |
 | `Language` | BCP 47 tag (`es`, `en-GB`, `ca`) | the `Language` of `Document` | Language of the text of the box, when it is not that of the document ([language](#language-language)). |
 
 What has no text ignores what it inherits without an error: a `Block` inherits `Size` for its children, and a `Text` that inherits
-`Numbered: true` does nothing, because only a heading reads it.
+`Numbered: true` does nothing, because only the headings and the figures read it.
 
 ## Where there is text
 

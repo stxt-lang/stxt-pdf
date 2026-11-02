@@ -2,9 +2,10 @@
 
 Un `Table of contents` es un índice automático: un bloque en flujo, sin hijos, que genera una **entrada por encabezado** de los
 niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los de un `Markdown` y los que están después del
-propio índice, salvo los que declaran `In table of contents: false` ([Encabezados](heading.md#fuera-del-índice)). Admite `Id`,
-`Style`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un `Markdown`. No admite `Link`: sus entradas ya
-llevan el suyo.
+propio índice, salvo los que declaran `In table of contents: false` ([Encabezados](heading.md#fuera-del-índice)). Con
+`Of: figures` o `Of: tables` es un **índice de figuras o de tablas**: una entrada por `Figure` de ese contador
+([abajo](#qué-lista-of)). Admite `Id`, `Style`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un
+`Markdown`. No admite `Link`: sus entradas ya llevan el suyo.
 
 ```
 Table of contents:
@@ -14,10 +15,40 @@ Table of contents:
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. |
+| `Of` | `headings`, `figures`, `tables` | `headings` | Qué lista: los encabezados de `Levels`, las figuras o las tablas ([abajo](#qué-lista-of)). |
+| `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. Solo con `Of: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, una línea o nada. |
 
 No van en las reglas de `Styles`, que solo admiten los grupos.
+
+## Qué lista (`Of`)
+
+Con `Of: figures`, el índice lista las `Figure` que se numeran con el contador de las figuras, y con `Of: tables`, las
+que se numeran con el de las tablas ([Figure](figure.md#numeración)): por defecto, una `Figure` con una `Table` cuenta
+entre las tablas y las demás entre las figuras, y `Figure counter` lo cambia. Salen en orden del documento, también las
+que están después del índice, numeradas o no, salvo las que declaran `In table of contents: false`. Cada entrada es como
+la de un encabezado: el **texto del pie**, con su número o su `Number label` delante, la guía y la página de la figura,
+clicable entera. Todas las entradas son `TOC 1`, y `For element: TOC 1` las estila.
+
+```
+Heading 1:
+    In table of contents: false
+    Text: Índice de figuras
+Table of contents:
+    Of: figures
+Heading 1:
+    In table of contents: false
+    Text: Índice de tablas
+Table of contents:
+    Of: tables
+```
+
+`Levels` no tiene efecto con `Of: figures` o `tables`, y es un error (`LEVELS_WITHOUT_HEADINGS`). Un índice de figuras o de
+tablas sin ninguna que listar es `TABLE_OF_CONTENTS_EMPTY`.
+
+> **Decisión:** un índice lista una sola cosa (`Of`), y un índice de figuras y otro de tablas son dos `Table of contents`.
+> Las entradas de los dos son `TOC 1`, con la misma regla, porque no tienen niveles. *Alternativa descartada:* un índice
+> mixto de figuras y tablas, o elementos generados propios (`TOC figure`), que piden más reglas.
 
 ## Entradas
 
@@ -59,9 +90,10 @@ izquierdo, y el espacio entre entradas, su `Margin` o su `Padding` vertical. Las
 
 Son errores:
 
-- un `Table of contents` sin ningún encabezado en sus niveles (`TABLE_OF_CONTENTS_EMPTY`, con la línea del
-  `Table of contents`);
-- un `Levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`);
+- un `Table of contents` sin ningún encabezado en sus niveles, o sin ninguna figura o tabla con `Of: figures` o
+  `tables` (`TABLE_OF_CONTENTS_EMPTY`, con la línea del `Table of contents`);
+- un `Levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`), o un `Levels` con `Of: figures` o
+  `tables` (`LEVELS_WITHOUT_HEADINGS`);
 - un `Table of contents` sin `Font` o sin `Size` propios o heredados (`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con
   la línea del `Table of contents`).
 
@@ -72,9 +104,11 @@ página no puede estar en un índice: se declara con `In table of contents: fals
 
 ## Accesibilidad
 
-Un lector de pantalla lo anuncia como un índice, con cada entrada como un enlace a su encabezado. Los marcadores del PDF no
-cambian ([El PDF](../common/pdf.md#marcadores)).
+Un lector de pantalla lo anuncia como un índice, con cada entrada como un enlace a su encabezado o a su figura. Los
+marcadores del PDF no cambian ([El PDF](../common/pdf.md#marcadores)).
 
 ## Lo que no hay
 
-- Índices de otras cosas que los encabezados (figuras, tablas), índices alfabéticos y entradas escritas a mano.
+- Índices de otras cosas que los encabezados, las figuras y las tablas (listados, ecuaciones), índices alfabéticos y
+  entradas escritas a mano.
+- Un índice mixto de figuras y tablas.

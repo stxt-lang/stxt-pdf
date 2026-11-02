@@ -7,7 +7,7 @@ A text can write data that the engine computes:
 | `{page}` | The printed number of the page where the text is ([Breaks](breaks.md#page-numbers-page-and-pages)) |
 | `{pages}` | The last printed number of its page sequence ([Document](../components/document.md#page-numbering)) |
 | `{page of: id}` | The printed number of the page where the box with that `Id` starts |
-| `{number of: id}` | The number of that box in the document: that of a numbered `List item` or a numbered heading |
+| `{number of: id}` | The number of that box in the document: that of a numbered `List item`, a numbered heading or a numbered `Figure` |
 | `{heading N}` | The text of the last `Heading N` that starts on that page or before, in a `Page overlay`: the running head |
 | `{heading N: first}` | That of the first `Heading N` that starts on that page |
 
@@ -54,8 +54,10 @@ The `List item` elements of a numbered list have it, and it is what their marker
 (`decimal`, `lower-alpha`, `upper-roman`), with whatever `Start` and `Number` there are. Each item gives only its own
 number: to write "4.2" from a nested list, both are written, `{number of: clausula}.{number of: apartado}`. Headings with
 `Numbered: true` also have it, and their number is the complete one (`4.2`: their levels joined by dots,
-[Headings](../components/heading.md#numbering-numbered)). A `List item` of a bulleted list or of a list without a marker,
-an unnumbered heading or any other box has no number (`REFERENCE_NOT_NUMBERED`). A heading written in a `Markdown` can be
+[Headings](../components/heading.md#numbering-numbered)), and so do the numbered `Figure` elements, whose number is that
+of their counter (`3`, without the label of `Number label`, [Figure](../components/figure.md#numbering)). A `List item`
+of a bulleted list or of a list without a marker, an unnumbered heading, a figure with `Numbered: false` or any other box
+has no number (`REFERENCE_NOT_NUMBERED`). A heading written in a `Markdown` can be
 referred to if it carries `{#id}` ([Markdown](../components/markdown.md#headings)). An item of a Markdown list cannot
 be referred to, because it carries no `Id`.
 

@@ -154,7 +154,8 @@ Paragraph: The amounts in appendix {number of: fees}.
 
 `{number of: id}` gives the complete number (`4.2`) and not that of its last level like that of a `List item`. The headings of a
 `Markdown` are numbered like the others, and they can be referred to if they carry an `Id`, which is written at the end of their text
-(`## Sales {#sales}`, [Markdown](markdown.md#headings)).
+(`## Sales {#sales}`, [Markdown](markdown.md#headings)). Figures and tables with a caption are numbered apart, with the
+same properties and their own counters ([Figure](figure.md#numbering)).
 
 ## Bookmarks and accessibility
 

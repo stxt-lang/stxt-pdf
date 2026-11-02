@@ -49,9 +49,10 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | [`Frame`, `Overlay` and `Page overlay`](components/frame-and-overlays.md) | Shifting a box, placing it at an exact position or repeating it on each page |
 | [`Image`](components/image.md) | PNG, JPEG and SVG images, and pages of a PDF |
 | [`Barcode`](components/barcode.md) | QR codes and barcodes generated from their data |
+| [`Figure`](components/figure.md) | Figures and tables with a numbered caption ("Figure 3."), referable and listed |
 | [`Markdown`](components/markdown.md) | Writing long content in Markdown |
 | [`Footnote`](components/footnote.md) | Footnotes, numbered and placed on the page of their call |
-| [`Table of contents`](components/table-of-contents.md) | The automatic table of contents |
+| [`Table of contents`](components/table-of-contents.md) | The automatic table of contents, of headings, figures or tables |
 
 The [examples](../../../test/examples/README.md) are eleven real documents with their PDF, from an invoice to an annual
 report.

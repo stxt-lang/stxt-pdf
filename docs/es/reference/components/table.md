@@ -189,6 +189,6 @@ sola vez, en la primera página en que salen.
 ## Lo que no hay
 
 - Bordes fusionados entre celdas: cada celda tiene el suyo.
-- `Box` en una columna, una fila con tamaño o relleno propios y un título de tabla aparte (un encabezado o un `Paragraph`
-  antes de la tabla).
+- `Box` en una columna y una fila con tamaño o relleno propios. El título de una tabla («Tabla 3. Bornes») es el
+  `Caption` de una [`Figure`](figure.md) con la tabla dentro.
 - Filas con menos celdas que columnas, o `Span` que pasan de un grupo a otro: son errores.

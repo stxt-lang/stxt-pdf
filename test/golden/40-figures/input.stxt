@@ -1,0 +1,63 @@
+# Figures (reference/components/figure.md). Page area of 260 × 160 from (20, 20), which ends at y = 180; lines of 12
+# (Size 10) and 5 pt per character.
+#
+# toc lists the figures (f1 and f2: two entries of 12, 24 high) and toc2 the tables (t1: one entry, 12). f1 is an image
+# of 100 × 60 with its caption below (12): 72 high, at 20 + 24 + 12 = 56. t1 has its caption above (12) and a table of
+# two rows of 12 (24): 36 high, at 128, which ends at 164. f2 (an image of 30 and its caption, 42) does not fit in the
+# 16 left and is not split: it goes whole to page 2, at 20, and p (one line: "Véase la figura 2." is 18 characters,
+# 90 pt) follows at 62. The captions carry the number of their counter: "1 Esquema", "1 Bornes", "2 Detalle".
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table of contents:
+			Id: toc
+			Of: figures
+		Table of contents:
+			Id: toc2
+			Of: tables
+		Figure:
+			Id: f1
+			Caption: Esquema
+				Id: c1
+			Image: test/wide.png
+				Id: i1
+				Alt: El esquema
+				Box:
+					Width: 100
+					Height: 60
+		Figure:
+			Id: t1
+			Caption: Bornes
+				Id: c2
+			Table:
+				Id: tb
+				Column sizes: * *
+				Body:
+					Row:
+						Cell: L
+						Cell: Fase
+					Row:
+						Cell: N
+						Cell: Neutro
+		Figure:
+			Id: f2
+			Caption: Detalle
+				Id: c3
+			Image: test/wide.png
+				Id: i2
+				Alt: El detalle
+				Box:
+					Width: 100
+					Height: 30
+		Text: Véase la figura {number of: f2}.
+			Id: p

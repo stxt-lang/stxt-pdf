@@ -65,6 +65,14 @@ class ElementTest {
         assertTrue(Element.selectable().contains(Element.FOOTNOTES));
         assertTrue(!Element.written().contains(Element.FOOTNOTES));
         assertTrue(Element.written().contains(Element.FOOTNOTE));
+        // A Figure and its Caption are written; the caption carries text and only goes in a Figure.
+        assertEquals(Optional.of(Element.FIGURE), Element.of("figure"));
+        assertEquals(Optional.of(Element.CAPTION), Element.of("caption"));
+        assertTrue(Element.FIGURE.canBeItem());
+        assertTrue(!Element.CAPTION.canBeItem());
+        assertTrue(Element.CAPTION.hasText());
+        assertEquals(Element.Role.FIGURE_GROUP, Element.FIGURE.role());
+        assertEquals(Element.Role.CAPTION, Element.CAPTION.role());
         // The code block is named by For element rules, but it is not written.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK));

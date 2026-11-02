@@ -1,0 +1,22 @@
+# Case: Levels in a table of contents of figures
+# Code: LEVELS_WITHOUT_HEADINGS
+# Line: 22
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Figure:
+			Caption: Pie
+			Image: test/wide.png
+				Alt: Uno
+		Table of contents:
+			Of: figures
+			Levels: 1 2

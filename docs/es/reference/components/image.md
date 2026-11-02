@@ -128,7 +128,8 @@ partir una caja, son un error (`BREAK_IN_IMAGE`), también si los da una regla d
 Donde va un elemento en flujo: en una sección, `Block`, `Frame`, `Overlay`, `Page overlay` (un logotipo que se repite en cada
 página), `Columns`, `List item` (pero no al principio: el marcador necesita una línea con la que alinearse,
 `LIST_ITEM_WITHOUT_LINE`), `Cell` y como elemento de un `Item` o un `Area`. En un `Markdown`, una imagen sola en su párrafo
-(`![Alt](ruta)`) es una `Image` ([Markdown](markdown.md)).
+(`![Alt](ruta)`) es una `Image` ([Markdown](markdown.md)). Dentro de una [`Figure`](figure.md), la imagen lleva un pie
+numerado («Figura 3. ...»), y su `Alt` es obligatorio.
 
 ## SVG
 

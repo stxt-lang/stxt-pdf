@@ -49,8 +49,9 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [`Frame`, `Overlay` y `Page overlay`](components/frame-and-overlays.md) | Desplazar una caja, colocarla en un sitio exacto o repetirla en cada página |
 | [`Image`](components/image.md) | Imágenes PNG, JPEG y SVG, y páginas de un PDF |
 | [`Barcode`](components/barcode.md) | Códigos QR y códigos de barras generados a partir de sus datos |
+| [`Figure`](components/figure.md) | Figuras y tablas con pie numerado («Figura 3.»), referibles y con índice |
 | [`Markdown`](components/markdown.md) | Escribir contenido largo en Markdown |
 | [`Footnote`](components/footnote.md) | Notas al pie, numeradas y colocadas en la página de su llamada |
-| [`Table of contents`](components/table-of-contents.md) | El índice automático |
+| [`Table of contents`](components/table-of-contents.md) | El índice automático, de encabezados, de figuras o de tablas |
 
 Los [ejemplos](../../../test/examples/README.es.md) son once documentos reales con su PDF, de una factura a un informe anual.

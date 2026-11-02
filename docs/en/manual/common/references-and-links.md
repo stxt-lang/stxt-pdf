@@ -9,7 +9,7 @@ A text can write data that the engine works out:
 | `{page}` | The number of the page where the text is |
 | `{pages}` | The total number of pages of the current count |
 | `{page of: id}` | The page where the box with that `Id` starts |
-| `{number of: id}` | The number of an item of a numbered list, or that of a numbered heading |
+| `{number of: id}` | The number of an item of a numbered list, that of a numbered heading or that of a figure |
 | `{heading 1}` | The title of the last `Heading 1` that has started, in the header or the footer of each page |
 | `{heading 1: first}` | That of the first `Heading 1` that starts on the page |
 
@@ -29,8 +29,8 @@ List:
 - A reference to an `Id` that does not exist is an error, and so is the page of something that does not have a single
   page (what is inside a `Page overlay`, which is repeated on all of them) or of something that is on a page without a
   number.
-- `{number of: id}` of an item gives only its own (`3`, `c`, `IV`), and of a numbered heading, the complete one (`4.2`).
-  Nothing else has a number.
+- `{number of: id}` of an item gives only its own (`3`, `c`, `IV`), of a numbered heading, the complete one (`4.2`), and of
+  a [`Figure`](../components/figure.md), its number without the label ("figure 3"). Nothing else has a number.
 - `{heading N}` (1 to 6) is the **running head** of a book or a manual: the current chapter or section in the header. It
   only goes in a `Page overlay`, which then changes from one page to the next. If the heading is numbered, it carries its
   number (`3 Installation`). A new chapter leaves the section empty until the first one starts, and before the first

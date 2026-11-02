@@ -37,8 +37,8 @@ Styles:
 | `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
-| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)) |
-| `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título ([Encabezados](../components/heading.md)) |
+| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)); las figuras lo llevan salvo que digan `false` ([Figure](../components/figure.md)) |
+| `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título, o del pie de una figura ([Encabezados](../components/heading.md)) |
 
 El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
 [Formato del texto](text-formatting.md).

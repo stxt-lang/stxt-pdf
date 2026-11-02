@@ -338,7 +338,23 @@ public final class Box {
         return element == null ? 0 : element.headingLevel();
     }
 
-    /** Text of a heading for the table of contents: that of its {@code Text}, joined and with spaces normalized. */
+    /**
+     * The {@code Caption} of a {@code Figure} (reference/components/figure.md), the child that carries its text;
+     * {@code null} in the other boxes.
+     */
+    public Box caption() {
+        for (Box child : children) {
+            if (child.element() == Element.CAPTION) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Text of a heading for the table of contents, the bookmarks and the running heads: that of its {@code Text},
+     * joined and with spaces normalized. Of a {@code Figure}, the text of its caption, the only child with text.
+     */
     public String headingText() {
         return children.stream().filter(Box::hasText).map(b -> b.text.strip())
                 .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");

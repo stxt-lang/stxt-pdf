@@ -70,7 +70,7 @@ depend on the `LayoutContext` interface.
   (`Element.Role`), which is the only thing that layout and painting look at.
 - **`Style`** and its groups: the properties of a box, split as in the document (`TypographyStyle`, the only one that
   is inherited, `BoxStyle`, `BreakStyle`) and by element type (`StackStyle`, `GridStyle`, `ItemStyle`, `ListStyle`,
-  `ColumnsStyle`, `ImageStyle`, `TableOfContentsStyle`), with the document line of each property.
+  `ColumnsStyle`, `ImageStyle`, `FigureStyle`, `TableOfContentsStyle`), with the document line of each property.
 - **`BoxTreeBuilder`**: the orchestrator of the construction ([The box tree](implementation/tree.md)). It splits the
   work among its parts:
   - `ElementReader`, what is specific to each family of elements;
@@ -81,7 +81,8 @@ depend on the `LayoutContext` interface.
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
     generated images ([The box tree](implementation/tree.md#generated-images));
   - `ModelValidator`, the rules that look at the box once read;
-  - `Footnotes`, the footnotes: the area of each section, the numbering of the calls and their checks.
+  - `Footnotes`, the footnotes: the area of each section, the numbering of the calls and their checks;
+  - `Figures`, the figures with a caption: their counters, where the caption goes and their `Alt`.
 
 ### Layout (`layout`)
 

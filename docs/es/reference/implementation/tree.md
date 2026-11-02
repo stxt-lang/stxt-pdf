@@ -27,7 +27,7 @@ En el schema:
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
 
 Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que
-`Item` y `Area` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
+`Item`, `Area` y `Figure` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
 tenga su texto en un sitio y solo uno, que la raíz sea `Document`, que el `Text` de un encabezado no tenga `Break`, la
 jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Header rows`, `Body`, `Footer rows`, que una `Cell`
 no tenga a la vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema
@@ -57,7 +57,9 @@ es el orden común a todos los elementos (el sitio, la herencia, las reglas, las
 el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
 `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la
 caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
-elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`.
+elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`. La familia
+`FIGURE` construye el elemento y el `Caption` de una `Figure`, los ordena según `Caption position`, la numera
+(`Figures`) y la deja sin partir.
 
 Las piezas:
 
@@ -70,8 +72,9 @@ Las piezas:
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
 | `MarkdownBuilder` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT |
-| `TableOfContentsBuilder` | Las entradas de los índices, al final de la construcción |
-| `HeadingNumbers` | Los números de los encabezados |
+| `TableOfContentsBuilder` | Las entradas de los índices (de encabezados, de figuras o de tablas), al final de la construcción |
+| `HeadingNumbers` | Los números de los encabezados, y la escritura del número delante del título o del pie |
+| `Figures` | Las figuras: los dos contadores, si una `Figure` va numerada, dónde va su pie, con qué contador cuenta y su `Alt` |
 | `References`, `LinkTargets` | Comprueban las referencias y los enlaces `#id` del árbol entero |
 | `Footnotes` | Las notas al pie: el área de cada sección, las llamadas `[^id]` numeradas al leerlas y, al final, que cada llamada tiene su nota y cada nota su llamada, y el número delante del primer texto de cada nota |
 | `ModelValidator` | Las reglas que miran la caja ya leída (como los márgenes, los mínimos y máximos, el alto definido o el giro) |
@@ -88,7 +91,7 @@ Ningún método de `tree` pasa de 60 líneas ni de complejidad 20.
 `Box` tiene los campos privados, se lee con métodos (como `text()`, `children()` o `formattedRuns()`) y se escribe con
 métodos `set...` del package. `Style` se parte en un grupo por cada grupo del documento (`TypographyStyle`, `BoxStyle`, `BreakStyle`)
 y por cada tipo de elemento con propiedades propias (`StackStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ColumnsStyle`,
-`ImageStyle`, `TableOfContentsStyle`). En `Style` quedan las propiedades que definen el elemento y las líneas. Fuera de `tree` se
+`ImageStyle`, `FigureStyle`, `TableOfContentsStyle`). En `Style` quedan las propiedades que definen el elemento y las líneas. Fuera de `tree` se
 lee a través del grupo: `style.typography().fontSize()`, `style.stack().direction()`, `style.box().margin()`. Solo se hereda
 `TypographyStyle`: `Style.inheriting` copia el grupo del padre. Una propiedad nueva va en el grupo de su sitio en el
 documento, con su lectura y su `set...`.

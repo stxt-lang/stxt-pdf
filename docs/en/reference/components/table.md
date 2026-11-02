@@ -189,6 +189,6 @@ once, on the first page where they appear.
 ## What is not supported
 
 - Merged borders between cells: each cell has its own.
-- `Box` on a column, a row with its own size or padding, and a separate table title (a heading or a `Paragraph`
-  before the table).
+- `Box` on a column and a row with its own size or padding. The title of a table ("Table 3. Terminals") is the
+  `Caption` of a [`Figure`](figure.md) with the table inside.
 - Rows with fewer cells than columns, or `Span` values that pass from one group to another: they are errors.

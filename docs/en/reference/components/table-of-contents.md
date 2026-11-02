@@ -2,9 +2,10 @@
 
 A `Table of contents` is an automatic table of contents: an in-flow block, without children, that generates **one entry per heading** of the
 levels in `Levels` (1 to 3 by default), in document order, also those of a `Markdown` and those that come after the
-table of contents itself, except those that declare `In table of contents: false` ([Headings](heading.md#outside-the-table-of-contents)). It accepts `Id`,
-`Style`, `Box`, `Typography` and `Break`, like a `Block`, and goes wherever a `Markdown` goes. It does not accept `Link`: its entries already
-carry their own.
+table of contents itself, except those that declare `In table of contents: false` ([Headings](heading.md#outside-the-table-of-contents)). With
+`Of: figures` or `Of: tables` it is a **table of figures or of tables**: one entry per `Figure` of that counter
+([below](#what-it-lists-of)). It accepts `Id`, `Style`, `Box`, `Typography` and `Break`, like a `Block`, and goes
+wherever a `Markdown` goes. It does not accept `Link`: its entries already carry their own.
 
 ```
 Table of contents:
@@ -14,10 +15,42 @@ Table of contents:
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
-| `Levels` | two integers from 1 to 6: the first and the last level | `1 3` | The headings it lists: `Levels: 1 2` lists the `Heading 1` and `Heading 2` elements. Without any heading at those levels it is an error. |
+| `Of` | `headings`, `figures`, `tables` | `headings` | What it lists: the headings of `Levels`, the figures or the tables ([below](#what-it-lists-of)). |
+| `Levels` | two integers from 1 to 6: the first and the last level | `1 3` | The headings it lists: `Levels: 1 2` lists the `Heading 1` and `Heading 2` elements. Without any heading at those levels it is an error. Only with `Of: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | What fills the gap between the title and the page of each entry: dots, a line or nothing. |
 
 They do not go in the `Styles` rules, which only accept the groups.
+
+## What it lists (`Of`)
+
+With `Of: figures`, the table of contents lists the `Figure` elements numbered with the counter of the figures, and with
+`Of: tables`, those numbered with that of the tables ([Figure](figure.md#numbering)): by default, a `Figure` with a
+`Table` counts among the tables and the rest among the figures, and `Figure counter` changes it. They appear in document
+order, also those after the table of contents, numbered or not, except those that declare `In table of contents: false`.
+Each entry is like that of a heading: the **text of the caption**, with its number or its `Number label` before it, the
+leader and the page of the figure, clickable as a whole. All the entries are `TOC 1`, and `For element: TOC 1` styles
+them.
+
+```
+Heading 1:
+    In table of contents: false
+    Text: List of figures
+Table of contents:
+    Of: figures
+Heading 1:
+    In table of contents: false
+    Text: List of tables
+Table of contents:
+    Of: tables
+```
+
+`Levels` has no effect with `Of: figures` or `tables`, and it is an error (`LEVELS_WITHOUT_HEADINGS`). A table of figures
+or of tables without any to list is `TABLE_OF_CONTENTS_EMPTY`.
+
+> **Decision:** a table of contents lists one single thing (`Of`), and a table of figures and one of tables are two
+> `Table of contents` elements. The entries of both are `TOC 1`, with the same rule, because they have no levels.
+> *Rejected alternative:* a mixed table of figures and tables, or generated elements of their own (`TOC figure`), which
+> ask for more rules.
 
 ## Entries
 
@@ -59,9 +92,10 @@ The entry inherits the typography of the `Table of contents`, and its boxes, tha
 
 These are errors:
 
-- a `Table of contents` without any heading at its levels (`TABLE_OF_CONTENTS_EMPTY`, with the line of the
-  `Table of contents`);
-- a `Levels` that is not two levels from 1 to 6 in order (`VALUE_NOT_ALLOWED`);
+- a `Table of contents` without any heading at its levels, or without any figure or table with `Of: figures` or
+  `tables` (`TABLE_OF_CONTENTS_EMPTY`, with the line of the `Table of contents`);
+- a `Levels` that is not two levels from 1 to 6 in order (`VALUE_NOT_ALLOWED`), or a `Levels` with `Of: figures` or
+  `tables` (`LEVELS_WITHOUT_HEADINGS`);
 - a `Table of contents` without its own or inherited `Font` or `Size` (`TEXT_WITHOUT_FONT` and `TEXT_WITHOUT_FONT_SIZE`, with
   the line of the `Table of contents`).
 
@@ -72,9 +106,11 @@ numbers cannot be in a table of contents: it is declared with `In table of conte
 
 ## Accessibility
 
-A screen reader announces it as a table of contents, with each entry as a link to its heading. The PDF bookmarks do not
-change ([The PDF](../common/pdf.md#bookmarks)).
+A screen reader announces it as a table of contents, with each entry as a link to its heading or its figure. The PDF
+bookmarks do not change ([The PDF](../common/pdf.md#bookmarks)).
 
 ## What is not supported
 
-- Tables of contents of things other than headings (figures, tables), alphabetical indexes and entries written by hand.
+- Tables of contents of things other than headings, figures and tables (listings, equations), alphabetical indexes and
+  entries written by hand.
+- A mixed table of figures and tables.

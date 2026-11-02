@@ -20,7 +20,7 @@ import dev.stxt.pdf.model.Value;
  * <p>The properties go in groups, each in its own class: the document ones ({@link TypographyStyle},
  * {@link BoxStyle} and {@link BreakStyle}, reference/common/structure.md) and the ones of an element kind
  * ({@link StackStyle}, {@link GridStyle}, {@link ItemStyle}, {@link ListStyle}, {@link ColumnsStyle},
- * {@link ImageStyle} and {@link TableOfContentsStyle}). An algorithm reads only its own:
+ * {@link ImageStyle}, {@link FigureStyle} and {@link TableOfContentsStyle}). An algorithm reads only its own:
  * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
  * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
  * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
@@ -55,6 +55,7 @@ public final class Style extends StyleGroup {
     private final ListStyle list = new ListStyle();
     private final ColumnsStyle columns = new ColumnsStyle();
     private final ImageStyle image = new ImageStyle();
+    private final FigureStyle figure = new FigureStyle();
     private final TableOfContentsStyle tableOfContents = new TableOfContentsStyle();
 
     // --- Properties of the element -----------------------------------------------------------------
@@ -83,7 +84,7 @@ public final class Style extends StyleGroup {
      */
     private boolean rowHeader;
     /**
-     * {@code In table of contents} of a heading: whether it has an entry in tables of contents
+     * {@code In table of contents} of a heading or a {@code Figure}: whether it has an entry in tables of contents
      * (reference/components/table-of-contents.md). Not inherited.
      */
     private boolean inTableOfContents = true;
@@ -164,6 +165,11 @@ public final class Style extends StyleGroup {
     /** Those of {@code Image} (reference/components/image.md). */
     public ImageStyle image() {
         return image;
+    }
+
+    /** Those of {@code Figure} (reference/components/figure.md). */
+    public FigureStyle figure() {
+        return figure;
     }
 
     /** Those of {@code Table of contents} (reference/components/table-of-contents.md). */
@@ -398,6 +404,7 @@ public final class Style extends StyleGroup {
         list.close();
         columns.close();
         image.close();
+        figure.close();
         tableOfContents.close();
     }
 }

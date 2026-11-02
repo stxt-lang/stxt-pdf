@@ -1,22 +1,33 @@
-# Three-page quick guide for a thermostat. It gathers what a technical manual usually has:
-# a figure with overlaid numbers (a Frame with its Overlay elements on top) and its legend
-# beside it (a List of Paragraph with the bold written with Markup: markdown, which the Paragraph
-# rule enables), colored notices, numbered steps in Markdown, a wiring diagram,
+# Four-page quick guide for a thermostat. It gathers what a technical manual usually has:
+# a figure with overlaid numbers (a Frame with its Overlay elements on top, inside a Figure with its
+# caption) and its legend beside it (a List of Paragraph with the bold written with Markup: markdown,
+# which the Paragraph rule enables), colored notices, numbered steps in Markdown, a wiring diagram,
 # a terminal block with aligned columns (a Text with Preformatted: pre, in monospace),
-# inline code and tables of specifications and of faults. The heading
+# inline code and tables of specifications and of faults. The figures and the tables are Figure
+# elements with a Caption, numbered apart ("Figure 1.", "Table 1.": the labels are the Number label
+# of the rules in the Styles of the document, because they depend on the language), and the last
+# section lists them with two Table of contents (Of: figures and Of: tables). The heading
 # structure gives the PDF outline (bookmarks), and the fault table refers to the diagram with
-# {page of: wiring}, the page where it is (also inside Markdown). The header writes the section in
-# effect on each page with {heading 2}, a running head. The sections are numbered Heading 2
-# (Numbered: true in styles.stxt: 1 to 8) and their subsections, Heading 3 (3.1, 8.1..., also
-# those of a Markdown); the product title declares Numbered: false. A Markdown link refers to the
-# specifications section with {number of: specs-heading}. The labels are written in
-# lowercase and put in uppercase, spaced out, with Case and Letter spacing.
+# {number of: wiring} and {page of: wiring}, its number and the page where it is (also inside
+# Markdown). The header writes the section in effect on each page with {heading 2}, a running head.
+# The sections are numbered Heading 2 (Numbered: true in styles.stxt: 1 to 9) and their
+# subsections, Heading 3 (3.1, 8.1..., also those of a Markdown); the product title declares
+# Numbered: false. A Markdown link refers to the specifications section with
+# {number of: specs-heading}. The labels are written in lowercase and put in uppercase, spaced out,
+# with Case and Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
 		Margin: 64 54 66 54
 	Title: Quick guide to the Aire+ T2 thermostat
 	Language: en
+	Styles:
+		For element: Figure
+			Typography:
+				Number label: Figure {number}.
+		For style: table
+			Typography:
+				Number label: Table {number}.
 	Section:
 		Page overlay:
 			Id: header
@@ -74,31 +85,38 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 6 0
 			Item:
-				Frame:
-					Id: device
+				Figure:
+					Id: fig-device
+					Alt: The thermostat seen from the front, with its four parts numbered
 					Box:
 						Width: 250
-						Height: 250
-					Image: examples/manual/en/thermostat.svg
-						Alt: The thermostat seen from the front, with the temperature ring and the status light
-						Box:
-							Width: 100%
-					Overlay:
-						Offset: 30 auto auto 184
-						Style: badge
-						Text: 1
-					Overlay:
-						Offset: 76 auto auto 124
-						Style: badge
-						Text: 2
-					Overlay:
-						Offset: 170 auto auto 70
-						Style: badge
-						Text: 3
-					Overlay:
-						Offset: 120 auto auto 190
-						Style: badge
-						Text: 4
+						Margin: 0
+					Caption: The four parts of the thermostat.
+					Block:
+						Frame:
+							Id: device
+							Box:
+								Width: 250
+								Height: 250
+							Image: examples/manual/en/thermostat.svg
+								Box:
+									Width: 100%
+							Overlay:
+								Offset: 30 auto auto 184
+								Style: badge
+								Text: 1
+							Overlay:
+								Offset: 76 auto auto 124
+								Style: badge
+								Text: 2
+							Overlay:
+								Offset: 170 auto auto 70
+								Style: badge
+								Text: 3
+							Overlay:
+								Offset: 120 auto auto 190
+								Style: badge
+								Text: 4
 			Item:
 				Grow: 1
 				Block:
@@ -171,18 +189,13 @@ Document (dev.stxt.pdf):
 					3. Screw the plate to the wall, **1.5 m** from the floor and away from drafts and heat sources.
 					4. Connect the wires to the terminals following the diagram below and tighten the screws firmly.
 					5. Fit the thermostat onto the plate and restore the power: it will switch on by itself.
-			Image: examples/manual/en/wiring.svg
+			Figure:
 				Id: wiring
-				Alt: Wiring diagram of terminals L, N, C and NO with the wire colors
-				Box:
-					Width: 100%
-					Margin: 6 0 0 0
-			Text: Wiring diagram of the four terminals.
-				Typography:
-					Size: 8
-					Color: #5E7479
-				Box:
-					Margin: 3 0 10 0
+				Caption: Wiring diagram of the four terminals.
+				Image: examples/manual/en/wiring.svg
+					Alt: Wiring diagram of terminals L, N, C and NO with the wire colors
+					Box:
+						Width: 100%
 			Heading 3:
 				Text: If your installation has no neutral
 			Markdown:
@@ -215,39 +228,43 @@ Document (dev.stxt.pdf):
 				Text: If a terminal shows in red, check the wire and repeat the check before closing the cover.
 			Heading 3:
 				Text: Terminal reference
-			Table:
-				Id: terminals
-				Column sizes: 56 * 100
-				Header rows:
-					Row:
-						Cell: Terminal
-						Cell: Function
-						Cell: Usual wire
-				Body:
-					Row:
-						Cell: L
-							Row header: true
-							Style: mono
-						Cell: Power supply, live
-						Cell: Brown
-					Row:
-						Cell: N
-							Row header: true
-							Style: mono
-						Cell: Power supply, neutral
-						Cell: Blue
-					Row:
-						Cell: C
-							Row header: true
-							Style: mono
-						Cell: Boiler common contact
-						Cell: Gray
-					Row:
-						Cell: NO
-							Row header: true
-							Style: mono
-						Cell: Normally open contact
-						Cell: Yellow
+			Figure:
+				Id: tab-terminals
+				Style: table
+				Caption: Thermostat terminals and usual wires.
+				Table:
+					Id: terminals
+					Column sizes: 56 * 100
+					Header rows:
+						Row:
+							Cell: Terminal
+							Cell: Function
+							Cell: Usual wire
+					Body:
+						Row:
+							Cell: L
+								Row header: true
+								Style: mono
+							Cell: Power supply, live
+							Cell: Brown
+						Row:
+							Cell: N
+								Row header: true
+								Style: mono
+							Cell: Power supply, neutral
+							Cell: Blue
+						Row:
+							Cell: C
+								Row header: true
+								Style: mono
+							Cell: Boiler common contact
+							Cell: Gray
+						Row:
+							Cell: NO
+								Row header: true
+								Style: mono
+							Cell: Normally open contact
+							Cell: Yellow
 		Block:
 			Id: app
 			Break:
@@ -261,11 +278,17 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 8 0
 				Item:
-					Image: examples/manual/en/app.png
-						Id: app-screen
-						Alt: The main screen of the app, with the living room temperature and the plus and minus buttons
+					Figure:
+						Id: fig-app
 						Box:
 							Width: 112
+							Margin: 0
+						Caption: The main screen of the app.
+						Image: examples/manual/en/app.png
+							Id: app-screen
+							Alt: The main screen of the app, with the living room temperature and the plus and minus buttons
+							Box:
+								Width: 112
 				Item:
 					Grow: 1
 					Markdown:
@@ -280,38 +303,40 @@ Document (dev.stxt.pdf):
 							If pairing fails, bring the phone closer to the thermostat and check that you are using a **2.4 GHz** network: 5 GHz is not supported.
 			Heading 2:
 				Text: Set your weekly schedule
-			Paragraph: The thermostat comes with an energy-saving schedule that you can change from the app or from the dial menu. These are the factory time slots:
-			Table:
-				Id: schedule
-				Column sizes: * * *
-				Box:
-					Margin: 0 0 12 0
-				Header rows:
-					Row:
-						Cell: Time slot
-						Cell: Monday to Friday
-						Cell: Weekend
-				Body:
-					Row:
-						Cell: Morning · 06:30–08:30
-							Row header: true
-						Cell: 21 °C
-						Cell: 18 °C
-					Row:
-						Cell: Day · 08:30–17:00
-							Row header: true
-						Cell: 17 °C
-						Cell: 20 °C
-					Row:
-						Cell: Evening · 17:00–23:00
-							Row header: true
-						Cell: 21.5 °C
-						Cell: 21.5 °C
-					Row:
-						Cell: Night · 23:00–06:30
-							Row header: true
-						Cell: 16 °C
-						Cell: 16 °C
+			Paragraph: The thermostat comes with an energy-saving schedule that you can change from the app or from the dial menu. These are the factory time slots (table {number of: tab-schedule}):
+			Figure:
+				Id: tab-schedule
+				Style: table
+				Caption: Time slots of the factory schedule.
+				Table:
+					Id: schedule
+					Column sizes: * * *
+					Header rows:
+						Row:
+							Cell: Time slot
+							Cell: Monday to Friday
+							Cell: Weekend
+					Body:
+						Row:
+							Cell: Morning · 06:30–08:30
+								Row header: true
+							Cell: 21 °C
+							Cell: 18 °C
+						Row:
+							Cell: Day · 08:30–17:00
+								Row header: true
+							Cell: 17 °C
+							Cell: 20 °C
+						Row:
+							Cell: Evening · 17:00–23:00
+								Row header: true
+							Cell: 21.5 °C
+							Cell: 21.5 °C
+						Row:
+							Cell: Night · 23:00–06:30
+								Row header: true
+							Cell: 16 °C
+							Cell: 16 °C
 			Heading 2:
 				Text: Troubleshooting
 			Markdown:
@@ -319,42 +344,46 @@ Document (dev.stxt.pdf):
 				Content >>
 					| Symptom | Probable cause | What to do |
 					|---------|----------------|-----------|
-					| The screen does not turn on | No power or a loose wire | Check the electrical panel and terminals L and N |
-					| Status light in red | It cannot connect to the Wi-Fi network | Move the router closer or repeat the pairing |
-					| The boiler does not start | C/NO contact wired wrong | Check the diagram on page {page of: wiring} |
-					| Wrong temperature | It is near a heat source | Move it to another spot, 1.5 m from the floor |
+					| The screen does not turn on | No power or a loose wire | Check the panel and terminals L and N |
+					| Status light in red | No Wi-Fi connection | Move the router closer or pair again |
+					| The boiler does not start | C/NO contact wired wrong | Check figure {number of: wiring} (page {page of: wiring}) |
+					| Wrong temperature | It is near a heat source | Move it 1.5 m from the floor |
 			Heading 2:
 				Id: specs-heading
 				Text: Technical specifications
-			Table:
-				Id: specs
-				Column sizes: 150 *
-				Body:
-					Row:
-						Cell: Power supply
-							Row header: true
-						Cell: 230 V AC, 50 Hz, or 2 AA batteries
-							Style: mono
-					Row:
-						Cell: Output contact
-							Row header: true
-						Cell: 6 A / 250 V, potential-free
-							Style: mono
-					Row:
-						Cell: Temperature range
-							Row header: true
-						Cell: 5 to 30 °C, in 0.5 °C steps
-							Style: mono
-					Row:
-						Cell: Connectivity
-							Row header: true
-						Cell: Wi-Fi 2.4 GHz (IEEE 802.11 b/g/n)
-							Style: mono
-					Row:
-						Cell: Dimensions
-							Row header: true
-						Cell: 86 × 86 × 24 mm
-							Style: mono
+			Figure:
+				Id: tab-specs
+				Style: table
+				Caption: Specifications of the Aire+ T2.
+				Table:
+					Id: specs
+					Column sizes: 150 *
+					Body:
+						Row:
+							Cell: Power supply
+								Row header: true
+							Cell: 230 V AC, 50 Hz, or 2 AA batteries
+								Style: mono
+						Row:
+							Cell: Output contact
+								Row header: true
+							Cell: 6 A / 250 V, potential-free
+								Style: mono
+						Row:
+							Cell: Temperature range
+								Row header: true
+							Cell: 5 to 30 °C, in 0.5 °C steps
+								Style: mono
+						Row:
+							Cell: Connectivity
+								Row header: true
+							Cell: Wi-Fi 2.4 GHz (IEEE 802.11 b/g/n)
+								Style: mono
+						Row:
+							Cell: Dimensions
+								Row header: true
+							Cell: 86 × 86 × 24 mm
+								Style: mono
 		Block:
 			Id: support
 			Heading 2:
@@ -429,3 +458,17 @@ Document (dev.stxt.pdf):
 						Text: Videos, FAQs and forum
 							Typography:
 								Size: 8
+		Block:
+			Id: lists
+			Heading 2:
+				Text: List of figures and tables
+			Text: Figures
+				Style: list-label
+			Table of contents:
+				Id: figures
+				Of: figures
+			Text: Tables
+				Style: list-label
+			Table of contents:
+				Id: tables
+				Of: tables

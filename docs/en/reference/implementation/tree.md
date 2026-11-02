@@ -27,7 +27,7 @@ In the schema:
 - the rest, `INLINE` without children, whose form `ValueReader` checks.
 
 What the schema cannot express is checked by `BoxTreeBuilder`: that `Page` declares its size in a single way, that
-`Item` and `Area` have exactly one element and a `List item` at least one (the schema counts by type), that a `Text`
+`Item`, `Area` and `Figure` have exactly one element and a `List item` at least one (the schema counts by type), that a `Text`
 has its text in one place and only one, that the root is `Document`, that the `Text` of a heading has no `Break`, the
 hierarchy and the place of the headings and, in a `Table`, the order `Header rows`, `Body`, `Footer rows`, that a `Cell`
 does not have both a value and elements and that each row fills its columns. What a `Markdown` generates goes through the schema
@@ -57,7 +57,9 @@ is the order common to all elements (the place, inheritance, the rules, the prop
 the content), and what is specific to each one is done by its family, `ElementReader` (an enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
 `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` and `CONTAINER`, chosen with `ElementReader.of`): the layout of the
 box, what its wrapper gives it, the properties of its type, what it checks before creating the box, and its content. A
-new element with nothing of its own is a `CONTAINER`, and one with something of its own, a new family, without touching `element`.
+new element with nothing of its own is a `CONTAINER`, and one with something of its own, a new family, without touching `element`. The
+`FIGURE` family builds the element and the `Caption` of a `Figure`, orders them by `Caption position`, numbers it
+(`Figures`) and keeps it from being split.
 
 The pieces:
 
@@ -70,8 +72,9 @@ The pieces:
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
 | `ListBuilder`, `ListMarkers` | Lists: the numbering and the box of the marker |
 | `MarkdownBuilder` | Translates a `Markdown` (and text with `Markup: markdown`) into STXT nodes |
-| `TableOfContentsBuilder` | The entries of the tables of contents, at the end of the construction |
-| `HeadingNumbers` | The numbers of the headings |
+| `TableOfContentsBuilder` | The entries of the tables of contents (of headings, figures or tables), at the end of the construction |
+| `HeadingNumbers` | The numbers of the headings, and the writing of the number before the title or the caption |
+| `Figures` | The figures: the two counters, whether a `Figure` is numbered, where its caption goes, which counter it counts in and its `Alt` |
 | `References`, `LinkTargets` | Check the references and the `#id` links of the whole tree |
 | `Footnotes` | The footnotes: the area of each section, the calls `[^id]` numbered as they are read and, at the end, that each call has its note and each note its call, and the number before the first text of each note |
 | `ModelValidator` | The rules that look at the box already read (such as margins, minimums and maximums, definite height or rotation) |
@@ -88,7 +91,7 @@ No method in `tree` exceeds 60 lines or a complexity of 20.
 `Box` has private fields, is read with methods (such as `text()`, `children()` or `formattedRuns()`) and is written with
 package-private `set...` methods. `Style` is split into one group for each group of the document (`TypographyStyle`, `BoxStyle`, `BreakStyle`)
 and for each element type with properties of its own (`StackStyle`, `GridStyle`, `ItemStyle`, `ListStyle`, `ColumnsStyle`,
-`ImageStyle`, `TableOfContentsStyle`). `Style` keeps the properties that define the element and the lines. Outside `tree` it is
+`ImageStyle`, `FigureStyle`, `TableOfContentsStyle`). `Style` keeps the properties that define the element and the lines. Outside `tree` it is
 read through the group: `style.typography().fontSize()`, `style.stack().direction()`, `style.box().margin()`. Only
 `TypographyStyle` is inherited: `Style.inheriting` copies the group of the parent. A new property goes in the group of its place in the
 document, with its reading and its `set...`.

@@ -1,0 +1,29 @@
+# Page 1: toc (24) at 20, toc2 (12) at 44, f1 at 56 (i1 at 56, c1 at 116) and t1 at 128 (c2 at 128, tb at 140,
+#   which ends at 164). Page 2: f2 at 20 (i2 at 20, c3 at 50) and p at 62.
+Result:
+	Page: 1
+		Fragment: toc
+			Rect: 20 20 260 24
+		Fragment: toc2
+			Rect: 20 44 260 12
+		Fragment: f1
+			Rect: 20 56 260 72
+			Fragment: i1
+				Rect: 20 56 100 60
+			Fragment: c1
+				Rect: 20 116 260 12
+		Fragment: t1
+			Rect: 20 128 260 36
+			Fragment: c2
+				Rect: 20 128 260 12
+			Fragment: tb
+				Rect: 20 140 260 24
+	Page: 2
+		Fragment: f2
+			Rect: 20 20 260 42
+			Fragment: i2
+				Rect: 20 20 100 30
+			Fragment: c3
+				Rect: 20 50 260 12
+		Fragment: p
+			Rect: 20 62 260 12

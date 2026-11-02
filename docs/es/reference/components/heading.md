@@ -154,7 +154,8 @@ Paragraph: Los importes del anexo {number of: fees}.
 
 `{number of: id}` da el número completo (`4.2`) y no el de su último nivel como el de un `List item`. Los encabezados de un
 `Markdown` se numeran como los demás, y se pueden referir si llevan `Id`, que se escribe al final de su texto
-(`## Ventas {#ventas}`, [Markdown](markdown.md#encabezados)).
+(`## Ventas {#ventas}`, [Markdown](markdown.md#encabezados)). Las figuras y las tablas con pie se numeran aparte, con
+las mismas propiedades y sus propios contadores ([Figure](figure.md#numeración)).
 
 ## Marcadores y accesibilidad
 

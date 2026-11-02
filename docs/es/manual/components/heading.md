@@ -84,6 +84,7 @@ una regla, en todo el documento o en un encabezado concreto.
   apartados en cifras dan `II.1`.
 - `Number label` cambia lo que va delante del título: `Number label: Anexo {number}.` escribe «Anexo A. Honorarios». El
   `{number}` es donde va el número, y `{number of: id}` sigue dando solo el número («el anexo A»).
+- Las figuras y las tablas con pie se numeran aparte, con las mismas propiedades ([Figure](figure.md)).
 
 ```
 Styles:

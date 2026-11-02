@@ -65,8 +65,16 @@ public enum Element {
      */
     BARCODE("Barcode", Layout.IMAGE, Position.STATIC, true, false, 0),
     /**
+     * A figure with a caption (reference/components/figure.md): a block with exactly one element ({@code Image},
+     * {@code Barcode}, {@code Table} or {@code Block}) and its {@link #CAPTION}, above or below it, numbered with the
+     * counter of the figures or the tables.
+     */
+    FIGURE("Figure", Layout.BLOCK, Position.STATIC, true, false, 0),
+    /** The caption of a {@link #FIGURE}: a text, with its number before it if the figure is numbered. */
+    CAPTION("Caption", Layout.INLINE, Position.STATIC, false, true, 0),
+    /**
      * Automatic table of contents (reference/common/references.md): a block whose children, generated when the tree is
-     * built, are one entry per heading ({@link #TOC_1} ... {@link #TOC_6}).
+     * built, are one entry per heading ({@link #TOC_1} ... {@link #TOC_6}), or per figure or table.
      */
     TABLE_OF_CONTENTS("Table of contents", Layout.BLOCK, Position.STATIC, true, false, 0),
     /**
@@ -105,9 +113,10 @@ public enum Element {
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
-     * The entries of a {@link #TABLE_OF_CONTENTS}, one per heading level: a generated {@code Stack} with the
-     * title, the leader and the page number. They are not written in the document, but the {@code For element} rules
-     * name them ({@code TOC 2}) to style them (reference/components/table-of-contents.md).
+     * The entries of a {@link #TABLE_OF_CONTENTS}, one per heading level (those of a table of contents of figures or
+     * tables are {@link #TOC_1}): a generated {@code Stack} with the title, the leader and the page number. They are
+     * not written in the document, but the {@code For element} rules name them ({@code TOC 2}) to style them
+     * (reference/components/table-of-contents.md).
      */
     TOC_1("TOC 1", Layout.STACK),
     TOC_2("TOC 2", Layout.STACK),
@@ -253,6 +262,14 @@ public enum Element {
         CELL,
         /** An image, read from a file or generated ({@code Image} and {@code Barcode}). */
         FIGURE,
+        /**
+         * A {@code Figure} element (reference/components/figure.md): an image, a table or a block with its caption.
+         * With an image or a block it is the figure of the tagged PDF, with the caption inside; with a table, the
+         * table carries the caption and the element has no meaning of its own.
+         */
+        FIGURE_GROUP,
+        /** The caption of a {@code Figure}: a text read with what it describes. */
+        CAPTION,
         /** A table of contents ({@code Table of contents}, reference/components/table-of-contents.md). */
         TABLE_OF_CONTENTS,
         /** A footnote ({@code Footnote}, reference/components/footnote.md): read after the paragraph that calls it. */
@@ -296,6 +313,8 @@ public enum Element {
             case ROW -> Role.ROW;
             case CELL -> Role.CELL;
             case IMAGE, BARCODE -> Role.FIGURE;
+            case FIGURE -> Role.FIGURE_GROUP;
+            case CAPTION -> Role.CAPTION;
             case TABLE_OF_CONTENTS -> Role.TABLE_OF_CONTENTS;
             case FOOTNOTE -> Role.NOTE;
             case FOOTNOTES -> Role.FOOTNOTES;

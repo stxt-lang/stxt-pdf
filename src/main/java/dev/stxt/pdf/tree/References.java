@@ -101,8 +101,8 @@ public final class References {
                 case NUMBER -> {
                     if (target.number() == null) {
                         throw new InvalidModelException(site.line(), ErrorCode.REFERENCE_NOT_NUMBERED, text
-                                + ": " + r.id() + " has no number (only the items of a numbered list "
-                                + "and the headings with Numbered: true have one)");
+                                + ": " + r.id() + " has no number (only the items of a numbered list, "
+                                + "the headings with Numbered: true and the numbered figures have one)");
                     }
                 }
                 default -> throw new IllegalStateException("Unexpected reference: " + text);

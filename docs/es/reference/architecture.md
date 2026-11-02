@@ -70,7 +70,7 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   (`Element.Role`), que es lo único que el layout y el pintado miran.
 - **`Style`** y sus grupos: las propiedades de una caja, separadas como en el documento (`TypographyStyle`, el único que
   se hereda, `BoxStyle`, `BreakStyle`) y por tipo de elemento (`StackStyle`, `GridStyle`, `ItemStyle`, `ListStyle`,
-  `ColumnsStyle`, `ImageStyle`, `TableOfContentsStyle`), con la línea del documento de cada propiedad.
+  `ColumnsStyle`, `ImageStyle`, `FigureStyle`, `TableOfContentsStyle`), con la línea del documento de cada propiedad.
 - **`BoxTreeBuilder`**: el orquestador de la construcción ([El árbol de cajas](implementation/tree.md)). Reparte el
   trabajo entre sus piezas:
   - `ElementReader`, lo propio de cada familia de elementos;
@@ -81,7 +81,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
     imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));
   - `ModelValidator`, las reglas que miran la caja ya leída;
-  - `Footnotes`, las notas al pie: el área de cada sección, la numeración de las llamadas y sus comprobaciones.
+  - `Footnotes`, las notas al pie: el área de cada sección, la numeración de las llamadas y sus comprobaciones;
+  - `Figures`, las figuras con pie: sus contadores, dónde va el pie y su `Alt`.
 
 ### Layout (`layout`)
 

@@ -334,8 +334,8 @@ final class ModelValidator {
                     + "(a Section, a Block, a Columns, a Cell with elements...), followed by the text that runs beside it");
         }
         if (s.layout() != Layout.IMAGE && s.box().width().isAuto() && s.box().maxWidth() == null) {
-            throw error(s.line(SIDE), ErrorCode.SIDE_WITHOUT_WIDTH, "A Block with Side needs Width or Max width: with "
-                    + "Width auto it takes up the whole width and leaves no room for the text beside it");
+            throw error(s.line(SIDE), ErrorCode.SIDE_WITHOUT_WIDTH, "A Block or a Figure with Side needs Width or Max "
+                    + "width: with Width auto it takes up the whole width and leaves no room for the text beside it");
         }
         if (s.layout() == Layout.IMAGE) {
             // An image already rejects them (BREAK_IN_IMAGE), with its own message.

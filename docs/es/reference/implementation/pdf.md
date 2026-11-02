@@ -50,6 +50,7 @@ Un elemento por caja, en el orden del documento, que es el orden de lectura:
 | `Table of contents` y sus entradas | `TOC` y `TOCI`, con dos `Span` (el título y el número) |
 | `Footnote` | `Note` (`FENote` con PDF/UA-2), con el número en un `Lbl`, justo después del texto que la llama; la llamada, un `Reference` dentro de ese texto ([abajo](#notas-al-pie)) |
 | `Image` con `Alt`, `Barcode` | `Figure`, con `Alt` y `BBox` |
+| `Figure` con una imagen o un `Block`, y su `Caption` | `Figure`, con el `Alt` (el de la imagen, o el suyo) y el pie en un `Caption`; con una `Table`, la tabla lleva el `Caption` ([abajo](#figuras)) |
 | Una caja con `Link`, un enlace de texto | `Link` ([abajo](#enlaces)) |
 | El resto (como `Block`, `Stack`, `Grid`, `Columns`, `Markdown` o los posicionados) | `Div` |
 
@@ -128,6 +129,17 @@ tiene una sola `THead` y una sola `TFoot`.
 
 El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Fit: inside`. El de
 una imagen girada es el rectángulo que la envuelve.
+
+Una `Figure` con pie ([Figure](../components/figure.md)) con una imagen dentro es **un solo** `Figure`: el de la figura,
+con el `Alt` de la imagen, el `BBox` de la imagen y el pie en un `Caption`; la imagen no tiene elemento propio y su
+contenido cuelga del `Figure` (o de un `Link`, si lleva `Link`). Con un `Block` dentro, el `Figure` lleva el `Alt` propio
+de la `Figure` y contiene el `Div` del bloque y el `Caption`. Con una `Table` dentro, la figura no tiene elemento: la
+`Table` lleva el `Caption` como primer hijo (pie encima) o último (pie debajo). El orden del `Caption` es el de la página.
+Las notas al pie llamadas desde un pie van tras la figura.
+
+> **Decisión:** la figura con imagen es un solo `Figure` y no uno dentro de otro, y la tabla lleva su propio `Caption`,
+> como piden PDF 1.7 y 2.0 (un `Caption` es hijo de `Figure` o de `Table`). *Alternativa descartada:* un `Div` con el
+> `Figure` de la imagen y un `P` para el pie, que no dice que el pie es de la figura.
 
 ### Notas al pie
 

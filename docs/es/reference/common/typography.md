@@ -31,15 +31,15 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Kerning` | `true`, `false` | `false` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `false`, `true`, `wrap` | `false` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: true` o `wrap`, las columnas de una tabulación. |
-| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). |
-| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
-| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
+| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). Una `Figure` va numerada salvo que lo declare ella o una regla suya ([Figure](../components/figure.md#numeración)). |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado, o el de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
+| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado, o del pie de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente ([Cortes](breaks.md#elección-del-corte)). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 | `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |
 
 Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` para sus hijos, y un `Text` que hereda
-`Numbered: true` no hace nada, porque solo lo lee un encabezado.
+`Numbered: true` no hace nada, porque solo lo leen los encabezados y las figuras.
 
 ## Dónde hay texto
 

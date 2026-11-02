@@ -3,54 +3,70 @@ Result:
 		Fragment: banner
 			Rect: 54 64 487.28 109
 		Fragment: overview
-			Rect: 54 191 487.28 250
-			Fragment: device
-				Rect: 54 191 250 250
+			Rect: 54 191 487.28 271.5
+			Fragment: fig-device
+				Rect: 54 191 250 271.5
+				Fragment: device
+					Rect: 54 191 250 250
 		Fragment: contents
-			Rect: 54 494 487.28 49
+			Rect: 54 515.5 487.28 49
 		Fragment: warning-power
-			Rect: 54 551 487.28 65.5
+			Rect: 54 572.5 487.28 65.5
 		Fragment: installation
-			Rect: 54 628.5 487.28 133.5
+			Rect: 54 650 487.28 112
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer
 			Rect: 54 795.89 487.28 20
 	Page: 2
 		Fragment: installation
-			Rect: 54 64 487.28 654.41
+			Rect: 54 64 487.28 697.41
 			Fragment: wiring
-				Rect: 54 64 487.28 194.91
+				Rect: 54 86.5 487.28 212.41
 			Fragment: terminal
-				Rect: 54 403.41 487.28 98
-			Fragment: terminals
-				Rect: 54 593.41 487.28 125
+				Rect: 54 425.91 487.28 98
+			Fragment: tab-terminals
+				Rect: 54 617.91 487.28 143.5
+				Fragment: terminals
+					Rect: 54 636.41 487.28 125
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer
 			Rect: 54 795.89 487.28 20
 	Page: 3
 		Fragment: app
-			Rect: 54 64 487.28 668.5
-			Fragment: app-screen
-				Rect: 54 97 112 200
-			Fragment: schedule
-				Rect: 54 386 487.28 125
+			Rect: 54 64 487.28 679.5
+			Fragment: fig-app
+				Rect: 54 97 112 236
+				Fragment: app-screen
+					Rect: 54 97 112 200
+			Fragment: tab-schedule
+				Rect: 54 422 487.28 143.5
+				Fragment: schedule
+					Rect: 54 440.5 487.28 125
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer
 			Rect: 54 795.89 487.28 20
 	Page: 4
 		Fragment: app
-			Rect: 54 64 487.28 158
+			Rect: 54 64 487.28 176.5
 			Fragment: specs-heading
 				Rect: 54 64 487.28 25
-			Fragment: specs
-				Rect: 54 97 487.28 125
+			Fragment: tab-specs
+				Rect: 54 97 487.28 143.5
+				Fragment: specs
+					Rect: 54 115.5 487.28 125
 		Fragment: support
-			Rect: 54 242 487.28 214
+			Rect: 54 260.5 487.28 214
 			Fragment: contact
-				Rect: 54 390.5 487.28 65.5
+				Rect: 54 409 487.28 65.5
+		Fragment: lists
+			Rect: 54 494.5 487.28 175
+			Fragment: figures
+				Rect: 54 546 487.28 49.5
+			Fragment: tables
+				Rect: 54 620 487.28 49.5
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer

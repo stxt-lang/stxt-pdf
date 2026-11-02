@@ -34,6 +34,10 @@ final class BuildContext {
     int headingLevel;
     /** The counters of the heading numbering ({@code Numbered}, reference/components/heading.md). */
     final HeadingNumbers headingNumbers = new HeadingNumbers();
+    /** The counters of the figures and the tables (reference/components/figure.md). */
+    final Figures figureNumbers = new Figures();
+    /** The {@code Figure} boxes of the document, in order: the tables of contents of figures and tables list them. */
+    final List<Box> figures = new ArrayList<>();
     /** Whether the content of a {@code Page overlay} is being built. */
     boolean insidePageOverlay;
     /** Whether the texts of a heading are being built: a footnote call is not allowed in them. */

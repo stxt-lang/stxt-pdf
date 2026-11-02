@@ -1,22 +1,33 @@
-# Three-page quick guide for a thermostat. It gathers what a technical manual usually has:
-# a figure with overlaid numbers (a Frame with its Overlay elements on top) and its legend
-# beside it (a List of Paragraph with the bold written with Markup: markdown, which the Paragraph
-# rule enables), colored notices, numbered steps in Markdown, a wiring diagram,
+# Four-page quick guide for a thermostat. It gathers what a technical manual usually has:
+# a figure with overlaid numbers (a Frame with its Overlay elements on top, inside a Figure with its
+# caption) and its legend beside it (a List of Paragraph with the bold written with Markup: markdown,
+# which the Paragraph rule enables), colored notices, numbered steps in Markdown, a wiring diagram,
 # a terminal block with aligned columns (a Text with Preformatted: pre, in monospace),
-# inline code and tables of specifications and of faults. The heading
+# inline code and tables of specifications and of faults. The figures and the tables are Figure
+# elements with a Caption, numbered apart ("Figura 1.", "Tabla 1.": the labels are the Number label
+# of the rules in the Styles of the document, because they depend on the language), and the last
+# section lists them with two Table of contents (Of: figures and Of: tables). The heading
 # structure gives the PDF outline (bookmarks), and the fault table refers to the diagram with
-# {page of: wiring}, the page where it is (also inside Markdown). The header writes the section in
-# effect on each page with {heading 2}, a running head. The sections are numbered Heading 2
-# (Numbered: true in styles.stxt: 1 to 8) and their subsections, Heading 3 (3.1, 8.1..., also
-# those of a Markdown); the product title declares Numbered: false. A Markdown link refers to the
-# specifications section with {number of: specs-heading}. The labels are written in
-# lowercase and put in uppercase, spaced out, with Case and Letter spacing.
+# {number of: wiring} and {page of: wiring}, its number and the page where it is (also inside
+# Markdown). The header writes the section in effect on each page with {heading 2}, a running head.
+# The sections are numbered Heading 2 (Numbered: true in styles.stxt: 1 to 9) and their
+# subsections, Heading 3 (3.1, 8.1..., also those of a Markdown); the product title declares
+# Numbered: false. A Markdown link refers to the specifications section with
+# {number of: specs-heading}. The labels are written in lowercase and put in uppercase, spaced out,
+# with Case and Letter spacing.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4
 		Margin: 64 54 66 54
 	Title: Guía rápida del termostato Aire+ T2
 	Language: es
+	Styles:
+		For element: Figure
+			Typography:
+				Number label: Figura {number}.
+		For style: table
+			Typography:
+				Number label: Tabla {number}.
 	Section:
 		Page overlay:
 			Id: header
@@ -74,31 +85,38 @@ Document (dev.stxt.pdf):
 			Box:
 				Margin: 0 0 6 0
 			Item:
-				Frame:
-					Id: device
+				Figure:
+					Id: fig-device
+					Alt: El termostato visto de frente, con sus cuatro partes numeradas
 					Box:
 						Width: 250
-						Height: 250
-					Image: examples/manual/es/thermostat.svg
-						Alt: El termostato visto de frente, con el anillo de temperatura y el indicador luminoso
-						Box:
-							Width: 100%
-					Overlay:
-						Offset: 30 auto auto 184
-						Style: badge
-						Text: 1
-					Overlay:
-						Offset: 76 auto auto 124
-						Style: badge
-						Text: 2
-					Overlay:
-						Offset: 170 auto auto 70
-						Style: badge
-						Text: 3
-					Overlay:
-						Offset: 120 auto auto 190
-						Style: badge
-						Text: 4
+						Margin: 0
+					Caption: Las cuatro partes del termostato.
+					Block:
+						Frame:
+							Id: device
+							Box:
+								Width: 250
+								Height: 250
+							Image: examples/manual/es/thermostat.svg
+								Box:
+									Width: 100%
+							Overlay:
+								Offset: 30 auto auto 184
+								Style: badge
+								Text: 1
+							Overlay:
+								Offset: 76 auto auto 124
+								Style: badge
+								Text: 2
+							Overlay:
+								Offset: 170 auto auto 70
+								Style: badge
+								Text: 3
+							Overlay:
+								Offset: 120 auto auto 190
+								Style: badge
+								Text: 4
 			Item:
 				Grow: 1
 				Block:
@@ -171,18 +189,13 @@ Document (dev.stxt.pdf):
 					3. Atornilla la base a la pared, a **1,5 m** del suelo y lejos de corrientes de aire y de fuentes de calor.
 					4. Conecta los cables a los bornes según el esquema de abajo y aprieta bien los tornillos.
 					5. Encaja el termostato en la base y restablece la corriente: se encenderá solo.
-			Image: examples/manual/es/wiring.svg
+			Figure:
 				Id: wiring
-				Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
-				Box:
-					Width: 100%
-					Margin: 6 0 0 0
-			Text: Esquema de conexión de los cuatro bornes.
-				Typography:
-					Size: 8
-					Color: #5E7479
-				Box:
-					Margin: 3 0 10 0
+				Caption: Esquema de conexión de los cuatro bornes.
+				Image: examples/manual/es/wiring.svg
+					Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
+					Box:
+						Width: 100%
 			Heading 3:
 				Text: Si tu instalación no tiene neutro
 			Markdown:
@@ -215,39 +228,43 @@ Document (dev.stxt.pdf):
 				Text: Si algún borne aparece en rojo, revisa el cable y repite la comprobación antes de cerrar la tapa.
 			Heading 3:
 				Text: Referencia de los bornes
-			Table:
-				Id: terminals
-				Column sizes: 56 * 100
-				Header rows:
-					Row:
-						Cell: Borne
-						Cell: Función
-						Cell: Cable habitual
-				Body:
-					Row:
-						Cell: L
-							Row header: true
-							Style: mono
-						Cell: Alimentación, fase
-						Cell: Marrón
-					Row:
-						Cell: N
-							Row header: true
-							Style: mono
-						Cell: Alimentación, neutro
-						Cell: Azul
-					Row:
-						Cell: C
-							Row header: true
-							Style: mono
-						Cell: Común del contacto de la caldera
-						Cell: Gris
-					Row:
-						Cell: NO
-							Row header: true
-							Style: mono
-						Cell: Contacto normalmente abierto
-						Cell: Amarillo
+			Figure:
+				Id: tab-terminals
+				Style: table
+				Caption: Bornes del termostato y cables habituales.
+				Table:
+					Id: terminals
+					Column sizes: 56 * 100
+					Header rows:
+						Row:
+							Cell: Borne
+							Cell: Función
+							Cell: Cable habitual
+					Body:
+						Row:
+							Cell: L
+								Row header: true
+								Style: mono
+							Cell: Alimentación, fase
+							Cell: Marrón
+						Row:
+							Cell: N
+								Row header: true
+								Style: mono
+							Cell: Alimentación, neutro
+							Cell: Azul
+						Row:
+							Cell: C
+								Row header: true
+								Style: mono
+							Cell: Común del contacto de la caldera
+							Cell: Gris
+						Row:
+							Cell: NO
+								Row header: true
+								Style: mono
+							Cell: Contacto normalmente abierto
+							Cell: Amarillo
 		Block:
 			Id: app
 			Break:
@@ -261,11 +278,17 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 0 0 8 0
 				Item:
-					Image: examples/manual/es/app.png
-						Id: app-screen
-						Alt: La pantalla principal de la aplicación, con la temperatura del salón y los botones más y menos
+					Figure:
+						Id: fig-app
 						Box:
 							Width: 112
+							Margin: 0
+						Caption: La pantalla principal de la aplicación.
+						Image: examples/manual/es/app.png
+							Id: app-screen
+							Alt: La pantalla principal de la aplicación, con la temperatura del salón y los botones más y menos
+							Box:
+								Width: 112
 				Item:
 					Grow: 1
 					Markdown:
@@ -280,38 +303,40 @@ Document (dev.stxt.pdf):
 							Si el emparejamiento falla, acerca el móvil al termostato y comprueba que usas una red de **2,4 GHz**: la de 5 GHz no es compatible.
 			Heading 2:
 				Text: Programa la semana
-			Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica:
-			Table:
-				Id: schedule
-				Column sizes: * * *
-				Box:
-					Margin: 0 0 12 0
-				Header rows:
-					Row:
-						Cell: Franja
-						Cell: De lunes a viernes
-						Cell: Fin de semana
-				Body:
-					Row:
-						Cell: Mañana · 06:30–08:30
-							Row header: true
-						Cell: 21 °C
-						Cell: 18 °C
-					Row:
-						Cell: Día · 08:30–17:00
-							Row header: true
-						Cell: 17 °C
-						Cell: 20 °C
-					Row:
-						Cell: Tarde · 17:00–23:00
-							Row header: true
-						Cell: 21,5 °C
-						Cell: 21,5 °C
-					Row:
-						Cell: Noche · 23:00–06:30
-							Row header: true
-						Cell: 16 °C
-						Cell: 16 °C
+			Paragraph: El termostato viene con un programa de ahorro que puedes cambiar desde la aplicación o desde el menú de la corona. Estas son las franjas de fábrica (tabla {number of: tab-schedule}):
+			Figure:
+				Id: tab-schedule
+				Style: table
+				Caption: Franjas horarias del programa de fábrica.
+				Table:
+					Id: schedule
+					Column sizes: * * *
+					Header rows:
+						Row:
+							Cell: Franja
+							Cell: De lunes a viernes
+							Cell: Fin de semana
+					Body:
+						Row:
+							Cell: Mañana · 06:30–08:30
+								Row header: true
+							Cell: 21 °C
+							Cell: 18 °C
+						Row:
+							Cell: Día · 08:30–17:00
+								Row header: true
+							Cell: 17 °C
+							Cell: 20 °C
+						Row:
+							Cell: Tarde · 17:00–23:00
+								Row header: true
+							Cell: 21,5 °C
+							Cell: 21,5 °C
+						Row:
+							Cell: Noche · 23:00–06:30
+								Row header: true
+							Cell: 16 °C
+							Cell: 16 °C
 			Heading 2:
 				Text: Solución de problemas
 			Markdown:
@@ -321,40 +346,44 @@ Document (dev.stxt.pdf):
 					|---------|----------------|-----------|
 					| La pantalla no se enciende | Sin corriente o cable mal conectado | Revisa el cuadro eléctrico y los bornes L y N |
 					| Indicador en rojo | No se conecta a la red wifi | Acerca el router o repite el emparejamiento |
-					| La caldera no arranca | Contacto C/NO mal cableado | Comprueba el esquema de la página {page of: wiring} |
+					| La caldera no arranca | Contacto C/NO mal cableado | Comprueba la figura {number of: wiring} (página {page of: wiring}) |
 					| Temperatura errónea | Está cerca de una fuente de calor | Cámbialo de sitio, a 1,5 m del suelo |
 			Heading 2:
 				Id: specs-heading
 				Text: Especificaciones técnicas
-			Table:
-				Id: specs
-				Column sizes: 150 *
-				Body:
-					Row:
-						Cell: Alimentación
-							Row header: true
-						Cell: 230 V c. a., 50 Hz, o 2 pilas AA
-							Style: mono
-					Row:
-						Cell: Contacto de salida
-							Row header: true
-						Cell: 6 A / 250 V, libre de potencial
-							Style: mono
-					Row:
-						Cell: Rango de temperatura
-							Row header: true
-						Cell: de 5 a 30 °C, pasos de 0,5 °C
-							Style: mono
-					Row:
-						Cell: Conectividad
-							Row header: true
-						Cell: Wifi 2,4 GHz (IEEE 802.11 b/g/n)
-							Style: mono
-					Row:
-						Cell: Dimensiones
-							Row header: true
-						Cell: 86 × 86 × 24 mm
-							Style: mono
+			Figure:
+				Id: tab-specs
+				Style: table
+				Caption: Especificaciones del Aire+ T2.
+				Table:
+					Id: specs
+					Column sizes: 150 *
+					Body:
+						Row:
+							Cell: Alimentación
+								Row header: true
+							Cell: 230 V c. a., 50 Hz, o 2 pilas AA
+								Style: mono
+						Row:
+							Cell: Contacto de salida
+								Row header: true
+							Cell: 6 A / 250 V, libre de potencial
+								Style: mono
+						Row:
+							Cell: Rango de temperatura
+								Row header: true
+							Cell: de 5 a 30 °C, pasos de 0,5 °C
+								Style: mono
+						Row:
+							Cell: Conectividad
+								Row header: true
+							Cell: Wifi 2,4 GHz (IEEE 802.11 b/g/n)
+								Style: mono
+						Row:
+							Cell: Dimensiones
+								Row header: true
+							Cell: 86 × 86 × 24 mm
+								Style: mono
 		Block:
 			Id: support
 			Heading 2:
@@ -429,3 +458,17 @@ Document (dev.stxt.pdf):
 						Text: Vídeos, preguntas frecuentes y foro
 							Typography:
 								Size: 8
+		Block:
+			Id: lists
+			Heading 2:
+				Text: Índice de figuras y tablas
+			Text: Figuras
+				Style: list-label
+			Table of contents:
+				Id: figures
+				Of: figures
+			Text: Tablas
+				Style: list-label
+			Table of contents:
+				Id: tables
+				Of: tables

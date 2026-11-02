@@ -5,6 +5,9 @@ import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.BarcodeFormat;
 import dev.stxt.pdf.model.Break;
+import dev.stxt.pdf.model.CaptionPosition;
+import dev.stxt.pdf.model.FigureCounter;
+import dev.stxt.pdf.model.Listing;
 import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.ErrorCorrection;
@@ -141,6 +144,9 @@ final class PropertyReader {
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
             entry("format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
+            entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
+            entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
+            entry("of", (p, s) -> s.tableOfContents().setOf(enumValue(Listing.class, p))),
             entry("levels", TableOfContentsBuilder::levels),
             entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 
@@ -248,8 +254,8 @@ final class PropertyReader {
     }
 
     /**
-     * The alternative text of an {@code Image} or a {@code Barcode}: not empty; for a decorative image, it is not
-     * declared.
+     * The alternative text of an {@code Image}, a {@code Barcode} or a {@code Figure} with a {@code Block}: not empty;
+     * for a decorative image, it is not declared.
      */
     private static String alt(Node p) {
         String alt = p.getText().trim();
@@ -376,7 +382,10 @@ final class PropertyReader {
         return Alignment.valueOf(d.name());
     }
 
-    /** {@code Number label}: a template with {@code {number}} exactly once (reference/components/heading.md). */
+    /**
+     * {@code Number label}: a template with {@code {number}} exactly once (reference/components/heading.md and
+     * reference/components/figure.md).
+     */
     private static String numberLabel(Node p) {
         String label = p.getText().strip();
         int at = label.indexOf(HeadingNumbers.NUMBER);

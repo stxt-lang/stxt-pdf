@@ -1,0 +1,19 @@
+# Case: A figure with a Block without its own Alt
+# Code: FIGURE_WITHOUT_ALT
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Figure:
+			Caption: Pie
+			Block:
+				Text: Hola

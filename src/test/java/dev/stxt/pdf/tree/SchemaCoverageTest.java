@@ -148,7 +148,11 @@ class SchemaCoverageTest {
             Map.entry("Number markers", "Number markers: decimal lower-alpha"),
             Map.entry("Table columns", "Table columns: auto"),
             Map.entry("Column align", "Column align: right"),
+            // Figure
+            Map.entry("Caption position", "Caption position: top"),
+            Map.entry("Figure counter", "Figure counter: tables"),
             // Table of contents
+            Map.entry("Of", "Of: figures"),
             Map.entry("Levels", "Levels: 1 2"),
             Map.entry("Leader", "Leader: line"),
             // Image
@@ -218,8 +222,14 @@ class SchemaCoverageTest {
         // A footnote needs its call, and its Id is the name of the call.
         t.put("Footnote", new Template(HEADER + "\tParagraph: Hola[^n]\n\t\tTypography:\n\t\t\tMarkup: markdown\n"
                 + "\tFootnote:\n\t\tId: n\n\t\t{}\n\t\tParagraph: Nota", Set.of("Id")));
-        // A table of contents needs some heading to list.
-        t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tTable of contents:\n\t\t{}"));
+        // A table of contents needs some heading to list, or some figure with Of: figures.
+        t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tFigure:\n\t\tCaption: C\n"
+                + "\t\tImage: test/wide.png\n\t\t\tAlt: A\n\tTable of contents:\n\t\t{}"));
+        // A figure with a Block carries its own Alt; with an image, the Alt would have no effect.
+        t.put("Figure", new Template(HEADER + "\tFigure:\n\t\tAlt: Conjunto\n\t\t{}\n\t\tCaption: Pie\n\t\tBlock:\n"
+                + "\t\t\tText: Hola", Set.of("Alt")));
+        t.put("Caption", new Template(HEADER + "\tFigure:\n\t\tAlt: Conjunto\n\t\tBlock:\n\t\t\tText: Hola\n\t\tCaption:\n"
+                + "\t\t\t{}\n\t\t\tContent >>\n\t\t\t\tPie", Set.of("Content")));
         t.put("Image", new Template(HEADER + "\tImage: test/wide.png\n\t\t{}"));
         t.put("Barcode", new Template(HEADER + "\tBarcode: https://example.com/a\n\t\tAlt: Enlace\n\t\t{}",
                 Set.of("Alt")));
@@ -246,7 +256,7 @@ class SchemaCoverageTest {
         // Clear needs a side box before the element: the template of each element, with one in front.
         String side = "\tImage: test/square.png\n\t\tSide: left\n";
         for (String element : List.of("Block", "Text", "Paragraph", "Heading 1", "Heading 2", "Heading 3", "Heading 4",
-                "Heading 5", "Heading 6", "Markdown", "Image", "Barcode")) {
+                "Heading 5", "Heading 6", "Markdown", "Image", "Barcode", "Figure")) {
             Template base = t.get(element);
             t.put(element + " > Clear", new Template(HEADER + side + base.document().substring(HEADER.length()),
                     base.present()));

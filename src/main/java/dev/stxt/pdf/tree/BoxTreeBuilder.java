@@ -334,7 +334,7 @@ public final class BoxTreeBuilder {
             String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
                     s.typography().numberFormat());
             if (headingNumber != null) {
-                HeadingNumbers.prefix(box, headingNumber);
+                HeadingNumbers.prefix(box, box.children().get(0), headingNumber);
             }
         }
         if (box.marker() != null) {

@@ -37,6 +37,7 @@ public final class PropertyKey {
     public static final String COLOR = "color";
     public static final String CODE_FONT = "code-font";
     public static final String HYPHENATE = "hyphenate";
+    public static final String NUMBERED = "numbered";
 
     // Properties of the elements
     public static final String OFFSET = "offset";
@@ -50,6 +51,8 @@ public final class PropertyKey {
     public static final String SIDE = "side";
     public static final String CLEAR = "clear";
     public static final String DROP_CAP = "drop-cap";
+    public static final String ALT = "alt";
+    public static final String LEVELS = "levels";
 
     // Columns
     public static final String COUNT = "count";

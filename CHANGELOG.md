@@ -7,6 +7,24 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Figures with a caption.** New element `Figure`: a block with exactly one element (an `Image`, a `Barcode`, a `Table`
+  or a `Block`) and a `Caption`, a text (value or `Content >>`, with `Markup: markdown` if wanted) that goes below the
+  content or above a table, wherever it is written (`Caption position: top | bottom` changes it). A figure is numbered
+  by default, with the counter of the figures or, with a `Table` inside, of the tables (`Figure counter: figures |
+  tables` changes it); `Numbered: false` declared in it or in a rule that reaches it (not inherited) leaves it without a
+  number, `Number format` and `Number label` (`Number label: Figure {number}.`) apply as in the headings, the number goes
+  before the caption and `{number of: id}` gives it. The figure is not split across pages (a table inside is, with the
+  caption kept with its first or last part), it goes wherever an in-flow element goes except in a `Page overlay`, also
+  as a side box with `Side`. The image inside needs `Alt`, and a figure with a `Block`, its own. `For element: Figure`
+  and `For element: Caption` style them. In the tagged PDF a figure with an image or a block is a single `Figure` with
+  the `Alt`, the `BBox` and a `Caption`; with a table, the `Table` carries the `Caption`. New codes `FIGURE_CONTENT`,
+  `FIGURE_WITHOUT_ALT` and `FIGURE_PROPERTY_WITHOUT_EFFECT`.
+- **Tables of figures and tables.** `Of: headings | figures | tables` in `Table of contents` (`headings` by default):
+  with `figures` or `tables` it lists the `Figure` elements of that counter, with the text of their caption, in `TOC 1`
+  entries, and `In table of contents: false` on a `Figure` leaves it out. `Levels` with `Of: figures` or `tables` is
+  `LEVELS_WITHOUT_HEADINGS` (new code), and a table of figures or tables with nothing to list, `TABLE_OF_CONTENTS_EMPTY`.
+- The manual example (`test/examples/08-manual`) has its figures and tables as `Figure` elements ("Figura 1.",
+  "Tabla 1."), refers to the wiring diagram with `{number of: id}` and ends with a list of figures and a list of tables.
 - **Side boxes.** `Side: left | right` on an `Image`, a `Barcode` or a `Block` (with `Width` or `Max width`) in block
   flow places it at that side of its container, at its position in the flow, and the text of the siblings that follow
   it shortens its lines beside it while they overlap it: the `Text` and `Paragraph` elements and, with the text inside

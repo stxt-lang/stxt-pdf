@@ -85,6 +85,7 @@ level in a rule, in the whole document or on a specific heading.
   numerals and sections in digits give `II.1`.
 - `Number label` changes what goes before the title: `Number label: Appendix {number}.` writes "Appendix A. Fees". The
   `{number}` is where the number goes, and `{number of: id}` still gives only the number ("appendix A").
+- Figures and tables with a caption are numbered apart, with the same properties ([Figure](figure.md)).
 
 ```
 Styles:

@@ -52,6 +52,7 @@ One element per box, in the order of the document, which is the reading order:
 | `Table of contents` and its entries | `TOC` and `TOCI`, with two `Span` (the title and the number) |
 | `Footnote` | `Note` (`FENote` with PDF/UA-2), with the number in a `Lbl`, right after the text that calls it; the call, a `Reference` inside that text ([below](#footnotes)) |
 | `Image` with `Alt`, `Barcode` | `Figure`, with `Alt` and `BBox` |
+| `Figure` with an image or a `Block`, and its `Caption` | `Figure`, with the `Alt` (that of the image, or its own) and the caption in a `Caption`; with a `Table`, the table carries the `Caption` ([below](#figures)) |
 | A box with `Link`, a text link | `Link` ([below](#links)) |
 | The rest (such as `Block`, `Stack`, `Grid`, `Columns`, `Markdown` or the positioned elements) | `Div` |
 
@@ -132,6 +133,17 @@ has a single `THead` and a single `TFoot`.
 
 The `BBox` of the `Figure` of an image is its content box on the page and not the visible part with `Fit: inside`. That of
 a rotated image is the rectangle that encloses it.
+
+A `Figure` with a caption ([Figure](../components/figure.md)) with an image inside is **a single** `Figure`: that of the
+figure, with the `Alt` of the image, the `BBox` of the image and the caption in a `Caption`; the image has no element of
+its own and its content hangs from the `Figure` (or from a `Link`, if it carries `Link`). With a `Block` inside, the
+`Figure` carries the `Alt` of the `Figure` itself and contains the `Div` of the block and the `Caption`. With a `Table`
+inside, the figure has no element: the `Table` carries the `Caption` as its first child (caption above) or its last one
+(caption below). The order of the `Caption` is that of the page. The footnotes called from a caption go after the figure.
+
+> **Decision:** the figure with an image is a single `Figure` and not one inside another, and the table carries its own
+> `Caption`, as PDF 1.7 and 2.0 ask (a `Caption` is a child of `Figure` or of `Table`). *Rejected alternative:* a `Div`
+> with the `Figure` of the image and a `P` for the caption, which does not say that the caption belongs to the figure.
 
 ### Footnotes
 

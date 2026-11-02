@@ -7,7 +7,7 @@ Un texto puede escribir datos que el motor calcula:
 | `{page}` | El número impreso de la página donde está el texto ([Cortes](breaks.md#números-de-página-page-y-pages)) |
 | `{pages}` | El último número impreso de su tanda ([Document](../components/document.md#numeración-de-las-páginas)) |
 | `{page of: id}` | El número impreso de la página donde empieza la caja con ese `Id` |
-| `{number of: id}` | El número de esa caja en el documento: el de un `List item` numerado o un encabezado numerado |
+| `{number of: id}` | El número de esa caja en el documento: el de un `List item` numerado, un encabezado numerado o una `Figure` numerada |
 | `{heading N}` | El texto del último `Heading N` que empieza en esa página o antes, en un `Page overlay`: el título corrido |
 | `{heading N: first}` | El del primer `Heading N` que empieza en esa página |
 
@@ -53,8 +53,10 @@ Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador
 `lower-alpha`, `upper-roman`), con el `Start` y el `Number` que haya. Cada ítem da solo su propio número: para escribir
 «4.2» de una lista anidada, se escriben los dos, `{number of: clausula}.{number of: apartado}`. También lo tienen los
 encabezados con `Numbered: true`, y su número es el completo (`4.2`: sus niveles unidos por puntos,
-[Encabezados](../components/heading.md#numeración-numbered)). Un `List item` de una lista con viñetas o sin marcador, un
-encabezado sin numerar o cualquier otra caja no tiene número (`REFERENCE_NOT_NUMBERED`). Un encabezado escrito en un
+[Encabezados](../components/heading.md#numeración-numbered)), y las `Figure` numeradas, cuyo número es el de su contador
+(`3`, sin la etiqueta de `Number label`, [Figure](../components/figure.md#numeración)). Un `List item` de una lista con
+viñetas o sin marcador, un encabezado sin numerar, una figura con `Numbered: false` o cualquier otra caja no tiene número
+(`REFERENCE_NOT_NUMBERED`). Un encabezado escrito en un
 `Markdown` se puede referir si lleva `{#id}` ([Markdown](../components/markdown.md#encabezados)). Un ítem de una lista
 de Markdown no se puede referir, porque no lleva `Id`.
 

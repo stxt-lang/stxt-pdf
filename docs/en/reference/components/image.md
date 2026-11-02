@@ -128,7 +128,8 @@ splitting a box, are an error (`BREAK_IN_IMAGE`), also if a rule of `Styles` giv
 Wherever an in-flow element goes: in a section, `Block`, `Frame`, `Overlay`, `Page overlay` (a logo repeated on every
 page), `Columns`, `List item` (but not at the beginning: the marker needs a line to align with,
 `LIST_ITEM_WITHOUT_LINE`), `Cell` and as the element of an `Item` or an `Area`. In a `Markdown`, an image alone in its paragraph
-(`![Alt](path)`) is an `Image` ([Markdown](markdown.md)).
+(`![Alt](path)`) is an `Image` ([Markdown](markdown.md)). Inside a [`Figure`](figure.md), the image carries a numbered
+caption ("Figure 3. ..."), and its `Alt` is required.
 
 ## SVG
 

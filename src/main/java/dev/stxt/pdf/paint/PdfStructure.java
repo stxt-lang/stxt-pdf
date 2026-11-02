@@ -58,7 +58,9 @@ import java.util.TreeMap;
  * their items (with the marker in {@code Lbl} and the content in {@code LBody}, reference/components/list.md), {@code
  * Table} with {@code THead}, {@code TBody}, {@code TFoot}, {@code TR}, {@code TH} and {@code TD} for tables
  * (reference/components/table.md), {@code Figure} for images with {@code Alt} (with their alternative text and their
- * {@code BBox}, reference/components/image.md) and {@code Div} for the rest, a {@code Columns} included
+ * {@code BBox}, reference/components/image.md) and for the {@code Figure} elements with their {@code Caption}
+ * (reference/components/figure.md; with a table inside, the {@code Table} carries the {@code Caption}) and {@code Div}
+ * for the rest, a {@code Columns} included
  * (reference/components/columns.md), whose columns have no element of their own. The text of each fragment is
  * marked content ({@code BDC}/{@code EMC} with its {@code MCID}) that hangs from the element of its box; a box broken
  * across pages has content on several. Backgrounds, borders, images without {@code Alt} (decorative) and
@@ -189,6 +191,10 @@ final class PdfStructure {
             standIns(box, parent);
             return;
         }
+        if (box.role() == Role.FIGURE_GROUP) {
+            figure(box, parent);
+            return;
+        }
         // An image with a link is the content of its Link: Link → Figure.
         PDStructureNode owner = box.isImage() && box.style().link() != null ? newLink(box, parent) : parent;
         PDStructureElement e = element(type(box, ua), owner);
@@ -237,6 +243,64 @@ final class PdfStructure {
         }
         content = linked(box, content);
         children(box, content);
+    }
+
+    /**
+     * A {@code Figure} element (reference/components/figure.md): with an image or a {@code Block} inside, it is a
+     * {@code Figure} with the alternative text (that of the image, or its own) and the {@code Caption}, in the order
+     * they are laid out; the image inside has no element of its own, its content hangs from the {@code Figure} (or
+     * from its {@code Link}), which gets the {@code BBox}. With a {@code Table} inside, the table carries the
+     * {@code Caption}, as its first or its last child, and the figure has no element. The footnotes called from the
+     * caption go after the figure.
+     */
+    private void figure(Box figure, PDStructureNode parent) {
+        Box caption = figure.caption();
+        Box content = figure.children().stream().filter(c -> c != caption).findFirst().orElseThrow();
+        boolean captionFirst = figure.children().get(0) == caption;
+        if (content.role() == Role.TABLE) {
+            build(content, parent);
+            PDStructureElement table = elements.get(content);
+            // What points to the figure (a table of contents entry, a link, a bookmark destination) finds the table.
+            elements.put(figure, table);
+            PDStructureElement cap = element("Caption", table);
+            if (captionFirst && !table.getKids().isEmpty()) {
+                table.insertBefore(cap, table.getKids().get(0));
+            } else {
+                table.appendKid(cap);
+            }
+            elements.put(caption, cap);
+            attributes(caption, cap);
+            captionNotes(caption, parent);
+            return;
+        }
+        PDStructureElement e = element("Figure", parent);
+        parent.appendKid(e);
+        elements.put(figure, e);
+        attributes(figure, e);
+        e.setAlternateDescription(content.isImage() ? content.style().image().alt() : figure.style().image().alt());
+        for (Box child : figure.children()) {
+            if (child == caption) {
+                PDStructureElement cap = element("Caption", e);
+                e.appendKid(cap);
+                elements.put(caption, cap);
+                attributes(caption, cap);
+            } else if (child.isImage()) {
+                // Its content is the content of the Figure or, with a Link, of a Link inside it: Figure → Link → image.
+                elements.put(child, child.style().link() != null ? newLink(child, e) : e);
+            } else {
+                build(child, e);
+            }
+        }
+        captionNotes(caption, parent);
+    }
+
+    /** The footnotes called from the caption of a figure (reference/components/footnote.md): after the figure. */
+    private void captionNotes(Box caption, PDStructureNode after) {
+        for (TextRun run : caption.runs()) {
+            if (run.format().footnote() != null && notes.containsKey(run.format().footnote())) {
+                build(notes.get(run.format().footnote()), after);
+            }
+        }
     }
 
     /**
@@ -461,7 +525,8 @@ final class PdfStructure {
             case TABLE -> "Table";
             case ROW -> "TR";
             case CELL -> group(box) == 0 || box.style().rowHeader() ? "TH" : "TD";
-            case FIGURE -> "Figure";
+            case FIGURE, FIGURE_GROUP -> "Figure";
+            case CAPTION -> "Caption";
             case TABLE_OF_CONTENTS -> "TOC";
             case TOC_ENTRY -> "TOCI";
             case SPAN, PAGE_NUMBER -> "Span";
@@ -713,12 +778,17 @@ final class PdfStructure {
 
     /**
      * The {@code BBox} of the {@code Figure} of an image: its content box on the page, in
-     * PDF coordinates. An image is not broken, so it is only on one page.
+     * PDF coordinates. An image is not broken, so it is only on one page. Inside a {@code Figure} element, the image
+     * hangs from the {@code Figure} of the element, or from a {@code Link} inside it: the {@code BBox} goes to the
+     * {@code Figure}.
      */
     void figureBox(Box box, PDRectangle r) {
         PDStructureElement e = elements.get(box);
         if (e == null) {
             return;
+        }
+        if (!"Figure".equals(e.getStructureType()) && e.getParent() instanceof PDStructureElement figure) {
+            e = figure;
         }
         PDLayoutAttributeObject layout = new PDLayoutAttributeObject();
         layout.setBBox(r);

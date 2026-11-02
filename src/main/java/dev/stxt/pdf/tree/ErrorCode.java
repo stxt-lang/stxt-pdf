@@ -143,6 +143,20 @@ public enum ErrorCode {
     /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
     DROP_CAP_NOT_ALLOWED,
 
+    // --- Figures -------------------------------------------------------------------------------
+    /**
+     * A {@code Figure} without exactly one element besides its {@code Caption}: an {@code Image}, a {@code Barcode},
+     * a {@code Table} or a {@code Block} (reference/components/figure.md).
+     */
+    FIGURE_CONTENT,
+    /**
+     * An {@code Image} or a {@code Barcode} of a {@code Figure} without {@code Alt}, or a {@code Figure} with a
+     * {@code Block} without its own {@code Alt}: a figure with a caption is content, not decoration.
+     */
+    FIGURE_WITHOUT_ALT,
+    /** In a {@code Figure}, a property with no effect: {@code Alt} with an image or a table inside. */
+    FIGURE_PROPERTY_WITHOUT_EFFECT,
+
     // --- Barcodes -------------------------------------------------------------------------------
     /**
      * A {@code Barcode} without data, or with data that its {@code Format} cannot encode: characters it does not have,
@@ -165,7 +179,10 @@ public enum ErrorCode {
      * boxes.
      */
     REFERENCE_NOT_PLACEABLE,
-    /** A reference to a box that has no number: it is neither an item of a numbered list nor a heading. */
+    /**
+     * A reference to a box that has no number: it is neither an item of a numbered list, nor a numbered heading, nor
+     * a numbered figure.
+     */
     REFERENCE_NOT_NUMBERED,
     /** The pages the text refers to do not stabilize: each pagination pass changes them. */
     REFERENCE_UNSTABLE,
@@ -209,8 +226,13 @@ public enum ErrorCode {
     LINK_UNKNOWN,
 
     // --- Table of contents --------------------------------------------------------------------
-    /** A {@code Table of contents} without any heading in the levels of {@code Levels}. */
+    /**
+     * A {@code Table of contents} without any heading in the levels of {@code Levels} or, with {@code Of: figures} or
+     * {@code tables}, without any figure or table to list.
+     */
     TABLE_OF_CONTENTS_EMPTY,
+    /** {@code Levels} in a {@code Table of contents} with {@code Of: figures} or {@code tables}, which lists no headings. */
+    LEVELS_WITHOUT_HEADINGS,
 
     // --- Reusable rules (Styles) ---------------------------------------------------------------
     /** {@code For element} with a name that is not a box element. */

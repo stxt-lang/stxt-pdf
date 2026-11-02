@@ -55,13 +55,15 @@ final class HeadingNumbers {
     }
 
     /**
-     * Writes the number before the title of the heading, as one more piece of text: the layout, the
-     * table of contents and the PDF bookmarks see it without treating it apart. It goes in the first {@code Text},
-     * followed by a space; with {@code Number label}, the template with the number in its {@code {number}}.
+     * Writes the number of a heading before its title, or that of a figure before its caption
+     * (reference/components/figure.md), as one more piece of text: the layout, the table of contents and the PDF
+     * bookmarks see it without treating it apart. It goes in {@code text} (the first {@code Text} of the heading, the
+     * {@code Caption} of the figure), followed by a space; with {@code Number label}, the template with the number in
+     * its {@code {number}}.
      */
-    static void prefix(Box heading, String number) {
-        heading.setNumber(number);
-        String label = heading.style().typography().numberLabel();
-        heading.children().get(0).prependText((label == null ? number : label.replace(NUMBER, number)) + " ");
+    static void prefix(Box numbered, Box text, String number) {
+        numbered.setNumber(number);
+        String label = numbered.style().typography().numberLabel();
+        text.prependText((label == null ? number : label.replace(NUMBER, number)) + " ");
     }
 }
