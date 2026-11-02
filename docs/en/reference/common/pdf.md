@@ -78,9 +78,12 @@ The caller can turn the check off ([Using from Java](../implementation/api.md#co
 One per heading, with its text (and its number, if it has one), nested by level, and leading to the heading. The viewer
 shows them when the document is opened.
 
-## Title
+## Title and subject
 
-`Title` is what the viewer shows instead of the file name.
+`Title` is what the viewer shows instead of the file name. `Subject`, if there is one, is the subject of the PDF: the
+viewer shows it in the document properties, and document managers and search engines read it
+([Document](../components/document.md#subject)). Both go in the document information and in the XMP metadata, the same
+in both places, as PDF/A requires.
 
 ## PDF/A
 

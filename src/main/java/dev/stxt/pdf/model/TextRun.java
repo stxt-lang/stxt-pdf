@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
  */
 public record TextRun(String text, TextFormat format) {
 
+    /**
+     * A forced line break in the text (reference/components/markdown.md): the one a Markdown line break becomes. It
+     * separates words like a space, ends the line there and is never painted.
+     */
+    public static final char LINE_SEPARATOR = ' ';
+
     public TextRun {
         Objects.requireNonNull(text, "text");
         Objects.requireNonNull(format, "format");

@@ -40,13 +40,14 @@ número de la nota ([Footnote](../components/footnote.md)).
 
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
-- El salto de línea simple de `Content` vale un espacio.
+- El salto de línea simple de `Content` vale un espacio, y una `\` al final de la línea es un salto de línea forzado
+  ([Markdown](../components/markdown.md#saltos-de-línea-forzados)).
 - **Se hereda**: se declara una vez en `For element: Document` o en una regla, y un texto vuelve al literal con `Markup: none`.
 - Solo interpreta el formato dentro de la línea. Lo que en un `Markdown` empezaría un bloque es texto:
   `- 5 % de descuento`, `2024. Un buen año`, `# 1 en ventas`, `> 30 años` o una línea `---` se pintan tal cual, sin
-  escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen, HTML o un salto
-  de línea forzado son `MARKDOWN_UNSUPPORTED`, con la línea del párrafo, y un enlace con título o con un destino
-  no admitido, lo mismo que en un `Markdown`.
+  escaparlos, y una lista o un encabezado se escriben en un `Markdown`. Dentro de la línea, una imagen o HTML son
+  `MARKDOWN_UNSUPPORTED`, con la línea del párrafo, y un enlace con título o con un destino no admitido, lo mismo que en
+  un `Markdown`.
 - No actúa dentro de un `Markdown`, aunque se herede (lo escapado sigue siendo literal), ni en las entradas de un
   `Table of contents`. `Alt` y los demás valores son siempre literales.
 - Las referencias (`{page}`, `{page of: id}`) funcionan igual.

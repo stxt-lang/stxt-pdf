@@ -83,13 +83,15 @@ as follows:
 | `[x](target)`, `<target>` | underlined run with a link to that target ([Links](../common/links.md)) |
 | `` `x` `` | code run, with the family of `Code font` |
 | `[^id]` | the call of the footnote with that `Id`: a superscript run with its number ([Footnote](footnote.md)) |
+| `\` at the end of the line | a forced line break: the line ends there, within the same paragraph ([below](#forced-line-breaks)) |
 | Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |
 | `![Alt](path)`, alone in its paragraph | `Image` with that path and its `Alt`, or decorative with `![](path)` ([Image](image.md)) |
 
 Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](target "title")`), images inside a text
 (also inside a link) or with a title (`![Alt](path "title")`), the language tag of a code block
-(```` ```java ````: there is no highlighting), block quotes, HTML, horizontal rules, forced line breaks (two spaces or `\` at
-the end of the line) and link definitions (`[x][ref]` with `[ref]: target`: the target is written in the link itself).
+(```` ```java ````: there is no highlighting), block quotes, HTML, horizontal rules, a forced line break without text
+before it on its line ([below](#forced-line-breaks)) and link definitions (`[x][ref]` with `[ref]: target`: the target is
+written in the link itself).
 A heading cannot go inside a list item either, as in a `List item`, nor can a table be left without rows below
 the header. A `Markdown` without content, or a heading or a paragraph without text, is `TEXT_CONTENT`.
 
@@ -105,6 +107,34 @@ A single line break inside a paragraph counts as a space, as in a `Text`. The fo
 `***x***` is bold and italic. That same inline syntax, without the rest of the elements, is accepted by `Markup: markdown` in a
 `Text`, a `Paragraph` or a `Cell` ([Text formatting](../common/text-formatting.md#inline-formatting-markup)), which inside
 a `Markdown` has no effect: its texts come already interpreted.
+
+### Forced line breaks
+
+A `\` at the end of a line is a **forced line break**: the line ends there and the text goes on in the next one, within
+the same paragraph, without the margin of a new paragraph. It is for what goes on consecutive lines without being separate
+paragraphs, like a signature with its position:
+
+```
+Marta Vidal\
+Administration
+```
+
+- In both line breakings (`Line breaking: simple` and `balanced`) the break is a mandatory end of line, and no line goes
+  past it.
+- The line a forced line break ends is **not justified**, like the last one of the paragraph.
+- It works in paragraphs, headings and list items, and with `Markup: markdown` in a `Text`, a `Paragraph` or a `Cell`.
+- In the text of a heading that the table of contents, the bookmarks and the running heads copy, and in the alternative
+  text of an image, the break is a space.
+- A break without text before it on its line (at the start of the paragraph or right after another one) is
+  `MARKDOWN_UNSUPPORTED`.
+- The two spaces at the end of the line, the other form CommonMark accepts, are not a break: STXT removes the spaces at
+  the end of each line of a `>>` block, so they do not reach the Markdown.
+- In the text, the break is the character U+2028 (line separator). Written as is in any text, also without `Markup`, it
+  does the same.
+
+> **Decision:** a break without text before it on its line is an error. *Rejected alternative:* painting it as an empty
+> line, which is mistaken for a blank line between paragraphs, which is something else (the text after it is a new
+> paragraph, with its margin).
 
 ## Code
 
@@ -205,7 +235,8 @@ What is generated is read like what is written by hand: headings, paragraphs, li
 
 ## What is not supported
 
-- Block quotes, HTML, horizontal rules, forced line breaks, task lists and code highlighting. Footnotes are called with
+- Block quotes, HTML, horizontal rules, task lists and code highlighting. Footnotes are called with
   `[^id]`, but their content is a `Footnote`, not a definition `[^id]: ...` ([Footnote](footnote.md)).
 - Images inside a text and links with a title or with a separate definition.
+- Two spaces at the end of the line as a forced line break: STXT removes them.
 - `Id` in what is generated, except in the headings (`{#id}`), and `Style`.

@@ -439,7 +439,8 @@ public final class StackingContext {
         }
         StringBuilder out = new StringBuilder();
         collectText(box, out);
-        String text = out.toString().replaceAll("\\s+", " ").strip();
+        // A forced line break (U+2028) is a space too.
+        String text = out.toString().replaceAll("[\\s\\u2028]+", " ").strip();
         return text.isEmpty() ? null : text;
     }
 

@@ -28,6 +28,11 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * preformatted text, which {@link PreformattedText} breaks). A word wider than the line takes a line of its own and
  * overflows.</p>
  *
+ * <p><strong>Forced line breaks</strong> (reference/components/markdown.md). The
+ * {@link TextRun#LINE_SEPARATOR} (U+2028), which a Markdown line break becomes, separates words like a space and ends
+ * the line there: both algorithms end a line at the start of the word after it and no line goes past it
+ * ({@link Word#forced()}). The line it ends is never justified ({@link Line#forced()}), like the last one.</p>
+ *
  * <p>The text is a list of formatted runs ({@link TextRun}). A word can have
  * parts from several runs ({@code **neg**rita}) and measures the sum of its parts, each one with its
  * font; the space between two words has the format of the run that holds the first of its
@@ -64,17 +69,24 @@ public final class LineBreaker {
     public static final String HYPHEN = "-";
     /** The soft hyphen of the text: a break point written by the author, which is never painted. */
     public static final char SOFT_HYPHEN = '\u00AD';
+    /** A forced line break of the text ({@link TextRun#LINE_SEPARATOR}). */
+    private static final char LINE_SEPARATOR = TextRun.LINE_SEPARATOR;
     private static final int[] NO_BREAKS = new int[0];
 
     /**
      * A word: its parts, with consecutive runs of the same format joined, the format
-     * of the space that separates it from the next one and the positions (characters before them) where it may be
-     * split with a hyphen, in order, never at its start or its end; empty if it cannot be split.
+     * of the space that separates it from the next one, the positions (characters before them) where it may be
+     * split with a hyphen, in order, never at its start or its end (empty if it cannot be split), and whether a
+     * forced line break follows it ({@link TextRun#LINE_SEPARATOR}).
      */
-    record Word(List<TextRun> parts, TextFormat gap, int[] breaks) {
+    record Word(List<TextRun> parts, TextFormat gap, int[] breaks, boolean forced) {
 
         Word(List<TextRun> parts, TextFormat gap) {
             this(parts, gap, NO_BREAKS);
+        }
+
+        Word(List<TextRun> parts, TextFormat gap, int[] breaks) {
+            this(parts, gap, breaks, false);
         }
 
         String text() {
@@ -88,12 +100,12 @@ public final class LineBreaker {
 
     /**
      * A line of the line breaking: its runs, with consecutive ones of the same format joined, whether it ends
-     * inside a word, with a hyphen (its last run ends with {@link #HYPHEN}), and the position of the text where it
+     * inside a word, with a hyphen (its last run ends with {@link #HYPHEN}), the position of the text where it
      * starts ({@link Paragraph}), from which the rest of the text can be broken again
-     * (reference/components/block.md). A line without runs is an empty one: a line beside a side box where no word
-     * fits, which is left blank.
+     * (reference/components/block.md), and whether a forced line break ends it. A line without runs is an empty one:
+     * a line beside a side box where no word fits, which is left blank.
      */
-    public record Line(List<TextRun> runs, boolean hyphenated, int start) {
+    public record Line(List<TextRun> runs, boolean hyphenated, int start, boolean forced) {
 
         public Line {
             runs = List.copyOf(runs);
@@ -107,6 +119,11 @@ public final class LineBreaker {
         /** A line at the start of the text. */
         public Line(List<TextRun> runs, boolean hyphenated) {
             this(runs, hyphenated, 0);
+        }
+
+        /** A line that no forced line break ends. */
+        public Line(List<TextRun> runs, boolean hyphenated, int start) {
+            this(runs, hyphenated, start, false);
         }
 
         /** An empty line at position {@code start}: no word of the text fits in it. */
@@ -200,7 +217,8 @@ public final class LineBreaker {
      * measured once; only when the sum is within {@link Tolerance#MODEL} of the available width is the line built
      * and measured whole, so the decision is the same as measuring it every time, regardless of the rounding of the
      * sum. A word that does not fit alone at the start of a line, not even split, takes the line and overflows,
-     * unless a later line is wider (a side box ends): then the line is left empty and the word goes to the next.
+     * unless a later line is wider (a side box ends): then the line is left empty and the word goes to the next. A
+     * word followed by a forced line break ends its line.
      */
     private static List<Line> greedy(Paragraph p, int from, LineWidths widths) {
         List<Line> lines = new ArrayList<>();
@@ -220,6 +238,12 @@ public final class LineBreaker {
             if (p.fitsMeasured(a, whole, available)) {
                 lastFit = whole;
                 w++;
+                if (p.forced(whole)) {
+                    // A forced line break follows the word: the line ends with it.
+                    lines.add(p.line(a, whole));
+                    a = whole;
+                    lastFit = -1;
+                }
                 continue;
             }
             // The word does not fit whole: the longest part of it that fits with its hyphen.
@@ -252,6 +276,11 @@ public final class LineBreaker {
             // Alone at the start of the line and it does not fit, not even split: it takes the line and overflows.
             lastFit = whole;
             w++;
+            if (p.forced(whole)) {
+                lines.add(p.line(a, whole));
+                a = whole;
+                lastFit = -1;
+            }
         }
     }
 
@@ -276,6 +305,8 @@ public final class LineBreaker {
      * line on, every line has the same width and the number no longer matters. In a line narrower than the ones
      * after it, a single piece of a word that does not fit may not overflow: the line is left empty, with the
      * demerits of a line without badness, and the piece goes to the next one.</p>
+     *
+     * <p>No line goes past a forced line break, and the line that ends at one has no badness, like the last.</p>
      */
     static List<Line> optimal(Paragraph p, int from, LineWidths widths) {
         int positions = p.positions();
@@ -301,6 +332,10 @@ public final class LineBreaker {
                     }
                     double available = widths.width(k);
                     for (int i = j - 1; i >= from; i--) {
+                        if (i + 1 < j && p.forced(i + 1)) {
+                            // Starting earlier, the line would go past a forced line break.
+                            break;
+                        }
                         if (best[i][k] == Double.POSITIVE_INFINITY) {
                             continue;
                         }
@@ -314,7 +349,8 @@ public final class LineBreaker {
                             // Beside a side box, the piece goes to a wider line instead of overflowing.
                             continue;
                         }
-                        double d = best[i][k] + demerits(available - width, p.spaces(i, j) * STRETCH, j == end);
+                        double d = best[i][k] + demerits(available - width, p.spaces(i, j) * STRETCH,
+                                j == end || p.forced(j));
                         if (p.hyphen(j)) {
                             d += HYPHEN_PENALTY * HYPHEN_PENALTY;
                             if (p.hyphen(i)) {
@@ -395,7 +431,10 @@ public final class LineBreaker {
         return intrinsics(TextRun.plain(text), measurer, font, fontSize);
     }
 
-    /** Narrowest width (widest word) and natural width (the whole text unbroken). */
+    /**
+     * Narrowest width (widest word) and natural width (the whole text unbroken, or, with forced line breaks, its
+     * widest line).
+     */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize) {
         return intrinsics(runs, measurer, font, fontSize, 0);
@@ -433,7 +472,16 @@ public final class LineBreaker {
                 from = to;
             }
         }
-        return new IntrinsicSizes(min, width(line(words).runs(), measurer, font, fontSize, letterSpacing));
+        double natural = 0;
+        int from = 0;
+        for (int w = 0; w < words.size(); w++) {
+            if (words.get(w).forced() || w == words.size() - 1) {
+                natural = Math.max(natural, width(line(words.subList(from, w + 1)).runs(), measurer, font, fontSize,
+                        letterSpacing));
+                from = w + 1;
+            }
+        }
+        return new IntrinsicSizes(min, natural);
     }
 
     /** Horizontal offset of a line according to the alignment. */
@@ -570,9 +618,10 @@ public final class LineBreaker {
 
     /**
      * The words of the text (see the class description): what lies between the white-space characters
-     * ({@link #isSpace}, the {@code \s} of regular expressions), with one pass over the text, each one with its break
-     * points: those of its soft hyphens, which are removed from it, or, if it has none and there is a
-     * {@code hyphenator}, those of the patterns of the language ({@link #breaks}).
+     * ({@link #isSpace}, the {@code \s} of regular expressions, and the {@link TextRun#LINE_SEPARATOR}), with one pass
+     * over the text, each one with its break points: those of its soft hyphens, which are removed from it, or, if it
+     * has none and there is a {@code hyphenator}, those of the patterns of the language ({@link #breaks}). A word with
+     * a line separator in the white space after it, and a word after it, is {@linkplain Word#forced() forced}.
      */
     static List<Word> words(List<TextRun> runs, Hyphenator hyphenator) {
         String text = TextRun.text(runs);
@@ -588,7 +637,9 @@ public final class LineBreaker {
         int n = text.length();
         int i = 0;
         while (true) {
+            boolean forced = false;
             while (i < n && isSpace(text.charAt(i))) {
+                forced |= text.charAt(i) == LINE_SEPARATOR;
                 i++;
             }
             if (i == n) {
@@ -599,7 +650,7 @@ public final class LineBreaker {
                 i++;
             }
             if (previous != null) {
-                result.add(new Word(previous.parts(), cursor.format(previousEnd), previous.breaks()));
+                result.add(new Word(previous.parts(), cursor.format(previousEnd), previous.breaks(), forced));
             }
             previous = word(cursor.parts(text, start, i), hyphenator);
             previousEnd = i;
@@ -691,9 +742,12 @@ public final class LineBreaker {
         return breaks;
     }
 
-    /** The white-space characters that separate words: those of {@code \s} ({@code [ \t\n\x0B\f\r]}). */
+    /**
+     * The white-space characters that separate words: those of {@code \s} ({@code [ \t\n\x0B\f\r]}) and the
+     * {@link TextRun#LINE_SEPARATOR}.
+     */
     private static boolean isSpace(char c) {
-        return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r';
+        return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r' || c == LINE_SEPARATOR;
     }
 
     /** The runs of the characters {@code from} to {@code to} of some runs, each part with its format. */
@@ -866,6 +920,12 @@ public final class LineBreaker {
             return posOffset[p] > 0;
         }
 
+        /** Whether a forced line break comes right before position {@code p}: a line has to end there. */
+        boolean forced(int p) {
+            int w = posWord[p];
+            return posOffset[p] == 0 && w > 0 && w < words.size() && words.get(w - 1).forced();
+        }
+
         /** The last word of a line that ends at {@code b}, and how many of its characters the line has. */
         private int lastWord(int b) {
             return hyphen(b) ? posWord[b] : posWord[b] - 1;
@@ -969,7 +1029,7 @@ public final class LineBreaker {
             if (hyphen(b)) {
                 runs.add(HYPHEN, hyphenFormat(words.get(last).parts(), posOffset[b]));
             }
-            return new Line(runs.build(), hyphen(b), a);
+            return new Line(runs.build(), hyphen(b), a, forced(b));
         }
     }
 

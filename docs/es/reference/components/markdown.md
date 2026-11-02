@@ -83,13 +83,15 @@ así:
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../common/links.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
 | `[^id]` | la llamada a la nota al pie con ese `Id`: un tramo en superíndice con su número ([Footnote](footnote.md)) |
+| `\` al final de la línea | un salto de línea forzado: la línea acaba ahí, dentro del mismo párrafo ([abajo](#saltos-de-línea-forzados)) |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes dentro de un texto
 (también dentro de un enlace) o con título (`![Alt](ruta "título")`), la etiqueta de lenguaje de un bloque de código
-(```` ```java ````: no hay resaltado), citas, HTML, líneas horizontales, saltos de línea forzados (dos espacios o `\` al
-final de la línea) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se escribe en el propio enlace).
+(```` ```java ````: no hay resaltado), citas, HTML, líneas horizontales, un salto de línea forzado sin texto antes en su
+línea ([abajo](#saltos-de-línea-forzados)) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se
+escribe en el propio enlace).
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
 la cabecera. Un `Markdown` sin contenido, o un encabezado o un párrafo sin texto, es `TEXT_CONTENT`.
 
@@ -105,6 +107,33 @@ Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Tex
 `***x***` es negrita y cursiva. Esa misma sintaxis en línea, sin el resto de elementos, la admite `Markup: markdown` en un
 `Text`, un `Paragraph` o una `Cell` ([Formato del texto](../common/text-formatting.md#formato-en-línea-markup)), que dentro
 de un `Markdown` no actúa: sus textos ya vienen interpretados.
+
+### Saltos de línea forzados
+
+Una `\` al final de una línea es un **salto de línea forzado**: la línea acaba ahí y el texto sigue en la siguiente, dentro
+del mismo párrafo, sin el margen de un párrafo nuevo. Sirve para lo que va en líneas seguidas sin ser párrafos distintos,
+como una firma con su cargo:
+
+```
+Marta Vidal\
+Administración
+```
+
+- En los dos repartos en líneas (`Line breaking: simple` y `balanced`) el salto es un final de línea obligatorio, y
+  ninguna línea lo cruza.
+- La línea que acaba en un salto forzado **no se justifica**, como la última del párrafo.
+- Vale en párrafos, encabezados e ítems de lista, y con `Markup: markdown` en un `Text`, un `Paragraph` o una `Cell`.
+- En el texto de un encabezado que copian el índice, los marcadores y los títulos corridos, y en el texto alternativo de
+  una imagen, el salto es un espacio.
+- Un salto sin texto antes en su línea (al principio del párrafo o justo después de otro) es `MARKDOWN_UNSUPPORTED`.
+- Los dos espacios al final de la línea, la otra forma que admite CommonMark, no son un salto: STXT quita los espacios
+  del final de cada línea de un bloque `>>`, así que no llegan al Markdown.
+- En el texto, el salto es el carácter U+2028 (separador de línea). Escrito tal cual en cualquier texto, también sin
+  `Markup`, hace lo mismo.
+
+> **Decisión:** un salto sin texto antes en su línea es un error. *Alternativa descartada:* pintarlo como una línea vacía,
+> que se confunde con una línea en blanco entre párrafos, que es otra cosa (el texto que sigue es un párrafo nuevo, con su
+> margen).
 
 ## Código
 
@@ -205,7 +234,8 @@ Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tabl
 
 ## Lo que no hay
 
-- Citas, HTML, líneas horizontales, saltos de línea forzados, listas de tareas y resaltado de código. Las notas al pie se
+- Citas, HTML, líneas horizontales, listas de tareas y resaltado de código. Las notas al pie se
   llaman con `[^id]`, pero su contenido es una `Footnote`, no una definición `[^id]: ...` ([Footnote](footnote.md)).
 - Imágenes dentro de un texto y enlaces con título o con definición aparte.
+- Dos espacios al final de la línea como salto de línea forzado: STXT los quita.
 - `Id` en lo generado, salvo en los encabezados (`{#id}`), y `Style`.

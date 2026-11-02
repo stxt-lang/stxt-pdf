@@ -65,7 +65,7 @@ The pieces:
 
 | Class | What it does |
 |---|---|
-| `PageSetupReader` | `Page` (with the inheritance by groups of the sections), `Title` and `Language` |
+| `PageSetupReader` | `Page` (with the inheritance by groups of the sections), `Title`, `Language` and `Subject` |
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
 | `StyleRules` | The rules of `Styles` from the two origins and their priority |

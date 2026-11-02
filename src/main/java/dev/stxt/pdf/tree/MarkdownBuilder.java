@@ -60,7 +60,8 @@ import dev.stxt.pdf.model.TextRun;
  * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
  * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md). A
  * link is an underlined run with its target (reference/common/links.md); inline code, a code run, which gets the
- * family of {@code Code font} when its box is built. {@link BoxTreeBuilder} then builds those nodes like any other
+ * family of {@code Code font} when its box is built; a line break ({@code \} at the end of the line), a
+ * {@link TextRun#LINE_SEPARATOR} in the text. {@link BoxTreeBuilder} then builds those nodes like any other
  * element, so the schema, the rules of {@code Styles}, the validation of reference/common/errors.md, the tagged PDF and
  * the bookmarks treat them the same way.
  *
@@ -99,11 +100,11 @@ final class MarkdownBuilder {
 
     private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
             + "images alone in their paragraph and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
-            + "`code` and [links](target) are allowed";
+            + "`code`, [links](target) and line breaks (\\ at the end of the line) are allowed";
 
     private static final String INLINE_SUBSET = "a text with Markup: markdown only allows text with **bold**, "
-            + "*italic*, ++underline++, ~~strikethrough~~ and [links](target); the rest goes in a Markdown, and a special "
-            + "character is written with \\ before it (\\*)";
+            + "*italic*, ++underline++, ~~strikethrough~~, [links](target) and line breaks (\\ at the end of the line); "
+            + "the rest goes in a Markdown, and a special character is written with \\ before it (\\*)";
 
     /**
      * The generated elements, in order, and the runs of the formatted texts, by node ({@code Text}, {@code Paragraph}
@@ -159,7 +160,9 @@ final class MarkdownBuilder {
                 out.add("\n\n", TextFormat.PLAIN);
             }
             first = false;
-            t.inline(p, TextFormat.PLAIN, out, line);
+            for (TextRun run : t.inline(p, line)) {
+                out.add(run.text(), run.format());
+            }
         }
         return out.build();
     }
@@ -282,7 +285,8 @@ final class MarkdownBuilder {
                         + "(\"" + i.getTitle() + "\"): the image is described in its alternative text, ![...]");
             }
             InlineNode image = node("Image", i.getDestination(), line);
-            String alt = TextRun.text(inline(i, line)).strip();
+            // A line break in the alternative text is a space: the text is read, not laid out.
+            String alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ').strip();
             if (!alt.isEmpty()) {
                 image.addChild(node("Alt", alt, line));
             }
@@ -453,10 +457,26 @@ final class MarkdownBuilder {
             }
         }
 
-        private List<TextRun> inline(org.commonmark.node.Node block, int line) {
+        /**
+         * The runs of a block. A line break needs text before it on its line: one at the start of the block or right
+         * after another would leave an empty line, which is a paragraph break and not a line break.
+         */
+        List<TextRun> inline(org.commonmark.node.Node block, int line) {
             TextRun.Joiner out = new TextRun.Joiner();
             inline(block, TextFormat.PLAIN, out, line);
-            return out.build();
+            List<TextRun> runs = out.build();
+            String text = TextRun.text(runs);
+            int from = 0;
+            for (int at = text.indexOf(TextRun.LINE_SEPARATOR); at >= 0;
+                 at = text.indexOf(TextRun.LINE_SEPARATOR, from)) {
+                if (text.substring(from, at).isBlank()) {
+                    throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, (inlineOnly ? "Markup: markdown" : "Markdown")
+                            + " does not allow a line break without text before it on its line: an empty line is "
+                            + "written as a blank line between two paragraphs");
+                }
+                from = at + 1;
+            }
+            return runs;
         }
 
         /** The text of the children of {@code parent}, with the formatting its ancestors accumulate. */
@@ -467,6 +487,10 @@ final class MarkdownBuilder {
                 } else if (n instanceof SoftLineBreak) {
                     // A single line break counts as a space, as in a Text (reference/common/typography.md).
                     out.add(" ", f);
+                } else if (n instanceof HardLineBreak) {
+                    // \ at the end of the line: the line ends there (reference/components/markdown.md). Two spaces
+                    // never get here: STXT removes the spaces at the end of the lines of a block.
+                    out.add(String.valueOf(TextRun.LINE_SEPARATOR), f);
                 } else if (n instanceof StrongEmphasis) {
                     inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
                 } else if (n instanceof Emphasis) {
@@ -564,8 +588,6 @@ final class MarkdownBuilder {
                 what = "horizontal rules";
             } else if (n instanceof HtmlBlock || n instanceof HtmlInline) {
                 what = "HTML";
-            } else if (n instanceof HardLineBreak) {
-                what = "forced line breaks (two spaces or \\ at the end of the line)";
             } else if (n instanceof LinkReferenceDefinition) {
                 what = "link definitions";
             } else {

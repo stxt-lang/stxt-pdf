@@ -52,6 +52,7 @@ class PdfATest {
             "Document (dev.stxt.pdf):",
             "\tLanguage: es",
             "\tTitle: Prueba & PDF/A",
+            "\tSubject: Lo que <restringe> PDF/A",
             "\tPage:",
             "\t\tWidth: 400",
             "\t\tHeight: 500",
@@ -194,6 +195,10 @@ class PdfATest {
             assertTrue(xmp.contains("<pdfaid:conformance>" + pdfA.level() + "</pdfaid:conformance>"), xmp);
             assertTrue(xmp.contains("<pdfuaid:part>1</pdfuaid:part>"), xmp);
             assertTrue(xmp.contains("Prueba &amp; PDF/A"), xmp);
+            // The subject agrees in the document information and in the XMP, as PDF/A requires.
+            assertEquals("Lo que <restringe> PDF/A", doc.getDocumentInformation().getSubject());
+            assertTrue(xmp.contains("<dc:description><rdf:Alt><rdf:li xml:lang=\"x-default\">"
+                    + "Lo que &lt;restringe&gt; PDF/A</rdf:li></rdf:Alt></dc:description>"), xmp);
             List<PDOutputIntent> intents = doc.getDocumentCatalog().getOutputIntents();
             assertEquals(1, intents.size());
             assertEquals("sRGB IEC61966-2.1", intents.get(0).getOutputConditionIdentifier());

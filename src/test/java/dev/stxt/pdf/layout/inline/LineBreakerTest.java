@@ -66,6 +66,46 @@ class LineBreakerTest {
         assertEquals(List.of("uno dos tres"), LineBreaker.breakLines("uno\ndos\n\ntres", 100, measurer, F, 1));
     }
 
+    // Forced line breaks (reference/components/markdown.md): the line separator a Markdown line break becomes.
+
+    private static final String BR = String.valueOf(TextRun.LINE_SEPARATOR);
+
+    @Test
+    void aLineSeparatorEndsTheLineInBothAlgorithms() {
+        // "uno dos" would share its line with "tres" at width 12; the separator ends it.
+        String text = "uno dos" + BR + "tres cuatro cinco";
+        for (LineBreaking wrap : LineBreaking.values()) {
+            assertEquals(List.of("uno dos", "tres cuatro", "cinco"),
+                    LineBreaker.breakLines(text, 12, measurer, F, 1, wrap), wrap.toString());
+        }
+    }
+
+    @Test
+    void theLineASeparatorEndsIsMarked() {
+        for (LineBreaking wrap : LineBreaking.values()) {
+            List<LineBreaker.Line> lines = LineBreaker.breakLines(List.of(run("uno " + BR + " dos" + BR + "tres")),
+                    100, measurer, F, 1, wrap);
+            assertEquals(List.of("uno", "dos", "tres"), texts(lines), wrap.toString());
+            assertEquals(List.of(true, true, false), lines.stream().map(LineBreaker.Line::forced).toList());
+        }
+    }
+
+    @Test
+    void aSeparatorAtTheEdgesOfTheTextBreaksNothing() {
+        // Two together end a single line: the Markdown does not let them through.
+        List<LineBreaker.Line> lines = LineBreaker.breakLines(List.of(run(BR + "uno" + BR + BR + "dos" + BR)), 100,
+                measurer, F, 1, LineBreaking.SIMPLE);
+        assertEquals(List.of("uno", "dos"), texts(lines));
+        assertEquals(List.of(true, false), lines.stream().map(LineBreaker.Line::forced).toList());
+    }
+
+    @Test
+    void theNaturalWidthOfATextWithSeparatorsIsItsWidestLine() {
+        IntrinsicSizes s = LineBreaker.intrinsics("uno dos" + BR + "tres", measurer, F, 1);
+        assertEquals(4, s.narrowest(), 1e-9);
+        assertEquals(7, s.natural(), 1e-9);
+    }
+
     @Test
     void emptyTextHasNoLines() {
         assertEquals(List.of(), LineBreaker.breakLines(" \n ", 100, measurer, F, 1));

@@ -520,8 +520,8 @@ public final class InlineLayout implements LayoutAlgorithm {
                 lines.add(new TextLine(left, y, 0, lineHeight, fontSize, "", 0, List.of(), false, left, right));
                 continue;
             }
-            // Preformatted lines are not justified.
-            boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1;
+            // Preformatted lines are not justified, nor is the one a forced line break ends.
+            boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1 && !text.forced();
             lines.add(LineBreaker.place(text.runs(), measurer, s, fontSize, left, right, b.widths().width(j), justify,
                     y, lineHeight, text.hyphenated()));
         }

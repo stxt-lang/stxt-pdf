@@ -50,7 +50,9 @@ Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../components/te
 ## Espacios y párrafos
 
 Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** es un error
-(`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Con `Preformatted: true` o `wrap` se
+(`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Dentro de él, una línea se puede acabar a la
+fuerza con el salto de línea de Markdown, `\` al final de la línea
+([Markdown](../components/markdown.md#saltos-de-línea-forzados)). Con `Preformatted: true` o `wrap` se
 conservan los espacios y los saltos de línea, también las líneas en blanco de un `Text`
 ([Formato del texto](text-formatting.md#texto-preformateado)).
 

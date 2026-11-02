@@ -58,6 +58,9 @@ Document (dev.stxt.pdf):
                 ~~~
                 Referencia: 2026-014
                 ~~~
+
+                Marta Vidal\
+                Administración
 ```
 
 ## Propiedades
@@ -86,10 +89,10 @@ del `Markdown` o, una vez para todo el documento, en `For element: Document`, y 
 | `` `código` `` | Código en línea, con `Code font` |
 | Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `For element: Code block` |
 | `![texto alternativo](ruta)`, sola en su párrafo | Una `Image` |
+| `\` al final de la línea | Un salto de línea dentro del párrafo, como el de la firma del ejemplo |
 
-Lo demás es un error, para que nada se pierda en silencio. Por ejemplo: citas, HTML, líneas horizontales, saltos de línea
-forzados, imágenes dentro de un párrafo, enlaces con título o la etiqueta de lenguaje de un bloque de código (no hay
-resaltado).
+Lo demás es un error, para que nada se pierda en silencio. Por ejemplo: citas, HTML, líneas horizontales, imágenes dentro
+de un párrafo, enlaces con título o la etiqueta de lenguaje de un bloque de código (no hay resaltado).
 
 ## Estilo
 
@@ -104,6 +107,8 @@ para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo 
   Markdown puede empezar por `##`. Se numeran y salen en el índice como los demás.
 - Lo generado no tiene `Id`, salvo un encabezado que lo escribe al final, `## Ventas {#ventas}`: así se enlaza
   (`[ver ventas](#ventas)`) o se cita (`{page of: ventas}`, `{number of: ventas}`).
+- Un salto de línea se escribe con `\` al final de la línea. Los dos espacios al final que admite también Markdown no
+  sirven, porque STXT quita los espacios del final de cada línea. La línea que acaba en un salto no se justifica.
 - Los errores dicen la línea del documento donde empieza el bloque de Markdown que falla.
 - Para negrita o cursiva en un párrafo suelto, no hace falta un `Markdown`: basta `Markup: markdown`
   ([Formato del texto](../common/text-formatting.md)).

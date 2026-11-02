@@ -3,6 +3,7 @@
 `Document` is the root of every document. It has:
 
 - **`Language`** and **`Title`**: required.
+- **`Subject`**: optional, what the document is about.
 - **`Page`**: the paper and the margins.
 - **`Styles`**: optional, with the style rules ([Styles](../common/styles.md)).
 - **`Page overlay`**: optional, the headers and footers of the whole document.
@@ -12,6 +13,7 @@
 Document (dev.stxt.pdf):
     Language: en
     Title: Annual report
+    Subject: Results and activity of the company in 2025
     Page:
         Paper: A4
         Margin: 56
@@ -69,6 +71,9 @@ This document has three sections:
 `Title` is the title that the PDF viewer shows instead of the file name. `Language` is the language of the document,
 a BCP 47 tag (`es`, `en-US`, `ca`). The screen reader needs it to read the text, and automatic capitalization follows its
 rules. Both are required, because without them the PDF is not accessible.
+
+`Subject` is optional: a sentence that says what the document is about. It is the subject of the PDF, which the viewer
+shows in the document properties and which document managers and search engines use.
 
 ## `Page`
 

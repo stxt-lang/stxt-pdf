@@ -65,7 +65,7 @@ Las piezas:
 
 | Clase | Qué hace |
 |---|---|
-| `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title` y `Language` |
+| `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title`, `Language` y `Subject` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |

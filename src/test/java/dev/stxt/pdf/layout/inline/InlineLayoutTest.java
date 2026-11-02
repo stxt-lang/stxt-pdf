@@ -141,6 +141,17 @@ class InlineLayoutTest {
         assertEquals(0, lines.get(1).wordSpacing(), 1e-9);
     }
 
+    @Test
+    void theLineAForcedLineBreakEndsIsNotJustified() {
+        // A Markdown line break after "aa bb": that line is not justified; "cc dd" (25), which the line breaking
+        // ends, is justified to 30.
+        LayoutFixture l = layOut("\tText:", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:",
+                "\t\t\tAlign: justify", "\t\t\tMarkup: markdown", "\t\tContent >>", "\t\t\taa bb\\", "\t\t\tcc dd ee");
+        List<TextLine> lines = l.fragment("T").lines();
+        assertEquals(List.of("aa bb", "cc dd", "ee"), lines.stream().map(TextLine::text).toList());
+        assertEquals(List.of(0.0, 5.0, 0.0), lines.stream().map(TextLine::wordSpacing).toList());
+    }
+
     // Overflow: shrink (reference/common/overflow.md): the Size goes down in steps of 0.5 until the text fits.
 
     @Test

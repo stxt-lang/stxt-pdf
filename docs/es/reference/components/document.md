@@ -1,7 +1,7 @@
 # `Document`
 
 La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Page`, un `Title` y un
-`Language`, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
+`Language`, un `Subject` opcional, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
 `For element: Document`.
 
@@ -95,6 +95,17 @@ BCP 47 (`es`, `en-US` o `ca`). Un valor que no lo cumple es `VALUE_NOT_ALLOWED`,
 afectan al layout, salvo que `Language` da las reglas de las mayúsculas de `Case`
 ([Formato del texto](../common/text-formatting.md#mayúsculas-case)). El título es el que muestra el visor, y el idioma,
 el que usa un lector de pantalla. Los dos son obligatorios para que el PDF sea accesible ([El PDF](../common/pdf.md)).
+
+## `Subject`
+
+`Subject` dice de qué trata el documento, en una frase: `Subject: Condiciones de la póliza de hogar`. Es opcional, como mucho
+uno, y es un texto no vacío (`VALUE_NOT_ALLOWED` si está vacío). No afecta al layout: va al PDF como su asunto, que el
+visor enseña en las propiedades del documento y que leen los gestores documentales y los buscadores
+([El PDF](../common/pdf.md#título-y-asunto)). Sin `Subject`, el PDF no lleva asunto.
+
+> **Decisión:** se llama `Subject`, como la entrada del PDF y el campo «Asunto» de las propiedades de un procesador de
+> textos y de un visor de PDF. *Alternativa descartada:* `Description`, el nombre de su copia en los metadatos XMP
+> (`dc:description`), que se confundiría con un texto que describe el contenido para quien no lo ve, que es `Alt`.
 
 ## `Section`
 

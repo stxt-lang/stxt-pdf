@@ -354,11 +354,12 @@ public final class Box {
 
     /**
      * Text of a heading for the table of contents, the bookmarks and the running heads: that of its {@code Text},
-     * joined and with spaces normalized. Of a {@code Figure}, the text of its caption, the only child with text.
+     * joined and with spaces normalized (a forced line break is a space too). Of a {@code Figure}, the text of its
+     * caption, the only child with text.
      */
     public String headingText() {
         return children.stream().filter(Box::hasText).map(b -> b.text.strip())
-                .collect(Collectors.joining(" ")).replaceAll("\\s+", " ");
+                .collect(Collectors.joining(" ")).replaceAll("[\\s\\u2028]+", " ");
     }
 
     /** Children that take part in the flow of the parent (in flow and {@code Frame}). */

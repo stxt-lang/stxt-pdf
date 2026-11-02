@@ -1,4 +1,4 @@
-# Case: Hard line break in Markdown
+# Case: Line break without text before it on its line
 # Code: MARKDOWN_UNSUPPORTED
 # Line: 18
 Document (dev.stxt.pdf):
@@ -16,4 +16,5 @@ Document (dev.stxt.pdf):
 		Markdown:
 			Content >>
 				Primera línea\
-				segunda línea
+				\
+				tercera línea

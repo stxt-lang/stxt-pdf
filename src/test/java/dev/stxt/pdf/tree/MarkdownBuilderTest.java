@@ -81,6 +81,18 @@ class MarkdownBuilderTest {
     }
 
     @Test
+    void aLineBreakIsALineSeparatorInTheText() {
+        // \ at the end of the line (STXT removes the spaces at the end of the lines of a block, so two spaces are not
+        // a line break); the separator takes the format around the break.
+        String br = String.valueOf(TextRun.LINE_SEPARATOR);
+        MarkdownBuilder.Translation t = translate("Joan **Costa**\\", "Director\\", "Acme");
+        assertEquals(List.of("Paragraph: Joan Costa" + br + "Director" + br + "Acme @15"),
+                outline(t.elements().get(0)));
+        assertEquals(List.of(run("Joan "), run("Costa", "b"), run(br + "Director" + br + "Acme")),
+                t.runs().get(t.elements().get(0)));
+    }
+
+    @Test
     void anImageAloneInItsParagraphIsAnImage() {
         MarkdownBuilder.Translation t = translate("![Un *paisaje*](test/wide.png)", "", "![](logos/acme.png)",
                 "", "Texto.");

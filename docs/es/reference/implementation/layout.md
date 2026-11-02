@@ -199,6 +199,13 @@ guiones seguidos (10 000). Los anchos siguen siendo sumas: los de las palabras e
 palabra partida, cada uno medido una vez. `Hyphenations.validate` comprueba antes del layout, como las fuentes, que cada
 caja con texto y `Hyphenate: true` está en un idioma con patrones.
 
+**Saltos de línea forzados.** El salto de un Markdown (`\` al final de la línea) llega al texto como el carácter U+2028
+(`TextRun.LINE_SEPARATOR`), que `MarkdownBuilder` escribe en su lugar. `LineBreaker.words` lo trata como un espacio que
+separa palabras y marca la palabra de antes (`Word.forced`); la posición donde empieza la siguiente es un final
+obligatorio (`Paragraph.forced`). El reparto voraz cierra ahí la línea, y Knuth-Plass no deja que ninguna línea lo
+cruce y no da maldad a la que acaba en él, como a la última. La `Line` lo dice con `forced`, e `InlineLayout` no la
+justifica. El ancho natural del texto es el de su línea más ancha entre saltos.
+
 > **Decisión:** el idioma se comprueba al empezar el layout y no al construir el árbol, como las fuentes: `tree` no
 > depende de `layout`, donde viven los patrones. *Alternativa descartada:* los patrones en `model`.
 

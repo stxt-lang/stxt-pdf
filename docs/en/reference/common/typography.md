@@ -50,7 +50,9 @@ What has no text ignores what it inherits without an error: a `Block` inherits `
 ## Spaces and paragraphs
 
 Sequences of spaces and single line breaks are equivalent to a space. A **blank line** is an error
-(`TEXT_BLANK_LINE`): each `Text` and each `Paragraph` is a single paragraph. With `Preformatted: true` or `wrap`
+(`TEXT_BLANK_LINE`): each `Text` and each `Paragraph` is a single paragraph. Within it, a line can be ended on purpose
+with the Markdown line break, `\` at the end of the line
+([Markdown](../components/markdown.md#forced-line-breaks)). With `Preformatted: true` or `wrap`
 spaces and line breaks are kept, including the blank lines of a `Text`
 ([Text formatting](text-formatting.md#preformatted-text)).
 

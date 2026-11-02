@@ -78,9 +78,12 @@ está activa.
 Uno por encabezado, con su texto (y su número, si lo lleva), anidados por nivel y que llevan al encabezado. El visor los
 muestra al abrir el documento.
 
-## Título
+## Título y asunto
 
-`Title` es lo que el visor muestra en lugar del nombre del fichero.
+`Title` es lo que el visor muestra en lugar del nombre del fichero. `Subject`, si lo hay, es el asunto del PDF: el visor lo
+enseña en las propiedades del documento, y los gestores documentales y los buscadores lo leen
+([Document](../components/document.md#subject)). Los dos van en la información del documento y en los metadatos XMP,
+iguales en los dos sitios, como pide PDF/A.
 
 ## PDF/A
 

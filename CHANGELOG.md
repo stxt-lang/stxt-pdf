@@ -7,6 +7,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Subject of the PDF.** New optional `Subject` in `Document`: a non-empty text (`VALUE_NOT_ALLOWED` if empty) that
+  goes to the `Subject` of the document information and to the `dc:description` of the XMP metadata, equal in both as
+  PDF/A requires. Without it, the PDF has no subject, as before. `Metadata` has a third component, `subject` (the
+  constructor with two remains).
+- **Forced line breaks in Markdown.** A `\` at the end of a line, in a `Markdown` or in a text with `Markup: markdown`,
+  is now a forced line break within the paragraph instead of `MARKDOWN_UNSUPPORTED`. Both line breakings end the line
+  there, and that line is not justified. It reaches the text as U+2028 (`TextRun.LINE_SEPARATOR`), which written as is
+  in any text does the same; in the text of a heading that the table of contents, the bookmarks and the running heads
+  copy, and in the alternative text of an image, it is a space. A break without text before it on its line (at the
+  start of the paragraph or after another one) is `MARKDOWN_UNSUPPORTED`. The two trailing spaces of CommonMark are not
+  a break, because STXT removes the spaces at the end of the lines of a `>>` block. `LineBreaker.Line` has a fourth
+  component, `forced` (the constructor with three remains).
 - **Image markers in lists.** `Marker: image` and the new `Marker image` node, in the `List` (for all its items) or in
   a `List item` (its own, which replaces that of the list whole), with the path of the image relative to `images/`
   and, as children, `Alt` and `Height`. The image is as tall as `Height` or the `Size` of the item, as wide as its

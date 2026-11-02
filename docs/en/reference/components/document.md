@@ -1,7 +1,7 @@
 # `Document`
 
 The root of every document: `Document`, with the namespace `dev.stxt.pdf`. It has exactly one `Page`, one `Title` and one
-`Language`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
+`Language`, an optional `Subject`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
 which hold the content. A document has no loose content and no `Typography`: the base typography goes in the rule
 `For element: Document`.
 
@@ -94,6 +94,18 @@ tag (`es`, `en-US` or `ca`). A value that does not meet this is `VALUE_NOT_ALLOW
 affect the layout, except that `Language` gives the capitalization rules of `Case`
 ([Text formatting](../common/text-formatting.md#capitalization-case)). The title is the one the viewer shows, and the language,
 the one a screen reader uses. Both are required for the PDF to be accessible ([The PDF](../common/pdf.md)).
+
+## `Subject`
+
+`Subject` says what the document is about, in a sentence: `Subject: Terms of the home insurance policy`. It is optional,
+at most one, and a non-empty text (`VALUE_NOT_ALLOWED` if it is empty). It does not affect the layout: it goes to the PDF
+as its subject, which the viewer shows in the document properties and which document managers and search engines read
+([The PDF](../common/pdf.md#title-and-subject)). Without `Subject`, the PDF has no subject.
+
+> **Decision:** it is called `Subject`, like the entry of the PDF and the «Subject» field of the properties of a word
+> processor and of a PDF viewer. *Rejected alternative:* `Description`, the name of its copy in the XMP metadata
+> (`dc:description`), which would be mistaken for a text that describes the content for whoever cannot see it, which is
+> `Alt`.
 
 ## `Section`
 

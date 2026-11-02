@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * What the PDF says about itself (reference/implementation/pdf.md): the title and the language of the document, the
- * XMP packet with the declarations of PDF/UA and of PDF/A, and the output intent of PDF/A.
+ * What the PDF says about itself (reference/implementation/pdf.md): the title, the subject and the language of the
+ * document, the XMP packet with the declarations of PDF/UA and of PDF/A, and the output intent of PDF/A.
  *
  * <p>The title goes in the document information and in the XMP metadata ({@code dc:title}), and the viewer shows it
- * instead of the file name; the language ({@code Lang} of the catalog) is that of all the content. A document always
+ * instead of the file name; the subject, if there is one, goes in both too ({@code Subject} and
+ * {@code dc:description}, which PDF/A requires to agree); the language ({@code Lang} of the catalog) is that of all
+ * the content. A document always
  * has a {@code Title} (required): without a title the PDF would not comply with PDF/UA (7.1) and could not claim it.
  * With PDF/A, the packet carries {@code pdfaid:part} and {@code pdfaid:conformance} and the catalog an
  * {@code OutputIntent} with the sRGB profile of the ICC ({@link #ICC_PROFILE}), the color every color of the PDF is
@@ -57,8 +59,8 @@ final class PdfMetadata {
     }
 
     /**
-     * Writes the title and the language of {@code metadata}, and the XMP packet if there is a title, a PDF/A to
-     * declare ({@code pdfA}, or {@code null}) or extra XMP ({@code extraXmp}: {@code rdf:Description} elements, or
+     * Writes the title, the subject and the language of {@code metadata}, and the XMP packet if there is a title, a
+     * subject, a PDF/A to declare ({@code pdfA}, or {@code null}) or extra XMP ({@code extraXmp}: {@code rdf:Description} elements, or
      * {@code null}).
      */
     static void write(PDDocument doc, Metadata metadata, int ua, PdfA pdfA, String extraXmp) throws IOException {
@@ -72,9 +74,13 @@ final class PdfMetadata {
             preferences.setDisplayDocTitle(true);
             catalog.setViewerPreferences(preferences);
         }
-        if (metadata.title() != null || pdfA != null || extraXmp != null) {
+        if (metadata.subject() != null) {
+            doc.getDocumentInformation().setSubject(metadata.subject());
+        }
+        if (metadata.title() != null || metadata.subject() != null || pdfA != null || extraXmp != null) {
             PDMetadata xmp = new PDMetadata(doc);
-            xmp.importXMPMetadata(xmp(metadata.title(), ua, pdfA, extraXmp).getBytes(StandardCharsets.UTF_8));
+            xmp.importXMPMetadata(xmp(metadata.title(), metadata.subject(), ua, pdfA, extraXmp)
+                    .getBytes(StandardCharsets.UTF_8));
             catalog.setMetadata(xmp);
         }
         if (pdfA != null) {
@@ -83,24 +89,32 @@ final class PdfMetadata {
     }
 
     /**
-     * The XMP packet: the title ({@code dc:title}, if there is one) with the PDF/UA declaration ({@code pdfuaid:part},
+     * The XMP packet: the title ({@code dc:title}) and the subject ({@code dc:description}), each one if there is
+     * one, the PDF/UA declaration if there is a title ({@code pdfuaid:part},
      * 1 or 2; 2 with the revision of the standard, {@code pdfuaid:rev}), the PDF/A declaration ({@code pdfaid:part}
      * and {@code pdfaid:conformance}, if {@code pdfA} is not {@code null}), the extension schemas (the description
      * of {@code pdfuaid} that PDF/A asks for, and those of {@code extra}) and the rest of {@code extra}
      * ({@link Xmp}), at the end.
      */
-    static String xmp(String title, int ua, PdfA pdfA, String extra) {
+    static String xmp(String title, String subject, int ua, PdfA pdfA, String extra) {
         StringBuilder packet = new StringBuilder();
         packet.append("<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n")
                 .append("<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n")
                 .append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n");
+        if (title != null || subject != null) {
+            packet.append("<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n");
+            if (title != null) {
+                packet.append("<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">").append(escape(title))
+                        .append("</rdf:li></rdf:Alt></dc:title>\n");
+            }
+            if (subject != null) {
+                packet.append("<dc:description><rdf:Alt><rdf:li xml:lang=\"x-default\">").append(escape(subject))
+                        .append("</rdf:li></rdf:Alt></dc:description>\n");
+            }
+            packet.append("</rdf:Description>\n");
+        }
         if (title != null) {
-            String escaped = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-            packet.append("<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n")
-                    .append("<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">").append(escaped)
-                    .append("</rdf:li></rdf:Alt></dc:title>\n")
-                    .append("</rdf:Description>\n")
-                    .append("<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n")
+            packet.append("<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n")
                     .append("<pdfuaid:part>").append(ua).append("</pdfuaid:part>\n")
                     .append(ua == 2 ? "<pdfuaid:rev>2024</pdfuaid:rev>\n" : "")
                     .append("</rdf:Description>\n");
@@ -126,6 +140,11 @@ final class PdfMetadata {
         }
         packet.append(descriptions);
         return packet.append("</rdf:RDF>\n</x:xmpmeta>\n<?xpacket end=\"w\"?>").toString();
+    }
+
+    /** A text as the content of an XML element. */
+    private static String escape(String text) {
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**

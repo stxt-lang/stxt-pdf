@@ -34,17 +34,24 @@ final class PageSetupReader {
     record Spec(PageSetup pageSetup, PageSetup.Paper paper) {
     }
 
-    /** {@code Title} and {@code Language} of {@code Document}: a non-empty title and a BCP 47 tag. */
+    /**
+     * {@code Title}, {@code Language} and {@code Subject} of {@code Document}: a non-empty title, a BCP 47 tag and, if
+     * there is one, a non-empty subject.
+     */
     static Metadata metadata(InlineNode document) {
-        String title = child(document, "title").map(n -> {
-            String t = n.getText().trim();
-            if (t.isEmpty()) {
-                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Title needs a text");
-            }
-            return t;
-        }).orElse(null);
+        String title = child(document, "title").map(n -> text(n, "Title")).orElse(null);
         String language = child(document, "language").map(ValueReader::language).orElse(null);
-        return new Metadata(title, language);
+        String subject = child(document, "subject").map(n -> text(n, "Subject")).orElse(null);
+        return new Metadata(title, language, subject);
+    }
+
+    /** The text of a {@code Title} or a {@code Subject}, which cannot be empty. */
+    private static String text(Node n, String name) {
+        String t = n.getText().trim();
+        if (t.isEmpty()) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, name + " needs a text");
+        }
+        return t;
     }
 
     /**

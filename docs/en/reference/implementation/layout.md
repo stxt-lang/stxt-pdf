@@ -200,6 +200,13 @@ penalty per hyphen (50²) and per two consecutive hyphens (10,000). Widths are s
 the spaces and the parts of a split word, each one measured once. `Hyphenations.validate` checks before the layout,
 like the fonts, that every box with text and `Hyphenate: true` is in a language with patterns.
 
+**Forced line breaks.** The break of a Markdown (`\` at the end of the line) reaches the text as the character U+2028
+(`TextRun.LINE_SEPARATOR`), which `MarkdownBuilder` writes in its place. `LineBreaker.words` treats it as a space that
+separates words and marks the word before it (`Word.forced`); the position where the next one starts is a mandatory end
+(`Paragraph.forced`). The greedy breaking closes the line there, and Knuth-Plass lets no line go past it and gives no
+badness to the one that ends at it, like the last one. The `Line` says so with `forced`, and `InlineLayout` does not
+justify it. The natural width of the text is that of its widest line between breaks.
+
 > **Decision:** the language is checked when the layout starts and not when the tree is built, like the fonts:
 > `tree` does not depend on `layout`, where the patterns live. *Rejected alternative:* the patterns in `model`.
 

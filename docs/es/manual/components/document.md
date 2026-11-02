@@ -3,6 +3,7 @@
 `Document` es la raíz de todo documento. Tiene:
 
 - **`Language`** y **`Title`**: obligatorios.
+- **`Subject`**: opcional, de qué trata el documento.
 - **`Page`**: el papel y los márgenes.
 - **`Styles`**: opcional, con las reglas de estilo ([Estilos](../common/styles.md)).
 - **`Page overlay`**: opcionales, las cabeceras y los pies de todo el documento.
@@ -12,6 +13,7 @@
 Document (dev.stxt.pdf):
     Language: es
     Title: Informe anual
+    Subject: Resultados y actividad de la empresa en 2025
     Page:
         Paper: A4
         Margin: 56
@@ -69,6 +71,9 @@ Este documento tiene tres secciones:
 `Title` es el título que muestra el visor de PDF en lugar del nombre del fichero. `Language` es el idioma del documento,
 una etiqueta BCP 47 (`es`, `en-US`, `ca`). El lector de pantalla lo necesita para leer el texto, y las mayúsculas automáticas siguen sus
 reglas. Los dos son obligatorios, porque sin ellos el PDF no es accesible.
+
+`Subject` es opcional: una frase que dice de qué trata el documento. Es el asunto del PDF, que el visor enseña en las
+propiedades del documento y que usan los gestores documentales y los buscadores.
 
 ## `Page`
 

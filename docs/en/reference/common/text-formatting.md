@@ -40,13 +40,14 @@ the note ([Footnote](../components/footnote.md)).
 
 - Marks are not text: they are neither measured nor painted. A special character is written with a backslash in front (`\*`, `\[`,
   `\\`).
-- A single line break in `Content` counts as a space.
+- A single line break in `Content` counts as a space, and a `\` at the end of the line is a forced line break
+  ([Markdown](../components/markdown.md#forced-line-breaks)).
 - **It is inherited**: it is declared once in `For element: Document` or in a rule, and a text goes back to literal with `Markup: none`.
 - It only interprets formatting within the line. What would start a block in a `Markdown` is text:
   `- 5% off`, `2024. A good year`, `# 1 in sales`, `> 30 years` or a `---` line are painted as they are, without
-  escaping them, and a list or a heading is written in a `Markdown`. Within the line, an image, HTML or a forced line
-  break are `MARKDOWN_UNSUPPORTED`, with the line of the paragraph, and so is a link with a title or with a target
-  that is not accepted, the same as in a `Markdown`.
+  escaping them, and a list or a heading is written in a `Markdown`. Within the line, an image or HTML are
+  `MARKDOWN_UNSUPPORTED`, with the line of the paragraph, and so is a link with a title or with a target that is not
+  accepted, the same as in a `Markdown`.
 - It does not act inside a `Markdown`, even if it is inherited (what is escaped is still literal), nor in the entries of a
   `Table of contents`. `Alt` and the other values are always literal.
 - References (`{page}`, `{page of: id}`) work the same way.

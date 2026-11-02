@@ -58,6 +58,9 @@ Document (dev.stxt.pdf):
                 ~~~
                 Reference: 2026-014
                 ~~~
+
+                Marta Vidal\
+                Administration
 ```
 
 ## Properties
@@ -86,9 +89,10 @@ of the `Markdown` or, once for the whole document, in `For element: Document`, a
 | `` `code` `` | Inline code, with `Code font` |
 | A code block (between ```` ``` ```` or `~~~`, or indented four spaces) | A preformatted block with `Code font`, styled with `For element: Code block` |
 | `![alt text](path)`, alone in its paragraph | An `Image` |
+| `\` at the end of the line | A line break within the paragraph, like the one of the signature in the example |
 
-Anything else is an error, so that nothing is lost silently. For example: quotes, HTML, horizontal rules, forced line breaks,
-images inside a paragraph, links with a title or the language tag of a code block (there is no highlighting).
+Anything else is an error, so that nothing is lost silently. For example: quotes, HTML, horizontal rules, images inside a
+paragraph, links with a title or the language tag of a code block (there is no highlighting).
 
 ## Style
 
@@ -103,6 +107,8 @@ which apply to the whole document, and with the `Typography` of the `Markdown`. 
   start with `##`. They are numbered and appear in the table of contents like the others.
 - What is generated has no `Id`, except a heading that writes it at the end, `## Ventas {#ventas}`: this way it is linked
   (`[ver ventas](#ventas)`) or cited (`{page of: ventas}`, `{number of: ventas}`).
+- A line break is written with `\` at the end of the line. The two spaces at the end that Markdown also accepts do not
+  work, because STXT removes the spaces at the end of each line. The line a break ends is not justified.
 - Errors give the line of the document where the failing Markdown block starts.
 - For bold or italic in a single paragraph, a `Markdown` is not needed: `Markup: markdown` is enough
   ([Text formatting](../common/text-formatting.md)).
