@@ -500,8 +500,8 @@ public final class StackingContext {
         paintDecorations(canvas, p, content, metrics, true);
         Tagging tags = canvas.tagging();
         // With letter spacing, whoever extracts the text guesses spaces between the letters: each sequence of runs of
-        // a line carries its text separately (reference/implementation/pdf.md).
-        boolean spaced = s.typography().letterSpacing() != 0;
+        // a line carries its text separately (reference/implementation/pdf.md). A styled run can have its own.
+        double letterSpacing = s.typography().letterSpacing();
         boolean open = false;
         String current = null;
         List<TextLine> lines = p.f().lines();
@@ -516,6 +516,7 @@ public final class StackingContext {
                     && !l.hyphenated() && !(n == 0 && s.dropCap() > 0);
             double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
             List<TextLine.Run> runs = l.runs();
+            boolean spaced = runs.stream().anyMatch(r -> r.format().letterSpacing(letterSpacing) != 0);
             for (int i = 0; i < runs.size(); i++) {
                 TextLine.Run r = runs.get(i);
                 String link = r.format().link();
@@ -551,7 +552,8 @@ public final class StackingContext {
                 // A superscript (the call or the label of a footnote) is raised above the baseline.
                 canvas.text(content.x() + l.x() + r.x(), baseline - r.format().rise() * l.fontSize(), shown,
                         r.format().face(font),
-                        l.fontSize() * r.format().scale(), s.typography().color(), l.wordSpacing(), s.typography().letterSpacing());
+                        l.fontSize() * r.format().scale(), r.format().color(s.typography().color()), l.wordSpacing(),
+                        r.format().letterSpacing(letterSpacing));
                 if (actual && last) {
                     tags.endActualText();
                 }
@@ -634,7 +636,7 @@ public final class StackingContext {
                 text.toString());
     }
 
-    /** Underline ({@code underline}) or strikethrough lines of the runs, with the color of the text. */
+    /** Underline ({@code underline}) or strikethrough lines of the runs, with the color of the text of each run. */
     private static void paintDecorations(Canvas canvas, Piece p, Rect content, VerticalMetrics metrics,
                                          boolean underline) {
         Style s = p.f().box().style();
@@ -647,7 +649,7 @@ public final class StackingContext {
                 DecorationMetrics d = canvas.decoration(r.format().face(s.typography().fontFace()));
                 double x = content.x() + l.x() + r.x();
                 canvas.background(underline ? d.underline(x, baseline, r.width(), l.fontSize())
-                        : d.strikeout(x, baseline, r.width(), l.fontSize()), s.typography().color());
+                        : d.strikeout(x, baseline, r.width(), l.fontSize()), r.format().color(s.typography().color()));
             }
         }
     }

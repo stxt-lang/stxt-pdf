@@ -30,7 +30,7 @@
 | **Reference container** | Rectangle against which the percentages, the `auto` values and the offsets of a box are resolved ([The box](box.md#the-reference-container)). |
 | **Resources folder** | Folder of the fonts and the images. Resources are looked up only downward ([Resources](resources.md)). |
 | **Rotation** (`Rotate`) | A box that is painted rotated: in flow, around its center and taking up the rectangle that encloses it, and positioned, around its `Rotate origin` and without changing the layout. Rotated content has to fit on the page ([Layers and rotation](layers-and-rotation.md#rotation-rotate)). |
-| **Run** | Part of the text of a box with its formatting (bold, italic, underline, strikethrough, link and, in code, another family) ([Text formatting](text-formatting.md#runs)). |
+| **Run** | Part of the text of a box with its formatting (bold, italic, underline, strikethrough, link, in code another family and, in a styled run, what its `For style` rule declares) ([Text formatting](text-formatting.md#runs)). |
 | **Section** | Independent part of the document (`Section`): it starts a page and has its own `Page`, its `Page overlay` elements and its numbering ([Document](../components/document.md#section)). |
 | **Side box** (`Side`) | `Image`, `Barcode` or `Block` placed at one side of its container, with the text of the siblings that follow it running beside it ([Block](../components/block.md#side-boxes-side)). |
 | **Small caps** | Lowercase letters painted as smaller capitals (`Small caps`). |

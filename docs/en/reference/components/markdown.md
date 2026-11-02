@@ -82,6 +82,7 @@ as follows:
 | `~~x~~` | strikethrough run (a single tilde does not strike through) |
 | `[x](target)`, `<target>` | underlined run with a link to that target ([Links](../common/links.md)) |
 | `` `x` `` | code run, with the family of `Code font` |
+| `[x]{name}` | styled run: with what the `For style: name` rule declares ([Text formatting](../common/text-formatting.md#styled-runs)) |
 | `[^id]` | the call of the footnote with that `Id`: a superscript run with its number ([Footnote](footnote.md)) |
 | `\` at the end of the line | a forced line break: the line ends there, within the same paragraph ([below](#forced-line-breaks)) |
 | Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |

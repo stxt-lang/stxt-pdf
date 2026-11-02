@@ -248,8 +248,14 @@ public enum ErrorCode {
      * {@code Page overlay}, a heading, a {@code Text} of a heading or a {@code Cell}.
      */
     STYLE_NOT_ALLOWED,
-    /** A {@code Style} class without a {@code For style} rule. */
+    /** A {@code Style} class, or the style of a styled run ({@code [text]{name}}), without a {@code For style} rule. */
     STYLE_WITHOUT_RULE,
+    /**
+     * The {@code For style} rule of a styled run ({@code [text]{name}}) declares what a run does not allow: a
+     * {@code Box} or a {@code Break}, or a property of {@code Typography} that would change the height of the line
+     * or that only a box has (line of the property).
+     */
+    STYLE_NOT_ALLOWED_IN_RUN,
     /** Two {@code Named color} with the same name in the same source. */
     COLOR_DUPLICATE,
     /** A color written with a name that no {@code Named color} declares (line of the property). */

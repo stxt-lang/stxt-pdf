@@ -1,5 +1,6 @@
 package dev.stxt.pdf.layout.inline;
 
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.TextCase;
@@ -26,6 +27,21 @@ class TextTransformTest {
     void withoutTransformNorSmallCapsTheRunsAreTheSame() {
         List<TextRun> runs = List.of(run("Hola"), run("mundo", "b"));
         assertSame(runs, TextTransform.apply(runs, new StyleEditor().style()));
+    }
+
+    /** A styled run with its own {@code Case} or {@code Small caps} uses them (reference/common/text-formatting.md). */
+    @Test
+    void aStyledRunUsesItsOwnCaseAndSmallCaps() {
+        TextFormat upper = TextFormat.PLAIN.withStyle(
+                new RunStyle("upper", null, null, null, null, null, null, TextCase.UPPERCASE, null));
+        TextFormat none = TextFormat.PLAIN.withStyle(
+                new RunStyle("none", null, null, null, null, null, null, TextCase.NONE, false));
+        List<TextRun> runs = List.of(run("uno "), new TextRun("dos", upper));
+        // Without anything in the box, only the styled run changes: the runs have to be transformed.
+        assertEquals(List.of(run("uno "), new TextRun("DOS", upper)), TextTransform.apply(runs, new StyleEditor().style()));
+        // A styled run that turns them off in a box in small caps.
+        assertEquals(List.of(new TextRun("U", SMALL), run(" "), new TextRun("Dos", none)),
+                apply(List.of(run("u "), new TextRun("Dos", none)), TextCase.NONE, true, ES));
     }
 
     @Test

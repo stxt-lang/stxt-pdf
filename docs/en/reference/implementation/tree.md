@@ -71,7 +71,7 @@ The pieces:
 | `StyleRules` | The rules of `Styles` from the two origins and their priority |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
 | `ListBuilder`, `ListMarkers` | Lists: the numbering and the box of the marker |
-| `MarkdownBuilder` | Translates a `Markdown` (and text with `Markup: markdown`) into STXT nodes |
+| `MarkdownBuilder`, `RunMarks` | Translates a `Markdown` (and text with `Markup: markdown`) into STXT nodes; `RunMarks` marks its styled runs first |
 | `TableOfContentsBuilder` | The entries of the tables of contents (of headings, figures or tables), at the end of the construction |
 | `HeadingNumbers` | The numbers of the headings, and the writing of the number before the title or the caption |
 | `Figures` | The figures: the two counters, whether a `Figure` is numbered, where its caption goes, which counter it counts in and its `Alt` |
@@ -135,6 +135,18 @@ laid out in the flow: the `Paginator` places them.
 `Box.text()` is always the whole text and `Box.formattedRuns()` (`null` without formatting) splits it into `TextRun` with a
 `TextFormat`. `Box.runs()` gives a single run if there is no formatting. The layout tests put runs in the tree before
 closing it with `TextRuns`.
+
+A **styled run** (`[x]{name}`, [Text formatting](../common/text-formatting.md#styled-runs)) comes out of
+`MarkdownBuilder` with its `TextFormat.style()` half done, a `RunStyle` with only the name (`RunStyle.named`), because
+`MarkdownBuilder` does not know the rules. `ElementReader.runStyles` completes it when the box is built, before the
+`Code font` of the code: `StyleRules.runStyle` reads the `For style` rules of that name on a `Style` that inherits
+nothing (so what is declared in it is what the rules declare, each property with its line), rejects what is not in
+`StyleRules.RUN_PROPERTIES` (`STYLE_NOT_ALLOWED_IN_RUN`), and the `RunStyle` keeps what is declared (`null` the rest).
+The family of `Font` also goes in `TextFormat.family`, like that of code. The box keeps the `Style` of each name
+(`Box.runStyle`) for the errors that come later with the line of the rule: `FONT_UNKNOWN` in `PdfMetrics` and
+`CONTRAST_LOW` in `ContrastCheck`. Outside `tree` nobody looks at the name: `TextFormat.face`, `color`,
+`letterSpacing`, `textCase` and `smallCaps` give the value of the run or, if its style does not declare it, that of the
+box that is passed to them.
 
 > **Decision:** the text of the box is still a string and the runs are a partition of it: the lines of the document,
 > the messages, the PDF bookmarks and `{page}` work on the whole text, and a text without formatting is measured and painted
@@ -201,3 +213,15 @@ translates it into STXT nodes (`InlineNode` with the line of its block), which i
 per node (`Translation.runs`, in `BuildContext.runs`). `BoxTreeBuilder.markdown` builds those nodes with `element(...)` as
 children of the box of the `Markdown`. Text with `Markup: markdown` goes through `MarkdownBuilder.inline`, the same parser and the
 same translation in `inlineOnly` mode. Inside a `Markdown` it does not act (`BuildContext.insideMarkdown`).
+
+Before parsing, `RunMarks.mark` replaces each styled run with two marks, Unicode noncharacters that commonmark-java takes
+as letters: `RunMarks.OPEN` with the number of the name in place of the `[`, and `RunMarks.CLOSE` in place of
+`]{name}`. It walks the text like inline Markdown (escapes, code between backticks, the target of a link, images and
+blank lines) to leave out what is not text. `Translator.text` finds them in the `Text` nodes and gives the style to
+everything between them, also to marks, links and code, and a code block gets its text back with `RunMarks.unmark`.
+
+> **Decision:** marks before the parser and not a `LinkProcessor` of commonmark-java, which treats the run as a link: it
+> does not let a link contain it (`disallowPreviousLinks`) nor processes it if its text has brackets, and
+> `[[x]{a}](target)` and `[[x](target)]{a}` would come out as text without any warning. *Rejected alternative:* a
+> `LinkProcessor`, or recognizing the brackets in the `Text` nodes already parsed, where an escaped `\[` cannot be told
+> apart from an unescaped one.

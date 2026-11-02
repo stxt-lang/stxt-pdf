@@ -10,7 +10,9 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
@@ -170,7 +172,7 @@ public final class ContrastCheck implements Canvas {
             float[] seen = over(ink, backdrop);
             double ratio = ratio(seen, backdrop);
             if (ratio < needed) {
-                throw error(current, ratio, needed, seen, backdrop);
+                throw error(current, color, ratio, needed, seen, backdrop);
             }
         }
     }
@@ -228,13 +230,31 @@ public final class ContrastCheck implements Canvas {
         return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
     }
 
-    private static InvalidModelException error(Box box, double ratio, double needed, float[] ink, float[] backdrop) {
-        SourceLine line = box.style().isDeclared(PropertyKey.COLOR) ? box.style().line(PropertyKey.COLOR)
-                : SourceLine.of(box.line());
+    private static InvalidModelException error(Box box, String color, double ratio, double needed, float[] ink,
+                                               float[] backdrop) {
+        SourceLine line = colorLine(box, color);
         return new InvalidModelException(line, ErrorCode.CONTRAST_LOW, "The text of box " + box.describe()
                 + " has a contrast of " + decimal(ratio) + ":1 with its background (" + hex(ink) + " on "
                 + hex(backdrop) + ") and needs " + decimal(needed) + ":1 (3:1 for large text: Size of 18 or more, "
                 + "or 14 in bold): its Color or the background has to be changed");
+    }
+
+    /**
+     * The line of the {@code Color} of a text painted in {@code color}: that of the rule of a styled run of the box
+     * (reference/common/text-formatting.md) with that color, or else that of the box, or the line of the box if it
+     * does not declare one.
+     */
+    private static SourceLine colorLine(Box box, String color) {
+        if (box.formattedRuns() != null) {
+            for (TextRun r : box.formattedRuns()) {
+                RunStyle style = r.format().style();
+                if (style != null && color.equals(style.color())) {
+                    return box.runStyle(style.name()).line(PropertyKey.COLOR);
+                }
+            }
+        }
+        return box.style().isDeclared(PropertyKey.COLOR) ? box.style().line(PropertyKey.COLOR)
+                : SourceLine.of(box.line());
     }
 
     /** {@code 2.85}: rounded down, so that it never seems to reach the threshold. */

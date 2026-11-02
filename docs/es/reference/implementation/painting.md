@@ -224,7 +224,8 @@ hijo de su elemento y padre de su contenido, `PdfStructure.markLink`, el de un e
 el punto de la primera letra (un cuarto del cuerpo a la derecha y un tercio por encima de la línea base, donde no llega el
 subrayado) y recorre lo apuntado que lo contiene: un color opaco sustituye lo de debajo, uno translúcido se mezcla con cada
 color posible de debajo y una imagen lo deja sin conocer hasta que un color opaco la tapa. La caja del texto la sabe por su
-`Tagging` (`beginText`). Los bordes no se apuntan y las esquinas redondeadas cuentan como rectas. Lo usa
+`Tagging` (`beginText`). El color de un tramo con estilo llega en el `text`, y el error señala el `Color` de su regla
+(`Box.runStyle`). Los bordes no se apuntan y las esquinas redondeadas cuentan como rectas. Lo usa
 `Converter.layOut`, sobre las páginas ya maquetadas ([El PDF](../common/pdf.md#contraste)).
 
 ## El SVG de depuración

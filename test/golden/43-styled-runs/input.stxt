@@ -1,0 +1,67 @@
+# Styled runs, [text]{name} (reference/common/text-formatting.md): page of 240 × 160 with margins of 20, page area of
+# 200 × 120 from (20, 20). Size 10 with Line height 15; with the test metrics each character measures 5 pt (a small
+# cap, 4). The styles of the runs do not change the height of the lines: each text has the lines it would have without
+# them, except the last, whose letter spacing makes it break. The image shows the colors, the fonts and the case.
+#   colors: a price in red and bold, and a link whose text is a styled run. One line, y = 20.
+#   fonts:  a run in IBM Plex Serif italic, one of weight 300 and one with inline code in the Code font of its style,
+#           which the box does not have. y = 35.
+#   caps:   small caps and upper case in two runs of a text that has neither. y = 50.
+#   plain:  "Las letras espaciadas van", 25 characters, 125 in a box of 130: one line. y = 65.
+#   spaced: the same text with "letras espaciadas" in upper case and with Letter spacing 2, also on its space:
+#           15 + 5 + 17 × 7 + 5 + 15 = 159 does not fit. "Las LETRAS" measures 15 + 5 + 6 × 7, less the spacing of its
+#           last letter, 60; "ESPACIADAS van", 10 × 7 + 5 + 15 = 90, whose last letter has none. y = 80, two lines.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 240
+		Height: 160
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Line height: 15
+				Markup: markdown
+		For style: price
+			Typography:
+				Color: #B3261E
+				Bold: true
+		For style: serif
+			Typography:
+				Font: IBM Plex Serif
+				Italic: true
+		For style: light
+			Typography:
+				Weight: 300
+		For style: code
+			Typography:
+				Code font: IBM Plex Mono
+				Color: #12315A
+		For style: caps
+			Typography:
+				Small caps: true
+		For style: upper
+			Typography:
+				Case: uppercase
+		For style: wide
+			Typography:
+				Letter spacing: 2
+				Case: uppercase
+		For style: narrow
+			Box:
+				Width: 130
+	Section:
+		Text: Total: [12,50 €]{price}, [[ver precio]{price}](https://example.com).
+			Id: colors
+		Text: En [serifa cursiva]{serif}, [ligera]{light} y [con `mono`]{code}.
+			Id: fonts
+		Text: Un [aviso]{caps} y [otro]{upper} más.
+			Id: caps
+		Text: Las letras espaciadas van
+			Id: plain
+			Style: narrow
+		Text: Las [letras espaciadas]{wide} van
+			Id: spaced
+			Style: narrow

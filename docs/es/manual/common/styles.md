@@ -28,7 +28,7 @@ Styles:
 |---|---|
 | `For element: Document` | A todo el documento: aquí va la tipografía base. Solo admite `Typography` |
 | `For element: Paragraph` (o cualquier otro elemento) | A todos los elementos de ese tipo |
-| `For style: note` | A los elementos con `Style: note` (un elemento puede tener varios estilos: `Style: note wide`) |
+| `For style: note` | A los elementos con `Style: note` (un elemento puede tener varios estilos: `Style: note wide`) y a las partes de un texto escritas `[texto]{note}` ([Formato del texto](text-formatting.md#partes-con-otro-color-u-otra-fuente)) |
 | `For id: title` | Al elemento con `Id: title` |
 | `For element: Header cell`, `Body cell`, `Footer cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../components/table.md)) |
 | `For column: 3` (o `For column: 2 4`) | A las celdas que empiezan en esa columna (o columnas) de una tabla |

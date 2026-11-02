@@ -51,6 +51,7 @@ import dev.stxt.Node;
 import dev.stxt.TextNode;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
@@ -60,7 +61,8 @@ import dev.stxt.pdf.model.TextRun;
  * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
  * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md). A
  * link is an underlined run with its target (reference/common/links.md); inline code, a code run, which gets the
- * family of {@code Code font} when its box is built; a line break ({@code \} at the end of the line), a
+ * family of {@code Code font} when its box is built; a styled run ({@code [text]{name}}), a run with the name of its
+ * style ({@link RunStyle#named}), which also gets the values of its rule when its box is built; a line break ({@code \} at the end of the line), a
  * {@link TextRun#LINE_SEPARATOR} in the text. {@link BoxTreeBuilder} then builds those nodes like any other
  * element, so the schema, the rules of {@code Styles}, the validation of reference/common/errors.md, the tagged PDF and
  * the bookmarks treat them the same way.
@@ -100,10 +102,11 @@ final class MarkdownBuilder {
 
     private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
             + "images alone in their paragraph and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
-            + "`code`, [links](target) and line breaks (\\ at the end of the line) are allowed";
+            + "`code`, [links](target), [styled runs]{style} and line breaks (\\ at the end of the line) are allowed";
 
     private static final String INLINE_SUBSET = "a text with Markup: markdown only allows text with **bold**, "
-            + "*italic*, ++underline++, ~~strikethrough~~, [links](target) and line breaks (\\ at the end of the line); "
+            + "*italic*, ++underline++, ~~strikethrough~~, [links](target), [styled runs]{style} and line breaks (\\ at "
+            + "the end of the line); "
             + "the rest goes in a Markdown, and a special character is written with \\ before it (\\*)";
 
     /**
@@ -124,9 +127,10 @@ final class MarkdownBuilder {
     static Translation translate(InlineNode markdown, Footnotes footnotes) {
         Node content = child(markdown, "content").orElseThrow();
         // The Content >> block begins on the line after its own.
+        RunMarks.Marked marked = RunMarks.mark(content.getText(), content.getLine() + 1);
         Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1),
-                footnotes);
-        List<InlineNode> elements = t.blocks(PARSER.parse(content.getText()), false);
+                footnotes, marked.names());
+        List<InlineNode> elements = t.blocks(PARSER.parse(marked.text()), false);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown needs content in Content");
         }
@@ -148,10 +152,12 @@ final class MarkdownBuilder {
 
     /** Like {@link #inline(String, int)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}. */
     static List<TextRun> inline(String text, int firstLine, Footnotes footnotes) {
-        Translator t = new Translator(null, firstLine, true, new String[0], footnotes);
+        RunMarks.Marked marked = RunMarks.mark(text, firstLine);
+        Translator t = new Translator(null, firstLine, true, new String[0], footnotes, marked.names());
         TextRun.Joiner out = new TextRun.Joiner();
         boolean first = true;
-        for (org.commonmark.node.Node b = INLINE_PARSER.parse(text).getFirstChild(); b != null; b = b.getNext()) {
+        for (org.commonmark.node.Node b = INLINE_PARSER.parse(marked.text()).getFirstChild(); b != null;
+             b = b.getNext()) {
             int line = t.line(b);
             if (!(b instanceof Paragraph p)) {
                 throw t.unsupported(b, line);
@@ -187,11 +193,17 @@ final class MarkdownBuilder {
         private final String[] source;
         /** The footnotes of the document, which number the calls (reference/components/footnote.md). */
         private final Footnotes footnotes;
+        /** The names of the styled runs of the text, by number ({@link RunMarks}). */
+        private final List<String> styleNames;
+        /** The styled run the text being translated is in; {@code null} outside one. */
+        private RunStyle style;
 
-        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source, Footnotes footnotes) {
+        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source, Footnotes footnotes,
+                   List<String> styleNames) {
             this.markdown = markdown;
             this.source = source;
             this.footnotes = footnotes;
+            this.styleNames = styleNames;
             this.firstLine = firstLine;
             this.inlineOnly = inlineOnly;
             this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet-markers");
@@ -260,6 +272,8 @@ final class MarkdownBuilder {
             if (literal.endsWith("\n")) {
                 literal = literal.substring(0, literal.length() - 1);
             }
+            // The code is literal: what looked like a styled run is written again as it was.
+            literal = RunMarks.unmark(literal, styleNames);
             if (literal.isBlank()) {
                 throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown code block needs text");
             }
@@ -463,7 +477,11 @@ final class MarkdownBuilder {
          */
         List<TextRun> inline(org.commonmark.node.Node block, int line) {
             TextRun.Joiner out = new TextRun.Joiner();
+            style = null;
             inline(block, TextFormat.PLAIN, out, line);
+            if (style != null) {
+                throw unclosed(line);
+            }
             List<TextRun> runs = out.build();
             String text = TextRun.text(runs);
             int from = 0;
@@ -483,30 +501,76 @@ final class MarkdownBuilder {
         void inline(org.commonmark.node.Node parent, TextFormat f, TextRun.Joiner out, int line) {
             for (org.commonmark.node.Node n = parent.getFirstChild(); n != null; n = n.getNext()) {
                 if (n instanceof Text t) {
-                    calls(t.getLiteral(), f, out, line);
+                    text(t.getLiteral(), f, out, line);
                 } else if (n instanceof SoftLineBreak) {
                     // A single line break counts as a space, as in a Text (reference/common/typography.md).
-                    out.add(" ", f);
+                    out.add(" ", styled(f));
                 } else if (n instanceof HardLineBreak) {
                     // \ at the end of the line: the line ends there (reference/components/markdown.md). Two spaces
                     // never get here: STXT removes the spaces at the end of the lines of a block.
-                    out.add(String.valueOf(TextRun.LINE_SEPARATOR), f);
+                    out.add(String.valueOf(TextRun.LINE_SEPARATOR), styled(f));
                 } else if (n instanceof StrongEmphasis) {
-                    inline(n, new TextFormat(true, f.italic(), f.underline(), f.strike(), f.link()), out, line);
+                    inline(n, f.withMarks(true, f.italic(), f.underline(), f.strike()), out, line);
                 } else if (n instanceof Emphasis) {
-                    inline(n, new TextFormat(f.bold(), true, f.underline(), f.strike(), f.link()), out, line);
+                    inline(n, f.withMarks(f.bold(), true, f.underline(), f.strike()), out, line);
                 } else if (n instanceof Ins) {
-                    inline(n, new TextFormat(f.bold(), f.italic(), true, f.strike(), f.link()), out, line);
+                    inline(n, f.withMarks(f.bold(), f.italic(), true, f.strike()), out, line);
                 } else if (n instanceof Strikethrough) {
-                    inline(n, new TextFormat(f.bold(), f.italic(), f.underline(), true, f.link()), out, line);
+                    inline(n, f.withMarks(f.bold(), f.italic(), f.underline(), true), out, line);
                 } else if (n instanceof Link l) {
                     inline(n, link(l, f, line), out, line);
                 } else if (n instanceof Code c) {
-                    out.add(c.getLiteral(), f.asCode());
+                    out.add(RunMarks.unmark(c.getLiteral(), styleNames), styled(f).asCode());
                 } else {
                     throw unsupported(n, line);
                 }
             }
+        }
+
+        /** {@code f} with the style of the styled run the text is in, if it is in one. */
+        private TextFormat styled(TextFormat f) {
+            return style == null ? f : f.withStyle(style);
+        }
+
+        /**
+         * The text of a {@code Text} node with the marks of its styled runs ({@link RunMarks}): where one starts, the
+         * text that follows has its style, until it ends. A styled run inside another is an error.
+         */
+        private void text(String text, TextFormat f, TextRun.Joiner out, int line) {
+            int at = 0;
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                if (c != RunMarks.OPEN && c != RunMarks.CLOSE) {
+                    continue;
+                }
+                if (i > at) {
+                    calls(text.substring(at, i), styled(f), out, line);
+                }
+                if (c == RunMarks.OPEN) {
+                    int end = text.indexOf(RunMarks.END, i);
+                    String name = styleNames.get(RunMarks.number(text, i + 1, end));
+                    if (style != null) {
+                        throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "The styled run [...]{" + name + "} is "
+                                + "inside the styled run [...]{" + style.name() + "}: a run has a single style");
+                    }
+                    style = RunStyle.named(name);
+                    i = end;
+                } else if (style == null) {
+                    throw unclosed(line);
+                } else {
+                    style = null;
+                }
+                at = i + 1;
+            }
+            if (at < text.length()) {
+                calls(text.substring(at), styled(f), out, line);
+            }
+        }
+
+        /** A styled run that does not start and end in the same block. */
+        private InvalidModelException unclosed(int line) {
+            return error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "A styled run, [text]{style}, starts and ends in the "
+                    + "same " + (inlineOnly ? "paragraph" : "paragraph, heading, list item or table cell"));
         }
 
         /**
@@ -543,7 +607,7 @@ final class MarkdownBuilder {
             Links.problem(destination).ifPresent(problem -> {
                 throw error(line, ErrorCode.LINK_SCHEME, "Markdown link: " + problem);
             });
-            return new TextFormat(f.bold(), f.italic(), true, f.strike(), destination);
+            return f.withMarks(f.bold(), f.italic(), true, f.strike()).withLink(destination);
         }
 
         /**

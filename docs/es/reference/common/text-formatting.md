@@ -1,7 +1,7 @@
 # Formato del texto
 
-Lo que cambia cómo se ve el texto de una caja sin cambiar su caja: tramos con formato, formato en línea, mayúsculas,
-versalitas, interletraje, ligaduras, texto preformateado y rayas. Todas son propiedades de
+Lo que cambia cómo se ve el texto de una caja sin cambiar su caja: tramos con formato, formato en línea, tramos con
+estilo, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado y rayas. Todas son propiedades de
 [`Typography`](typography.md): **se heredan** y valen en las reglas de `Styles`.
 
 ## Tramos
@@ -13,8 +13,8 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
   caracteres (`GLYPH_MISSING`). La negrita y la cursiva se **suman** a las de la caja: no se pueden quitar. Un tramo en
   negrita tiene el peso 700, o el de la caja si ya es 700 o más (`Weight`, [Tipografía](typography.md#pesos-weight)): en
   un texto de peso 300 la negrita es el 700, y en uno de 900 sigue en 900.
-- El tamaño, el color, `Line height` y la familia son los de la caja (salvo el código, que usa `Code font`,
-  [abajo](#código-en-línea)), así que las líneas no cambian de alto.
+- El tamaño y `Line height` son los de la caja, así que las líneas no cambian de alto. El color y la familia también,
+  salvo en el código, que usa `Code font` ([abajo](#código-en-línea)), y en un [tramo con estilo](#tramos-con-estilo).
 - Una palabra con partes de varios tramos (**neg**rita) es una sola palabra: no se parte entre ellos y mide lo que suman
   sus partes.
 - El espacio entre dos palabras tiene el formato del tramo de su primer espacio en blanco: un subrayado cubre los espacios
@@ -35,8 +35,8 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
 Por defecto el texto de un `Text`, un `Paragraph` o una `Cell` es **literal**: los asteriscos son asteriscos. Con
 `Markup: markdown` se interpreta como el Markdown en línea de un [`Markdown`](../components/markdown.md), con la misma
 sintaxis: `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~`, `` `código` `` ([abajo](#código-en-línea)),
-`[texto](destino)` ([Enlaces](links.md)) y la llamada a una nota al pie, `[^id]`, que es un tramo en superíndice con el
-número de la nota ([Footnote](../components/footnote.md)).
+`[texto](destino)` ([Enlaces](links.md)), `[texto]{nombre}` ([abajo](#tramos-con-estilo)) y la llamada a una nota al
+pie, `[^id]`, que es un tramo en superíndice con el número de la nota ([Footnote](../components/footnote.md)).
 
 - Las marcas no son texto: no se miden ni se pintan. Un carácter especial se escribe con una barra delante (`\*`, `\[`,
   `\\`).
@@ -64,6 +64,55 @@ número de la nota ([Footnote](../components/footnote.md)).
 > como sin `Markup`. *Alternativa descartada:* `MARKDOWN_UNSUPPORTED` con la línea del bloque, que obligaba a escapar el
 > primer carácter.
 
+## Tramos con estilo
+
+Con `Markup: markdown`, o en un `Markdown`, un texto entre corchetes seguido, sin nada en medio, del nombre de un estilo
+entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regla `For style: precio` de `Styles`
+([Reglas reutilizables](styles.md)) lo que cambia cómo se ven sus letras y no el alto de la línea.
+
+| Propiedad de la regla | En el tramo |
+|---|---|
+| `Font`, `Bold`, `Weight`, `Italic` | la familia, el peso y el estilo de su fuente, que debe existir |
+| `Code font` | la familia del código que hay dentro del tramo |
+| `Color` | el color de sus letras y de sus rayas |
+| `Case`, `Small caps` | cómo se pintan sus letras ([Mayúsculas](#mayúsculas-case), [Versalitas](#versalitas-small-caps)) |
+| `Letter spacing` | el interletraje de sus caracteres, también de sus espacios ([Interletraje](#interletraje-letter-spacing)) |
+
+- Lo que la regla declara **sustituye** a lo de la caja, y lo que no declara es lo de la caja. Si dos reglas
+  `For style` con ese nombre (una del documento de estilos aparte y otra del documento) declaran lo mismo, gana la del
+  documento, como en una caja.
+- **Las marcas se suman al estilo**, estén dentro o fuera de los corchetes: `[**x**]{ligero}` y `**[x]{ligero}**` van en
+  negrita aunque la regla diga `Weight: 300`, y la negrita es el peso 700 ([arriba](#tramos)).
+- **El nombre** es una sola palabra, sin espacios, la misma que en `For style`. Sin su regla, es `STYLE_WITHOUT_RULE`, con
+  la línea donde empieza el texto. Unos corchetes seguidos de otra cosa (`[x] {precio}`, `[x]{a b}`, `[x]{}`) son texto,
+  y los números de página y las referencias siguen siendo lo que son: en `[ver]{page}` o `[ver]{page of: id}`, los
+  corchetes son texto. Por eso `page` y `pages` no pueden ser el nombre de un tramo.
+- **Una regla que declara otra cosa** (`Size`, `Line height`, `Align`, `Markup`, un `Box` o un `Break`) es
+  `STYLE_NOT_ALLOWED_IN_RUN` si se usa en un tramo, con la línea de lo que declara. La misma regla puede dar estilo a una
+  caja con `Style`, donde todo vale.
+- **Enlaces.** Un enlace puede tener un tramo con estilo en su texto (`[[ver precio]{precio}](https://...)`) y un tramo con
+  estilo puede tener un enlace (`[ver [aquí](https://...)]{precio}`). Un tramo con estilo dentro de otro es
+  `MARKDOWN_UNSUPPORTED`, como uno que empieza en un párrafo, una celda, un encabezado o un elemento de lista y acaba en
+  otro. Unos corchetes que una línea en blanco separa son texto.
+- **Lo que no es texto de Markdown no forma tramos**: unos corchetes escapados (`\[x\]{precio}`), los que van dentro de
+  código, en el destino de un enlace o en una imagen, y los de un bloque de código, que se escriben tal cual.
+- Un error del tramo (una familia que no existe, un contraste bajo) señala la línea de la propiedad en la regla. El texto
+  que lee un lector de pantalla y el que se copia es el escrito.
+- Un texto con Markdown no puede tener los no-caracteres de Unicode U+FDD0 a U+FDEF, que el motor usa para marcar los
+  tramos con estilo: es `MARKDOWN_UNSUPPORTED`. Un no-carácter no es texto y ninguna fuente lo tiene.
+
+> **Decisión:** un tramo con estilo toma una regla `For style` y no lleva propiedades propias, como `Style` en una caja: el
+> aspecto se declara una vez y se cambia en un sitio. *Alternativa descartada:* atributos en el texto
+> (`[x]{color=#B3261E}`), que repartirían los colores por el documento.
+
+> **Decisión:** lo que la regla no puede aplicar a un tramo es un error y no se ignora, aunque la regla se use también en
+> cajas. *Alternativa descartada:* tomar de la regla solo lo que vale en un tramo, que haría que `Size` cambiara la caja y
+> no el tramo sin ningún aviso.
+
+> **Decisión:** las marcas de Markdown se suman al estilo del tramo dondequiera que se escriban, como se suman a la caja.
+> *Alternativa descartada:* que el tramo gane a las marcas de fuera (`**[x]{ligero}**` en peso 300), que obliga a mirar el
+> anidamiento para saber cómo se ve una palabra.
+
 ## Código en línea
 
 Con `Markup: markdown`, o en un `Markdown`, lo que va entre comillas invertidas (`` `mvn test` ``) es **código**: un
@@ -72,8 +121,9 @@ tramo con la familia de `Code font`, que conserva el peso y el estilo de la caja
 cambian de alto, y el espacio en blanco se colapsa como en el resto del texto.
 
 `Code font` es de `Typography` ([Tipografía](typography.md)) y se hereda: se declara una vez, en `For element: Document`,
-para todo el documento. Sin ella, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en
-un `Markdown`, la del párrafo). Si la familia no existe, es `FONT_UNKNOWN`, con la línea de `Code font`.
+para todo el documento. Dentro de un [tramo con estilo](#tramos-con-estilo) vale el `Code font` de su regla, si lo
+declara. Sin ninguna, el código es un error (`CODE_WITHOUT_FONT`), con la línea donde empieza el texto (en un
+`Markdown`, la del párrafo). Si la familia no existe, es `FONT_UNKNOWN`, con la línea de `Code font`.
 
 ## Mayúsculas (`Case`)
 
@@ -87,13 +137,16 @@ en mayúsculas.
 - `{page}` y `{pages}` no se transforman.
 - Un lector de pantalla lee el texto escrito («Emisor» y no «EMISOR»), salvo en un texto con `{page}`, `{pages}` o una
   referencia, donde lee lo pintado.
+- Un [tramo con estilo](#tramos-con-estilo) con `Case` en su regla usa el suyo. `capitalize` sigue mirando lo que va antes
+  del tramo.
 
 ## Versalitas (`Small caps`)
 
 `Small caps` pinta cada minúscula, pasada a mayúscula, al 80 % del `Size`. Los espacios, las cifras, los signos y las
 mayúsculas se quedan como están. Se aplica después de `Case`: con `lowercase` todo son versalitas, con `uppercase` ninguna y con
 `capitalize` solo la inicial es grande. El `Size` de la caja no cambia, ni la altura de las líneas ni las rayas. Un lector
-de pantalla lee el texto escrito, como con `Case`.
+de pantalla lee el texto escrito, como con `Case`. Un [tramo con estilo](#tramos-con-estilo) con `Small caps` en su regla
+usa el suyo.
 
 > **Decisión:** las versalitas son sintetizadas y no la característica `smcp` de la fuente, que no tiene ninguna de las
 > incluidas. Con `Case: uppercase` no tienen efecto y no es un error: las dos se heredan, y es normal declararlas
@@ -102,7 +155,9 @@ de pantalla lee el texto escrito, como con `Case`.
 ## Interletraje (`Letter spacing`)
 
 Puntos que se suman al avance de cada carácter, también el espacio, **menos el último de cada línea**, para que `right` y
-`center` queden alineados con la última letra. Cuenta en el reparto en líneas, en los tamaños intrínsecos y en la
+`center` queden alineados con la última letra. Un [tramo con estilo](#tramos-con-estilo) con `Letter spacing` en su regla
+lleva el suyo en cada uno de sus caracteres, y el último de la línea no lleva el de su tramo. Un tramo con interletraje no
+tiene ligaduras ([abajo](#ligaduras-ligatures)). Cuenta en el reparto en líneas, en los tamaños intrínsecos y en la
 alineación, y `justify` reparte lo que sobra después. Puede ser negativo, y no se comprueba que el avance siga siendo
 positivo. Un porcentaje es `VALUE_NOT_ALLOWED`.
 
@@ -114,7 +169,8 @@ El texto que se copia o se extrae del PDF es el de la línea, sin espacios entre
 Por defecto cada carácter es un glifo: `fi` son dos. Con `Ligatures: true` se aplican las ligaduras de la fuente, que
 juntan algunos pares en un glifo de otro ancho (en IBM Plex Sans y Serif, `fi`, `fl`, `ffi` y `ffl`, y ninguna en IBM Plex
 Mono). Lo que se mide es lo que se pinta. Una ligadura no cruza un espacio ni el límite entre dos tramos. Con
-`Letter spacing` distinto de 0 no hay ligaduras. No cambia el texto que se lee ni el que se copia.
+`Letter spacing` distinto de 0, el de la caja o el de un tramo con estilo, no hay ligaduras. No cambia el texto que se lee
+ni el que se copia.
 
 > **Decisión:** `false` por defecto: sin ligaduras el texto se pinta mucho más rápido (de 17 a 30 veces). *Alternativa
 > descartada:* ligaduras siempre, o nunca.
@@ -156,7 +212,7 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 ## Lo que no hay
 
 - Tramos con otro tamaño (salvo el superíndice de una nota al pie y la letra capitular de un `Paragraph`,
-  [Text](../components/text.md#letra-capitular-drop-cap)), otro color u otra familia (salvo el código), ni que quiten la
-  negrita o la cursiva de la caja.
+  [Text](../components/text.md#letra-capitular-drop-cap)) o con otro interlineado, tramos con estilo dentro de otros y
+  marcas que quiten la negrita o la cursiva (un tramo con estilo sí puede, con `Weight` o `Italic: false`).
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.

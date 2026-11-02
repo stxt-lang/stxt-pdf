@@ -1,0 +1,20 @@
+# Case: Light gray styled run on the white page: the error points to the Color of its rule
+# Code: CONTRAST_LOW
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: faint
+			Typography:
+				Color: #CCCCCC
+	Section:
+		Text: Un texto con una [nota que casi no se ve]{faint}

@@ -10,6 +10,7 @@ import dev.stxt.pdf.model.TextRun;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,8 @@ public final class Box {
     private Box parent;
     private String text;
     private List<TextRun> runs;
+    /** The styles of its styled runs, by name ({@link #runStyle}). */
+    private Map<String, Style> runStyles = Map.of();
     private String image;
     private Modules modules;
     private String anchor;
@@ -118,6 +121,21 @@ public final class Box {
      */
     public List<TextRun> formattedRuns() {
         return runs;
+    }
+
+    /**
+     * The style of the styled runs of the text with that name ({@code [text]{name}},
+     * reference/common/text-formatting.md): what its {@code For style} rules declare, each property with its line, for
+     * the errors that the layout and the painting find in a run (a family that does not exist, a low contrast).
+     *
+     * @throws IllegalStateException if the text has no styled run with that name
+     */
+    public Style runStyle(String name) {
+        Style s = runStyles.get(name);
+        if (s == null) {
+            throw new IllegalStateException("The text of " + describe() + " has no styled run " + name);
+        }
+        return s;
     }
 
     /**
@@ -229,6 +247,12 @@ public final class Box {
         this.runs = runs;
     }
 
+    /** Sets the styles of the styled runs of the text, by name. */
+    void setRunStyles(Map<String, Style> styles) {
+        writable();
+        this.runStyles = Map.copyOf(styles);
+    }
+
     /** Writes {@code prefix} before the text; if the text has formatting, as a run without formatting. */
     void prependText(String prefix) {
         writable();
@@ -310,6 +334,7 @@ public final class Box {
         rows = List.copyOf(rows);
         closed = true;
         style.close();
+        runStyles.values().forEach(Style::close);
         children.forEach(Box::close);
         rows.forEach(Box::close);
         if (marker != null) {

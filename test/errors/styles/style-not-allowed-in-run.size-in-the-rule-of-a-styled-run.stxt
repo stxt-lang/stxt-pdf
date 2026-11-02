@@ -1,0 +1,20 @@
+# Case: The rule of a styled run declares Size, which would change the height of the line
+# Code: STYLE_NOT_ALLOWED_IN_RUN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: price
+			Typography:
+				Size: 14
+	Section:
+		Text: Total: [12,50 €]{price}

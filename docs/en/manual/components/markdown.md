@@ -87,6 +87,7 @@ of the `Markdown` or, once for the whole document, in `For element: Document`, a
 | `**bold**`, `*italic*`, `++underline++`, `~~strikethrough~~` | Inline formatting |
 | `[text](target)` | A link, underlined ([References and links](../common/references-and-links.md)) |
 | `` `code` `` | Inline code, with `Code font` |
+| `[text]{name}` | A part with the color or the font of the `For style: name` rule ([Text formatting](../common/text-formatting.md#parts-in-another-color-or-font)) |
 | A code block (between ```` ``` ```` or `~~~`, or indented four spaces) | A preformatted block with `Code font`, styled with `For element: Code block` |
 | `![alt text](path)`, alone in its paragraph | An `Image` |
 | `\` at the end of the line | A line break within the paragraph, like the one of the signature in the example |

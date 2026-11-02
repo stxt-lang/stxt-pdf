@@ -7,6 +7,7 @@ import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
@@ -279,6 +280,49 @@ class LineBreakerTest {
         assertEquals(4, line.width(), 1e-9);
         assertEquals(16, line.x(), 1e-9);
         assertEquals(4, line.runs().get(0).width(), 1e-9);
+    }
+
+    /** A run with the letter spacing of a styled run (reference/common/text-formatting.md). */
+    private static TextRun spaced(String text, double letterSpacing) {
+        return new TextRun(text, TextFormat.PLAIN.withStyle(
+                new RunStyle("wide", null, null, null, null, null, letterSpacing, null, null)));
+    }
+
+    @Test
+    void aStyledRunCarriesItsOwnLetterSpacing() {
+        // "ab" without spacing and "cd" with 2: 2 + (1 + 2) + (1 + 2), less the 2 of the last character.
+        assertEquals(6, LineBreaker.width(List.of(run("ab"), spaced("cd", 2)), measurer, F, 1, 0), 1e-9);
+        // The last character is of the box, without spacing: nothing is taken off.
+        assertEquals(8, LineBreaker.width(List.of(spaced("ab", 2), run("cd")), measurer, F, 1, 0), 1e-9);
+        // A styled run with 0 in a box with 1: "ab" carries 1 after each letter, "cd" none.
+        assertEquals(6, LineBreaker.width(List.of(run("ab"), spaced("cd", 0)), measurer, F, 1, 1), 1e-9);
+        assertEquals(new IntrinsicSizes(6, 6),
+                LineBreaker.intrinsics(List.of(run("ab"), spaced("cd", 2)), measurer, F, 1, 0));
+    }
+
+    @Test
+    void theLetterSpacingOfARunChangesTheBreaks() {
+        // Width 7: "ab cd" with the 2 of "cd" measures 2 + 1 + 3 + 3 - 2 = 7, and fits.
+        assertEquals(List.of("ab cd"), texts(LineBreaker.breakLines(List.of(run("ab "), spaced("cd", 2)), 7,
+                measurer, F, 1, 0, LineBreaking.SIMPLE)));
+        // Width 9: "ab cd ef" measures 8 without spacing, and 16 with the 2 of "cd ef", whose space carries it too.
+        assertEquals(List.of("ab cd ef"), texts(LineBreaker.breakLines(List.of(run("ab "), spaced("cd ef", 0)), 9,
+                measurer, F, 1, 0, LineBreaking.BALANCED)));
+        assertEquals(List.of("ab cd", "ef"), texts(LineBreaker.breakLines(List.of(run("ab "), spaced("cd ef", 2)), 9,
+                measurer, F, 1, 0, LineBreaking.BALANCED)));
+    }
+
+    @Test
+    void aPlacedLineDropsTheLetterSpacingOfItsLastRun() {
+        StyleEditor s = new StyleEditor();
+        s.font("F");
+        s.fontSize(1);
+        s.textAlign(TextAlign.RIGHT);
+        TextLine line = LineBreaker.place(List.of(run("ab"), spaced("cd", 2)), measurer, s.style(), 20, false, 0, 1);
+        // ab (2) + c (1 + 2) + d (1) = 6, to the right of 20.
+        assertEquals(6, line.width(), 1e-9);
+        assertEquals(14, line.x(), 1e-9);
+        assertEquals(4, line.runs().get(1).width(), 1e-9);
     }
 
     @Test

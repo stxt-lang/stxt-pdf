@@ -15,6 +15,7 @@ By default text is literal: an asterisk is an asterisk. With `Markup: markdown`,
 | `~~strikethrough~~` | ~~strikethrough~~ |
 | `[text](https://...)` | a link, underlined ([References and links](references-and-links.md)) |
 | `` `code` `` | code, in the font of `Code font` ([below](#code)) |
+| `[text]{price}` | the text with the color, the font and the rest of the `For style: price` rule ([below](#parts-in-another-color-or-font)) |
 
 ```
 Styles:
@@ -31,7 +32,48 @@ they are written, without escaping anything. A particular text becomes literal a
 
 Bold and italic add to those of the box: inside a bold title, `**x**` is still bold, and in a light text
 (`Weight: 300`), bold is weight 700 ([Typography](typography.md#weights)). The size, the color and the font are those of
-the box.
+the box, except in a [styled part](#parts-in-another-color-or-font).
+
+## Parts in another color or font
+
+With `Markup: markdown`, a text in brackets followed by the name of a style in braces, `[€12.50]{price}`, takes what the
+`For style: price` rule of `Styles` declares: the color, the font, the weight, the italic, the capitalization, the small
+caps or the letter spacing. The size and the line height are still those of the box, so the line does not change height.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Styled parts
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Markup: markdown
+        For style: price
+            Typography:
+                Color: #B3261E
+                Bold: true
+        For style: brand
+            Typography:
+                Font: IBM Plex Serif
+                Italic: true
+    Section:
+        Paragraph: A subscription to [The Gazette]{brand} costs [€12.50]{price} a month, VAT included.
+```
+
+- The rule is a `For style` rule like the others: the same one can style a box (`Style: price`) and a part of a text. In
+  a part only `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps` and `Letter spacing`
+  are valid. If the rule declares something else, such as `Size` or a `Box`, and it is used in a part, it is an error
+  (`STYLE_NOT_ALLOWED_IN_RUN`).
+- The marks add to the style: `[**€12.50**]{price}` and `**[€12.50]{price}**` are bold even if the rule says
+  `Weight: 300`. A link can have a styled part (`[[see price]{price}](https://...)`) and a styled part can have a link,
+  but a styled part cannot go inside another.
+- A name without its rule is an error (`STYLE_WITHOUT_RULE`). Brackets that are not followed by a name in braces are
+  text, and `\[` writes them as they are.
 
 ## Code
 
@@ -51,7 +93,8 @@ Paragraph: Run `mvn test` before publishing.
 ```
 
 Code keeps the bold and the italic of what surrounds it and does not change the height of the line. Without `Code font`,
-a text with code is an error.
+a text with code is an error. Inside a [styled part](#parts-in-another-color-or-font) the `Code font` of its rule
+applies, if it declares one.
 
 ## Capitalization (`Case`)
 

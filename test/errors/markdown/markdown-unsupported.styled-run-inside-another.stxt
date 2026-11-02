@@ -1,0 +1,20 @@
+# Case: Styled run inside another styled run
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: price
+			Typography:
+				Bold: true
+	Section:
+		Text: Total: [12,50 [€]{price}]{price}

@@ -82,6 +82,7 @@ así:
 | `~~x~~` | tramo tachado (con una sola tilde no se tacha) |
 | `[x](destino)`, `<destino>` | tramo subrayado con un enlace a ese destino ([Enlaces](../common/links.md)) |
 | `` `x` `` | tramo de código, con la familia de `Code font` |
+| `[x]{nombre}` | tramo con estilo: con lo que declara la regla `For style: nombre` ([Formato del texto](../common/text-formatting.md#tramos-con-estilo)) |
 | `[^id]` | la llamada a la nota al pie con ese `Id`: un tramo en superíndice con su número ([Footnote](footnote.md)) |
 | `\` al final de la línea | un salto de línea forzado: la línea acaba ahí, dentro del mismo párrafo ([abajo](#saltos-de-línea-forzados)) |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |

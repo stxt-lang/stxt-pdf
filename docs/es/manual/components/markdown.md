@@ -87,6 +87,7 @@ del `Markdown` o, una vez para todo el documento, en `For element: Document`, y 
 | `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` | Formato dentro de la línea |
 | `[texto](destino)` | Un enlace, subrayado ([Referencias y enlaces](../common/references-and-links.md)) |
 | `` `código` `` | Código en línea, con `Code font` |
+| `[texto]{nombre}` | Una parte con el color o la fuente de la regla `For style: nombre` ([Formato del texto](../common/text-formatting.md#partes-con-otro-color-u-otra-fuente)) |
 | Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `For element: Code block` |
 | `![texto alternativo](ruta)`, sola en su párrafo | Una `Image` |
 | `\` al final de la línea | Un salto de línea dentro del párrafo, como el de la firma del ejemplo |

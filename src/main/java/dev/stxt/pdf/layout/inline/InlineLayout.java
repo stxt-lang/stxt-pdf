@@ -306,7 +306,8 @@ public final class InlineLayout implements LayoutAlgorithm {
         double span = (s.dropCap() - 1) * lineHeight + metrics.capHeight() * fontSize;
         double size = span / metrics.capHeight();
         double advance = measurer.width(letter.text(), letter.format().face(font), size)
-                + s.typography().letterSpacing() * letter.text().codePointCount(0, letter.text().length());
+                + letter.format().letterSpacing(s.typography().letterSpacing())
+                * letter.text().codePointCount(0, letter.text().length());
         double gap = measurer.width(" ", font, fontSize);
         return new DropCap(letter.text(), letter.format(), size, advance + gap, dropCapRest(runs));
     }

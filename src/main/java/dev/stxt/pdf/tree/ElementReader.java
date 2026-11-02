@@ -6,10 +6,14 @@ import dev.stxt.TextNode;
 import dev.stxt.pdf.model.CaptionPosition;
 import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.RunStyle;
+import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +57,7 @@ enum ElementReader {
             text(n, box);
             box.setRuns(ctx.runs.get(n));
             inlineFormat(ctx, box);
+            runStyles(ctx, box);
             codeFont(box);
         }
     },
@@ -140,6 +145,7 @@ enum ElementReader {
                 cellText(n, box);
                 box.setRuns(ctx.runs.get(n));
                 inlineFormat(ctx, box);
+                runStyles(ctx, box);
                 codeFont(box);
             } else {
                 builder.buildContent(ctx, n, box);
@@ -422,6 +428,58 @@ enum ElementReader {
     }
 
     /**
+     * The styled runs of the text, {@code [text]{name}} (reference/common/text-formatting.md), get here the values of
+     * the {@code For style} rule of their name, which only the builder knows ({@link StyleRules#runStyle}): what the
+     * rule declares replaces what the box has, and the family of {@code Font} goes in the family of the run. Its code
+     * gets its family afterwards, in {@link #codeFont}. The box keeps the style of each name, with its lines.
+     */
+    private static void runStyles(BuildContext ctx, Box box) {
+        List<TextRun> runs = box.formattedRuns();
+        if (runs == null || runs.stream().noneMatch(r -> r.format().style() != null)) {
+            return;
+        }
+        Map<String, Style> styles = new HashMap<>();
+        Map<String, RunStyle> values = new HashMap<>();
+        List<TextRun> resolved = new ArrayList<>(runs.size());
+        int index = 0;
+        for (TextRun r : runs) {
+            RunStyle named = r.format().style();
+            if (named != null) {
+                String name = named.name();
+                if (!styles.containsKey(name)) {
+                    Style s = ctx.rules.runStyle(name, box.textLineAt(index));
+                    styles.put(name, s);
+                    values.put(name, runStyle(name, s));
+                }
+                RunStyle style = values.get(name);
+                TextFormat f = r.format().withStyle(style);
+                if (!f.code() && style.family() != null) {
+                    f = f.withFamily(style.family());
+                }
+                r = new TextRun(r.text(), f);
+            }
+            resolved.add(r);
+            index += r.text().length();
+        }
+        box.setRuns(List.copyOf(resolved));
+        box.setRunStyles(styles);
+    }
+
+    /** The values of a styled run: those that its rules declare in {@code s}; {@code null} the others. */
+    private static RunStyle runStyle(String name, Style s) {
+        TypographyStyle t = s.typography();
+        return new RunStyle(name,
+                s.isDeclared(PropertyKey.COLOR) ? t.color() : null,
+                s.isDeclared(PropertyKey.FONT) ? t.font() : null,
+                s.isDeclared(PropertyKey.CODE_FONT) ? t.codeFont() : null,
+                s.isDeclared(PropertyKey.FONT_WEIGHT) ? t.fontWeight() : null,
+                s.isDeclared(PropertyKey.FONT_STYLE) ? t.fontStyle() : null,
+                s.isDeclared(PropertyKey.internal("letter-spacing")) ? t.letterSpacing() : null,
+                s.isDeclared(PropertyKey.internal("case")) ? t.textCase() : null,
+                s.isDeclared(PropertyKey.internal("small-caps")) ? t.smallCaps() : null);
+    }
+
+    /**
      * Inline code (reference/common/text-formatting.md) is written with the family of {@code Code font}, its own
      * or inherited, which only the box knows: its runs receive it here. Without it, it is an error, with the line of
      * the code.
@@ -431,11 +489,14 @@ enum ElementReader {
         if (runs == null || runs.stream().noneMatch(r -> r.format().code())) {
             return;
         }
-        String family = box.style().typography().codeFont();
         List<TextRun> resolved = new ArrayList<>(runs.size());
         int index = 0;
         for (TextRun r : runs) {
             if (r.format().code()) {
+                // In a styled run, the Code font of its style, if it declares one.
+                RunStyle style = r.format().style();
+                String family = style != null && style.codeFamily() != null ? style.codeFamily()
+                        : box.style().typography().codeFont();
                 if (family == null) {
                     throw error(box.textLineAt(index), ErrorCode.CODE_WITHOUT_FONT, "The code needs Code font: "
                             + "it is declared in the Typography of the text, of an ancestor or of Styles (For element: Document), "

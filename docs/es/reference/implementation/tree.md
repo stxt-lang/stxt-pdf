@@ -71,7 +71,7 @@ Las piezas:
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
-| `MarkdownBuilder` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT |
+| `MarkdownBuilder`, `RunMarks` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT; `RunMarks` marca antes sus tramos con estilo |
 | `TableOfContentsBuilder` | Las entradas de los índices (de encabezados, de figuras o de tablas), al final de la construcción |
 | `HeadingNumbers` | Los números de los encabezados, y la escritura del número delante del título o del pie |
 | `Figures` | Las figuras: los dos contadores, si una `Figure` va numerada, dónde va su pie, con qué contador cuenta y su `Alt` |
@@ -135,6 +135,17 @@ maquetan en el flujo: los coloca el `Paginator`.
 `Box.text()` es siempre el texto entero y `Box.formattedRuns()` (`null` sin formato) lo parte en `TextRun` con un
 `TextFormat`. `Box.runs()` da un único tramo si no hay formato. Los tests de layout ponen tramos en el árbol antes de
 cerrarlo con `TextRuns`.
+
+Un **tramo con estilo** (`[x]{nombre}`, [Formato del texto](../common/text-formatting.md#tramos-con-estilo)) sale de
+`MarkdownBuilder` con su `TextFormat.style()` a medias, un `RunStyle` con solo el nombre (`RunStyle.named`), porque
+`MarkdownBuilder` no conoce las reglas. `ElementReader.runStyles` se lo completa al construir la caja, antes que el
+`Code font` del código: `StyleRules.runStyle` lee las reglas `For style` de ese nombre sobre un `Style` que no hereda nada
+(así lo declarado en él es lo que declaran las reglas, cada propiedad con su línea), rechaza lo que no está en
+`StyleRules.RUN_PROPERTIES` (`STYLE_NOT_ALLOWED_IN_RUN`), y el `RunStyle` guarda lo declarado (`null` lo demás). La
+familia de `Font` va además en `TextFormat.family`, como la del código. La caja guarda el `Style` de cada nombre
+(`Box.runStyle`) para los errores que salen después con la línea de la regla: `FONT_UNKNOWN` en `PdfMetrics` y
+`CONTRAST_LOW` en `ContrastCheck`. Fuera de `tree` nadie mira el nombre: `TextFormat.face`, `color`, `letterSpacing`,
+`textCase` y `smallCaps` dan el valor del tramo o, si su estilo no lo declara, el de la caja que se les pasa.
 
 > **Decisión:** el texto de la caja sigue siendo una cadena y los tramos son una partición suya: las líneas del documento,
 > los mensajes, los marcadores del PDF y `{page}` trabajan sobre el texto entero, y un texto sin formato se mide y se pinta
@@ -201,3 +212,16 @@ traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con e
 por nodo (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos con `element(...)` como
 hijos de la caja del `Markdown`. El texto con `Markup: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
 misma traducción en modo `inlineOnly`. Dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).
+
+Antes de parsear, `RunMarks.mark` cambia cada tramo con estilo por dos marcas, no-caracteres de Unicode que commonmark-java
+toma por letras: `RunMarks.OPEN` con el número del nombre en lugar del `[`, y `RunMarks.CLOSE` en lugar de `]{nombre}`.
+Recorre el texto como el Markdown en línea (los escapes, el código entre comillas invertidas, el destino de un enlace, las
+imágenes y las líneas en blanco) para dejar fuera lo que no es texto. `Translator.text` las encuentra en los nodos `Text` y
+da el estilo a todo lo que va entre ellas, también a las marcas, los enlaces y el código, y un bloque de código recupera su
+texto con `RunMarks.unmark`.
+
+> **Decisión:** las marcas antes del parser y no un `LinkProcessor` de commonmark-java, que trata el tramo como un enlace:
+> no deja que un enlace lo contenga (`disallowPreviousLinks`) ni lo procesa si su texto tiene corchetes, y
+> `[[x]{a}](destino)` y `[[x](destino)]{a}` saldrían como texto sin ningún aviso. *Alternativa descartada:* un
+> `LinkProcessor`, o reconocer los corchetes en los nodos `Text` ya parseados, donde un `\[` escapado no se distingue de
+> uno sin escapar.

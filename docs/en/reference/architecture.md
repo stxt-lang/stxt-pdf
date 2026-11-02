@@ -38,7 +38,7 @@ Dependencies go in a single direction and without cycles. `ArchitectureTest` sta
 
 | Package | Can use | Contents |
 |---|---|---|
-| `model` | nothing | Pure, shared types: the values (`Value`, `ValueParser`), the enums of the values (one per file, such as `TextAlign`, `Marker` or `Break`), geometry (`Rect`, `Sides`, `Insets`), formatted text (`TextRun`, `TextFormat`, `FontFace`), references (`Reference`), links (`Links`), grid placement (`GridAreas`, `Area`, `Cell`), colors and backgrounds (`Colors`, `Paint`, `Radii`), rotation (`Rotation`), the modules of a generated image (`Modules`, with `BarcodeFormat` and `ErrorCorrection`), tolerance (`Tolerance`), limits (`Limits`) and the root of the errors (`StxtPdfException`) |
+| `model` | nothing | Pure, shared types: the values (`Value`, `ValueParser`), the enums of the values (one per file, such as `TextAlign`, `Marker` or `Break`), geometry (`Rect`, `Sides`, `Insets`), formatted text (`TextRun`, `TextFormat`, `RunStyle`, `FontFace`), references (`Reference`), links (`Links`), grid placement (`GridAreas`, `Area`, `Cell`), colors and backgrounds (`Colors`, `Paint`, `Radii`), rotation (`Rotation`), the modules of a generated image (`Modules`, with `BarcodeFormat` and `ErrorCorrection`), tolerance (`Tolerance`), limits (`Limits`) and the root of the errors (`StxtPdfException`) |
 | `resources` | `model` | The resources folder (`Resources`), fonts (`FontLibrary`, `FontFile`, `KerningPairs`) and images (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | The box tree (`Box`, `Element`, `Style` and its groups) and its construction (`BoxTreeBuilder` and its parts), the model errors (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
@@ -77,7 +77,7 @@ depend on the `LayoutContext` interface.
   - `ValueReader`, the values, and `PropertyReader`, the properties;
   - `StyleRules`, the `Styles` rules;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` and `TableOfContentsBuilder`, tables, lists, Markdown and
-    tables of contents;
+    tables of contents, and `RunMarks`, the styled runs of the Markdown ([The box tree](implementation/tree.md#text-and-runs));
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
     generated images ([The box tree](implementation/tree.md#generated-images));
   - `ModelValidator`, the rules that look at the box once read;

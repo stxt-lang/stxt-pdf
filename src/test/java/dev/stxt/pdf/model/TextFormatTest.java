@@ -39,6 +39,40 @@ class TextFormatTest {
                 new TextFormat(false, true, false, false).face(light));
     }
 
+    /** The style of a styled run replaces what the box has, and the marks add to it (text-formatting.md). */
+    @Test
+    void theStyleOfARunReplacesTheBoxAndTheMarksAddToIt() {
+        RunStyle light = new RunStyle("light", "#B3261E", null, null, new FontWeight(300), FontStyle.NORMAL, 1.5,
+                TextCase.UPPERCASE, true);
+        TextFormat f = TextFormat.PLAIN.withStyle(light);
+        FontFace boldItalic = new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC);
+        assertEquals(new FontFace("F", new FontWeight(300), FontStyle.NORMAL), f.face(boldItalic));
+        assertEquals(new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC),
+                f.withMarks(true, true, false, false).face(REGULAR));
+        assertEquals("#B3261E", f.color("#000000"));
+        assertEquals(1.5, f.letterSpacing(0));
+        assertEquals(TextCase.UPPERCASE, f.textCase(TextCase.NONE));
+        assertTrue(f.smallCaps(false));
+        // What the style does not declare is that of the box.
+        TextFormat empty = TextFormat.PLAIN.withStyle(RunStyle.named("x"));
+        assertEquals(REGULAR, empty.face(REGULAR));
+        assertEquals("#000000", empty.color("#000000"));
+        assertEquals(2, empty.letterSpacing(2));
+        assertEquals(TextCase.LOWERCASE, empty.textCase(TextCase.LOWERCASE));
+        assertFalse(empty.smallCaps(false));
+    }
+
+    @Test
+    void aRunWithLetterSpacingHasNoLigatures() {
+        FontFace ligatures = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL, true, false);
+        TextFormat spaced = TextFormat.PLAIN.withStyle(
+                new RunStyle("wide", null, null, null, null, null, 1.0, null, null));
+        assertFalse(spaced.face(ligatures).ligatures());
+        TextFormat unspaced = TextFormat.PLAIN.withStyle(
+                new RunStyle("tight", null, null, null, null, null, 0.0, null, null));
+        assertTrue(unspaced.face(ligatures).ligatures());
+    }
+
     @Test
     void variantNamesTheWeightAndTheStyle() {
         assertEquals("normal", REGULAR.variant());

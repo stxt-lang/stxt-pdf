@@ -7,6 +7,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Styled runs.** With `Markup: markdown`, or in a `Markdown`, `[text]{name}` is a run that takes from the
+  `For style: name` rule what changes how its letters look and not the height of the line: `Font`, `Code font` (for the
+  code inside it), `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps` and `Letter spacing`. What the rule declares
+  replaces what the box has (a styled run can take the bold away with `Weight: 400`), and the Markdown marks add to it
+  wherever they are written. A link can contain a styled run and a styled run can contain a link. A name without its
+  rule is `STYLE_WITHOUT_RULE`, with the line where the text starts; a rule used in a run that declares anything else
+  (`Size`, `Line height`, `Align`, a `Box`, a `Break`...) is the new `STYLE_NOT_ALLOWED_IN_RUN`, with the line of what it
+  declares; a styled run inside another, or one that starts and ends in different blocks, is `MARKDOWN_UNSUPPORTED`.
+  Brackets followed by anything other than a single word in braces stay text, and so do `[x]{page}` and `[x]{pages}`,
+  whose braces are the page numbers. An unknown family and a low contrast of a styled run report the line of the
+  property in its rule. A text with Markdown that has a Unicode noncharacter from U+FDD0 to U+FDEF is
+  `MARKDOWN_UNSUPPORTED`: the engine uses them to mark the runs before parsing. The letter spacing of a line is now
+  measured run by run, and the last character of a line drops that of its own run. `TextFormat` has an eleventh
+  component, `style` (a `RunStyle`; the constructor with ten remains), and `withMarks` and `withStyle`;
+  `Box.runStyle(name)` gives the style of a styled run with its lines. Golden `43-styled-runs`.
 - **Subject of the PDF.** New optional `Subject` in `Document`: a non-empty text (`VALUE_NOT_ALLOWED` if empty) that
   goes to the `Subject` of the document information and to the `dc:description` of the XMP metadata, equal in both as
   PDF/A requires. Without it, the PDF has no subject, as before. `Metadata` has a third component, `subject` (the

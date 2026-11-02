@@ -1,0 +1,13 @@
+# Five texts one after the other from y = 20, the last one with two lines (see input.stxt).
+Result:
+	Page: 1
+		Fragment: colors
+			Rect: 20 20 200 15
+		Fragment: fonts
+			Rect: 20 35 200 15
+		Fragment: caps
+			Rect: 20 50 200 15
+		Fragment: plain
+			Rect: 20 65 130 15
+		Fragment: spaced
+			Rect: 20 80 130 30

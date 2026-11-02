@@ -303,6 +303,55 @@ final class StyleRules {
         applyAll(rules, noBreak, s);
     }
 
+    /**
+     * The properties of {@code Typography} that a styled run allows (reference/common/text-formatting.md): the ones that
+     * change how its letters look and not the height of the line.
+     */
+    static final List<String> RUN_PROPERTIES = List.of("font", "code-font", "bold", "weight", "italic", "color",
+            "case", "small-caps", "letter-spacing");
+
+    private static final String RUN_ALLOWED = "Font, Code font, Bold, Weight, Italic, Color, Case, Small caps and "
+            + "Letter spacing";
+
+    /**
+     * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}
+     * rules of that name declare, in the order of {@code Styles}, read into a style that inherits nothing, so that
+     * what is declared in it is what the rules declare, each property with its line. A rule with a {@code Box}, a
+     * {@code Break} or a property that a run does not allow is an error, with the line of what it declares.
+     *
+     * @param line line of the document where the run is, for the messages
+     */
+    Style runStyle(String name, int line) {
+        if (!classNames.contains(name)) {
+            throw error(line, ErrorCode.STYLE_WITHOUT_RULE, "The style " + name + " of the styled run [...]{" + name
+                    + "} has no rule: 'For style: " + name + "' is missing in Styles");
+        }
+        Style s = new Style(namedColors);
+        for (ClassRule rule : classRules) {
+            if (!rule.name().equals(name)) {
+                continue;
+            }
+            boolean fromFile = external.contains(rule.rule());
+            for (Node g : rule.rule().getChildren()) {
+                if (!g.getCanonicalName().equals("typography")) {
+                    throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, "The rule For style: " + name
+                            + " gives " + g.getName() + " to the styled run on line " + line + ", which is part of a "
+                            + "line and not a box: a run only takes " + RUN_ALLOWED), fromFile);
+                }
+                for (Node p : inline(g).getChildren()) {
+                    if (!RUN_PROPERTIES.contains(p.getCanonicalName())) {
+                        throw located(error(p, ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, "The rule For style: " + name
+                                + " gives " + p.getName() + " to the styled run on line " + line + ", which keeps the "
+                                + "size, the line height and the rest of the text of its box: a run only takes "
+                                + RUN_ALLOWED), fromFile);
+                    }
+                }
+            }
+            read(rule.rule(), s);
+        }
+        return s;
+    }
+
     /** The {@code For style} rules of a {@code Style}, in the order of {@code Styles}. */
     private List<InlineNode> classRules(Node classNode) {
         Set<String> classes = classes(classNode);

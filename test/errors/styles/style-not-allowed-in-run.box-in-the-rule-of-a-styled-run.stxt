@@ -1,0 +1,20 @@
+# Case: The rule of a styled run declares a Box, and a run is part of a line, not a box
+# Code: STYLE_NOT_ALLOWED_IN_RUN
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: tag
+			Box:
+				Background: #EEEEEE
+	Section:
+		Text: Una [etiqueta]{tag} en la frase

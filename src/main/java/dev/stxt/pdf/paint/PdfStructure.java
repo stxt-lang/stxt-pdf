@@ -386,7 +386,7 @@ final class PdfStructure {
         if (box.isImage()) {
             e.setAlternateDescription(box.style().image().alt());
         }
-        if (box.hasText() && TextTransform.applies(box.style()) && !Reference.contains(box.text())
+        if (box.hasText() && TextTransform.applies(box.runs(), box.style()) && !Reference.contains(box.text())
                 && !PageNumbers.contains(box.text())) {
             // Upper case is only a painting matter (reference/common/text-formatting.md): the text of the structure
             // is the written one. If it has page numbers or references, the text changes with the page and cannot be

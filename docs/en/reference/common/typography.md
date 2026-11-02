@@ -225,5 +225,6 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 - Vertical or right-to-left writing, and, of `GPOS`, what is not horizontal kerning (marks, contextual positioning).
 - Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the
   document's own, and changing the minimum letters on each side of the hyphen.
-- A different color or size within a line (except the drop cap and the superscript of a footnote): a run only changes
-  bold, italic, underline and strikethrough ([Text formatting](text-formatting.md#runs)).
+- A different size within a line (except the drop cap and the superscript of a footnote): a run changes the family,
+  the weight, the style, the color, the capitalization and the letter spacing
+  ([Text formatting](text-formatting.md#styled-runs)), but not the size.

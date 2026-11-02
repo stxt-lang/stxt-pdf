@@ -24,9 +24,15 @@ package dev.stxt.pdf.model;
  * number that opens the note itself. Both are superscripts ({@link #superscript()}): measured and painted at
  * {@link #SUPERSCRIPT_SCALE} of the size and raised {@link #SUPERSCRIPT_RISE} of it, without changing the height of
  * the line.</p>
+ *
+ * <p>{@code style} is that of a styled run, {@code [text]{name}} ({@link RunStyle}), or {@code null}: its color, its
+ * weight, its style, its letter spacing, its case and its small caps replace those of the box, and its family (or that
+ * of its code) is in {@code family}. The marks of the run (bold, italic) add to the style as they add to the box,
+ * wherever they are written.</p>
  */
 public record TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
-                         boolean smallCaps, boolean code, String family, String footnote, boolean label) {
+                         boolean smallCaps, boolean code, String family, String footnote, boolean label,
+                         RunStyle style) {
 
     /** Size of the small caps relative to that of the box. */
     public static final double SMALL_CAPS_SCALE = 0.8;
@@ -62,13 +68,64 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
         this(bold, italic, underline, strike, link, smallCaps, code, family, null, false);
     }
 
-    /** The font of the run, derived from that of the box. */
+    /** A format without the style of a styled run. */
+    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
+                      boolean smallCaps, boolean code, String family, String footnote, boolean label) {
+        this(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, null);
+    }
+
+    /**
+     * The font of the run, derived from that of the box: with the family, the weight and the style of its
+     * {@link #style()}, if it declares them, and its marks on top. A run with letter spacing has no ligatures, like a
+     * box (reference/common/text-formatting.md).
+     */
     public FontFace face(FontFace base) {
-        if (!bold && !italic && family == null) {
+        if (!bold && !italic && family == null && style == null) {
             return base;
         }
-        return new FontFace(family != null ? family : base.family(), bold ? base.weight().bolder() : base.weight(),
-                italic ? FontStyle.ITALIC : base.style(), base.ligatures(), base.kerning());
+        FontWeight weight = style != null && style.weight() != null ? style.weight() : base.weight();
+        FontStyle fontStyle = style != null && style.style() != null ? style.style() : base.style();
+        boolean ligatures = base.ligatures() && (style == null || style.letterSpacing() == null
+                || style.letterSpacing() == 0);
+        return new FontFace(family != null ? family : base.family(), bold ? weight.bolder() : weight,
+                italic ? FontStyle.ITALIC : fontStyle, ligatures, base.kerning());
+    }
+
+    /** The color of the text of the run: that of its {@link #style()} or, if it does not declare one, {@code box}. */
+    public String color(String box) {
+        return style != null && style.color() != null ? style.color() : box;
+    }
+
+    /**
+     * The letter spacing of the run, in points: that of its {@link #style()} or, if it does not declare one,
+     * {@code box}.
+     */
+    public double letterSpacing(double box) {
+        return style != null && style.letterSpacing() != null ? style.letterSpacing() : box;
+    }
+
+    /** The case of the run: that of its {@link #style()} or, if it does not declare one, {@code box}. */
+    public TextCase textCase(TextCase box) {
+        return style != null && style.textCase() != null ? style.textCase() : box;
+    }
+
+    /**
+     * Whether the run is painted in small caps ({@code Small caps}): its {@link #style()} or, if it does not declare
+     * it, {@code box}. It is not {@link #smallCaps()}, which marks the letters the layout already turned into them.
+     */
+    public boolean smallCaps(boolean box) {
+        return style != null && style.smallCaps() != null ? style.smallCaps() : box;
+    }
+
+    /** The same format with those marks: bold, italic, underline and strikethrough. */
+    public TextFormat withMarks(boolean b, boolean i, boolean u, boolean s) {
+        return new TextFormat(b, i, u, s, link, smallCaps, code, family, footnote, label, style);
+    }
+
+    /** The same format with the style of a styled run ({@code [text]{name}}). */
+    public TextFormat withStyle(RunStyle runStyle) {
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label,
+                runStyle);
     }
 
     /** Whether it has underline or strikeout, which are painted apart from the text. */
@@ -78,33 +135,33 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
 
     /** The same format with that link. */
     public TextFormat withLink(String destination) {
-        return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family, footnote, label);
+        return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family, footnote, label, style);
     }
 
     /** The same format with small caps turned on or off. */
     public TextFormat withSmallCaps(boolean small) {
         return small == smallCaps ? this
-                : new TextFormat(bold, italic, underline, strike, link, small, code, family, footnote, label);
+                : new TextFormat(bold, italic, underline, strike, link, small, code, family, footnote, label, style);
     }
 
     /** The same format as inline code, still without its family. */
     public TextFormat asCode() {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family, footnote, label);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family, footnote, label, style);
     }
 
     /** The same format with that font family. */
     public TextFormat withFamily(String fontFamily) {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily, footnote, label);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily, footnote, label, style);
     }
 
     /** The same format as the call of the footnote with that {@code Id}: a superscript. */
     public TextFormat withFootnote(String id) {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, id, false);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, id, false, style);
     }
 
     /** The same format as the label that opens a footnote: a superscript. */
     public TextFormat asLabel() {
-        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, null, true);
+        return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, null, true, style);
     }
 
     /** Whether the run is a superscript: the call or the label of a footnote. */

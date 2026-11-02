@@ -13,7 +13,7 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 | `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
 | `For element` | un elemento generado por el motor: `Code block`, `TOC 1` a `TOC 6` o `Footnotes` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
 | `For element` | una posición en una tabla: `Header cell`, `Body cell`, `Footer cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../components/table.md#estilo-de-las-celdas)) |
-| `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style` y las celdas de una `Row` con él en su `Style` |
+| `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style`, las celdas de una `Row` con él en su `Style` y los tramos con estilo `[texto]{nombre}` ([Formato del texto](text-formatting.md#tramos-con-estilo)) |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas |
 
@@ -136,7 +136,9 @@ Son errores:
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
   una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
-- un nombre de `Style` sin su regla `For style` (`STYLE_WITHOUT_RULE`);
+- un nombre de `Style` o de un tramo con estilo sin su regla `For style` (`STYLE_WITHOUT_RULE`);
+- la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size` o un `Box`
+  (`STYLE_NOT_ALLOWED_IN_RUN`);
 - dos `Named color` con el mismo nombre en el mismo origen (`COLOR_DUPLICATE`);
 - un color con forma de nombre que ningún `Named color` declara (`COLOR_UNKNOWN`);
 - un `Named color` sin nombre y color separados por un espacio, con un nombre mal escrito o con un color que no es

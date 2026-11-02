@@ -1,0 +1,20 @@
+# Case: Font of the rule of a styled run with a family that does not exist
+# Code: FONT_UNKNOWN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: brand
+			Typography:
+				Font: Helvetica
+	Section:
+		Text: Hecho por [Acme]{brand}

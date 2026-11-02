@@ -221,5 +221,6 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
   contextuales).
 - Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,
   y cambiar los mínimos de letras a cada lado del guion.
-- Color o tamaño distintos dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo
-  solo cambia negrita, cursiva, subrayado y tachado ([Formato del texto](text-formatting.md#tramos)).
+- Tamaño distinto dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo cambia
+  la familia, el peso, el estilo, el color, las mayúsculas y el interletraje
+  ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.

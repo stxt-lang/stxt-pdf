@@ -2,6 +2,7 @@ package dev.stxt.pdf.layout.inline;
 
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.Reference;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.resources.FontFile;
@@ -11,6 +12,7 @@ import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import dev.stxt.pdf.tree.SourceLine;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
@@ -118,7 +120,7 @@ public final class PdfMetrics implements TextMeasurer {
         boolean hyphens = s.typography().hyphenate() || box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0;
         int start = 0;
         for (TextRun run : box.runs()) {
-            FontFile font = font(box, fonts, run.format().face(s.typography().fontFace()), start);
+            FontFile font = font(box, fonts, run, start);
             String text = run.text();
             if (hyphens) {
                 requireGlyph(box, font, LineBreaker.HYPHEN.charAt(0), start);
@@ -183,25 +185,36 @@ public final class PdfMetrics implements TextMeasurer {
     /**
      * The font of a run that starts at character {@code index} of the text. If the variant of the box
      * does not exist, the error points to the text and the declarations; if it is the one of a formatted
-     * run, to the line of the run.
+     * run, to the line of the run. A family that does not exist points to its declaration: {@code Font} or
+     * {@code Code font}, of the box or of the rule of a styled run (reference/common/text-formatting.md).
      */
-    private static FontFile font(Box box, FontLibrary fonts, FontFace face, int index) {
+    private static FontFile font(Box box, FontLibrary fonts, TextRun run, int index) {
         Style s = box.style();
+        FontFace face = run.format().face(s.typography().fontFace());
         try {
             return fonts.find(face);
         } catch (ResourceException e) {
+            RunStyle style = run.format().style();
             if (!fonts.families().contains(face.family())) {
-                if (!face.family().equals(s.typography().font())) {
+                if (run.format().code() || !face.family().equals(s.typography().font())
+                        && (style == null || style.family() == null)) {
                     // The family of a code run: the culprit is the declaration of Code font.
-                    throw new InvalidModelException(s.line(CODE_FONT), ErrorCode.FONT_UNKNOWN,
+                    SourceLine line = style != null && style.codeFamily() != null
+                            ? box.runStyle(style.name()).line(CODE_FONT) : s.line(CODE_FONT);
+                    throw new InvalidModelException(line, ErrorCode.FONT_UNKNOWN,
                             e.getMessage() + " (the code font, Code font)");
+                }
+                if (style != null && style.family() != null) {
+                    throw new InvalidModelException(box.runStyle(style.name()).line(FONT), ErrorCode.FONT_UNKNOWN,
+                            e.getMessage() + " (the font of the style " + style.name() + ")");
                 }
                 // The culprit is the declaration of Font, even if it is in an ancestor.
                 throw new InvalidModelException(s.line(FONT), ErrorCode.FONT_UNKNOWN, e.getMessage());
             }
             if (!face.equals(s.typography().fontFace())) {
                 throw new InvalidModelException(box.textLineAt(index), ErrorCode.FONT_VARIANT_MISSING,
-                        e.getMessage() + " (text with " + face.variant() + " formatting)");
+                        e.getMessage() + " (text with " + face.variant() + " formatting"
+                                + (style != null ? " of the style " + style.name() : "") + ")");
             }
             throw new InvalidModelException(box.textLine(), ErrorCode.FONT_VARIANT_MISSING,
                     e.getMessage() + " (" + declarations(s) + ")");

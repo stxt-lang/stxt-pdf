@@ -49,8 +49,8 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * {@value #DOUBLE_HYPHEN_DEMERITS} more.</p>
  *
  * <p>Each character advances its width plus the letter spacing ({@code Letter spacing},
- * reference/common/text-formatting.md); the last one of the line does not carry it, so the width of a line is the
- * sum of its characters minus one letter spacing. A run in small caps is measured at
+ * reference/common/text-formatting.md), that of its run if it is a styled run; the last one of the line does not carry
+ * it, so the width of a line is the sum of its characters minus the letter spacing of the last one. A run in small caps is measured at
  * {@link TextFormat#SMALL_CAPS_SCALE} of the size.</p>
  */
 public final class LineBreaker {
@@ -339,7 +339,7 @@ public final class LineBreaker {
                         if (best[i][k] == Double.POSITIVE_INFINITY) {
                             continue;
                         }
-                        double width = p.advance(i, j) - p.letterSpacing;
+                        double width = p.width(i, j);
                         boolean single = p.single(i, j);
                         if (!single && !fits(width, available)) {
                             // Starting earlier it would be even wider; a single piece of a word may overflow.
@@ -398,7 +398,7 @@ public final class LineBreaker {
             if (best[at][k] == Double.POSITIVE_INFINITY || !widths.widerLater(k)) {
                 continue;
             }
-            double piece = p.advance(at, at + 1) - p.letterSpacing;
+            double piece = p.width(at, at + 1);
             if (fits(piece, widths.width(k))) {
                 continue;
             }
@@ -466,9 +466,8 @@ public final class LineBreaker {
             for (int k = 0; k <= word.breaks().length; k++) {
                 int to = k < word.breaks().length ? word.breaks()[k] : word.length();
                 List<TextRun> part = slice(word.parts(), from, to);
-                double advance = advance(k < word.breaks().length ? hyphenated(part, word.parts(), to) : part,
-                        measurer, font, fontSize, letterSpacing);
-                min = Math.max(min, advance - letterSpacing);
+                min = Math.max(min, width(k < word.breaks().length ? hyphenated(part, word.parts(), to) : part,
+                        measurer, font, fontSize, letterSpacing));
                 from = to;
             }
         }
@@ -559,17 +558,17 @@ public final class LineBreaker {
                                  double right, double available, boolean justify, double y, double height,
                                  boolean hyphenated) {
         FontFace font = s.typography().fontFace();
+        double letterSpacing = s.typography().letterSpacing();
         double[] widths = new double[runs.size()];
         double natural = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            widths[i] = advance(r.text(), r.format(), measurer, font, fontSize, s.typography().letterSpacing());
+            widths[i] = advance(r.text(), r.format(), measurer, font, fontSize, letterSpacing);
             natural += widths[i];
         }
         // The last character of the line carries no letter spacing (an empty line, of a preformatted text, has none).
-        if (!runs.isEmpty()) {
-            natural -= s.typography().letterSpacing();
-        }
+        double trailing = trailing(runs, letterSpacing);
+        natural -= trailing;
         String text = TextRun.text(runs);
         double x = offset(natural, available, s.typography().textAlign());
         double spacing = wordSpacing(text, natural, available, s.typography().textAlign(), !justify);
@@ -577,7 +576,7 @@ public final class LineBreaker {
         double at = 0;
         for (int i = 0; i < widths.length; i++) {
             TextRun r = runs.get(i);
-            double w = widths[i] + spacing * spaces(r.text()) - (i == widths.length - 1 ? s.typography().letterSpacing() : 0);
+            double w = widths[i] + spacing * spaces(r.text()) - (i == widths.length - 1 ? trailing : 0);
             placed.add(new TextLine.Run(at, w, r.text(), r.format()));
             at += w;
         }
@@ -591,7 +590,15 @@ public final class LineBreaker {
      */
     static double width(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                         double letterSpacing) {
-        return advance(runs, measurer, font, fontSize, letterSpacing) - letterSpacing;
+        return advance(runs, measurer, font, fontSize, letterSpacing) - trailing(runs, letterSpacing);
+    }
+
+    /**
+     * The letter spacing of the last character of some runs, which a line does not carry: that of its run
+     * ({@link TextFormat#letterSpacing(double)}, with {@code letterSpacing} that of the box); 0 without runs.
+     */
+    static double trailing(List<TextRun> runs, double letterSpacing) {
+        return runs.isEmpty() ? 0 : runs.get(runs.size() - 1).format().letterSpacing(letterSpacing);
     }
 
     /** Advance of some runs: their width plus the letter spacing of each character, the last one's included. */
@@ -604,11 +611,14 @@ public final class LineBreaker {
         return width;
     }
 
-    /** Advance of a text with that format. */
+    /**
+     * Advance of a text with that format: with the letter spacing of its run, {@code letterSpacing} (that of the box)
+     * if its style does not declare one.
+     */
     static double advance(String text, TextFormat format, TextMeasurer measurer, FontFace font, double fontSize,
                           double letterSpacing) {
         return measurer.width(text, format.face(font), fontSize * format.scale())
-                + letterSpacing * text.codePointCount(0, text.length());
+                + format.letterSpacing(letterSpacing) * text.codePointCount(0, text.length());
     }
 
     /** The words of the text, with the break points of their soft hyphens only. */
@@ -845,7 +855,7 @@ public final class LineBreaker {
         private final TextMeasurer measurer;
         private final FontFace font;
         private final double fontSize;
-        final double letterSpacing;
+        private final double letterSpacing;
         /** wholeWords[w]: advance of the words 0 to w-1. */
         private final double[] wholeWords;
         /** gaps[w]: advance of the spaces after the words 0 to w-1. */
@@ -964,12 +974,31 @@ public final class LineBreaker {
             return sum;
         }
 
+        /** Width of the line from {@code a} to {@code b}: its advance without the letter spacing of its last character. */
+        double width(int a, int b) {
+            return advance(a, b) - trailing(b);
+        }
+
+        /**
+         * The letter spacing of the last character of a line that ends at {@code b}: that of the run of the hyphen, if
+         * it ends with one, or of the last part of its last word.
+         */
+        private double trailing(int b) {
+            TextFormat last = hyphen(b) ? hyphenFormat(words.get(posWord[b]).parts(), posOffset[b])
+                    : lastPart(words.get(posWord[b] - 1)).format();
+            return last.letterSpacing(letterSpacing);
+        }
+
+        private static TextRun lastPart(Word word) {
+            return word.parts().get(word.parts().size() - 1);
+        }
+
         /**
          * Whether the line from {@code a} to {@code b} fits, measuring it whole when its sum is within
          * {@link Tolerance#MODEL} of the width.
          */
         boolean fitsMeasured(int a, int b, double available) {
-            double width = advance(a, b) - letterSpacing;
+            double width = width(a, b);
             if (Math.abs(width - available) <= Tolerance.MODEL) {
                 width = LineBreaker.width(line(a, b).runs(), measurer, font, fontSize, letterSpacing);
             }

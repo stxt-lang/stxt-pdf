@@ -15,6 +15,7 @@ Por defecto el texto es literal: un asterisco es un asterisco. Con `Markup: mark
 | `~~tachado~~` | ~~tachado~~ |
 | `[texto](https://...)` | un enlace, subrayado ([Referencias y enlaces](references-and-links.md)) |
 | `` `código` `` | código, en la fuente de `Code font` ([abajo](#código)) |
+| `[texto]{precio}` | el texto con el color, la fuente y el resto de la regla `For style: precio` ([abajo](#partes-con-otro-color-u-otra-fuente)) |
 
 ```
 Styles:
@@ -31,7 +32,48 @@ como se escriben, sin escapar nada. Un texto concreto vuelve a ser literal con `
 
 La negrita y la cursiva se suman a las de la caja: dentro de un título en negrita, `**x**` sigue en negrita, y en un texto
 ligero (`Weight: 300`), la negrita es el peso 700 ([Tipografía](typography.md#pesos)). El tamaño, el color y la fuente
-son los de la caja.
+son los de la caja, salvo en una [parte con estilo](#partes-con-otro-color-u-otra-fuente).
+
+## Partes con otro color u otra fuente
+
+Con `Markup: markdown`, un texto entre corchetes seguido del nombre de un estilo entre llaves, `[12,50 €]{precio}`, toma lo
+que declara la regla `For style: precio` de `Styles`: el color, la fuente, el peso, la cursiva, las mayúsculas, las
+versalitas o el interletraje. El tamaño y el interlineado siguen siendo los de la caja, así que la línea no cambia de alto.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Partes con estilo
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Markup: markdown
+        For style: precio
+            Typography:
+                Color: #B3261E
+                Bold: true
+        For style: marca
+            Typography:
+                Font: IBM Plex Serif
+                Italic: true
+    Section:
+        Paragraph: La suscripción a [La Gaceta]{marca} cuesta [12,50 €]{precio} al mes, con el IVA incluido.
+```
+
+- La regla es una regla `For style` como las demás: la misma puede dar estilo a una caja (`Style: precio`) y a una parte
+  de un texto. En una parte solo valen `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps` y
+  `Letter spacing`. Si la regla declara algo más, como `Size` o un `Box`, y se usa en una parte, es un error
+  (`STYLE_NOT_ALLOWED_IN_RUN`).
+- Las marcas se suman al estilo: `[**12,50 €**]{precio}` y `**[12,50 €]{precio}**` van en negrita aunque la regla diga
+  `Weight: 300`. Un enlace puede llevar una parte con estilo (`[[ver precio]{precio}](https://...)`) y una parte con estilo
+  puede llevar un enlace, pero una parte con estilo no puede ir dentro de otra.
+- Un nombre sin su regla es un error (`STYLE_WITHOUT_RULE`). Unos corchetes que no van seguidos de un nombre entre llaves
+  son texto, y `\[` los escribe sin más.
 
 ## Código
 
@@ -51,7 +93,8 @@ Paragraph: Ejecuta `mvn test` antes de publicar.
 ```
 
 El código conserva la negrita y la cursiva de lo que lo rodea y no cambia el alto de la línea. Sin `Code font`, un texto
-con código es un error.
+con código es un error. Dentro de una [parte con estilo](#partes-con-otro-color-u-otra-fuente) vale el `Code font` de su
+regla, si lo declara.
 
 ## Mayúsculas (`Case`)
 

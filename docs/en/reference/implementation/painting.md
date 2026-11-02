@@ -224,7 +224,8 @@ a child of its element and parent of its content, `PdfStructure.markLink`, that 
 the point of the first letter (a quarter of the font size to the right and a third above the baseline, where the
 underline does not reach) and goes through what has been recorded that contains it: an opaque color replaces what is underneath, a translucent one is mixed with each
 possible color underneath and an image leaves it unknown until an opaque color covers it. It knows the box of the text through its
-`Tagging` (`beginText`). Borders are not recorded and rounded corners count as square. It is used by
+`Tagging` (`beginText`). The color of a styled run comes in the `text`, and the error reports the `Color` of its rule
+(`Box.runStyle`). Borders are not recorded and rounded corners count as square. It is used by
 `Converter.layOut`, on the pages already laid out ([The PDF](../common/pdf.md#contrast)).
 
 ## The debug SVG

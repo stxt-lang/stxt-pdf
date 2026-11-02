@@ -1,7 +1,7 @@
 # Text formatting
 
-What changes how the text of a box looks without changing its box: formatted runs, inline formatting, capitalization,
-small caps, letter spacing, ligatures, preformatted text and underline and strikethrough lines. All of them are properties of
+What changes how the text of a box looks without changing its box: formatted runs, inline formatting, styled runs,
+capitalization, small caps, letter spacing, ligatures, preformatted text and underline and strikethrough lines. All of them are properties of
 [`Typography`](typography.md): **they are inherited** and they are valid in `Styles` rules.
 
 ## Runs
@@ -13,8 +13,8 @@ which can be combined. Each part is a **run**. They are written with `Markup: ma
   characters (`GLYPH_MISSING`). Bold and italic are **added** to those of the box: they cannot be removed. A bold run
   has weight 700, or that of the box if it is already 700 or more (`Weight`, [Typography](typography.md#weights-weight)):
   in a text of weight 300 bold is 700, and in one of 900 it stays 900.
-- Size, color, `Line height` and family are those of the box (except code, which uses `Code font`,
-  [below](#inline-code)), so lines do not change height.
+- Size and `Line height` are those of the box, so lines do not change height. Color and family too, except in code,
+  which uses `Code font` ([below](#inline-code)), and in a [styled run](#styled-runs).
 - A word with parts from several runs (**bo**ld) is a single word: it is not split between them and it measures the sum of
   its parts.
 - The space between two words has the formatting of the run of its first white space character: an underline covers the spaces
@@ -35,8 +35,8 @@ which can be combined. Each part is a **run**. They are written with `Markup: ma
 By default the text of a `Text`, a `Paragraph` or a `Cell` is **literal**: asterisks are asterisks. With
 `Markup: markdown` it is interpreted as the inline Markdown of a [`Markdown`](../components/markdown.md), with the same
 syntax: `**bold**`, `*italic*`, `++underline++`, `~~strikethrough~~`, `` `code` `` ([below](#inline-code)),
-`[text](target)` ([Links](links.md)) and the call of a footnote, `[^id]`, which is a superscript run with the number of
-the note ([Footnote](../components/footnote.md)).
+`[text](target)` ([Links](links.md)), `[text]{name}` ([below](#styled-runs)) and the call of a footnote, `[^id]`, which
+is a superscript run with the number of the note ([Footnote](../components/footnote.md)).
 
 - Marks are not text: they are neither measured nor painted. A special character is written with a backslash in front (`\*`, `\[`,
   `\\`).
@@ -64,6 +64,54 @@ the note ([Footnote](../components/footnote.md)).
 > as without `Markup`. *Rejected alternative:* `MARKDOWN_UNSUPPORTED` with the line of the block, which forced escaping the
 > first character.
 
+## Styled runs
+
+With `Markup: markdown`, or in a `Markdown`, a text in brackets followed, with nothing in between, by the name of a style
+in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For style: price` rule of `Styles`
+([Reusable rules](styles.md)) what changes how its letters look and not the height of the line.
+
+| Property of the rule | In the run |
+|---|---|
+| `Font`, `Bold`, `Weight`, `Italic` | the family, the weight and the style of its font, which must exist |
+| `Code font` | the family of the code inside the run |
+| `Color` | the color of its letters and of its lines |
+| `Case`, `Small caps` | how its letters are painted ([Capitalization](#capitalization-case), [Small caps](#small-caps-small-caps)) |
+| `Letter spacing` | the letter spacing of its characters, also of its spaces ([Letter spacing](#letter-spacing-letter-spacing)) |
+
+- What the rule declares **replaces** what the box has, and what it does not declare is that of the box. If two
+  `For style` rules with that name (one of the separate styles document and one of the document) declare the same thing,
+  the one of the document wins, as in a box.
+- **The marks add to the style**, inside or outside the brackets: `[**x**]{light}` and `**[x]{light}**` are bold even
+  if the rule says `Weight: 300`, and bold is weight 700 ([above](#runs)).
+- **The name** is a single word, without spaces, the same as in `For style`. Without its rule, it is `STYLE_WITHOUT_RULE`,
+  with the line where the text starts. Brackets followed by something else (`[x] {price}`, `[x]{a b}`, `[x]{}`) are text,
+  and page numbers and references stay what they are: in `[see]{page}` or `[see]{page of: id}`, the brackets are
+  text. That is why `page` and `pages` cannot be the name of a run.
+- **A rule that declares something else** (`Size`, `Line height`, `Align`, `Markup`, a `Box` or a `Break`) is
+  `STYLE_NOT_ALLOWED_IN_RUN` if it is used in a run, with the line of what it declares. The same rule can style a box
+  with `Style`, where everything is valid.
+- **Links.** A link can have a styled run in its text (`[[see price]{price}](https://...)`) and a styled run can have a
+  link (`[see [here](https://...)]{price}`). A styled run inside another is `MARKDOWN_UNSUPPORTED`, as is one that starts
+  in a paragraph, a cell, a heading or a list item and ends in another. Brackets that a blank line separates are text.
+- **What is not Markdown text does not form runs**: escaped brackets (`\[x\]{price}`), those inside code, in the
+  target of a link or in an image, and those of a code block, which are written as they are.
+- An error of the run (a family that does not exist, a low contrast) reports the line of the property in the rule. The
+  text that a screen reader reads and that is copied is the written one.
+- A text with Markdown cannot have the Unicode noncharacters U+FDD0 to U+FDEF, which the engine uses to mark the styled
+  runs: it is `MARKDOWN_UNSUPPORTED`. A noncharacter is not text and no font has it.
+
+> **Decision:** a styled run takes a `For style` rule and has no properties of its own, like `Style` in a box: the look
+> is declared once and changed in one place. *Rejected alternative:* attributes in the text (`[x]{color=#B3261E}`), which
+> would spread the colors across the document.
+
+> **Decision:** what the rule cannot apply to a run is an error and is not ignored, even if the rule is also used in
+> boxes. *Rejected alternative:* taking from the rule only what is valid in a run, which would make `Size` change the box
+> and not the run without any warning.
+
+> **Decision:** the Markdown marks add to the style of the run wherever they are written, as they add to the box.
+> *Rejected alternative:* the run winning over the marks outside it (`**[x]{light}**` at weight 300), which forces looking
+> at the nesting to know how a word looks.
+
 ## Inline code
 
 With `Markup: markdown`, or in a `Markdown`, what goes between backticks (`` `mvn test` ``) is **code**: a
@@ -72,8 +120,9 @@ run with the family of `Code font`, which keeps the weight and the style of the 
 change height, and white space is collapsed as in the rest of the text.
 
 `Code font` belongs to `Typography` ([Typography](typography.md)) and is inherited: it is declared once, in `For element: Document`,
-for the whole document. Without it, code is an error (`CODE_WITHOUT_FONT`), with the line where the text starts (in
-a `Markdown`, that of the paragraph). If the family does not exist, it is `FONT_UNKNOWN`, with the line of `Code font`.
+for the whole document. Inside a [styled run](#styled-runs) the `Code font` of its rule applies, if it declares one.
+Without any, code is an error (`CODE_WITHOUT_FONT`), with the line where the text starts (in a `Markdown`, that of the
+paragraph). If the family does not exist, it is `FONT_UNKNOWN`, with the line of `Code font`.
 
 ## Capitalization (`Case`)
 
@@ -87,13 +136,15 @@ in capitals.
 - `{page}` and `{pages}` are not transformed.
 - A screen reader reads the written text ("Emisor" and not "EMISOR"), except in a text with `{page}`, `{pages}` or a
   reference, where it reads what is painted.
+- A [styled run](#styled-runs) with `Case` in its rule uses its own. `capitalize` still looks at what goes before the
+  run.
 
 ## Small caps (`Small caps`)
 
 `Small caps` paints each lowercase letter, converted to uppercase, at 80% of `Size`. Spaces, digits, symbols and
 uppercase letters stay as they are. It is applied after `Case`: with `lowercase` everything is small caps, with `uppercase` nothing is, and with
 `capitalize` only the initial is large. The `Size` of the box, the height of the lines and the underline and strikethrough lines do not change. A screen
-reader reads the written text, as with `Case`.
+reader reads the written text, as with `Case`. A [styled run](#styled-runs) with `Small caps` in its rule uses its own.
 
 > **Decision:** small caps are synthesized and not the `smcp` feature of the font, which none of the included fonts
 > have. With `Case: uppercase` they have no effect and it is not an error: both are inherited, and it is normal to declare them
@@ -102,7 +153,9 @@ reader reads the written text, as with `Case`.
 ## Letter spacing (`Letter spacing`)
 
 Points added to the advance of each character, also the space, **except the last one of each line**, so that `right` and
-`center` stay aligned with the last letter. It counts in line breaking, in intrinsic sizes and in
+`center` stay aligned with the last letter. A [styled run](#styled-runs) with `Letter spacing` in its rule carries its own
+in each of its characters, and the last one of the line does not carry that of its run. A run with letter spacing has no
+ligatures ([below](#ligatures-ligatures)). It counts in line breaking, in intrinsic sizes and in
 alignment, and `justify` shares out what is left over afterward. It can be negative, and there is no check that the advance stays
 positive. A percentage is `VALUE_NOT_ALLOWED`.
 
@@ -114,7 +167,7 @@ The text that is copied or extracted from the PDF is that of the line, without s
 By default each character is a glyph: `fi` is two. With `Ligatures: true` the ligatures of the font are applied, which
 join some pairs into a glyph of a different width (in IBM Plex Sans and Serif, `fi`, `fl`, `ffi` and `ffl`, and none in IBM Plex
 Mono). What is measured is what is painted. A ligature does not cross a space or the boundary between two runs. With
-`Letter spacing` other than 0 there are no ligatures. It changes neither the text that is read nor the text that is copied.
+`Letter spacing` other than 0, that of the box or that of a styled run, there are no ligatures. It changes neither the text that is read nor the text that is copied.
 
 > **Decision:** `false` by default: without ligatures text is painted much faster (17 to 30 times). *Rejected
 > alternative:* ligatures always, or never.
@@ -156,7 +209,7 @@ underline goes below the text and the strikethrough, over it. A screen reader do
 ## What is not supported
 
 - Runs with another size (except the superscript of a footnote and the drop cap of a `Paragraph`,
-  [Text](../components/text.md#drop-cap-drop-cap)), another color or another family (except code), nor ones that remove
-  the bold or the italic of the box.
+  [Text](../components/text.md#drop-cap-drop-cap)) or another line height, styled runs inside others, and marks that
+  remove bold or italic (a styled run can, with `Weight` or `Italic: false`).
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.
