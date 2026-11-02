@@ -3,6 +3,7 @@ package dev.stxt.pdf.tree;
 import static dev.stxt.pdf.tree.ListBuilder.itemNumber;
 import static dev.stxt.pdf.tree.ListBuilder.marker;
 import static dev.stxt.pdf.tree.ListBuilder.markerLine;
+import static dev.stxt.pdf.tree.ListBuilder.validateItem;
 import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
 import static dev.stxt.pdf.tree.ModelValidator.validateClear;
@@ -429,9 +430,10 @@ public final class BoxTreeBuilder {
                     + "a Paragraph, a Text, a Block...");
         }
         box.setNumber(ListMarkers.number(list.style().list().marker(), number));
-        String marker = ListMarkers.text(list.style().list().marker(), number);
+        validateItem(box.style(), list);
+        Box marker = marker(n, box, list, number);
         if (marker != null) {
-            box.setMarker(marker(n, box, marker));
+            box.setMarker(marker);
         }
     }
 

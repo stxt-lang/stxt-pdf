@@ -114,10 +114,18 @@ spaces after it. It is not in the structure: that of an element with `Case` is s
 ### Lists
 
 `L` carries the attribute `ListNumbering` according to the `Marker`: `Disc`, `Decimal`, `LowerAlpha`, `UpperAlpha`, `LowerRoman`,
-`UpperRoman`, and `None` for `dash` and `none`.
+`UpperRoman`, and `None` for `dash`, `none` and `image`.
 
 > **Decision:** `dash` is `ListNumbering: None`, because PDF/UA-1 has no value for the dash. *Rejected
 > alternative:* `Unordered`, from PDF 2.0, which is used with PDF/UA-2 ([below](#pdfua-2)).
+
+An image marker ([List](../components/list.md#image-markers)) with `Alt` is a `Figure` inside the `Lbl` of the item, with
+the alternative text and the `BBox` of the image (`PdfStructure.figureBox`); without `Alt` it is decorative, painted as
+an *artifact*, and the `LI` has no `Lbl`. veraPDF accepts it this way in PDF/UA-1 and PDF/UA-2.
+
+> **Decision:** a decorative image leaves the item without `Lbl`, instead of an empty `Lbl`. *Rejected alternative:* a
+> `Lbl` without content, which tells the reader nothing; or `ActualText` on the `Lbl`, which PDF/UA does not provide
+> for an image.
 
 ### Tables
 

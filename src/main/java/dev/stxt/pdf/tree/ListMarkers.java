@@ -17,12 +17,12 @@ final class ListMarkers {
     }
 
     /**
-     * Text of the marker, with the trailing space; {@code null} with {@code none}. The number only
-     * counts in numberings, and it must be within their range ({@link #inRange}).
+     * Text of the marker, with the trailing space; {@code null} with {@code none} and with {@code image}, whose
+     * marker is not text. The number only counts in numberings, and it must be within their range ({@link #inRange}).
      */
     static String text(Marker marker, int number) {
         String label = switch (marker) {
-            case NONE -> null;
+            case NONE, IMAGE -> null;
             case BULLET -> "•";
             case DASH -> "–";
             default -> number(marker, number) + ".";

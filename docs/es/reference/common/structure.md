@@ -198,8 +198,8 @@ vez, y los elementos, las veces que se quiera.
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, además, `Drop cap` |
 | `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (al menos uno) |
-| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Start`; `List item` (al menos uno) |
-| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`; elementos salvo los encabezados (al menos uno) |
+| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio), `Marker image` (con `Alt` y `Height`), `Start`; `List item` (al menos uno) |
+| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (con `Alt` y `Height`); elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (obligatorio), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |

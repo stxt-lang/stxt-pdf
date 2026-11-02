@@ -2,10 +2,13 @@ package dev.stxt.pdf.layout.block;
 
 import dev.stxt.pdf.layout.LayoutFixture;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.tree.ErrorCode;
+import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -140,5 +143,61 @@ class ListLayoutTest {
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 3",
                 "\t\t\t\t\tPadding: 5", "\t\t\t\tText: Uno"));
         assertRect(f.marker("A"), 45, 48, 15, 12);
+    }
+
+    @Test
+    void imageMarkerIsAsTallAsTheSizeAndCenteredOnTheCapitals() {
+        // square.png is square: at Size 10 the image measures 10 × 10, plus the space of 5: 15, so it starts at 45.
+        // The baseline of the line of 12 is 9 below its top and the capitals (0.7) are centered 3.5 above it: the
+        // middle of the image is at 40 + 5.5, and its top at 40.5.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: image",
+                "\t\tMarker image: test/square.png",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
+        assertRect(f.rect("A"), 60, 40, 495, 12);
+        assertRect(f.marker("A"), 45, 40.5, 15, 10);
+    }
+
+    @Test
+    void imageMarkerFollowsItsProportionAndItsHeight() {
+        // shapes.svg is 200 × 100: 20 wide at the height of 10, and with Height: 20, 40 wide; both with the space
+        // of 5, in an indent of 50 (the items start at 90). The item with Height keeps the middle of the image at
+        // 40 + 5.5: its top goes 4.5 above the item.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: image",
+                "\t\tMarker image: test/shapes.svg", "\t\tBox:", "\t\t\tPadding: 0 0 0 50",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno",
+                "\t\tList item:", "\t\t\tId: B", "\t\t\tMarker image: test/shapes.svg", "\t\t\t\tHeight: 20",
+                "\t\t\tText: Dos"));
+        assertRect(f.marker("A"), 65, 40.5, 25, 10);
+        assertRect(f.marker("B"), 45, 47.5, 45, 20);
+    }
+
+    @Test
+    void imageMarkerWiderThanTheIndentIsAnError() {
+        // 20 + 5 in the indent of 20.
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(doc("\tList:",
+                "\t\tMarker: image", "\t\tMarker image: test/shapes.svg",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno")));
+        assertEquals(ErrorCode.LIST_MARKER_OVERFLOW, e.errorCode());
+        assertTrue(e.getMessage().contains("image test/shapes.svg"), e.getMessage());
+    }
+
+    @Test
+    void imageMarkerUsesTheTypographyOfTheItemNotOfItsFirstLine() {
+        // Paragraph of 20 pt: line of 24 and baseline at 40 + 2 + 16 = 58. The marker takes the Size of the item,
+        // 10: 10 × 10 centered 3.5 above the baseline, with its top at 58 − 3.5 − 5 = 49.5.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: image",
+                "\t\tMarker image: test/square.png",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tParagraph: Grande",
+                "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20"));
+        assertRect(f.marker("A"), 45, 49.5, 15, 10);
+    }
+
+    @Test
+    void imageMarkerMovesWithTheFirstLineToTheNextPage() {
+        LayoutFixture f = LayoutFixture.layOutPaged(180, doc("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
+                "\tList:", "\t\tMarker: image", "\t\tMarker image: test/square.png",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
+        assertFalse(f.has(1, "A"));
+        assertRect(f.marker(2, "A"), 45, 40.5, 15, 10);
     }
 }

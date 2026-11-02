@@ -1,0 +1,63 @@
+# Image markers (reference/components/list.md#image-markers). Pages of 595 × 300 with margins of 40: page area of
+# 515 × 220 from (40, 40), which ends at y = 260. Lines of 12 (Size 10), baseline 9 below the top of the line and
+# capitals of 0.7 × 10 = 7, so an image is centered 3.5 above the baseline: 5.5 below the top of the line.
+#
+# The indent of the lists is their left Padding of 20, declared in Styles. The image is as tall as the Size (10)
+# unless it declares Height, as wide as its proportion gives (check.svg and cross.svg are square; shapes.svg is
+# 200 × 100) and followed by a space of 5 pt, so the square ones measure 15 and start at x = 45.
+# i1 takes the image of the list; i2 replaces it with cross.svg of Height 14 (19 wide, at x = 41, centered on the
+# capitals: its top is 1.5 above the item); i3 starts with a nested list with dashes, whose first line is shared.
+# The block fill ends exactly at the end of the page; second starts on page 2 with its marker on the first line: the
+# wide shapes.svg (20 + 5) needs an indent of its own, 40, and its items start at x = 80.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: List
+			Box:
+				Padding: 0 0 0 20
+	Section:
+		List:
+			Id: icons
+			Marker: image
+			Marker image: test/check.svg
+				Alt: Incluido
+			List item:
+				Id: i1
+				Text: Responsabilidad civil
+			List item:
+				Id: i2
+				Marker image: test/cross.svg
+					Alt: Excluido
+					Height: 14
+				Text: Daños propios
+			List item:
+				Id: i3
+				List:
+					Id: sub
+					Marker: dash
+					List item:
+						Id: sa
+						Text: Asistencia en viaje
+		Block:
+			Id: fill
+			Box:
+				Height: 184
+				Background: #F1EFE8
+		List:
+			Id: second
+			Marker: image
+			Marker image: test/shapes.svg
+			Box:
+				Padding: 0 0 0 40
+			List item:
+				Id: s1
+				Text: Paisaje

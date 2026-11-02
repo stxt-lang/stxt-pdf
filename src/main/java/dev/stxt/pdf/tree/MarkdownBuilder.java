@@ -537,7 +537,8 @@ final class MarkdownBuilder {
                 } catch (IllegalArgumentException e) {
                     // Reported below, with the allowed values.
                 }
-                if (marker == null || marker.numbered() != numbered) {
+                // The image marker needs a Marker image, which a Markdown does not have.
+                if (marker == null || marker.numbered() != numbered || marker == Marker.IMAGE) {
                     throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + n.getName() + ": " + token
                             + (numbered ? " (decimal, lower-alpha, upper-alpha, lower-roman or upper-roman)"
                                     : " (bullet, dash or none)"));

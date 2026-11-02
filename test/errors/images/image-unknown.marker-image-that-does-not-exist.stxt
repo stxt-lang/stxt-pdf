@@ -1,0 +1,20 @@
+# Case: Marker image that does not exist
+# Code: IMAGE_UNKNOWN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: image
+			Marker image: test/no-existe.svg
+			List item:
+				Text: Uno

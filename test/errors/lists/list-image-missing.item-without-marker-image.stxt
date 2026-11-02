@@ -1,0 +1,22 @@
+# Case: Item of an image list without Marker image
+# Code: LIST_IMAGE_MISSING
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: image
+			List item:
+				Marker image: test/check.svg
+				Text: Uno
+			List item:
+				Text: Dos

@@ -71,6 +71,9 @@ class PropertyKeyTest {
         // The placement of a grid item is the value of Area, not a child.
         assertFalse(keys.contains(PropertyKey.ITEM_AREA));
         keys.add(PropertyKey.ITEM_AREA);
+        // Marker image is a property with children (Alt, Height), read whole by PropertyReader.markerImage.
+        assertFalse(keys.contains(PropertyKey.MARKER_IMAGE));
+        keys.add(PropertyKey.MARKER_IMAGE);
         return keys;
     }
 }

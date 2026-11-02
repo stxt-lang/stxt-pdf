@@ -11,6 +11,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Lists when building the tree (reference/components/list.md): elements, numbering and rules. */
 class ListsTest {
@@ -102,5 +104,88 @@ class ListsTest {
         Box stack = root("\tStack:", "\t\tItem:", "\t\t\tList:", "\t\t\t\tMarker: bullet",
                 "\t\t\t\tList item:", "\t\t\t\t\tText: a").children().get(0);
         assertEquals(Element.LIST, stack.children().get(0).element());
+    }
+
+    private static InvalidModelException error(String... lines) {
+        return assertThrows(InvalidModelException.class, () -> root(lines));
+    }
+
+    @Test
+    void anImageMarkerIsAnImageBoxWithTheMarkerImageOfTheList() {
+        Box list = root("\tList:", "\t\tMarker: image", "\t\tMarker image: test/check.svg",
+                "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b").children().get(0);
+        assertEquals(Marker.IMAGE, list.style().list().marker());
+        for (Box item : list.children()) {
+            Box marker = item.marker();
+            assertTrue(marker.isMarker());
+            assertTrue(marker.isImage());
+            assertEquals("test/check.svg", marker.image());
+            assertNull(marker.text());
+            // Decorative: without Alt, and without Height, it takes the Size of the item.
+            assertNull(marker.style().image().alt());
+            assertNull(marker.style().list().markerHeight());
+            assertEquals(Layout.INLINE, marker.style().layout());
+            // The line of the Marker image, for the errors of the file.
+            assertEquals(15, marker.line());
+        }
+        assertNull(list.children().get(0).number());
+    }
+
+    @Test
+    void theMarkerImageOfAnItemReplacesThatOfTheListWhole() {
+        Box list = root("\tList:", "\t\tMarker: image", "\t\tMarker image: test/check.svg", "\t\t\tAlt: Incluido",
+                "\t\t\tHeight: 8",
+                "\t\tList item:", "\t\t\tMarker image: test/cross.svg", "\t\t\t\tAlt: Excluido", "\t\t\tText: a",
+                "\t\tList item:", "\t\t\tMarker image: test/square.png", "\t\t\tText: b",
+                "\t\tList item:", "\t\t\tText: c").children().get(0);
+        Box own = list.children().get(0).marker();
+        assertEquals("test/cross.svg", own.image());
+        assertEquals("Excluido", own.style().image().alt());
+        assertNull(own.style().list().markerHeight());
+        assertEquals(19, own.line());
+        Box plain = list.children().get(1).marker();
+        assertEquals("test/square.png", plain.image());
+        assertNull(plain.style().image().alt());
+        Box inherited = list.children().get(2).marker();
+        assertEquals("test/check.svg", inherited.image());
+        assertEquals("Incluido", inherited.style().image().alt());
+        assertEquals(8, inherited.style().list().markerHeight());
+    }
+
+    @Test
+    void markerImageNeedsMarkerImage() {
+        InvalidModelException list = error("\tList:", "\t\tMarker: bullet", "\t\tMarker image: test/check.svg",
+                "\t\tList item:", "\t\t\tText: a");
+        assertEquals(ErrorCode.LIST_IMAGE_NOT_ALLOWED, list.errorCode());
+        assertEquals(15, list.line());
+        InvalidModelException item = error("\tList:", "\t\tMarker: decimal",
+                "\t\tList item:", "\t\t\tMarker image: test/check.svg", "\t\t\tText: a");
+        assertEquals(ErrorCode.LIST_IMAGE_NOT_ALLOWED, item.errorCode());
+        assertEquals(16, item.line());
+    }
+
+    @Test
+    void anItemOfAnImageListNeedsSomeMarkerImage() {
+        InvalidModelException e = error("\tList:", "\t\tMarker: image",
+                "\t\tList item:", "\t\t\tMarker image: test/check.svg", "\t\t\tText: a",
+                "\t\tList item:", "\t\t\tText: b");
+        assertEquals(ErrorCode.LIST_IMAGE_MISSING, e.errorCode());
+        assertEquals(18, e.line());
+    }
+
+    @Test
+    void markerImageNeedsAPathAndAPositiveHeight() {
+        assertEquals(ErrorCode.IMAGE_UNKNOWN, error("\tList:", "\t\tMarker: image", "\t\tMarker image:",
+                "\t\tList item:", "\t\t\tText: a").errorCode());
+        InvalidModelException height = error("\tList:", "\t\tMarker: image", "\t\tMarker image: test/check.svg",
+                "\t\t\tHeight: 50%", "\t\tList item:", "\t\t\tText: a");
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, height.errorCode());
+        assertEquals(16, height.line());
+    }
+
+    @Test
+    void anImageListDoesNotNumber() {
+        assertEquals(ErrorCode.LIST_NUMBER_NOT_ALLOWED, error("\tList:", "\t\tMarker: image", "\t\tStart: 2",
+                "\t\tMarker image: test/check.svg", "\t\tList item:", "\t\t\tText: a").errorCode());
     }
 }

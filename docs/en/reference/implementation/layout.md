@@ -156,7 +156,10 @@ The text of a box is always a single paragraph (blank lines are an error when re
 where they are content): `BreakRules.cutLines` applies widows and orphans to all its lines and only the last one is not justified.
 `InlineLayout.runs` replaces the references with their value and applies `TextTransform` to the runs **before** breaking them into lines.
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
-`List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`).
+`List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`); an image marker is as
+tall as `Height` or the `Size` of the item and as wide as its proportion gives (`LayoutContext.natural`), carries the
+space that separates it from the item as the right padding of the fragment, and is centered on the capitals
+(`VerticalMetrics.capHeight`) of the typography of the item on that baseline.
 
 **Side boxes** ([Block](../components/block.md#side-boxes-side)). `BlockLayout` places a child with `Side` whole, at its
 side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and

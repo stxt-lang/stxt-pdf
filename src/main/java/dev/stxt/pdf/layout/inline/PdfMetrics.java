@@ -107,7 +107,7 @@ public final class PdfMetrics implements TextMeasurer {
         if (box.hasText()) {
             check(box, fonts, headings);
         }
-        if (box.marker() != null) {
+        if (box.marker() != null && box.marker().hasText()) {
             check(box.marker(), fonts, headings);
         }
         box.children().forEach(child -> validate(child, fonts, headings));

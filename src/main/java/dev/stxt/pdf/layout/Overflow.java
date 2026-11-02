@@ -207,8 +207,9 @@ public final class Overflow {
             }
             double room = item.x() + list.padding().left();
             if (m.width() > room + TOLERANCE) {
-                throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "The marker '"
-                        + m.box().text().strip() + "' of List item " + item.box().describe() + " measures "
+                String marker = m.box().isImage() ? "image " + m.box().image() : "'" + m.box().text().strip() + "'";
+                throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "The marker "
+                        + marker + " of List item " + item.box().describe() + " measures "
                         + pt(m.width()) + " with its space, and the indent leaves " + pt(room)
                         + ": the left Padding of the list or "
                         + "the left margin of the item has to be increased");

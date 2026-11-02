@@ -216,6 +216,9 @@ class SchemaCoverageTest {
                 Set.of("Marker")));
         t.put("List item", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\tList item:\n\t\t\t{}\n"
                 + "\t\t\tParagraph: Uno"));
+        // The children of a Marker image (Alt, Height), in a list with Marker: image.
+        t.put("Marker image", new Template(HEADER + "\tList:\n\t\tMarker: image\n\t\tMarker image: test/square.png\n"
+                + "\t\t\t{}\n\t\tList item:\n\t\t\tParagraph: Uno"));
         // Separator needs a Gap that contains it, and Separator color, a Separator.
         t.put("Columns", new Template(HEADER + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 1\n"
                 + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Gap", "Separator")));

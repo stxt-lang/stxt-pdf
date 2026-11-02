@@ -41,12 +41,51 @@ Document (dev.stxt.pdf):
 
 | Property | Where | What it does |
 |---|---|---|
-| `Marker` | `List` | **Required.** `bullet` (•), `dash` (–), `none`, `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Required.** `bullet` (•), `dash` (–), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker image` | `List`, `List item` | The image of the marker with `Marker: image`, from `images/`. That of the list serves all its items; that of an item replaces it. It accepts `Alt` and `Height` |
 | `Start` | `List` | The number of the first item (1 by default). Only in numbered lists |
 | `Number` | `List item` | The number of this item. The following ones continue from it |
 
 `List` and `List item` also accept `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`. An item has one or more elements
 (a `Paragraph`, a `Text`, another `List`), but not headings.
+
+## Image markers
+
+With `Marker: image` the marker is an image: a check mark, a cross, an icon. `Marker image` says which one, in the list for
+all its items or in an item for that item alone. It is as tall as the `Size` of the text, unless it declares `Height`, and
+it is centered with the capitals of the first line. With `Alt`, a screen reader reads it; without it, it is decorative.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Coverage
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+    Section:
+        List:
+            Marker: image
+            Marker image: test/check.svg
+                Alt: Included
+            List item:
+                Paragraph: Compulsory third-party liability.
+            List item:
+                Paragraph: Roadside assistance.
+            List item:
+                Marker image: test/cross.svg
+                    Alt: Excluded
+                Paragraph: Own damage to the vehicle.
+```
+
+(The example uses the test icons of the repository, in `resources/images/test/`.)
 
 ## The indent
 
@@ -58,7 +97,9 @@ in the example. The markers are aligned to the right, next to the text with a sp
 
 - The marker uses the typography of the item and is aligned with its first line. That is why an item must start with a
   text: if it starts with a `Stack`, a `Grid` or an image, it is an error.
-- Each list numbers its items. A list inside another one starts again.
+- Each list numbers its items. A list inside another one starts again. A list with images does not number.
+- `Marker image` only makes sense with `Marker: image`; in another list it is an error, and so is an item of a list with
+  `Marker: image` without an image, neither its own nor the list's.
 - If the item is split across pages, the marker goes on the first one.
 - `{number of: id}` writes the number of an item with an `Id` (`3`, `c`, `IV`): "see clause {number of: pago}".
 

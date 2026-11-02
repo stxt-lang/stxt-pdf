@@ -525,7 +525,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             if (box.marker() == null || !first) {
                 return children;
             }
-            return MarkerLayout.place(box, children, slice.border(), slice.padding(), context.measurer())
+            return MarkerLayout.place(box, children, slice.border(), slice.padding(), context)
                     .map(marker -> {
                         List<Fragment> all = new ArrayList<>(children);
                         all.add(0, marker);

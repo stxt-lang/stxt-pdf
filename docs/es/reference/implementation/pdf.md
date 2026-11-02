@@ -110,10 +110,17 @@ espacios tras él. No está en la estructura: la de un elemento con `Case` sigue
 ### Listas
 
 `L` lleva el atributo `ListNumbering` según el `Marker`: `Disc`, `Decimal`, `LowerAlpha`, `UpperAlpha`, `LowerRoman`,
-`UpperRoman`, y `None` para `dash` y `none`.
+`UpperRoman`, y `None` para `dash`, `none` e `image`.
 
 > **Decisión:** `dash` es `ListNumbering: None`, porque PDF/UA-1 no tiene un valor para el guion. *Alternativa
 > descartada:* `Unordered`, de PDF 2.0, que sí se usa con PDF/UA-2 ([abajo](#pdfua-2)).
+
+Un marcador con imagen ([List](../components/list.md#marcadores-con-imagen)) con `Alt` es un `Figure` dentro del `Lbl` del
+ítem, con el texto alternativo y el `BBox` de la imagen (`PdfStructure.figureBox`); sin `Alt` es decorativo, se pinta como
+*artifact* y el `LI` no lleva `Lbl`. veraPDF lo acepta así en PDF/UA-1 y PDF/UA-2.
+
+> **Decisión:** la imagen decorativa deja al ítem sin `Lbl`, en vez de un `Lbl` vacío. *Alternativa descartada:* un
+> `Lbl` sin contenido, que no dice nada al lector; o `ActualText` en el `Lbl`, que PDF/UA no prevé para una imagen.
 
 ### Tablas
 

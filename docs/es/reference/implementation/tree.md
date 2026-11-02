@@ -143,7 +143,11 @@ cerrarlo con `TextRuns`.
 ## Elementos generados
 
 - **Marcador de lista:** `ListBuilder` crea en `Box.marker` la caja del marcador, generada y fuera de `children`
-  (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`).
+  (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`) o, con
+  `Marker: image`, una caja de imagen (`Box.isImage()`, con la ruta en `Box.image()` y el `Alt` y el `Height` del
+  `Marker image` en su `ListStyle`), con la línea del `Marker image` del ítem o, si no tiene, de la lista.
+  `PropertyReader.markerImage` lee el `Marker image` con sus hijos, y `ListBuilder.validateList` y `validateItem`
+  comprueban que solo va con `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`, `LIST_IMAGE_MISSING`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
 - **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
   con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el

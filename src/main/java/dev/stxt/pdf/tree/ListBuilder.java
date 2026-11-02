@@ -9,12 +9,14 @@ import java.util.Locale;
 
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
+import static dev.stxt.pdf.tree.PropertyKey.MARKER_IMAGE;
 import static dev.stxt.pdf.tree.PropertyKey.NUMBER;
 import static dev.stxt.pdf.tree.PropertyKey.START;
 
 /**
  * Lists (reference/components/list.md): numbering of the {@code List item}, the generated box of their
- * marker and the rules of {@code Start} and {@code Number}.
+ * marker (text, or the image of {@code Marker image}) and the rules of {@code Start}, {@code Number} and
+ * {@code Marker image}.
  */
 final class ListBuilder {
 
@@ -48,10 +50,18 @@ final class ListBuilder {
     }
 
     /**
-     * The generated box of the marker of a {@code List item} (reference/components/list.md): text with the typography
-     * of the item, which needs, like any text, {@code Font} and {@code Size}.
+     * The generated box of the marker of a {@code List item} (reference/components/list.md), or {@code null} with
+     * {@code Marker: none}: text with the typography of the item or, with {@code Marker: image}, the image of the
+     * {@code Marker image} of the item (which replaces that of the list whole) or of the list. Both need
+     * {@code Font} and {@code Size}: the text, like any text; the image, for the space that follows it and for its
+     * height when it does not declare {@code Height}.
      */
-    static Box marker(InlineNode n, Box item, String text) {
+    static Box marker(InlineNode n, Box item, Box list, int number) {
+        Marker marker = list.style().list().marker();
+        String text = ListMarkers.text(marker, number);
+        if (text == null && marker != Marker.IMAGE) {
+            return null;
+        }
         if (item.style().typography().font() == null) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "The marker of the List item needs Font: it is declared in "
                     + "the Typography of the List item, of an ancestor or of Styles (For element: Document)");
@@ -62,9 +72,32 @@ final class ListBuilder {
         }
         Style s = Style.inheriting(item.style());
         s.setLayout(Layout.INLINE);
-        Box marker = new Box(null, Element.MARKER, s, false, n.getLine());
-        marker.setText(text, n.getLine(), false);
-        return marker;
+        if (marker == Marker.IMAGE) {
+            Style owner = item.style().list().markerImage() != null ? item.style() : list.style();
+            if (owner.list().markerImage() == null) {
+                throw error(n, ErrorCode.LIST_IMAGE_MISSING, "The List item needs Marker image: the list (line "
+                        + list.line() + ") has Marker: image and declares no Marker image for its items");
+            }
+            // The line of the Marker image: the errors of the file (IMAGE_UNKNOWN, IMAGE_FORMAT) point to it.
+            Box image = new Box(null, Element.MARKER, s, false, owner.line(MARKER_IMAGE).number());
+            s.list().setMarkerImage(owner.list());
+            s.image().setAlt(owner.list().markerAlt());
+            image.setImage(owner.list().markerImage());
+            return image;
+        }
+        Box box = new Box(null, Element.MARKER, s, false, n.getLine());
+        box.setText(text, n.getLine(), false);
+        return box;
+    }
+
+    /** {@code Marker image} in a {@code List item} only with {@code Marker: image} in its list. */
+    static void validateItem(Style s, Box list) {
+        Marker marker = list.style().list().marker();
+        if (s.isDeclared(MARKER_IMAGE) && marker != Marker.IMAGE) {
+            throw error(s.line(MARKER_IMAGE), ErrorCode.LIST_IMAGE_NOT_ALLOWED, "Marker image has no effect: the list "
+                    + "(line " + list.line() + ") has Marker: " + markerName(marker) + ", and only Marker: image "
+                    + "draws an image");
+        }
     }
 
     /**
@@ -91,8 +124,15 @@ final class ListBuilder {
         }
     }
 
-    /** {@code Start} only numbers, and within the range of the numbering. */
+    /**
+     * {@code Marker image} only with {@code Marker: image}; {@code Start} only numbers, and within the range of the
+     * numbering.
+     */
     static void validateList(Style s) {
+        if (s.isDeclared(MARKER_IMAGE) && s.list().marker() != Marker.IMAGE) {
+            throw error(s.line(MARKER_IMAGE), ErrorCode.LIST_IMAGE_NOT_ALLOWED, "Marker image has no effect with "
+                    + "Marker: " + markerName(s.list().marker()) + ": only Marker: image draws an image");
+        }
         if (!s.isDeclared(START)) {
             return;
         }

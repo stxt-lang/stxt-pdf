@@ -148,7 +148,8 @@ Result:
 The dumps have no namespace and are read with `STXT.rawParser()`.
 
 - Only the boxes with `Id` are dumped, and the descendants with `Id` are nested inside.
-- The marker of a `List item` with `Id` is dumped inside the item as `Marker: 3.`, with its `Rect`.
+- The marker of a `List item` with `Id` is dumped inside the item as `Marker: 3.` (or `Marker image: path`, with an
+  image), with its `Rect`.
 - An `Overlay` is nested inside its reference container, after its in-flow children, and not inside its parent.
 - The columns of a `Columns` have no fragment: their children are nested inside the `Columns`, and a box split across two
   columns appears twice on the same page.

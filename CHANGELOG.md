@@ -7,6 +7,17 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Image markers in lists.** `Marker: image` and the new `Marker image` node, in the `List` (for all its items) or in
+  a `List item` (its own, which replaces that of the list whole), with the path of the image relative to `images/`
+  and, as children, `Alt` and `Height`. The image is as tall as `Height` or the `Size` of the item, as wide as its
+  proportion gives, followed by the space of a text marker, and centered on the capitals of the item's typography on
+  the baseline of its first line; the same list can mix images (a check mark and a cross). With `Alt`, the tagged PDF
+  carries it as a `Figure` inside the `Lbl` of the item; without it, the image is an artifact and the item has no
+  `Lbl`. A list with images does not number. New errors `LIST_IMAGE_NOT_ALLOWED` (`Marker image` without `Marker:
+  image`) and `LIST_IMAGE_MISSING` (an item without an image, its own or the list's); the errors of the file are those
+  of an `Image`, with the line of the `Marker image`. `image` is not allowed in `Bullet markers`. `Box.isImage()` is
+  also true for an image marker, and `ListStyle` has `markerImage()`, `markerAlt()` and `markerHeight()`. Golden
+  `42-marker-images`; the test icons `test/check.svg` and `test/cross.svg`.
 - **Rows and lines are split on the page they are on.** New `Split rows` (`Grid`, `Table`) and `Split items` (`Stack`),
   `true` by default: a row of a grid or a table, or a line of a horizontal stack (in a vertical one, an item), that does
   not fit in what is left of the page is now broken in parallel on that page, each item on its own, and continues on the

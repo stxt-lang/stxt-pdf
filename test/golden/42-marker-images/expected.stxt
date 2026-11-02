@@ -1,0 +1,38 @@
+# Page 1: icons from y = 40, with content from x = 60 (Padding 20). i1 (40): check.svg of 10 × 10 plus the space,
+# 15 wide at x = 45, with its top 0.5 below the top of the line (centered on the capitals). i2 (52): cross.svg of
+# 14 × 14 plus the space, 19 wide at x = 41, centered the same: its top at 52 + 5.5 − 7 = 50.5. i3 (64) contains
+# sub, whose item sa starts at x = 80 with the dash "– " (10) at x = 70; the image of i3 aligns with that line.
+# icons measures 36 and ends at 76; fill (184) ends at 260, the end of the page.
+# Page 2: second from y = 40, with its own indent of 40 (items at x = 80) and shapes.svg: 20 × 10 plus the space, 25
+# wide at x = 55.
+Result:
+	Page: 1
+		Fragment: icons
+			Rect: 40 40 515 36
+			Fragment: i1
+				Rect: 60 40 495 12
+				Marker image: test/check.svg
+					Rect: 45 40.5 15 10
+			Fragment: i2
+				Rect: 60 52 495 12
+				Marker image: test/cross.svg
+					Rect: 41 50.5 19 14
+			Fragment: i3
+				Rect: 60 64 495 12
+				Marker image: test/check.svg
+					Rect: 45 64.5 15 10
+				Fragment: sub
+					Rect: 60 64 495 12
+					Fragment: sa
+						Rect: 80 64 475 12
+						Marker: –
+							Rect: 70 64 10 12
+		Fragment: fill
+			Rect: 40 76 515 184
+	Page: 2
+		Fragment: second
+			Rect: 40 40 515 12
+			Fragment: s1
+				Rect: 80 40 475 12
+				Marker image: test/shapes.svg
+					Rect: 55 40.5 25 10

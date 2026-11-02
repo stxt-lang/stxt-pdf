@@ -156,7 +156,10 @@ El texto de una caja es siempre un solo párrafo (las líneas en blanco son un e
 donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
 `InlineLayout.runs` sustituye las referencias por su valor y aplica `TextTransform` a los tramos **antes** de repartirlos.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
-`List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`).
+`List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`); un marcador con imagen
+mide `Height` o el `Size` del ítem de alto y lo que da su proporción (`LayoutContext.natural`) de ancho, lleva el espacio
+que lo separa del ítem como relleno derecho del fragmento, y se centra en las mayúsculas (`VerticalMetrics.capHeight`) de
+la tipografía del ítem sobre esa línea base.
 
 **Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
 a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita

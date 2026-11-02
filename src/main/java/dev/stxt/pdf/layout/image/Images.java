@@ -41,9 +41,10 @@ public final class Images {
     }
 
     /**
-     * Checks, before the layout, that all the images of the tree exist and can be read.
+     * Checks, before the layout, that all the images of the tree exist and can be read, the markers of the lists
+     * ({@code Marker image}) included.
      *
-     * @throws InvalidModelException with the line of the first {@code Image} that fails
+     * @throws InvalidModelException with the line of the first {@code Image} (or {@code Marker image}) that fails
      */
     public void validate(Box box) {
         if (box.image() != null) {
@@ -51,6 +52,9 @@ public final class Images {
             ImageFile file = file(box);
             checkLimits(file, box);
             checkPage(file, box);
+        }
+        if (box.marker() != null) {
+            validate(box.marker());
         }
         box.children().forEach(this::validate);
     }

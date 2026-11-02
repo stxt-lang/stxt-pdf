@@ -41,12 +41,51 @@ Document (dev.stxt.pdf):
 
 | Propiedad | Dónde | Qué hace |
 |---|---|---|
-| `Marker` | `List` | **Obligatorio.** `bullet` (•), `dash` (–), `none`, `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Obligatorio.** `bullet` (•), `dash` (–), `none`, `image` (una imagen), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker image` | `List`, `List item` | La imagen del marcador con `Marker: image`, de `images/`. La de la lista vale para todos sus ítems; la de un ítem la sustituye. Admite `Alt` y `Height` |
 | `Start` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
 elementos (un `Paragraph`, un `Text`, otra `List`), pero no encabezados.
+
+## Marcadores con imagen
+
+Con `Marker: image` el marcador es una imagen: un visto, una cruz, un icono. `Marker image` dice cuál, en la lista para todos
+sus ítems o en un ítem para él solo. Mide de alto lo que el `Size` del texto, salvo que declare `Height`, y va centrada con
+las mayúsculas de la primera línea. Con `Alt`, un lector de pantalla la lee; sin él, es decorativa.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Coberturas
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+    Section:
+        List:
+            Marker: image
+            Marker image: test/check.svg
+                Alt: Incluido
+            List item:
+                Paragraph: Responsabilidad civil obligatoria.
+            List item:
+                Paragraph: Asistencia en viaje.
+            List item:
+                Marker image: test/cross.svg
+                    Alt: Excluido
+                Paragraph: Daños propios del vehículo.
+```
+
+(El ejemplo usa los iconos de prueba del repositorio, en `resources/images/test/`.)
 
 ## La sangría
 
@@ -58,7 +97,9 @@ marcadores quedan alineados a la derecha, pegados al texto con un espacio.
 
 - El marcador usa la tipografía del ítem y se alinea con su primera línea. Por eso un ítem tiene que empezar con un texto:
   si empieza con un `Stack`, un `Grid` o una imagen, es un error.
-- Cada lista numera sus ítems. Una lista dentro de otra empieza de nuevo.
+- Cada lista numera sus ítems. Una lista dentro de otra empieza de nuevo. Una lista con imágenes no numera.
+- `Marker image` solo tiene sentido con `Marker: image`; en otra lista es un error, y un ítem de una lista con
+  `Marker: image` sin imagen, ni suya ni de la lista, también.
 - Si el ítem se parte entre páginas, el marcador va en la primera.
 - `{number of: id}` escribe el número de un ítem con `Id` (`3`, `c`, `IV`): «véase la cláusula {number of: pago}».
 

@@ -26,7 +26,8 @@ List:
 
 | Property | Values | Default | Elements | Notes |
 |---|---|---|---|---|
-| `Marker` | `bullet`, `dash`, `none`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | required | `List` | Marker of the items: `•`, `–`, none, or a numbering (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker` | `bullet`, `dash`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | required | `List` | Marker of the items: `•`, `–`, none, an image, or a numbering (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker image` | path relative to `images/` | none | `List`, `List item` | The image of the marker with `Marker: image` ([Image markers](#image-markers)): that of the list serves all its items, and that of an item replaces it. It accepts `Alt` and `Height`. |
 | `Start` | integer | `1` | `List` | Number of the first item. Only in the numberings. |
 | `Number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
 
@@ -40,10 +41,64 @@ They do not go in the `Styles` rules, which only accept the groups. The indent o
 
 `Marker` is required: whether the list is numbered is decided by the author. The marker is text in the typography of the
 `List item` (its own, inherited or from `For element: List item`): `•` (`bullet`), `–` (`dash`), none (`none`), or the number of the
-item with a period: `3.`, `c.`, `C.`, `iii.`, `III.`. It is always followed by a space, which separates it from the content.
+item with a period: `3.`, `c.`, `C.`, `iii.`, `III.`. It is always followed by a space, which separates it from the content. With
+`image`, the marker is an image ([below](#image-markers)).
 
 > **Decision:** the marker is text in the font of the item, without a hollow circle or a square, which IBM Plex Sans does not have.
 > *Rejected alternative:* drawing them as shapes.
+
+## Image markers
+
+With `Marker: image`, the marker of each item is the image of a `Marker image`: that of the list, which serves all its
+items, or that of the item, which replaces that of the list whole (path, `Alt` and `Height`). The same list can have
+different images: the covered risks with a check mark and the excluded ones with a cross.
+
+```
+List:
+    Marker: image
+    Marker image: symbols/check.svg
+        Alt: Included
+    List item:
+        Paragraph: Third-party liability
+    List item:
+        Marker image: symbols/cross.svg
+            Alt: Excluded
+            Height: 8
+        Paragraph: Own damage
+```
+
+| Property | Values | Default | Notes |
+|---|---|---|---|
+| *(value)* | path relative to `images/` | required | The file, as in an [`Image`](image.md#file): PNG, JPEG, SVG or PDF (its first page). |
+| `Alt` | non-empty text | none | Alternative text: with it, the image is read as a figure inside the marker ([accessibility](#accessibility)). Without it, it is decorative. |
+| `Height` | positive length | the `Size` of the item | Height of the image. The width follows from its proportion. |
+
+- The image is as tall as `Height` or, without it, the `Size` of the typography of the item, and as wide as its proportion
+  gives. It is followed by the same space as a text marker, in the font of the item, and its right edge touches the left
+  edge of the border box of the item, like the other markers. Its vertical center is the center of the capitals of the
+  typography of the item on the baseline of the first line; with a `Height` greater than the `Size`, it sticks out above
+  and below the line.
+- The item needs `Font` and `Size`, as with a text marker (`TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE`): the space and the
+  default height come from them. And it needs a first line to align with (`LIST_ITEM_WITHOUT_LINE`).
+- A `Marker image` in a list, or in an item of a list, whose `Marker` is not `image` is an error
+  (`LIST_IMAGE_NOT_ALLOWED`), on the line of the `Marker image`. An item of a list with `Marker: image` that has no image,
+  neither its own nor the list's, is one too (`LIST_IMAGE_MISSING`), on the line of the item.
+- `Start` and `Number` have no effect (`LIST_NUMBER_NOT_ALLOWED`), and `{number of: id}` does not work for its items: a list
+  with images does not number.
+- The errors of the file are those of an `Image` (`IMAGE_UNKNOWN`, `IMAGE_FORMAT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX`), with
+  the line of the `Marker image`. An empty `Alt` is `VALUE_NOT_ALLOWED`, and so is a `Height` that is not a positive length.
+- A list of a `Markdown` has no image markers: `image` in `Bullet markers` is `VALUE_NOT_ALLOWED`.
+
+> **Decision:** `Marker: image` says that the markers are images and `Marker image` which one each is, with `Alt` and
+> `Height` as its children, as an `Image` carries its own. *Rejected alternative:* the path as the value of `Marker`, which
+> would stop being an enumeration; or `Marker image` alone, without `Marker: image`, which would make `Marker` optional.
+
+> **Decision:** the `Marker image` of an item replaces that of the list whole. *Rejected alternative:* inheriting from the
+> list's the `Alt` or the `Height` the item does not declare: the `Alt` describes a different image.
+
+> **Decision:** the image is centered on the capitals of the item, and by default it is as tall as its `Size`. *Rejected
+> alternative:* resting it on the baseline like a glyph, which leaves an icon visibly high next to the lowercase; or
+> centering it in the line box, which moves with `Line height`.
 
 ## Numbering
 
@@ -75,10 +130,13 @@ breaks, the marker is only in its first fragment. It does not change the break r
 
 ## Accessibility
 
-A screen reader announces the list with its number of items, and each item with its marker.
+A screen reader announces the list with its number of items, and each item with its marker. An image marker with `Alt`
+is read with its alternative text (it is a figure inside the marker, `Lbl` → `Figure`); without `Alt` it is decorative and
+the item has no marker for the reader ([The PDF inside](../implementation/pdf.md#lists)).
 
 ## What is not supported
 
-- Markers inside the item, with a style of their own different from the item, with images or with other text.
+- Markers inside the item, with a style of their own different from the item or with other text.
 - Hollow circle and square.
 - Lists in reverse order and suffixes other than the period.
+- Image markers in the lists of a `Markdown`.

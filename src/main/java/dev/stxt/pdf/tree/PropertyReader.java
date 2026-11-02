@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static dev.stxt.pdf.tree.Nodes.error;
+import static dev.stxt.pdf.tree.Nodes.inline;
 import static dev.stxt.pdf.tree.Nodes.isItemElement;
 import static dev.stxt.pdf.tree.Nodes.parse;
 import static dev.stxt.pdf.tree.Nodes.placement;
@@ -132,6 +133,7 @@ final class PropertyReader {
             entry("layer", (p, s) -> s.setLayer(integer(p))),
             entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
+            entry("marker-image", PropertyReader::markerImage),
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
@@ -266,6 +268,28 @@ final class PropertyReader {
                     + "carry Alt");
         }
         return alt;
+    }
+
+    /**
+     * The {@code Marker image} of a {@code List} or a {@code List item} (reference/components/list.md): the path of
+     * the image, relative to {@code images/}, and its {@code Alt} and {@code Height}. That the file exists and is an
+     * image is checked during layout, as with an {@code Image}; that the list has {@code Marker: image} is checked
+     * by {@link ListBuilder}.
+     */
+    private static void markerImage(Node p, Style s) {
+        String path = p.getText().trim();
+        if (path.isEmpty()) {
+            throw error(p, ErrorCode.IMAGE_UNKNOWN, "Marker image needs the path of the image, relative to the "
+                    + "images/ folder of the resources: Marker image: symbols/check.svg");
+        }
+        s.list().setMarkerImage(path);
+        for (Node child : inline(p).getChildren()) {
+            switch (child.getCanonicalName()) {
+                case "alt" -> s.list().setMarkerAlt(alt(child));
+                case "height" -> s.list().setMarkerHeight(positive(child));
+                default -> throw unread(child);
+            }
+        }
     }
 
     /** {@code Break} group: the page breaks, which are not inherited. */

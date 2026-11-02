@@ -143,7 +143,11 @@ closing it with `TextRuns`.
 ## Generated elements
 
 - **List marker:** `ListBuilder` creates the box of the marker in `Box.marker`, generated and outside `children`
-  (`Element.MARKER`, `Box.isMarker()`): text with the typography of the item and the final space included (`"3. "`).
+  (`Element.MARKER`, `Box.isMarker()`): text with the typography of the item and the final space included (`"3. "`) or,
+  with `Marker: image`, an image box (`Box.isImage()`, with the path in `Box.image()` and the `Alt` and `Height` of the
+  `Marker image` in its `ListStyle`), with the line of the `Marker image` of the item or, if it has none, of the list.
+  `PropertyReader.markerImage` reads the `Marker image` with its children, and `ListBuilder.validateList` and
+  `validateItem` check that it only goes with `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`, `LIST_IMAGE_MISSING`).
 - **Column flow:** the content of a `Columns` goes in a generated block box (`Element.COLUMN_FLOW`), its only child.
 - **Table of contents entries:** `TableOfContentsBuilder` generates at the end one `Stack` box per heading (`Element.TOC_1` to `Element.TOC_6`)
   with the title, the leader and the number. A heading without `Id` receives a generated name (`Box.anchor`), and `Box.key()` gives the

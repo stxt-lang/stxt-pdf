@@ -62,7 +62,11 @@ public final class StxtDump {
             // It goes inside the item: only if the item is dumped.
             if (f.box().parent().id() != null || includeWithoutId) {
                 String tab = "\t".repeat(level);
-                sb.append(tab).append("Marker: ").append(f.box().text().strip()).append('\n');
+                if (f.box().isImage()) {
+                    sb.append(tab).append("Marker image: ").append(f.box().image()).append('\n');
+                } else {
+                    sb.append(tab).append("Marker: ").append(f.box().text().strip()).append('\n');
+                }
                 appendRect(sb, tab, x, y, f);
             }
             return;

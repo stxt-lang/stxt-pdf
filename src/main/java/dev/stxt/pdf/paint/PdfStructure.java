@@ -224,11 +224,20 @@ final class PdfStructure {
             labels.put(box, label);
         }
         if (box.role() == Role.LIST_ITEM) {
-            // LI: the marker (Lbl) and the content (LBody).
-            if (box.marker() != null) {
+            // LI: the marker (Lbl) and the content (LBody). An image marker with Alt is a Figure inside the Lbl;
+            // without Alt it is decorative, painted as an artifact, and the item has no Lbl.
+            Box marker = box.marker();
+            if (marker != null && (!marker.isImage() || marker.style().image().alt() != null)) {
                 PDStructureElement label = element("Lbl", e);
                 e.appendKid(label);
-                elements.put(box.marker(), label);
+                if (marker.isImage()) {
+                    PDStructureElement figure = element("Figure", label);
+                    label.appendKid(figure);
+                    figure.setAlternateDescription(marker.style().image().alt());
+                    elements.put(marker, figure);
+                } else {
+                    elements.put(marker, label);
+                }
             }
             PDStructureElement body = element("LBody", e);
             e.appendKid(body);
@@ -416,9 +425,13 @@ final class PdfStructure {
         return link;
     }
 
-    /** Whether the box or what it contains has something to read: text, a marker or an image with {@code Alt}. */
+    /**
+     * Whether the box or what it contains has something to read: text, a marker (with text, or an image with
+     * {@code Alt}) or an image with {@code Alt}.
+     */
     private static boolean hasContent(Box box) {
-        if (box.hasText() || box.marker() != null || box.isImage() && box.style().image().alt() != null) {
+        if (box.hasText() || box.marker() != null && (box.marker().hasText() || box.marker().style().image().alt() != null)
+                || box.isImage() && box.style().image().alt() != null) {
             return true;
         }
         return box.children().stream().anyMatch(c -> c.style().position() != Position.PAGE_OVERLAY && hasContent(c));
@@ -495,13 +508,13 @@ final class PdfStructure {
     }
 
     /**
-     * {@code ListNumbering} of a list; {@code dash} has no equivalent in PDF/UA-1 and is {@code None}, and in
-     * PDF/UA-2 it is {@code Unordered}, from PDF 2.0.
+     * {@code ListNumbering} of a list; {@code dash} and {@code image} have no equivalent in PDF/UA-1 and are
+     * {@code None}, and in PDF/UA-2 they are {@code Unordered}, from PDF 2.0.
      */
     private static String listNumbering(Marker marker, int ua) {
         return switch (marker) {
             case BULLET -> PDListAttributeObject.LIST_NUMBERING_DISC;
-            case DASH -> ua == 2 ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
+            case DASH, IMAGE -> ua == 2 ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
             case NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
             case DECIMAL -> PDListAttributeObject.LIST_NUMBERING_DECIMAL;
             case LOWER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_LOWER_ALPHA;
@@ -511,8 +524,11 @@ final class PdfStructure {
         };
     }
 
-    /** Standard structure type of the box (decision G1 of the roadmap). */
+    /** Standard structure type of the box (decision G1 of the roadmap); of an image marker, its {@code Figure}. */
     static String type(Box box) {
+        if (box.isMarker() && box.isImage()) {
+            return "Figure";
+        }
         return switch (box.role()) {
             case DOCUMENT -> "Document";
             case SECTION -> "Sect";

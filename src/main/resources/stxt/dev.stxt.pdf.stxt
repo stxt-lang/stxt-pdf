@@ -389,6 +389,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Marker
 				Min: 1
 				Max: 1
+			Child: Marker image
+				Max: 1
 			Child: Start
 				Max: 1
 			Child: List item
@@ -410,6 +412,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Number
+				Max: 1
+			Child: Marker image
 				Max: 1
 			Child: Block
 			Child: Stack
@@ -1270,7 +1274,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Width
 		Description: Width of the border box (in Page, of the page).
 	Node: Height
-		Description: Height of the border box (in Page, of the page).
+		Description: Height of the border box (in Page, of the page; in a Marker image, of the image, a positive length).
 	Node: Min width
 		Description: Minimum width.
 	Node: Max width
@@ -1507,16 +1511,25 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Marker
 		Type: ENUM
-		Description: Marker of the items: bullet (•), dash (–) or none, or a numbering (1., a., A., i., I.).
+		Description: Marker of the items: bullet (•), dash (–) or none, an image (the Marker image of the list or of each item), or a numbering (1., a., A., i., I.).
 		Values:
 			Value: bullet
 			Value: dash
 			Value: none
+			Value: image
 			Value: decimal
 			Value: lower-alpha
 			Value: upper-alpha
 			Value: lower-roman
 			Value: upper-roman
+	Node: Marker image
+		Type: INLINE
+		Description: Image of the marker, with Marker: image, in the List (for all its items) or in a List item (its own, which replaces that of the list); the value is its path, relative to images/, as in an Image. As tall as the Size of the item unless it declares Height, as wide as its proportion gives, centered on the capitals of the first line of the item and followed by a space. With Alt it is read as a figure; without it, it is decorative.
+		Children:
+			Child: Alt
+				Max: 1
+			Child: Height
+				Max: 1
 	Node: Start
 		Type: INTEGER
 		Description: Number a numbering starts with: that of the first item of a numbered list or, in a Section with Page numbering: restart, that of its first page. By default, 1.
