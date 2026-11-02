@@ -94,6 +94,19 @@ repeated unchanged.
 > position is that of its place in the document. *Rejected alternative:* only as a child of `Document` and of `Section`, which is
 > where a header or a footer makes sense.
 
+What is seen on every page but is content (the QR code of a receipt, the data of a preprinted form of several sheets) is
+written twice: an `Overlay` at the start of the section, which falls on its first page and is read, and a
+`Page overlay` with the same content, the same `Offset` and `Pages: not-first`, which repeats it on the others as
+decoration. Both have the page area as their reference container if the `Overlay` is not inside another positioned box,
+so they appear in the same place. A screen reader reads it once, at its place in the document.
+
+> **Decision:** what is inside a `Page overlay` is decoration on every page, also on the first one where it appears. What
+> is repeated on every page is read only once, like the repeated rows of a table
+> ([PDF](../implementation/pdf.md#tables)), and the content that has to be read goes in an `Overlay`. *Rejected
+> alternative:* a property that made a `Page overlay` content on the first page where it appears, which would require
+> deciding where it goes in the reading order and lifting its restrictions (headings, link targets), when an `Overlay`
+> and a `Page overlay` with `Pages: not-first` give the same result.
+
 ### `Pages`
 
 A property of the `Page overlay` only (on another element it is a schema error, and so is a value that is not in the list). It counts

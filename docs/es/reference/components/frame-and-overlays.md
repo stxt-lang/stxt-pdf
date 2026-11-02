@@ -94,6 +94,19 @@ encabezado en vigor en ella; los demás se maquetan una vez y se repiten igual.
 > estática es la de su sitio en el documento. *Alternativa descartada:* solo como hijo de `Document` y de `Section`, que es
 > donde tiene sentido una cabecera o un pie.
 
+Lo que se ve en todas las páginas pero es contenido (el código QR de un recibo, los datos de un preimpreso de varias
+hojas) se escribe dos veces: un `Overlay` al principio de la sección, que cae en su primera página y se lee, y un
+`Page overlay` con el mismo contenido, el mismo `Offset` y `Pages: not-first`, que lo repite en las demás como
+decoración. Los dos tienen el área útil como contenedor de referencia si el `Overlay` no está dentro de otra caja
+posicionada, así que salen en el mismo sitio. Un lector de pantalla lo lee una vez, en su sitio del documento.
+
+> **Decisión:** lo que hay dentro de un `Page overlay` es decoración en todas las páginas, también en la primera en que
+> sale. Lo que se repite en cada página se lee una sola vez, como las filas repetidas de una tabla
+> ([PDF](../implementation/pdf.md#tablas)), y el contenido que tiene que leerse va en un `Overlay`. *Alternativa
+> descartada:* una propiedad que hiciera contenido un `Page overlay` en la primera página en que sale, que obligaría a
+> decidir dónde va en el orden de lectura y a levantar sus restricciones (encabezados, destinos de enlaces), cuando un
+> `Overlay` y un `Page overlay` con `Pages: not-first` dan lo mismo.
+
 ### `Pages`
 
 Propiedad solo del `Page overlay` (en otro elemento es un error del schema, y un valor que no está en la lista, también). Cuenta
