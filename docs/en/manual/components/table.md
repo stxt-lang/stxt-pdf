@@ -81,8 +81,8 @@ Document (dev.stxt.pdf):
 ## The cells
 
 A cell with a value (`Cell: 145.00`) is a text. Without a value, it has elements inside (a `Paragraph`, a `List`, another
-`Table`), but not both. Each cell has its own border: a line between rows is the bottom border of the cells. `Gap` on the
-`Table` separates the cells.
+`Table`), but not both. Each cell has its own border: a line between rows is the bottom border of the cells. For a full
+grid, with every border, there are [merged borders](#merged-borders). `Gap` on the `Table` separates the cells.
 
 **`Row header: true`** marks a cell as the header of its row (the item of an invoice, the time of a timetable): a screen
 reader reads it with each cell of the row. The cells of `Header rows` are already column headers.
@@ -161,12 +161,75 @@ Document (dev.stxt.pdf):
                     Cell: 2,000.00
 ```
 
+## Merged borders
+
+With a `Border` on each cell, two neighboring cells draw two lines side by side. With **`Merge borders: true`** on the
+`Table`, the border between two cells is drawn once, centered between the two, and the outer border of the table stays
+inside it. It is the way to draw a full grid.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Rates
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Cell
+            Box:
+                Padding: 3 5
+                Border: 0.5
+                Border color: #8A8478
+        For element: Header cell
+            Typography:
+                Bold: true
+            Box:
+                Border: 0.5 0.5 1.5 0.5
+                Border color: #12315A
+    Section:
+        Table:
+            Column sizes: * 60 60
+            Column align: left right right
+            Merge borders: true
+            Header rows:
+                Row:
+                    Cell: Rate
+                    Cell: Month
+                    Cell: Year
+            Body:
+                Row:
+                    Cell: Basic
+                    Cell: 9.00
+                    Cell: 90.00
+                Row:
+                    Cell: Professional
+                    Cell: 19.00
+                    Cell: 190.00
+                Row:
+                    Cell: Business
+                    Cell: 49.00
+                    Cell: 490.00
+```
+
+- Between two cells with borders of different widths, the wider one wins, with its color: the line under the header is
+  that of the header (1.5). With the same width and a different color, that of the cell above or that of the one on the
+  left wins.
+- A cell without border draws nothing: the line that separates it from its neighbor is that of the neighbor.
+- The table does not accept `Gap`, nor its cells `Corner radius`: the border between two cells would not be one line.
+- When the table goes on to another page, the line between the two rows of the break is drawn on both pages.
+
 ## Across pages
 
-- The table is broken between rows: a row that does not fit in what is left moves whole to the next page.
+- The table is broken between rows. A row that does not fit in what is left of the page is split on that page, each
+  cell on its own, unless its widows and orphans or a `Keep together` prevent it: then it moves whole to the next one.
+- With `Split rows: false` on the `Table`, a row that does not fit moves whole to the next page, and it is only split if
+  it does not fit even on an empty page.
 - The header is repeated at the top of each page, and the footer, after the last row of each page. They are never left
   alone.
-- A row that does not fit even on an empty page is split: its cells continue on the next page.
 - A `Break` on a `Row` of the body forces or avoids a break before or after it.
 
 More detail in the [reference](../../reference/components/table.md).

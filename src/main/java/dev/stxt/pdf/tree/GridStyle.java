@@ -28,6 +28,11 @@ public final class GridStyle extends StyleGroup {
      * instead of moving whole to the next one (reference/common/breaks.md).
      */
     private boolean splitRows = true;
+    /**
+     * {@code Merge borders}, only in a {@code Table}: the border between two cells is drawn once, the wider of the two
+     * (reference/components/table.md#merged-borders).
+     */
+    private boolean mergeBorders;
 
     GridStyle() {
     }
@@ -75,6 +80,15 @@ public final class GridStyle extends StyleGroup {
     void setSplitRows(boolean v) {
         writable();
         splitRows = v;
+    }
+
+    public boolean mergeBorders() {
+        return mergeBorders;
+    }
+
+    void setMergeBorders(boolean v) {
+        writable();
+        mergeBorders = v;
     }
 
     public Alignment horizontal() {

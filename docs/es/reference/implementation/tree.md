@@ -70,6 +70,7 @@ Las piezas:
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
+| `TableBorders` | Los bordes fusionados de una tabla con `Merge borders`: guarda el borde que declara cada celda (`Box.mergedBorder()`, con `model.Stroke`) y cambia su `Border` por el sitio que deja para las líneas |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
 | `MarkdownBuilder`, `RunMarks` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT; `RunMarks` marca antes sus tramos con estilo |
 | `TableOfContentsBuilder` | Las entradas de los índices (de encabezados, de figuras o de tablas), al final de la construcción |

@@ -4,6 +4,7 @@ import dev.stxt.pdf.fragment.BreakAppeal;
 import dev.stxt.pdf.fragment.BreakRules;
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Rule;
 import dev.stxt.pdf.fragment.Unit;
 import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Edges;
@@ -148,6 +149,32 @@ public final class UnitBreaker {
     }
 
     /**
+     * A unit as a fragment of the container shows it: whole, the part that fits at the end of the page if its group is
+     * broken, or the continuation of a broken group (that of its last unit, like its band).
+     *
+     * @param unit   the unit
+     * @param top    its top edge, from the content box of the fragment (under the repeated header)
+     * @param height its height in the fragment
+     * @param first  it starts in this fragment: it is not the continuation of a group broken on the previous page
+     * @param last   it ends in this fragment
+     */
+    public record UnitPiece(int unit, double top, double height, boolean first, boolean last) {
+    }
+
+    /** The lines that a container draws in each of its fragments ({@link Fragment#rules}): those of a table. */
+    @FunctionalInterface
+    public interface Rules {
+        /**
+         * The lines of a fragment.
+         *
+         * @param units      the units placed in the fragment, in order
+         * @param unitsEnd   the end of those units, from the content box: the repeated footer goes after it
+         * @param children   the fragments of the items, of the bands and of the repeated rows, already placed
+         */
+        List<Rule> of(List<UnitPiece> units, double unitsEnd, List<Fragment> children);
+    }
+
+    /**
      * Items that are repeated whole in each fragment, outside the units: the header of a
      * table at the top and its footer under the placed units (reference/components/table.md). They are never
      * broken, and what is left of the page for the units is the rest.
@@ -158,14 +185,22 @@ public final class UnitBreaker {
      * @param footHeight height of the footer, with the gap that separates it from the units
      * @param headBands  bands of the header rows, placed like their items
      * @param footBands  bands of the footer rows, placed like their items
+     * @param rules      the lines of each fragment, those of the merged borders of a table
+     *                   (reference/components/table.md#merged-borders); {@code null} without them
      */
     public record Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight,
-                         List<Fragment> headBands, List<Fragment> footBands) {
+                         List<Fragment> headBands, List<Fragment> footBands, Rules rules) {
         public static final Repeat NONE = new Repeat(List.of(), 0, List.of(), 0);
 
         /** Without bands. */
         public Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight) {
             this(head, headHeight, foot, footHeight, List.of(), List.of());
+        }
+
+        /** Without lines. */
+        public Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight,
+                      List<Fragment> headBands, List<Fragment> footBands) {
+            this(head, headHeight, foot, footHeight, headBands, footBands, null);
         }
     }
 
@@ -227,6 +262,8 @@ public final class UnitBreaker {
         final Piece[] pieces;
         /** Fragment of each band of {@code bands} in this fragment. */
         final Fragment[] bandPieces;
+        /** What this fragment shows of each unit; {@code null} if nothing. */
+        final UnitPiece[] unitPieces;
         /** First unit left to place. */
         int next;
         /**
@@ -259,6 +296,7 @@ public final class UnitBreaker {
                     : Double.POSITIVE_INFINITY;
             this.pieces = new Piece[placed.size()];
             this.bandPieces = new Fragment[bands.size()];
+            this.unitPieces = new UnitPiece[n];
         }
 
         LayoutResult layOut() {
@@ -294,6 +332,7 @@ public final class UnitBreaker {
                     bandPieces[b] = bands.get(b).fragment(repeat.headHeight(), s.bottom(), false, !s.broken());
                 }
             }
+            unitPieces[end - 1] = new UnitPiece(end - 1, repeat.headHeight(), s.bottom(), false, !s.broken());
             if (s.broken()) {
                 return result(s.bottom(), s.occupied(), false, next, s.tokens(), s.appeal());
             }
@@ -388,6 +427,11 @@ public final class UnitBreaker {
                             unit.end() - unit.start(), true, true);
                 }
             }
+            for (int u = from; u < to; u++) {
+                Unit unit = units.get(u);
+                unitPieces[u] = new UnitPiece(u, unit.start() - origin + repeat.headHeight(), unit.end() - unit.start(),
+                        true, true);
+            }
         }
 
         /** Places the units {@code [next, end)} whole and closes the fragment. */
@@ -466,6 +510,14 @@ public final class UnitBreaker {
                 }
                 bandPieces[b] = bands.get(b).fragment(top + repeat.headHeight(), Math.min(unitBottom, bottom) - top,
                         true, fits(unitBottom, bottom));
+            }
+            for (int u = start; u < end; u++) {
+                double top = units.get(u).start() - origin;
+                double unitBottom = units.get(u).end() - origin;
+                if (!fits(bottom, top)) {
+                    unitPieces[u] = new UnitPiece(u, top + repeat.headHeight(), Math.min(unitBottom, bottom) - top,
+                            true, fits(unitBottom, bottom));
+                }
             }
         }
 
@@ -555,6 +607,15 @@ public final class UnitBreaker {
                     repeat.headHeight() + Math.max(0, occupied) + repeat.footHeight(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fragments, List.of(), first, slice.finished());
+            if (repeat.rules() != null) {
+                List<UnitPiece> shown = new ArrayList<>();
+                for (UnitPiece u : unitPieces) {
+                    if (u != null) {
+                        shown.add(u);
+                    }
+                }
+                fragment = fragment.withRules(repeat.rules().of(shown, repeat.headHeight() + units, fragments));
+            }
             // The margins of the items never merge with those of the container (reference/components/block.md).
             if (slice.finished()) {
                 return LayoutResult.finished(fragment, pending, AdjoiningMargins.NONE);

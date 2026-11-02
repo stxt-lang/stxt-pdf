@@ -88,6 +88,13 @@ public enum ErrorCode {
     TABLE_COLUMN_ALIGN,
     /** {@code Row header} in a cell of {@code Header rows}, whose cells are already column headers. */
     ROW_HEADER_IN_HEADER_ROWS,
+    /**
+     * {@code Merge borders: true} in a table with {@code Gap} or with a cell with {@code Corner radius}: the border
+     * between two cells would not be one line.
+     */
+    MERGE_BORDERS_CONFLICT,
+    /** {@code Merge borders: true} in a table none of whose cells has a border. */
+    MERGE_BORDERS_WITHOUT_EFFECT,
 
     // --- Columns -------------------------------------------------------------------------------
     /** A {@code Columns} without {@code Count} or {@code Min column width}. */

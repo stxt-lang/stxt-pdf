@@ -38,14 +38,25 @@ import java.util.List;
  * @param turned   in a box rotated in flow (reference/common/layers-and-rotation.md), its unrotated border box,
  *                 relative to ({@code x}, {@code y}) and centered in the rectangle that encloses it; its children and
  *                 its lines refer to it. {@code null} in the other boxes
+ * @param rules    lines it draws over the backgrounds of its children and under their text: the merged borders of a
+ *                 table (reference/components/table.md#merged-borders); empty in the other boxes
  */
 public record Fragment(Box box, double x, double y, double width, double height, Insets margin,
                        Insets border, Insets padding, List<Fragment> children, List<TextLine> lines,
-                       boolean first, boolean last, double offsetX, double offsetY, Rect turned) {
+                       boolean first, boolean last, double offsetX, double offsetY, Rect turned, List<Rule> rules) {
 
     public Fragment {
         children = List.copyOf(children);
         lines = List.copyOf(lines);
+        rules = List.copyOf(rules);
+    }
+
+    /** A fragment without lines of its own ({@link #rules}). */
+    public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
+                    Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last,
+                    double offsetX, double offsetY, Rect turned) {
+        this(box, x, y, width, height, margin, border, padding, children, lines, first, last, offsetX, offsetY,
+                turned, List.of());
     }
 
     /** A fragment that does not belong to a box rotated in flow. */
@@ -92,7 +103,13 @@ public record Fragment(Box box, double x, double y, double width, double height,
      */
     public Fragment turned(Rect box, double width, double height) {
         return new Fragment(this.box, x, y, width, height, margin, border, padding, children, lines, first, last,
-                offsetX, offsetY, box);
+                offsetX, offsetY, box, rules);
+    }
+
+    /** The same fragment with these lines of its own ({@link #rules}). */
+    public Fragment withRules(List<Rule> rules) {
+        return new Fragment(box, x, y, width, height, margin, border, padding, children, lines, first, last, offsetX,
+                offsetY, turned, rules);
     }
 
     public Fragment moved(double newX, double newY) {
@@ -105,7 +122,7 @@ public record Fragment(Box box, double x, double y, double width, double height,
      */
     public Fragment moved(double newX, double newY, double dx, double dy) {
         return new Fragment(box, newX, newY, width, height, margin, border, padding, children, lines, first, last,
-                dx, dy, turned);
+                dx, dy, turned, rules);
     }
 
     /** The same fragment with more children at the end (the Overlay boxes this box resolves). */
@@ -113,6 +130,6 @@ public record Fragment(Box box, double x, double y, double width, double height,
         List<Fragment> all = new ArrayList<>(children);
         all.addAll(more);
         return new Fragment(box, x, y, width, height, margin, border, padding, all, lines, first, last, offsetX,
-                offsetY, turned);
+                offsetY, turned, rules);
     }
 }

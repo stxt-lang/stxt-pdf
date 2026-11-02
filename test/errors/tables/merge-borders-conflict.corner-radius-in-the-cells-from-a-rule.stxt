@@ -1,0 +1,26 @@
+# Case: Corner radius in the cells of a table with Merge borders, from a rule of Styles
+# Code: MERGE_BORDERS_CONFLICT
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Cell
+			Box:
+				Border: 0.5
+				Corner radius: 3
+	Section:
+		Table:
+			Column sizes: * *
+			Merge borders: true
+			Body:
+				Row:
+					Cell: a
+					Cell: b

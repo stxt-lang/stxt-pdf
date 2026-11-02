@@ -37,6 +37,7 @@ Table:
 | `Column align` | one alignment per column: `left`, `center`, `right` or `justify` | none | `Table` | The default alignment of the cells of each column. As many as `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 or 2 lengths (rows columns) | `0` | `Table` | Spacing between cells, as in `Grid`. |
 | `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
+| `Merge borders` | `true`, `false` | `false` | `Table` | The border between two cells is drawn once, the wider of the two ([Merged borders](#merged-borders)). |
 | `Span` | `rows columns`, two positive integers | `1 1` | `Cell` | Rows and columns that the cell takes up. |
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
@@ -89,6 +90,7 @@ A `Cell` is a box with two forms, like a `Text`: with a value (`Cell: 100`), it 
 a value, a block with elements (any except the headings), or empty if it has none. Both at the same time are
 an error (`CELL_CONTENT`). A long text goes in a `Paragraph`. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Span` and
 `Row header`. The borders are those of each cell, separate: a line between rows is drawn with the bottom border of the cells.
+With `Merge borders: true`, the border between two cells is drawn once ([Merged borders](#merged-borders)).
 The margins of a cell separate it from its area, as in a `Grid`.
 
 > **Decision:** `Row header: true` goes in each cell that is the header of its row (the item of an invoice, the time of a
@@ -174,6 +176,70 @@ The `Id` of a row is an `Id` of the document, unique like any other: it is the t
 > **Decision:** no selectors by row position (`Last row cell`), which identify the totals row by its
 > place and not by what it is: its `Style` and its `Id` are there for that.
 
+## Merged borders
+
+By default each cell paints its border, and two neighboring cells with `Border: 0.5` draw two lines side by side, 1 in
+all. With `Merge borders: true` on the `Table`, the border between two cells is drawn **once**:
+
+```
+Styles:
+    For element: Cell
+        Box:
+            Padding: 3 5
+            Border: 0.5
+            Border color: #8A8478
+    For element: Header cell
+        Box:
+            Border: 0.5 0.5 1.5 0.5
+            Border color: #12315A
+Table:
+    Column sizes: * 60 60
+    Merge borders: true
+    Header rows:
+        Row:
+            Cell: Rate
+            Cell: Month
+            Cell: Year
+    Body:
+        Row:
+            Cell: Basic
+            Cell: 9.00
+            Cell: 90.00
+```
+
+- **The line.** Between two neighboring cells, the line is the wider of the two sides that touch, with its color
+  (`Border color`, or that of the text of the cell). With the same width, that of the cell above or that of the one on
+  the left wins. A side without border contributes nothing: the line is that of the other one, and if neither has one,
+  there is no line. In the example, the line under the header is that of the header cells (1.5), and the others, 0.5.
+- **By segments.** A cell that takes up several rows or columns has a segment of line for each cell next to it, each one
+  resolved with that cell. Inside a cell that takes up several rows or columns there is no line.
+- **Where it goes.** The lines go on the lines of the grid: the one between two cells, centered on it; that of the outer
+  edge of the table, whole inside the table. Where two lines cross, the horizontal one goes into the vertical one by half
+  the width of the latter, and the wider one is painted on top.
+- **The room of each cell.** The `Border` of a cell is no longer painted: it is the room the cell leaves for the lines.
+  On a side between two cells, half of the widest line of that side; on a side on the edge of the table, its whole
+  border. The padding and the content start after it, so the height of the rows and the width of the columns count it.
+- **What covers what.** The lines are painted over the backgrounds of the cells and of what they contain, and under
+  their text. The band of a row (its `Box`, [Rows](#rows)) is not merged: it is painted under the cells, as always.
+- **What it does not allow.** `Gap` on the table or `Corner radius` on one of its cells, also from a rule, are
+  `MERGE_BORDERS_CONFLICT`: the border between two cells would not be one line. `Merge borders: true` on a table none of
+  whose cells has a border is `MERGE_BORDERS_WITHOUT_EFFECT`.
+
+Page breaks have their rules in [Breaks](#breaks).
+
+> **Decision:** the outer border of the table, and the top and bottom ones of each page it goes through, go whole inside
+> the table: the table does not paint outside its box. *Rejected alternative:* centering them on the edge, as word
+> processors do, which leaves half a line outside the table, in the margin or over what follows it.
+
+> **Decision:** the room of each cell is computed with the cells next to it in the table as written. A line that only
+> appears at a page break (that of the fragment, or the one under a repeated header) and is wider than that room goes
+> into the padding of the cell by what it lacks. *Rejected alternative:* reserving on each side the widest line possible
+> on any page, which would widen every row for a line that only appears on some.
+
+> **Decision:** `Merge borders` is a boolean, `false` by default, like `Split rows`: without it, no table changes.
+> *Rejected alternative:* `Borders: separate | collapse`, with a term that does not come from layout, and always merging
+> the borders, as a word processor does, which would move every table with borders.
+
 ## Breaks
 
 A table breaks between rows, like a grid ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)): a row that does not
@@ -190,6 +256,12 @@ the continuation carries the band of the last row of the group.
 > **Decision:** the continuation of a split group of rows carries the band of its last row: what continues on the
 > next page is not shared out among the rows of the group. *Rejected alternative:* sharing it out by the heights before
 > splitting, which do not correspond to what is placed.
+
+With `Merge borders` ([Merged borders](#merged-borders)), the top and bottom lines of each page go inside the table, like
+its outer border. If the break falls between two rows, the line between them is drawn on both pages, the same on each.
+If it falls inside a row that is split, the side of each split cell is only drawn with `Edges: closed` (that of the
+`Break` of its `Row`). Under the repeated header, the line is the wider one between the header and the body row that
+follows it on that page. A cell that already ended on a previous page draws nothing in the continuation of its group.
 
 The rows of `Header rows` and `Footer rows` are **repeated** on each page of the table: the header at the top and the footer right
 after the last body row of that page, each one with the `Gap` that separates it from the body. They are never split and
@@ -214,7 +286,8 @@ once, on the first page where they appear.
 
 ## What is not supported
 
-- Merged borders between cells: each cell has its own.
+- Merged borders in the tables of a `Markdown`: `Merge borders` is a property of the `Table`, and the rules of `Styles`
+  do not allow it.
 - `Box` on a column and a row with its own size or padding. The title of a table ("Table 3. Terminals") is the
   `Caption` of a [`Figure`](figure.md) with the table inside.
 - Rows with fewer cells than columns, or `Span` values that pass from one group to another: they are errors.

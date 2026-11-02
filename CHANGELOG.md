@@ -7,6 +7,17 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+- **Merged borders in tables.** New optional `Merge borders` in `Table`, `false` by default: with `true`, the border
+  between two cells is drawn once, centered on the line between them, with the wider of their two sides and its color
+  (with the same width, that of the cell above or on the left), and the outer border of the table goes whole inside it.
+  The `Border` of each cell is then the room it leaves for the lines: half of the widest line of a side between two
+  cells, or the whole border on the edge of the table. When a table breaks between two rows, the line between them is
+  drawn inside the table on both pages; through a split row, only with `Edges: closed`; under a repeated header, the
+  wider of the header's and that of the first row of the body on that page. `Gap` on the table or `Corner radius` on a
+  cell is `MERGE_BORDERS_CONFLICT`, and a table none of whose cells has a border, `MERGE_BORDERS_WITHOUT_EFFECT`.
+  Without `Merge borders` no document changes. `Fragment.rules` carries the lines (`fragment.Rule`), `Box.mergedBorder()`
+  the border each cell declares (`model.Stroke`), and the dump writes them as `Rule:` after the `Rect` of the table.
+  Golden `45-merged-borders`.
 - **Quiet zone of a barcode.** New optional `Quiet zone` in `Barcode`: the light modules on each side of the code, from 0
   to 40 (`VALUE_NOT_ALLOWED` outside that range), in the three formats; in an EAN-13 the same number goes on the left
   and on the right. Without it, the zones of the standards stay (4 modules in a QR code, 10 in a Code 128, 11 and 7 in

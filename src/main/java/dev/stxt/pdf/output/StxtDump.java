@@ -2,6 +2,7 @@ package dev.stxt.pdf.output;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.fragment.Rule;
 import dev.stxt.pdf.model.Rect;
 
 import java.math.BigDecimal;
@@ -78,6 +79,7 @@ public final class StxtDump {
             String name = f.box().id() != null ? f.box().id() : f.box().describe();
             sb.append(tab).append("Fragment: ").append(name).append('\n');
             appendRect(sb, tab, x, y, f);
+            appendRules(sb, tab, x, y, f);
             childLevel = level + 1;
         }
         dumpChildren(sb, f, x, y, childLevel, includeWithoutId);
@@ -86,6 +88,19 @@ public final class StxtDump {
     private static void appendRect(StringBuilder sb, String tab, double x, double y, Fragment f) {
         sb.append(tab).append("\tRect: ").append(format(x)).append(' ').append(format(y)).append(' ')
                 .append(format(f.width())).append(' ').append(format(f.height())).append('\n');
+    }
+
+    /**
+     * The lines of the fragment ({@link Fragment#rules}, the merged borders of a table), in the order they are painted:
+     * {@code Rule: x y width height color}, in page coordinates like {@code Rect}.
+     */
+    private static void appendRules(StringBuilder sb, String tab, double x, double y, Fragment f) {
+        Rect content = f.borderBox(x, y).shrink(f.border()).shrink(f.padding());
+        for (Rule r : f.rules()) {
+            sb.append(tab).append("\tRule: ").append(format(content.x() + r.x())).append(' ')
+                    .append(format(content.y() + r.y())).append(' ').append(format(r.width())).append(' ')
+                    .append(format(r.height())).append(' ').append(r.color()).append('\n');
+        }
     }
 
     /** Up to 2 decimals, without trailing zeros. */

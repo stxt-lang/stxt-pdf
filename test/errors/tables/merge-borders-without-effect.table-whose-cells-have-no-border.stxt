@@ -1,0 +1,22 @@
+# Case: Merge borders in a table none of whose cells has a border
+# Code: MERGE_BORDERS_WITHOUT_EFFECT
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Merge borders: true
+			Body:
+				Row:
+					Cell: a
+					Cell: b

@@ -1,0 +1,25 @@
+# Case: Gap in a table with Merge borders
+# Code: MERGE_BORDERS_CONFLICT
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Merge borders: true
+			Gap: 4
+			Body:
+				Row:
+					Cell:
+						Box:
+							Border: 0.5
+					Cell:

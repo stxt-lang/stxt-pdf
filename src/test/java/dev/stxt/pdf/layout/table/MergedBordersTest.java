@@ -1,0 +1,106 @@
+package dev.stxt.pdf.layout.table;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Rule;
+import dev.stxt.pdf.layout.LayoutFixture;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * The lines of the merged borders of a table across pages (reference/components/table.md#merged-borders). Pages of
+ * 180 pt with margins of 40: page area of 515 × 100 from (40, 40). The tables have one column of 515, and their cells
+ * {@code Border: 1} and blocks of fixed height.
+ */
+class MergedBordersTest {
+
+    private static final double PAGE = 180;
+    private static final String[] BORDER = {"\tStyles:", "\t\tFor element: Cell", "\t\t\tBox:", "\t\t\t\tBorder: 1"};
+
+    private static String[] concat(String[]... parts) {
+        return Arrays.stream(parts).flatMap(Arrays::stream).toArray(String[]::new);
+    }
+
+    private static String[] table(String... properties) {
+        String[] head = {"\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tMerge borders: true"};
+        return concat(head, Arrays.stream(properties).map(p -> "\t\t" + p).toArray(String[]::new));
+    }
+
+    /** A row with a cell that holds blocks of those heights. */
+    private static String[] row(String id, String[] rowLines, int... blocks) {
+        String[] lines = concat(new String[]{"\t\t\tRow:"}, rowLines, new String[]{"\t\t\t\tCell:", "\t\t\t\t\tId: " + id});
+        for (int h : blocks) {
+            lines = concat(lines, new String[]{"\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: " + h});
+        }
+        return lines;
+    }
+
+    private static String[] row(String id, int height) {
+        return row(id, new String[0], height);
+    }
+
+    /**
+     * The horizontal lines of the fragment of the table, as {@code y height}, from its content box, in the order they
+     * are painted: from the thinnest to the widest.
+     */
+    private static List<String> horizontal(LayoutFixture l, int page) {
+        Fragment t = l.fragment(page, "T");
+        return t.rules().stream().filter(r -> r.width() > r.height()).map(MergedBordersTest::yAndHeight).toList();
+    }
+
+    private static String yAndHeight(Rule r) {
+        return format(r.y()) + " " + format(r.height());
+    }
+
+    private static String format(double v) {
+        return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v);
+    }
+
+    /**
+     * The header (20, with a bottom border of 2) repeats: on each page the line under it is 2, the widest against the
+     * first row of the body on that page. The body rows measure 1 + 30 + 0.5, 0.5 + 30 + 0.5 and 0.5 + 30 + 1, and the
+     * header 1 + 20 + 1: on page 1, the header and two rows (84.5), with the line between the second and the third
+     * row inside at the bottom; on page 2 the third row goes under the header, and the line between them is the
+     * header's, 2 wide, centered on 22.
+     */
+    @Test
+    void theLineUnderARepeatedHeaderIsTheWidestOnEveryPage() {
+        LayoutFixture l = layOutPaged(PAGE, concat(BORDER, table("Split rows: false"),
+                new String[]{"\t\tHeader rows:"},
+                concat(new String[]{"\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tId: H", "\t\t\t\t\tBox:",
+                        "\t\t\t\t\t\tBorder: 1 1 2 1", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 20"}),
+                new String[]{"\t\tBody:"}, row("B1", 30), row("B2", 30), row("B3", 30)));
+        assertEquals(2, l.pages());
+        assertEquals(84.5, l.rect(1, "T").height(), 1e-9);
+        assertEquals(List.of("0 1", "53 1", "83.5 1", "21 2"), horizontal(l, 1));
+        assertEquals(53.5, l.rect(2, "T").height(), 1e-9);
+        assertEquals(List.of("0 1", "52.5 1", "21 2"), horizontal(l, 2));
+        // The vertical lines go along the whole fragment, inside it, as one rectangle each.
+        List<Rule> vertical = l.fragment(1, "T").rules().stream().filter(r -> r.height() > r.width()).toList();
+        assertEquals(List.of(new Rule(0, 0, 1, 84.5, "#000000"), new Rule(514, 0, 1, 84.5, "#000000")), vertical);
+    }
+
+    /**
+     * A row split across pages: with {@code Edges: open} (by default) the cut through its cell has no line; with
+     * {@code Edges: closed}, the cell's side is drawn at the cut on both pages.
+     */
+    @Test
+    void aSplitRowHasALineAtTheCutOnlyWithClosedEdges() {
+        LayoutFixture open = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody:"},
+                row("C", new String[0], 30, 30, 30, 30, 30)));
+        assertEquals(2, open.pages());
+        assertEquals(List.of("0 1"), horizontal(open, 1));
+        double end = open.rect(2, "T").height();
+        assertEquals(List.of(format(end - 1) + " 1"), horizontal(open, 2));
+
+        LayoutFixture closed = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody:"},
+                row("C", new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tEdges: closed"}, 30, 30, 30, 30, 30)));
+        assertEquals(2, closed.pages());
+        assertEquals(List.of("0 1", format(closed.rect(1, "T").height() - 1) + " 1"), horizontal(closed, 1));
+        assertEquals(List.of("0 1", format(closed.rect(2, "T").height() - 1) + " 1"), horizontal(closed, 2));
+    }
+}

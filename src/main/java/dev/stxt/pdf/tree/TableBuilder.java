@@ -87,6 +87,9 @@ final class TableBuilder {
             }
             firstRow += rows;
         }
+        if (table.style().grid().mergeBorders()) {
+            TableBorders.merge(table, firstRow, count);
+        }
     }
 
     /**

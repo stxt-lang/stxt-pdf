@@ -56,9 +56,12 @@ class PropertyKeyTest {
                 keys.add(PropertyKey.stack(canonical(stack)));
             }
         }
-        for (String grid : children.get("Grid")) {
-            if (children.get(grid).isEmpty()) {
-                keys.add(PropertyKey.grid(canonical(grid)));
+        // The properties of a Table are read like those of a Grid (Merge borders is only in a Table).
+        for (String container : List.of("Grid", "Table")) {
+            for (String grid : children.get(container)) {
+                if (children.get(grid).isEmpty()) {
+                    keys.add(PropertyKey.grid(canonical(grid)));
+                }
             }
         }
         for (String wrapper : List.of("Item", "Area")) {

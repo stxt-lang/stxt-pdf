@@ -86,9 +86,9 @@ final class PropertyReader {
      */
     static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution",
             "split-items");
-    /** Properties of the {@code Grid} and {@code Table} elements. */
+    /** Properties of the {@code Grid} and {@code Table} elements ({@code Merge borders}, only in a {@code Table}). */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical",
-            "split-rows");
+            "split-rows", "merge-borders");
     /** Properties of the {@code Columns} element. */
     static final Set<String> COLUMNS = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
@@ -356,6 +356,7 @@ final class PropertyReader {
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
             case "split-rows" -> s.grid().setSplitRows(bool(p));
+            case "merge-borders" -> s.grid().setMergeBorders(bool(p));
             default -> throw unread(p);
         }
     }

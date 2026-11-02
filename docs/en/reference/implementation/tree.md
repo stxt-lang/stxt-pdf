@@ -70,6 +70,7 @@ The pieces:
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
 | `StyleRules` | The rules of `Styles` from the two origins and their priority |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
+| `TableBorders` | The merged borders of a table with `Merge borders`: it keeps the border each cell declares (`Box.mergedBorder()`, with `model.Stroke`) and changes its `Border` into the room it leaves for the lines |
 | `ListBuilder`, `ListMarkers` | Lists: the numbering and the box of the marker |
 | `MarkdownBuilder`, `RunMarks` | Translates a `Markdown` (and text with `Markup: markdown`) into STXT nodes; `RunMarks` marks its styled runs first |
 | `TableOfContentsBuilder` | The entries of the tables of contents (of headings, figures or tables), at the end of the construction |

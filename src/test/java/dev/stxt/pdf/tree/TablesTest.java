@@ -5,6 +5,8 @@ import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Paint;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Stroke;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
@@ -201,6 +203,38 @@ class TablesTest {
             assertEquals(21, cell.style().line("break-before").number());
         }
         assertFalse(table.children().get(0).style().breaks().keepTogether());
+    }
+
+    /**
+     * With {@code Merge borders} each cell keeps the border it declares, and its {@code Border} is the room for the
+     * lines: half of the widest line against the cells next to it, or its whole border on the edge of the table
+     * (reference/components/table.md#merged-borders).
+     */
+    @Test
+    void mergedBordersLeaveRoomForTheLines() {
+        Box table = root("\tStyles:", "\t\tFor element: Cell", "\t\t\tBox:", "\t\t\t\tBorder: 1",
+                "\tTable:", "\t\tColumn sizes: * *", "\t\tMerge borders: true", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 3",
+                "\t\t\t\t\t\tBorder color: #C00000",
+                "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
+        Box a = table.children().get(0);
+        Box b = table.children().get(1);
+        Box d = table.children().get(3);
+        assertEquals(new Sides<>(Value.pt(1), Value.pt(1.5), Value.pt(0.5), Value.pt(1)), a.style().box().border());
+        assertEquals(new Sides<>(Value.pt(3), Value.pt(3), Value.pt(1.5), Value.pt(1.5)), b.style().box().border());
+        assertEquals(new Sides<>(Value.pt(1.5), Value.pt(1), Value.pt(1), Value.pt(0.5)), d.style().box().border());
+        assertEquals(Sides.all(new Stroke(1, "#000000")), a.mergedBorder());
+        assertEquals(Sides.all(new Stroke(3, "#C00000")), b.mergedBorder());
+    }
+
+    @Test
+    void withoutMergeBordersTheCellsKeepTheirBorder() {
+        Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 1", "\t\t\t\tCell: b")
+                .children().get(0);
+        assertFalse(table.style().grid().mergeBorders());
+        assertNull(table.children().get(0).mergedBorder());
+        assertEquals(Sides.all(Value.pt(1)), table.children().get(0).style().box().border());
     }
 
     @Test

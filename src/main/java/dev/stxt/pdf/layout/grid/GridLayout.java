@@ -28,6 +28,7 @@ import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -142,10 +143,28 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
+     * A grid laid out without fragmenting ({@link #arrange}) with its columns: where each one starts, from the content
+     * box, and its width. The table draws its merged borders with them (reference/components/table.md#merged-borders).
+     */
+    public record ArrangedWithColumns(UnitBreaker.Arranged arranged, List<Double> columnStarts,
+                                      List<Double> columnWidths) {
+
+        public ArrangedWithColumns {
+            columnStarts = List.copyOf(columnStarts);
+            columnWidths = List.copyOf(columnWidths);
+        }
+    }
+
+    /**
      * Places the items and sizes the tracks, without fragmenting: the rows are the units. The
      * table uses it to break only its body.
      */
     public UnitBreaker.Arranged arrange(Box box, ConstraintSpace space) {
+        return arrangeWithColumns(box, space).arranged();
+    }
+
+    /** Like {@link #arrange}, with the columns. */
+    public ArrangedWithColumns arrangeWithColumns(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, context);
         Style s = box.style();
         double contentWidth = model.contentWidth();
@@ -225,8 +244,10 @@ public final class GridLayout implements LayoutAlgorithm {
         List<UnitBreaker.Band> bands = box.rows().stream().map(r -> new UnitBreaker.Band(r,
                 r.style().item().area().row() - 1, 0, width, Insets.resolve(r.style().box().border(), contentWidth)))
                 .toList();
-        return new UnitBreaker.Arranged(model, placed, pending, rowUnits(g, rows, y, extent, s.grid().splitRows()),
-                bands);
+        UnitBreaker.Arranged arranged = new UnitBreaker.Arranged(model, placed, pending,
+                rowUnits(g, rows, y, extent, s.grid().splitRows()), bands);
+        return new ArrangedWithColumns(arranged, Arrays.stream(x).boxed().toList(),
+                Arrays.stream(columns).boxed().toList());
     }
 
     /**

@@ -29,7 +29,11 @@ link on each line, joining consecutive ones with the same destination), which ca
 text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines; the
 call and the number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a
 superscript run is painted raised `TextFormat.rise()` of the size. The footnote area of a page (`Page.footnotes`) is
-painted as one more in-flow box, after the flow and before the `Page overlay` boxes.
+painted as one more in-flow box, after the flow and before the `Page overlay` boxes. The lines of a fragment
+(`Fragment.rules`, the merged borders of a table) are one more in-flow `Piece` (`rules`), after all the descendants of the
+fragment: they are painted with `Canvas.background` over the backgrounds of the cells and under their text, with the
+rotations and clips of what the fragment contains. A cell with merged borders (`Box.mergedBorder()`) does not paint its
+border, which is only the room for those lines.
 
 `Canvas` only draws and each canvas gives its `Tagging` with `Canvas.tagging()` (`PdfTagging` in the PDF and `Tagging.NONE` in the
 SVG): the marked text of the tagged PDF and the links.

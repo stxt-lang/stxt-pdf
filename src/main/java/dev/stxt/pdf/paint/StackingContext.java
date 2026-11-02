@@ -1,6 +1,7 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Rule;
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.layout.inline.LineBreaker;
 import dev.stxt.pdf.model.Edges;
@@ -61,8 +62,17 @@ public final class StackingContext {
     /**
      * Fragment with its absolute origin already computed and the rotations and clips of its ancestors, from the page
      * inwards, applied to it when painting it. Its own rotation is not included: it is applied afterwards.
+     *
+     * <p>With {@code rules}, the piece is only the lines of the fragment ({@link Fragment#rules}, the merged borders of
+     * a table), which go in the flow after the backgrounds of its descendants and before their text; its frames are
+     * then those of what the fragment contains, its own rotation included.</p>
      */
-    private record Piece(Fragment f, double x, double y, List<Frame> frames) {
+    private record Piece(Fragment f, double x, double y, List<Frame> frames, boolean rules) {
+
+        Piece(Fragment f, double x, double y, List<Frame> frames) {
+            this(f, x, y, frames, false);
+        }
+
         Rect borderBox() {
             return f.borderBox(x, y);
         }
@@ -200,6 +210,9 @@ public final class StackingContext {
                 walkChildren(p);
             }
         }
+        if (!parent.f().rules().isEmpty()) {
+            inFlow.add(new Piece(parent.f(), parent.x(), parent.y(), inner, true));
+        }
     }
 
     private static boolean createsContext(Fragment f) {
@@ -268,7 +281,8 @@ public final class StackingContext {
         negative.forEach(s -> s.paint(canvas));
         inFlow.forEach(p -> box(canvas, p));
         framed(canvas, root, contentClips(root), () -> paintContent(canvas, root));
-        inFlow.forEach(p -> framed(canvas, p, contentClips(p), () -> paintContent(canvas, p)));
+        inFlow.stream().filter(p -> !p.rules())
+                .forEach(p -> framed(canvas, p, contentClips(p), () -> paintContent(canvas, p)));
         positionedZero.forEach(s -> s.paint(canvas));
         positive.forEach(s -> s.paint(canvas));
     }
@@ -286,18 +300,26 @@ public final class StackingContext {
 
     /** The background and the border of the piece, with its clips, and its debugging outline, without them. */
     private static void box(Canvas canvas, Piece p) {
+        if (p.rules()) {
+            framed(canvas, p, Clips.ALL, () -> paintFragmentRules(canvas, p));
+            return;
+        }
         framed(canvas, p, paintsBox(p) ? Clips.ALL : Clips.NONE, () -> paintBackgroundAndBorder(canvas, p));
         if (canvas.outlines()) {
             framed(canvas, p, Clips.NONE, () -> canvas.outline(p.borderBox()));
         }
     }
 
-    /** Whether the box paints something in the backgrounds step: its background, its border or the column rule. */
+    /**
+     * Whether the box paints something in the backgrounds step: its background, its border (not that of a cell with
+     * merged borders, which its table draws) or the column rule.
+     */
     private static boolean paintsBox(Piece p) {
         Style s = p.f().box().style();
         Insets border = p.f().border();
-        return s.box().background() != null || border.top() > 0 || border.right() > 0 || border.bottom() > 0
-                || border.left() > 0 || s.columns().separator() > 0;
+        boolean paintsBorder = p.f().box().mergedBorder() == null
+                && (border.top() > 0 || border.right() > 0 || border.bottom() > 0 || border.left() > 0);
+        return s.box().background() != null || paintsBorder || s.columns().separator() > 0;
     }
 
     /**
@@ -318,7 +340,8 @@ public final class StackingContext {
                 ends.add(canvas::endClip);
             }
         }
-        if (beginRotation(canvas, p) > 0) {
+        // The frames of the lines of a fragment already carry its rotation.
+        if (!p.rules() && beginRotation(canvas, p) > 0) {
             ends.add(canvas::endRotation);
         }
         body.run();
@@ -345,9 +368,24 @@ public final class StackingContext {
         if (s.box().background() != null) {
             canvas.fill(borderBox.shrink(p.f().border()), radii.inset(p.f().border()), s.box().background());
         }
-        canvas.border(borderBox, p.f().border(), radii, borderColors(s));
+        // The border of a cell with merged borders is only the room for the lines that its table draws.
+        if (p.f().box().mergedBorder() == null) {
+            canvas.border(borderBox, p.f().border(), radii, borderColors(s));
+        }
         if (s.columns().separator() > 0) {
             paintRules(canvas, p);
+        }
+    }
+
+    /**
+     * The lines of a fragment ({@link Fragment#rules}): the merged borders of a table
+     * (reference/components/table.md#merged-borders), each one a rectangle of its color relative to the content box.
+     * Like backgrounds, they are not content of the tagged PDF.
+     */
+    private static void paintFragmentRules(Canvas canvas, Piece p) {
+        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
+        for (Rule r : p.f().rules()) {
+            canvas.background(new Rect(content.x() + r.x(), content.y() + r.y(), r.width(), r.height()), r.color());
         }
     }
 

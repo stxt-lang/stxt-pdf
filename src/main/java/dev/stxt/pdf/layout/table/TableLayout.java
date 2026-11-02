@@ -35,6 +35,9 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
  * <p>If at the start of a page the header and the footer leave no room for the body, the table cannot
  * advance: it is an error ({@link ErrorCode#TABLE_REPEAT_OVERFLOW}). A row of the body that
  * does not fit in the room they leave is split in parallel, as in a grid.</p>
+ *
+ * <p>With {@code Merge borders} each fragment carries the lines between its cells ({@link MergedBorders}), which it
+ * draws with the rows it shows.</p>
  */
 public final class TableLayout implements LayoutAlgorithm {
 
@@ -53,7 +56,8 @@ public final class TableLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        UnitBreaker.Arranged a = grid.arrange(box, space);
+        GridLayout.ArrangedWithColumns arranged = grid.arrangeWithColumns(box, space);
+        UnitBreaker.Arranged a = arranged.arranged();
         UnitBreaker.Units all = a.units();
         int head = box.headerRows();
         int bodyEnd = all.size() - box.footerRows();
@@ -99,8 +103,37 @@ public final class TableLayout implements LayoutAlgorithm {
         }
         UnitBreaker.Arranged bodyOnly = new UnitBreaker.Arranged(a.model(), body, a.outOfFlow(),
                 all.slice(head, bodyEnd, bodyStart), bodyBands);
+        UnitBreaker.Rules rules = null;
+        if (box.style().grid().mergeBorders()) {
+            MergedBorders borders = new MergedBorders(box, arranged.columnStarts(), arranged.columnWidths());
+            rules = (shown, unitsEnd, children) -> borders.rules(rows(all, head, bodyEnd, bodyBottom, shown, unitsEnd),
+                    children);
+        }
         UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight, headBands,
-                footBands);
+                footBands, rules);
         return UnitBreaker.fragment(context, box, space, from, bodyOnly, repeat);
+    }
+
+    /**
+     * The rows a fragment shows, each with its row of the table as unit: those of the header, at their place; those of
+     * the body, as the fragment places them ({@code body}, whose units count from the first one of the body); and those
+     * of the footer, after them ({@code unitsEnd}).
+     */
+    private static List<UnitBreaker.UnitPiece> rows(UnitBreaker.Units all, int head, int bodyEnd, double bodyBottom,
+                                                    List<UnitBreaker.UnitPiece> body, double unitsEnd) {
+        List<UnitBreaker.UnitPiece> rows = new ArrayList<>();
+        for (int u = 0; u < head; u++) {
+            Unit unit = all.get(u);
+            rows.add(new UnitBreaker.UnitPiece(u, unit.start(), unit.end() - unit.start(), true, true));
+        }
+        for (UnitBreaker.UnitPiece p : body) {
+            rows.add(new UnitBreaker.UnitPiece(p.unit() + head, p.top(), p.height(), p.first(), p.last()));
+        }
+        for (int u = bodyEnd; u < all.size(); u++) {
+            Unit unit = all.get(u);
+            rows.add(new UnitBreaker.UnitPiece(u, unitsEnd + unit.start() - bodyBottom, unit.end() - unit.start(), true,
+                    true));
+        }
+        return rows;
     }
 }

@@ -82,7 +82,8 @@ Document (dev.stxt.pdf):
 
 Una celda con valor (`Cell: 145,00`) es un texto. Sin valor, tiene elementos dentro (un `Paragraph`, una `List`, otra
 `Table`), pero no las dos cosas. Cada celda tiene su propio borde: una línea entre filas es el borde de abajo de las celdas.
-`Gap` en la `Table` separa las celdas.
+Para una rejilla completa, con todos los bordes, están los [bordes fusionados](#bordes-fusionados). `Gap` en la `Table`
+separa las celdas.
 
 **`Row header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
 de pantalla la lee con cada celda de la fila. Las celdas de `Header rows` ya son cabeceras de columna.
@@ -161,11 +162,73 @@ Document (dev.stxt.pdf):
                     Cell: 2000,00
 ```
 
+## Bordes fusionados
+
+Con un `Border` en cada celda, dos celdas vecinas dibujan dos líneas juntas. Con **`Merge borders: true`** en la `Table`,
+el borde entre dos celdas se dibuja una sola vez, centrado entre las dos, y el borde exterior de la tabla queda dentro de
+ella. Es la forma de dibujar una rejilla completa.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Tarifas
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Cell
+            Box:
+                Padding: 3 5
+                Border: 0.5
+                Border color: #8A8478
+        For element: Header cell
+            Typography:
+                Bold: true
+            Box:
+                Border: 0.5 0.5 1.5 0.5
+                Border color: #12315A
+    Section:
+        Table:
+            Column sizes: * 60 60
+            Column align: left right right
+            Merge borders: true
+            Header rows:
+                Row:
+                    Cell: Tarifa
+                    Cell: Mes
+                    Cell: Año
+            Body:
+                Row:
+                    Cell: Básica
+                    Cell: 9,00
+                    Cell: 90,00
+                Row:
+                    Cell: Profesional
+                    Cell: 19,00
+                    Cell: 190,00
+                Row:
+                    Cell: Empresa
+                    Cell: 49,00
+                    Cell: 490,00
+```
+
+- Entre dos celdas con bordes de distinto ancho, gana el más ancho, con su color: la línea bajo la cabecera es la de la
+  cabecera (1,5). Con el mismo ancho y distinto color, gana el de la celda de arriba o el de la izquierda.
+- Una celda sin borde no dibuja nada: la línea que la separa de su vecina es la de la vecina.
+- La tabla no admite `Gap`, ni sus celdas `Corner radius`: el borde entre dos celdas no sería una línea.
+- Cuando la tabla pasa de página, la línea entre las dos filas del corte se dibuja en las dos páginas.
+
 ## Entre páginas
 
-- La tabla se corta entre filas: una fila que no cabe en lo que queda pasa entera a la siguiente página.
+- La tabla se corta entre filas. Una fila que no cabe en lo que queda de página se parte en esa página, con cada celda
+  por su lado, salvo que sus viudas y huérfanas o un `Keep together` lo impidan: entonces pasa entera a la siguiente.
+- Con `Split rows: false` en la `Table`, una fila que no cabe pasa entera a la siguiente página, y solo se parte si no
+  cabe ni en una página vacía.
 - La cabecera se repite arriba en cada página, y el pie, detrás de la última fila de cada página. Nunca se quedan solas.
-- Una fila que no cabe ni en una página vacía se parte: sus celdas continúan en la página siguiente.
 - Un `Break` en una `Row` del cuerpo fuerza o evita un corte antes o después de ella.
 
 Más detalle en la [referencia](../../reference/components/table.md).

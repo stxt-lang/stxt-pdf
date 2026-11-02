@@ -29,7 +29,11 @@ enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tag
 texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas; la
 llamada y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un
 tramo en superíndice se pinta elevado `TextFormat.rise()` del cuerpo. El área de notas de una página (`Page.footnotes`)
-se pinta como una caja más en flujo, después del flujo y antes de los `Page overlay`.
+se pinta como una caja más en flujo, después del flujo y antes de los `Page overlay`. Las líneas de un fragmento
+(`Fragment.rules`, los bordes fusionados de una tabla) son un `Piece` más en flujo (`rules`), detrás de todos los
+descendientes del fragmento: se pintan con `Canvas.background` sobre los fondos de las celdas y debajo de su texto, con los
+giros y los recortes de lo que contiene el fragmento. Una celda con bordes fusionados (`Box.mergedBorder()`) no pinta su
+borde, que es solo el sitio de esas líneas.
 
 `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (`PdfTagging` en el PDF y `Tagging.NONE` en el
 SVG): el texto marcado del PDF etiquetado y los enlaces.

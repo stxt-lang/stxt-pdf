@@ -1,0 +1,75 @@
+# t1 at y = 20: rows at 20, 46 and 71.5; it ends at 97. Lines, from the thinnest to the widest: the vertical ones
+#   (left edge inside at 20, between the columns centered on 120 at 119.5, right edge inside at 219), in #C00000 along
+#   the header and in #333333 along the body, joined over its two rows; the top edge inside (20); the line between
+#   b2 and b3 only in the second column, centered on 71.5 and going into the vertical line by 0.5 (119.5); the bottom
+#   edge inside (96); and last, the 2 wide one under the header, centered on 46.
+# t2 at y = 97: rows at 97, 122.5 and 147.5 (they end at 172.5; the fourth, 25.5, does not fit in the 7.5 left). The
+#   line between the third and the fourth row goes inside, at 171.5. On page 2 the fourth row goes at 20, with that
+#   line inside at the top (20) and the bottom edge inside at 44.5.
+# t3 at y = 45.5 of page 2: the lines between t3a and t3b (that of t3a, blue) and between t3b and t3c (that of t3c)
+#   centered on 80 and 140; t3b has no top or bottom line; the bottom of t3c (3) goes inside, at 70.5, and last.
+Result:
+	Page: 1
+		Fragment: t1
+			Rect: 20 20 260 77
+			Rule: 20 20 1 26 #C00000
+			Rule: 20 46 1 51 #333333
+			Rule: 119.5 20 1 26 #C00000
+			Rule: 119.5 46 1 51 #333333
+			Rule: 219 20 1 26 #C00000
+			Rule: 219 46 1 51 #333333
+			Rule: 20 20 200 1 #C00000
+			Rule: 119.5 71 100.5 1 #333333
+			Rule: 20 96 200 1 #333333
+			Rule: 20 45 200 2 #C00000
+			Fragment: h1
+				Rect: 20 20 100 26
+			Fragment: h2
+				Rect: 120 20 100 26
+			Fragment: b1
+				Rect: 20 46 100 51
+			Fragment: b2
+				Rect: 120 46 100 25.5
+			Fragment: b3
+				Rect: 120 71.5 100 25.5
+		Fragment: t2
+			Rect: 20 97 260 75.5
+			Rule: 20 97 1 75.5 #333333
+			Rule: 119.5 97 1 75.5 #333333
+			Rule: 219 97 1 75.5 #333333
+			Rule: 20 97 200 1 #333333
+			Rule: 20 122 200 1 #333333
+			Rule: 20 147 200 1 #333333
+			Rule: 20 171.5 200 1 #333333
+			Fragment: t2r1
+				Rect: 20 97 100 25.5
+			Fragment: t2r2
+				Rect: 20 122.5 100 25
+			Fragment: t2r3
+				Rect: 20 147.5 100 25
+	Page: 2
+		Fragment: t2
+			Rect: 20 20 260 25.5
+			Rule: 20 20 1 25.5 #333333
+			Rule: 119.5 20 1 25.5 #333333
+			Rule: 219 20 1 25.5 #333333
+			Rule: 20 20 200 1 #333333
+			Rule: 20 44.5 200 1 #333333
+			Fragment: t2r4
+				Rect: 20 20 100 25.5
+		Fragment: t3
+			Rect: 20 45.5 260 28
+			Rule: 20 45.5 1 28 #1F6FB2
+			Rule: 79.5 45.5 1 28 #1F6FB2
+			Rule: 139.5 45.5 1 28 #333333
+			Rule: 199 45.5 1 28 #333333
+			Rule: 20 45.5 60.5 1 #1F6FB2
+			Rule: 139.5 45.5 60.5 1 #333333
+			Rule: 20 72.5 60.5 1 #1F6FB2
+			Rule: 139.5 70.5 60.5 3 #333333
+			Fragment: t3a
+				Rect: 20 45.5 60 28
+			Fragment: t3b
+				Rect: 80 45.5 60 28
+			Fragment: t3c
+				Rect: 140 45.5 60 28

@@ -4,6 +4,8 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Position;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Stroke;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
@@ -58,6 +60,7 @@ public final class Box {
     private int headerRows;
     private int footerRows;
     private List<Box> rows = new ArrayList<>();
+    private Sides<Stroke> mergedBorder;
     private boolean closed;
 
     Box(String id, Element element, Style style, boolean anonymous, int line) {
@@ -217,6 +220,16 @@ public final class Box {
         return rows;
     }
 
+    /**
+     * The border a cell of a table with {@code Merge borders} declares, side by side with its color
+     * (reference/components/table.md#merged-borders). The table draws the lines between its cells with it, and the
+     * {@code Border} of the cell's style is then only the room the layout leaves for them, which the cell does not
+     * paint. {@code null} in the other boxes.
+     */
+    public Sides<Stroke> mergedBorder() {
+        return mergedBorder;
+    }
+
     // --- Writing, only in tree while it is built ------------------------------------------------------
 
     void addChild(Box child) {
@@ -319,6 +332,11 @@ public final class Box {
         writable();
         row.parent = this;
         rows.add(row);
+    }
+
+    void setMergedBorder(Sides<Stroke> border) {
+        writable();
+        this.mergedBorder = border;
     }
 
     /**

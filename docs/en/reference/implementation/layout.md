@@ -133,7 +133,11 @@ header and footer with `UnitBreaker.Repeat`. The bands of the rows (`Box.rows()`
 `GridLayout.arrange` creates them with the width of the columns, `TableLayout` places those of the header and the footer in the
 `Repeat` and leaves those of the body in their unit, and `UnitBreaker` puts them in each fragment before the items (whole,
 cut with `splitBands` if their group splits, or that of the last unit in the continuation of the group). They are fragments
-without children: painting treats them like any in-flow box. Forced breaks are `PAGE` or `COLUMN`
+without children: painting treats them like any in-flow box. With `Merge borders`
+([Table](../components/table.md#merged-borders)), `UnitBreaker` also records what each fragment shows of each unit
+(`UnitBreaker.UnitPiece`: whole, trimmed or the continuation of its group, like the bands) and passes it with its children
+to `Repeat.rules`; `TableLayout` adds the rows of the header and the footer and `layout.table.MergedBorders` computes the
+lines of that fragment over the columns of `GridLayout.arrangeWithColumns`, which go in `Fragment.rules`. Forced breaks are `PAGE` or `COLUMN`
 (`BreakRules.forcedBetween` returns the type). The page break has the quality `BreakAppeal.FORCED_PAGE`, above `PERFECT_BREAK`.
 
 The content of a `Columns` goes in a generated box, the column flow (`Element.COLUMN_FLOW`), its only child: each

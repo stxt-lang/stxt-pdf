@@ -37,6 +37,7 @@ Table:
 | `Column align` | una alineación por columna: `left`, `center`, `right` o `justify` | sin valor | `Table` | La alineación por defecto de las celdas de cada columna. Tantas como `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 o 2 longitudes (filas columnas) | `0` | `Table` | Separación entre celdas, como en `Grid`. |
 | `Split rows` | `true`, `false` | `true` | `Table` | Una fila que no cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo; con `false`, pasa entera a la siguiente ([Cortes](#cortes)). |
+| `Merge borders` | `true`, `false` | `false` | `Table` | El borde entre dos celdas se dibuja una sola vez, el más grueso de los dos ([Bordes fusionados](#bordes-fusionados)). |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
@@ -88,6 +89,7 @@ Una `Cell` es una caja con dos formas, como un `Text`: con valor (`Cell: 100`), 
 valor, un bloque con elementos (cualquiera salvo los encabezados), o vacía si no tiene ninguno. Las dos cosas a la vez son
 un error (`CELL_CONTENT`). Un texto largo va en un `Paragraph`. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Span` y
 `Row header`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
+Con `Merge borders: true`, el borde entre dos celdas se dibuja una sola vez ([Bordes fusionados](#bordes-fusionados)).
 Los márgenes de una celda la separan de su área, como en un `Grid`.
 
 > **Decisión:** `Row header: true` va en cada celda que es cabecera de su fila (el concepto de una factura, la hora de un
@@ -173,6 +175,70 @@ El `Id` de una fila es un `Id` del documento, único como cualquier otro: es des
 > **Decisión:** nada de selectores por posición de la fila (`Last row cell`), que identifican la fila de totales por su
 > sitio y no por lo que es: para eso están su `Style` y su `Id`.
 
+## Bordes fusionados
+
+Sin más, cada celda pinta su borde, y dos celdas vecinas con `Border: 0.5` dibujan dos líneas juntas, de 1 en total. Con
+`Merge borders: true` en la `Table`, el borde entre dos celdas se dibuja **una sola vez**:
+
+```
+Styles:
+    For element: Cell
+        Box:
+            Padding: 3 5
+            Border: 0.5
+            Border color: #8A8478
+    For element: Header cell
+        Box:
+            Border: 0.5 0.5 1.5 0.5
+            Border color: #12315A
+Table:
+    Column sizes: * 60 60
+    Merge borders: true
+    Header rows:
+        Row:
+            Cell: Tarifa
+            Cell: Mes
+            Cell: Año
+    Body:
+        Row:
+            Cell: Básica
+            Cell: 9,00
+            Cell: 90,00
+```
+
+- **La línea.** Entre dos celdas vecinas, la línea es el más ancho de los dos lados que se tocan, con su color
+  (`Border color`, o el del texto de la celda). Con el mismo ancho, gana el de la celda de arriba o el de la izquierda. Un
+  lado sin borde no aporta nada: la línea es la del otro, y si ninguno tiene, no hay línea. En el ejemplo, la línea bajo
+  la cabecera es la de las celdas de la cabecera (1,5), y las demás, de 0,5.
+- **Por tramos.** Una celda que ocupa varias filas o columnas tiene un tramo de línea por cada celda que tiene al lado,
+  cada uno resuelto con esa celda. Dentro de una celda que ocupa varias filas o columnas no hay línea.
+- **Dónde va.** Las líneas van sobre las líneas de la rejilla: la de entre dos celdas, centrada en ella; la del borde
+  exterior de la tabla, entera dentro de la tabla. Donde se cruzan dos líneas, la horizontal entra en la vertical la mitad
+  del ancho de esta, y la más ancha se pinta encima.
+- **El sitio de cada celda.** El `Border` de una celda ya no se pinta: es el sitio que la celda deja para las líneas. En
+  un lado entre dos celdas, la mitad de la línea más ancha de ese lado; en un lado del borde de la tabla, su borde entero.
+  El relleno y el contenido empiezan después, así que el alto de las filas y el ancho de las columnas cuentan con él.
+- **Qué tapa a qué.** Las líneas se pintan encima de los fondos de las celdas y de lo que contienen, y debajo de su
+  texto. La franja de una fila (su `Box`, [Filas](#filas)) no se fusiona: se pinta debajo de las celdas, como siempre.
+- **Lo que no admite.** `Gap` en la tabla o `Corner radius` en una de sus celdas, también desde una regla, son
+  `MERGE_BORDERS_CONFLICT`: el borde entre dos celdas no sería una línea. `Merge borders: true` en una tabla ninguna de
+  cuyas celdas tiene borde es `MERGE_BORDERS_WITHOUT_EFFECT`.
+
+Los cortes de página tienen sus reglas en [Cortes](#cortes).
+
+> **Decisión:** el borde exterior de la tabla, y el de arriba y el de abajo de cada página por la que pasa, van enteros
+> dentro de la tabla: la tabla no pinta fuera de su caja. *Alternativa descartada:* centrarlos sobre el borde, como los
+> procesadores de textos, que deja media línea fuera de la tabla, en el margen o encima de lo que la sigue.
+
+> **Decisión:** el sitio de cada celda se calcula con las celdas que tiene al lado en la tabla escrita. Una línea que
+> solo sale en un corte de página (la del fragmento, o la que hay bajo una cabecera repetida) y es más ancha que ese
+> sitio entra en el relleno de la celda lo que le falta. *Alternativa descartada:* reservar en cada lado la línea más
+> ancha posible en cualquier página, que ensancharía todas las filas por una línea que solo sale en algunas.
+
+> **Decisión:** `Merge borders` es un booleano, `false` por defecto, como `Split rows`: sin él, ninguna tabla cambia.
+> *Alternativa descartada:* `Borders: separate | collapse`, con un término que no es de maquetación, y fusionar los bordes
+> siempre, como un procesador de textos, que movería todas las tablas con bordes.
+
 ## Cortes
 
 Una tabla se corta entre filas, como un grid ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)): una fila que no
@@ -189,6 +255,13 @@ la continuación lleva la franja de la última fila del grupo.
 > **Decisión:** la continuación de un grupo de filas partido lleva la franja de su última fila: lo que sigue en la
 > página siguiente no se reparte entre las filas del grupo. *Alternativa descartada:* repartirlo por las alturas sin
 > partir, que no corresponden a lo que se coloca.
+
+Con `Merge borders` ([Bordes fusionados](#bordes-fusionados)), la línea de arriba y la de abajo de cada página van dentro
+de la tabla, como su borde exterior. Si el corte cae entre dos filas, la línea entre ellas se dibuja en las dos páginas,
+igual en cada una. Si cae dentro de una fila que se parte, el lado de cada celda partida solo se dibuja con
+`Edges: closed` (el del `Break` de su `Row`). Bajo la cabecera repetida, la línea es la más ancha entre la cabecera y la
+fila del cuerpo que la sigue en esa página. Una celda que ya terminó en una página anterior no dibuja nada en la
+continuación de su grupo.
 
 Las filas de `Header rows` y `Footer rows` se **repiten** en cada página de la tabla: la cabecera arriba y el pie justo
 detrás de la última fila del cuerpo de esa página, cada uno con el `Gap` que lo separa del cuerpo. No se parten nunca y
@@ -213,7 +286,8 @@ sola vez, en la primera página en que salen.
 
 ## Lo que no hay
 
-- Bordes fusionados entre celdas: cada celda tiene el suyo.
+- Bordes fusionados en las tablas de un `Markdown`: `Merge borders` es una propiedad de la `Table`, y las reglas de
+  `Styles` no la admiten.
 - `Box` en una columna y una fila con tamaño o relleno propios. El título de una tabla («Tabla 3. Bornes») es el
   `Caption` de una [`Figure`](figure.md) con la tabla dentro.
 - Filas con menos celdas que columnas, o `Span` que pasan de un grupo a otro: son errores.

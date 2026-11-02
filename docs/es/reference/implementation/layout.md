@@ -133,7 +133,11 @@ cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`,
 `GridLayout.arrange` las crea con el ancho de las columnas, `TableLayout` coloca las de la cabecera y el pie en el
 `Repeat` y deja las del cuerpo en su unidad, y `UnitBreaker` las pone en cada fragmento delante de los ítems (enteras,
 recortadas con `splitBands` si su grupo se parte, o la de la última unidad en la continuación del grupo). Son fragmentos
-sin hijos: el pintado las trata como cualquier caja en flujo. Los cortes forzados son `PAGE` o `COLUMN`
+sin hijos: el pintado las trata como cualquier caja en flujo. Con `Merge borders`
+([Table](../components/table.md#bordes-fusionados)), `UnitBreaker` apunta además qué muestra cada fragmento de cada unidad
+(`UnitBreaker.UnitPiece`: entera, recortada o la continuación de su grupo, como las franjas) y se lo pasa con sus hijos a
+`Repeat.rules`; `TableLayout` añade las filas de la cabecera y del pie y `layout.table.MergedBorders` calcula las líneas
+de ese fragmento sobre las columnas de `GridLayout.arrangeWithColumns`, que van en `Fragment.rules`. Los cortes forzados son `PAGE` o `COLUMN`
 (`BreakRules.forcedBetween` devuelve el tipo). El de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
 
 El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMN_FLOW`), su único hijo: cada
