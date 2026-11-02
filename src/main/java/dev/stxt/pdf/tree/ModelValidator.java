@@ -244,6 +244,21 @@ final class ModelValidator {
     }
 
     /**
+     * {@code Merge borders} written by the element itself only has an effect on a {@code Table}
+     * (reference/components/table.md#merged-borders); from a rule it is not checked, so that a rule that also reaches
+     * other boxes ({@code For style}) leaves them alone.
+     */
+    static void validateMergeBorders(InlineNode n, Box box) {
+        if (box.role() == Element.Role.TABLE) {
+            return;
+        }
+        child(n, "box").map(Nodes::inline).flatMap(b -> child(b, "merge-borders")).ifPresent(p -> {
+            throw error(p, ErrorCode.MERGE_BORDERS_WITHOUT_EFFECT, "Merge borders only has an effect on a Table, "
+                    + "and this is a " + n.getName() + ": it goes in the Box of the table");
+        });
+    }
+
+    /**
      * The whole tree, once built (reference/common/overflow.md): a box with {@code Overflow: clip} has no text inside
      * it, at any depth, because clipped text would not be read; and where the text shrinks, {@code Min size} is not
      * greater than {@code Size}.

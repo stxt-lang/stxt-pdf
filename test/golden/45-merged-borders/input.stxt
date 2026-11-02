@@ -1,4 +1,5 @@
-# Merge borders (reference/components/table.md#merged-borders). Page area of 260 × 160 from (20, 20). Every cell has
+# Merge borders (reference/components/table.md#merged-borders), in the three tables from a rule For element: Table.
+# Page area of 260 × 160 from (20, 20). Every cell has
 # Padding: 2 and Border: 1 in #333333 and holds a block 20 high, so each row measures 24 plus the room its cells leave
 # for the lines: half of the line between two cells, or the whole border on the edge of the table.
 #
@@ -28,6 +29,9 @@ Document (dev.stxt.pdf):
 				Padding: 2
 				Border: 1
 				Border color: #333333
+		For element: Table
+			Box:
+				Merge borders: true
 		For element: Block
 			Box:
 				Height: 20
@@ -40,7 +44,6 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t1
 			Column sizes: 100 100
-			Merge borders: true
 			Header rows:
 				Row:
 					Style: head
@@ -66,7 +69,6 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t2
 			Column sizes: 100 100
-			Merge borders: true
 			Split rows: false
 			Body:
 				Row:
@@ -96,7 +98,6 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t3
 			Column sizes: 60 60 60
-			Merge borders: true
 			Body:
 				Row:
 					Cell:

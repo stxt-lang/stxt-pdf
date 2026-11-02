@@ -1,6 +1,6 @@
-# Case: Merge borders in a table none of whose cells has a border
+# Case: Merge borders in the Box of a table none of whose cells has a border
 # Code: MERGE_BORDERS_WITHOUT_EFFECT
-# Line: 18
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -15,7 +15,8 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: * *
-			Merge borders: true
+			Box:
+				Merge borders: true
 			Body:
 				Row:
 					Cell: a

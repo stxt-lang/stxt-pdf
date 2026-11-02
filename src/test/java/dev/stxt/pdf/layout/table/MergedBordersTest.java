@@ -26,7 +26,7 @@ class MergedBordersTest {
     }
 
     private static String[] table(String... properties) {
-        String[] head = {"\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tMerge borders: true"};
+        String[] head = {"\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tBox:", "\t\t\tMerge borders: true"};
         return concat(head, Arrays.stream(properties).map(p -> "\t\t" + p).toArray(String[]::new));
     }
 

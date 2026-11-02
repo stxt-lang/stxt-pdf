@@ -1,0 +1,20 @@
+# Case: Merge borders in the Box of a Block, which is not a table
+# Code: MERGE_BORDERS_WITHOUT_EFFECT
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Box:
+				Merge borders: true
+				Border: 0.5
+			Paragraph: Texto

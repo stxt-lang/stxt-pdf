@@ -34,6 +34,11 @@ public final class BoxStyle extends StyleGroup {
     private Corners<Value> cornerRadius = Corners.all(Value.pt(0));
     /** What is done with what does not fit in the box (reference/common/overflow.md). */
     private Overflow overflow = Overflow.ERROR;
+    /**
+     * {@code Merge borders}: in a {@code Table}, the border between two cells is drawn once, the wider of the two
+     * (reference/components/table.md#merged-borders); the other boxes ignore it if it comes from a rule.
+     */
+    private boolean mergeBorders;
 
     BoxStyle() {
     }
@@ -172,5 +177,14 @@ public final class BoxStyle extends StyleGroup {
     /** Whether what sticks out of the box is painted clipped and not checked ({@code Overflow: clip}). */
     public boolean clips() {
         return overflow == Overflow.CLIP;
+    }
+
+    public boolean mergeBorders() {
+        return mergeBorders;
+    }
+
+    void setMergeBorders(boolean v) {
+        writable();
+        mergeBorders = v;
     }
 }

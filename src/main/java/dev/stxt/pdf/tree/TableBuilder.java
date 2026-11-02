@@ -87,8 +87,8 @@ final class TableBuilder {
             }
             firstRow += rows;
         }
-        if (table.style().grid().mergeBorders()) {
-            TableBorders.merge(table, firstRow, count);
+        if (table.style().box().mergeBorders()) {
+            TableBorders.merge(n, table, firstRow, count);
         }
     }
 

@@ -200,7 +200,7 @@ once, and the elements, as many times as needed.
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (at least one) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required), `Marker image` (with `Alt` and `Height`), `Start`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`); elements except headings (at least one) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required), `Column align`, `Gap`, `Split rows`, `Merge borders`; `Header rows`, `Body` (required), `Footer rows` |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (required), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elements except headings |
@@ -217,7 +217,7 @@ once, and the elements, as many times as needed.
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; one in-flow element |
-| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background`, `Overflow` |
+| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background`, `Overflow`, `Merge borders` |
 | `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Min size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 

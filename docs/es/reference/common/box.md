@@ -38,6 +38,7 @@ El modelo de caja. No se hereda.
 | `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(...)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
 | `Overflow` | `error`, `shrink`, `clip` | `error` | Qué se hace con lo que no cabe en la caja ([Desbordamiento](overflow.md#política-por-caja-overflow)). |
+| `Merge borders` | `true`, `false` | `false` | Solo en una `Table`: el borde entre dos celdas se dibuja una sola vez ([Bordes fusionados](../components/table.md#bordes-fusionados)). En el `Box` de otro elemento es un error; desde una regla, las otras cajas no hacen nada con él. |
 
 > **Decisión:** `narrowest`, `natural` y `fit` solo valen en `Width` (y en las pistas de `Grid` y `Table`): un alto
 > `auto` ya es el de su contenido, y en `Height` serían otra forma de escribir `auto`. *Alternativa descartada:*

@@ -213,7 +213,7 @@ class TablesTest {
     @Test
     void mergedBordersLeaveRoomForTheLines() {
         Box table = root("\tStyles:", "\t\tFor element: Cell", "\t\t\tBox:", "\t\t\t\tBorder: 1",
-                "\tTable:", "\t\tColumn sizes: * *", "\t\tMerge borders: true", "\t\tBody:",
+                "\tTable:", "\t\tColumn sizes: * *", "\t\tBox:", "\t\t\tMerge borders: true", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 3",
                 "\t\t\t\t\t\tBorder color: #C00000",
                 "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d").children().get(0);
@@ -232,9 +232,44 @@ class TablesTest {
         Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 1", "\t\t\t\tCell: b")
                 .children().get(0);
-        assertFalse(table.style().grid().mergeBorders());
+        assertFalse(table.style().box().mergeBorders());
         assertNull(table.children().get(0).mergedBorder());
         assertEquals(Sides.all(Value.pt(1)), table.children().get(0).style().box().border());
+    }
+
+    /**
+     * {@code Merge borders} is in the {@code Box} group, so a rule of {@code Styles} gives it to every table, also those
+     * of a {@code Markdown}.
+     */
+    @Test
+    void aRuleMergesTheBordersOfTheTablesOfAMarkdown() {
+        Box markdown = root("\tStyles:", "\t\tFor element: Table", "\t\t\tBox:", "\t\t\t\tMerge borders: true",
+                "\t\tFor element: Cell", "\t\t\tBox:", "\t\t\t\tBorder: 1",
+                "\tMarkdown:", "\t\tTable columns: equal", "\t\tContent >>", "\t\t\t| a | b |", "\t\t\t|---|---|",
+                "\t\t\t| c | d |").children().get(0);
+        Box table = markdown.children().get(0);
+        assertEquals(Element.TABLE, table.element());
+        assertTrue(table.style().box().mergeBorders());
+        Box a = table.children().get(0);
+        assertEquals(Sides.all(new Stroke(1, "#000000")), a.mergedBorder());
+        assertEquals(new Sides<>(Value.pt(1), Value.pt(0.5), Value.pt(0.5), Value.pt(1)), a.style().box().border());
+    }
+
+    /**
+     * From a rule, {@code Merge borders} on a table without borders does nothing, and on a box that is not a table it
+     * is ignored: only what the element writes in its own {@code Box} is checked.
+     */
+    @Test
+    void fromARuleMergeBordersWithoutEffectIsNotAnError() {
+        Box root = root("\tStyles:", "\t\tFor style: grid", "\t\t\tBox:", "\t\t\t\tMerge borders: true",
+                "\tBlock:", "\t\tStyle: grid", "\t\tParagraph: x",
+                "\tTable:", "\t\tStyle: grid", "\t\tColumn sizes: * *", "\t\tBody:",
+                "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b");
+        assertTrue(root.children().get(0).style().box().mergeBorders());
+        assertNull(root.children().get(0).mergedBorder());
+        Box table = root.children().get(1);
+        assertEquals(Sides.all(Stroke.NONE), table.children().get(0).mergedBorder());
+        assertEquals(Sides.all(Value.pt(0)), table.children().get(0).style().box().border());
     }
 
     @Test

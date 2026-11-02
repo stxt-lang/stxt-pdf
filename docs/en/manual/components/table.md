@@ -163,9 +163,10 @@ Document (dev.stxt.pdf):
 
 ## Merged borders
 
-With a `Border` on each cell, two neighboring cells draw two lines side by side. With **`Merge borders: true`** on the
-`Table`, the border between two cells is drawn once, centered between the two, and the outer border of the table stays
-inside it. It is the way to draw a full grid.
+With a `Border` on each cell, two neighboring cells draw two lines side by side. With **`Merge borders: true`** in the
+`Box` of the `Table`, the border between two cells is drawn once, centered between the two, and the outer border of the
+table stays inside it. It is the way to draw a full grid. Since it goes in the `Box`, it is also written in a rule of
+`Styles`: `For element: Table` merges the borders of every table of the document, also those of a `Markdown`.
 
 ```
 Document (dev.stxt.pdf):
@@ -179,6 +180,9 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 10
+        For element: Table
+            Box:
+                Merge borders: true
         For element: Cell
             Box:
                 Padding: 3 5
@@ -194,7 +198,6 @@ Document (dev.stxt.pdf):
         Table:
             Column sizes: * 60 60
             Column align: left right right
-            Merge borders: true
             Header rows:
                 Row:
                     Cell: Rate
@@ -219,7 +222,9 @@ Document (dev.stxt.pdf):
   that of the header (1.5). With the same width and a different color, that of the cell above or that of the one on the
   left wins.
 - A cell without border draws nothing: the line that separates it from its neighbor is that of the neighbor.
-- The table does not accept `Gap`, nor its cells `Corner radius`: the border between two cells would not be one line.
+- The table does not accept `Gap`, nor its cells `Corner radius`: the border between two cells would not be one line. A
+  table that needs `Gap` in a document that merges the borders of all of them carries `Merge borders: false` in its
+  `Box`.
 - When the table goes on to another page, the line between the two rows of the break is drawn on both pages.
 
 ## Across pages

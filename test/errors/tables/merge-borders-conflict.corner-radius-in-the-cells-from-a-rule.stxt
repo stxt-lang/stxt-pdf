@@ -16,10 +16,12 @@ Document (dev.stxt.pdf):
 			Box:
 				Border: 0.5
 				Corner radius: 3
+		For element: Table
+			Box:
+				Merge borders: true
 	Section:
 		Table:
 			Column sizes: * *
-			Merge borders: true
 			Body:
 				Row:
 					Cell: a

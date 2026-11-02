@@ -10,6 +10,7 @@ import static dev.stxt.pdf.tree.ModelValidator.validateClear;
 import static dev.stxt.pdf.tree.ModelValidator.validateClip;
 import static dev.stxt.pdf.tree.ModelValidator.validateDropCap;
 import static dev.stxt.pdf.tree.ModelValidator.validateOverflow;
+import static dev.stxt.pdf.tree.ModelValidator.validateMergeBorders;
 import static dev.stxt.pdf.tree.ModelValidator.validateShrink;
 import static dev.stxt.pdf.tree.ModelValidator.validateContainer;
 import static dev.stxt.pdf.tree.ModelValidator.validateRotation;
@@ -346,6 +347,7 @@ public final class BoxTreeBuilder {
         }
         reader.content(this, ctx, n, box);
         validateShrink(n, box);
+        validateMergeBorders(n, box);
         ctx.insidePageOverlay = outerPageOverlay;
         ctx.insideHeading = outerHeading;
         ctx.unbreakable = outerUnbreakable;

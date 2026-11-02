@@ -104,7 +104,7 @@ public final class TableLayout implements LayoutAlgorithm {
         UnitBreaker.Arranged bodyOnly = new UnitBreaker.Arranged(a.model(), body, a.outOfFlow(),
                 all.slice(head, bodyEnd, bodyStart), bodyBands);
         UnitBreaker.Rules rules = null;
-        if (box.style().grid().mergeBorders()) {
+        if (box.style().box().mergeBorders()) {
             MergedBorders borders = new MergedBorders(box, arranged.columnStarts(), arranged.columnWidths());
             rules = (shown, unitsEnd, children) -> borders.rules(rows(all, head, bodyEnd, bodyBottom, shown, unitsEnd),
                     children);

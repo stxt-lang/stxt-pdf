@@ -37,13 +37,14 @@ Table:
 | `Column align` | one alignment per column: `left`, `center`, `right` or `justify` | none | `Table` | The default alignment of the cells of each column. As many as `Column sizes` (`TABLE_COLUMN_ALIGN`). |
 | `Gap` | 1 or 2 lengths (rows columns) | `0` | `Table` | Spacing between cells, as in `Grid`. |
 | `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
-| `Merge borders` | `true`, `false` | `false` | `Table` | The border between two cells is drawn once, the wider of the two ([Merged borders](#merged-borders)). |
 | `Span` | `rows columns`, two positive integers | `1 1` | `Cell` | Rows and columns that the cell takes up. |
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
 
-They do not go in the rules of `Styles`, which only accept the groups.
+They do not go in the rules of `Styles`, which only accept the groups. `Merge borders` (`true` or `false`, by default
+`false`) goes in the `Box` of the `Table`, so it is also valid in a rule: the border between two cells is drawn once,
+the wider of the two ([Merged borders](#merged-borders)).
 
 > **Decision:** the groups of rows that are repeated are called `Header rows` and `Footer rows`, the names of the
 > layout tools. *Rejected alternative:* `Header` and `Footer`, which in a word processor are the
@@ -179,10 +180,13 @@ The `Id` of a row is an `Id` of the document, unique like any other: it is the t
 ## Merged borders
 
 By default each cell paints its border, and two neighboring cells with `Border: 0.5` draw two lines side by side, 1 in
-all. With `Merge borders: true` on the `Table`, the border between two cells is drawn **once**:
+all. With `Merge borders: true` in the `Box` of the `Table`, the border between two cells is drawn **once**:
 
 ```
 Styles:
+    For element: Table
+        Box:
+            Merge borders: true
     For element: Cell
         Box:
             Padding: 3 5
@@ -194,7 +198,6 @@ Styles:
             Border color: #12315A
 Table:
     Column sizes: * 60 60
-    Merge borders: true
     Header rows:
         Row:
             Cell: Rate
@@ -207,6 +210,12 @@ Table:
             Cell: 90.00
 ```
 
+- **Where it is written.** `Merge borders` belongs to the `Box` group, next to `Border`: it is written in the `Box` of
+  the `Table` or in a rule of `Styles` ([Styles](../common/styles.md)), which also reaches the tables of a `Markdown`. In
+  the example, `For element: Table` merges the borders of every table of the document, and a table separates them with
+  `Merge borders: false` in its `Box`. It only has an effect on a `Table`: written in the `Box` of another element it is
+  `MERGE_BORDERS_WITHOUT_EFFECT`, and if it reaches another box from a rule (a `For style` that a table and a `Block`
+  use), that box does nothing with it.
 - **The line.** Between two neighboring cells, the line is the wider of the two sides that touch, with its color
   (`Border color`, or that of the text of the cell). With the same width, that of the cell above or that of the one on
   the left wins. A side without border contributes nothing: the line is that of the other one, and if neither has one,
@@ -221,9 +230,10 @@ Table:
   border. The padding and the content start after it, so the height of the rows and the width of the columns count it.
 - **What covers what.** The lines are painted over the backgrounds of the cells and of what they contain, and under
   their text. The band of a row (its `Box`, [Rows](#rows)) is not merged: it is painted under the cells, as always.
-- **What it does not allow.** `Gap` on the table or `Corner radius` on one of its cells, also from a rule, are
-  `MERGE_BORDERS_CONFLICT`: the border between two cells would not be one line. `Merge borders: true` on a table none of
-  whose cells has a border is `MERGE_BORDERS_WITHOUT_EFFECT`.
+- **What it does not allow.** `Gap` on the table or `Corner radius` on one of its cells, also when `Merge borders` or
+  the `Corner radius` come from a rule, are `MERGE_BORDERS_CONFLICT`: the border between two cells would not be one
+  line. `Merge borders: true` in the `Box` of a table none of whose cells has a border is `MERGE_BORDERS_WITHOUT_EFFECT`;
+  from a rule, that table stays as it is.
 
 Page breaks have their rules in [Breaks](#breaks).
 
@@ -236,9 +246,15 @@ Page breaks have their rules in [Breaks](#breaks).
 > into the padding of the cell by what it lacks. *Rejected alternative:* reserving on each side the widest line possible
 > on any page, which would widen every row for a line that only appears on some.
 
-> **Decision:** `Merge borders` is a boolean, `false` by default, like `Split rows`: without it, no table changes.
-> *Rejected alternative:* `Borders: separate | collapse`, with a term that does not come from layout, and always merging
-> the borders, as a word processor does, which would move every table with borders.
+> **Decision:** `Merge borders` is a boolean, `false` by default: without it, no table changes. *Rejected alternative:*
+> `Borders: separate | collapse`, with a term that does not come from layout, and always merging the borders, as a word
+> processor does, which would move every table with borders.
+
+> **Decision:** `Merge borders` goes in the `Box` group, although it only has an effect on a table, so that a rule of
+> `Styles` gives it to every table of a document or of a separate styles document, also to those of a `Markdown`. As with
+> `Overflow: shrink`, what the element itself writes is checked, and what reaches a box where it has no effect from a
+> rule does nothing. *Rejected alternative:* a property of the `Table` itself, like `Split rows`, which the rules do not
+> accept and which left the tables of a `Markdown` without merged borders.
 
 ## Breaks
 
@@ -286,8 +302,6 @@ once, on the first page where they appear.
 
 ## What is not supported
 
-- Merged borders in the tables of a `Markdown`: `Merge borders` is a property of the `Table`, and the rules of `Styles`
-  do not allow it.
 - `Box` on a column and a row with its own size or padding. The title of a table ("Table 3. Terminals") is the
   `Caption` of a [`Figure`](figure.md) with the table inside.
 - Rows with fewer cells than columns, or `Span` values that pass from one group to another: they are errors.

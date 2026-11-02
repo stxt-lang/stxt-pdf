@@ -1,6 +1,6 @@
 # Case: Gap in a table with Merge borders
 # Code: MERGE_BORDERS_CONFLICT
-# Line: 19
+# Line: 20
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -15,7 +15,8 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: * *
-			Merge borders: true
+			Box:
+				Merge borders: true
 			Gap: 4
 			Body:
 				Row:

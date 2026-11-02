@@ -259,6 +259,9 @@ class SchemaCoverageTest {
         t.put("For id", new Template(HEADER + "\t\tFor id: r\n\t\t\t{}\n\tBlock:\n\t\tId: r"));
         t.put("For column", new Template(HEADER + "\t\tFor column: 1\n\t\t\t{}\n\tBlock:"));
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));
+        // Merge borders written in the Box of an element only has an effect on a Table.
+        t.put("Box > Merge borders", new Template(HEADER + "\tTable:\n\t\tColumn sizes: *\n\t\tBox:\n\t\t\t{}\n"
+                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: a"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
         // Clear needs a side box before the element: the template of each element, with one in front.

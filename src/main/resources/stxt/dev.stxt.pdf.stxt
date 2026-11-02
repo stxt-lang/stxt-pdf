@@ -767,8 +767,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Split rows
 				Max: 1
-			Child: Merge borders
-				Max: 1
 			Child: Header rows
 				Max: 1
 			Child: Body
@@ -1085,6 +1083,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Background
 				Max: 1
 			Child: Overflow
+				Max: 1
+			Child: Merge borders
 				Max: 1
 	Node: Typography
 		Type: GROUP
@@ -1494,7 +1494,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: With true (by default), a row of a Grid or a Table that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
 	Node: Merge borders
 		Type: BOOLEAN
-		Description: With true, the border between two cells of a Table is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it. False by default.
+		Description: Only in a Table (from a rule of Styles, the other boxes ignore it): with true, the border between two cells is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it. False by default.
 	Node: Horizontal
 		Type: ENUM
 		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (start, end, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (start, end, center, justify, around or distribute); if not, the alignment of all the items (start, end, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.

@@ -1,5 +1,6 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.InlineNode;
 import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Stroke;
@@ -8,10 +9,11 @@ import dev.stxt.pdf.model.Value;
 
 import java.util.List;
 
+import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyKey.CORNER_RADIUS;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_GAP;
-import static dev.stxt.pdf.tree.PropertyKey.GRID_MERGE_BORDERS;
+import static dev.stxt.pdf.tree.PropertyKey.MERGE_BORDERS;
 
 /**
  * The borders of the cells of a {@code Table} with {@code Merge borders: true}
@@ -28,16 +30,19 @@ final class TableBorders {
     }
 
     /**
-     * Merges the borders of the cells of {@code table}, of {@code rows} rows and {@code columns} columns. A table with
-     * {@code Gap} or a cell with {@code Corner radius} is {@link ErrorCode#MERGE_BORDERS_CONFLICT}, and one none of
-     * whose cells has a border, {@link ErrorCode#MERGE_BORDERS_WITHOUT_EFFECT}.
+     * Merges the borders of the cells of {@code table} ({@code n}), of {@code rows} rows and {@code columns} columns. A
+     * table with {@code Gap} or a cell with {@code Corner radius} is {@link ErrorCode#MERGE_BORDERS_CONFLICT}, also
+     * when {@code Merge borders} comes from a rule; a table none of whose cells has a border is
+     * {@link ErrorCode#MERGE_BORDERS_WITHOUT_EFFECT} only if the table declares it in its own {@code Box}: from a rule
+     * it does nothing, like a rule that also reaches other boxes.
      */
-    static void merge(Box table, int rows, int columns) {
+    static void merge(InlineNode n, Box table, int rows, int columns) {
         Style s = table.style();
         if (!zero(s.grid().rowGap()) || !zero(s.grid().columnGap())) {
             throw error(s.line(GRID_GAP), ErrorCode.MERGE_BORDERS_CONFLICT, "The Gap of the table separates its cells, "
-                    + "and with Merge borders the border between two cells is a single line: the Gap is not possible "
-                    + "with Merge borders");
+                    + "and with Merge borders (" + s.line(MERGE_BORDERS) + ") the border between two cells is a single "
+                    + "line: the Gap is not possible with Merge borders, which Merge borders: false in the Box of the "
+                    + "table turns off");
         }
         List<Box> cells = table.children().stream().filter(c -> c.role() == Element.Role.CELL).toList();
         Box[][] at = new Box[rows][columns];
@@ -53,7 +58,7 @@ final class TableBorders {
             if (cs.box().cornerRadius().asList().stream().anyMatch(v -> !zero(v))) {
                 throw error(cs.line(CORNER_RADIUS), ErrorCode.MERGE_BORDERS_CONFLICT, "Corner radius rounds the "
                         + "corners of a cell, and with Merge borders the borders of the cells are the straight lines "
-                        + "of the table (" + s.line(GRID_MERGE_BORDERS) + "): Corner radius is not possible in its "
+                        + "of the table (" + s.line(MERGE_BORDERS) + "): Corner radius is not possible in its "
                         + "cells");
             }
             Sides<Stroke> own = declared(cs);
@@ -61,8 +66,10 @@ final class TableBorders {
             any |= own.asList().stream().anyMatch(stroke -> !stroke.isNone());
         }
         if (!any) {
-            throw error(s.line(GRID_MERGE_BORDERS), ErrorCode.MERGE_BORDERS_WITHOUT_EFFECT, "None of the cells of the "
-                    + "table has a Border: Merge borders is not needed");
+            child(n, "box").map(Nodes::inline).flatMap(b -> child(b, "merge-borders")).ifPresent(p -> {
+                throw error(p, ErrorCode.MERGE_BORDERS_WITHOUT_EFFECT, "None of the cells of the table has a "
+                        + "Border: Merge borders is not needed");
+            });
         }
         for (Box cell : cells) {
             cell.style().box().setBorder(room(cell, at));

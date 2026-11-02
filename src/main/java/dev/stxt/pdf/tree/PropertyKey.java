@@ -26,6 +26,7 @@ public final class PropertyKey {
     public static final String BORDER = "border";
     public static final String CORNER_RADIUS = "corner-radius";
     public static final String OVERFLOW = "overflow";
+    public static final String MERGE_BORDERS = "merge-borders";
 
     // Typography
     public static final String FONT = "font";
@@ -78,7 +79,6 @@ public final class PropertyKey {
     public static final String STACK_SPLIT_ITEMS = "stack.split-items";
     public static final String GRID_ROWS = "grid.row-sizes";
     public static final String GRID_GAP = "grid.gap";
-    public static final String GRID_MERGE_BORDERS = "grid.merge-borders";
     public static final String ITEM_GROW = "item.grow";
     public static final String ITEM_BASE_SIZE = "item.base-size";
     public static final String ITEM_HORIZONTAL = "item.horizontal";

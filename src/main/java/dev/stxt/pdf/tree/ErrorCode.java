@@ -93,7 +93,10 @@ public enum ErrorCode {
      * between two cells would not be one line.
      */
     MERGE_BORDERS_CONFLICT,
-    /** {@code Merge borders: true} in a table none of whose cells has a border. */
+    /**
+     * {@code Merge borders} in the {@code Box} of an element that is not a {@code Table}, or {@code Merge borders: true}
+     * in the {@code Box} of a table none of whose cells has a border.
+     */
     MERGE_BORDERS_WITHOUT_EFFECT,
 
     // --- Columns -------------------------------------------------------------------------------
