@@ -25,6 +25,12 @@ also in a single value (`Margin: 20mm 40`). Any other unit (`5cm`, `12pt`, `1in`
 (`12 mm`) are `VALUE_SYNTAX`. `Grow` and `Shrink` (factors), `Rotate` (degrees) and `Aspect ratio` (a proportion) are
 not measurements: a unit in them is also an error.
 
+Every number of the document, also the degrees of `Rotate` and of `linear(...)`, the two parts of `Aspect ratio` and the
+factors, is written with digits, a decimal point if it needs one and, where it is accepted, a `-` in front. `+12`, `12.`,
+`.5`, `1e3`, `0x10`, `NaN`, `Infinity` and a number that does not fit in a `double` (more than 308 digits) are
+`VALUE_SYNTAX`. In `Rotate`, which the schema declares a number, `0x10`, `NaN` and `Infinity` are rejected first by the
+schema, with its own error.
+
 > **Decision:** a number alone is points and measurements in millimeters carry `mm`: documents written in points stay
 > valid as they are. There is a single extra unit, because millimeters and points cover paper and typography, and each
 > measurement is written in a single way. *Rejected alternative:* `cm`, `in` and an explicit `pt`, which would give two

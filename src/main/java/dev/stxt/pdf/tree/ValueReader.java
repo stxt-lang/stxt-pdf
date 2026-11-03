@@ -173,12 +173,7 @@ final class ValueReader {
      * turns, which would not rotate anything.
      */
     static double angle(Node n) {
-        double v;
-        try {
-            v = Double.parseDouble(n.getText().trim());
-        } catch (NumberFormatException ex) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "Expected a number of degrees: " + n.getText().trim());
-        }
+        double v = number(n, n.getText(), "Expected a number of degrees, as in 45 or -12.5: " + n.getText().trim());
         if (v == 0 || Math.abs(v) >= 360) {
             throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Rotate allows degrees between -360 and 360, except 0, 360 and -360, "
                     + "which do not rotate anything: " + n.getText().trim());
@@ -287,25 +282,37 @@ final class ValueReader {
         return sides;
     }
 
+    /**
+     * {@code Aspect ratio} (reference/common/box.md): {@code width/height}, two positive numbers, or a positive
+     * number.
+     */
     static Double aspectRatio(Node n) {
         String t = n.getText().trim();
-        try {
-            if (t.contains("/")) {
-                String[] p = t.split("/");
-                double r = Double.parseDouble(p[0].trim()) / Double.parseDouble(p[1].trim());
-                if (r > 0 && Double.isFinite(r)) {
-                    return r;
-                }
-            } else {
-                double r = Double.parseDouble(t);
-                if (r > 0) {
-                    return r;
-                }
-            }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException ex) {
-            // reported below
+        String message = "Aspect ratio expects 'width/height' or a positive number: " + t;
+        String[] parts = t.split("/", -1);
+        if (parts.length > 2) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, message);
         }
-        throw error(n, ErrorCode.VALUE_SYNTAX, "Aspect ratio expects 'width/height' or a positive number: " + t);
+        double width = number(n, parts[0], message);
+        double height = parts.length == 2 ? number(n, parts[1], message) : 1;
+        double r = width / height;
+        if (width <= 0 || height <= 0 || !Double.isFinite(r) || r == 0) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, message);
+        }
+        return r;
+    }
+
+    /**
+     * A number as the document writes them ({@code 12}, {@code 12.5}, {@code -30}: reference/common/values.md), without
+     * unit; otherwise {@code VALUE_SYNTAX} with {@code message}. {@code NaN}, {@code Infinity}, hexadecimal numbers and
+     * exponents are not numbers of the document, although Java reads them.
+     */
+    private static double number(Node n, String text, String message) {
+        try {
+            return ValueParser.factor(text);
+        } catch (IllegalArgumentException ex) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, message);
+        }
     }
 
     /** A color: {@code #...} or the name of a {@code Named color} ({@link NamedColors}). */
@@ -343,15 +350,7 @@ final class ValueReader {
             throw error(n, ErrorCode.VALUE_SYNTAX,
                     "linear expects an angle and at least two colors: linear(180, #FFFFFF00, #FFFFFF)");
         }
-        double angle;
-        try {
-            angle = Double.parseDouble(args[0].trim());
-        } catch (NumberFormatException e) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "The angle of linear is a number of degrees: " + args[0].trim());
-        }
-        if (!Double.isFinite(angle)) {
-            throw error(n, ErrorCode.VALUE_SYNTAX, "The angle of linear is a number of degrees: " + args[0].trim());
-        }
+        double angle = number(n, args[0], "The angle of linear is a number of degrees: " + args[0].trim());
         List<String> stops = new java.util.ArrayList<>();
         for (int i = 1; i < args.length; i++) {
             stops.add(names.resolve(n, args[i].trim(), " in linear"));

@@ -1,0 +1,14 @@
+# Case: Rotate: 4.5e1, a number with an exponent, which the schema accepts and the document does not write
+# Code: VALUE_SYNTAX
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Frame:
+			Rotate: 4.5e1
+			Box:
+				Height: 10

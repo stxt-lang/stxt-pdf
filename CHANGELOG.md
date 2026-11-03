@@ -49,6 +49,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   ("A styled run ... starts and ends in the same paragraph"): reading the alternative text of the image closed the run.
   The text before and after the image now has the style of the run, and the image is not affected by it, as the
   reference says.
+- Numbers written in a form the document does not use are `VALUE_SYNTAX`, as the reference says (`12`, `12.5`, `-30`):
+  `Rotate` accepted `+45`, `45.` and `4.5e1` (forms the schema allows); `Aspect ratio` and the angle of `linear(...)`
+  accepted any number Java reads, such as `0x1p4` (16), `1e3` or, in `Aspect ratio`, `Infinity`. `Aspect ratio` also
+  ignored what followed a second `/` (`16/9/3` was `16/9`) and accepted `-16/-9`; now it needs two positive numbers or
+  one. A number with more digits than a `double` holds (more than 308) is `VALUE_SYNTAX` in any property, where it was
+  read as infinite.
 
 ### Java API
 

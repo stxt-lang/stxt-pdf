@@ -166,7 +166,11 @@ public final class ValueParser {
             throw new IllegalArgumentException("Invalid value: " + original.trim()
                     + " (the decimal separator is a point, for example 12.5)");
         }
-        return Double.parseDouble(t);
+        double v = Double.parseDouble(t);
+        if (!Double.isFinite(v)) {
+            throw new IllegalArgumentException("Invalid value: " + original.trim() + " (the number is too large)");
+        }
+        return v;
     }
 
     private static void require(boolean condition, String message) {

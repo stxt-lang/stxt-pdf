@@ -48,4 +48,36 @@ class ValueParserPropertiesTest {
             }
         }
     }
+
+    /**
+     * A number of the document is finite and written as {@code 12}, {@code 12.5} or {@code -30}
+     * (reference/common/values.md): {@code NaN}, {@code Infinity}, a hexadecimal number, an exponent or more digits than
+     * a double holds are an {@link IllegalArgumentException}, although {@link Double#parseDouble} reads them.
+     */
+    @Test
+    void aFactorIsFiniteAndWrittenAsTheDocumentWritesNumbers() {
+        String[] pieces = {"0", "1", "9", "-", "+", ".", "e", "E", "x", "p", "0x", "NaN", "Infinity", "d", "f", " ",
+                "1".repeat(400)};
+        Random random = new Random(20261103);
+        for (int i = 0; i < 50_000; i++) {
+            StringBuilder sb = new StringBuilder();
+            int count = 1 + random.nextInt(6);
+            for (int k = 0; k < count; k++) {
+                sb.append(pieces[random.nextInt(pieces.length)]);
+            }
+            String text = sb.toString();
+            double v;
+            try {
+                v = ValueParser.factor(text);
+            } catch (IllegalArgumentException expected) {
+                continue;
+            } catch (RuntimeException e) {
+                fail("ValueParser.factor(\"" + text + "\") throws " + e, e);
+                return;
+            }
+            if (!Double.isFinite(v) || !text.trim().matches("-?\\d+(\\.\\d+)?")) {
+                fail("ValueParser.factor(\"" + text + "\") accepts " + v);
+            }
+        }
+    }
 }
