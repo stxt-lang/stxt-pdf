@@ -47,6 +47,30 @@ class ImageLibraryTest {
         assertSame(images.find("test/square.png"), images.find("test/square.png"));
     }
 
+    /**
+     * Two spellings of the same file are one image, read once; and a document with many spellings of the same files
+     * cannot make the library grow without bound (it lives as long as its {@link Resources}: a whole service).
+     */
+    @Test
+    void theSpellingsOfAFileAreOneImage() {
+        ImageLibrary library = new Resources().images();
+        ImageFile image = library.find("test/square.png");
+        for (String spelling : new String[]{"./test/square.png", "././test/square.png", ".//test/square.png",
+                "test\\square.png", "test/./square.png"}) {
+            assertSame(image, library.find(spelling), spelling);
+        }
+        if (Files.exists(Path.of("resources/images/TEST/SQUARE.PNG"))) {
+            // A file system that does not tell capitals from small letters, as on Windows and macOS.
+            assertSame(image, library.find("TEST/SQUARE.PNG"));
+        }
+        assertEquals(1, library.files());
+        for (int i = 0; i < 3 * ImageLibrary.MAX_SPELLINGS; i++) {
+            library.find("./".repeat(i) + "test/square.png");
+        }
+        assertEquals(1, library.files());
+        assertTrue(library.spellings() <= ImageLibrary.MAX_SPELLINGS, "spellings: " + library.spellings());
+    }
+
     @Test
     void recognizesTheFormatByContent() {
         ImageFormatException gif = assertThrows(ImageFormatException.class, () -> images.find("test/drawing.gif"));

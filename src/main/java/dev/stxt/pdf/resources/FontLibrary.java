@@ -66,8 +66,9 @@ public final class FontLibrary {
             files = walk.filter(FontLibrary::isFontFile)
                     .sorted()
                     .toList();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        } catch (IOException | UncheckedIOException e) {
+            // The walk reports what it cannot read while it walks as an UncheckedIOException.
+            throw new ResourceException("Cannot read the fonts folder " + folder + ": " + e.getMessage(), e);
         }
         Map<FontFace, FontFile> faces = new HashMap<>();
         Set<String> families = new TreeSet<>();

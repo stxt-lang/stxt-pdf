@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /** On the fonts of the repository ({@code resources/fonts}) and copies of them in temporary folders. */
 class FontLibraryTest {
@@ -228,6 +229,22 @@ class FontLibraryTest {
         Files.writeString(r.fontsFolder().resolve("broken.ttf"), "no es una fuente");
         ResourceException e = assertThrows(ResourceException.class, r::fonts);
         assertTrue(e.getMessage().startsWith("Cannot read the font"), e.getMessage());
+    }
+
+    /**
+     * A font file that cannot be resolved (a link to nothing) is a problem of the resources folder, with its path, not
+     * a defect of the engine (reference/implementation/api.md).
+     */
+    @Test
+    void aLinkToNothingIsAProblemOfTheResources() throws IOException {
+        Resources r = copy("plex", "Regular");
+        try {
+            Files.createSymbolicLink(r.fontsFolder().resolve("broken.ttf"), dir.resolve("nothing.ttf"));
+        } catch (UnsupportedOperationException | IOException e) {
+            assumeTrue(false, "The system does not support symbolic links");
+        }
+        ResourceException e = assertThrows(ResourceException.class, r::fonts);
+        assertTrue(e.getMessage().contains("broken.ttf"), e.getMessage());
     }
 
     @Test

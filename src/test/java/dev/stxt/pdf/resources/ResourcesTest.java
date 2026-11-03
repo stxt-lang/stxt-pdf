@@ -77,6 +77,18 @@ class ResourcesTest {
         assertEquals(r.root().resolve("images/inside.png"), r.resolve("images/inside.png"));
     }
 
+    /**
+     * A file that cannot be read when its links are resolved (removed after it was found, or a link to nothing) is a
+     * problem of the resources, with its path, not a defect of the engine (reference/implementation/api.md).
+     */
+    @Test
+    void aFileThatCannotBeResolvedIsAProblemOfTheResources() throws IOException {
+        Resources r = resources();
+        Path gone = r.root().resolve("images/gone.png");
+        ResourceException e = assertThrows(ResourceException.class, () -> r.checkInside(gone));
+        assertTrue(e.getMessage().contains("gone.png"), e.getMessage());
+    }
+
     @Test
     void defaultRootIsTheResourcesFolder() {
         assertEquals(Path.of("resources").toAbsolutePath().normalize(), new Resources().root());

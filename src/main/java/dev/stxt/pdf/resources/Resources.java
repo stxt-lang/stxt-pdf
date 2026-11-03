@@ -1,7 +1,6 @@
 package dev.stxt.pdf.resources;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
@@ -154,7 +153,7 @@ public final class Resources {
             }
             return path;
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new ResourceException("Cannot resolve the resource " + root.relativize(path) + ": " + e, e);
         }
     }
 }

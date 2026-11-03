@@ -55,6 +55,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   ignored what followed a second `/` (`16/9/3` was `16/9`) and accepted `-16/-9`; now it needs two positive numbers or
   one. A number with more digits than a `double` holds (more than 308) is `VALUE_SYNTAX` in any property, where it was
   read as infinite.
+- A file of the resources folder that could not be read or resolved (a link to nothing in `fonts/`, a font folder that
+  cannot be walked, a file removed while it was being looked up) reached whoever converts as an `InternalException` (a
+  defect of the engine) or, while painting, as the `IOException` of the destination. It is now a `ResourceException`
+  with the path of the file, as `api.md` promises.
+- The images of a `Resources` are kept once per file: two spellings of the same path (`logo.png` and `./logo.png`, or
+  `Logo.png` on a file system that does not tell capitals from small letters) were read twice and kept twice, so a
+  service that shares its `Resources` could see its memory grow with what the documents wrote.
 
 ### Java API
 

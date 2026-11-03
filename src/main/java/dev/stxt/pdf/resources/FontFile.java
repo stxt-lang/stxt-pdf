@@ -140,7 +140,7 @@ public final class FontFile {
         try {
             return ttf.getOriginalData();
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw unreadable("content", e);
         }
     }
 
@@ -163,7 +163,7 @@ public final class FontFile {
             try (InputStream in = content()) {
                 value = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(in.readAllBytes()));
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                throw unreadable("content", e);
             } catch (NoSuchAlgorithmException e) {
                 throw new IllegalStateException("The JVM has no SHA-256", e);
             }
@@ -438,7 +438,7 @@ public final class FontFile {
                         gsub = data == GsubData.NO_DATA_FOUND ? null
                                 : new GsubWorkerFactory().getGsubWorker(cmap, data);
                     } catch (IOException e) {
-                        throw new UncheckedIOException(e);
+                        throw unreadable("ligatures", e);
                     }
                     gsubRead = true;
                 }
@@ -470,8 +470,17 @@ public final class FontFile {
             try {
                 return (int) Math.round(ttf.getAdvanceWidth(glyph) * 1000 / unitsPerEm);
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                throw unreadable("widths", e);
             }
         }
+    }
+
+    /**
+     * What a font that cannot be read gives (reference/implementation/api.md): a problem of the resources, never an
+     * {@link UncheckedIOException}, which would reach whoever converts as a defect of the engine or a failure
+     * of the destination. fontbox keeps the file in memory, so this only happens with a damaged file.
+     */
+    private ResourceException unreadable(String what, IOException e) {
+        return new ResourceException("Cannot read the " + what + " of the font " + path + ": " + e.getMessage(), e);
     }
 }

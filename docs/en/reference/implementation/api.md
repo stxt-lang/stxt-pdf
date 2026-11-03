@@ -106,7 +106,10 @@ those two it can be `null`. See [Styles](../common/styles.md#separate-styles-doc
 ## Resources
 
 `new Resources(Path.of("other"))` uses another resources folder. Every path goes through `Resources.resolve`, which never goes
-backwards. `Resources` is shared across threads and across conversions. It indexes `fonts/` once and keeps the images it has read.
+backwards. `Resources` is shared across threads and across conversions. It indexes `fonts/` once and keeps the images it has read,
+one per file: `ImageLibrary` keeps them by their real path, so `logo.png`, `./logo.png` and, on a file system that does
+not tell capitals from small letters, `Logo.png` are the same image, and what the documents write does not make the
+memory of a service grow. The spellings already seen are a shortcut to them that is emptied when it reaches 1024.
 
 `FontLibrary` indexes the `.ttf` and `.otf` files and identifies each one by its contents:
 
@@ -148,7 +151,7 @@ try {
 |---|---|
 | `InvalidModelException` (`tree`) | The rules of the model, the overflows and the resources the document names. `errorCode()` gives the `ErrorCode` and `ErrorCode.kind()` its kind (`INVALID_DOCUMENT` except `PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX` and `PDF_TOO_LARGE`, which are `LIMIT`) |
 | `DocumentSyntaxException` (`tree`) | The syntax and the schema of `stxt-core`, with its code and its line and the original exception as the cause. A `LimitException` from the library is `LIMIT` |
-| `ResourceException` (`resources`) | The resources folder (`RESOURCE`), with `ImageFormatException` |
+| `ResourceException` (`resources`) | The resources folder (`RESOURCE`), with `ImageFormatException`: also a file that cannot be read or resolved (a damaged font, a broken link, a folder without read permission), with its path in the message |
 | `InternalException` (`model`) | A failure of the engine. The original cause is in `getCause()` |
 | `CancelledException` (`model`) | The conversion stopped by its `Cancellation` (`CANCELLED`), without a line ([Canceling a conversion](#canceling-a-conversion)) |
 

@@ -104,7 +104,10 @@ esos dos puede ser `null`. Ver [Styles](../common/styles.md#documento-de-estilos
 ## Recursos
 
 `new Resources(Path.of("otra"))` usa otra carpeta de recursos. Toda ruta pasa por `Resources.resolve`, que nunca va hacia
-atrás. `Resources` se comparte entre hilos y entre conversiones. Indexa `fonts/` una vez y guarda las imágenes leídas.
+atrás. `Resources` se comparte entre hilos y entre conversiones. Indexa `fonts/` una vez y guarda las imágenes leídas,
+una por fichero: `ImageLibrary` las guarda por su ruta real, así que `logo.png`, `./logo.png` y, en un sistema de
+ficheros que no distingue mayúsculas, `Logo.png` son la misma imagen, y lo que escriben los documentos no hace crecer la
+memoria de un servicio. Las grafías ya vistas son un atajo hacia ellas que se vacía al llegar a 1024.
 
 `FontLibrary` indexa los `.ttf` y los `.otf` e identifica cada uno por su interior:
 
@@ -146,7 +149,7 @@ try {
 |---|---|
 | `InvalidModelException` (`tree`) | Las reglas del modelo, los desbordamientos y los recursos que nombra el documento. `errorCode()` da el `ErrorCode` y `ErrorCode.kind()` su tipo (`INVALID_DOCUMENT` salvo `PAGE_LIMIT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX` y `PDF_TOO_LARGE`, que son `LIMIT`) |
 | `DocumentSyntaxException` (`tree`) | La sintaxis y el schema de `stxt-core`, con su código y su línea y la excepción original como causa. Un `LimitException` de la librería es `LIMIT` |
-| `ResourceException` (`resources`) | La carpeta de recursos (`RESOURCE`), con `ImageFormatException` |
+| `ResourceException` (`resources`) | La carpeta de recursos (`RESOURCE`), con `ImageFormatException`: también un fichero que no se puede leer o resolver (una fuente dañada, un enlace roto, una carpeta sin permiso de lectura), con su ruta en el mensaje |
 | `InternalException` (`model`) | Un fallo del motor. La causa original va en `getCause()` |
 | `CancelledException` (`model`) | La conversión parada por su `Cancellation` (`CANCELLED`), sin línea ([Cancelar una conversión](#cancelar-una-conversión)) |
 
