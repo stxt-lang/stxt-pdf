@@ -1352,7 +1352,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: balanced
 	Node: Hyphenate
 		Type: BOOLEAN
-		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US and en-GB; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split.
+		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split.
 	Node: Markup
 		Type: ENUM
 		Description: Inline formatting of the text: none (by default; the text is literal) or markdown (interprets **bold**, *italic*, ++underline++, ~~strikethrough~~ and [links](target), with the CommonMark escapes; it does nothing inside a Markdown).

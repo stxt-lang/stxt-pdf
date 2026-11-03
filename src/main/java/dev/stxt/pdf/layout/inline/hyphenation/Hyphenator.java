@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * its hyphens are. The minima ({@code left}, {@code right}) are the letters that have to stay on each side of a
  * hyphen, those the patterns were made for.</p>
  *
+ * <p>The patterns of some languages (French, Italian) include the apostrophe, so that an elided word
+ * ({@code l'information}) is hyphenated as a whole, as in TeX: in those, the apostrophe is one more letter of the word
+ * ({@link #isLetter}), and the typographic one (U+2019) matches the {@code '} of the patterns.</p>
+ *
  * <p>The patterns are kept in a trie of their letters; the word is walked once from each of its positions.
  * Matching is on the word in lower case ({@link Locale#ROOT}, like the {@code \lccode} of TeX). The result of each word
  * is memorized: the same words repeat along a document.</p>
@@ -34,6 +38,12 @@ public final class Hyphenator {
 
     /** Entries memorized before the cache is emptied, so that a hostile document does not grow it without bound. */
     private static final int CACHE_LIMIT = 50_000;
+
+    /** The apostrophe of the patterns. */
+    private static final char APOSTROPHE = '\'';
+
+    /** The typographic apostrophe (right single quotation mark), which matches {@link #APOSTROPHE}. */
+    private static final char TYPOGRAPHIC_APOSTROPHE = '’';
 
     /** A node of the pattern trie: its children by letter and, if a pattern ends here, its levels. */
     private static final class Node {
@@ -47,6 +57,8 @@ public final class Hyphenator {
     private final Map<String, int[]> exceptions = new HashMap<>();
     private final int left;
     private final int right;
+    /** Whether the patterns or the exceptions have the apostrophe as a letter. */
+    private final boolean apostrophe;
     private final ConcurrentHashMap<String, int[]> cache = new ConcurrentHashMap<>();
 
     /**
@@ -61,6 +73,8 @@ public final class Hyphenator {
         }
         this.left = left;
         this.right = right;
+        this.apostrophe = patterns.stream().anyMatch(p -> p.indexOf(APOSTROPHE) >= 0)
+                || exceptions.stream().anyMatch(e -> e.indexOf(APOSTROPHE) >= 0);
         patterns.forEach(this::addPattern);
         exceptions.forEach(this::addException);
     }
@@ -117,10 +131,19 @@ public final class Hyphenator {
     }
 
     /**
+     * Whether a character is a letter of a word for these patterns: a Unicode letter or, if the patterns have it,
+     * the apostrophe ({@code '} or U+2019).
+     */
+    public boolean isLetter(int codePoint) {
+        return Character.isLetter(codePoint)
+                || apostrophe && (codePoint == APOSTROPHE || codePoint == TYPOGRAPHIC_APOSTROPHE);
+    }
+
+    /**
      * The positions of {@code word} where a hyphen may be inserted (the number of characters before it), in order;
-     * empty if it cannot be hyphenated. {@code word} is a run of letters without spaces, digits or punctuation: the
-     * caller gives it the letters of the word alone. The minima apply to it: a position before {@code left} letters or
-     * after which fewer than {@code right} remain is never given.
+     * empty if it cannot be hyphenated. {@code word} is a run of letters ({@link #isLetter}) without spaces, digits or
+     * punctuation: the caller gives it the letters of the word alone. The minima apply to it: a position before
+     * {@code left} letters or after which fewer than {@code right} remain is never given.
      */
     public int[] breaks(String word) {
         int[] cached = cache.get(word);
@@ -136,7 +159,7 @@ public final class Hyphenator {
     }
 
     private int[] compute(String word) {
-        String lower = word.toLowerCase(Locale.ROOT);
+        String lower = word.toLowerCase(Locale.ROOT).replace(TYPOGRAPHIC_APOSTROPHE, APOSTROPHE);
         if (lower.length() != word.length()) {
             // A letter whose lower case has another length (an upper-case İ): the positions would not match.
             return new int[0];

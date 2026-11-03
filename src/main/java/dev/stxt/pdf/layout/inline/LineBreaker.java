@@ -721,7 +721,9 @@ public final class LineBreaker {
      * together (what goes before them, like an opening quotation mark, and after them, like a period, stays with the
      * first and the last part and does not count for the minima). A word with something that is not a letter among
      * its letters (a digit, a hyphen, a middle dot) is not split, nor is one with a brace, which may hold
-     * {@code {page}}.
+     * {@code {page}}. Among its letters, an apostrophe is a letter in the languages whose patterns have it
+     * ({@link Hyphenator#isLetter}: {@code l'in-for-ma-tion} in French); at the ends it is punctuation, like a closing
+     * quotation mark.
      */
     static int[] breaks(String text, Hyphenator hyphenator) {
         if (text.indexOf('{') >= 0 || text.indexOf('}') >= 0) {
@@ -740,7 +742,7 @@ public final class LineBreaker {
         }
         for (int i = from; i < to; ) {
             int cp = text.codePointAt(i);
-            if (!Character.isLetter(cp)) {
+            if (!hyphenator.isLetter(cp)) {
                 return NO_BREAKS;
             }
             i += Character.charCount(cp);

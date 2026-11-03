@@ -2,7 +2,7 @@
 # Code: HYPHENATION_LANGUAGE_UNSUPPORTED
 # Line: 14
 Document (dev.stxt.pdf):
-	Language: de
+	Language: fi
 	Title: Prueba
 	Page:
 		Width: 595
@@ -14,4 +14,4 @@ Document (dev.stxt.pdf):
 				Hyphenate: true
 				Size: 10
 	Section:
-		Paragraph: Donaudampfschifffahrtsgesellschaft
+		Paragraph: kaupunginvaltuusto

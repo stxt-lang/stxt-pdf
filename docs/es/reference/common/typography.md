@@ -108,16 +108,21 @@ Con `Hyphenate: true` el reparto en líneas puede partir una palabra al final de
 patrones de partición del idioma de la caja (`Language`). Es de `Typography`, se hereda y vale `false` por defecto.
 
 - **Los patrones son los de TeX** (`hyph-utf8`), con el algoritmo de Liang, y van dentro del motor para `es`, `ca`,
-  `en-US` y `en-GB` ([Recursos](resources.md#patrones-de-partición)). `en` sin región y cualquier otra región del
-  inglés usan los americanos; `es` y `ca` con cualquier región, los suyos. `Hyphenate: true` en una caja con texto en
-  otro idioma es un error (`HYPHENATION_LANGUAGE_UNSUPPORTED`), con la línea del `Hyphenate`, aunque venga de una
-  antecesora o de una regla. Una caja sin texto no se comprueba.
-- **Los mínimos son los de los patrones**: quedan al menos 2 letras antes del guion y 2 después en `es` y `ca`, y 2 y 3
-  en inglés; una palabra más corta no se parte. Una palabra se parte solo por sus letras, que tienen que ir todas
-  seguidas: lo que va delante (una comilla, un paréntesis) y detrás (un punto, una coma) se queda con la primera y la
-  última parte y no cuenta para los mínimos. Una palabra con algo que no es una letra entre sus letras (una cifra, un
-  guion, el punto volado de `col·lecció`) o con `{page}`, `{pages}` o una referencia no se parte. Las mayúsculas se
-  parten como las minúsculas.
+  `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` y `pt` ([Recursos](resources.md#patrones-de-partición)). `en` sin región y
+  cualquier otra región del inglés usan los americanos; los demás idiomas, con cualquier región o variante, los suyos.
+  Los del alemán son los de la ortografía reformada (`de-1996`), también con `de-CH`, `de-AT` o `de-1901`.
+  `Hyphenate: true` en una caja con texto en otro idioma es un error (`HYPHENATION_LANGUAGE_UNSUPPORTED`), con la línea
+  del `Hyphenate`, aunque venga de una antecesora o de una regla. Una caja sin texto no se comprueba.
+- **Los mínimos son los de los patrones**: quedan al menos 2 letras antes del guion y 2 después en `es`, `ca`, `de`,
+  `fr`, `it` y `nl`, y 2 y 3 en inglés y en `pt`; una palabra más corta no se parte. Una palabra se parte solo por sus
+  letras, que tienen que ir todas seguidas: lo que va delante (una comilla, un paréntesis) y detrás (un punto, una
+  coma) se queda con la primera y la última parte y no cuenta para los mínimos. Una palabra con algo que no es una
+  letra entre sus letras (una cifra, un guion, el punto volado de `col·lecció`) o con `{page}`, `{pages}` o una
+  referencia no se parte. Las mayúsculas se parten como las minúsculas.
+- **El apóstrofo** (`'` o `’`) entre las letras de una palabra es una letra más en los idiomas cuyos patrones lo
+  incluyen, `fr` e `it`: `l'information` se parte `l'in-for-ma-tion` y `dell'amministrazione`,
+  `del-l'am-mi-ni-stra-zio-ne`, y cuenta para los mínimos. En los demás idiomas una palabra con apóstrofo no se parte.
+  Al principio o al final de la palabra es puntuación, como una comilla.
 - **Un guion blando** (U+00AD) escrito en el texto es un punto de corte explícito, con o sin `Hyphenate`: una palabra
   que lo lleva se parte solo ahí, y los patrones no añaden más. No se pinta ni se mide donde la palabra no se parte. En
   un texto con `Preformatted: true` o `wrap` se descarta.
@@ -134,8 +139,18 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
   espacio invisible del final ([El PDF por dentro](../implementation/pdf.md#texto-que-se-lee)).
 
 > **Decisión:** los patrones de TeX como recursos del motor, convertidos a un formato propio de texto plano y sin
-> dependencias; cuatro idiomas para empezar, y los demás son un error y no un silencio. *Alternativa descartada:*
-> una biblioteca de partición, o partir sin patrones.
+> dependencias; nueve idiomas, y los demás son un error y no un silencio. *Alternativa descartada:* una biblioteca de
+> partición, o partir sin patrones.
+
+> **Decisión:** el alemán, solo con la ortografía reformada de 1996, la oficial, para cualquier región y variante: la
+> tradicional casi no se usa en documentos nuevos y sus patrones costarían otros 120 KB en el jar. *Alternativa
+> descartada:* los patrones de la ortografía tradicional (`hyph-de-1901.tex` y `hyph-de-ch-1901.tex`) para las
+> variantes `de-1901` y `de-CH-1901`.
+
+> **Decisión:** el apóstrofo es una letra donde los patrones lo incluyen, como en TeX, para que el francés y el
+> italiano partan las palabras con elisión, que son muy frecuentes. *Alternativa descartada:* la regla general (una
+> palabra con algo que no es una letra entre sus letras no se parte), que dejaría enteras `l'information` o
+> `dell'amministrazione`.
 
 > **Decisión:** una sola propiedad, `Hyphenate`, con los mínimos que traen los patrones de cada idioma. *Alternativa
 > descartada:* propiedades para la longitud mínima de la palabra y para las letras a cada lado, que casi nadie cambia.
@@ -219,8 +234,9 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 - Unidades relativas a la fuente: todo se mide en puntos, en milímetros o en porcentajes.
 - Escritura vertical o de derecha a izquierda, y de `GPOS`, lo que no es kerning horizontal (marcas, posiciones
   contextuales).
-- Patrones de partición de otros idiomas que `es`, `ca`, `en-US` y `en-GB`, patrones o excepciones propios del documento,
-  y cambiar los mínimos de letras a cada lado del guion.
+- Patrones de partición de otros idiomas que `es`, `ca`, `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` y `pt`, los de la
+  ortografía alemana tradicional, patrones o excepciones propios del documento, y cambiar los mínimos de letras a cada
+  lado del guion.
 - Tamaño distinto dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo cambia
   la familia, el peso, el estilo, el color, las mayúsculas y el interletraje
   ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.

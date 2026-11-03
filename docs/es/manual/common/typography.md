@@ -109,8 +109,9 @@ un solo párrafo, y para varios se escriben varios `Paragraph`.
 
 Con `Hyphenate: true` el motor parte las palabras con guion al final de la línea donde lo permiten las reglas del idioma
 de la caja (`Language`), como hace un procesador de textos, y las columnas estrechas justificadas quedan sin huecos.
-Tiene reglas para el castellano, el catalán y el inglés americano y británico; en otro idioma, `Hyphenate: true` es un
-error. Lo normal es declararlo una vez, en `For element: Document`:
+Tiene reglas para el castellano, el catalán, el inglés americano y británico, el alemán (con la ortografía de 1996), el
+francés, el italiano, el neerlandés y el portugués; en otro idioma, `Hyphenate: true` es un error. Lo normal es
+declararlo una vez, en `For element: Document`:
 
 ```
 Document (dev.stxt.pdf):

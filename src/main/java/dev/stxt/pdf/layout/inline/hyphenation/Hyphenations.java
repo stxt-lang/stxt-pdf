@@ -15,14 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The hyphenation patterns the engine has, by language (reference/common/typography.md): the patterns of hyph-utf8
- * for Spanish, Catalan, American English and British English, as resources of the jar
- * (reference/common/resources.md). Each one is read the first time a document in its language asks for it and is
- * shared from then on.
+ * for Spanish, Catalan, American English, British English, German, French, Italian, Dutch and Portuguese, as
+ * resources of the jar (reference/common/resources.md). Each one is read the first time a document in its language
+ * asks for it and is shared from then on.
  *
  * <p>The language of a text is the {@link Locale} of its {@code Typography} ({@code Language}): the region chooses
- * between American and British English ({@code en-GB} is British, any other English is American), and Spanish and
- * Catalan have one set of patterns whatever the region. A text with {@code Hyphenate: true} in another language is
- * an error ({@link ErrorCode#HYPHENATION_LANGUAGE_UNSUPPORTED}, checked before the layout by {@link #validate}).</p>
+ * between American and British English ({@code en-GB} is British, any other English is American), and the other
+ * languages have one set of patterns whatever the region or the variant (German has those of the reformed spelling,
+ * {@code hyph-de-1996.tex}). A text with {@code Hyphenate: true} in another language is an error
+ * ({@link ErrorCode#HYPHENATION_LANGUAGE_UNSUPPORTED}, checked before the layout by {@link #validate}).</p>
  */
 public final class Hyphenations {
 
@@ -31,10 +32,15 @@ public final class Hyphenations {
             "es", "es.txt",
             "ca", "ca.txt",
             "en-US", "en-us.txt",
-            "en-GB", "en-gb.txt");
+            "en-GB", "en-gb.txt",
+            "de", "de.txt",
+            "fr", "fr.txt",
+            "it", "it.txt",
+            "nl", "nl.txt",
+            "pt", "pt.txt");
 
     /** The supported languages for the messages, in the order of the documentation. */
-    private static final String SUPPORTED = "es, ca, en-US and en-GB";
+    private static final String SUPPORTED = "es, ca, en-US, en-GB, de, fr, it, nl and pt";
 
     private static final ConcurrentHashMap<String, Hyphenator> LOADED = new ConcurrentHashMap<>();
 
@@ -58,7 +64,7 @@ public final class Hyphenations {
     private static String key(Locale locale) {
         String language = locale.getLanguage();
         switch (language) {
-            case "es", "ca":
+            case "es", "ca", "de", "fr", "it", "nl", "pt":
                 return language;
             case "en":
                 return locale.getCountry().equals("GB") ? "en-GB" : "en-US";
@@ -105,6 +111,6 @@ public final class Hyphenations {
 
     /** The languages with patterns, for the documentation and the tests. */
     public static List<String> supported() {
-        return List.of("es", "ca", "en-US", "en-GB");
+        return List.of("es", "ca", "en-US", "en-GB", "de", "fr", "it", "nl", "pt");
     }
 }

@@ -110,8 +110,9 @@ and several are written as several `Paragraph`.
 
 With `Hyphenate: true` the engine splits words with a hyphen at the end of the line where the rules of the language of
 the box (`Language`) allow it, as a word processor does, and narrow justified columns are left without gaps. It has
-rules for Spanish, Catalan and American and British English; in another language, `Hyphenate: true` is an error. The
-usual thing is to declare it once, in `For element: Document`:
+rules for Spanish, Catalan, American and British English, German (with the 1996 spelling), French, Italian, Dutch and
+Portuguese; in another language, `Hyphenate: true` is an error. The usual thing is to declare it once, in
+`For element: Document`:
 
 ```
 Document (dev.stxt.pdf):

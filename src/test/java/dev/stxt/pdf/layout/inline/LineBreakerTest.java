@@ -455,4 +455,17 @@ class LineBreakerTest {
         assertArrayEquals(new int[0], LineBreaker.breaks("{page}", es));
         assertArrayEquals(new int[0], LineBreaker.breaks("2025", es));
     }
+
+    @Test
+    void anApostropheAmongTheLettersIsALetterOnlyInTheLanguagesWhosePatternsHaveIt() {
+        Hyphenator fr = Hyphenations.forLocale(Locale.forLanguageTag("fr"));
+        Hyphenator en = Hyphenations.forLocale(Locale.forLanguageTag("en-US"));
+        // l'in-for-ma-tion, with the straight and the typographic apostrophe.
+        assertArrayEquals(new int[]{4, 7, 9}, LineBreaker.breaks("l'information", fr));
+        assertArrayEquals(new int[]{4, 7, 9}, LineBreaker.breaks("l’information", fr));
+        // At the ends it is punctuation, like a quotation mark: in-for-ma-tion shifted by the opening one.
+        assertArrayEquals(new int[]{3, 6, 8}, LineBreaker.breaks("‘information’", fr));
+        // The English patterns do not have it, and the word is not split.
+        assertArrayEquals(new int[0], LineBreaker.breaks("hyphenation's", en));
+    }
 }

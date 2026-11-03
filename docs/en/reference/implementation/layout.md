@@ -210,7 +210,8 @@ that is read is still one word.
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
 box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns
 of the resource of the language, with a cache per word. `LineBreaker.words` gives each word its break points (those of
-its soft hyphens, which it removes from the text, or those of the patterns over its letters), and both line breakings
+its soft hyphens, which it removes from the text, or those of the patterns over its letters, which are those of
+`Hyphenator.isLetter`: the Unicode ones and, if the patterns have it, the apostrophe), and both line breakings
 work over the **positions** of the text (`LineBreaker.Paragraph`): the start of each word and each break point. A
 line goes from one position to another; if it ends at a break point it carries the hyphen, measured with the format of
 the previous letter, and the `Line` (and the placed `TextLine`) says so with `hyphenated`. The greedy breaking tries,

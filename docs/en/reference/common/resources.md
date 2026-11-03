@@ -97,10 +97,21 @@ original:
 | `ca` | `hyph-ca.tex` (1.11, 2003-07-15) | Gonçal Badenes, Francina Turon | LPPL 1.0 or later |
 | `en-US` | `hyph-en-us.tex` (2005-05-30) | Gerard D.C. Kuiken, on those of Knuth and Liang | Copying and distribution permitted, with or without modification, preserving the notice |
 | `en-GB` | `hyph-en-gb.tex` (2005-10-18) | Dominik Wujastyk, Graham Toal | MIT |
+| `de` | `hyph-de-1996.tex` (2024-02-28) | Deutschsprachige Trennmustermannschaft | MIT |
+| `fr` | `hyph-fr.tex` (2.13, 2016-05-12) | Daniel Flipo, Bernard Gaulle, Arthur Reutenauer | MIT |
+| `it` | `hyph-it.tex` (4.9, 2014-04-22) | Claudio Beccari | LPPL 1.3 or later, or MIT, at choice: used under the MIT |
+| `nl` | `hyph-nl.tex` (1.1, 1996-11) | Piet Tutelaers | MIT |
+| `pt` | `hyph-pt.tex` (1.4, 2024-07-13) | Pedro J. de Rezende, J. Joao Dias Almeida, Leonardo Araujo, Aline Benevides | BSD 3-clause |
 
 The LPPL allows distributing a derived version if it has another name, is identified as derived and refers to the
-original; the header of `ca.txt` does so. The files are regenerated with `java tools/HyphenationPatterns.java
-<folder>`, with the `hyph-*.tex` files of https://github.com/hyphenation/tex-hyphen in that folder.
+original; the header of `ca.txt` does so. The BSD 3-clause license asks to keep the copyright notice, the list of
+conditions and the disclaimer in the code and in the documentation of what is distributed; the header of `pt.txt`
+carries them. The files are regenerated with `java tools/HyphenationPatterns.java <folder>`, with the `hyph-*.tex`
+files of https://github.com/hyphenation/tex-hyphen in that folder.
+
+The nine take about 240 KB compressed in the jar, 120 of them German, which has 36,000 patterns. Each one is read the
+first time a document asks for it and is shared from then on; German takes about 7.5 MB of memory, and the rest, less
+than 3 MB each.
 
 > **Decision:** the patterns go in the jar and not in the resources folder: the language is not a resource of the
 > document, and the patterns of a language are the same for everyone. *Rejected alternative:* a `hyphenation/`

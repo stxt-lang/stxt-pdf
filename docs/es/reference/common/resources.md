@@ -96,10 +96,21 @@ por línea y una excepción por línea. Cada fichero conserva así el aviso de c
 | `ca` | `hyph-ca.tex` (1.11, 2003-07-15) | Gonçal Badenes, Francina Turon | LPPL 1.0 o posterior |
 | `en-US` | `hyph-en-us.tex` (2005-05-30) | Gerard D.C. Kuiken, sobre los de Knuth y Liang | Copia y distribución libres, con o sin cambios, conservando el aviso |
 | `en-GB` | `hyph-en-gb.tex` (2005-10-18) | Dominik Wujastyk, Graham Toal | MIT |
+| `de` | `hyph-de-1996.tex` (2024-02-28) | Deutschsprachige Trennmustermannschaft | MIT |
+| `fr` | `hyph-fr.tex` (2.13, 2016-05-12) | Daniel Flipo, Bernard Gaulle, Arthur Reutenauer | MIT |
+| `it` | `hyph-it.tex` (4.9, 2014-04-22) | Claudio Beccari | LPPL 1.3 o posterior, o MIT, a elegir: se usa con la MIT |
+| `nl` | `hyph-nl.tex` (1.1, 1996-11) | Piet Tutelaers | MIT |
+| `pt` | `hyph-pt.tex` (1.4, 2024-07-13) | Pedro J. de Rezende, J. Joao Dias Almeida, Leonardo Araujo, Aline Benevides | BSD de 3 cláusulas |
 
 La LPPL admite distribuir una versión derivada si lleva otro nombre, se identifica como derivada y remite al original;
-la cabecera de `ca.txt` lo hace. Los ficheros se regeneran con `java tools/HyphenationPatterns.java <carpeta>`, con los
-`hyph-*.tex` de https://github.com/hyphenation/tex-hyphen en esa carpeta.
+la cabecera de `ca.txt` lo hace. La BSD de 3 cláusulas pide conservar el aviso de copyright, la lista de condiciones y
+la renuncia de garantía en el código y en la documentación de lo que se distribuye; la cabecera de `pt.txt` los lleva.
+Los ficheros se regeneran con `java tools/HyphenationPatterns.java <carpeta>`, con los `hyph-*.tex` de
+https://github.com/hyphenation/tex-hyphen en esa carpeta.
+
+Los nueve ocupan unos 240 KB comprimidos en el jar, 120 de ellos el alemán, que tiene 36 000 patrones. Cada uno se lee
+la primera vez que un documento lo pide y se comparte desde entonces; el alemán ocupa unos 7,5 MB de memoria, y el
+resto, menos de 3 MB cada uno.
 
 > **Decisión:** los patrones van en el jar y no en la carpeta de recursos: el idioma no es un recurso del documento y
 > los patrones de un idioma son los mismos para todos. *Alternativa descartada:* una subcarpeta `hyphenation/` en

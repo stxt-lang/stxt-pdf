@@ -99,16 +99,17 @@ class HyphenationLayoutTest {
 
     @Test
     void aLanguageWithoutPatternsIsAnError() {
-        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: Donaudampfschiff",
-                "\t\tTypography:", "\t\t\tLanguage: de", "\t\t\tHyphenate: true"));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: kaupunginvaltuusto",
+                "\t\tTypography:", "\t\t\tLanguage: fi", "\t\t\tHyphenate: true"));
         assertEquals(ErrorCode.HYPHENATION_LANGUAGE_UNSUPPORTED, e.errorCode());
-        assertTrue(e.getMessage().contains("'de'") && e.getMessage().contains("es, ca, en-US and en-GB"), e.getMessage());
+        assertTrue(e.getMessage().contains("'fi'")
+                && e.getMessage().contains("es, ca, en-US, en-GB, de, fr, it, nl and pt"), e.getMessage());
     }
 
     @Test
     void onlyBoxesWithTextNeedPatterns() {
         // Hyphenate and a language without patterns on a Block are fine if its texts are in a language with them.
-        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLanguage: de", "\t\t\tHyphenate: true",
+        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLanguage: fi", "\t\t\tHyphenate: true",
                 "\t\tText: constitución", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tWidth: 40",
                 "\t\t\tTypography:", "\t\t\t\tLanguage: es");
         assertEquals(List.of("consti-", "tución"), texts(f.fragment("T").lines()));

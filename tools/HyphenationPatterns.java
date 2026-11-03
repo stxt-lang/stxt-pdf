@@ -30,7 +30,12 @@ public final class HyphenationPatterns {
             "es", "hyph-es.tex",
             "ca", "hyph-ca.tex",
             "en-us", "hyph-en-us.tex",
-            "en-gb", "hyph-en-gb.tex");
+            "en-gb", "hyph-en-gb.tex",
+            "fr", "hyph-fr.tex",
+            "pt", "hyph-pt.tex",
+            "it", "hyph-it.tex",
+            "de", "hyph-de-1996.tex",
+            "nl", "hyph-nl.tex");
 
     private static final Path OUTPUT = Path.of("src", "main", "resources", "dev", "stxt", "pdf", "hyphenation");
 

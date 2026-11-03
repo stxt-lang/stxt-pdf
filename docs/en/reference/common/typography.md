@@ -110,16 +110,22 @@ hyphenation patterns of the language of the box (`Language`). It belongs to `Typ
 by default.
 
 - **The patterns are those of TeX** (`hyph-utf8`), with Liang's algorithm, and are built into the engine for `es`,
-  `ca`, `en-US` and `en-GB` ([Resources](resources.md#hyphenation-patterns)). `en` without a region, and any other
-  region of English, use the American ones; `es` and `ca` with any region, their own. `Hyphenate: true` on a box with
-  text in another language is an error (`HYPHENATION_LANGUAGE_UNSUPPORTED`), with the line of the `Hyphenate`, even if
-  it comes from an ancestor or from a rule. A box without text is not checked.
-- **The minima are those of the patterns**: at least 2 letters stay before the hyphen and 2 after it in `es` and `ca`,
-  and 2 and 3 in English; a shorter word is not split. A word is split only through its letters, which have to be all
-  together: what goes before them (a quotation mark, a parenthesis) and after them (a period, a comma) stays with the
-  first and the last part and does not count for the minima. A word with something that is not a letter among its
-  letters (a digit, a hyphen, the middle dot of `col·lecció`) or with `{page}`, `{pages}` or a reference is not split.
-  Capitals are split like lowercase letters.
+  `ca`, `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` and `pt` ([Resources](resources.md#hyphenation-patterns)). `en`
+  without a region, and any other region of English, use the American ones; the other languages, with any region or
+  variant, their own. Those of German are the ones of the reformed spelling (`de-1996`), also with `de-CH`, `de-AT` or
+  `de-1901`. `Hyphenate: true` on a box with text in another language is an error
+  (`HYPHENATION_LANGUAGE_UNSUPPORTED`), with the line of the `Hyphenate`, even if it comes from an ancestor or from a
+  rule. A box without text is not checked.
+- **The minima are those of the patterns**: at least 2 letters stay before the hyphen and 2 after it in `es`, `ca`,
+  `de`, `fr`, `it` and `nl`, and 2 and 3 in English and in `pt`; a shorter word is not split. A word is split only
+  through its letters, which have to be all together: what goes before them (a quotation mark, a parenthesis) and after
+  them (a period, a comma) stays with the first and the last part and does not count for the minima. A word with
+  something that is not a letter among its letters (a digit, a hyphen, the middle dot of `col·lecció`) or with
+  `{page}`, `{pages}` or a reference is not split. Capitals are split like lowercase letters.
+- **The apostrophe** (`'` or `’`) among the letters of a word is one more letter in the languages whose patterns
+  include it, `fr` and `it`: `l'information` is split `l'in-for-ma-tion` and `dell'amministrazione`,
+  `del-l'am-mi-ni-stra-zio-ne`, and it counts for the minima. In the other languages a word with an apostrophe is not
+  split. At the start or at the end of the word it is punctuation, like a quotation mark.
 - **A soft hyphen** (U+00AD) written in the text is an explicit break point, with or without `Hyphenate`: a word that
   has one is split only there, and the patterns add no more. It is neither painted nor measured where the word is not
   split. In a text with `Preformatted: true` or `wrap` it is discarded.
@@ -137,8 +143,18 @@ by default.
   ([The PDF inside](../implementation/pdf.md#text-that-is-read)).
 
 > **Decision:** the TeX patterns as resources of the engine, converted to a plain-text format of its own and without
-> dependencies; four languages to start with, and the rest are an error and not a silence. *Rejected alternative:* a
-> hyphenation library, or splitting without patterns.
+> dependencies; nine languages, and the rest are an error and not a silence. *Rejected alternative:* a hyphenation
+> library, or splitting without patterns.
+
+> **Decision:** German only with the reformed spelling of 1996, the official one, for any region and variant: the
+> traditional one is hardly used in new documents and its patterns would cost another 120 KB in the jar. *Rejected
+> alternative:* the patterns of the traditional spelling (`hyph-de-1901.tex` and `hyph-de-ch-1901.tex`) for the
+> variants `de-1901` and `de-CH-1901`.
+
+> **Decision:** the apostrophe is a letter where the patterns include it, as in TeX, so that French and Italian split
+> the words with elision, which are very frequent. *Rejected alternative:* the general rule (a word with something
+> that is not a letter among its letters is not split), which would leave `l'information` or `dell'amministrazione`
+> whole.
 
 > **Decision:** a single property, `Hyphenate`, with the minima the patterns of each language bring. *Rejected
 > alternative:* properties for the minimum length of the word and for the letters on each side, which almost nobody
@@ -223,8 +239,9 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
   ([Resources](resources.md#fonts)).
 - Units relative to the font: everything is measured in points, millimeters or percentages.
 - Vertical or right-to-left writing, and, of `GPOS`, what is not horizontal kerning (marks, contextual positioning).
-- Hyphenation patterns for languages other than `es`, `ca`, `en-US` and `en-GB`, patterns or exceptions of the
-  document's own, and changing the minimum letters on each side of the hyphen.
+- Hyphenation patterns for languages other than `es`, `ca`, `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` and `pt`, those
+  of the traditional German spelling, patterns or exceptions of the document's own, and changing the minimum letters
+  on each side of the hyphen.
 - A different size within a line (except the drop cap and the superscript of a footnote): a run changes the family,
   the weight, the style, the color, the capitalization and the letter spacing
   ([Text formatting](text-formatting.md#styled-runs)), but not the size.

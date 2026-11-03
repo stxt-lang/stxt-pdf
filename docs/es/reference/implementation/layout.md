@@ -208,7 +208,8 @@ lee siga siendo una palabra.
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
 (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones
 del recurso del idioma, con una caché por palabra. `LineBreaker.words` da a cada palabra sus puntos de corte (los de sus
-guiones blandos, que quita del texto, o los de los patrones sobre sus letras), y los dos repartos trabajan sobre las
+guiones blandos, que quita del texto, o los de los patrones sobre sus letras, que son las de `Hyphenator.isLetter`: las
+de Unicode y, si los patrones lo tienen, el apóstrofo), y los dos repartos trabajan sobre las
 **posiciones** del texto (`LineBreaker.Paragraph`): el inicio de cada palabra y cada punto de corte. Una línea va de
 una posición a otra; si acaba en un punto de corte lleva el guion, medido con el formato de la letra anterior, y la
 `Line` (y la `TextLine` colocada) lo dice con `hyphenated`. El reparto voraz prueba, cuando una palabra no cabe, sus

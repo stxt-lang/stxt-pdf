@@ -9,6 +9,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **Hyphenation in German, French, Italian, Dutch and Portuguese.** `Hyphenate: true` now works with `Language: de`,
+  `fr`, `it`, `nl` and `pt` (any region or variant), besides `es`, `ca`, `en-US` and `en-GB`, with the TeX patterns of
+  `hyph-utf8` built into the jar (about 175 KB more, 120 of them German). German uses the patterns of the reformed
+  spelling of 1996, also for `de-CH` and `de-1901`. In French and Italian the apostrophe between the letters of a word
+  is a letter, as in TeX: `l'information` is split `l'in-for-ma-tion`; in the other languages a word with an apostrophe
+  is still not split. The licenses of the new patterns are in "Hyphenation patterns" of the reference (resources).
 - **Manual page "Debugging a document"** (`docs/en/manual/common/debugging.md`, and its Spanish original): the SVG
   preview page by page (`Converter.toSvg`), the outlines of the boxes (`debug`), the dump of the boxes with an `Id`
   (`StxtDump`) and how to read an error, with a complete document. Until now they were only told in the reference.
