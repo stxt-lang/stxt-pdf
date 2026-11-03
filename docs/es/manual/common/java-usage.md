@@ -30,7 +30,7 @@ converter.toPdf(doc, out);
 | `resources` | La carpeta `resources/` del directorio de trabajo ([Recursos](resources.md)) |
 | `styles` | Ninguno. El fichero de estilos aparte del documento ([Estilos](styles.md#estilos-en-un-fichero-aparte)) |
 | `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF |
-| `debug` | `false`. Con `true`, pinta el contorno de cada caja |
+| `debug` | `false`. Con `true`, pinta el contorno de cada caja ([Depurar un documento](debugging.md#los-contornos)) |
 | `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
 | `pdfA` | Ninguno. Con `PdfA.A2B`, `A2A`, `A3B` o `A3A`, el PDF cumple también ese PDF/A, la norma de archivo ([abajo](#pdfa-y-adjuntos)) |
 | `exclude` | Ninguna: se comprueba todo. Quita las comprobaciones que se le dicen (abajo) |
@@ -95,7 +95,7 @@ try {
 ## Más
 
 - Para usar las páginas antes de pintarlas, o escribir también un SVG de cada página: `converter.layOut(doc)` y
-  `converter.toSvg(...)`.
+  `converter.toSvg(...)` ([Depurar un documento](debugging.md)).
 - En un servidor sin pantalla, la JVM se arranca con `-Djava.awt.headless=true`.
 
 El detalle (hilos, tipos de error, límites) está en la [referencia](../../reference/implementation/api.md).

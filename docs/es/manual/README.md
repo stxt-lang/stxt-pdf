@@ -32,6 +32,7 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [Recursos](common/resources.md) | Dónde van las fuentes y las imágenes |
 | [Errores](common/errors.md) | Cómo leer un error y los más habituales |
 | [Uso desde Java](common/java-usage.md) | Convertir documentos desde un programa |
+| [Depurar un documento](common/debugging.md) | La vista previa en SVG, los contornos de las cajas, el volcado de las posiciones y cómo leer un error |
 
 ## Componentes
 

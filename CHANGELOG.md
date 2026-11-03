@@ -7,6 +7,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+### Added
+
+- **Manual page "Debugging a document"** (`docs/en/manual/common/debugging.md`, and its Spanish original): the SVG
+  preview page by page (`Converter.toSvg`), the outlines of the boxes (`debug`), the dump of the boxes with an `Id`
+  (`StxtDump`) and how to read an error, with a complete document. Until now they were only told in the reference.
+
 ### Changed
 
 - **A barcode too small to be read is an error.** A `Barcode` whose content box, once laid out, leaves its modules

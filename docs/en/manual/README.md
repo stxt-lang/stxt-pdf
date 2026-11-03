@@ -32,6 +32,7 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | [Resources](common/resources.md) | Where fonts and images go |
 | [Errors](common/errors.md) | How to read an error, and the most common ones |
 | [Using from Java](common/java-usage.md) | Converting documents from a program |
+| [Debugging a document](common/debugging.md) | The SVG preview, the outlines of the boxes, the dump of the positions and how to read an error |
 
 ## Components
 

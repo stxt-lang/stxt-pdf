@@ -30,7 +30,7 @@ converter.toPdf(doc, out);
 | `resources` | The `resources/` folder of the working directory ([Resources](resources.md)) |
 | `styles` | None. The separate styles file of the document ([Styles](styles.md#styles-in-a-separate-file)) |
 | `limits` | 2,000 pages, 25 million pixels per image, 20,000 elements and 64 levels per SVG and 20 MB per PDF |
-| `debug` | `false`. With `true`, it paints the outline of each box |
+| `debug` | `false`. With `true`, it paints the outline of each box ([Debugging a document](debugging.md#the-outlines)) |
 | `pdfUa` | `1`: the PDF complies with PDF/UA-1. With `2`, PDF/UA-2, in PDF 2.0, which some old viewers do not open |
 | `pdfA` | None. With `PdfA.A2B`, `A2A`, `A3B` or `A3A`, the PDF also complies with that PDF/A, the archiving standard ([below](#pdfa-and-attachments)) |
 | `exclude` | None: everything is checked. It removes the checks it is given (below) |
@@ -97,7 +97,7 @@ try {
 ## More
 
 - To use the pages before painting them, or to also write an SVG of each page: `converter.layOut(doc)` and
-  `converter.toSvg(...)`.
+  `converter.toSvg(...)` ([Debugging a document](debugging.md)).
 - On a server without a display, the JVM is started with `-Djava.awt.headless=true`.
 
 The detail (threads, error types, limits) is in the [reference](../../reference/implementation/api.md).
