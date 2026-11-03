@@ -99,6 +99,22 @@ class HyphenatorTest {
         assertArrayEquals(new int[]{2, 4}, h.breaks("abcdef"));
     }
 
+    /** A word shorter than the two minima together has no break, even if a pattern matches it. */
+    @Test
+    void aWordShorterThanTheMinimaHasNoBreaks() {
+        Hyphenator h = new Hyphenator(List.of("b1c"), List.of(), 2, 2);
+        assertArrayEquals(new int[]{2}, h.breaks("abcd"));
+        assertEquals(0, h.breaks("abc").length);
+        assertEquals(0, h.breaks("ab").length);
+    }
+
+    /** A letter whose lower case has another length (the Turkish dotted I) would shift the positions: no breaks. */
+    @Test
+    void aLetterWhoseLowerCaseChangesLengthGivesNoBreaks() {
+        assertEquals(0, of("en-US").breaks("İstanbul").length);
+        assertTrue(of("en-US").breaks("Istanbul").length > 0);
+    }
+
     @Test
     void upperCaseIsHyphenatedLikeLowerCase() {
         assertArrayEquals(of("es").breaks("constitución"), of("es").breaks("CONSTITUCIÓN"));

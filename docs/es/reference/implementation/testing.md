@@ -112,7 +112,8 @@ los casos válidos, y los inválidos van al catálogo.
   ([Uso desde Java](api.md#cancelar-una-conversión)).
 - **Arquitectura:** `ArchitectureTest` comprueba las dependencias entre packages ([Arquitectura](../architecture.md)).
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
-  (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min, con el informe en
+  (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min en Linux y cerca de una hora en
+  Windows, con el informe en
   `target/pit-reports/`). No está en
   la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera los tests que escriben en carpetas compartidas
   de `target/` o arrancan otra JVM.

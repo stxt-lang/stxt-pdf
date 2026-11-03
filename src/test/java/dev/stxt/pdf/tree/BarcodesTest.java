@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -220,6 +221,13 @@ class BarcodesTest {
         assertEquals(5, Barcodes.checkDigit("841234567890"));
         assertEquals(1, Barcodes.checkDigit("400638133393"));
         assertEquals(0, Barcodes.checkDigit("000000000000"));
+    }
+
+    /** The limits of a Code 128: the space and ~ are the first and the last characters it encodes, and 80 of them fit. */
+    @Test
+    void code128EncodesThePrintableAsciiUpToEightyCharacters() {
+        assertNotNull(modules("\tBarcode: ~ !", "\t\tAlt: Referencia", "\t\tFormat: code-128"));
+        assertNotNull(modules("\tBarcode: " + "A".repeat(80), "\t\tAlt: Referencia", "\t\tFormat: code-128"));
     }
 
     @Test

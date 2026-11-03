@@ -53,6 +53,7 @@ public final class PdfPainter implements Closeable {
     private final Resources resources;
     private final PdfFonts fonts;
     private final PdfImages images;
+    private final Cancellation cancellation;
     private final PdfLinks links = new PdfLinks();
     private final PdfStructure structure = PdfStructure.none();
     private final List<Page> pages = new ArrayList<>();
@@ -73,8 +74,8 @@ public final class PdfPainter implements Closeable {
         this.doc = Objects.requireNonNull(doc, "doc");
         this.resources = Objects.requireNonNull(resources, "resources");
         this.fonts = new PdfFonts(doc, resources);
-        this.images = new PdfImages(doc, Objects.requireNonNull(limits, "limits"),
-                Objects.requireNonNull(cancellation, "cancellation"));
+        this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
+        this.images = new PdfImages(doc, Objects.requireNonNull(limits, "limits"), this.cancellation);
     }
 
     /**
@@ -88,6 +89,7 @@ public final class PdfPainter implements Closeable {
     public void paint(Page page, PDPage target) throws IOException {
         Objects.requireNonNull(page, "page");
         Objects.requireNonNull(target, "target");
+        cancellation.check();
         PDRectangle box = target.getMediaBox();
         double left = box.getLowerLeftX();
         double top = box.getUpperRightY();

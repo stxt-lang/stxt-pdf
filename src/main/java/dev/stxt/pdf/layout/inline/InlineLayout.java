@@ -274,7 +274,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             return f;
         }
         return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.margin(), f.border(), f.padding(),
-                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned());
+                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned(), f.rules());
     }
 
     /**
@@ -460,11 +460,9 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         double top = Slice.top(model, first);
         double left = model.border().left() + model.padding().left();
-        double right = model.border().right() + model.padding().right();
         List<Exclusion> beside = new ArrayList<>();
         for (Exclusion e : space.exclusions()) {
-            Exclusion moved = new Exclusion(e.top() - top, e.bottom() - top, Math.max(0, e.left() - left),
-                    Math.max(0, e.right() - right));
+            Exclusion moved = e.shifted(left, top, model.width(), model.contentWidth());
             if (moved.bottom() > Tolerance.EPSILON && moved.intrudes()) {
                 beside.add(moved);
             }

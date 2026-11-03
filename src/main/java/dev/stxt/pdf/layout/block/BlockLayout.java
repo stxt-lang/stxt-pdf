@@ -143,6 +143,11 @@ public final class BlockLayout implements LayoutAlgorithm {
         boolean onRight() {
             return right > EPSILON;
         }
+
+        /** The band as an exclusion, measured from the content box of the block. */
+        Exclusion exclusion() {
+            return new Exclusion(top, bottom, left, right);
+        }
     }
 
     /** Layout of one fragment of a box. */
@@ -203,10 +208,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             }
             double top = Slice.top(model, first);
             double left = model.border().left() + model.padding().left();
-            double right = model.border().right() + model.padding().right();
             for (Exclusion e : space.exclusions()) {
-                Beside b = new Beside(e.top() - top, e.bottom() - top, Math.max(0, e.left() - left),
-                        Math.max(0, e.right() - right), -1);
+                Exclusion m = e.shifted(left, top, model.width(), model.contentWidth());
+                Beside b = new Beside(m.top(), m.bottom(), m.left(), m.right(), -1);
                 if (b.bottom() > EPSILON && (b.onLeft() || b.onRight())) {
                     beside.add(b);
                 }
@@ -428,8 +432,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 if (b.bottom() <= childY + EPSILON) {
                     continue;
                 }
-                Exclusion e = new Exclusion(b.top() - childY, b.bottom() - childY, Math.max(0, b.left() - childX),
-                        Math.max(0, b.right() - (contentWidth - childX - childWidth)));
+                Exclusion e = b.exclusion().shifted(childX, childY, contentWidth, childWidth);
                 if (e.intrudes()) {
                     exclusions.add(e);
                 }

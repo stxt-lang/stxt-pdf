@@ -1,0 +1,21 @@
+# Case: a clipped List: the markers and the text of its items would be clipped
+# Code: CLIP_WITH_TEXT
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: bullet
+			Box:
+				Overflow: clip
+			List item:
+				Text: Uno

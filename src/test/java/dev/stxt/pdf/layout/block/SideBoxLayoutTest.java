@@ -239,4 +239,39 @@ class SideBoxLayoutTest {
         assertEquals("aaaaaaaa aaaaaaaa", lines.get(2).text());
         assertEquals(0, lines.get(2).left(), 1e-9);
     }
+
+    // Cases that were missing according to mutation testing.
+
+    /**
+     * The widows of a text cut beside a side box are counted at the whole width. A box of 96 keeps the eight lines of
+     * page 1 at 18 words; with 163 words, the cut after eight lines would leave 19 words, two lines beside the box but
+     * one at the whole width: fewer than the two widows, so the cut moves up a line and 37 words go to page 2.
+     */
+    @Test
+    void theWidowsOfATextCutBesideASideBoxAreCountedAtTheWholeWidth() {
+        LayoutFixture l = layOutPaged(180, "\tImage: test/square.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:",
+                "\t\t\tWidth: 60", "\t\t\tHeight: 96", "\t\t\tMargin: 0 10 0 0",
+                "\tParagraph: " + words(163), "\t\tId: P");
+        assertEquals(2, l.pages());
+        assertEquals(List.of(18, 18, 18, 18, 18, 18, 18),
+                l.fragment(1, "P").lines().stream().map(SideBoxLayoutTest::wordsOf).toList());
+        assertEquals(List.of(20, 17), l.fragment(2, "P").lines().stream().map(SideBoxLayoutTest::wordsOf).toList());
+    }
+
+    /** The vertical margins of a side box move it down and count in the height of its block. */
+    @Test
+    void aSideBoxKeepsItsVerticalMargins() {
+        LayoutFixture l = layOut("\tBlock:", "\t\tId: B",
+                "\t\tImage: test/square.png", "\t\t\tId: I", "\t\t\tSide: left", "\t\t\tBox:",
+                "\t\t\t\tWidth: 60", "\t\t\t\tHeight: 60", "\t\t\t\tMargin: 10 10 10 0",
+                "\t\tParagraph: " + words(30), "\t\t\tId: P");
+        assertRect(40, 50, 60, 60, l.rect("I"));
+        // The block reaches the bottom margin of the box: 10 + 60 + 10.
+        assertRect(40, 40, 515, 80, l.rect("B"));
+        assertRect(40, 40, 515, 24, l.rect("P"));
+        List<TextLine> lines = l.fragment("P").lines();
+        assertEquals(List.of(18, 12), lines.stream().map(SideBoxLayoutTest::wordsOf).toList());
+        assertEquals(70, lines.get(0).left(), 1e-9);
+        assertEquals(70, lines.get(1).left(), 1e-9);
+    }
 }

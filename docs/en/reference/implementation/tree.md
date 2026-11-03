@@ -86,7 +86,7 @@ The pieces:
 | `ModelValidator` | The rules that look at the box already read (such as margins, minimums and maximums, definite height or rotation) |
 | `Nodes` | Access to the nodes and the errors |
 
-No method in `tree` exceeds 60 lines or a complexity of 20.
+No method in `tree` exceeds 65 lines or a complexity of 20.
 
 > **Decision:** the element families are an enum with default methods and not an interface with one class per family:
 > there are few of them, they are closed (the schema gives them) and they share almost everything. *Rejected alternative:* an interface with one class

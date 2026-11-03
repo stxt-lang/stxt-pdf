@@ -113,7 +113,8 @@ the valid cases, and the invalid ones go to the catalog.
   without writing anything ([Using from Java](api.md#canceling-a-conversion)).
 - **Architecture:** `ArchitectureTest` checks the dependencies between packages ([Architecture](../architecture.md)).
 - **Mutation:** the `pit` profile of the `pom.xml` runs PIT over `layout` and `fragment`
-  (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min, with the report in
+  (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min on Linux and close to an hour on
+  Windows, with the report in
   `target/pit-reports/`). It is not in
   the CI: it is an occasional pass to see whether the asserts measure anything. It leaves out the tests that write in shared folders
   of `target/` or start another JVM.

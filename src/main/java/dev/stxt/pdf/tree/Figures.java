@@ -64,10 +64,10 @@ final class Figures {
      * does not declare one, which would have no effect.
      */
     static void validateAlt(InlineNode n, Style s, Box content) {
-        if (content.isImage() && content.style().image().alt() == null) {
-            throw error(content.line(), ErrorCode.FIGURE_WITHOUT_ALT, "The " + content.element().label() + " of a "
-                    + "Figure needs Alt, the text that says what it shows to whoever cannot see it: a figure with a "
-                    + "caption is content, not decoration");
+        if (content.element() == Element.IMAGE && content.style().image().alt() == null) {
+            // A Barcode without Alt is BARCODE_WITHOUT_ALT when it is built, before getting here.
+            throw error(content.line(), ErrorCode.FIGURE_WITHOUT_ALT, "The Image of a Figure needs Alt, the text that "
+                    + "says what it shows to whoever cannot see it: a figure with a caption is content, not decoration");
         }
         if (content.element() == Element.BLOCK && s.image().alt() == null) {
             throw error(n, ErrorCode.FIGURE_WITHOUT_ALT, "A Figure with a Block needs Alt, the text that says what "

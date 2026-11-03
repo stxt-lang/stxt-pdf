@@ -61,6 +61,24 @@ class FootnoteLayoutTest {
     }
 
     /**
+     * Two lines with a call each: the first note fits under them, but not both (24.5 + 12 more than the 120 of the
+     * page area with 60 + 24 of flow), so the second line moves to the next page with its note.
+     */
+    @Test
+    void aSecondNoteThatDoesNotFitTakesItsLineToTheNextPage() {
+        LayoutFixture f = LayoutFixture.layOutPaged(200, join(new String[] {MARKDOWN,
+                "\tBlock:", "\t\tId: filler", "\t\tBox:", "\t\t\tHeight: 60"},
+                text("p1", 1, "[^a]"), note("a", 1), text("p2", 1, "[^b]"), note("b", 1)));
+        assertEquals(2, f.pages());
+        assertEquals(new Rect(40, 100, 515, 12), f.rect(1, "p1"));
+        assertEquals(new Rect(40, 148, 515, 12), f.rect(1, "a"));
+        assertFalse(f.has(1, "p2"));
+        assertFalse(f.has(1, "b"));
+        assertEquals(new Rect(40, 40, 515, 12), f.rect(2, "p2"));
+        assertEquals(new Rect(40, 148, 515, 12), f.rect(2, "b"));
+    }
+
+    /**
      * A note that does not fit under its line continues on the next page, before the notes of that page, respecting
      * widows and orphans; the line stays with the start of its note.
      */

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -102,5 +103,48 @@ class MergedBordersTest {
         assertEquals(2, closed.pages());
         assertEquals(List.of("0 1", format(closed.rect(1, "T").height() - 1) + " 1"), horizontal(closed, 1));
         assertEquals(List.of("0 1", format(closed.rect(2, "T").height() - 1) + " 1"), horizontal(closed, 2));
+    }
+
+    // Cases that were missing according to mutation testing.
+
+    /**
+     * A table cut between two rows: the line between them is drawn on both pages, inside the fragment. Rows of
+     * 1 + 30 + 0.5, 0.5 + 30 + 0.5 and 0.5 + 30 + 0.5 fill page 1 (93.5, with the bottom side of the fourth row's cell
+     * as the line at the bottom), and the fourth, 0.5 + 30 + 1, starts page 2 with the third row's bottom side as the
+     * line at the top.
+     */
+    @Test
+    void aTableCutBetweenRowsDrawsTheLineOnBothPages() {
+        LayoutFixture l = layOutPaged(PAGE, concat(BORDER, table("Split rows: false"), new String[]{"\t\tBody:"},
+                row("R1", 30), row("R2", 30), row("R3", 30), row("R4", 30)));
+        assertEquals(2, l.pages());
+        assertEquals(93.5, l.rect(1, "T").height(), 1e-9);
+        assertEquals(List.of("0 1", "31 1", "62 1", "92.5 1"), horizontal(l, 1));
+        assertEquals(31.5, l.rect(2, "T").height(), 1e-9);
+        assertEquals(List.of("0 1", "30.5 1"), horizontal(l, 2));
+    }
+
+    /** Numbering the pages ({@code {page}} in a cell) rebuilds the fragments of the table and keeps its lines. */
+    @Test
+    void theLinesSurviveThePageNumbering() {
+        LayoutFixture l = layOut(concat(BORDER, table(), new String[]{"\t\tBody:", "\t\t\tRow:",
+                "\t\t\t\tCell: p. {page}"}));
+        // One cell: its four sides, each a rule.
+        assertEquals(4, l.fragment("T").rules().size());
+    }
+
+    /** The pieces of a horizontal line that touch across the columns are one rule, as wide as the table. */
+    @Test
+    void theHorizontalPiecesOfTheColumnsAreJoined() {
+        String[] cell = {"\t\t\t\tCell:", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30"};
+        LayoutFixture l = layOut(concat(BORDER, new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: * *",
+                        "\t\tBox:", "\t\t\tMerge borders: true", "\t\tBody:"},
+                new String[]{"\t\t\tRow:"}, cell, cell, new String[]{"\t\t\tRow:"}, cell, cell));
+        List<Rule> horizontal = l.fragment("T").rules().stream().filter(r -> r.width() > r.height()).toList();
+        assertEquals(List.of(new Rule(0, 0, 515, 1, "#000000"), new Rule(0, 31, 515, 1, "#000000"),
+                new Rule(0, 62, 515, 1, "#000000")), horizontal);
+        List<Rule> vertical = l.fragment("T").rules().stream().filter(r -> r.height() > r.width()).toList();
+        assertEquals(List.of(new Rule(0, 0, 1, 63, "#000000"), new Rule(257, 0, 1, 63, "#000000"),
+                new Rule(514, 0, 1, 63, "#000000")), vertical);
     }
 }

@@ -59,6 +59,14 @@ class RunMarksTest {
         assertEquals("[a](https://a.example/[b]{x}) <y>c</>", marked("[a](https://a.example/[b]{x}) [c]{y}"));
     }
 
+    /** The target of a link ends at its balanced parenthesis; an escaped one does not count, and one never closed is no target. */
+    @Test
+    void theTargetOfALinkEndsAtItsBalancedParenthesis() {
+        assertEquals("[a](https://a.example/(b)/[c]{x}) <y>d</>", marked("[a](https://a.example/(b)/[c]{x}) [d]{y}"));
+        assertEquals("[a](https://a.example/\\)[c]{x}) <y>d</>", marked("[a](https://a.example/\\)[c]{x}) [d]{y}"));
+        assertEquals("[a](b <x>c</>", marked("[a](b [c]{x}"));
+    }
+
     @Test
     void aBlankLineSeparatesTheBrackets() {
         assertEquals("[a\n\nb]{x}", marked("[a\n\nb]{x}"));

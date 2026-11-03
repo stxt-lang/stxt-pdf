@@ -13,6 +13,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   content left a gap at the end of a column (a box with a definite height, or a stretched grid item, broken inside the
   column) consumed that gap from its height and could run out of room on the next page (`BOX_OVERFLOW`). As any other
   box, it now consumes only what its columns take up ("Definite height and breaks" in the reference).
+- A table with `Merge borders` lost its lines when a text inside it (or inside a `Page overlay` that contains it) was
+  numbered with `{page}` or `{pages}`: the numbering rebuilt the fragments without them.
+- `PdfPainter` with a `Cancellation` consulted it only at each image, not before each page as documented. It now stops
+  before painting a page once the cancellation is requested.
+- The message of `MARKDOWN_UNSUPPORTED` for a text with `Markup: markdown` lists `` `code` `` and `![images](path)`
+  among what it allows, which it already did.
 
 ## [0.9.0] - 2026-11-02
 

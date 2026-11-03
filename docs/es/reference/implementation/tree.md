@@ -86,7 +86,7 @@ Las piezas:
 | `ModelValidator` | Las reglas que miran la caja ya leída (como los márgenes, los mínimos y máximos, el alto definido o el giro) |
 | `Nodes` | El acceso a los nodos y los errores |
 
-Ningún método de `tree` pasa de 60 líneas ni de complejidad 20.
+Ningún método de `tree` pasa de 65 líneas ni de complejidad 20.
 
 > **Decisión:** las familias de elementos son un enum con métodos por defecto y no una interfaz con una clase por familia:
 > son pocas, están cerradas (las da el schema) y comparten casi todo. *Alternativa descartada:* una interfaz con una clase

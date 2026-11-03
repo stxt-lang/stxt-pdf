@@ -4,6 +4,8 @@ import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Cancellation;
+import dev.stxt.pdf.model.CancelledException;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -27,6 +29,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -107,6 +110,27 @@ class PdfPainterTest {
         }
     }
 
+    /** The cancellation is consulted before each page: once requested, the next page is not painted. */
+    @Test
+    void theCancellationIsConsultedBeforeEachPage() throws IOException {
+        LaidOutDocument document = twoPages();
+        try (PDDocument doc = form(2)) {
+            int[] painted = {0};
+            Cancellation afterTheFirst = () -> painted[0] > 0;
+            try (PdfPainter painter = new PdfPainter(doc, RESOURCES, Limits.DEFAULT, afterTheFirst)) {
+                painter.paint(document.pages().get(0), doc.getPage(0));
+                painted[0]++;
+                assertThrows(CancelledException.class, () -> painter.paint(document.pages().get(1), doc.getPage(1)));
+            }
+            // The second page keeps only the stream of the form.
+            int streams = 0;
+            for (var it = doc.getPage(1).getContentStreams(); it.hasNext(); it.next()) {
+                streams++;
+            }
+            assertEquals(1, streams);
+        }
+    }
+
     @Test
     void internalLinksAreResolvedAmongThePagesPainted() throws IOException {
         LaidOutDocument document = twoPages();
@@ -136,6 +160,29 @@ class PdfPainterTest {
             List<PDAnnotation> annotations = doc.getPage(0).getAnnotations();
             assertEquals(1, annotations.size(), "only the link to the URL");
             assertEquals("URI", annotations.get(0).getCOSObject().getCOSDictionary(COSName.A).getNameAsString(COSName.S));
+        }
+    }
+
+    /** The link annotations move with the content when the media box does not start at x = 0. */
+    @Test
+    void theAnnotationsFollowTheMediaBox() throws IOException {
+        LaidOutDocument document = laidOut("\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
+                "\tParagraph: Ver [uno](#uno) y [la web](https://stxt.dev).");
+        PDRectangle atZero = linkRectangle(document, new PDRectangle(0, 0, 400, 500));
+        PDRectangle shifted = linkRectangle(document, new PDRectangle(100, 50, 400, 500));
+        assertEquals(atZero.getLowerLeftX() + 100, shifted.getLowerLeftX(), 1e-3);
+        assertEquals(atZero.getWidth(), shifted.getWidth(), 1e-3);
+    }
+
+    /** The rectangle of the first link annotation of the first page of {@code document}, painted on {@code mediaBox}. */
+    private static PDRectangle linkRectangle(LaidOutDocument document, PDRectangle mediaBox) throws IOException {
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage(mediaBox);
+            doc.addPage(page);
+            try (PdfPainter painter = new PdfPainter(doc, RESOURCES, Limits.DEFAULT)) {
+                painter.paint(document.pages().get(0), page);
+            }
+            return page.getAnnotations().get(0).getRectangle();
         }
     }
 

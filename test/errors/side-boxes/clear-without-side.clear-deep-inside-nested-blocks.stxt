@@ -1,0 +1,19 @@
+# Case: Clear in a text nested in two Blocks, none of which has a side box
+# Code: CLEAR_WITHOUT_SIDE
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Block:
+			Block:
+				Paragraph: Hola
+					Clear: true

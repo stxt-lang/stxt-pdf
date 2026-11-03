@@ -108,8 +108,8 @@ final class MarkdownBuilder {
             + "line) are allowed";
 
     private static final String INLINE_SUBSET = "a text with Markup: markdown only allows text with **bold**, "
-            + "*italic*, ++underline++, ~~strikethrough~~, [links](target), [styled runs]{style} and line breaks (\\ at "
-            + "the end of the line); "
+            + "*italic*, ++underline++, ~~strikethrough~~, `code`, [links](target), ![images](path), "
+            + "[styled runs]{style} and line breaks (\\ at the end of the line); "
             + "the rest goes in a Markdown, and a special character is written with \\ before it (\\*)";
 
     /**
@@ -664,9 +664,7 @@ final class MarkdownBuilder {
 
         InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
-            if (n instanceof Code || n instanceof FencedCodeBlock || n instanceof IndentedCodeBlock) {
-                what = "code";
-            } else if (n instanceof BlockQuote) {
+            if (n instanceof BlockQuote) {
                 what = "quotes (>)";
             } else if (n instanceof ThematicBreak) {
                 what = "horizontal rules";

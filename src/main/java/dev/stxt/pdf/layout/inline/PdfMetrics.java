@@ -147,7 +147,8 @@ public final class PdfMetrics implements TextMeasurer {
                                 requireGlyphs(box, font, heading, start + i);
                             }
                         } else {
-                            // A page or a number, painted with digits (or letters, in lists).
+                            // A page or a number: only the digits are required (a list item with letters paints
+                            // ASCII letters, which every text font has).
                             for (char d : DIGITS.toCharArray()) {
                                 requireGlyph(box, font, d, start + i);
                             }
