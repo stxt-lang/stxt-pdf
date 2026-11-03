@@ -62,6 +62,7 @@ public final class Engine implements LayoutContext {
 
     private final LayoutCache cache = new LayoutCache();
     private final TextMeasurer measurer;
+    private final Resources resources;
     private final Images images;
     private final Limits limits;
     /** Whether the modules of the barcodes are checked ({@link Check#BARCODE_SIZE}). */
@@ -128,6 +129,7 @@ public final class Engine implements LayoutContext {
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
                   Cancellation cancellation, Progress progress) {
         this.measurer = measurer;
+        this.resources = resources;
         this.limits = limits;
         this.moduleSizes = !excluded.contains(Check.BARCODE_SIZE);
         this.cancellation = cancellation;
@@ -184,7 +186,7 @@ public final class Engine implements LayoutContext {
                 ModuleSizes.check(pages, cancellation);
             }
             progress.laidOut(pages.size());
-            return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages);
+            return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages, resources);
         } finally {
             release();
         }

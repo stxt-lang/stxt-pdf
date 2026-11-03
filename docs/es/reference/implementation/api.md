@@ -104,10 +104,10 @@ esos dos puede ser `null`. Ver [Styles](../common/styles.md#documento-de-estilos
 ## Recursos
 
 `new Resources(Path.of("otra"))` usa otra carpeta de recursos. Toda ruta pasa por `Resources.resolve`, que nunca va hacia
-atrás. `Resources` se comparte entre hilos y entre conversiones. Indexa `fonts/` una vez y guarda las imágenes leídas,
+atrás. `Resources` se comparte entre hilos y entre conversiones. Guarda el índice de `fonts/` y las imágenes leídas,
 una por fichero: `ImageLibrary` las guarda por su ruta real, así que `logo.png`, `./logo.png` y, en un sistema de
 ficheros que no distingue mayúsculas, `Logo.png` son la misma imagen, y lo que escriben los documentos no hace crecer la
-memoria de un servicio. Las grafías ya vistas son un atajo hacia ellas que se vacía al llegar a 1024.
+memoria de un servicio. Las grafías ya vistas son un atajo hacia ellas, sin ir al disco, que se vacía al llegar a 1024.
 
 `FontLibrary` indexa los `.ttf` y los `.otf` e identifica cada uno por su interior:
 
@@ -124,6 +124,41 @@ con el de TrueType, sea cual sea su extensión; `FontFile.cff()` dice cuáles so
 > **Decisión:** las fuentes solo se comprueban con `PdfMetrics` (`Engine.layOutDocument` llama a `validate`). Con
 > `FixedMetrics` no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar
 > siempre las fuentes al construir el árbol, que obligaría a tener la carpeta también para maquetar sin PDF.
+
+### Ficheros que cambian
+
+Los ficheros de la carpeta pueden cambiar mientras vive el `Converter`: cada conversión ve la carpeta como está cuando
+empieza, sin crear otro `Converter` ni otro `Resources`. `Converter` trabaja en cada conversión con
+`Resources.snapshot()`, una vista de la carpeta que comparte con el `Resources` y con las demás vistas lo ya leído:
+
+- **Fuentes.** La primera vez que la vista las pide, recorre `fonts/` mirando el tamaño y la fecha de modificación de
+  cada fichero, sin leerlo. Si son los del último índice, lo usa; si se ha añadido, quitado o sustituido un fichero,
+  indexa la carpeta otra vez.
+- **Imágenes.** La primera vez que la vista pide una imagen, mira el tamaño y la fecha de su fichero. Si son los de la
+  imagen ya leída, la usa; si no, la lee otra vez y la nueva sustituye a la vieja para las vistas que vengan después. Un
+  SVG con texto se lee también otra vez si las fuentes se han indexado de nuevo, porque su texto se comprobó con ellas.
+- **Durante la conversión.** La vista se queda con lo que encontró mientras vive, así que una conversión no mezcla dos
+  versiones de un fichero. El `LaidOutDocument` la guarda (`LaidOutDocument.resources()`), y `toPdf` y `toSvg` lo pintan
+  con las mismas fuentes e imágenes con que se maquetó.
+
+Las fuentes y los SVG están en memoria, así que un documento ya maquetado se pinta igual aunque su fichero cambie o
+desaparezca. Un PNG, un JPEG o un PDF se vuelve a leer al pintar, y antes `ImageFile.checkUnchanged` compara su tamaño y
+su fecha con los que tenía al leerlo: si no coinciden, la conversión acaba en `IMAGE_FORMAT`, sin línea, en vez de pintar
+una imagen con el tamaño de otra; si el fichero ya no se puede leer (porque se ha borrado, por ejemplo), en `RESOURCE`,
+con su ruta. La conversión siguiente lee el fichero nuevo.
+
+Un `Resources` creado con su constructor y usado sin `snapshot()` (con `Engine`, `PdfDocumentWriter` o `PdfPainter`
+directamente) lee cada fichero la primera vez y no vuelve a mirar la carpeta. Para ver los cambios, se les pasa
+`resources.snapshot()`, una por documento.
+
+> **Decisión:** una vista por conversión, que mira cada fichero la primera vez que lo usa: los cambios se ven sin crear
+> otro `Converter`, cuesta un recorrido de `fonts/` y una consulta al disco por imagen y conversión, y una conversión no
+> mezcla versiones. El SVG se guarda en memoria, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha, porque
+> pueden ser grandes. No se detecta un fichero sustituido por otro del mismo tamaño con la fecha del original (como hacen
+> `cp -p`, `rsync -t` o un zip al descomprimirse), ni un cambio entre la comprobación y la lectura. *Alternativas
+> descartadas:* una carpeta que no puede cambiar mientras vive el `Resources`, que pedía crear otro para ver un fichero
+> nuevo; un `reload()` que llama quien cambia los ficheros; mirar el disco en cada uso de un fichero, que está en cada
+> medida; leer los bytes una vez al pintar y comprobar sobre ellos el formato y el tamaño medidos.
 
 ## Errores
 

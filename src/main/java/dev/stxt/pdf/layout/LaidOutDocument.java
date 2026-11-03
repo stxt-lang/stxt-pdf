@@ -1,6 +1,7 @@
 package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.Metadata;
@@ -22,10 +23,19 @@ import java.util.List;
  * @param metadata title and language of the document
  * @param root     the root of the document, from which its sections hang (reference/components/document.md)
  * @param pages    the pages, in order; never empty
+ * @param resources the resources it was laid out with, a {@link Resources#snapshot()} when it comes from a
+ *                  {@link dev.stxt.pdf.convert.Converter}: the PDF and the SVG are painted with the same version of
+ *                  each font and each image; {@code null} if it is not known
  */
-public record LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, List<Page> pages) {
+public record LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, List<Page> pages,
+        Resources resources) {
 
     public LaidOutDocument {
         pages = List.copyOf(pages);
+    }
+
+    /** Without the resources it was laid out with: whoever paints it gives them. */
+    public LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, List<Page> pages) {
+        this(pageSetup, metadata, root, pages, null);
     }
 }

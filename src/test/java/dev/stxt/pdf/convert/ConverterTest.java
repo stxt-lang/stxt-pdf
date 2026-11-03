@@ -72,15 +72,21 @@ class ConverterTest {
         assertArrayEquals(fromText, pdf(Converter.builder().styles(file).build(), document()));
     }
 
-    /** The fonts are read when the folder is indexed: the PDF does not change even if the file disappears later. */
+    /**
+     * The fonts are read when the folder is indexed: the PDF of a document already laid out does not change even if
+     * the file disappears later (the next conversion sees it is gone, ResourceChangesTest).
+     */
     @Test
     void theFontsAreReadOnce(@org.junit.jupiter.api.io.TempDir Path folder) throws IOException {
         Path fonts = Files.createDirectories(folder.resolve("fonts"));
         Files.copy(Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"), fonts.resolve("a.ttf"));
         Converter converter = Converter.builder().resources(new Resources(folder)).styles(BASE).build();
+        LaidOutDocument laidOut = converter.layOut(document());
         byte[] before = pdf(converter, document());
         Files.delete(fonts.resolve("a.ttf"));
-        assertArrayEquals(before, pdf(converter, document()));
+        ByteArrayOutputStream after = new ByteArrayOutputStream();
+        converter.toPdf(laidOut, after);
+        assertArrayEquals(before, after.toByteArray());
     }
 
     @Test

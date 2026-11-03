@@ -3,6 +3,8 @@ package dev.stxt.pdf.resources;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -14,9 +16,18 @@ import java.util.regex.Pattern;
  * rejects absolute paths, {@code ..} segments and symbolic links that point
  * outside the folder.</p>
  *
- * <p><strong>Threads:</strong> it can be shared among all conversions and all threads. Fonts and
- * images are read the first time they are requested, with double-checked locking, and are then read without a
- * lock; the folder is scanned only once, so files added later are not seen.</p>
+ * <p><strong>Changes in the folder</strong> (reference/implementation/api.md): a {@code Resources} created with a
+ * constructor reads each font and each image the first time it is requested and does not look at the folder again.
+ * {@link #snapshot()} gives a view of the folder as it is now, which shares what was already read: the fonts are
+ * indexed again if a file of {@code fonts/} was added, removed or replaced, and each image is read again the first time
+ * the view requests it if its file changed. {@link dev.stxt.pdf.convert.Converter} takes a snapshot for each
+ * conversion, so a conversion works with one version of each file from start to end and the next one sees the
+ * changes. An SVG is painted with the bytes that were read; a PNG, a JPEG or a PDF that changed or was removed between
+ * laying out and painting makes the conversion fail ({@link ImageFile#checkUnchanged()}).</p>
+ *
+ * <p><strong>Threads:</strong> it can be shared among all conversions and all threads, and so can its snapshots. Fonts
+ * and images are read the first time they are requested, with double-checked locking, and are then read without a
+ * lock.</p>
  */
 public final class Resources {
 
@@ -27,6 +38,10 @@ public final class Resources {
     private static final Pattern DRIVE = Pattern.compile("^[A-Za-z]:");
 
     private final Path root;
+    /** What this object and its snapshots share. */
+    private final Shared shared;
+    /** Whether it is a {@link #snapshot()}, which looks at the folder again, or was created with a constructor. */
+    private final boolean snapshot;
     /** Created the first time they are requested and read without a lock (double-checked locking). */
     private volatile FontLibrary fonts;
     private volatile ImageLibrary images;
@@ -37,7 +52,23 @@ public final class Resources {
     }
 
     public Resources(Path root) {
-        this.root = root.toAbsolutePath().normalize();
+        this(root.toAbsolutePath().normalize(), new Shared(), false);
+    }
+
+    private Resources(Path root, Shared shared, boolean snapshot) {
+        this.root = root;
+        this.shared = shared;
+        this.snapshot = snapshot;
+    }
+
+    /**
+     * A view of the folder as it is now, which shares with this object (and with its other snapshots) the fonts and
+     * the images already read: those whose files have not changed are not read again. It looks at the folder only the
+     * first time it is asked for its fonts or for each image, and then keeps what it found while it lives, so that one
+     * conversion does not mix two versions of a file. Creating it costs nothing until then.
+     */
+    public Resources snapshot() {
+        return new Resources(root, shared, true);
     }
 
     public Path root() {
@@ -55,7 +86,8 @@ public final class Resources {
     }
 
     /**
-     * Fonts of {@code fonts/}. They are scanned the first time they are requested.
+     * Fonts of {@code fonts/}. They are scanned the first time they are requested; in a {@link #snapshot()}, again if
+     * the files of the folder are not those of the last scan.
      *
      * @throws ResourceException if the folder does not exist or some font is not valid
      */
@@ -65,7 +97,7 @@ public final class Resources {
             synchronized (this) {
                 library = fonts;
                 if (library == null) {
-                    library = FontLibrary.scan(this);
+                    library = shared.fonts(this, snapshot);
                     fonts = library;
                 }
             }
@@ -73,19 +105,48 @@ public final class Resources {
         return library;
     }
 
-    /** Images of {@code images/}, read the first time they are requested. */
+    /**
+     * Images of {@code images/}, read the first time they are requested; in a {@link #snapshot()}, again if the file
+     * changed since it was read.
+     */
     public ImageLibrary images() {
         ImageLibrary library = images;
         if (library == null) {
             synchronized (this) {
                 library = images;
                 if (library == null) {
-                    library = new ImageLibrary(this);
+                    library = new ImageLibrary(this, shared.images, snapshot);
                     images = library;
                 }
             }
         }
         return library;
+    }
+
+    /** What a {@code Resources} and its snapshots share: the last scan of the fonts and the images read. */
+    private static final class Shared {
+
+        /** The images read, by real path; a snapshot replaces the one whose file changed. */
+        final Map<Path, ImageFile> images = new ConcurrentHashMap<>();
+        private volatile FontLibrary fonts;
+
+        /**
+         * The fonts of the last scan, scanning them the first time and, if {@code refresh}, again when the files of
+         * the folder are not those it read.
+         */
+        FontLibrary fonts(Resources resources, boolean refresh) {
+            FontLibrary library = fonts;
+            if (library != null && (!refresh || library.stamps().equals(FontLibrary.stamps(resources)))) {
+                return library;
+            }
+            synchronized (this) {
+                // If another thread scanned in the meantime, its scan is at least as recent as the look above.
+                if (fonts == library) {
+                    fonts = FontLibrary.scan(resources);
+                }
+                return fonts;
+            }
+        }
     }
 
     /**

@@ -21,6 +21,14 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
+- **The files of the resources folder can change while the `Converter` lives.** Each conversion sees the fonts and the
+  images as they are when it starts: a font added, removed or replaced in `fonts/`, and an image replaced in `images/`,
+  are seen by the next conversion without creating another `Converter` or `Resources`. Until 0.9.0 a `Resources` read
+  each file once and did not look at the folder again. What has not changed is not read again: each conversion walks
+  `fonts/` once and looks at each image it uses once, by its size and modification time. A document already laid out
+  is painted with the fonts and images it was laid out with ("Files that change" in `api.md`). A `Resources` used
+  without `Converter` (with `Engine`, `PdfDocumentWriter` or `PdfPainter`) keeps the old behavior unless it is given
+  `resources.snapshot()`.
 - **A barcode too small to be read is an error.** A `Barcode` whose content box, once laid out, leaves its modules
   narrower than the minimum of its format is `BARCODE_TOO_SMALL` (new code), with the line of the `Barcode`, the module
   it is left with and the content box it needs. The minimum is 0.25 mm in a QR code and a Code 128, about three dots of a
@@ -59,6 +67,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   cannot be walked, a file removed while it was being looked up) reached whoever converts as an `InternalException` (a
   defect of the engine) or, while painting, as the `IOException` of the destination. It is now a `ResourceException`
   with the path of the file, as `api.md` promises.
+- An image that changed on disk after it was read was laid out with the old file and painted with the new one, without
+  a warning, and the limits had been checked on the old one. An SVG is now painted with the bytes that were checked
+  when it was read. A PNG, a JPEG or a PDF, which is read again when painting, is compared with the size and the
+  modification time it had: if they changed between laying out and painting, the conversion ends in `IMAGE_FORMAT`
+  ("The image logo.png changed after it was read..."). An image that can no longer be read when painting (removed, for
+  example) is a `ResourceException` with its path, where it was the `IOException` of the destination in `toPdf` and an
+  `InternalException` in `toSvg`.
 - The images of a `Resources` are kept once per file: two spellings of the same path (`logo.png` and `./logo.png`, or
   `Logo.png` on a file system that does not tell capitals from small letters) were read twice and kept twice, so a
   service that shares its `Resources` could see its memory grow with what the documents wrote.
@@ -69,6 +84,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - `Modules` has a sixth component, `minModule` (the narrowest module that can be read, 0 for none; the constructor of
   five components stays), and `usedModule(width, height)` and `minimumSize()`.
 - `layout.ModuleSizes`, the check that `Engine` runs after `Overflow` unless `Check.BARCODE_SIZE` is removed.
+- `ImageFile.name()`, `svgContent()` (the bytes of an SVG as they were read), `checkUnchanged()` and
+  `unreadable(IOException)`.
+- `Resources.snapshot()`, a view of the folder as it is now that shares what was already read, and
+  `LaidOutDocument.resources()`, the one it was laid out with (a fifth component; the constructor of four stays and
+  leaves it `null`). `Converter.toPdf(LaidOutDocument, ...)` and `toSvg(LaidOutDocument)` paint with it when it is
+  there.
 
 ## [0.9.0] - 2026-11-02
 

@@ -106,10 +106,11 @@ those two it can be `null`. See [Styles](../common/styles.md#separate-styles-doc
 ## Resources
 
 `new Resources(Path.of("other"))` uses another resources folder. Every path goes through `Resources.resolve`, which never goes
-backwards. `Resources` is shared across threads and across conversions. It indexes `fonts/` once and keeps the images it has read,
-one per file: `ImageLibrary` keeps them by their real path, so `logo.png`, `./logo.png` and, on a file system that does
-not tell capitals from small letters, `Logo.png` are the same image, and what the documents write does not make the
-memory of a service grow. The spellings already seen are a shortcut to them that is emptied when it reaches 1024.
+backwards. `Resources` is shared across threads and across conversions. It keeps the index of `fonts/` and the images it
+has read, one per file: `ImageLibrary` keeps them by their real path, so `logo.png`, `./logo.png` and, on a file system
+that does not tell capitals from small letters, `Logo.png` are the same image, and what the documents write does not make
+the memory of a service grow. The spellings already seen are a shortcut to them, without going to the disk, that is
+emptied when it reaches 1024.
 
 `FontLibrary` indexes the `.ttf` and `.otf` files and identifies each one by its contents:
 
@@ -126,6 +127,44 @@ with the TrueType one, whatever its extension; `FontFile.cff()` says which ones 
 > **Decision:** the fonts are only checked with `PdfMetrics` (`Engine.layOutDocument` calls `validate`). With
 > `FixedMetrics` the fonts folder is not looked at: it is enough for `Font` to be declared. *Rejected alternative:* always validating
 > the fonts when building the tree, which would require the folder also to lay out without PDF.
+
+### Files that change
+
+The files of the folder can change while the `Converter` lives: each conversion sees the folder as it is when it
+starts, without creating another `Converter` or another `Resources`. `Converter` works in each conversion with
+`Resources.snapshot()`, a view of the folder that shares with the `Resources` and with the other views what was already
+read:
+
+- **Fonts.** The first time the view asks for them, it walks `fonts/` looking at the size and the modification time of
+  each file, without reading it. If they are those of the last index, it uses it; if a file was added, removed or
+  replaced, it indexes the folder again.
+- **Images.** The first time the view asks for an image, it looks at the size and the date of its file. If they are
+  those of the image already read, it uses it; if not, it reads it again and the new one replaces the old one for the
+  views that come after. An SVG with text is also read again if the fonts were indexed again, because its text was
+  checked with them.
+- **During the conversion.** The view keeps what it found while it lives, so a conversion does not mix two versions of
+  a file. The `LaidOutDocument` keeps it (`LaidOutDocument.resources()`), and `toPdf` and `toSvg` paint it with the same
+  fonts and images it was laid out with.
+
+The fonts and the SVGs are in memory, so a document already laid out is painted the same even if its file changes or
+disappears. A PNG, a JPEG or a PDF is read again when painting, and before that `ImageFile.checkUnchanged` compares its
+size and its date with those it had when it was read: if they do not match, the conversion ends in `IMAGE_FORMAT`,
+without a line, instead of painting an image with the size of another; if the file can no longer be read (because it was
+removed, for example), in `RESOURCE`, with its path. The next conversion reads the new file.
+
+A `Resources` created with its constructor and used without `snapshot()` (with `Engine`, `PdfDocumentWriter` or
+`PdfPainter` directly) reads each file the first time and does not look at the folder again. To see the changes, they
+are given `resources.snapshot()`, one per document.
+
+> **Decision:** one view per conversion, which looks at each file the first time it uses it: the changes are seen
+> without creating another `Converter`, it costs a walk of `fonts/` and one look at the disk per image and conversion,
+> and a conversion does not mix versions. The SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by
+> their size and their date, because they can be large. A file replaced by another of the same size with the date of the
+> original (as `cp -p`, `rsync -t` or a zip when it is extracted do) is not detected, nor a change between the check and
+> the reading. *Rejected alternatives:* a folder that cannot change while the `Resources` lives, which needed another one
+> to see a new file; a `reload()` that whoever changes the files calls; looking at the disk at each use of a file, which
+> is in each measurement; reading the bytes once when painting and checking on them the format and the size that were
+> measured.
 
 ## Errors
 

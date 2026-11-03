@@ -56,6 +56,12 @@ import java.util.function.Supplier;
  * {@link #layOut(InlineNode)} and the result is painted with {@link #toPdf(LaidOutDocument, OutputStream)} and
  * {@link #toSvg(LaidOutDocument)}. A {@link LaidOutDocument} does not change after it is laid out.</p>
  *
+ * <p><strong>Changes in the resources folder:</strong> each conversion works with a {@link Resources#snapshot()} of
+ * the folder taken when it starts, so it sees the fonts and the images that were added, removed or replaced since the
+ * previous one, without creating another {@code Converter}. A {@link LaidOutDocument} keeps its snapshot, and
+ * {@link #toPdf(LaidOutDocument, OutputStream)} and {@link #toSvg(LaidOutDocument)} paint it with the same fonts and
+ * images it was laid out with (reference/implementation/api.md).</p>
+ *
  * <p>What belongs to one document and not to the configuration, the files to embed and their XMP
  * ({@link Attachments}, for Factur-X), goes with each call: {@link #toPdf(InlineNode, OutputStream, Attachments)}.
  * Embedding a file needs {@link Builder#pdfA PDF/A-3}.</p>
@@ -160,7 +166,9 @@ public final class Converter {
         Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         return guarded(() -> {
-            LaidOutDocument laidOut = new Engine(new PdfMetrics(resources), resources, limits, excluded, stop,
+            // The folder as it is now, for this whole conversion: the document is painted with it too.
+            Resources current = resources.snapshot();
+            LaidOutDocument laidOut = new Engine(new PdfMetrics(current), current, limits, excluded, stop,
                     progress).layOutDocument(document, styles);
             if (!excluded.contains(Check.CONTRAST)) {
                 ContrastCheck.check(laidOut, stop);
@@ -262,8 +270,8 @@ public final class Converter {
         Objects.requireNonNull(attachments, "attachments");
         Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
-        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments,
-                stop, progress));
+        guarded(() -> PdfDocumentWriter.write(document, resources(document), limits, target, debug, pdfUa, pdfA,
+                attachments, stop, progress));
     }
 
     /**
@@ -301,8 +309,8 @@ public final class Converter {
                     + "one has " + target.getNumberOfPages() + "; one page at a time goes with PdfPainter");
         }
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
-        guarded(() -> PdfDocumentWriter.write(document, resources, limits, target, debug, pdfUa, pdfA, attachments,
-                stop, progress));
+        guarded(() -> PdfDocumentWriter.write(document, resources(document), limits, target, debug, pdfUa, pdfA,
+                attachments, stop, progress));
     }
 
     /** The SVG of each page of an already laid out document, in order. */
@@ -332,12 +340,21 @@ public final class Converter {
             for (int i = 0; i < pages.size(); i++) {
                 stop.check();
                 Page page = pages.get(i);
-                svg.add(SvgCanvas.page(page, page.pageSetup(), debug, resources));
+                svg.add(SvgCanvas.page(page, page.pageSetup(), debug, resources(document)));
                 progress.pagePainted(i + 1, pages.size());
             }
             progress.done();
             return List.copyOf(svg);
         });
+    }
+
+    /**
+     * The resources a document is painted with: those it was laid out with ({@link LaidOutDocument#resources()}), so
+     * that it is painted with the fonts and the images it was measured with, or, if they are not known, the folder as
+     * it is now.
+     */
+    private Resources resources(LaidOutDocument document) {
+        return document.resources() != null ? document.resources() : resources.snapshot();
     }
 
     /** A job that writes to a destination. */

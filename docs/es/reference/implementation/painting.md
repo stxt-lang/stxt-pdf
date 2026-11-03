@@ -151,6 +151,10 @@ de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de si
 
 `PdfImages` incrusta el PNG y el JPEG con PDFBox y el SVG con JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) dibujando en un
 `PdfBoxGraphics2D` (`pdfbox-graphics2d` 3.0.5), que da un formulario del tamaño natural, una vez por fichero.
+El SVG lo dibuja con los bytes que guardó `ImageFile` al leerlo, y el PNG, el JPEG y el PDF los vuelve a leer del
+fichero después de comprobar con `ImageFile.checkUnchanged` que no ha cambiado ([Uso desde Java](api.md#ficheros-que-cambian)). Si
+no puede leerlos, el error es un `ResourceException` con la ruta. `SvgCanvas` sigue las mismas reglas para el `data:`
+de cada imagen.
 `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde manda `ImageFit` y restablece los guiones antes de
 dibujarlo. JSVG dibuja el texto como contornos. `PdfCanvas.inlineImage` dibuja una imagen en línea
 ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) en el rectángulo de su tramo, que

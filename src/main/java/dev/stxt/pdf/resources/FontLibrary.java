@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,6 +38,9 @@ import java.util.stream.Stream;
  * <p>These are errors: a missing folder, a file that cannot be read, a variable
  * font, two files with the same family, weight and style, and a link that leaves the
  * resources folder.</p>
+ *
+ * <p>It keeps the size and the modification time of each file as it read them ({@link #stamps()}), so that
+ * {@link Resources#snapshot()} can tell whether the folder changed without reading the fonts again.</p>
  */
 public final class FontLibrary {
 
@@ -49,31 +55,27 @@ public final class FontLibrary {
     private final Map<FontFace, FontFile> faces;
     /** All the families found, including those whose files cannot be used, in alphabetical order. */
     private final SortedSet<String> families;
+    private final List<Stamp> stamps;
 
-    private FontLibrary(Path folder, Map<FontFace, FontFile> faces, Set<String> families) {
+    /** A font file as it was when it was read: its path, its size and its modification time. */
+    record Stamp(Path path, long size, FileTime modified) {
+    }
+
+    private FontLibrary(Path folder, Map<FontFace, FontFile> faces, Set<String> families, List<Stamp> stamps) {
         this.folder = folder;
         this.faces = Map.copyOf(faces);
         this.families = Collections.unmodifiableSortedSet(new TreeSet<>(families));
+        this.stamps = List.copyOf(stamps);
     }
 
     static FontLibrary scan(Resources resources) {
-        Path folder = resources.fontsFolder();
-        if (!Files.isDirectory(folder)) {
-            throw new ResourceException("The fonts folder " + folder + " does not exist");
-        }
-        List<Path> files;
-        try (Stream<Path> walk = Files.walk(folder)) {
-            files = walk.filter(FontLibrary::isFontFile)
-                    .sorted()
-                    .toList();
-        } catch (IOException | UncheckedIOException e) {
-            // The walk reports what it cannot read while it walks as an UncheckedIOException.
-            throw new ResourceException("Cannot read the fonts folder " + folder + ": " + e.getMessage(), e);
-        }
         Map<FontFace, FontFile> faces = new HashMap<>();
         Set<String> families = new TreeSet<>();
-        for (Path file : files) {
+        List<Stamp> stamps = new ArrayList<>();
+        for (Path file : files(resources)) {
             resources.checkInside(file);
+            // Before reading it: a change while it is being read gives another modification time.
+            stamps.add(stamp(file));
             Entry entry = read(file);
             families.add(entry.family());
             if (entry.font() == null) {
@@ -82,10 +84,54 @@ public final class FontLibrary {
             FontFile previous = faces.putIfAbsent(entry.font().face(), entry.font());
             if (previous != null) {
                 throw new ResourceException("Two files for the font " + entry.font().face() + ": "
-                        + folder.relativize(previous.path()) + " and " + folder.relativize(file));
+                        + resources.fontsFolder().relativize(previous.path()) + " and "
+                        + resources.fontsFolder().relativize(file));
             }
         }
-        return new FontLibrary(folder, faces, families);
+        return new FontLibrary(resources.fontsFolder(), faces, families, stamps);
+    }
+
+    /**
+     * The font files of the folder as they are now, without reading them, in the order of {@link #stamps()}: what
+     * changes when a file is added, removed or replaced.
+     *
+     * @throws ResourceException if the folder does not exist or cannot be walked
+     */
+    static List<Stamp> stamps(Resources resources) {
+        List<Stamp> stamps = new ArrayList<>();
+        for (Path file : files(resources)) {
+            stamps.add(stamp(file));
+        }
+        return stamps;
+    }
+
+    /** The size and the modification time of each file when it was read, in the order of the path. */
+    List<Stamp> stamps() {
+        return stamps;
+    }
+
+    private static List<Path> files(Resources resources) {
+        Path folder = resources.fontsFolder();
+        if (!Files.isDirectory(folder)) {
+            throw new ResourceException("The fonts folder " + folder + " does not exist");
+        }
+        try (Stream<Path> walk = Files.walk(folder)) {
+            return walk.filter(FontLibrary::isFontFile)
+                    .sorted()
+                    .toList();
+        } catch (IOException | UncheckedIOException e) {
+            // The walk reports what it cannot read while it walks as an UncheckedIOException.
+            throw new ResourceException("Cannot read the fonts folder " + folder + ": " + e.getMessage(), e);
+        }
+    }
+
+    private static Stamp stamp(Path file) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
+            return new Stamp(file, attributes.size(), attributes.lastModifiedTime());
+        } catch (IOException e) {
+            throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
+        }
     }
 
     /** Whether the file is a font by its extension: {@code .ttf} or {@code .otf}, in upper or lower case. */

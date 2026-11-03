@@ -8,13 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Images of the {@code images/} folder (reference/components/image.md), by their path relative to
- * it ({@code logos/acme.png}). Each file is read only once (except in a race between threads, which keeps one of the
- * reads), whatever the spelling of its path ({@code logo.png}, {@code ./logo.png} and, where the file system does not
- * tell capitals from small letters, {@code Logo.png} are the same image). It is thread-safe.
+ * it ({@code logos/acme.png}), whatever the spelling of the path ({@code logo.png}, {@code ./logo.png} and, where the
+ * file system does not tell capitals from small letters, {@code Logo.png} are the same image). It is thread-safe.
  *
- * <p>It lives as long as its {@link Resources}, which a service shares among all its conversions, so it does not grow
- * with what the documents write: the images are kept by their real path, one per file of the folder, and the spellings
- * already seen are only a shortcut to them, emptied when it reaches {@link #MAX_SPELLINGS}.</p>
+ * <p>Each {@link Resources} has its own, and they share the images read, kept by their real path, one per file of the
+ * folder, so they do not grow with what the documents write. The one of a {@code Resources} created with a constructor
+ * reads each file only once (except in a race between threads, which keeps one of the reads). The one of a
+ * {@link Resources#snapshot()} looks at the file the first time it is asked for it: if it does not have the size and the
+ * modification time it had when it was read, or it is an SVG with text and the fonts were scanned again, it reads it
+ * again and the new image replaces the old one for the snapshots that come after. Then it keeps the image it found while
+ * it lives. The spellings already seen are a shortcut to the images, without going to the disk, emptied when it
+ * reaches {@link #MAX_SPELLINGS}.</p>
  */
 public final class ImageLibrary {
 
@@ -22,13 +26,20 @@ public final class ImageLibrary {
     static final int MAX_SPELLINGS = 1024;
 
     private final Resources resources;
-    /** The images, by real path. */
-    private final Map<Path, ImageFile> files = new ConcurrentHashMap<>();
+    /** The images read, by real path, shared by a {@code Resources} and its snapshots. */
+    private final Map<Path, ImageFile> shared;
+    /** Whether it belongs to a snapshot, which reads again the images whose file changed. */
+    private final boolean refresh;
+    /** The images this library found, by real path: those of {@link #shared} or, in a snapshot, its own. */
+    private final Map<Path, ImageFile> files;
     /** The image of each spelling already seen, to find it without going to the disk. */
     private final Map<String, ImageFile> spellings = new ConcurrentHashMap<>();
 
-    ImageLibrary(Resources resources) {
+    ImageLibrary(Resources resources, Map<Path, ImageFile> shared, boolean refresh) {
         this.resources = resources;
+        this.shared = shared;
+        this.refresh = refresh;
+        this.files = refresh ? new ConcurrentHashMap<>() : shared;
     }
 
     /**
@@ -67,7 +78,7 @@ public final class ImageLibrary {
         file = files.get(real);
         if (file == null) {
             // Two threads that request the same image at the same time both read it and one is kept: they are equal.
-            file = ImageFile.read(resolved, path, resources);
+            file = current(real, resolved, path);
             ImageFile previous = files.putIfAbsent(real, file);
             if (previous != null) {
                 file = previous;
@@ -80,9 +91,24 @@ public final class ImageLibrary {
         return file;
     }
 
-    /** The images read, one per file (for the tests). */
+    /** The image as the file is now: the one already read if it has not changed, or the file read again. */
+    private ImageFile current(Path real, Path resolved, String path) {
+        if (refresh) {
+            ImageFile known = shared.get(real);
+            if (known != null && known.isCurrent(resources)) {
+                return known;
+            }
+        }
+        ImageFile file = ImageFile.read(resolved, path, resources);
+        if (refresh) {
+            shared.put(real, file);
+        }
+        return file;
+    }
+
+    /** The images read, one per file, shared with the other snapshots (for the tests). */
     int files() {
-        return files.size();
+        return shared.size();
     }
 
     /** The spellings in the shortcut (for the tests). */

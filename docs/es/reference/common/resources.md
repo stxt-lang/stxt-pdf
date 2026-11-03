@@ -23,6 +23,9 @@ subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es `resources/image
 > **Decisión:** se admiten los enlaces simbólicos que no salen de la carpeta de recursos. *Alternativa descartada:*
 > rechazar cualquier enlace.
 
+Los ficheros pueden cambiar mientras el motor está en marcha: cada conversión ve las fuentes y las imágenes como están
+cuando empieza ([Uso desde Java](../implementation/api.md#ficheros-que-cambian)).
+
 ## Fuentes
 
 Solo se usan las fuentes de `fonts/`: los ficheros `.ttf` y `.otf`. No hay fuentes del sistema, ni las 14 estándar de

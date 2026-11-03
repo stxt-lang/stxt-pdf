@@ -61,7 +61,9 @@ The value is the path of the file, relative to `images/` and always downward ([R
 format is recognized by the content and not by the extension (an SVG is a file that starts with `<`, and a PDF, one that
 starts with `%PDF-`). An `Image` without a path, a file that does not exist or a path that goes outside `images/` are an error
 (`IMAGE_UNKNOWN`). A file that is not PNG, JPEG, PDF or an accepted SVG (such as a GIF or a WebP), or that cannot be read,
-is `IMAGE_FORMAT`. The errors point to the line of the `Image`.
+is `IMAGE_FORMAT`. The errors point to the line of the `Image`. If the file changes, the next conversion reads it
+again, and a document already laid out is not painted with an image other than the one it was laid out with
+([Using from Java](../implementation/api.md#files-that-change)).
 
 An XML file that is not an SVG is also `IMAGE_FORMAT`. An empty `Alt` is `VALUE_NOT_ALLOWED`.
 

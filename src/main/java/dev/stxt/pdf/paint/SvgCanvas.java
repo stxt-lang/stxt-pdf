@@ -27,7 +27,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Locale;
@@ -340,19 +339,8 @@ public final class SvgCanvas implements Canvas {
         ImageFile file = resources.images().find(box.image());
         int number = box.style().image().pdfPage();
         Rect target = ImageFit.place(box.style().image().fit(), content, file.width(number), file.height(number));
-        String data;
-        try {
-            byte[] bytes = file.format() == ImageFile.Format.PDF ? pageAsPng(file, number)
-                    : Files.readAllBytes(file.path());
-            data = Base64.getEncoder().encodeToString(bytes);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        String mime = switch (file.format()) {
-            case PNG, PDF -> "image/png";
-            case JPEG -> "image/jpeg";
-            case SVG -> "image/svg+xml";
-        };
+        String data = Base64.getEncoder().encodeToString(content(file, number));
+        String mime = mime(file);
         boolean rounded = !radii.isSquare();
         if (rounded) {
             String id = "c" + ids++;
@@ -375,17 +363,8 @@ public final class SvgCanvas implements Canvas {
             return;
         }
         ImageFile file = resources.images().find(image.path());
-        String data;
-        try {
-            data = Base64.getEncoder().encodeToString(Files.readAllBytes(file.path()));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        String mime = switch (file.format()) {
-            case PNG, PDF -> "image/png";
-            case JPEG -> "image/jpeg";
-            case SVG -> "image/svg+xml";
-        };
+        String data = Base64.getEncoder().encodeToString(content(file, 1));
+        String mime = mime(file);
         svg.append(String.format(Locale.ROOT, "<image x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\" "
                         + "preserveAspectRatio=\"none\" href=\"data:%s;base64,%s\"/>\n",
                 area.x(), area.y(), area.width(), area.height(), mime, data));
@@ -411,6 +390,33 @@ public final class SvgCanvas implements Canvas {
             }
         }
         svg.append("\"").append(fillAttr(box.style().typography().color())).append("/>\n");
+    }
+
+    /**
+     * What goes in the {@code data:} of an image: the bytes of the SVG that were read, the file of a PNG or a JPEG,
+     * and page {@code number} of a PDF drawn into a PNG. The last three are read from the file, as in the PDF
+     * ({@link ImageFile#checkUnchanged()}).
+     *
+     * @throws dev.stxt.pdf.resources.ResourceException if the file changed after it was read or cannot be read
+     */
+    private static byte[] content(ImageFile file, int number) {
+        if (file.format() == ImageFile.Format.SVG) {
+            return file.svgContent();
+        }
+        file.checkUnchanged();
+        try {
+            return file.format() == ImageFile.Format.PDF ? pageAsPng(file, number) : Files.readAllBytes(file.path());
+        } catch (IOException e) {
+            throw file.unreadable(e);
+        }
+    }
+
+    private static String mime(ImageFile file) {
+        return switch (file.format()) {
+            case PNG, PDF -> "image/png";
+            case JPEG -> "image/jpeg";
+            case SVG -> "image/svg+xml";
+        };
     }
 
     /** Page {@code number} (from 1) of a PDF, drawn into a PNG. */

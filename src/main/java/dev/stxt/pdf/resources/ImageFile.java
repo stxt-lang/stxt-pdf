@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +29,11 @@ import java.util.Locale;
  * ({@link #POINTS_PER_PIXEL}), regardless of the resolution the file declares. That of an SVG is
  * that of its {@code width} and {@code height} or, if they are missing, that of its {@code viewBox}, also in
  * pixels. A PDF is already in points and each page has its own.</p>
+ *
+ * <p>What was read is what the layout measures (reference/implementation/api.md). An SVG keeps the bytes it was
+ * checked with, and is painted with them. A PNG, a JPEG or a PDF is read again when painting:
+ * {@link #checkUnchanged()} compares its size and its modification time with those it had when it was read. With the
+ * same comparison a {@link Resources#snapshot()} knows whether it has to read the file again.</p>
  */
 public final class ImageFile {
 
@@ -40,7 +47,15 @@ public final class ImageFile {
     public enum Format { PNG, JPEG, SVG, PDF }
 
     private final Path path;
+    private final String name;
     private final Format format;
+    /** Size and modification time of the file when it was read. */
+    private final long size;
+    private final FileTime modified;
+    /** The content of an SVG, as it was checked; {@code null} for the other formats. */
+    private final byte[] svg;
+    /** The fonts the text of an SVG was checked with; {@code null} without text. */
+    private final FontLibrary fonts;
     private final double pixelWidth;
     private final double pixelHeight;
     private final boolean text;
@@ -49,9 +64,15 @@ public final class ImageFile {
     private final List<FontFile> textFonts;
     private final List<PdfInspector.PdfPage> pages;
 
-    private ImageFile(Path path, Format format, double pixelWidth, double pixelHeight, boolean text,
-            long svgElements, int svgDepth, List<FontFile> textFonts, List<PdfInspector.PdfPage> pages) {
+    private ImageFile(Path path, String name, BasicFileAttributes attributes, Format format, double pixelWidth,
+            double pixelHeight, byte[] svg, FontLibrary fonts, boolean text, long svgElements, int svgDepth,
+            List<FontFile> textFonts, List<PdfInspector.PdfPage> pages) {
         this.path = path;
+        this.fonts = fonts;
+        this.name = name;
+        this.size = attributes.size();
+        this.modified = attributes.lastModifiedTime();
+        this.svg = svg;
         this.format = format;
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
@@ -71,19 +92,22 @@ public final class ImageFile {
     static ImageFile read(Path path, String name, Resources resources) {
         byte[] head = new byte[12];
         int n;
+        // Before reading it: a change while it is being read gives another modification time.
+        BasicFileAttributes attributes;
         try (InputStream in = Files.newInputStream(path)) {
+            attributes = Files.readAttributes(path, BasicFileAttributes.class);
             n = in.readNBytes(head, 0, head.length);
         } catch (IOException e) {
             throw new ImageFormatException("Cannot read the image " + name + ": " + e.getMessage(), e);
         }
         Format format = startsWith(head, n, PNG) ? Format.PNG : startsWith(head, n, JPEG) ? Format.JPEG : null;
         if (format == null && looksLikeXml(head, n)) {
-            return readSvg(path, name, resources);
+            return readSvg(path, name, attributes, resources);
         }
         if (format == null && startsWith(head, n, PDF)) {
             List<PdfInspector.PdfPage> pages = PdfInspector.inspect(path, name);
-            return new ImageFile(path, Format.PDF, pages.get(0).width() / POINTS_PER_PIXEL,
-                    pages.get(0).height() / POINTS_PER_PIXEL, false, 0, 0, List.of(), pages);
+            return new ImageFile(path, name, attributes, Format.PDF, pages.get(0).width() / POINTS_PER_PIXEL,
+                    pages.get(0).height() / POINTS_PER_PIXEL, null, null, false, 0, 0, List.of(), pages);
         }
         if (format == null) {
             throw new ImageFormatException("The image " + name + " is not PNG, JPEG, SVG or PDF" + guess(head, n)
@@ -98,7 +122,8 @@ public final class ImageFile {
             if (width <= 0 || height <= 0) {
                 throw new ImageFormatException("The image " + name + " has no pixels");
             }
-            return new ImageFile(path, format, width, height, false, 0, 0, List.of(), List.of());
+            return new ImageFile(path, name, attributes, format, width, height, null, null, false, 0, 0, List.of(),
+                    List.of());
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
@@ -133,7 +158,7 @@ public final class ImageFile {
         return text.stripLeading().startsWith("<");
     }
 
-    private static ImageFile readSvg(Path path, String name, Resources resources) {
+    private static ImageFile readSvg(Path path, String name, BasicFileAttributes attributes, Resources resources) {
         byte[] content;
         try {
             content = Files.readAllBytes(path);
@@ -150,8 +175,8 @@ public final class ImageFile {
         for (FontFace face : info.fonts()) {
             fonts.add(face == null ? null : resources.fonts().lookup(face));
         }
-        return new ImageFile(path, Format.SVG, info.widthPx(), info.heightPx(), !info.texts().isEmpty(),
-                info.elements(), info.depth(), Collections.unmodifiableList(fonts), List.of());
+        return new ImageFile(path, name, attributes, Format.SVG, info.widthPx(), info.heightPx(), content,
+                fonts.isEmpty() ? null : resources.fonts(), !info.texts().isEmpty(), info.elements(), info.depth(), Collections.unmodifiableList(fonts), List.of());
     }
 
     /** That the font of a text of the SVG exists in {@code fonts/} and has all its characters: no substitution. */
@@ -202,6 +227,71 @@ public final class ImageFile {
 
     public Path path() {
         return path;
+    }
+
+    /** Its path in the document that read it first, for the messages. */
+    public String name() {
+        return name;
+    }
+
+    /**
+     * The content of an SVG as it was checked when it was read, without reading the file again; a new copy in each
+     * call.
+     *
+     * @throws IllegalStateException if it is not an SVG
+     */
+    public byte[] svgContent() {
+        if (svg == null) {
+            throw new IllegalStateException("The image " + name + " is " + format + ", not SVG");
+        }
+        return svg.clone();
+    }
+
+    /**
+     * That the file of a PNG, a JPEG or a PDF, which is read again when painting, has the size and the modification
+     * time it had when it was read: otherwise the document would have been laid out with one image and painted with
+     * another. An SVG is painted with the bytes that were read ({@link #svgContent()}), so it is not checked.
+     *
+     * @throws ImageFormatException if the file changed
+     * @throws ResourceException    if it can no longer be read, for example because it was removed
+     */
+    public void checkUnchanged() {
+        if (format == Format.SVG) {
+            return;
+        }
+        BasicFileAttributes now;
+        try {
+            now = Files.readAttributes(path, BasicFileAttributes.class);
+        } catch (IOException e) {
+            throw unreadable(e);
+        }
+        if (now.size() != size || !now.lastModifiedTime().equals(modified)) {
+            throw new ImageFormatException("The image " + name + " changed after it was read (its size or its "
+                    + "modification time is not the same): the document was laid out with the previous file and "
+                    + "has to be laid out again");
+        }
+    }
+
+    /**
+     * Whether it is still the image of its file for {@code resources}: the file has the size and the modification
+     * time it had when it was read (false if it cannot be read, which reading it again reports) and, if it is an SVG
+     * with text, the fonts of {@code resources} are those its text was checked with.
+     */
+    boolean isCurrent(Resources resources) {
+        try {
+            BasicFileAttributes now = Files.readAttributes(path, BasicFileAttributes.class);
+            if (now.size() != size || !now.lastModifiedTime().equals(modified)) {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return fonts == null || fonts == resources.fonts();
+    }
+
+    /** The error of a failure to read the file again when painting, with its path. */
+    public ResourceException unreadable(IOException e) {
+        return new ResourceException("Cannot read the image " + name + ": " + e.getMessage(), e);
     }
 
     public Format format() {

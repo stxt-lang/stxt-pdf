@@ -23,6 +23,9 @@ subfolder: that of an `Image`, to `images/` (`logos/acme.png` is `resources/imag
 > **Decision:** symbolic links that do not leave the resources folder are allowed. *Rejected alternative:* rejecting any
 > link.
 
+The files can change while the engine is running: each conversion sees the fonts and the images as they are when it
+starts ([Using from Java](../implementation/api.md#files-that-change)).
+
 ## Fonts
 
 Only the fonts in `fonts/` are used: the `.ttf` and `.otf` files. There are no system fonts, nor the 14 standard PDF

@@ -22,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,12 +71,22 @@ final class PdfImages implements Closeable {
         this.imports = new PdfPages(doc);
     }
 
-    /** The PNG or the JPEG, embedded the first time. */
-    PDImageXObject bitmap(ImageFile file) throws IOException {
+    /**
+     * The PNG or the JPEG, embedded the first time, from the file as it is now.
+     *
+     * @throws dev.stxt.pdf.resources.ResourceException if it changed after it was read or cannot be read
+     *         ({@link ImageFile#checkUnchanged()})
+     */
+    PDImageXObject bitmap(ImageFile file) {
         PDImageXObject image = bitmaps.get(file.path());
         if (image == null) {
             cancellation.check();
-            image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
+            file.checkUnchanged();
+            try {
+                image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
+            } catch (IOException e) {
+                throw file.unreadable(e);
+            }
             bitmaps.put(file.path(), image);
         }
         return image;
@@ -100,19 +109,28 @@ final class PdfImages implements Closeable {
     /**
      * Page {@code number} (from 1) of the PDF on a form of {@code file.width(number)} ×
      * {@code file.height(number)} points, with the origin at its bottom left corner, like {@link #drawing}.
-     * Each page is copied only once.
+     * Each page is copied only once, from the file as it is when the first one is.
+     *
+     * @throws dev.stxt.pdf.resources.ResourceException if it changed after it was read or cannot be read
+     *         ({@link ImageFile#checkUnchanged()})
      */
-    PDFormXObject page(ImageFile file, int number) throws IOException {
+    PDFormXObject page(ImageFile file, int number) {
         Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file.path(), p -> new HashMap<>());
         PDFormXObject form = forms.get(number);
         if (form == null) {
             cancellation.check();
-            PDDocument source = sources.get(file.path());
-            if (source == null) {
-                source = Loader.loadPDF(file.path().toFile());
-                sources.put(file.path(), source);
+            try {
+                PDDocument source = sources.get(file.path());
+                if (source == null) {
+                    file.checkUnchanged();
+                    source = Loader.loadPDF(file.path().toFile());
+                    sources.put(file.path(), source);
+                }
+                // PDFBox reads the source as it needs it: what it copies is also read from the file.
+                form = imports.page(source, number, file.path().getFileName().toString());
+            } catch (IOException e) {
+                throw file.unreadable(e);
             }
-            form = imports.page(source, number, file.path().getFileName().toString());
             forms.put(number, form);
         }
         return form;
@@ -146,8 +164,8 @@ final class PdfImages implements Closeable {
         if (fonts != null) {
             context.preProcessor(fonts::rewrite);
         }
-        SVGDocument svg = new SVGLoader().load(new ByteArrayInputStream(Files.readAllBytes(file.path())),
-                URI.create("about:blank"), context.build());
+        SVGDocument svg = new SVGLoader().load(new ByteArrayInputStream(file.svgContent()), URI.create("about:blank"),
+                context.build());
         if (svg == null) {
             throw new ImageFormatException("The SVG " + file.path().getFileName()
                     + " cannot be drawn: JSVG does not load it (for example, it nests more <use> than its limit of "

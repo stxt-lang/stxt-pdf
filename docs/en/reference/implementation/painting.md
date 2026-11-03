@@ -151,6 +151,10 @@ clockwise (in the PDF, with the origin at the bottom, the angle changes sign).
 
 `PdfImages` embeds the PNG and the JPEG with PDFBox and the SVG with JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) drawing on a
 `PdfBoxGraphics2D` (`pdfbox-graphics2d` 3.0.5), which gives a form of the natural size, once per file.
+It draws the SVG with the bytes `ImageFile` kept when it read it, and reads the PNG, the JPEG and the PDF again from the
+file after checking with `ImageFile.checkUnchanged` that it has not changed ([Using from Java](api.md#files-that-change)). If it
+cannot read them, the error is a `ResourceException` with the path. `SvgCanvas` follows the same rules for the `data:`
+of each image.
 `PdfCanvas.image` places it with a scaling `cm` matrix where `ImageFit` says and resets the dash pattern before
 drawing it. JSVG draws the text as outlines. `PdfCanvas.inlineImage` draws an inline image
 ([Text formatting](../common/text-formatting.md#images-inside-a-text)) in the rectangle of its run, which
