@@ -4,6 +4,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.InlineImage;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -290,6 +291,23 @@ class MarkdownBuilderTest {
         InvalidModelException title = assertThrows(InvalidModelException.class,
                 () -> translate("Ver ![logo](test/wide.png \"Logo\")"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, title.errorCode());
+    }
+
+    /**
+     * An image inside a styled run does not close it, and the style does not apply to the image
+     * (reference/common/text-formatting.md): the text before and after it has the style, the image does not.
+     */
+    @Test
+    void anImageInsideAStyledRunKeepsTheRunOpen() {
+        TextFormat s = TextFormat.PLAIN.withStyle(RunStyle.named("s"));
+        assertEquals(List.of(new TextRun("a ", s),
+                        new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/check.svg", "b"))),
+                        new TextRun(" d", s), run(" e")),
+                MarkdownBuilder.inline("[a ![b](test/check.svg) d]{s} e", 1));
+        // The alternative text of the image, with its own marks, does not change the run around it either.
+        assertEquals(List.of(new TextRun("a ", s), new TextRun(TextRun.IMAGE,
+                        TextFormat.PLAIN.withImage(new InlineImage("test/check.svg", "b c"))), new TextRun(" d", s)),
+                MarkdownBuilder.inline("[a ![b **c**](test/check.svg) d]{s}", 1));
     }
 
     /** {@code {#id}} at the end of a heading gives it its {@code Id} and is removed from the text. */

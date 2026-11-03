@@ -308,21 +308,29 @@ final class MarkdownBuilder {
         /**
          * The alternative text of an image, without formatting; {@code null} if it has none (the image is
          * decorative). A line break in it is a space: the text is read, not laid out. The title ({@code "..."}) would
-         * have no effect and is an error.
+         * have no effect and is an error. It is translated as a block of its own, so the styled run the image is in,
+         * if any, is kept open around it.
          */
         private String alt(Image i, int line) {
             if (i.getTitle() != null && !i.getTitle().isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow the title of an image "
                         + "(\"" + i.getTitle() + "\"): the image is described in its alternative text, ![...]");
             }
-            String alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ')
-                    .replace(TextRun.OBJECT_REPLACEMENT, ' ').strip();
+            RunStyle open = style;
+            String alt;
+            try {
+                alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ')
+                        .replace(TextRun.OBJECT_REPLACEMENT, ' ').strip();
+            } finally {
+                style = open;
+            }
             return alt.isEmpty() ? null : alt;
         }
 
         /**
          * An image inside a text (reference/common/text-formatting.md): a run that is the image, with its path and
-         * its alternative text, in the format of the text around it (a link, for an image that is clicked).
+         * its alternative text, in the format of the text around it (a link, for an image that is clicked), without
+         * the style of the styled run it is in, which does not apply to it.
          */
         private InlineImage inlineImage(Image i, int line) {
             return new InlineImage(i.getDestination(), alt(i, line));
@@ -543,7 +551,7 @@ final class MarkdownBuilder {
                 } else if (n instanceof Code c) {
                     out.add(RunMarks.unmark(c.getLiteral(), styleNames), styled(f).asCode());
                 } else if (n instanceof Image i) {
-                    out.add(TextRun.IMAGE, styled(f).withImage(inlineImage(i, line)));
+                    out.add(TextRun.IMAGE, f.withImage(inlineImage(i, line)));
                 } else {
                     throw unsupported(n, line);
                 }

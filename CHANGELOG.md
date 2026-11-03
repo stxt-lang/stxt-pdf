@@ -45,6 +45,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   destination"), and with `PdfPainter` the link was removed without a warning: the destinations were only looked for in
   the flow of each page, and a note is in its footnote area. The link now goes to the note, in the footnote area of the
   page of its call, as the reference says.
+- An inline image inside a styled run of Markdown (`[see ![logo](logo.svg) here]{brand}`) was `MARKDOWN_UNSUPPORTED`
+  ("A styled run ... starts and ends in the same paragraph"): reading the alternative text of the image closed the run.
+  The text before and after the image now has the style of the run, and the image is not affected by it, as the
+  reference says.
 
 ### Java API
 
