@@ -362,6 +362,11 @@ public enum ErrorCode {
      * page.
      */
     TABLE_REPEAT_OVERFLOW,
+    /**
+     * A {@code Barcode} whose content box makes its modules narrower than the minimum of its format (line of the
+     * {@code Barcode}); the caller can remove the check ({@link dev.stxt.pdf.model.Check#BARCODE_SIZE}).
+     */
+    BARCODE_TOO_SMALL,
 
     // --- Fonts --------------------------------------------------------------------------------
     /** {@code Font} is not in the fonts folder. */

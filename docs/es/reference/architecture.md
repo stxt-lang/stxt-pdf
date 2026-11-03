@@ -12,7 +12,7 @@ Java 17 y Maven: artefacto `dev.stxt:stxt-pdf`, package raíz `dev.stxt.pdf`. La
 ```
 texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
            ──BoxTreeBuilder──▶ árbol de Box (con su Style), PageSetup y las Section
-           ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ LaidOutDocument (páginas con sus Fragment)
+           ──Engine.layOutDocument──▶ Paginator ──▶ Overflow ──▶ ModuleSizes ──▶ LaidOutDocument (páginas con sus Fragment)
            ──▶ StackingContext + Canvas ──▶ PdfCanvas (PDF) · SvgCanvas (SVG de depuración)
            ──▶ StxtDump (volcado de los tests)
 ```
@@ -23,7 +23,8 @@ texto STXT ──DocumentReader──▶ InlineNode (stxt-core)
    reglas de `Styles`, comprueba las reglas que el schema no puede expresar y cierra el árbol, que desde ahí es de solo
    lectura.
 3. **Maquetar.** `Engine` despacha cada caja a su algoritmo de layout. El `Paginator` reparte cada sección en páginas,
-   repite la paginación hasta que las referencias convergen y coloca los `Page overlay`. `Overflow` comprueba que nada desborda.
+   repite la paginación hasta que las referencias convergen y coloca los `Page overlay`. `Overflow` comprueba que nada desborda,
+   y `ModuleSizes`, que ningún código queda demasiado pequeño para leerse.
    El resultado es un `LaidOutDocument`: una lista de `Page` con su árbol de `Fragment`.
 4. **Pintar.** `StackingContext` recorre los fragmentos de cada página en orden de pintado y llama a un `Canvas`:
    `PdfCanvas` escribe el PDF (con su etiquetado, marcadores y enlaces) y `SvgCanvas`, el SVG de depuración.
@@ -43,7 +44,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
 | `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, `Rule` (las líneas de una tabla con bordes fusionados), los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`) y las reglas de corte (`BreakRules`) |
-| `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`) y un subpackage por algoritmo: `block`, `inline` (con `inline.hyphenation`, los patrones de partición), `stack`, `grid`, `table`, `columns`, `position` e `image` |
+| `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`, `ModuleSizes`) y un subpackage por algoritmo: `block`, `inline` (con `inline.hyphenation`, los patrones de partición), `stack`, `grid`, `table`, `columns`, `position` e `image` |
 | `output` | `fragment`, `model` | `StxtDump`, el volcado de los tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | El pintado (`StackingContext`, `Canvas`) y los dos lienzos: el PDF (`PdfDocumentWriter`, `PdfCanvas` y sus piezas) y el SVG (`SvgCanvas`) |
 | `convert` | todos menos `tree` y `output` | `Converter`, la entrada del motor. Nada depende de él |
@@ -99,6 +100,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`Paginator`**: reparte cada sección en páginas, hace converger las referencias, numera las páginas y coloca los
   `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.
+- **`ModuleSizes`**: comprueba en el resultado ya paginado que los módulos de cada código no quedan por debajo de su
+  mínimo.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas, con el `Hyphenator` de `inline.hyphenation` para
   partir palabras), `StackResolver`, `TrackSizing` y `Placement` (grid),
   `Columns` (cuántas columnas y de qué ancho), `OverlayEquation`, `UnitBreaker` (cortes de `Stack`, `Grid` y tablas), `Slice` (alto, borde y

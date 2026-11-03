@@ -66,6 +66,27 @@ class ModulesTest {
         assertEquals(Fit.STRETCH, new Modules(5, 1, new BitSet(), 1, 20).fit());
     }
 
+    /**
+     * Inside, the module scales with the side that leaves less room: the 10 × 6 matrix in 20 × 6 keeps its height, and
+     * its modules of 2 stay at 2. Stretched, it is the width divided among the columns, whatever the height.
+     */
+    @Test
+    void usedModuleFollowsTheFit() {
+        Modules m = sample();
+        assertEquals(2, m.usedModule(20, 6), 1e-9);
+        assertEquals(1, m.usedModule(5, 30), 1e-9);
+        assertEquals(0.5, new Modules(10, 1, new BitSet(), 1, 20).usedModule(5, 200), 1e-9);
+    }
+
+    /** The smallest box keeps the proportion of the matrix, with modules of the minimum. */
+    @Test
+    void minimumSizeScalesTheNaturalSize() {
+        Modules m = new Modules(5, 2, new BitSet(), 2, 3, 0.5);
+        assertArrayEquals(new double[] {2.5, 1.5}, m.minimumSize(), 1e-9);
+        assertArrayEquals(new double[] {0, 0}, sample().minimumSize(), 1e-9);
+        assertEquals(0, sample().minModule());
+    }
+
     @Test
     void isImmutable() {
         BitSet dark = new BitSet();
@@ -83,5 +104,13 @@ class ModulesTest {
         BitSet outside = new BitSet();
         outside.set(4);
         assertThrows(IllegalArgumentException.class, () -> new Modules(2, 2, outside, 1, 1));
+    }
+
+    /** The minimum is not negative and not wider than the natural module, which would make the natural size an error. */
+    @Test
+    void rejectsAMinimumOutsideTheNaturalModule() {
+        assertThrows(IllegalArgumentException.class, () -> new Modules(1, 1, new BitSet(), 1, 1, -0.1));
+        assertThrows(IllegalArgumentException.class, () -> new Modules(1, 1, new BitSet(), 1, 1, 1.1));
+        assertEquals(1, new Modules(1, 1, new BitSet(), 1, 1, 1).minModule());
     }
 }

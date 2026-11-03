@@ -13,7 +13,7 @@ algorithm, so that the `LayoutCache` is used (without it, nested `Stack` and `Gr
 
 `Engine.layOutDocument` is the entry point: it validates the fonts, the images and the hyphenation languages, paginates
 with the `Paginator`, checks the
-overflows with `Overflow` and returns a `LaidOutDocument`. When it finishes (also if it fails) it releases everything it memoizes.
+overflows with `Overflow` and the minimum module of the codes with `ModuleSizes`, and returns a `LaidOutDocument`. When it finishes (also if it fails) it releases everything it memoizes.
 The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) is package-private.
 
 > **Decision:** the layout algorithms depend on the interface `LayoutContext` and not on `Engine`. The pagination
@@ -379,6 +379,17 @@ use `Tolerance.fits(size, space)` and `Tolerance.same(a, b)`, never a `1e-9` of 
 
 > **Decision:** two named tolerances and not one: with `EPSILON` in `Overflow` the engine would be stricter and a box that
 > sticks out 0.005 pt would be an error. *Rejected alternative:* a single tolerance, with that change of behavior.
+
+After `Overflow`, and unless whoever converts removes `Check.BARCODE_SIZE`, `ModuleSizes` goes through the same pages
+(flow, footnote area and `Page overlay` boxes) and, in each fragment with `Box.modules()`, compares the content box with
+`Modules.minimumSize()`, the size at which the modules measure `Modules.minModule()`, with the tolerance `Tolerance.MODEL`:
+the width and the height in a matrix, and only the width in a stretched row (`Modules.fit()`). The first one that falls
+short is `BARCODE_TOO_SMALL`, with the line of its box ([Barcode](../components/barcode.md#minimum-module)). The generator
+puts the minimum in `Modules`, so `ModuleSizes` knows nothing about formats.
+
+> **Decision:** the minimum module is checked on the paginated result, like the overflows, and not when measuring the
+> image (`Images.natural`), because a code is laid out with provisional sizes when a `Stack` or a `Grid` is measured.
+> *Rejected alternative:* checking it in `ImageLayout`, which would give errors from measuring passes.
 
 ## Threads
 

@@ -18,18 +18,30 @@ import java.util.List;
  *                     {@code row * columns + column}
  * @param moduleWidth  natural width of a module, in points
  * @param moduleHeight natural height of a module, in points
+ * @param minModule    the narrowest module that can still be read, in points, at most {@code moduleWidth}; 0 if
+ *                     there is no minimum. A drawing whose box leaves narrower modules is an error unless the caller
+ *                     removes the check ({@link Check#BARCODE_SIZE})
  */
-public record Modules(int columns, int rows, BitSet dark, double moduleWidth, double moduleHeight) {
+public record Modules(int columns, int rows, BitSet dark, double moduleWidth, double moduleHeight, double minModule) {
 
     public Modules {
         if (columns < 1 || rows < 1 || moduleWidth <= 0 || moduleHeight <= 0) {
             throw new IllegalArgumentException("Modules of " + columns + " × " + rows + " of " + moduleWidth + " × "
                     + moduleHeight + " pt");
         }
+        if (minModule < 0 || minModule > moduleWidth) {
+            throw new IllegalArgumentException("A minimum module of " + minModule + " pt for modules of " + moduleWidth
+                    + " pt");
+        }
         if (dark.length() > columns * rows) {
             throw new IllegalArgumentException("A dark module outside the " + columns + " × " + rows + " matrix");
         }
         dark = (BitSet) dark.clone();
+    }
+
+    /** Without a minimum module. */
+    public Modules(int columns, int rows, BitSet dark, double moduleWidth, double moduleHeight) {
+        this(columns, rows, dark, moduleWidth, moduleHeight, 0);
     }
 
     /** A copy of the dark modules. */
@@ -60,6 +72,27 @@ public record Modules(int columns, int rows, BitSet dark, double moduleWidth, do
      */
     public Fit fit() {
         return rows == 1 ? Fit.STRETCH : Fit.INSIDE;
+    }
+
+    /**
+     * The width of a module once the drawing fills a content box of {@code width} × {@code height} points
+     * ({@link #fit()}): stretched, the width divided among the columns; inside, the natural width scaled as much as
+     * the box allows on both sides.
+     */
+    public double usedModule(double width, double height) {
+        if (fit() == Fit.STRETCH) {
+            return width / columns;
+        }
+        return moduleWidth * Math.min(width / naturalWidth(), height / naturalHeight());
+    }
+
+    /**
+     * The smallest content box, width and height in points, in which the modules measure {@link #minModule()}: the
+     * width alone if the drawing is stretched, whose height does not change its modules.
+     */
+    public double[] minimumSize() {
+        double scale = minModule / moduleWidth;
+        return new double[] {naturalWidth() * scale, naturalHeight() * scale};
     }
 
     /**

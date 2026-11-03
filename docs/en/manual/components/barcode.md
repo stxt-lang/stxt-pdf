@@ -106,6 +106,10 @@ Barcode:
 - A QR code is always square: in a box that is not, it is drawn as large as it fits, centered. A barcode is stretched to
   the box: with `Width` and `Height`, the bars take up the whole height.
 - It is not split across pages: if it does not fit in what is left, it moves whole to the next one.
+- It cannot shrink until it cannot be read: if the box leaves the modules below 0.25 mm in a QR code or a Code 128, or
+  below 0.264 mm in an EAN-13, it is an error (`BARCODE_TOO_SMALL`) that says which size it needs. A QR code of a short
+  address (33 modules with the quiet zone) needs at least 8.25 mm on each side, without counting the `Padding`. In a
+  barcode only the width counts.
 
 For a phone to read it well, a printed QR code should not measure less than 2 cm (about 57 points), and the modules have
 to contrast with the background: dark on light.

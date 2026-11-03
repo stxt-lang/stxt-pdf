@@ -64,6 +64,8 @@ public final class Engine implements LayoutContext {
     private final TextMeasurer measurer;
     private final Images images;
     private final Limits limits;
+    /** Whether the modules of the barcodes are checked ({@link Check#BARCODE_SIZE}). */
+    private final boolean moduleSizes;
     private final Cancellation cancellation;
     private final Progress progress;
     private final InlineLayout inline;
@@ -102,7 +104,7 @@ public final class Engine implements LayoutContext {
 
     /**
      * Engine with those metrics, those images and those {@link Limits}, without the checks in {@code excluded} that
-     * are made during layout (those of the PDF images, {@link Check}).
+     * are made during layout (those of the PDF images and the size of the barcodes, {@link Check}).
      */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded) {
         this(measurer, resources, limits, excluded, Cancellation.NONE);
@@ -127,6 +129,7 @@ public final class Engine implements LayoutContext {
                   Cancellation cancellation, Progress progress) {
         this.measurer = measurer;
         this.limits = limits;
+        this.moduleSizes = !excluded.contains(Check.BARCODE_SIZE);
         this.cancellation = cancellation;
         this.progress = progress;
         this.images = new Images(resources, limits, excluded);
@@ -148,7 +151,8 @@ public final class Engine implements LayoutContext {
      * validates it against the schema. Before laying out it checks with the {@link TextMeasurer} that
      * all the text can be measured (the fonts, in the PDF output), that all the images exist and that every
      * hyphenated text is in a language with patterns ({@link Hyphenations#validate}),
-     * and afterwards that nothing overflows ({@link Overflow}).
+     * and afterwards that nothing overflows ({@link Overflow}) and that no barcode has modules too narrow to be read
+     * ({@link ModuleSizes}).
      */
     public LaidOutDocument layOutDocument(InlineNode document) {
         return layOutDocument(new BoxTreeBuilder(cancellation).build(document));
@@ -176,6 +180,9 @@ public final class Engine implements LayoutContext {
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
             Overflow.check(pages, cancellation);
+            if (moduleSizes) {
+                ModuleSizes.check(pages, cancellation);
+            }
             progress.laidOut(pages.size());
             return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages);
         } finally {

@@ -38,6 +38,9 @@ import static dev.stxt.pdf.tree.Nodes.error;
  *
  * <p>{@code Quiet zone} replaces the quiet zone of the format with that number of modules on each side.</p>
  *
+ * <p>Each format has a narrowest module ({@link Modules#minModule()}): 0.25 mm in QR and Code 128, and 80 % of the
+ * nominal one in EAN-13. The layout checks it once the box has its size ({@code BARCODE_TOO_SMALL}).</p>
+ *
  * <p>It is deterministic: the same data in the same format gives the same modules, and so the same PDF.</p>
  */
 final class Barcodes implements ImageGenerator {
@@ -52,6 +55,13 @@ final class Barcodes implements ImageGenerator {
     static final double LINEAR_MODULE = 0.33 * Value.POINTS_PER_MM;
     /** Natural height of the bars of a one-dimensional barcode: 22.85 mm, the nominal one of EAN-13. */
     static final double LINEAR_HEIGHT = 22.85 * Value.POINTS_PER_MM;
+    /**
+     * Narrowest module of a QR code and of a Code 128: 0.25 mm, about three dots of a printer at 300 dpi. Their
+     * standards do not fix one.
+     */
+    static final double MIN_MODULE = 0.25 * Value.POINTS_PER_MM;
+    /** Narrowest module of an EAN-13: 80 % of the nominal one, the smallest that its standard allows. */
+    static final double EAN_13_MIN_MODULE = 0.8 * LINEAR_MODULE;
     /** Quiet zone of a Code 128, in modules, on each side. */
     static final int CODE_128_QUIET_ZONE = 10;
     /** Quiet zone of an EAN-13, in modules, on the left. */
@@ -122,7 +132,7 @@ final class Barcodes implements ImageGenerator {
                 }
             }
         }
-        return new Modules(side, side, dark, QR_MODULE, QR_MODULE);
+        return new Modules(side, side, dark, QR_MODULE, QR_MODULE, MIN_MODULE);
     }
 
     private static Modules code128(InlineNode n, String data, int quiet) {
@@ -137,7 +147,7 @@ final class Barcodes implements ImageGenerator {
             throw error(n, ErrorCode.BARCODE_DATA, "The data of the Barcode has " + data.length() + " characters and a "
                     + "Code 128 holds at most " + CODE_128_MAX + ": a QR code holds more");
         }
-        return linear(new Code128Writer().encode(data), quiet, quiet);
+        return linear(new Code128Writer().encode(data), quiet, quiet, MIN_MODULE);
     }
 
     private static Modules ean13(InlineNode n, String data, int left, int right) {
@@ -150,7 +160,7 @@ final class Barcodes implements ImageGenerator {
             throw error(n, ErrorCode.BARCODE_DATA, "The check digit of the EAN-13 " + data + " is " + check + ", not "
                     + data.charAt(12));
         }
-        return linear(new EAN13Writer().encode(data.substring(0, 12) + check), left, right);
+        return linear(new EAN13Writer().encode(data.substring(0, 12) + check), left, right, EAN_13_MIN_MODULE);
     }
 
     /** The check digit of the 12 digits of an EAN-13: weights 1 and 3 from the left, up to the next ten. */
@@ -162,15 +172,15 @@ final class Barcodes implements ImageGenerator {
         return (10 - sum % 10) % 10;
     }
 
-    /** One row with the bars of {@code bars} between the quiet zones. */
-    private static Modules linear(boolean[] bars, int left, int right) {
+    /** One row with the bars of {@code bars} between the quiet zones, with modules no narrower than {@code min}. */
+    private static Modules linear(boolean[] bars, int left, int right, double min) {
         BitSet dark = new BitSet();
         for (int i = 0; i < bars.length; i++) {
             if (bars[i]) {
                 dark.set(left + i);
             }
         }
-        return new Modules(left + bars.length + right, 1, dark, LINEAR_MODULE, LINEAR_HEIGHT);
+        return new Modules(left + bars.length + right, 1, dark, LINEAR_MODULE, LINEAR_HEIGHT, min);
     }
 
     /** A character for a message: itself and its code point, which says what it is when it is not visible. */

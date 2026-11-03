@@ -109,6 +109,17 @@ class BarcodesTest {
         assertEquals(22.85 * Value.POINTS_PER_MM, ean.naturalHeight(), 1e-9);
     }
 
+    /** The narrowest module of each format: 0.25 mm in QR and Code 128, and 80 % of 0.33 mm in EAN-13. */
+    @Test
+    void minimumModuleOfEachFormat() {
+        assertEquals(0.25 * Value.POINTS_PER_MM, modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace").minModule(),
+                1e-9);
+        assertEquals(0.25 * Value.POINTS_PER_MM,
+                modules("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tFormat: code-128").minModule(), 1e-9);
+        assertEquals(0.264 * Value.POINTS_PER_MM,
+                modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13").minModule(), 1e-9);
+    }
+
     @Test
     void errorCorrectionChangesTheMatrix() throws Exception {
         Modules low = modules("\tBarcode: https://stxt.dev/pdf/barcode", "\t\tAlt: Enlace", "\t\tError correction: low");

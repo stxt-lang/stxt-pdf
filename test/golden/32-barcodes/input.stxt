@@ -7,7 +7,8 @@
 #   code:   a Code 128 with Width 160 and Height 30: the bars are stretched to the box. y = 160.
 #   ean:    an EAN-13 with Width 100. Its modules are 11 + 95 + 7 = 113 of 0.33 mm (37.29 mm) by 22.85 mm, so the
 #           height is 100 × 22.85 / 37.29 = 61.28. y = 190.
-#   wide:   a QR code in a box of 60 × 20: it is drawn square, 20 × 20, centered. y = 251.28.
+#   wide:   a QR code in a box of 60 × 24: it is drawn square, 24 × 24, centered, with modules of 24 / 33 = 0.727 pt
+#           (0.257 mm), above the narrowest that can be read, 0.25 mm. y = 251.28.
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -51,4 +52,4 @@ Document (dev.stxt.pdf):
 			Alt: Enlace a stxt.dev
 			Box:
 				Width: 60
-				Height: 20
+				Height: 24

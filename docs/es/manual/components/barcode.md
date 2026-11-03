@@ -104,6 +104,10 @@ Barcode:
 - Un QR es siempre cuadrado: en una caja que no lo es, se dibuja lo más grande que cabe, centrado. Un código de barras se
   estira a la caja: con `Width` y `Height`, las barras ocupan todo el alto.
 - No se parte entre páginas: si no cabe en lo que queda, pasa entero a la siguiente.
+- No puede encoger hasta no leerse: si la caja deja los módulos por debajo de 0,25 mm en un QR o un Code 128, o de
+  0,264 mm en un EAN-13, es un error (`BARCODE_TOO_SMALL`) que dice qué tamaño necesita. Un QR de una dirección corta
+  (33 módulos con la zona de silencio) necesita al menos 8,25 mm de lado, sin contar el `Padding`. En un código de barras
+  solo cuenta el ancho.
 
 Para que un móvil lo lea bien, un QR impreso no debería medir menos de 2 cm (unos 57 puntos) y los módulos tienen que
 contrastar con el fondo: oscuros sobre claro.

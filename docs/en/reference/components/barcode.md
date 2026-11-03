@@ -152,8 +152,38 @@ A `Barcode` does not accept `Fit`.
 > `Grid` like an image. *Rejected alternative:* requiring `Width` or `Height`, which leaves without an intrinsic size the one
 > that declares it as a percentage.
 
-> **Decision:** a QR code in a box that is not square is drawn centered, without an error. *Rejected alternative:* an error
-> if `Width` and `Height` are not equal, which with percentages cannot be known before the layout.
+> **Decision:** a QR code in a box that is not square is drawn centered, without an error as long as its modules do not go
+> below the [minimum](#minimum-module). *Rejected alternative:* an error if `Width` and `Height` are not equal, which with
+> percentages cannot be known before the layout.
+
+### Minimum module
+
+A code shrunk until it cannot be read is an error. Each format has a minimum module:
+
+| `Format` | Minimum module | Where it comes from |
+|---|---|---|
+| `qr` | 0.25 mm | About three dots of a 300 dpi printer. ISO/IEC 18004 does not set one |
+| `code-128` | 0.25 mm | The same criterion. ISO/IEC 15417 does not set one |
+| `ean-13` | 0.264 mm | 80 % of the nominal module (0.33 mm), the smallest that ISO/IEC 15420 allows |
+
+If the content box, once laid out, leaves narrower modules, it is an error (`BARCODE_TOO_SMALL`, with the line of the
+`Barcode`) that gives the module that is left and the minimum size of the content box. In a QR code the shorter side counts
+(in a wide and low box, the height); in a barcode, only the width, because stretching the bars in height does not change
+the module. The quiet zone is part of the drawing: a QR code of 25 modules plus 4 of zone on each side (33) needs a content
+box of 8.25 × 8.25 mm (23.39 pt), and the `Padding` does not count. It is checked with the final size, after pagination: in
+a `Stack` or a `Grid` a code is measured several times, and only the last one counts.
+
+Whoever converts can remove the check (`Check.BARCODE_SIZE`, [Using from Java](../implementation/api.md#checks)), and then
+the code is drawn as small as its box.
+
+> **Decision:** the minimum is fixed per format and there is no property in the document to change it; whoever needs to
+> draw a smaller code removes the check when converting. *Rejected alternative:* a property of the `Barcode`
+> (`Min module`), another value to write in each document for a rare case; and drawing the shrunk code without a warning,
+> as up to 0.9.0, which gives a half result.
+
+> **Decision:** 0.25 mm in QR and Code 128, the smallest module that a 300 dpi office printer draws with three dots.
+> *Rejected alternative:* the minimums of GS1 (0.396 mm in a point-of-sale QR code and 0.495 mm in a logistics GS1-128),
+> meant for checkout and warehouse scanners, which would rule out the codes that invoices and certificates carry.
 
 ## Page breaks
 
@@ -186,5 +216,7 @@ print resolution. The same data in the same format always gives the same modules
 - The human-readable text under the bars of an EAN-13 or a Code 128: it goes in a `Text`.
 - Choosing the version or the mask of the QR code.
 - A different quiet zone on each side: `Quiet zone` is the same on both.
+- A minimum height of the bars: a low barcode is drawn without a warning.
+- Changing the minimum module from the document.
 - A logo in the center of a QR code.
 - Checking the contrast of the modules with the background.

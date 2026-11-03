@@ -23,5 +23,12 @@ public enum Check {
      * comment (reference/components/image.md): if it has any, {@code IMAGE_FORMAT}. Without this check, the page is
      * drawn without them.
      */
-    PDF_IMAGE_ANNOTATIONS
+    PDF_IMAGE_ANNOTATIONS,
+
+    /**
+     * The size of the modules of a {@code Barcode} (reference/components/barcode.md): if its box makes them narrower
+     * than the minimum of its format, {@code BARCODE_TOO_SMALL}. Without this check, the code is drawn as small as its
+     * box and may not be read.
+     */
+    BARCODE_SIZE
 }

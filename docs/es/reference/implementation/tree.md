@@ -189,7 +189,8 @@ bloques de código, las entradas de índice y el área de notas; `Element.isWrit
 Un `Barcode` es una imagen que no sale de un fichero: el árbol la genera a partir de su valor al construirse. La familia
 `BARCODE` de `ElementReader` comprueba sus propiedades (`ModelValidator.validateBarcode`) y le pide el dibujo a
 `Barcodes`, que codifica los datos con ZXing 3.5.4 y devuelve un `Modules` (`model`): la matriz de módulos oscuros y
-claros, con la zona de silencio, y el tamaño natural de un módulo. La caja lo guarda en `Box.modules()`; su elemento tiene
+claros, con la zona de silencio, el tamaño natural de un módulo y el más estrecho que se puede leer
+(`Modules.minModule()`, que comprueba `ModuleSizes` tras maquetar). La caja lo guarda en `Box.modules()`; su elemento tiene
 `Layout.IMAGE` y el papel `FIGURE`, y `Box.isImage()` es cierto, así que el layout lo dimensiona con el tamaño natural de
 los módulos (`Images.natural`) y el pintado lo dibuja sin saber de qué elemento viene (`Canvas.image`, que mira
 `Box.modules()`).

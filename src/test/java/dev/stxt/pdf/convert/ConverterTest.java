@@ -170,6 +170,21 @@ class ConverterTest {
     }
 
     /**
+     * A QR code whose box makes its modules narrower than 0.25 mm is an error, unless {@link Check#BARCODE_SIZE} is
+     * removed: then it is drawn as small as its box.
+     */
+    @Test
+    void theModulesOfABarcodeAreCheckedUnlessExcluded() throws IOException {
+        InlineNode document = READER.read(Docs.sectioned(HEADER + "\tBarcode: https://stxt.dev\n\t\tAlt: QR\n"
+                + "\t\tBox:\n\t\t\tWidth: 15"));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> Converter.create().layOut(document));
+        assertEquals(ErrorCode.BARCODE_TOO_SMALL, e.errorCode());
+        assertTrue(e.getMessage().contains("BARCODE_SIZE"), e.getMessage());
+        assertThrows(InvalidModelException.class, () -> Converter.builder().exclude(Check.CONTRAST).build().layOut(document));
+        assertFalse(pdf(Converter.builder().exclude(Check.BARCODE_SIZE).build(), document).length == 0);
+    }
+
+    /**
      * A form field visible on the page of a PDF is an error, unless {@link Check#PDF_IMAGE_ANNOTATIONS} is
      * removed: then the page is drawn without it.
      */

@@ -150,8 +150,39 @@ Un `Barcode` no admite `Fit`.
 > en los códigos de barras. Así un `Barcode` sin tamaño se ve y se lee, y se mide en un `Stack` o un `Grid` como una imagen.
 > *Alternativa descartada:* exigir `Width` o `Height`, que deja sin tamaño intrínseco al que lo declara en porcentaje.
 
-> **Decisión:** un QR en una caja que no es cuadrada se dibuja centrado, sin error. *Alternativa descartada:* un error si
-> `Width` y `Height` no son iguales, que con porcentajes no se puede saber antes de maquetar.
+> **Decisión:** un QR en una caja que no es cuadrada se dibuja centrado, sin error mientras sus módulos no bajen del
+> [mínimo](#módulo-mínimo). *Alternativa descartada:* un error si `Width` y `Height` no son iguales, que con porcentajes no
+> se puede saber antes de maquetar.
+
+### Módulo mínimo
+
+Un código encogido hasta que no se puede leer es un error. Cada formato tiene un módulo mínimo:
+
+| `Format` | Módulo mínimo | De dónde sale |
+|---|---|---|
+| `qr` | 0,25 mm | Unos tres puntos de una impresora de 300 ppp. ISO/IEC 18004 no fija ninguno |
+| `code-128` | 0,25 mm | El mismo criterio. ISO/IEC 15417 no fija ninguno |
+| `ean-13` | 0,264 mm | El 80 % del módulo nominal (0,33 mm), el menor que admite ISO/IEC 15420 |
+
+Si la caja de contenido, una vez maquetada, deja los módulos más estrechos, es un error (`BARCODE_TOO_SMALL`, con la línea
+del `Barcode`) que da el módulo que queda y el tamaño mínimo de la caja de contenido. En un QR cuenta el lado más corto (en
+una caja ancha y baja, el alto); en un código de barras, solo el ancho, porque estirar las barras a lo alto no cambia el
+módulo. La zona de silencio forma parte del dibujo: un QR de 25 módulos más 4 de zona a cada lado (33) necesita una caja de
+contenido de 8,25 × 8,25 mm (23,39 pt), y el `Padding` no cuenta. Se comprueba con el tamaño final, después de paginar: en
+un `Stack` o un `Grid` un código se mide varias veces, y solo cuenta la última.
+
+Quien convierte puede quitar la comprobación (`Check.BARCODE_SIZE`, [Uso desde Java](../implementation/api.md#comprobaciones)),
+y entonces el código se dibuja tan pequeño como su caja.
+
+> **Decisión:** el mínimo es fijo por formato y no hay propiedad en el documento para cambiarlo; quien necesita dibujar un
+> código más pequeño quita la comprobación al convertir. *Alternativa descartada:* una propiedad del `Barcode`
+> (`Min module`), otro valor que escribir en cada documento para un caso raro; y dibujar el código encogido sin aviso, como
+> hasta la 0.9.0, que da un resultado a medias.
+
+> **Decisión:** 0,25 mm en QR y Code 128, el módulo más pequeño que una impresora de oficina de 300 ppp dibuja con tres
+> puntos. *Alternativa descartada:* los mínimos de GS1 (0,396 mm en un QR de punto de venta y 0,495 mm en un GS1-128 de
+> logística), pensados para los lectores de caja y de almacén, que dejarían fuera los códigos que llevan las facturas y los
+> certificados.
 
 ## Cortes de página
 
@@ -185,5 +216,7 @@ el mismo PDF.
 - El texto legible bajo las barras de un EAN-13 o un Code 128: va en un `Text`.
 - Elegir la versión o la máscara del QR.
 - Una zona de silencio distinta a cada lado: `Quiet zone` es la misma en los dos.
+- Un alto mínimo de las barras: un código de barras bajo se dibuja sin aviso.
+- Cambiar el módulo mínimo desde el documento.
 - Un logotipo en el centro de un QR.
 - Comprobar el contraste de los módulos con el fondo.

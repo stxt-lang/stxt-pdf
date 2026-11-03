@@ -74,13 +74,14 @@ las que se han quitado. Son los valores del enum `Check` (`model`):
 | `CONTRAST` | El contraste del texto con su fondo, `CONTRAST_LOW` ([El PDF](../common/pdf.md#contraste)). `layOut` lo comprueba con `ContrastCheck`, un lienzo que apunta lo que se pinta | Un texto puede no leerse |
 | `PDF_IMAGE_FONTS` | Que las fuentes de la página de un PDF que dibuja una `Image` cumplan PDF/UA: incrustadas, que digan qué carácter es cada glifo y las demás reglas de la lista, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | El visor puede sustituir una fuente, su texto puede no copiarse y el PDF puede no cumplir PDF/UA |
 | `PDF_IMAGE_ANNOTATIONS` | Que la página de un PDF no tenga anotaciones que se vean, `IMAGE_FORMAT` | La página se dibuja sin ellas |
+| `BARCODE_SIZE` | Que los módulos de un `Barcode` no queden más estrechos que el mínimo de su formato, `BARCODE_TOO_SMALL` ([Barcode](../components/barcode.md#módulo-mínimo)) | El código se dibuja tan pequeño como su caja y puede no leerse |
 
 ```java
 Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAGE_ANNOTATIONS).build();
 ```
 
-`Engine` recibe las que se quitan y se las pasa a `Images`, y el contraste lo comprueba `Converter.layOut` después de
-maquetar.
+`Engine` recibe las que se quitan y se las pasa a `Images`; si no se quita `BARCODE_SIZE`, comprueba los módulos con
+`ModuleSizes` después de `Overflow`. El contraste lo comprueba `Converter.layOut` después de maquetar.
 
 > **Decisión:** una sola forma de quitar comprobaciones, un enum y `exclude`, en vez de un booleano por cada una: por
 > defecto se hace todo y lo que se quita se nombra. *Alternativa descartada:* `checkContrast(boolean)` y un método más por
@@ -226,7 +227,7 @@ destino no se ha escrito nada: el PDF se escribe entero al final.
 
 Dónde se consulta: `BoxTreeBuilder`, en cada elemento (un `Barcode` se genera al construir el árbol); `Engine`, en cada
 layout que no está en la caché (`layoutOnce` y `contentIntrinsic`); `Paginator`, en cada vuelta de la convergencia de las
-referencias y en cada página, al paginar el flujo y al colocar los `Page overlay`; `Overflow` y `ContrastCheck`, en cada
+referencias y en cada página, al paginar el flujo y al colocar los `Page overlay`; `Overflow`, `ModuleSizes` y `ContrastCheck`, en cada
 página; `PdfDocumentWriter`, en cada página que pinta y antes de guardar; `PdfImages`, en cada imagen que incrusta o dibuja
 por primera vez, y `Converter.toSvg`, en cada página. Cada consulta cuesta una lectura del reloj monótono o de la marca del
 hilo. Lo que no se corta es una sola llamada a PDFBox, a JSVG o a ZXing (dibujar un SVG, generar un código, guardar el

@@ -7,6 +7,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+### Changed
+
+- **A barcode too small to be read is an error.** A `Barcode` whose content box, once laid out, leaves its modules
+  narrower than the minimum of its format is `BARCODE_TOO_SMALL` (new code), with the line of the `Barcode`, the module
+  it is left with and the content box it needs. The minimum is 0.25 mm in a QR code and a Code 128, about three dots of a
+  300 dpi printer, and 0.264 mm in an EAN-13, 80 % of its nominal module. A QR code counts its shorter side; a barcode,
+  only its width. Until 0.9.0 the code was drawn as small as its box without a warning. Whoever converts can remove the
+  check with `Converter.builder().exclude(Check.BARCODE_SIZE)`. The golden case `32-barcodes` now draws its last QR code
+  in a box of 60 × 24 instead of 60 × 20, whose modules (0.21 mm) are below the minimum.
+
 ### Fixed
 
 - A `Columns` with a definite height (its `Height`, or the height of the grid row or stack line that stretches it) whose
@@ -19,6 +29,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   before painting a page once the cancellation is requested.
 - The message of `MARKDOWN_UNSUPPORTED` for a text with `Markup: markdown` lists `` `code` `` and `![images](path)`
   among what it allows, which it already did.
+
+### Java API
+
+- `Check.BARCODE_SIZE` and `ErrorCode.BARCODE_TOO_SMALL`.
+- `Modules` has a sixth component, `minModule` (the narrowest module that can be read, 0 for none; the constructor of
+  five components stays), and `usedModule(width, height)` and `minimumSize()`.
+- `layout.ModuleSizes`, the check that `Engine` runs after `Overflow` unless `Check.BARCODE_SIZE` is removed.
 
 ## [0.9.0] - 2026-11-02
 

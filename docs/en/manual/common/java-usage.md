@@ -47,6 +47,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST).build();
 | `Check.CONTRAST` | A text that barely stands out from its background ([Box](box.md#contrast)) |
 | `Check.PDF_IMAGE_FONTS` | A page of a PDF with a font that does not comply with PDF/UA, such as one that is not embedded or that does not say which character each glyph is ([Image](../components/image.md#a-page-of-a-pdf)) |
 | `Check.PDF_IMAGE_ANNOTATIONS` | A page of a PDF with a visible form field or comment, which would not be drawn |
+| `Check.BARCODE_SIZE` | A QR code or barcode so small that its modules cannot be read ([Barcode](../components/barcode.md#the-size)) |
 
 ## PDF/A and attachments
 

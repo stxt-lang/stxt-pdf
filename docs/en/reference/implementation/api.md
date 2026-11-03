@@ -76,13 +76,14 @@ the ones that have been removed. They are the values of the enum `Check` (`model
 | `CONTRAST` | The contrast of the text with its background, `CONTRAST_LOW` ([The PDF](../common/pdf.md#contrast)). `layOut` checks it with `ContrastCheck`, a canvas that records what is painted | A text may be unreadable |
 | `PDF_IMAGE_FONTS` | That the fonts of the page of a PDF drawn by an `Image` comply with PDF/UA: embedded, stating which character each glyph is and the other rules of the list, `IMAGE_FORMAT` ([Image](../components/image.md#pdf)) | The viewer may substitute a font, its text may not be copyable and the PDF may not conform to PDF/UA |
 | `PDF_IMAGE_ANNOTATIONS` | That the page of a PDF has no visible annotations, `IMAGE_FORMAT` | The page is drawn without them |
+| `BARCODE_SIZE` | That the modules of a `Barcode` are not narrower than the minimum of its format, `BARCODE_TOO_SMALL` ([Barcode](../components/barcode.md#minimum-module)) | The code is drawn as small as its box and may not be read |
 
 ```java
 Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAGE_ANNOTATIONS).build();
 ```
 
-`Engine` receives the removed ones and passes them to `Images`, and the contrast is checked by `Converter.layOut` after
-layout.
+`Engine` receives the removed ones and passes them to `Images`; unless `BARCODE_SIZE` is removed, it checks the modules
+with `ModuleSizes` after `Overflow`. The contrast is checked by `Converter.layOut` after layout.
 
 > **Decision:** a single way to remove checks, an enum and `exclude`, instead of one boolean for each: by
 > default everything is done and what is removed is named. *Rejected alternative:* `checkContrast(boolean)` and one more method for
@@ -228,8 +229,8 @@ nothing has been written to the destination: the PDF is written whole at the end
 
 Where it is asked: `BoxTreeBuilder`, at each element (a `Barcode` is generated when the tree is built); `Engine`, at
 each layout that is not in the cache (`layoutOnce` and `contentIntrinsic`); `Paginator`, at each pass of the convergence
-of the references and at each page, when paginating the flow and when placing the `Page overlay` boxes; `Overflow` and
-`ContrastCheck`, at each page; `PdfDocumentWriter`, at each page it paints and before saving; `PdfImages`, at each image
+of the references and at each page, when paginating the flow and when placing the `Page overlay` boxes; `Overflow`,
+`ModuleSizes` and `ContrastCheck`, at each page; `PdfDocumentWriter`, at each page it paints and before saving; `PdfImages`, at each image
 it embeds or draws for the first time, and `Converter.toSvg`, at each page. Each question costs one reading of the
 monotonic clock or of the flag of the thread. What is not cut short is a single call to PDFBox, JSVG or ZXing (drawing an
 SVG, generating a code, saving the PDF), which finishes on its own; the [limits](#limits) bound how long each can take.

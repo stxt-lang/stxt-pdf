@@ -13,7 +13,7 @@ algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crece
 
 `Engine.layOutDocument` es la entrada: valida las fuentes, las imágenes y los idiomas de los guiones, pagina con el
 `Paginator`, comprueba los
-desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
+desbordamientos con `Overflow` y el módulo mínimo de los códigos con `ModuleSizes`, y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
 El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) es de package.
 
 > **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`. El protocolo de la
@@ -375,6 +375,17 @@ compara con `Tolerance.fits(size, space)` y `Tolerance.same(a, b)`, nunca con un
 
 > **Decisión:** dos tolerancias con nombre y no una: con `EPSILON` en `Overflow` el motor sería más estricto y una caja que se
 > sale 0,005 pt sería un error. *Alternativa descartada:* una sola tolerancia, con ese cambio de comportamiento.
+
+Después de `Overflow`, y salvo que quien convierte quite `Check.BARCODE_SIZE`, `ModuleSizes` recorre las mismas páginas
+(flujo, área de notas y `Page overlay`) y, en cada fragmento con `Box.modules()`, compara la caja de contenido con
+`Modules.minimumSize()`, el tamaño en el que los módulos miden `Modules.minModule()`, con la tolerancia `Tolerance.MODEL`:
+el ancho y el alto en una matriz, y solo el ancho en una fila estirada (`Modules.fit()`). El primero que no llega es
+`BARCODE_TOO_SMALL`, con la línea de su caja ([Barcode](../components/barcode.md#módulo-mínimo)). El mínimo lo pone el
+generador en `Modules`, así que `ModuleSizes` no sabe de formatos.
+
+> **Decisión:** el módulo mínimo se comprueba sobre el resultado paginado, como los desbordamientos, y no al medir la imagen
+> (`Images.natural`), porque un código se maqueta con tamaños provisionales al medir un `Stack` o un `Grid`.
+> *Alternativa descartada:* comprobarlo en `ImageLayout`, que daría errores por pasadas de medida.
 
 ## Hilos
 
