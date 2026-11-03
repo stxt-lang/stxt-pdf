@@ -57,6 +57,48 @@ class PaginationCacheTest {
     }
 
     /**
+     * A section of chapters: a {@code Block} with a {@code Heading 1} and {@code paragraphs} paragraphs each, with a
+     * top margin of 24 on the heading or, if {@code onBlock}, on the block, so that both documents have the same
+     * geometry.
+     */
+    private static String chapters(int chapters, int paragraphs, boolean onBlock) {
+        StringBuilder sb = new StringBuilder("Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n"
+                + "\tTitle: Capítulos\n\tLanguage: es\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
+                + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\tSection:\n");
+        for (int c = 0; c < chapters; c++) {
+            sb.append("\t\tBlock:\n");
+            if (onBlock) {
+                sb.append("\t\t\tBox:\n\t\t\t\tMargin: 24 0 0 0\n");
+            }
+            sb.append("\t\t\tHeading 1:\n\t\t\t\tText: Capítulo ").append(c).append('\n');
+            if (!onBlock) {
+                sb.append("\t\t\t\tBox:\n\t\t\t\t\tMargin: 24 0 0 0\n");
+            }
+            for (int i = 0; i < paragraphs; i++) {
+                sb.append("\t\t\tParagraph: ").append(PARAGRAPH).append(' ').append(i).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * The top margin of the heading comes out of the chapter and moves it down once laid out; the chapter is not laid
+     * out again at its position when the first layout holds there (what it placed fits), so each one costs the same as
+     * with the margin on the block itself, which does not move it. It used to cost a second layout of the chapter on
+     * the page where it starts: with short chapters, almost twice the layouts (944 versus 505). The chapter that
+     * crosses the end of each page fills it and does not hold lower down, so it is still laid out twice on that page:
+     * that is the margin the test allows.
+     */
+    @Test
+    void aChildMovedByTheMarginsThatComeOutOfItIsLaidOutOnce() {
+        int[] onHeading = layOut(chapters(60, 5, false));
+        int[] onBlock = layOut(chapters(60, 5, true));
+        assertEquals(onBlock[0], onHeading[0]);
+        assertTrue(onHeading[0] > 10, "the test needs chapters that start in the middle of a page: " + onHeading[0]);
+        assertTrue(onHeading[1] <= onBlock[1] * 1.15, onHeading[1] + " layouts versus " + onBlock[1]);
+    }
+
+    /**
      * With 101 pages, the text with {page} in the flow is measured again with three figures: "Página 000" (50) does not
      * fit in its box of 48 and takes two lines; measured with two (45) it would fit in one. The cache has to forget it
      * (mutation testing).

@@ -74,7 +74,9 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * last break of highest quality among the previous ones and the one inside the child is chosen. Forced breaks
  * apply as soon as they appear, also after an empty child, except at the start of a page. A child whose top border
  * would fall past the end of the page (its merged margins push it there) is not laid out: the break goes before it. In a non-forced break, the margins that touch it are truncated; in a forced one,
- * the top margin of the child that starts the page is kept.</p>
+ * the top margin of the child that starts the page is kept. A child that, once laid out, the margins coming out of it
+ * at the top move down is laid out again at its position only if the result can change: what it placed does not fit in
+ * what is left from there, or there are side boxes beside it ({@link Run#holdsAt}).</p>
  *
  * <p>A {@code List item} also carries its marker in the first fragment, hanging to its
  * left ({@link MarkerLayout}).</p>
@@ -287,9 +289,11 @@ public final class BlockLayout implements LayoutAlgorithm {
                 if (noRoom(flowY)) {
                     return breakBefore();
                 }
-                r = layOutChild(child, flowY, childToken, wraps);
-                if (r.breakToken() instanceof BreakToken.Before) {
-                    return breakBefore();
+                if (!holdsAt(r, flowY, wraps)) {
+                    r = layOutChild(child, flowY, childToken, wraps);
+                    if (r.breakToken() instanceof BreakToken.Before) {
+                        return breakBefore();
+                    }
                 }
             }
             Fragment f = r.fragment();
@@ -463,6 +467,19 @@ public final class BlockLayout implements LayoutAlgorithm {
          */
         double top(MarginStrut childTop) {
             return atTop ? 0 : cursor + strut.add(childTop).resolve();
+        }
+
+        /**
+         * Whether the layout of a child made higher up is also its layout with its top border at {@code y}: what it
+         * placed fits in what is left of the page from {@code y}, and there is nothing beside it (the exclusions of
+         * the side boxes depend on where the child is placed). With less room nothing new fits and what fitted still
+         * fits, so the algorithms take the same decisions, also in a child that was broken: laying it out again
+         * would compute the same subtree, with another key in the cache. A fragment that reaches the end of the page
+         * (a definite height, a split row, the columns of a {@code Columns}, a broken child that fills the page) does
+         * not fit from lower down, and the child is laid out again.
+         */
+        boolean holdsAt(LayoutResult r, double y, boolean wraps) {
+            return !(wraps && !beside.isEmpty()) && fits(y + r.fragment().height(), contentRemaining);
         }
 
         /**

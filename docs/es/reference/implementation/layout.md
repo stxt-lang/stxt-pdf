@@ -58,6 +58,16 @@ Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que 
 deja pasar los suyos). El padre los fusiona con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
 guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
 
+Cuando los márgenes que salen de un hijo por arriba lo mueven hacia abajo una vez maquetado (el margen superior de su primer
+descendiente es mayor que los de alrededor), lo que le queda de página y lo que tiene al lado cambian, y `BlockLayout` lo
+maqueta otra vez en su posición solo si el resultado puede cambiar: si lo que colocó no cabe en lo que queda desde ahí o si
+tiene cajas laterales al lado (`Run.holdsAt`). Si cabe y no hay nada al lado, el primer layout vale, aunque el hijo quedara
+cortado: con menos sitio nada nuevo cabe y lo colocado sigue cabiendo, así que los algoritmos deciden lo mismo, y repetirlo
+calcularía el mismo subárbol con otra clave en la caché. Un fragmento que llega al final de la página (un alto definido, una
+fila partida, las columnas de un `Columns`, un hijo cortado que llena la página) no cabe desde más abajo y se repite: un
+capítulo más largo que la página se maqueta dos veces en la página donde empieza. Hasta la 0.9.0 se repetía siempre, y un
+bloque corto que empezaba a media página costaba el doble.
+
 ## Grid
 
 `TrackSizing.size` reparte el espacio libre entre las pistas según un `Distribution`: `EQUAL`, a partes iguales entre las

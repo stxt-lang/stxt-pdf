@@ -58,6 +58,16 @@ Each box returns in `AdjoiningMargins` the margins of its descendants that come 
 lets its own through). The parent merges them with the child's own margins, which it resolves itself. `MarginStrut` is immutable and
 keeps the largest positive and the most negative separately. `Box.isolatesMargins()` says which boxes cut it off.
 
+When the margins that come out of a child at the top move it down once laid out (the top margin of its first descendant is
+larger than those around it), what is left of the page for it and what is beside it change, and `BlockLayout` lays it out
+again at its position only if the result can change: if what it placed does not fit in what is left from there or if there
+are side boxes beside it (`Run.holdsAt`). If it fits and has nothing beside it, the first layout holds, even if the child
+was broken: with less room nothing new fits and what fitted still fits, so the algorithms take the same decisions, and
+repeating it would compute the same subtree with another key in the cache. A fragment that reaches the end of the page (a
+definite height, a split row, the columns of a `Columns`, a broken child that fills the page) does not fit from lower down
+and is repeated: a chapter longer than the page is laid out twice on the page where it starts. Until 0.9.0 it was always
+repeated, and a short block that started in the middle of a page cost twice.
+
 ## Grid
 
 `TrackSizing.size` shares the free space among the tracks according to a `Distribution`: `EQUAL`, equally among the

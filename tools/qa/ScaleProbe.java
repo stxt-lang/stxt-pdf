@@ -1,7 +1,9 @@
 // QA probe: long text documents of 200 to 12 800 paragraphs, with {page} and {pages}
 // in a Page overlay; it gives the time of reading, layout and painting and the hits and misses of the cache, also per
 // page. Those of 2000 and 2100 paragraphs fall on both sides of page 100, where {pages} needs one more digit;
-// the "toc" ones also carry a Table of contents and a {page of: ...} per chapter, which repeat until they converge. For
+// the "toc" ones also carry a Table of contents and a {page of: ...} per chapter, which repeat until they converge; the
+// "chapters" ones group the paragraphs in blocks headed by a Heading 1 whose top margin comes out of the block and moves
+// it down once laid out (five paragraphs per block, a quarter of a page; "long chapters", twenty, more than a page). For
 // the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
 // jdk.ExecutionSample".
 import dev.stxt.InlineNode;
@@ -35,6 +37,21 @@ public class ScaleProbe {
         return sb.toString();
     }
 
+    /**
+     * Chapters of perChapter paragraphs: a Block with a Heading 1 whose top margin comes out of it and moves it down once
+     * laid out, and its paragraphs. A short chapter fits whole on the page where it starts; a long one is broken there.
+     */
+    static String chapters(int paras, int perChapter) {
+        StringBuilder sb = new StringBuilder(head());
+        for (int i = 0; i < paras; i++) {
+            if (i % perChapter == 0) {
+                sb.append("\t\tBlock:\n\t\t\tHeading 1:\n\t\t\t\tText: Capitulo " + i + "\n\t\t\t\tBox:\n\t\t\t\t\tMargin: 24 0 12 0\n");
+            }
+            sb.append("\t\t\tParagraph: ").append(LOREM).append(' ').append(i).append("\n");
+        }
+        return sb.toString();
+    }
+
     static void run(String label, String text, Resources r) throws Exception {
         long t0 = System.nanoTime();
         InlineNode doc = new DocumentReader().read(text);
@@ -61,6 +78,10 @@ public class ScaleProbe {
         }
         for (int n : new int[]{800, 3200}) {
             run("toc " + n, big(n, true), r);
+        }
+        for (int n : new int[]{800, 3200}) {
+            run("chapters " + n, chapters(n, 5), r);
+            run("long chapters " + n, chapters(n, 20), r);
         }
         System.out.println("max heap MB: " + Runtime.getRuntime().maxMemory() / 1048576);
     }

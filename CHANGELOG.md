@@ -36,6 +36,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   only its width. Until 0.9.0 the code was drawn as small as its box without a warning. Whoever converts can remove the
   check with `Converter.builder().exclude(Check.BARCODE_SIZE)`. The golden case `32-barcodes` now draws its last QR code
   in a box of 60 × 24 instead of 60 × 20, whose modules (0.21 mm) are below the minimum.
+- **A block child moved down by the margins that come out of it is laid out once.** When the top margin of the first
+  descendant of a child (a chapter `Block` that starts with a `Heading 1` with a `Margin`) is larger than the margins
+  around it, the child ends up lower than where it was first laid out. Until 0.9.0 it was then laid out again at its
+  position, a second layout of the child on that page; now the first layout is kept when what it placed fits from there
+  and no side box is beside it. In a document of short chapters (a quarter of a page each) the layouts per page go from
+  52 to 32, the same as with the margin on the block; a chapter longer than the page is still laid out twice on the page
+  where it starts. The output does not change.
 
 ### Fixed
 
