@@ -48,8 +48,8 @@ import static dev.stxt.pdf.tree.TableBuilder.table;
 enum ElementReader {
 
     /**
-     * {@code Text}, {@code Paragraph}, the {@code Caption} of a {@code Figure} and the code block of a
-     * {@code Markdown}: the text, with its runs.
+     * {@code Text}, {@code Paragraph} and the {@code Caption} of a {@code Figure}: the text, with its runs (the code
+     * block of a {@code Markdown} is {@link #CODE_BLOCK}).
      */
     TEXT {
         @Override

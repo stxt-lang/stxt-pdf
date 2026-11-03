@@ -24,8 +24,8 @@ import dev.stxt.pdf.model.Value;
  * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
  * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
  * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
- * rotation, {@code Link}, {@code Row header} and {@code In table of contents}) and the line where each property was
- * declared, with its document ({@link SourceLine}).</p>
+ * rotation, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Clear} and
+ * {@code Drop cap}) and the line where each property was declared, with its document ({@link SourceLine}).</p>
  *
  * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
  * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link #inheriting}).</p>
@@ -68,8 +68,9 @@ public final class Style extends StyleGroup {
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
     /**
-     * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), only in {@code Frame},
-     * {@code Overlay}, {@code Page overlay} and {@code Image}; {@code null} = no rotation. Not inherited.
+     * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), in {@code Frame},
+     * {@code Overlay}, {@code Page overlay}, {@code Image} and the in-flow boxes that {@link #rotatesInFlow()} admits;
+     * {@code null} = no rotation. Not inherited.
      */
     private Rotation rotation;
     /**

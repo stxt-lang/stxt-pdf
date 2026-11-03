@@ -5,6 +5,15 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Fixed
+
+- A `Columns` with a definite height (its `Height`, or the height of the grid row or stack line that stretches it) whose
+  content left a gap at the end of a column (a box with a definite height, or a stretched grid item, broken inside the
+  column) consumed that gap from its height and could run out of room on the next page (`BOX_OVERFLOW`). As any other
+  box, it now consumes only what its columns take up ("Definite height and breaks" in the reference).
+
 ## [0.9.0] - 2026-11-02
 
 Everything the engine lacked to replace an HTML-and-CSS pipeline in production: three new elements (`Figure`,

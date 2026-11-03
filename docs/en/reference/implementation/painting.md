@@ -23,7 +23,7 @@ it contains (`Frame.Kind.WINDOW`). An `Overlay` inherits the rotations and the w
 painted with the rotations and the windows (`Clips.WINDOWS`), each line at its size (`TextLine.fontSize`, that of the box or
 the one `Overflow: shrink` left it), and the debug outline (`Canvas.outlines()`), without clips (`Clips.NONE`), so that the
 whole box is visible. The backgrounds step of a box that paints nothing, and the content step of a box without text or
-image, do not clip. The areas of the links are computed by
+image (except the leader of a table of contents, which clips by the windows), do not clip. The areas of the links are computed by
 `StackingContext.paintLinks` when painting (the border box of each fragment with `Link`, and the rectangle of each run with a
 link on each line, joining consecutive ones with the same destination), which calls `Tagging.link`. `StackingContext.paintText` splits the
 text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines; the
@@ -63,6 +63,7 @@ SVG): the marked text of the tagged PDF and the links.
 | `PdfStructure` | The tagged PDF and the bookmarks |
 | `PdfMetadata` | The title, the language, the XMP packet (PDF/UA, PDF/A and the XMP of the attachments) and the output intent of PDF/A |
 | `PdfAttachments` | The embedded files of PDF/A-3: the file specifications, the `EmbeddedFiles` tree and the `AF` array |
+| `PdfId` | The identifier of the trailer (`/ID`), computed from the content when saving |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
 | `ImageFit`, `Leaders`, `Shapes` | Where an image is drawn according to `Fit`, the leader of a table of contents and the paths of the boxes |
 
@@ -219,10 +220,16 @@ The font cache of JSVG is JVM-wide and not synchronized: an SVG with text is dra
 `PdfStructure` builds the structure tree with the marked content (`Tagging.beginText`/`endText`, and the backgrounds, the
 borders and the `Page overlay` are *artifacts*) and the bookmarks. `PdfStructure.type` is an exhaustive `switch` over `Element.Role`, so a
 new element with a role that already exists does not touch `paint`. `PdfStructure.build` creates the `Link` of a box with `Link` as
-a child of its element and parent of its content, `PdfStructure.markLink`, that of a text link, and
-`PdfStructure.outside`, the loose `Link` of what is not content, and `PdfStructure.markInlineImage`, the `Figure` of an
-inline image when it is painted, with its `Alt` and its `BBox`, under the element of the text or under a new `Link` if
-it is in a link.
+a child of its element and parent of its content (in a table, which cannot wrap its own, an empty `Link` that is a
+child of the `Table`), `PdfStructure.markLink`, that of a text link, and `PdfStructure.outside` finds the loose `Link` of
+what is not content, which `standIns` left in its place when building the tree. `PdfStructure.markInlineImage` is the
+`Figure` of an inline image when it is painted, with its `Alt` and its `BBox`, under the element of the text or under a
+new `Link` if it is in a link. The other pieces: `figure` builds the `Figure` with its `Caption` (or the `Caption` inside
+the `Table`), `children` hangs each footnote after the text that calls it and `captionNotes`, after the figure whose
+caption calls it, `markFootnoteCall` and `markFootnoteLabel` mark the call (a `Reference` with `Ref` both ways) and the
+number of the note (its `Lbl`), `goTo` gives the action with the structure destination of PDF/UA-2, and
+`PdfStructure.none()` is the untagged structure that `PdfPainter` paints with. What each one writes is in
+[The PDF inside](pdf.md).
 
 > **Decision:** `Element.Role` is the role of a box, shared by several elements, and it is the only thing painting looks at:
 > the names of the PDF tags are in `PdfStructure`. *Rejected alternative:* PDF methods in `Element`, which

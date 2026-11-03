@@ -544,7 +544,7 @@ final class PdfStructure {
         };
     }
 
-    /** Standard structure type of the box (decision G1 of the roadmap); of an image marker, its {@code Figure}. */
+    /** Standard structure type of the box (reference/implementation/pdf.md); of an image marker, its {@code Figure}. */
     static String type(Box box) {
         if (box.isMarker() && box.isImage()) {
             return "Figure";

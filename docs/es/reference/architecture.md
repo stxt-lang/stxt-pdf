@@ -42,7 +42,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`, `KerningPairs`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
-| `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`) y las reglas de corte (`BreakRules`) |
+| `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, `Rule` (las líneas de una tabla con bordes fusionados), los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`) y las reglas de corte (`BreakRules`) |
 | `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`) y un subpackage por algoritmo: `block`, `inline` (con `inline.hyphenation`, los patrones de partición), `stack`, `grid`, `table`, `columns`, `position` e `image` |
 | `output` | `fragment`, `model` | `StxtDump`, el volcado de los tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | El pintado (`StackingContext`, `Canvas`) y los dos lienzos: el PDF (`PdfDocumentWriter`, `PdfCanvas` y sus piezas) y el SVG (`SvgCanvas`) |
@@ -63,9 +63,10 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 
 ### Árbol de cajas (`tree`)
 
-- **`Box`**: una caja del árbol. Guarda su `Element`, su `Style`, sus hijos, su texto y sus tramos, su imagen, su marcador
-  de lista, su número y su `Id`. No guarda geometría: la posición y el tamaño solo existen en los fragmentos. Se cierra al
-  terminar la construcción.
+- **`Box`**: una caja del árbol. Guarda su `Element`, su `Style`, sus hijos, su texto y sus tramos, su imagen o los
+  módulos de su código, su marcador de lista, su número, su `Id` (o el nombre generado que lo sustituye), las filas con
+  nombre de una tabla, el borde que declara una celda con `Merge borders` y el estilo de sus tramos con nombre. No guarda
+  geometría: la posición y el tamaño solo existen en los fragmentos. Se cierra al terminar la construcción.
 - **`Element`**: el enum de los elementos (como `BLOCK`, `HEADING_2` o `CELL`), con su `Layout`, su `Position` y su papel
   (`Element.Role`), que es lo único que el layout y el pintado miran.
 - **`Style`** y sus grupos: las propiedades de una caja, separadas como en el documento (`TypographyStyle`, el único que
@@ -78,6 +79,7 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   - `StyleRules`, las reglas de `Styles`;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` y `TableOfContentsBuilder`, las tablas, las listas, el Markdown y
     los índices, y `RunMarks`, los tramos con estilo del Markdown ([El árbol de cajas](implementation/tree.md#texto-y-tramos));
+  - `TableBorders`, los bordes fusionados de una tabla, y `NamedColors`, los colores con nombre de `Styles`;
   - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
     imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));
   - `ModelValidator`, las reglas que miran la caja ya leída;
@@ -100,7 +102,9 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas, con el `Hyphenator` de `inline.hyphenation` para
   partir palabras), `StackResolver`, `TrackSizing` y `Placement` (grid),
   `Columns` (cuántas columnas y de qué ancho), `OverlayEquation`, `UnitBreaker` (cortes de `Stack`, `Grid` y tablas), `Slice` (alto, borde y
-  relleno de cada fragmento) ([El layout](implementation/layout.md)).
+  relleno de cada fragmento), `LineWidths` (el ancho de cada línea junto a las cajas laterales), `MergedBorders` (las
+  líneas de una tabla con bordes fusionados) y `RunningHeads` (el encabezado en vigor en cada página)
+  ([El layout](implementation/layout.md)).
 - **`TextMeasurer`**: mide el texto. `FixedMetrics` (cada carácter mide medio cuerpo) es el de los tests de layout.
   `PdfMetrics` da las métricas reales de las fuentes y es el del PDF.
 

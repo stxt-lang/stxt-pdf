@@ -23,7 +23,7 @@ esquinas, y un `Page overlay`, nada. El fondo, el borde y la imagen se pintan co
 se pinta con los giros y las ventanas (`Clips.WINDOWS`), cada línea con su tamaño (`TextLine.fontSize`, el de la caja o el
 que `Overflow: shrink` le dejó), y el contorno de depuración (`Canvas.outlines()`), sin recortes (`Clips.NONE`), para que se
 vea la caja entera. El paso de los fondos de una caja que no pinta nada, y el del contenido de una caja sin texto ni
-imagen, no recortan. Las zonas de los enlaces las calcula
+imagen (salvo la guía de un índice, que recorta por las ventanas), no recortan. Las zonas de los enlaces las calcula
 `StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`, y el rectángulo de cada tramo con
 enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`. `StackingContext.paintText` parte el
 texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas; la
@@ -63,6 +63,7 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 | `PdfStructure` | El PDF etiquetado y los marcadores |
 | `PdfMetadata` | El título, el idioma, el paquete XMP (PDF/UA, PDF/A y el XMP de los adjuntos) y el perfil de salida de PDF/A |
 | `PdfAttachments` | Los ficheros adjuntos de PDF/A-3: las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
+| `PdfId` | El identificador del tráiler (`/ID`), calculado del contenido al guardar |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
 | `ImageFit`, `Leaders`, `Shapes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice y los caminos de las cajas |
 
@@ -218,10 +219,15 @@ La caché de fuentes de JSVG es de toda la JVM y no está sincronizada: un SVG c
 `PdfStructure` construye el árbol de estructura con el contenido marcado (`Tagging.beginText`/`endText`, y los fondos, los
 bordes y los `Page overlay` son *artifacts*) y los marcadores. `PdfStructure.type` es un `switch` exhaustivo sobre `Element.Role`, así que un
 elemento nuevo con un papel que ya existe no toca `paint`. `PdfStructure.build` crea el `Link` de una caja con `Link` como
-hijo de su elemento y padre de su contenido, `PdfStructure.markLink`, el de un enlace de texto, y
-`PdfStructure.outside`, el `Link` suelto de lo que no es contenido, y `PdfStructure.markInlineImage`, el `Figure` de una
+hijo de su elemento y padre de su contenido (en una tabla, que no puede envolver el suyo, un `Link` vacío hijo del
+`Table`), `PdfStructure.markLink`, el de un enlace de texto, y `PdfStructure.outside` busca el `Link` suelto de lo que no
+es contenido, que `standIns` dejó en su sitio al construir el árbol. `PdfStructure.markInlineImage` es el `Figure` de una
 imagen en línea al pintarla, con su `Alt` y su `BBox`, bajo el elemento del texto o bajo un `Link` nuevo si está en un
-enlace.
+enlace. Las demás piezas: `figure` construye la `Figure` con su `Caption` (o la `Caption` dentro de la `Table`),
+`children` cuelga cada nota al pie tras el texto que la llama y `captionNotes`, tras la figura cuyo pie la llama,
+`markFootnoteCall` y `markFootnoteLabel` marcan la llamada (un `Reference` con `Ref` en los dos sentidos) y el número
+de la nota (su `Lbl`), `goTo` da la acción con destino de estructura de PDF/UA-2, y `PdfStructure.none()` es la
+estructura sin etiquetar con la que pinta `PdfPainter`. Lo que escribe cada una está en [El PDF por dentro](pdf.md).
 
 > **Decisión:** `Element.Role` es el papel de una caja, compartido por varios elementos, y es lo único que el pintado mira:
 > los nombres de las etiquetas del PDF están en `PdfStructure`. *Alternativa descartada:* métodos del PDF en `Element`, que

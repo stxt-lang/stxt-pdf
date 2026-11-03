@@ -116,11 +116,6 @@ public final class LineBreaker {
             this(runs, false, 0);
         }
 
-        /** A line at the start of the text. */
-        public Line(List<TextRun> runs, boolean hyphenated) {
-            this(runs, hyphenated, 0);
-        }
-
         /** A line that no forced line break ends. */
         public Line(List<TextRun> runs, boolean hyphenated, int start) {
             this(runs, hyphenated, start, false);

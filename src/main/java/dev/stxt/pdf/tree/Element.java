@@ -12,9 +12,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Box elements of the document (reference/common/structure.md), the marker that the engine generates for each {@code
- * List item} (reference/components/list.md) and the column flow of each {@code Columns}
- * (reference/components/columns.md). Each one gives its {@code Layout} and its {@code Position}, which are not
+ * Box elements of the document (reference/common/structure.md) and the ones the engine generates: the marker of each
+ * {@code List item} (reference/components/list.md), the column flow of each {@code Columns}
+ * (reference/components/columns.md), the rows of a table, the code blocks of a {@code Markdown}, the table of contents
+ * entries and the footnote area. Each one gives its {@code Layout} and its {@code Position}, which are not
  * declared, and the meaning used by the {@code For element} rules, the bookmarks and the PDF tags.
  *
  * <p>The structure (which children each element accepts) is only in the schema; {@code ElementTest}

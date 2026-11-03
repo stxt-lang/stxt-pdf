@@ -33,7 +33,7 @@ import java.util.Base64;
 import java.util.Locale;
 
 /**
- * SVG output for debugging (milestone 2): one page per file, in pt. If {@code debug} is
+ * SVG output for debugging: one page per file, in pt. If {@code debug} is
  * on, it also draws the outline of each border box.
  *
  * <p>It does not embed the fonts: the viewer uses its own, and the baseline is the approximate one

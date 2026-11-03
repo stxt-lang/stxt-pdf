@@ -48,7 +48,8 @@ import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
  * if the content ends here and Fill is balance: the minimum height in which it fits without worse breaks
  *                between columns (binary search)
  * no page or height to fill: always balanced
- * height of the content = that of the tallest column
+ * height of the content = that of the tallest column; of a definite Height, the Columns
+ *                         consumes only what they take up (LayoutResult.occupied)
  * </pre>
  *
  * <p>Breaks. A column break is one more break inside the flow; a page break
@@ -104,15 +105,17 @@ public final class ColumnsLayout implements LayoutAlgorithm {
     /**
      * The columns filled with a height.
      *
-     * @param columns fragments of the flow, one per column with content, already placed
-     * @param token   where the flow continues; {@code null} if it has finished
-     * @param appeal  quality of the break of the last column
-     * @param worst   quality of the worst break between columns
-     * @param before  the first column has placed nothing
-     * @param height  height of the tallest column
+     * @param columns  fragments of the flow, one per column with content, already placed
+     * @param token    where the flow continues; {@code null} if it has finished
+     * @param appeal   quality of the break of the last column
+     * @param worst    quality of the worst break between columns
+     * @param before   the first column has placed nothing
+     * @param height   height of the tallest column
+     * @param occupied height of the content that counts as consumed of a definite height: the tallest of what the
+     *                 columns take up ({@link LayoutResult#occupied}); at most {@code height}
      */
     private record Fill(List<Fragment> columns, BreakToken token, int appeal, int worst, boolean before,
-                        double height) {
+                        double height, double occupied) {
 
         boolean finished() {
             return !before && token == null;
@@ -155,7 +158,8 @@ public final class ColumnsLayout implements LayoutAlgorithm {
 
         LayoutResult layOut() {
             if (contentDone) {
-                return result(new Fill(List.of(), null, BreakAppeal.PERFECT_BREAK, BreakAppeal.FORCED_PAGE, false, 0));
+                return result(new Fill(List.of(), null, BreakAppeal.PERFECT_BREAK, BreakAppeal.FORCED_PAGE, false, 0,
+                        0));
             }
             double page = space.fragmenting() ? Slice.contentRemaining(model, first, space) : Double.POSITIVE_INFINITY;
             double own = ownRemaining();
@@ -214,14 +218,17 @@ public final class ColumnsLayout implements LayoutAlgorithm {
             int appeal = BreakAppeal.PERFECT_BREAK;
             int worst = BreakAppeal.FORCED_PAGE;
             double tallest = 0;
+            double occupied = 0;
             for (int i = 0; i < columns.count(); i++) {
                 LayoutResult r = context.layout(flow, columnSpace(OptionalDouble.of(height), atStart), token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     // What follows does not fit in a column of this height: nor in the others.
-                    return new Fill(placed, token, appeal, worst, i == 0, tallest);
+                    return new Fill(placed, token, appeal, worst, i == 0, tallest, occupied);
                 }
                 placed.add(r.fragment().moved(columns.x(i), 0));
                 tallest = Math.max(tallest, r.fragment().height());
+                // A column whose content goes on may take up less than it measures (LayoutResult.occupied).
+                occupied = Math.max(occupied, r.occupied(token));
                 token = r.breakToken();
                 appeal = r.breakAppeal();
                 if (token == null || appeal == BreakAppeal.FORCED_PAGE) {
@@ -229,7 +236,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
                 }
                 worst = Math.min(worst, appeal);
             }
-            return new Fill(placed, token, appeal, worst, false, tallest);
+            return new Fill(placed, token, appeal, worst, false, tallest, occupied);
         }
 
         /**
@@ -266,7 +273,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
 
         LayoutResult result(Fill fill) {
             boolean contentFinished = fill.finished();
-            Slice slice = Slice.of(model, first, consumed, fill.height(), contentFinished, space);
+            Slice slice = Slice.of(model, first, consumed, fill.height(), fill.occupied(), contentFinished, space);
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
                     slice.border(), slice.padding(), fill.columns(), List.of(), first, slice.finished());
             // The margins of the content do not come out of the columns (reference/components/block.md).

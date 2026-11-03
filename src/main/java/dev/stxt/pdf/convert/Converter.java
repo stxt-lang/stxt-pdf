@@ -33,8 +33,8 @@ import java.util.function.Supplier;
 
 /**
  * Entry point of the engine: STXT document → PDF (or SVG) with the real metrics of the fonts and the images of the
- * resources folder. It gathers in one object what used to be passed separately to each call: the resources folder
- * ({@link Resources}), the separate styles document (reference/common/styles.md) and the debug outlines.
+ * resources folder. It gathers in one object the resources folder ({@link Resources}), the separate styles document
+ * (reference/common/styles.md) and the debug outlines.
  *
  * <p><strong>It is immutable and thread-safe</strong>: it is created once and shared. Each conversion
  * creates its own {@link Engine}, which cannot be shared (it holds the layout cache), so two

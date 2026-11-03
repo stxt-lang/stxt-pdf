@@ -70,7 +70,8 @@ public final class UnitBreaker {
      * @param splittable the items of a unit that does not fit at the start of a page can be broken in parallel, as the
      *                   last resort
      * @param split      {@code Split rows} or {@code Split items}: a unit that does not fit in what is left of the page
-     *                   is broken in parallel on that page instead of going whole to the next one
+     *                   is broken in parallel on that page instead of going whole to the next one; only where
+     *                   {@code splittable} allows it
      */
     public record Units(List<Unit> list, double extent, boolean splittable, boolean split) {
 

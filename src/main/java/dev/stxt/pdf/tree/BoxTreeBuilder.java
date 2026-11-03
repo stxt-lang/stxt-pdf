@@ -89,8 +89,6 @@ public final class BoxTreeBuilder {
         this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
     }
 
-    /** BCP 47 language tag: the language (2 or 3 letters) and subtags of 1 to 8 letters or digits. */
-
     /**
      * Children of an element that are not its properties: the wrappers and the text, the classes
      * (already applied with their rules), the row groups and the {@code Span}, which {@link TableBuilder} reads,

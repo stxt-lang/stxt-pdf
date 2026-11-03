@@ -148,7 +148,7 @@ public enum ErrorCode {
      * runs beside it (reference/components/block.md).
      */
     SIDE_NOT_IN_BLOCK_FLOW,
-    /** {@code Side} on a {@code Block} with {@code Width: auto} and no {@code Max width}: it would take the whole width. */
+    /** {@code Side} on a {@code Block} or a {@code Figure} with {@code Width: auto} and no {@code Max width}: it would take the whole width. */
     SIDE_WITHOUT_WIDTH,
     /** {@code Keep together} or {@code Edges} in a {@code Block} with {@code Side}, which is not split. */
     BREAK_IN_SIDE_BOX,
@@ -328,8 +328,8 @@ public enum ErrorCode {
     /** {@code Isolate margins: true} on an item of {@code Stack} or {@code Grid}, which already isolates. */
     ISOLATE_MARGINS_IN_ITEM,
     /**
-     * An own {@code Break} inside an {@code Overlay}, a {@code Page overlay}, a rotated {@code Frame} or a rotated
-     * in-flow box.
+     * An own {@code Break} inside an {@code Overlay}, a {@code Page overlay}, a rotated {@code Frame}, a rotated
+     * in-flow box, a side box or a box with {@code Overflow: clip}.
      */
     BREAK_IN_UNBREAKABLE,
     /**

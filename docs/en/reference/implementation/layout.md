@@ -7,13 +7,14 @@ pages of common behavior and of each component; here, how it is built.
 
 `Engine` dispatches by `Style.layout` to the corresponding algorithm (an `EnumMap`, and the table, which is a grid, has its own).
 The algorithms do not know the engine: they depend on **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
-`measurer`, `natural`), which `Engine` implements and which a test can replace with a double. **Every recursive call for
+`measurer`, `natural`, `imageRatio`), which `Engine` implements and which a test can replace with a double. **Every recursive call for
 layout or intrinsic sizes goes through `context.layout(...)` / `context.intrinsic(...)`**, never directly to the
 algorithm, so that the `LayoutCache` is used (without it, nested `Stack` and `Grid` grow exponentially).
 
-`Engine.layOutDocument` is the entry point: it validates the fonts and the images, paginates with the `Paginator`, checks the
+`Engine.layOutDocument` is the entry point: it validates the fonts, the images and the hyphenation languages, paginates
+with the `Paginator`, checks the
 overflows with `Overflow` and returns a `LaidOutDocument`. When it finishes (also if it fails) it releases everything it memoizes.
-The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `number`, `overlays()`) is package-private.
+The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) is package-private.
 
 > **Decision:** the layout algorithms depend on the interface `LayoutContext` and not on `Engine`. The pagination
 > protocol stays in `Engine`, package-private, because moving it to another class did not remove any dependency.
@@ -58,6 +59,10 @@ lets its own through). The parent merges them with the child's own margins, whic
 keeps the largest positive and the most negative separately. `Box.isolatesMargins()` says which boxes cut it off.
 
 ## Grid
+
+`TrackSizing.size` shares the free space among the tracks according to a `Distribution`: `EQUAL`, equally among the
+`auto` ones, in a `Grid`, and `CONTENT`, in proportion to the content of each column, in a `Table` (`GridLayout.arrange`
+chooses it by the role of the box, [Table](../components/table.md)).
 
 > **Decision:** a stretched grid item is always laid out again with its height fixed, even if it measures the same as when
 > it was measured, so that its children have the definite base that the definite height rule promises. It costs one more layout per stretched
@@ -121,12 +126,13 @@ by comparing tokens. The token of the root does not accumulate height: each page
 gives what is left for the content. A fragment of a box with a definite height that does not end reaches the end of the
 page but only consumes what its content takes up, and the same holds upwards: `LayoutResult.occupied(from)` gives what a
 fragment takes up for its parent (what its token consumed in that fragment, not its height), and `BlockLayout` (in the
-`Mark` of the broken child) and `UnitBreaker` (in `Split`) pass it to `Slice.of` as `occupied`, apart from the visible
-height of the content. Stack and grid break between units (lines, items or rows, which are `fragment.Unit`) with `UnitBreaker`: they are
+`Mark` of the broken child), `UnitBreaker` (in `Split`) and `ColumnsLayout` (in `Fill`: the tallest of its columns) pass
+it to `Slice.of` as `occupied`, apart from the visible height of the content. Stack and grid break between units (lines, items or rows, which are `fragment.Unit`) with `UnitBreaker`: they are
 laid out whole without fragmenting (`UnitBreaker.Arranged`: placed items and `Units`) and `UnitBreaker.fragment` keeps what
 fits on the page. A unit that does not fit in what is left of the page splits its items in parallel on that page
-(`Units.split`, from `Split rows` and `Split items`; with `false`, only the one that does not fit even at the start of a page,
-`Units.splittable`), repeating their layout with `ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`;
+(`Units.split`, from `Split rows` and `Split items`, and only where `Units.splittable` allows it, which the lines of a
+horizontal `Stack` with `Wrap` do not; with `false`, only the one that does not fit even at the start of a page),
+repeating their layout with `ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`;
 `UnitBreaker.splitOnThisPage` compares the quality of that break with that of the best break between units
 (`BreakRules.cutUnits`) and keeps the last of the best ones, and the `BreakToken.Container` carries the token of each item. With `atFragmentainerStart` something has to be placed even if it overflows (progress guarantee). Tables repeat
 header and footer with `UnitBreaker.Repeat`. The bands of the rows (`Box.rows()`, `Element.ROW`) are `UnitBreaker.Band`:
@@ -176,8 +182,9 @@ space that separates it from the item as the right padding of the fragment, and 
 **Side boxes** ([Block](../components/block.md#side-boxes-side)). `BlockLayout` places a child with `Side` whole, at its
 side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and
 what it takes from each side, margins included). To each child that runs beside the boxes (`Box.wrapsBesideSideBoxes`:
-texts that are not preformatted, `Block`, headings, `Markdown` and lists without background or border; lists, only
-beside boxes on the right) it passes in the `ConstraintSpace` the **exclusions** (`model.Exclusion`: band and what it
+texts that are not preformatted, `Block`, headings, `Markdown`, lists and list items without background or border that
+are not side boxes and have no `Clear`, position, `Rotate` or `Overflow: clip`; lists, only beside boxes on the right) it
+passes in the `ConstraintSpace` the **exclusions** (`model.Exclusion`: band and what it
 takes from each side, measured from the border box of the child), which are part of the key of the cache; the other
 children go down to the bottom of the side boxes. A `Block` that receives exclusions treats them as inherited side boxes
 for its own children, without counting them for its height. `InlineLayout` moves them to the content box and
@@ -319,7 +326,9 @@ by probes: no reservation; if the notes do not fit, the full height of those not
 reservation fit, because less room is less flow), unless it leaves the body no room (it is placed by force by the
 progress guarantee and overflows: then, the largest reservation that does not force it, by bisection); and from one that
 fits, down to what its notes need and, where a smaller one brings back a call that no longer fits, by bisection between
-the two (`PRECISION`, 0.001 pt). Each note is laid out with `context.layout` like any block, so the cache answers the
+the two (`PRECISION`, 0.001 pt). Notes that do not fit even with the whole reservation are `FOOTNOTE_TOO_TALL`, and a
+reservation that does not settle in 60 probes (`MAX_PROBES`) is an `InternalException`. Each note is laid out with
+`context.layout` like any block, so the cache answers the
 repeated probes; only the last one may be left broken, with a break without violations (`BreakAppeal.PERFECT_BREAK`)
 and only if the flow continues, and its rest (`FootnoteLayout.Carry`) heads the area of the next page. The area
 measures what its notes measure and is anchored at the end of the page area: the surplus of the reservation stays
@@ -340,7 +349,8 @@ referred to.
 **Running heads.** `RunningHeads` walks the pages in physical order and keeps the heading of each level in effect: the
 last one that has started (the `Fragment` with `first()` of a box with `headingLevel() > 0`, with the text of
 `Box.headingText()`, which already carries the number), until one of a higher level starts, which empties those below
-it. For each page it gives the value of each reference of the document (`"2"`, `"2: first"`), and `pages` passes it to
+it. For each page it gives the value of each reference of the document: `"2"`, the heading in effect, and `"2: first"`,
+the first of that level that starts on the page or, if none starts, the same as `"2"`; `pages` passes it to
 the engine (`Engine.headings`) before placing the `Page overlay` boxes of the page, only when it differs from that of the
 previous one; the engine keeps it in `InlineLayout` like the assumed pages and forgets what the cache and the line
 breaking hold of the texts that carry a running head and of their ancestors, so those `Page overlay` boxes are laid out

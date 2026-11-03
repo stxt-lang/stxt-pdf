@@ -52,11 +52,6 @@ public sealed interface BreakToken {
         public Line {
             exclusions = List.copyOf(exclusions);
         }
-
-        /** The token of a text broken into lines from its start, without exclusions. */
-        public Line(int nextLine, double consumedHeight) {
-            this(nextLine, consumedHeight, 0, List.of());
-        }
     }
 
     /**

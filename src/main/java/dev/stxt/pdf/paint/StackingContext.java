@@ -517,7 +517,7 @@ public final class StackingContext {
      * text (in the tagged PDF, <em>artifacts</em>).
      *
      * <p>Text is painted in sequences of consecutive runs with the same link, also from one line
-     * to the next ({@link Canvas#beginText} if they have none, {@link Canvas#beginLinkText} if they have one): each
+     * to the next ({@link Tagging#beginText} if they have none, {@link Tagging#beginLinkText} if they have one): each
      * sequence is a separate marked content, and that of a link hangs from the {@code Link} of the tagged PDF
      * (reference/common/links.md). Inside each link sequence, one clickable area per line ({@link
      * #paintLinkZone}).</p>

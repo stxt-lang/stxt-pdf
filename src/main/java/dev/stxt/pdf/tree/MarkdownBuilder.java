@@ -447,7 +447,6 @@ final class MarkdownBuilder {
             return cell;
         }
 
-        /** A {@code Text} or a {@code Paragraph} with the text of a block and its runs. */
         /**
          * The {@code Id} of a heading, written at the end of its text as {@code {#id}}
          * (reference/components/markdown.md), which is removed from the text; {@code null} if it has none. An empty
@@ -475,6 +474,7 @@ final class MarkdownBuilder {
             return id;
         }
 
+        /** A {@code Text} or a {@code Paragraph} with the text of a block and its runs. */
         private InlineNode text(String name, org.commonmark.node.Node block, int line, String empty) {
             List<TextRun> text = inline(block, line);
             String value = TextRun.text(text);

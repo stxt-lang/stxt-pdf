@@ -86,7 +86,8 @@ An element with `Case` or `Small caps` carries `ActualText` with the written tex
 A normal text line that is not the last of its box (or of its fragment) ends with an invisible space after the last
 word: the line break swallows the space, and without it whoever joins the text of the lines (a screen reader,
 extraction, search) would glue the words together. It changes neither the width of the line nor the layout. The text of `Preformatted: true`
-and `wrap` does not have it: its lines are lines.
+and `wrap` does not have it: its lines are lines. Neither does the first line of a `Paragraph` with `Drop cap`: the drop
+cap is the first letter of the word that starts the next line.
 
 > **Decision:** the invisible space at the end of each broken line. *Rejected alternative:* leaving it to the geometry,
 > as some extractors do.
@@ -201,6 +202,8 @@ The `Link` element wraps what is clicked and carries each annotation as an objec
   `Div → Link → P, P` or `TOCI → Link → title, number`). An image is the exception: its `Link` is the parent of its `Figure`
   (`Link → Figure`), because a `Figure` cannot contain its `Link`. A split box has a single `Link` with one `OBJR`
   per fragment.
+- *Table with `Link`:* a `Table` cannot wrap its content in a `Link`: its own is an empty child of the `Table`, with the
+  text of the link as `Alt`, and carries its annotations.
 - *Link inside the text:* the `Link` is a child of the element of the text (`P → text, Link, text`) and contains the marked
   content of the words of the link, which are painted in separate sequences. There is one per link and fragment, even if it spans
   several lines: one marked content and one `OBJR` per line. Two consecutive links with the same destination are one.
@@ -245,7 +248,7 @@ these differences:
 - **Structure destinations:** a link to a box of the document and a bookmark are a `GoTo` action with the element of the
   box in `SD` (or that of its nearest ancestor that has an element) and the same position. `D`, with the page, remains for the
   viewers that do not understand `SD`.
-- **Lists:** `dash` is `ListNumbering: Unordered`.
+- **Lists:** `dash` and `image` are `ListNumbering: Unordered`.
 - **Footnotes:** `FENote` instead of `Note`, with `NoteType: Footnote`.
 - **Links with nothing to read** (those that carry `Alt`): their annotation does not carry `Contents`, because what is read is the `Alt`.
 

@@ -19,10 +19,13 @@ La estructura solo está en el schema: `DocumentSchema` lo compila una vez, `Doc
 En el schema:
 
 - los elementos contenedores y los grupos son `GROUP` (sin valor);
-- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` y las reglas de `Styles`, `INLINE`;
+- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, `Caption`, `Marker image` y las reglas de `Styles`, `INLINE` con
+  hijos;
 - `Content`, `BLOCK`, y `Areas`, `TEXT`;
-- `Isolate margins`, `Wrap`, `Row header` e `In table of contents`, `BOOLEAN`;
-- `Layer`, `Widows`, `Orphans`, `Start`, `Number` y `Count`, `INTEGER`, y `Rotate`, `NUMBER`;
+- los interruptores (como `Isolate margins`, `Wrap`, `Row header`, `In table of contents`, `Merge borders` o `Hyphenate`),
+  `BOOLEAN`;
+- los enteros (como `Layer`, `Widows`, `Orphans`, `Start`, `Number`, `Count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
+  y `Rotate`, `NUMBER`;
 - las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
 
@@ -54,8 +57,9 @@ que se construye con ella lo dice también en `inStyles()`.
 
 `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`. `BoxTreeBuilder.element`
 es el orden común a todos los elementos (el sitio, la herencia, las reglas, las propiedades y sus comprobaciones, la caja y
-el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
-`GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` y `CONTAINER`, elegida con `ElementReader.of`): el layout de la
+el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `CODE_BLOCK`, `IMAGE`, `BARCODE`,
+`CELL`, `TABLE`, `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS`, `FOOTNOTE`, `FIGURE` y `CONTAINER`, elegida
+con `ElementReader.of`): el layout de la
 caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
 elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`. La familia
 `FIGURE` construye el elemento y el `Caption` de una `Figure`, los ordena según `Caption position`, la numera
@@ -69,6 +73,7 @@ Las piezas:
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
+| `NamedColors` | Los colores con nombre (`Named color`) de los dos orígenes, leídos antes que las reglas y sustituidos por su color al leer cada propiedad (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `TableBorders` | Los bordes fusionados de una tabla con `Merge borders`: guarda el borde que declara cada celda (`Box.mergedBorder()`, con `model.Stroke`) y cambia su `Border` por el sitio que deja para las líneas |
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
@@ -120,7 +125,8 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
-`Page number format`, `Start`, `Inherit page overlays` y `Begin on`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box`
+`Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` y el área de
+notas, `footnotes()`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box`
 **sin `parent`**) y **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
 (referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Page overlay` y subir por
 `parent` se quedan dentro de la sección. Los `Page overlay` hijos de `Document` también son hijos de la raíz (con `parent`) y no se
@@ -158,12 +164,14 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
   (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`) o, con
   `Marker: image`, una caja de imagen (`Box.isImage()`, con la ruta en `Box.image()` y el `Alt` y el `Height` del
   `Marker image` en su `ListStyle`), con la línea del `Marker image` del ítem o, si no tiene, de la lista.
-  `PropertyReader.markerImage` lee el `Marker image` con sus hijos, y `ListBuilder.validateList` y `validateItem`
-  comprueban que solo va con `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`, `LIST_IMAGE_MISSING`).
+  `PropertyReader.markerImage` lee el `Marker image` con sus hijos, `ListBuilder.validateList` y `validateItem`
+  comprueban que solo va con `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`) y `ListBuilder.marker`, que con `Marker: image` hay
+  una imagen (`LIST_IMAGE_MISSING`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
 - **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
-  con el título, la guía y el número. Un encabezado sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el
-  `Id` o ese nombre.
+  o, con `Of: figures` o `tables`, por `Figure` de ese contador (`Element.TOC_1`), con el título o el pie, la guía y el
+  número. Un encabezado o una figura sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el `Id` o ese
+  nombre.
 - **Área de notas:** `Footnotes.beginSection` crea en cada sección la caja `Footnotes` (`Element.FOOTNOTES`,
   `Position.FOOTNOTES`, fuera del flujo: `Style.isOutOfFlow()`), hija de la sección después de su contenido, con el
   aspecto por defecto del filete y las reglas `For element: Footnotes` encima. Cada `Footnote` escrita en la sección
@@ -173,7 +181,8 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
 - **Bloque de código:** `MarkdownBuilder` marca el nodo `Text` que genera (`Translation.codeBlocks`) y
   `BoxTreeBuilder.element` le da el elemento `Element.CODE_BLOCK`.
 
-Los elementos generados que se nombran en `Styles` sin escribirse en el documento son `Element.selectable()`.
+Los elementos que una regla `For element` puede nombrar son `Element.selectable()`: los escritos y, de los generados, los
+bloques de código, las entradas de índice y el área de notas; `Element.isWritten()` distingue los escritos.
 
 ## Imágenes generadas
 
@@ -210,16 +219,17 @@ de la fila. Tampoco da la línea de cada celda, así que los errores de una celd
 
 `MarkdownBuilder` parsea el `Content` con commonmark-java 0.30.1 (con las extensiones de tablas, tachado y subrayado) y lo
 traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema. Los tramos de cada texto van aparte,
-por nodo (`Translation.runs`, en `BuildContext.runs`). `BoxTreeBuilder.markdown` construye esos nodos con `element(...)` como
+por nodo (`Translation.runs`, en `BuildContext.runs`). La familia `MARKDOWN` de `ElementReader` construye esos nodos con `element(...)` como
 hijos de la caja del `Markdown`. El texto con `Markup: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
 misma traducción en modo `inlineOnly`. Dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).
 
-Antes de parsear, `RunMarks.mark` cambia cada tramo con estilo por dos marcas, no-caracteres de Unicode que commonmark-java
-toma por letras: `RunMarks.OPEN` con el número del nombre en lugar del `[`, y `RunMarks.CLOSE` en lugar de `]{nombre}`.
+Antes de parsear, `RunMarks.mark` cambia cada tramo con estilo por marcas, no-caracteres de Unicode que commonmark-java
+toma por letras: `RunMarks.OPEN`, los dígitos del número del nombre y `RunMarks.END` en lugar del `[`, y `RunMarks.CLOSE`
+en lugar de `]{nombre}`.
 Recorre el texto como el Markdown en línea (los escapes, el código entre comillas invertidas, el destino de un enlace, las
 imágenes y las líneas en blanco) para dejar fuera lo que no es texto. `Translator.text` las encuentra en los nodos `Text` y
-da el estilo a todo lo que va entre ellas, también a las marcas, los enlaces y el código, y un bloque de código recupera su
-texto con `RunMarks.unmark`.
+da el estilo a todo lo que va entre ellas, también a las marcas, los enlaces y el código, y el código, en línea o en bloque, recupera
+su texto con `RunMarks.unmark`.
 
 > **Decisión:** las marcas antes del parser y no un `LinkProcessor` de commonmark-java, que trata el tramo como un enlace:
 > no deja que un enlace lo contenga (`disallowPreviousLinks`) ni lo procesa si su texto tiene corchetes, y

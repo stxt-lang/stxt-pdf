@@ -7,13 +7,14 @@ páginas de comportamiento común y de cada componente, y aquí, cómo está hec
 
 `Engine` despacha por `Style.layout` al algoritmo correspondiente (un `EnumMap`, y la tabla, que es un grid, tiene el suyo).
 Los algoritmos no conocen el motor: dependen de **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
-`measurer`, `natural`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
+`measurer`, `natural`, `imageRatio`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
 layout o de tamaños intrínsecos pasa por `context.layout(...)` / `context.intrinsic(...)`**, nunca directamente al
 algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crecen de forma exponencial).
 
-`Engine.layOutDocument` es la entrada: valida las fuentes y las imágenes, pagina con el `Paginator`, comprueba los
+`Engine.layOutDocument` es la entrada: valida las fuentes, las imágenes y los idiomas de los guiones, pagina con el
+`Paginator`, comprueba los
 desbordamientos con `Overflow` y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
-El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `number`, `overlays()`) es de package.
+El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) es de package.
 
 > **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`. El protocolo de la
 > paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia.
@@ -58,6 +59,10 @@ deja pasar los suyos). El padre los fusiona con los márgenes propios del hijo, 
 guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
 
 ## Grid
+
+`TrackSizing.size` reparte el espacio libre entre las pistas según un `Distribution`: `EQUAL`, a partes iguales entre las
+`auto`, en un `Grid`, y `CONTENT`, en proporción al contenido de cada columna, en una `Table` (`GridLayout.arrange` lo
+elige por el papel de la caja, [Table](../components/table.md)).
 
 > **Decisión:** un ítem de grid estirado se maqueta siempre otra vez con su alto fijado, aunque mida lo mismo que al
 > medirlo, para que sus hijos tengan la base definida que promete la regla del alto definido. Cuesta un layout más por ítem
@@ -121,12 +126,13 @@ comparando tokens. El token de la raíz no acumula alto: cada página tiene el �
 da lo que queda al contenido. Un fragmento de una caja con alto definido que no termina llega al final de la página pero
 solo consume lo que ocupa su contenido, y lo mismo vale hacia arriba: `LayoutResult.occupied(from)` da lo que un fragmento
 ocupa para su padre (lo consumido por su token en ese fragmento, y no su alto), y `BlockLayout` (en la `Mark` del hijo
-partido) y `UnitBreaker` (en `Split`) lo pasan a `Slice.of` como `occupied`, aparte del alto visible del contenido.
+partido), `UnitBreaker` (en `Split`) y `ColumnsLayout` (en `Fill`: el mayor de sus columnas) lo pasan a `Slice.of` como
+`occupied`, aparte del alto visible del contenido.
 Stack y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
 que cabe en la página. Una unidad que no cabe en lo que queda de página parte sus ítems en paralelo en esa página
-(`Units.split`, de `Split rows` y `Split items`; con `false`, solo la que no cabe ni al principio de página,
-`Units.splittable`), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
+(`Units.split`, de `Split rows` y `Split items`, y solo donde `Units.splittable` lo admite, que no es el caso de las líneas
+de un `Stack` horizontal con `Wrap`; con `false`, solo la que no cabe ni al principio de página), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
 `UnitBreaker.splitOnThisPage` compara la calidad de ese corte con la del mejor corte entre unidades (`BreakRules.cutUnits`)
 y se queda con el último de los mejores, y el `BreakToken.Container` lleva el token de cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso). Las tablas repiten
 cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`, `Element.ROW`) son `UnitBreaker.Band`:
@@ -175,7 +181,8 @@ la tipografía del ítem sobre esa línea base.
 **Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
 a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita
 por cada lado, con sus márgenes). A cada hijo que rodea las cajas (`Box.wrapsBesideSideBoxes`: textos no preformateados,
-`Block`, encabezados, `Markdown` y listas sin fondo ni borde; las listas, solo junto a cajas derechas) le pasa en el
+`Block`, encabezados, `Markdown`, listas e ítems de lista sin fondo ni borde, que no sean cajas laterales ni lleven `Clear`,
+posición, `Rotate` u `Overflow: clip`; las listas, solo junto a cajas derechas) le pasa en el
 `ConstraintSpace` las **exclusiones** (`model.Exclusion`: banda y lo que quita por cada lado, medidas desde la caja de
 borde del hijo), que forman parte de la clave de la caché; los demás hijos bajan hasta el final de las cajas laterales. Un
 `Block` que recibe exclusiones las trata como cajas laterales heredadas para sus propios hijos, sin que cuenten para su
@@ -316,7 +323,9 @@ es función de la reserva y las notas dependen del cuerpo, la reserva se busca p
 caben, la altura entera de esas notas (en la que las de cualquier reserva mayor caben, porque menos sitio es menos
 flujo), salvo que no deje sitio al cuerpo (lo coloca forzado por la garantía de progreso y desborda: entonces, la mayor
 reserva que no lo fuerza, por bisección); y desde una que cabe, hacia abajo hasta lo que sus notas necesitan y, donde
-una menor trae una llamada que ya no cabe, por bisección entre las dos (`PRECISION`, 0,001 pt). Cada nota se maqueta con
+una menor trae una llamada que ya no cabe, por bisección entre las dos (`PRECISION`, 0,001 pt). Unas notas que no caben ni
+con la reserva entera son `FOOTNOTE_TOO_TALL`, y una reserva que no asienta en 60 sondas (`MAX_PROBES`), un
+`InternalException`. Cada nota se maqueta con
 `context.layout` como cualquier bloque, así que la caché responde a las sondas repetidas; solo la última puede quedar
 partida, con un corte sin violaciones (`BreakAppeal.PERFECT_BREAK`) y solo si el flujo continúa, y su resto
 (`FootnoteLayout.Carry`) encabeza el área de la página siguiente. El área mide lo que miden sus notas y se ancla al final
@@ -337,7 +346,8 @@ también lo recorre: una nota tiene `Id` y se puede referir.
 **Títulos corridos.** `RunningHeads` recorre las páginas en orden físico y guarda el encabezado de cada nivel en vigor: el
 último que ha empezado (el `Fragment` con `first()` de una caja con `headingLevel() > 0`, con el texto de
 `Box.headingText()`, que ya lleva el número), hasta que empieza uno de un nivel superior, que vacía los de debajo. Para
-cada página da el valor de cada referencia del documento (`"2"`, `"2: first"`), y `pages` se lo pasa al motor
+cada página da el valor de cada referencia del documento: `"2"`, el encabezado en vigor, y `"2: first"`, el primero de ese
+nivel que empieza en la página o, si no empieza ninguno, el mismo que `"2"`; `pages` se lo pasa al motor
 (`Engine.headings`) antes de colocar los `Page overlay` de la página, solo cuando difiere del de la anterior; el motor lo
 guarda en `InlineLayout` como las páginas supuestas y olvida lo que la caché y el reparto en líneas tienen de los textos
 que llevan un título corrido y de sus antepasados, así que esos `Page overlay` se maquetan de nuevo en cada página que

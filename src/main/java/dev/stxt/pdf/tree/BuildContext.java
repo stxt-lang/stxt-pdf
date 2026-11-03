@@ -48,8 +48,9 @@ final class BuildContext {
     /** Whether the content of a {@code Columns} is being built. */
     boolean insideColumns;
     /**
-     * The box that is not split across pages ({@code an Overlay}, {@code a Page overlay} or {@code a rotated Frame})
-     * whose content is being built, or {@code null}: inside it, a {@code Break} has no effect, except in the
+     * The box that is not split across pages (an {@code Overlay}, a {@code Page overlay}, a rotated {@code Frame} or
+     * box, a side box or a box with {@code Overflow: clip}; {@code BoxTreeBuilder.unbreakable}) whose content is being
+     * built, or {@code null}: inside it, a {@code Break} has no effect, except in the
      * columns of a {@code Columns} (reference/common/breaks.md).
      */
     String unbreakable;
@@ -75,10 +76,6 @@ final class BuildContext {
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
     /** The footnotes: their calls, their boxes and their numbering (reference/components/footnote.md). */
     final Footnotes footnotes = new Footnotes();
-
-    BuildContext(StyleRules rules) {
-        this(rules, Cancellation.NONE);
-    }
 
     BuildContext(StyleRules rules, Cancellation cancellation) {
         this.rules = rules;

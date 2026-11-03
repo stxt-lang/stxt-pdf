@@ -61,11 +61,6 @@ public final class LineWidths {
         return new LineWidths(contentWidth, lineHeight, exclusions, lines, width);
     }
 
-    /** Width of the content box: that of every line from {@link #varying()} on. */
-    public double contentWidth() {
-        return contentWidth;
-    }
-
     /** The first line that has the whole width, like all the ones after it; 0 if every line has it. */
     public int varying() {
         return varying;

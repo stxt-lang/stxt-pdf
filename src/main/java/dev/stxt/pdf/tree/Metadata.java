@@ -11,9 +11,4 @@ public record Metadata(String title, String language, String subject) {
 
     /** No title, language or subject: a layout result built by hand, not from a document. */
     public static final Metadata NONE = new Metadata(null, null, null);
-
-    /** A title and a language, without a subject. */
-    public Metadata(String title, String language) {
-        this(title, language, null);
-    }
 }

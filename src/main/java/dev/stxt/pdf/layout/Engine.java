@@ -55,7 +55,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * It can be reused in sequence: {@link #layOutDocument(BoxTreeBuilder.Result)} empties the cache and the
  * state when it finishes, so that a stored engine does not retain the box tree of the last document.</p>
  *
- * <p>The protocol with the {@link Paginator} (reserved digits, assumed pages, numbering and out-of-flow boxes)
+ * <p>The protocol with the {@link Paginator} (reserved digits, assumed pages, running heads, numbering and out-of-flow boxes)
  * is not public: it is only used from this package.</p>
  */
 public final class Engine implements LayoutContext {

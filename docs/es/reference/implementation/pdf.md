@@ -84,7 +84,8 @@ Un elemento con `Case` o `Small caps` lleva `ActualText` con el texto escrito, p
 Una línea de texto normal que no es la última de su caja (o de su fragmento) acaba con un espacio invisible tras la última
 palabra: el corte de línea se come el espacio, y sin él quien une el texto de las líneas (un lector de pantalla, la
 extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `Preformatted: true`
-y `wrap` no lo lleva: sus líneas son líneas.
+y `wrap` no lo lleva: sus líneas son líneas. Tampoco la primera línea de un `Paragraph` con `Drop cap`: la capitular es la
+primera letra de la palabra con que empieza la línea siguiente.
 
 > **Decisión:** el espacio invisible al final de cada línea partida. *Alternativa descartada:* dejarlo a la geometría,
 > como hacen algunos extractores.
@@ -195,6 +196,8 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
   `Div → Link → P, P` o `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
   (`Link → Figure`), porque una `Figure` no puede contener a su `Link`. Una caja partida tiene un solo `Link` con una `OBJR`
   por fragmento.
+- *Tabla con `Link`:* una `Table` no puede envolver su contenido en un `Link`: el suyo es un hijo vacío del `Table`, con el
+  texto del enlace como `Alt`, y lleva sus anotaciones.
 - *Enlace dentro del texto:* el `Link` es hijo del elemento del texto (`P → texto, Link, texto`) y contiene el contenido
   marcado de las palabras del enlace, que se pintan en secuencias aparte. Es uno por enlace y fragmento, aunque ocupe
   varias líneas: un contenido marcado y una `OBJR` por línea. Dos enlaces seguidos con el mismo destino son uno.
@@ -239,7 +242,7 @@ estas diferencias:
 - **Destinos de estructura:** un enlace a una caja del documento y un marcador son una acción `GoTo` con el elemento de la
   caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición. `D`, con la página, queda para los
   visores que no entienden `SD`.
-- **Listas:** `dash` es `ListNumbering: Unordered`.
+- **Listas:** `dash` e `image` son `ListNumbering: Unordered`.
 - **Notas al pie:** `FENote` en lugar de `Note`, con `NoteType: Footnote`.
 - **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
 

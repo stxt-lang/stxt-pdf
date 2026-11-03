@@ -4,6 +4,7 @@ import dev.stxt.pdf.layout.LayoutFixture;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
@@ -165,5 +166,51 @@ class ColumnsFragmentationTest {
         assertRect(40, 65, 250, 25, l.rect(2, "J"));
         assertRect(305, 40, 250, 25, l.rect(2, "K"));
         assertRect(305, 65, 250, 25, l.rect(2, "L"));
+    }
+
+    // The gap that a child with a definite height leaves at the end of a column (reference/common/breaks.md).
+
+    /**
+     * A Columns of Height: 200 with one column contains a block of Height: 200 whose 16 lines of 12 leave 4 at the end
+     * of each column of 100: the Columns does not consume that gap either, and on page 3 it still has the 4 that the
+     * block needs to finish (it used to be BOX_OVERFLOW).
+     */
+    @Test
+    void aChildWithADefiniteHeightThatLeavesAGapDoesNotOverflowTheColumns() {
+        String text = String.join(" ", Collections.nCopies(16, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 1", "Box:", "\tHeight: 200"),
+                List.of("\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 200", "\t\t\t\tWidth: 30",
+                        "\t\t\tText: " + text, "\t\t\t\tId: T")));
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "M"));
+        assertRect(40, 40, 30, 100, l.rect(1, "B"));
+        assertEquals(8, l.fragment(1, "T").lines().size());
+        assertRect(40, 40, 515, 100, l.rect(2, "M"));
+        assertEquals(8, l.fragment(2, "T").lines().size());
+        assertRect(40, 40, 515, 4, l.rect(3, "M"));
+        assertRect(40, 40, 30, 4, l.rect(3, "B"));
+    }
+
+    /**
+     * The same Columns, stretched to a grid row of 200 (A) that is split on the page it is on: the gap is not taken
+     * from it either, and the row goes on to page 3 with the 4 that are left (it used to be BOX_OVERFLOW).
+     */
+    @Test
+    void aStretchedColumnsInASplitRowDoesNotOverflow() {
+        String text = String.join(" ", Collections.nCopies(16, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tId: G", "\t\tColumn sizes: * *",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 200",
+                "\t\tArea:", "\t\t\tColumns:", "\t\t\t\tId: M", "\t\t\t\tCount: 1",
+                "\t\t\t\tBlock:", "\t\t\t\t\tId: B", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 200", "\t\t\t\t\t\tWidth: 30",
+                "\t\t\t\t\tText: " + text, "\t\t\t\t\t\tId: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "G"));
+        assertRect(297.5, 40, 257.5, 100, l.rect(1, "M"));
+        assertEquals(8, l.fragment(1, "T").lines().size());
+        assertRect(40, 40, 257.5, 100, l.rect(2, "A"));
+        assertEquals(8, l.fragment(2, "T").lines().size());
+        assertRect(40, 40, 515, 4, l.rect(3, "G"));
+        assertFalse(l.has(3, "A"));
+        assertRect(297.5, 40, 257.5, 4, l.rect(3, "M"));
     }
 }

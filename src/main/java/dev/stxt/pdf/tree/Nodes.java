@@ -4,7 +4,6 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Position;
 
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -44,11 +43,6 @@ final class Nodes {
     /** A node with children: the schema does not allow it to be written as a text block ({@code >>}). */
     static InlineNode inline(Node n) {
         return (InlineNode) n;
-    }
-
-    /** Required child ({@code "Type"}), guaranteed by the schema. */
-    static Node required(InlineNode n, String child) {
-        return child(n, child.toLowerCase(Locale.ROOT)).orElseThrow();
     }
 
     /** Name of a property for messages: {@code min-width} → {@code Min width}. */

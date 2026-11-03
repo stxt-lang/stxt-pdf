@@ -42,7 +42,7 @@ Dependencies go in a single direction and without cycles. `ArchitectureTest` sta
 | `resources` | `model` | The resources folder (`Resources`), fonts (`FontLibrary`, `FontFile`, `KerningPairs`) and images (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | The box tree (`Box`, `Element`, `Style` and its groups) and its construction (`BoxTreeBuilder` and its parts), the model errors (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
-| `fragment` | `model`, `tree` | The result of the layout: `Fragment`, `Page`, `TextLine`, the break tokens (`BreakToken`, `BreakAppeal`, `Unit`) and the break rules (`BreakRules`) |
+| `fragment` | `model`, `tree` | The result of the layout: `Fragment`, `Page`, `TextLine`, `Rule` (the lines of a table with merged borders), the break tokens (`BreakToken`, `BreakAppeal`, `Unit`) and the break rules (`BreakRules`) |
 | `layout` | `fragment`, `model`, `resources`, `tree` | The engine (`Engine`, `Paginator`, `Overflow`) and one subpackage per algorithm: `block`, `inline` (with `inline.hyphenation`, the hyphenation patterns), `stack`, `grid`, `table`, `columns`, `position` and `image` |
 | `output` | `fragment`, `model` | `StxtDump`, the dump for the tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | Painting (`StackingContext`, `Canvas`) and the two canvases: the PDF (`PdfDocumentWriter`, `PdfCanvas` and its parts) and the SVG (`SvgCanvas`) |
@@ -63,9 +63,10 @@ depend on the `LayoutContext` interface.
 
 ### Box tree (`tree`)
 
-- **`Box`**: a box of the tree. It holds its `Element`, its `Style`, its children, its text and its runs, its image, its list
-  marker, its number and its `Id`. It holds no geometry: position and size exist only in the fragments. It is closed when
-  construction ends.
+- **`Box`**: a box of the tree. It holds its `Element`, its `Style`, its children, its text and its runs, its image or the
+  modules of its barcode, its list marker, its number, its `Id` (or the generated name that stands in for it), the named
+  rows of a table, the border a cell declares with `Merge borders` and the style of its named runs. It holds no geometry:
+  position and size exist only in the fragments. It is closed when construction ends.
 - **`Element`**: the enum of the elements (such as `BLOCK`, `HEADING_2` or `CELL`), with its `Layout`, its `Position` and its role
   (`Element.Role`), which is the only thing that layout and painting look at.
 - **`Style`** and its groups: the properties of a box, split as in the document (`TypographyStyle`, the only one that
@@ -78,6 +79,7 @@ depend on the `LayoutContext` interface.
   - `StyleRules`, the `Styles` rules;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` and `TableOfContentsBuilder`, tables, lists, Markdown and
     tables of contents, and `RunMarks`, the styled runs of the Markdown ([The box tree](implementation/tree.md#text-and-runs));
+  - `TableBorders`, the merged borders of a table, and `NamedColors`, the named colors of `Styles`;
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
     generated images ([The box tree](implementation/tree.md#generated-images));
   - `ModelValidator`, the rules that look at the box once read;
@@ -100,7 +102,9 @@ depend on the `LayoutContext` interface.
 - Pure parts of each algorithm: `LineBreaker` (line breaking, with the `Hyphenator` of `inline.hyphenation` to split
   words), `StackResolver`, `TrackSizing` and `Placement` (grid),
   `Columns` (how many columns and how wide), `OverlayEquation`, `UnitBreaker` (breaks of `Stack`, `Grid` and tables), `Slice` (height, border and
-  padding of each fragment) ([The layout](implementation/layout.md)).
+  padding of each fragment), `LineWidths` (the width of each line beside the side boxes), `MergedBorders` (the lines of a
+  table with merged borders) and `RunningHeads` (the heading in effect on each page)
+  ([The layout](implementation/layout.md)).
 - **`TextMeasurer`**: measures text. `FixedMetrics` (each character measures half the font size) is the one of the layout tests.
   `PdfMetrics` provides the real metrics of the fonts and is the one of the PDF.
 

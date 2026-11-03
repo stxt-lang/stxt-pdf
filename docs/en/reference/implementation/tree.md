@@ -19,10 +19,13 @@ The structure is only in the schema: `DocumentSchema` compiles it once, `Documen
 In the schema:
 
 - the container elements and the groups are `GROUP` (no value);
-- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area` and the rules of `Styles`, `INLINE`;
+- `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, `Caption`, `Marker image` and the rules of `Styles`, `INLINE` with
+  children;
 - `Content`, `BLOCK`, and `Areas`, `TEXT`;
-- `Isolate margins`, `Wrap`, `Row header` and `In table of contents`, `BOOLEAN`;
-- `Layer`, `Widows`, `Orphans`, `Start`, `Number` and `Count`, `INTEGER`, and `Rotate`, `NUMBER`;
+- the switches (such as `Isolate margins`, `Wrap`, `Row header`, `In table of contents`, `Merge borders` or `Hyphenate`),
+  `BOOLEAN`;
+- the integers (such as `Layer`, `Widows`, `Orphans`, `Start`, `Number`, `Count`, `Weight`, `Drop cap` or `Quiet zone`),
+  `INTEGER`, and `Rotate`, `NUMBER`;
 - those with closed values (such as `Fit`, `Leader`, `Pages` or `Paper`), `ENUM`;
 - the rest, `INLINE` without children, whose form `ValueReader` checks.
 
@@ -54,8 +57,9 @@ built with it also states it in `inStyles()`.
 
 `BoxTreeBuilder` is the orchestrator and keeps no state: what belongs to each call goes in a `BuildContext`. `BoxTreeBuilder.element`
 is the order common to all elements (the place, inheritance, the rules, the properties and their checks, the box and
-the content), and what is specific to each one is done by its family, `ElementReader` (an enum: `TEXT`, `IMAGE`, `CELL`, `TABLE`,
-`GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS` and `CONTAINER`, chosen with `ElementReader.of`): the layout of the
+the content), and what is specific to each one is done by its family, `ElementReader` (an enum: `TEXT`, `CODE_BLOCK`, `IMAGE`,
+`BARCODE`, `CELL`, `TABLE`, `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS`, `FOOTNOTE`, `FIGURE` and `CONTAINER`,
+chosen with `ElementReader.of`): the layout of the
 box, what its wrapper gives it, the properties of its type, what it checks before creating the box, and its content. A
 new element with nothing of its own is a `CONTAINER`, and one with something of its own, a new family, without touching `element`. The
 `FIGURE` family builds the element and the `Caption` of a `Figure`, orders them by `Caption position`, numbers it
@@ -69,6 +73,7 @@ The pieces:
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
 | `StyleRules` | The rules of `Styles` from the two origins and their priority |
+| `NamedColors` | The named colors (`Named color`) of the two origins, read before the rules and replaced by their color when each property is read (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
 | `TableBorders` | The merged borders of a table with `Merge borders`: it keeps the border each cell declares (`Box.mergedBorder()`, with `model.Stroke`) and changes its `Border` into the room it leaves for the lines |
 | `ListBuilder`, `ListMarkers` | Lists: the numbering and the box of the marker |
@@ -120,7 +125,8 @@ list, those in flow are computed once, and writing to a closed box or style is a
 ## The sections and the root
 
 `BoxTreeBuilder.Result` gives the root of the document and the list of `Section` (`tree/Section`: box, `PageSetup`, `Page numbering`,
-`Page number format`, `Start`, `Inherit page overlays` and `Begin on`). The **box of each section is the root of its layout** (`Element.SECTION`, a `Box`
+`Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` and the
+footnote area, `footnotes()`). The **box of each section is the root of its layout** (`Element.SECTION`, a `Box`
 **without `parent`**) and **hangs from `root.children()` without being a child** (`root.addSection`, not `addChild`): the traversals of the whole tree
 (references, links, tables of contents, fonts, images, `Id`) start from the root and see them, and the layout, the `Page overlay` and going up through
 `parent` stay inside the section. The `Page overlay` children of `Document` are also children of the root (with `parent`) and are not
@@ -159,12 +165,14 @@ box that is passed to them.
   (`Element.MARKER`, `Box.isMarker()`): text with the typography of the item and the final space included (`"3. "`) or,
   with `Marker: image`, an image box (`Box.isImage()`, with the path in `Box.image()` and the `Alt` and `Height` of the
   `Marker image` in its `ListStyle`), with the line of the `Marker image` of the item or, if it has none, of the list.
-  `PropertyReader.markerImage` reads the `Marker image` with its children, and `ListBuilder.validateList` and
-  `validateItem` check that it only goes with `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`, `LIST_IMAGE_MISSING`).
+  `PropertyReader.markerImage` reads the `Marker image` with its children, `ListBuilder.validateList` and
+  `validateItem` check that it only goes with `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`) and `ListBuilder.marker`, that with
+  `Marker: image` there is an image (`LIST_IMAGE_MISSING`).
 - **Column flow:** the content of a `Columns` goes in a generated block box (`Element.COLUMN_FLOW`), its only child.
 - **Table of contents entries:** `TableOfContentsBuilder` generates at the end one `Stack` box per heading (`Element.TOC_1` to `Element.TOC_6`)
-  with the title, the leader and the number. A heading without `Id` receives a generated name (`Box.anchor`), and `Box.key()` gives the
-  `Id` or that name.
+  or, with `Of: figures` or `tables`, per `Figure` of that counter (`Element.TOC_1`), with the title or the caption, the
+  leader and the number. A heading or a figure without `Id` receives a generated name (`Box.anchor`), and `Box.key()`
+  gives the `Id` or that name.
 - **Footnote area:** `Footnotes.beginSection` creates in each section the `Footnotes` box (`Element.FOOTNOTES`,
   `Position.FOOTNOTES`, out of the flow: `Style.isOutOfFlow()`), a child of the section after its content, with the
   default look of the rule and the `For element: Footnotes` rules on top. Each `Footnote` written in the section
@@ -174,7 +182,8 @@ box that is passed to them.
 - **Code block:** `MarkdownBuilder` marks the `Text` node it generates (`Translation.codeBlocks`) and
   `BoxTreeBuilder.element` gives it the element `Element.CODE_BLOCK`.
 
-The generated elements that are named in `Styles` without being written in the document are `Element.selectable()`.
+The elements a `For element` rule can name are `Element.selectable()`: the written ones and, of the generated ones, the
+code blocks, the table of contents entries and the footnote area; `Element.isWritten()` tells the written ones apart.
 
 ## Generated images
 
@@ -211,15 +220,16 @@ of the row. Nor does it give the line of each cell, so the errors of a cell poin
 
 `MarkdownBuilder` parses the `Content` with commonmark-java 0.30.1 (with the tables, strikethrough and underline extensions) and
 translates it into STXT nodes (`InlineNode` with the line of its block), which it validates with the schema. The runs of each text go separately,
-per node (`Translation.runs`, in `BuildContext.runs`). `BoxTreeBuilder.markdown` builds those nodes with `element(...)` as
+per node (`Translation.runs`, in `BuildContext.runs`). The `MARKDOWN` family of `ElementReader` builds those nodes with `element(...)` as
 children of the box of the `Markdown`. Text with `Markup: markdown` goes through `MarkdownBuilder.inline`, the same parser and the
 same translation in `inlineOnly` mode. Inside a `Markdown` it does not act (`BuildContext.insideMarkdown`).
 
-Before parsing, `RunMarks.mark` replaces each styled run with two marks, Unicode noncharacters that commonmark-java takes
-as letters: `RunMarks.OPEN` with the number of the name in place of the `[`, and `RunMarks.CLOSE` in place of
-`]{name}`. It walks the text like inline Markdown (escapes, code between backticks, the target of a link, images and
+Before parsing, `RunMarks.mark` replaces each styled run with marks, Unicode noncharacters that commonmark-java takes
+as letters: `RunMarks.OPEN`, the digits of the number of the name and `RunMarks.END` in place of the `[`, and
+`RunMarks.CLOSE` in place of `]{name}`. It walks the text like inline Markdown (escapes, code between backticks, the target of a link, images and
 blank lines) to leave out what is not text. `Translator.text` finds them in the `Text` nodes and gives the style to
-everything between them, also to marks, links and code, and a code block gets its text back with `RunMarks.unmark`.
+everything between them, also to marks, links and code, and code, inline or in a block, gets its text back with
+`RunMarks.unmark`.
 
 > **Decision:** marks before the parser and not a `LinkProcessor` of commonmark-java, which treats the run as a link: it
 > does not let a link contain it (`disallowPreviousLinks`) nor processes it if its text has brackets, and

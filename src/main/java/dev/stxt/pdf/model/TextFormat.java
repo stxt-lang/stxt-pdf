@@ -3,8 +3,8 @@ package dev.stxt.pdf.model;
 /**
  * Format of a run of text (reference/common/text-formatting.md): what changes within a line. Bold
  * and italic add to those of the box (a bold run has weight 700, or that of the box if it is already 700 or more,
- * {@link FontWeight#bolder()}); the size, the color and {@code Line height} are always those of the box, and so is the
- * family except in code ({@code family}).
+ * {@link FontWeight#bolder()}); the size and {@code Line height} are always those of the box, and so are the color and
+ * the family unless a styled run ({@code style}) or code ({@code family}) changes them.
  *
  * <p>{@code smallCaps} marks the lowercase letters painted as small caps (reference/common/text-formatting.md): the
  * text of the run is already in upper case and is measured and painted at {@link #SMALL_CAPS_SCALE} of the size. The
