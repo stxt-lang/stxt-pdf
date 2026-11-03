@@ -3,6 +3,8 @@ package dev.stxt.pdf.paint;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.CancelledException;
@@ -147,6 +149,29 @@ class PdfPainterTest {
             PDAnnotationLink external = (PDAnnotationLink) annotations.get(1);
             assertNull(external.getDestination());
             assertEquals("URI", external.getAction().getCOSObject().getNameAsString(COSName.S));
+        }
+    }
+
+    /** A link to a footnote goes to the note, in the footnote area of the page (reference/components/footnote.md). */
+    @Test
+    void aLinkToAFootnoteGoesToTheNote() throws IOException {
+        LaidOutDocument document = laidOut("\tParagraph: Uno[^a] dos.", "\tParagraph: Ir a la nota", "\t\tLink: #a",
+                "\tFootnote:", "\t\tId: a", "\t\tParagraph: Nota a.");
+        Page page = document.pages().get(0);
+        Fragment area = page.footnotes();
+        double noteY = page.pageSetup().pageArea().y() + area.y() + area.border().top() + area.padding().top()
+                + area.children().get(0).y();
+        try (PDDocument doc = form(1)) {
+            try (PdfPainter painter = new PdfPainter(doc, RESOURCES, Limits.DEFAULT)) {
+                painter.paint(page, doc.getPage(0));
+            }
+            List<PDAnnotation> annotations = doc.getPage(0).getAnnotations();
+            assertEquals(1, annotations.size(), "the link to the note is not removed");
+            PDPageXYZDestination destination = (PDPageXYZDestination) ((PDAnnotationLink) annotations.get(0))
+                    .getDestination();
+            assertSame(doc.getPage(0).getCOSObject(), destination.getPage().getCOSObject());
+            // The top left corner of the page is at the top left corner of the A4 page.
+            assertEquals((int) Math.ceil(PDRectangle.A4.getHeight() - noteY), destination.getTop());
         }
     }
 

@@ -41,6 +41,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   before painting a page once the cancellation is requested.
 - The message of `MARKDOWN_UNSUPPORTED` for a text with `Markup: markdown` lists `` `code` `` and `![images](path)`
   among what it allows, which it already did.
+- `Link: #id` to the `Id` of a `Footnote` ended the conversion with an `InternalException` ("Link without a
+  destination"), and with `PdfPainter` the link was removed without a warning: the destinations were only looked for in
+  the flow of each page, and a note is in its footnote area. The link now goes to the note, in the footnote area of the
+  page of its call, as the reference says.
 
 ### Java API
 

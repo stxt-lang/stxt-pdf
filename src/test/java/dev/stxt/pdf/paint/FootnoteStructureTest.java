@@ -3,6 +3,9 @@ package dev.stxt.pdf.paint;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
@@ -12,11 +15,15 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -78,6 +85,34 @@ class FootnoteStructureTest {
             String content = new String(pdf.getPage(0).getContents().readAllBytes(), StandardCharsets.ISO_8859_1);
             assertTrue(content.contains("/Reference <</MCID"), content);
             assertTrue(content.contains("/Lbl <</MCID"), content);
+        }
+    }
+
+    /**
+     * {@code Link: #id} to a note goes to the note in the footnote area of the page of its call
+     * (reference/components/footnote.md), with the corner of its fragment like any other box.
+     */
+    @Test
+    void aLinkToANoteGoesToTheNoteInTheFootnoteArea() throws Exception {
+        String source = Docs.sectioned(DOCUMENT.replace("\tParagraph: Tres.\n", "\tParagraph: Ir a la nota\n\t\tLink: #n\n"));
+        Converter converter = Converter.builder().build();
+        Page page = converter.layOut(new DocumentReader().read(source)).pages().get(0);
+        Fragment area = page.footnotes();
+        Fragment note = area.children().get(0);
+        double noteY = page.pageSetup().pageArea().y() + area.y() + area.border().top() + area.padding().top()
+                + note.y();
+        for (int ua = 1; ua <= 2; ua++) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Converter.builder().pdfUa(ua).build().toPdf(new DocumentReader().read(source), out);
+            byte[] pdf = out.toByteArray();
+            try (PDDocument doc = Loader.loadPDF(pdf)) {
+                PDAnnotationLink link = (PDAnnotationLink) doc.getPage(0).getAnnotations().get(0);
+                PDPageXYZDestination destination = (PDPageXYZDestination) (ua == 1 ? link.getDestination()
+                        : ((PDActionGoTo) link.getAction()).getDestination());
+                assertSame(doc.getPage(0).getCOSObject(), destination.getPage().getCOSObject());
+                assertEquals((int) Math.ceil(page.pageSetup().height() - noteY), destination.getTop());
+            }
+            assertEquals(Map.of(), PdfUa.failedRules(pdf, ua));
         }
     }
 

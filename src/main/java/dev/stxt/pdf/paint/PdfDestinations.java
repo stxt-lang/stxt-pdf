@@ -19,8 +19,9 @@ import java.util.Map;
  * links to a box of the document ({@link PdfLinks}, reference/common/links.md).
  *
  * <p>Headings and the boxes that can be pointed to ({@link Box#key()}: with {@code Id}, or the
- * headings a table of contents lists) have a destination. {@code Page overlay} boxes do not: they repeat on every
- * page and have no single destination.</p>
+ * headings a table of contents lists) have a destination, also a {@code Footnote}, whose destination is the note in
+ * the footnote area of the page of its call (reference/components/footnote.md). {@code Page overlay} boxes do not:
+ * they repeat on every page and have no single destination.</p>
  */
 final class PdfDestinations {
 
@@ -48,9 +49,16 @@ final class PdfDestinations {
                                                double[] tops) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
         for (int i = 0; i < pages.size(); i++) {
-            Rect area = pages.get(i).pageSetup().pageArea();
-            find(pages.get(i).content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), lefts[i],
-                    tops[i], targets);
+            Page page = pages.get(i);
+            Rect area = page.pageSetup().pageArea();
+            find(page.content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), lefts[i], tops[i],
+                    targets);
+            // The notes are not in the flow: they are in the footnote area, relative to the page area like the flow.
+            Fragment footnotes = page.footnotes();
+            if (footnotes != null) {
+                find(footnotes, area.x() + footnotes.x(), area.y() + footnotes.y(), new AffineTransform(),
+                        pdfPages.get(i), lefts[i], tops[i], targets);
+            }
         }
         return targets;
     }
