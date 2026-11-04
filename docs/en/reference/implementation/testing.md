@@ -144,8 +144,10 @@ the valid cases, and the invalid ones go to the catalog.
   `target/pit-reports/`). It is not in
   the CI: it is an occasional pass to see whether the asserts measure anything. It leaves out the tests that write in shared folders
   of `target/` or start another JVM.
-- **Performance:** the tests with `@Tag("perf")` are not run by `mvn test`. They are run with
-  `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. The measurement probes are in [`tools/qa/`](../../../../tools/qa).
+- **Performance:** the tests with `@Tag("perf")` are run neither by `mvn test` nor by the CI: they are probes to run by
+  hand, like those of [`tools/qa/`](../../../../tools/qa), and they print their measurements without asserting anything
+  about them. They are run with `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. What the suite does watch is
+  the complexity: how much work twice the document costs (`LongTextTest`, `LayoutCacheTest`, `PaginationCacheTest`).
   Those with `@Tag("slow")` are run by `mvn test`, and only `-Pquick` leaves them out (see the start of this page).
 
 ## Continuous integration

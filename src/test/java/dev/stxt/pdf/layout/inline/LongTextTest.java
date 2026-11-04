@@ -82,8 +82,10 @@ class LongTextTest {
     }
 
     /**
-     * Timings with the two metrics and the two line-breaking modes, from 25 to 100 pages. It is not in the normal
-     * suite ({@code perf}): {@code mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest}.
+     * Timings with the two metrics and the two line-breaking modes, from 25 to 100 pages. A probe to run by hand,
+     * like those of {@code tools/qa/}: it is neither in the normal suite nor in the CI ({@code perf}), it prints the
+     * measurements and asserts nothing about them.
+     * {@code mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest}.
      */
     @Tag("perf")
     @Test

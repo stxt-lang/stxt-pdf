@@ -142,8 +142,10 @@ los casos válidos, y los inválidos van al catálogo.
   `target/pit-reports/`). No está en
   la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera los tests que escriben en carpetas compartidas
   de `target/` o arrancan otra JVM.
-- **Rendimiento:** los tests con `@Tag("perf")` no van en `mvn test`. Se ejecutan con
-  `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. Las sondas de medición están en [`tools/qa/`](../../../../tools/qa).
+- **Rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` ni en la CI: son sondas que se ejecutan a mano,
+  como las de [`tools/qa/`](../../../../tools/qa), e imprimen sus medidas sin afirmar nada sobre ellas. Se ejecutan con
+  `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. Lo que sí vigila la suite es la complejidad: cuánto
+  trabajo cuesta el doble de documento (`LongTextTest`, `LayoutCacheTest`, `PaginationCacheTest`).
   Los de `@Tag("slow")` sí van en `mvn test`, y solo los deja fuera `-Pquick` (ver el principio de esta página).
 
 ## Integración continua

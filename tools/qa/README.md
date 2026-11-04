@@ -24,4 +24,10 @@ java -Xmx3g -cp "target/qa:$CP" BombsProbe gen /tmp/bombs
 for f in argb-12000.png binary-30000.png rects-300k.svg use-9x10.svg; do java -Xmx512m -cp "target/qa:$CP" BombsProbe run /tmp/bombs $f; done
 ```
 
-A test of the suite with the same idea as `ConcurrencyProbe` is `ConcurrentConversionTest`.
+A test of the suite with the same idea as `ConcurrencyProbe` is `ConcurrentConversionTest`. The suite also has one probe
+of its own, `LongTextTest.measureLongText` (`@Tag("perf")`, outside `mvn test` and the CI): the layout times of a long
+text with the two metrics and the two line-breaking modes, printed and not asserted.
+
+```bash
+mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest
+```
