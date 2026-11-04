@@ -89,7 +89,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 
 ### Layout (`layout`)
 
-- **`Engine`**: despacha cada caja al algoritmo de su `Layout` y guarda la caché del layout. Implementa `LayoutContext`, que
+- **`Engine`**: despacha cada caja al algoritmo de su `Layout` y guarda la caché del layout y, para el texto, `TextValues`
+  y `LineBreakingMemo`. Implementa `LayoutContext`, que
   es lo que ven los algoritmos. No se comparte entre hilos.
 - **`LayoutAlgorithm`**: la interfaz de los algoritmos (`BlockLayout`, `InlineLayout`, `StackLayout`, `GridLayout`,
   `TableLayout`, `ColumnsLayout`, `ImageLayout`): `layout(box, space, from)` y `contentIntrinsic(box)`.

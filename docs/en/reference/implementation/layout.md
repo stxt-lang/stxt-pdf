@@ -15,9 +15,15 @@ algorithm, so that the `LayoutCache` is used (without it, nested `Stack` and `Gr
 with the `Paginator`, checks the
 overflows with `Overflow` and the minimum module of the codes with `ModuleSizes`, and returns a `LaidOutDocument`. When it finishes (also if it fails) it releases everything it memoizes.
 The protocol with the `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) is package-private.
+What that protocol sets lives in two objects of the `Engine` that `InlineLayout` receives in its constructor and only
+reads: `TextValues` (the probe number of `{page}` and `{pages}`, the assumed pages, the numbers and the running heads)
+and `LineBreakingMemo` (the memoized line breaking). The algorithms keep no state of the document.
 
 > **Decision:** the layout algorithms depend on the interface `LayoutContext` and not on `Engine`. The pagination
-> protocol stays in `Engine`, package-private, because moving it to another class did not remove any dependency.
+> protocol stays in `Engine`, package-private, because moving it to another class did not remove any dependency; what it
+> sets goes in `TextValues` and `LineBreakingMemo`, which the engine injects into `InlineLayout`, so the algorithm is
+> tested with references without a whole `Engine`. *Rejected alternative:* `InlineLayout` with that state as fields,
+> which the engine had to know by its concrete type inside the map of algorithms.
 
 > **Decision:** the pagination protocol is not public: whoever drove an `Engine` from outside could break the
 > numbering of another document. *Rejected alternative:* a session object per document.
@@ -201,12 +207,12 @@ than those of the in-order distribution.
 `InlineLayout` breaks the text into lines with `LineBreaker` (greedy or Knuth-Plass) or, with `Preformatted: true` or `wrap`, with `PreformattedText`.
 The text of a box is always a single paragraph (blank lines are an error when reading it, except in a preformatted one,
 where they are content): `BreakRules.cutLines` applies widows and orphans to all its lines and only the last one is not justified.
-`InlineLayout.runs` replaces the references with their value and applies `TextTransform` to the runs **before** breaking them into lines,
+`InlineLayout.runs` replaces the references with their value (the one the `Paginator` left in `TextValues`) and applies `TextTransform` to the runs **before** breaking them into lines,
 with the `Case` and the `Small caps` of each styled run (`TextFormat.textCase`, `smallCaps`). `LineBreaker` measures each
 character with the letter spacing of its run (`TextFormat.letterSpacing`, in `advance`) and takes from a line that of its
 last character (`trailing`, `Paragraph.width`), which is that of its run. A run that is an image (`TextFormat.image`,
 with the text `TextRun.IMAGE`, U+FFFC) measures in `advance` what `TextMeasurer.imageWidth` gives: as tall as the size of
-the line and as wide as its proportion, which `InlineLayout.WithImages` reads from the file through
+the line and as wide as its proportion, which `TextValues.WithImages` reads from the file through
 `LayoutContext.imageRatio` (so the image measures what it is also with `FixedMetrics`), and `PageNumbers.probing`
 delegates. `Images.validate` checks the images of the runs beforehand like those of the `Image` boxes (format, limits),
 with the line of the text.
@@ -288,8 +294,8 @@ kerning, the last letter and the hyphen are a pair. `Engine.layOutDocument` firs
 checks that the fonts exist and have all the characters.
 
 **Long text.** Each page lays out the text from a different line, so the `LayoutCache` does not help. `InlineLayout` memoizes
-the line breaking per box and available width (without that memory, the cost grows with the square of the pages, and
-`LongTextTest` watches it). Greedy line breaking adds up the advances of the words and spaces of the current line and only measures the whole
+the line breaking per box and available width in `LineBreakingMemo`, which belongs to the `Engine` like the cache
+(without that memory, the cost grows with the square of the pages, and `LongTextTest` watches it). Greedy line breaking adds up the advances of the words and spaces of the current line and only measures the whole
 line when the sum is within `Tolerance.MODEL` of the available width.
 
 > **Decision:** the width of a text is additive between words and greedy line breaking adds up, measuring the whole line only near
@@ -320,13 +326,14 @@ even physical page. Those end with a blank page: `Numbering` counts it as one mo
 reserves its physical number for it and `pages` adds it as a `Page` with `blank`, an empty fragment of the box of the section and
 without `Page overlay`. It is not part of the flow of the section, so the `Pages` of its `Page overlay` does not see it.
 
-**`{page}` and `{pages}`.** `InlineLayout` measures the markers as a trial number (`00` at first) and the lines
-keep them. When pagination finishes, the `Paginator` calls `Engine.number`, which redoes only those lines with the
-values of each page already written (`PageNumbers`). If some printed number does not fit in the trial one (`Numbering.probe`:
+**`{page}` and `{pages}`.** `InlineLayout` measures the markers as a trial number (`00` at first, the measurer of
+`TextValues`) and the lines keep them. When pagination finishes, the `Paginator` calls `Engine.number`
+(`PageNumbers.number`, with the real measurer), which redoes only those lines with the values of each page already
+written. If some printed number does not fit in the trial one (`Numbering.probe`:
 as many characters as the longest, with `M` or `m` if there are Roman numerals), pagination is done again with one that covers it
 (`PageNumbers.cover`), which only grows.
 
-**References.** `Engine.assume` sets the assumed pages (the first time, `00`), pagination is done, the page on which the
+**References.** `Engine.assume` sets the assumed pages in `TextValues` (the first time, `00`), pagination is done, the page on which the
 first fragment of each referenced box (`Box.key()`) has ended up is checked, and pagination is done again if any differs, up to 10 passes that
 change something. If they do not converge, it is `REFERENCE_UNSTABLE`. The passes caused by the digits of `{pages}` growing do not count, because
 they only grow. With an additive measurer pagination always converges: the error is a safety net.
@@ -347,7 +354,7 @@ they only grow. With an additive measurer pagination always converges: the error
 
 **Paginating again does not empty the cache.** When the trial number grows (`Engine.reservePageNumbers`) or
 the page of a reference changes (`Engine.assume`), the `Paginator` passes the texts whose width changes and the engine forgets only what
-the `LayoutCache` and the line breaking store about them and their ancestors (`Engine.forget`), also the arrangement of a
+the `LayoutCache` and the line breaking (`LineBreakingMemo`) store about them and their ancestors (`Engine.forget`), also the arrangement of a
 `Stack`, a `Grid` or a `Table` that contains them. The cache and the line breaking store everything by box first (a map
 per box with the rest of the key), so forgetting costs what the forgotten boxes cost and not what is stored: a
 `{heading 1}` in a `Page overlay` forgets its text on every page where the chapter changes. `PaginationCacheTest`,
@@ -393,7 +400,7 @@ last one that has started (the `Fragment` with `first()` of a box with `headingL
 it. For each page it gives the value of each reference of the document: `"2"`, the heading in effect, and `"2: first"`,
 the first of that level that starts on the page or, if none starts, the same as `"2"`; `pages` passes it to
 the engine (`Engine.headings`) before placing the `Page overlay` boxes of the page, only when it differs from that of the
-previous one; the engine keeps it in `InlineLayout` like the assumed pages and forgets what the cache and the line
+previous one; the engine keeps it in `TextValues` like the assumed pages and forgets what the cache and the line
 breaking hold of the texts that carry a running head and of their ancestors, so those `Page overlay` boxes are laid out
 again on each page that changes, and the rest comes from the cache. The flow is already paginated and is not touched: a
 `Page overlay` takes up no space.

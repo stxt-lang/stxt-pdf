@@ -89,7 +89,8 @@ depend on the `LayoutContext` interface.
 
 ### Layout (`layout`)
 
-- **`Engine`**: dispatches each box to the algorithm of its `Layout` and keeps the layout cache. It implements `LayoutContext`, which
+- **`Engine`**: dispatches each box to the algorithm of its `Layout` and keeps the layout cache and, for the text,
+  `TextValues` and `LineBreakingMemo`. It implements `LayoutContext`, which
   is what the algorithms see. It is not shared between threads.
 - **`LayoutAlgorithm`**: the interface of the algorithms (`BlockLayout`, `InlineLayout`, `StackLayout`, `GridLayout`,
   `TableLayout`, `ColumnsLayout`, `ImageLayout`): `layout(box, space, from)` and `contentIntrinsic(box)`.

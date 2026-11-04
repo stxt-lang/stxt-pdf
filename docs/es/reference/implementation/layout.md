@@ -14,10 +14,16 @@ algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crece
 `Engine.layOutDocument` es la entrada: valida las fuentes, las imágenes y los idiomas de los guiones, pagina con el
 `Paginator`, comprueba los
 desbordamientos con `Overflow` y el módulo mínimo de los códigos con `ModuleSizes`, y devuelve un `LaidOutDocument`. Al terminar (también si falla) suelta todo lo que memoriza.
-El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) es de package.
+El protocolo con el `Paginator` (`reservePageNumbers`, `assume`, `headings`, `number`, `overlays()`) es de package. Lo que
+ese protocolo fija vive en dos objetos del `Engine` que `InlineLayout` recibe en su constructor y solo lee: `TextValues`
+(el número de prueba de `{page}` y `{pages}`, las páginas supuestas, los números y los títulos corridos) y
+`LineBreakingMemo` (el reparto en líneas memorizado). Los algoritmos no guardan estado del documento.
 
 > **Decisión:** los algoritmos de layout dependen de la interfaz `LayoutContext` y no de `Engine`. El protocolo de la
-> paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia.
+> paginación se queda en `Engine`, de package, porque moverlo a otra clase no quitaba ninguna dependencia; lo que fija
+> va en `TextValues` y `LineBreakingMemo`, que el motor inyecta en `InlineLayout`, y así el algoritmo se prueba con
+> referencias sin un `Engine` entero. *Alternativa descartada:* `InlineLayout` con ese estado como campos, que el motor
+> tenía que conocer por su tipo concreto dentro del mapa de algoritmos.
 
 > **Decisión:** el protocolo de la paginación no es público: quien manejara un `Engine` desde fuera podría romper la
 > numeración de otro documento. *Alternativa descartada:* un objeto de sesión por documento.
@@ -199,12 +205,12 @@ que los del reparto en orden.
 `InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `Preformatted: true` o `wrap`, con `PreformattedText`.
 El texto de una caja es siempre un solo párrafo (las líneas en blanco son un error al leerlo, salvo en uno preformateado,
 donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
-`InlineLayout.runs` sustituye las referencias por su valor y aplica `TextTransform` a los tramos **antes** de repartirlos,
+`InlineLayout.runs` sustituye las referencias por su valor (el que el `Paginator` dejó en `TextValues`) y aplica `TextTransform` a los tramos **antes** de repartirlos,
 con el `Case` y el `Small caps` de cada tramo con estilo (`TextFormat.textCase`, `smallCaps`). `LineBreaker` mide cada
 carácter con el interletraje de su tramo (`TextFormat.letterSpacing`, en `advance`) y quita a una línea el del último
 carácter (`trailing`, `Paragraph.width`), que es el de su tramo. Un tramo que es una imagen (`TextFormat.image`, con el
 texto `TextRun.IMAGE`, U+FFFC) mide en `advance` lo que da `TextMeasurer.imageWidth`: tan alto como el tamaño de la línea
-y tan ancho como su proporción, que `InlineLayout.WithImages` lee del fichero a través de `LayoutContext.imageRatio`
+y tan ancho como su proporción, que `TextValues.WithImages` lee del fichero a través de `LayoutContext.imageRatio`
 (así también con `FixedMetrics` la imagen mide lo que es), y `PageNumbers.probing` delega. `Images.validate` comprueba
 antes las imágenes de los tramos como las de las `Image` (formato, límites), con la línea del texto.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
@@ -284,8 +290,8 @@ el guion son un par. `Engine.layOutDocument` llama antes a `validate(root)`, que
 comprueba que existen las fuentes y tienen todos los caracteres.
 
 **Texto largo.** Cada página maqueta el texto desde otra línea, así que la `LayoutCache` no ayuda. `InlineLayout` memoriza
-el reparto en líneas por caja y ancho disponible (sin esa memoria, el coste crece con el cuadrado de las páginas, y lo
-vigila `LongTextTest`). El reparto voraz suma los avances de las palabras y los espacios de la línea en curso y solo mide la línea
+el reparto en líneas por caja y ancho disponible en `LineBreakingMemo`, que es del `Engine` como la caché (sin esa
+memoria, el coste crece con el cuadrado de las páginas, y lo vigila `LongTextTest`). El reparto voraz suma los avances de las palabras y los espacios de la línea en curso y solo mide la línea
 entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 
 > **Decisión:** el ancho de un texto es aditivo entre palabras y el reparto voraz suma, midiendo la línea entera solo cerca
@@ -316,13 +322,13 @@ página física par. Esas acaban con una página en blanco: `Numbering` la cuent
 le reserva su número físico y `pages` la añade como una `Page` con `blank`, un fragmento vacío de la caja de la sección y
 sin `Page overlay`. No forma parte del flujo de la sección, así que el `Pages` de sus `Page overlay` no la ve.
 
-**`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio) y las líneas
-los conservan. Al terminar de paginar, el `Paginator` llama a `Engine.number`, que rehace solo esas líneas con los
-valores de cada página ya escritos (`PageNumbers`). Si algún número impreso no cabe en el de prueba (`Numbering.probe`:
+**`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio, el medidor de
+`TextValues`) y las líneas los conservan. Al terminar de paginar, el `Paginator` llama a `Engine.number`
+(`PageNumbers.number`, con el medidor real), que rehace solo esas líneas con los valores de cada página ya escritos. Si algún número impreso no cabe en el de prueba (`Numbering.probe`:
 tantos caracteres como el más largo, con `M` o `m` si hay romanos), se vuelve a paginar con uno que lo cubre
 (`PageNumbers.cover`), que solo crece.
 
-**Referencias.** `Engine.assume` fija las páginas supuestas (la primera vez, `00`), se pagina, se mira en qué página ha
+**Referencias.** `Engine.assume` fija las páginas supuestas en `TextValues` (la primera vez, `00`), se pagina, se mira en qué página ha
 quedado el primer fragmento de cada caja referida (`Box.key()`) y se vuelve a paginar si alguna difiere, hasta 10 pasadas que
 cambien algo. Si no convergen, es `REFERENCE_UNSTABLE`. Las pasadas por crecer las cifras de `{pages}` no cuentan, porque
 solo crecen. Con un medidor aditivo la paginación converge siempre: el error es una red de seguridad.
@@ -343,7 +349,7 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 
 **Volver a paginar no vacía la caché.** Cuando el número de prueba crece (`Engine.reservePageNumbers`) o cambia
 la página de una referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo
-que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`), también el reparto de
+que la `LayoutCache` y el reparto en líneas (`LineBreakingMemo`) guardan de ellos y de sus antepasados (`Engine.forget`), también el reparto de
 un `Stack`, un `Grid` o una `Table` que los contenga. La caché y el reparto en líneas guardan todo por caja primero (un mapa
 por caja con el resto de la clave), así que olvidar cuesta lo que las cajas olvidadas y no lo que hay guardado: un
 `{heading 1}` en un `Page overlay` olvida su texto en cada página donde cambia el capítulo. Lo vigilan
@@ -388,7 +394,7 @@ también lo recorre: una nota tiene `Id` y se puede referir.
 cada página da el valor de cada referencia del documento: `"2"`, el encabezado en vigor, y `"2: first"`, el primero de ese
 nivel que empieza en la página o, si no empieza ninguno, el mismo que `"2"`; `pages` se lo pasa al motor
 (`Engine.headings`) antes de colocar los `Page overlay` de la página, solo cuando difiere del de la anterior; el motor lo
-guarda en `InlineLayout` como las páginas supuestas y olvida lo que la caché y el reparto en líneas tienen de los textos
+guarda en `TextValues` como las páginas supuestas y olvida lo que la caché y el reparto en líneas tienen de los textos
 que llevan un título corrido y de sus antepasados, así que esos `Page overlay` se maquetan de nuevo en cada página que
 cambia, y el resto sale de la caché. El flujo ya está paginado y no se toca: un `Page overlay` no ocupa espacio.
 

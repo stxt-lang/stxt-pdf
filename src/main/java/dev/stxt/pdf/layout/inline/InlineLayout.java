@@ -17,7 +17,6 @@ import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
 import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.Tolerance;
@@ -28,12 +27,8 @@ import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.OptionalDouble;
-import java.util.Set;
 
 /**
  * Layout {@code inline}: text broken into line boxes (reference/common/text-formatting.md).
@@ -61,9 +56,9 @@ import java.util.Set;
  * together: a page break does not fall among them.</p>
  *
  * <p>{@code {page}} and {@code {pages}} are measured as a probe number and replaced when
- * pagination ends with {@link #number} ({@link PageNumbers}). The references to other boxes and the running heads
+ * pagination ends ({@link PageNumbers#number}). The references to other boxes and the running heads
  * ({@link Reference}) are replaced before breaking the text into lines, with the values the
- * {@link dev.stxt.pdf.layout.Paginator} gives ({@link #assume}, {@link #headings}).</p>
+ * {@link dev.stxt.pdf.layout.Paginator} gives ({@link TextValues}).</p>
  *
  * <p>With {@code Overflow: shrink} (reference/common/overflow.md) the text is broken at the {@code Size} of the box
  * and, if some line is wider than its line box or the lines are taller than its definite height, again at smaller
@@ -72,8 +67,10 @@ import java.util.Set;
  * follows it if it is a percentage.</p>
  *
  * <p>The line breaking of a text is done only once per available width (and height limit, if it shrinks, exclusions
- * and start position) and reused on each page: each fragment starts at another line ({@code from}), so the cache of
- * the {@link LayoutContext} does not help, and without it a text of N pages was broken N times (quadratic cost).</p>
+ * and start position) and reused on each page ({@link LineBreakingMemo}): each fragment starts at another line
+ * ({@code from}), so the cache of the {@link LayoutContext} does not help, and without it a text of N pages was broken
+ * N times (quadratic cost). The algorithm keeps nothing of the document: the values of the text and that memory
+ * belong to the {@link dev.stxt.pdf.layout.Engine}, which gives them to it.</p>
  */
 public final class InlineLayout implements LayoutAlgorithm {
 
@@ -81,14 +78,14 @@ public final class InlineLayout implements LayoutAlgorithm {
     public static final double SHRINK_STEP = 0.5;
 
     /**
-     * The key of a memorized line breaking inside its box ({@link #broken}).
+     * The key of a memorized line breaking inside its box ({@link LineBreakingMemo}).
      *
      * @param limit  height of the content box the lines have to fit in, if the text shrinks and the height is definite
      *               or has a maximum; empty otherwise (it is not part of the key of a text that does not shrink)
      * @param beside what the side boxes take from the content box, by line ({@link #beside})
      * @param from   position of the text the line breaking starts at (reference/components/block.md); 0 is its start
      */
-    private record BrokenKey(double available, OptionalDouble limit, List<Exclusion> beside, int from) {
+    record BrokenKey(double available, OptionalDouble limit, List<Exclusion> beside, int from) {
     }
 
     /**
@@ -101,117 +98,35 @@ public final class InlineLayout implements LayoutAlgorithm {
      * @param width  the room it takes from the left of those lines: its advance plus a space of the paragraph
      * @param rest   the runs of the text without it
      */
-    private record DropCap(String letter, TextFormat format, double size, double width, List<TextRun> rest) {
+    record DropCap(String letter, TextFormat format, double size, double width, List<TextRun> rest) {
     }
 
     /**
      * The lines of a text and the size they are broken at: the {@code Size} of the box, or the one it shrank to; the
      * line box of each one and, in a paragraph with {@code Drop cap} broken from its start, its drop cap.
      */
-    private record Broken(List<LineBreaker.Line> lines, double fontSize, LineWidths widths, DropCap dropCap) {
+    record Broken(List<LineBreaker.Line> lines, double fontSize, LineWidths widths, DropCap dropCap) {
     }
 
     private final LayoutContext context;
-    /** Measures {@code {page}} and {@code {pages}} as the probe number ({@link PageNumbers}). */
-    private TextMeasurer measurer;
-    private final TextMeasurer real;
-    /**
-     * Line breaking of each text per available width (and height limit); depends on {@link #measurer}. By box first,
-     * so that {@link #forget} does not go through the others.
-     */
-    private final Map<Box, Map<BrokenKey, Broken>> broken = new IdentityHashMap<>();
-    /**
-     * Page assumed for each box referred to with {@code {page of: id}} (reference/common/references.md); see {@link
-     * #assume}.
-     */
-    private Map<String, String> pages = Map.of();
-    /** Number of each box referred to with {@code {number of: id}}. */
-    private Map<String, String> numbers = Map.of();
-    /**
-     * The running heads of the page being laid out, by the id of their reference ({@code "2"}, {@code "2: first"}):
-     * the text of the heading in effect on the page, or empty; see {@link #headings}.
-     */
-    private Map<String, String> headings = Map.of();
+    /** What the text measures and is worth now: the probe number, the references and the running heads. */
+    private final TextValues values;
+    /** Line breaking of each text per available width (and height limit); depends on {@link #values}. */
+    private final LineBreakingMemo memo;
 
-    public InlineLayout(LayoutContext context, TextMeasurer measurer) {
+    /**
+     * The layout of the text with the values and the memorized line breaking of the engine, which sets the former
+     * through its protocol with the {@link dev.stxt.pdf.layout.Paginator} and empties both when it finishes.
+     */
+    public InlineLayout(LayoutContext context, TextValues values, LineBreakingMemo memo) {
         this.context = context;
-        this.real = new WithImages(measurer, context);
-        reset();
+        this.values = values;
+        this.memo = memo;
     }
 
-    /**
-     * The measurer of the layout, which measures an image inside a text ({@link TextMeasurer#imageWidth}) with the
-     * proportion the context reads from its file ({@link LayoutContext#imageRatio}), whatever the measurer of the
-     * text (also {@link FixedMetrics}, so that the tests draw the real image in its place).
-     */
-    private record WithImages(TextMeasurer text, LayoutContext context) implements TextMeasurer {
-
-        @Override
-        public double width(String s, FontFace font, double fontSize) {
-            return text.width(s, font, fontSize);
-        }
-
-        @Override
-        public double imageWidth(InlineImage image, double height) {
-            return height * context.imageRatio(image.path());
-        }
-
-        @Override
-        public VerticalMetrics vertical(FontFace font) {
-            return text.vertical(font);
-        }
-
-        @Override
-        public void validate(Box root) {
-            text.validate(root);
-        }
-    }
-
-    /** Returns to the state before the layout: the default probe digits, no references, no memorized line breaking. */
-    public void reset() {
-        this.measurer = PageNumbers.probing(real, PageNumbers.firstProbe());
-        this.pages = Map.of();
-        this.numbers = Map.of();
-        this.headings = Map.of();
-        broken.clear();
-    }
-
-    /**
-     * The probe number of {@code {page}} and {@code {pages}} ({@link PageNumbers}). It changes what the texts with
-     * those markers measure: the caller forgets their memorized line breaking ({@link #forget}) and what the cache of
-     * the {@link LayoutContext} keeps of them.
-     */
-    public void reservePageNumbers(String probe) {
-        this.measurer = PageNumbers.probing(real, probe);
-    }
-
-    /**
-     * The values of the references to other boxes in the text ({@code {page of: id}} and {@code {number of: id}},
-     * reference/common/references.md): they are replaced before breaking the text into lines, so the text measures what
-     * is going to be painted. The pages are an assumption that the {@link dev.stxt.pdf.layout.Paginator} repeats until
-     * it holds. As with {@link #reservePageNumbers}, the caller forgets the texts whose value changes.
-     */
-    public void assume(Map<String, String> pages, Map<String, String> numbers) {
-        this.pages = Map.copyOf(pages);
-        this.numbers = Map.copyOf(numbers);
-    }
-
-    /**
-     * The running heads of the page whose {@code Page overlay} boxes are going to be laid out
-     * ({@code {heading N}} and {@code {heading N: first}}, reference/common/references.md): the text of the heading of
-     * each level in effect on it, by the id of the reference, and empty where there is none yet. They change from one
-     * page to the next, so the {@link dev.stxt.pdf.layout.Paginator} sets them before each page and, as with
-     * {@link #assume}, the caller forgets the texts that contain them.
-     */
-    public void headings(Map<String, String> headings) {
-        this.headings = Map.copyOf(headings);
-    }
-
-    /** Forgets the memorized line breaking of those boxes. */
-    public void forget(Set<Box> boxes) {
-        for (Box box : boxes) {
-            broken.remove(box);
-        }
+    /** Measures the text as it is broken: {@code {page}} and {@code {pages}} as the probe number. */
+    private TextMeasurer measurer() {
+        return values.measurer();
     }
 
     /**
@@ -222,7 +137,7 @@ public final class InlineLayout implements LayoutAlgorithm {
     private List<TextRun> runs(Box box) {
         List<TextRun> runs = box.runs();
         if (Reference.contains(box.text())) {
-            runs = runs.stream().map(r -> new TextRun(Reference.replace(r.text(), this::referenced), r.format()))
+            runs = runs.stream().map(r -> new TextRun(Reference.replace(r.text(), values::referenced), r.format()))
                     .toList();
         }
         if (box.style().typography().preformatted().enabled() && box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0) {
@@ -239,50 +154,6 @@ public final class InlineLayout implements LayoutAlgorithm {
      */
     private static Hyphenator hyphenator(Style s) {
         return s.typography().hyphenate() ? Hyphenations.forLocale(s.typography().locale()) : null;
-    }
-
-    private String referenced(Reference.Kind kind, String id) {
-        return switch (kind) {
-            case PAGE -> pages.get(id);
-            case NUMBER -> numbers.get(id);
-            case HEADING -> headings.get(id);
-        };
-    }
-
-    /**
-     * Second phase of the numbering ({@link PageNumbers}): the fragment and its descendants with
-     * the real values of {@code {page}} and {@code {pages}} in their lines. Each line with a
-     * marker is measured and aligned again in its line box; with {@code justify}, it is only justified if it already
-     * was. Returns the same fragment if nothing changes.
-     */
-    public Fragment number(Fragment f, String page, String pages) {
-        List<Fragment> children = new ArrayList<>();
-        boolean changed = false;
-        for (Fragment child : f.children()) {
-            Fragment numbered = number(child, page, pages);
-            changed |= numbered != child;
-            children.add(numbered);
-        }
-        List<TextLine> lines = new ArrayList<>();
-        Style s = f.box().style();
-        double contentWidth = f.contentWidth();
-        for (TextLine l : f.lines()) {
-            if (!PageNumbers.contains(l.text())) {
-                lines.add(l);
-                continue;
-            }
-            changed = true;
-            List<TextRun> runs = l.runs().stream()
-                    .map(r -> new TextRun(PageNumbers.apply(r.text(), page, pages), r.format())).toList();
-            lines.add(LineBreaker.place(runs, real, s, l.fontSize(), l.left(), l.right(),
-                    Math.max(0, contentWidth - l.left() - l.right()), l.wordSpacing() > 0, l.y(), l.height(),
-                    l.hyphenated()));
-        }
-        if (!changed) {
-            return f;
-        }
-        return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.margin(), f.border(), f.padding(),
-                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned(), f.rules());
     }
 
     /**
@@ -339,13 +210,13 @@ public final class InlineLayout implements LayoutAlgorithm {
             return null;
         }
         FontFace font = s.typography().fontFace();
-        VerticalMetrics metrics = measurer.vertical(font);
+        VerticalMetrics metrics = measurer().vertical(font);
         double span = (s.dropCap() - 1) * lineHeight + metrics.capHeight() * fontSize;
         double size = span / metrics.capHeight();
-        double advance = measurer.width(letter.text(), letter.format().face(font), size)
+        double advance = measurer().width(letter.text(), letter.format().face(font), size)
                 + letter.format().letterSpacing(s.typography().letterSpacing())
                 * letter.text().codePointCount(0, letter.text().length());
-        double gap = measurer.width(" ", font, fontSize);
+        double gap = measurer().width(" ", font, fontSize);
         return new DropCap(letter.text(), letter.format(), size, advance + gap, dropCapRest(runs));
     }
 
@@ -363,7 +234,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (s.typography().preformatted().enabled()) {
             // Preformatted text keeps its lines: it goes below the side boxes, never beside them.
             List<LineBreaker.Line> lines = List.copyOf(PreformattedText.lines(runs(box), s.typography().tabSize(),
-                    s.typography().preformatted() == Preformatted.WRAP, available, measurer,
+                    s.typography().preformatted() == Preformatted.WRAP, available, measurer(),
                     s.typography().fontFace(), fontSize, s.typography().letterSpacing()));
             return new Broken(lines, fontSize, LineWidths.uniform(available), null);
         }
@@ -381,7 +252,7 @@ public final class InlineLayout implements LayoutAlgorithm {
                 }
             }
         }
-        LineBreaker.Paragraph paragraph = LineBreaker.paragraph(runs, measurer, s.typography().fontFace(), fontSize,
+        LineBreaker.Paragraph paragraph = LineBreaker.paragraph(runs, measurer(), s.typography().fontFace(), fontSize,
                 s.typography().letterSpacing(), hyphenator(s));
         if (paragraph == null) {
             return new Broken(List.of(), fontSize, widths, dropCap);
@@ -412,10 +283,10 @@ public final class InlineLayout implements LayoutAlgorithm {
         return b;
     }
 
-    /** The memorized line breaking of the text with that key, made if it is the first time. */
+    /** The memorized line breaking of the text with that key ({@link LineBreakingMemo}), made the first time. */
     private Broken broken(Box box, double available, OptionalDouble limit, List<Exclusion> beside, int from) {
-        return broken.computeIfAbsent(box, b -> new HashMap<>()).computeIfAbsent(
-                new BrokenKey(available, limit, beside, from), k -> shrink(box, available, limit, beside, from));
+        return memo.broken(box, new BrokenKey(available, limit, beside, from),
+                () -> shrink(box, available, limit, beside, from));
     }
 
     /**
@@ -427,7 +298,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         FontFace font = s.typography().fontFace();
         List<LineBreaker.Line> lines = b.lines();
         for (int k = 0; k < lines.size(); k++) {
-            if (LineBreaker.width(lines.get(k).runs(), measurer, font, b.fontSize(), s.typography().letterSpacing())
+            if (LineBreaker.width(lines.get(k).runs(), measurer(), font, b.fontSize(), s.typography().letterSpacing())
                     > b.widths().width(k) + Tolerance.MODEL) {
                 return false;
             }
@@ -486,9 +357,9 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         if (s.typography().preformatted().enabled()) {
             return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
-                    measurer, s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
+                    measurer(), s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
         }
-        return LineBreaker.intrinsics(textRuns(box), measurer, s.typography().fontFace(), s.typography().fontSize(),
+        return LineBreaker.intrinsics(textRuns(box), measurer(), s.typography().fontFace(), s.typography().fontSize(),
                 s.typography().letterSpacing(), hyphenator(s));
     }
 
@@ -558,7 +429,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             }
             // Preformatted lines are not justified, nor is the one a forced line break ends.
             boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1 && !text.forced();
-            lines.add(LineBreaker.place(text.runs(), measurer, s, fontSize, left, right, b.widths().width(j), justify,
+            lines.add(LineBreaker.place(text.runs(), measurer(), s, fontSize, left, right, b.widths().width(j), justify,
                     y, lineHeight, text.hyphenated()));
         }
 
@@ -608,11 +479,11 @@ public final class InlineLayout implements LayoutAlgorithm {
      */
     private TextLine dropCapLine(Style s, Broken b, double lineHeight) {
         DropCap d = b.dropCap();
-        VerticalMetrics metrics = measurer.vertical(s.typography().fontFace());
+        VerticalMetrics metrics = measurer().vertical(s.typography().fontFace());
         double baseline = metrics.baseline((s.dropCap() - 1) * lineHeight, lineHeight, b.fontSize());
         double y = baseline - metrics.baseline(0, lineHeight, d.size());
         double left = b.widths().left(0) - d.width();
-        double width = d.width() - measurer.width(" ", s.typography().fontFace(), b.fontSize());
+        double width = d.width() - measurer().width(" ", s.typography().fontFace(), b.fontSize());
         return new TextLine(left, y, width, lineHeight, d.size(), d.letter(), 0,
                 List.of(new TextLine.Run(0, width, d.letter(), d.format())), false, left, 0);
     }

@@ -12,8 +12,10 @@ import dev.stxt.pdf.layout.image.Images;
 import dev.stxt.pdf.layout.image.NaturalSize;
 import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.InlineLayout;
+import dev.stxt.pdf.layout.inline.LineBreakingMemo;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
+import dev.stxt.pdf.layout.inline.TextValues;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.columns.ColumnsLayout;
 import dev.stxt.pdf.layout.position.OverlayLayout;
@@ -49,8 +51,9 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * only wants to convert a document uses {@link dev.stxt.pdf.convert.Converter}, which creates and configures it.
  *
  * <p><strong>Threads: an {@code Engine} is not thread-safe and is not shared.</strong> It keeps the layout cache
- * (unsynchronized maps), the memoized line breaking and the assumed pages of the references
- * ({@link dev.stxt.pdf.layout.inline.InlineLayout}). Two conversions at once need one engine each, which is what
+ * (unsynchronized maps), the memoized line breaking ({@link LineBreakingMemo}) and the values of the texts: the
+ * reserved digits and the assumed pages of the references ({@link TextValues}). Two conversions at once need one
+ * engine each, which is what
  * the {@code Converter} does; what can be shared is what does not change:
  * {@link Resources}, {@link dev.stxt.pdf.stxt.DocumentReader} and the already laid out {@link LaidOutDocument}.
  * It can be reused in sequence: {@link #layOutDocument(BoxTreeBuilder.Result)} empties the cache and the
@@ -70,7 +73,10 @@ public final class Engine implements LayoutContext {
     private final boolean moduleSizes;
     private final Cancellation cancellation;
     private final Progress progress;
-    private final InlineLayout inline;
+    /** What the texts measure and are worth, which the {@link Paginator} sets pass by pass. */
+    private final TextValues values;
+    /** The memorized line breaking of the texts, emptied with the cache. */
+    private final LineBreakingMemo lineBreaking = new LineBreakingMemo();
     private final TableLayout table;
     private final OverlayLayout overlays;
     /** The algorithm of each {@code Layout}; a table, which is a grid, has its own ({@link #algorithm}). */
@@ -116,12 +122,12 @@ public final class Engine implements LayoutContext {
         this.cancellation = cancellation;
         this.progress = progress;
         this.images = new Images(resources, limits, excluded);
-        this.inline = new InlineLayout(this, measurer);
+        this.values = new TextValues(measurer, this);
         GridLayout grid = new GridLayout(this);
         this.table = new TableLayout(this, grid);
         this.overlays = new OverlayLayout(this);
         algorithms.put(Layout.BLOCK, new BlockLayout(this));
-        algorithms.put(Layout.INLINE, inline);
+        algorithms.put(Layout.INLINE, new InlineLayout(this, values, lineBreaking));
         algorithms.put(Layout.STACK, new StackLayout(this));
         algorithms.put(Layout.GRID, grid);
         algorithms.put(Layout.COLUMNS, new ColumnsLayout(this));
@@ -179,7 +185,8 @@ public final class Engine implements LayoutContext {
      */
     private void release() {
         cache.clear();
-        inline.reset();
+        lineBreaking.clear();
+        values.reset();
     }
 
     /** The limits of this engine, which the {@link Paginator} applies to the number of pages. */
@@ -218,7 +225,7 @@ public final class Engine implements LayoutContext {
      * ancestors is forgotten ({@link #forget}).
      */
     void reservePageNumbers(String probe, Collection<Box> changed) {
-        inline.reservePageNumbers(probe);
+        values.reservePageNumbers(probe);
         forget(changed);
     }
 
@@ -229,7 +236,7 @@ public final class Engine implements LayoutContext {
      * different from the previous pass, change: what the cache stores of them and of their ancestors is forgotten.
      */
     void assume(Map<String, String> pages, Map<String, String> numbers, Collection<Box> changed) {
-        inline.assume(pages, numbers);
+        values.assume(pages, numbers);
         forget(changed);
     }
 
@@ -241,7 +248,7 @@ public final class Engine implements LayoutContext {
      * of their ancestors is forgotten.
      */
     void headings(Map<String, String> headings, Collection<Box> changed) {
-        inline.headings(headings);
+        values.headings(headings);
         forget(changed);
     }
 
@@ -259,7 +266,7 @@ public final class Engine implements LayoutContext {
         }
         if (!stale.isEmpty()) {
             cache.forget(stale);
-            inline.forget(stale);
+            lineBreaking.forget(stale);
         }
     }
 
@@ -415,7 +422,7 @@ public final class Engine implements LayoutContext {
      * those of its descendants; the {@link Paginator} uses it when it finishes paginating.
      */
     Fragment number(Fragment fragment, String page, String pages) {
-        return inline.number(fragment, page, pages);
+        return PageNumbers.number(fragment, values.realMeasurer(), page, pages);
     }
 
     /** Layout of the out-of-flow boxes; the {@link Paginator} uses it for the {@code Page overlay} ones. */

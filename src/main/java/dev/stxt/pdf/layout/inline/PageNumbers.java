@@ -1,7 +1,14 @@
 package dev.stxt.pdf.layout.inline;
 
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.tree.Style;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Page numbering in the text: {@code {page}} and {@code {pages}}
@@ -11,7 +18,7 @@ import dev.stxt.pdf.model.InlineImage;
  * <ol>
  *   <li>Pagination measures each marker as a probe number of {@value #DIGITS} digits
  *       (or wider, see below); the lines keep the markers.</li>
- *   <li>With the total number of pages known, {@link InlineLayout#number} puts the real values
+ *   <li>With the total number of pages known, {@link #number} puts the real values
  *       in the lines that contain them and recomputes their width, their alignment and their
  *       justification. The line breaks do not change.</li>
  * </ol>
@@ -79,5 +86,41 @@ public final class PageNumbers {
                 return measurer.imageWidth(image, height);
             }
         };
+    }
+
+    /**
+     * Second phase: the fragment and its descendants with the real values of {@code {page}} and {@code {pages}} in
+     * their lines. Each line with a marker is measured again with {@code measurer} (the real one, {@link
+     * TextValues#realMeasurer}) and aligned again in its line box; with {@code justify}, it is only justified if it
+     * already was. Returns the same fragment if nothing changes.
+     */
+    public static Fragment number(Fragment f, TextMeasurer measurer, String page, String pages) {
+        List<Fragment> children = new ArrayList<>();
+        boolean changed = false;
+        for (Fragment child : f.children()) {
+            Fragment numbered = number(child, measurer, page, pages);
+            changed |= numbered != child;
+            children.add(numbered);
+        }
+        List<TextLine> lines = new ArrayList<>();
+        Style s = f.box().style();
+        double contentWidth = f.contentWidth();
+        for (TextLine l : f.lines()) {
+            if (!contains(l.text())) {
+                lines.add(l);
+                continue;
+            }
+            changed = true;
+            List<TextRun> runs = l.runs().stream()
+                    .map(r -> new TextRun(apply(r.text(), page, pages), r.format())).toList();
+            lines.add(LineBreaker.place(runs, measurer, s, l.fontSize(), l.left(), l.right(),
+                    Math.max(0, contentWidth - l.left() - l.right()), l.wordSpacing() > 0, l.y(), l.height(),
+                    l.hyphenated()));
+        }
+        if (!changed) {
+            return f;
+        }
+        return new Fragment(f.box(), f.x(), f.y(), f.width(), f.height(), f.margin(), f.border(), f.padding(),
+                children, lines, f.first(), f.last(), f.offsetX(), f.offsetY(), f.turned(), f.rules());
     }
 }
