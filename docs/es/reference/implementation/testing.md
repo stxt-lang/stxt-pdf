@@ -206,3 +206,11 @@ pequeños maquetados con las métricas fijas.
 
 > **Decisión:** el `Rect` de un posicionado girado es el de sin girar, como el de un enlace o un fondo, porque su giro no
 > cambia el layout. El de una caja girada en flujo es el rectángulo que ocupa, que es lo que su giro cambia en el layout.
+
+> **Decisión:** el formato del volcado es aditivo. Un nodo nuevo solo se vuelca para lo que antes no existía (una
+> propiedad, un valor o un tipo de caja nuevos), como `Rule:`, que solo sale en las tablas con `Merge borders`, así que
+> ningún `expected.stxt` existente cambia y el golden que estrena lo nuevo es el que lo comprueba. Volcar algo nuevo
+> también para lo que ya existía obligaría a recalcular a mano todos los golden afectados, y no se hace. *Alternativas
+> descartadas:* que el comparador ignore los nodos cuyo nombre no sale en el `expected.stxt` del caso, que dejaría pasar
+> un golden incompleto, y una propiedad que añada los nodos nuevos a los `expected.stxt`, que es generar el resultado
+> esperado. Hasta el 2026-11-04, ningún cambio del volcado tocó un golden existente.

@@ -209,3 +209,11 @@ documents laid out with the fixed metrics.
 
 > **Decision:** the `Rect` of a rotated positioned element is the unrotated one, like that of a link or a background, because its rotation does not
 > change the layout. That of a box rotated in flow is the rectangle it occupies, which is what its rotation changes in the layout.
+
+> **Decision:** the dump format is additive. A new node is only dumped for what did not exist before (a new property,
+> value or kind of box), like `Rule:`, which only appears in the tables with `Merge borders`, so no existing
+> `expected.stxt` changes and the golden that introduces the new feature is the one that checks it. Dumping something new
+> also for what already existed would require recalculating by hand every affected golden, and it is not done.
+> *Rejected alternatives:* having the comparator ignore the nodes whose name does not appear in the `expected.stxt` of the
+> case, which would let an incomplete golden pass, and a property that adds the new nodes to the `expected.stxt`, which
+> is generating the expected result. Until 2026-11-04, no change of the dump touched an existing golden.
