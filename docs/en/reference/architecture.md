@@ -136,3 +136,6 @@ depend on the `LayoutContext` interface.
 - **Outside `tree`, layout and painting ask for the role of a box, never for its element** (except the dispatch of the
   table in `Engine`), so a new element with a role that already exists does not touch `paint`.
 - **The inputs and outputs of the layout are immutable `record` types.**
+- **What the jar promises is written down**: the table of "What is promised" in
+  [Using from Java](implementation/api.md#what-is-promised). Everything else public is so because another package uses
+  it, and `PublicApiTest` checks that no promised signature exposes it.

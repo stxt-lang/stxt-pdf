@@ -125,6 +125,10 @@ los casos válidos, y los inválidos van al catálogo.
   motor pregunta en cada fase y que, pedida en cualquiera de ellas, para allí sin envolver el error y sin escribir nada
   ([Uso desde Java](api.md#cancelar-una-conversión)).
 - **Arquitectura:** `ArchitectureTest` comprueba las dependencias entre packages ([Arquitectura](../architecture.md)).
+- **API pública:** `PublicApiTest` lee la tabla de «Lo que se promete» de [Uso desde Java](api.md#lo-que-se-promete) y
+  comprueba que cada tipo y cada miembro prometido existe y es público, que ninguna firma prometida expone un tipo del
+  motor que no lo esté ni uno de otra librería que no sea de `stxt-core` o el `PDDocument` y el `PDPage` de PDFBox, y
+  que la tabla de `docs/en/` dice lo mismo.
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min en Linux y cerca de una hora en
   Windows, con el informe en

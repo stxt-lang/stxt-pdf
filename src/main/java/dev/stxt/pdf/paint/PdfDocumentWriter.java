@@ -87,7 +87,7 @@ public final class PdfDocumentWriter {
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments) throws IOException {
-        write(document, resources, limits, target, debug, ua, pdfA, attachments, Cancellation.NONE);
+        write(document, resources, limits, target, debug, ua, pdfA, attachments, Cancellation.NONE, Progress.NONE);
     }
 
     /**
@@ -95,17 +95,7 @@ public final class PdfDocumentWriter {
      * with a {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for it
      * (reference/implementation/api.md): it is asked at each page before painting it, at each image the first time it
      * is embedded or drawn, and before saving. Nothing has been written to {@code target} then: the PDF is written
-     * whole at the end.
-     */
-    public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
-            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation) throws IOException {
-        write(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation, Progress.NONE);
-    }
-
-    /**
-     * Like {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean, int, PdfA, Attachments,
-     * Cancellation)}, telling {@code progress} each page painted and, once the PDF is written, that it is done
-     * (reference/implementation/api.md).
+     * whole at the end. And telling {@code progress} each page painted and, once the PDF is written, that it is done.
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)

@@ -176,7 +176,7 @@ public final class FontLibrary {
     }
 
     /** All the fonts that can be used, in order of family and variant. */
-    public List<FontFile> all() {
+    List<FontFile> all() {
         return faces.values().stream()
                 .sorted(Comparator.comparing(FontFile::face,
                         Comparator.comparing(FontFace::family).thenComparing(BY_VARIANT)))

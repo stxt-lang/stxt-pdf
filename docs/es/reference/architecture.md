@@ -137,3 +137,6 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **Fuera de `tree`, el layout y el pintado preguntan el papel de una caja, nunca su elemento** (salvo el despacho de la
   tabla en `Engine`), así que un elemento nuevo con un papel que ya existe no toca `paint`.
 - **Las entradas y salidas del layout son `record` inmutables.**
+- **Lo que el jar promete está escrito**: la tabla de «Lo que se promete» de
+  [Uso desde Java](implementation/api.md#lo-que-se-promete). Lo demás público lo es porque otro package lo usa, y
+  `PublicApiTest` comprueba que ninguna firma prometida lo expone.

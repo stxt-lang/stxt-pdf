@@ -4,7 +4,6 @@
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.resources.FontFile;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.fontbox.ttf.TTFParser;
@@ -58,18 +57,17 @@ public class ColdStartProbe {
         }
 
         // 2. What PdfFonts.font does for each font and document, by parts, warm.
-        // The TTF ones: the OTF with CFF outlines are embedded whole, which this does not measure.
-        List<FontFile> files = new ArrayList<>(resources.fonts().all());
-        files.removeIf(FontFile::cff);
+        // The .ttf ones: the OTF with CFF outlines are embedded whole, which this does not measure.
+        List<Path> files = new ArrayList<>();
+        try (var ds = Files.newDirectoryStream(resources.fontsFolder(), "*.ttf")) {
+            for (Path f : ds) files.add(f);
+        }
         int rounds = 50;
-        long read = 0, parse = 0, load = 0, save = 0, fromContent = 0;
+        long read = 0, parse = 0, load = 0, save = 0;
         for (int r = 0; r < rounds + 10; r++) {
-            for (FontFile f : files) {
-                long c0 = System.nanoTime();
-                new TTFParser().parse(new RandomAccessReadBuffer(f.content()));
-                if (r >= 10) fromContent += System.nanoTime() - c0;
+            for (Path f : files) {
                 long a0 = System.nanoTime();
-                byte[] bytes = Files.readAllBytes(f.path());
+                byte[] bytes = Files.readAllBytes(f);
                 long a1 = System.nanoTime();
                 TrueTypeFont ttf = new TTFParser().parse(new RandomAccessReadBuffer(bytes));
                 ttf.setEnableGsub(false);
@@ -88,8 +86,6 @@ public class ColdStartProbe {
         int n = rounds * files.size();
         System.out.printf("per font and document (%d files, %d times): read %.3f ms, parse %.3f ms, PDType0Font.load %.3f ms, subset and save %.3f ms%n",
                 files.size(), n, read / 1e6 / n, parse / 1e6 / n, load / 1e6 / n, save / 1e6 / n);
-        // What PdfFonts does: parse the bytes FontFile already has, without reading the file.
-        System.out.printf("same, parsing from FontFile.content(): %.3f ms%n", fromContent / 1e6 / n);
     }
 
     static void convert(DocumentReader reader, Resources resources, In in) throws IOException {

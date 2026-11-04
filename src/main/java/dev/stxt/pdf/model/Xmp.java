@@ -119,7 +119,7 @@ public record Xmp(List<String> schemas, String descriptions) {
      * namespace): the declarations of the elements it was taken out of go with it. Comments and processing
      * instructions are dropped; the text is kept.
      */
-    public static String serialize(Element element, Map<String, String> scope) {
+    static String serialize(Element element, Map<String, String> scope) {
         StringBuilder out = new StringBuilder();
         write(element, scope, out);
         return out.toString();

@@ -51,39 +51,12 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
     /** No format: the text as the box declares it. */
     public static final TextFormat PLAIN = new TextFormat(false, false, false, false);
 
-    /** A format without link or small caps. */
+    /**
+     * The marks alone: no link, small caps, code, family, footnote, label, style or image. The rest is added with the
+     * {@code with...} methods.
+     */
     public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike) {
-        this(bold, italic, underline, strike, null);
-    }
-
-    /** A format without small caps. */
-    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link) {
-        this(bold, italic, underline, strike, link, false);
-    }
-
-    /** A format that is not code, with the family of the box. */
-    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
-                      boolean smallCaps) {
-        this(bold, italic, underline, strike, link, smallCaps, false, null);
-    }
-
-    /** A format that is not a footnote call nor a footnote label. */
-    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
-                      boolean smallCaps, boolean code, String family) {
-        this(bold, italic, underline, strike, link, smallCaps, code, family, null, false);
-    }
-
-    /** A format without the style of a styled run. */
-    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
-                      boolean smallCaps, boolean code, String family, String footnote, boolean label) {
-        this(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, null);
-    }
-
-    /** A format that is not an image. */
-    public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
-                      boolean smallCaps, boolean code, String family, String footnote, boolean label,
-                      RunStyle style) {
-        this(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, style, null);
+        this(bold, italic, underline, strike, null, false, false, null, null, false, null, null);
     }
 
     /**

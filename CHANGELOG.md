@@ -134,6 +134,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `LaidOutDocument.resources()`, the one it was laid out with (a fifth component; the constructor of four stays and
   leaves it `null`). `Converter.toPdf(LaidOutDocument, ...)` and `toSvg(LaidOutDocument)` paint with it when it is
   there.
+- **What the jar will promise from 1.0 is written down.** "What is promised" in `reference/implementation/api.md` lists
+  the types and members that are the contract: `Converter`, `DocumentReader`, `Resources` (the folder and its
+  snapshot), the configuration and the errors, and what `layOut` returns (`LaidOutDocument`, `Page`, `Fragment`,
+  `TextLine` and `Rule` whole, and of the `Box` of each fragment what identifies it: its `Id`, element, role and line).
+  Everything else public belongs to the engine (`Engine`, `PdfDocumentWriter`, `Box.style()`, `Resources.fonts()`...):
+  it can be used and it is not promised. `PublicApiTest` reads the table and fails when a promised signature exposes a
+  type that is not in it.
+- Removed, as internal API nothing used: the `Engine` constructors of three, four and five arguments (the ones with
+  none, one and two arguments and the full one stay), the `PdfDocumentWriter.write` overload with a `Cancellation` and
+  no `Progress`, and the `TextFormat` constructors of five to eleven arguments (the one with the four marks and the
+  canonical one stay; the rest is `withLink`, `withSmallCaps`, `asCode`...). `FontLibrary.all()`, `Xmp.serialize` and
+  the class `PdfInspector` are now package-private.
 
 ## [0.9.0] - 2026-11-02
 

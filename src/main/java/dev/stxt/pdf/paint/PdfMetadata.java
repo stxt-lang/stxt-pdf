@@ -150,7 +150,7 @@ final class PdfMetadata {
     /**
      * The one {@code pdfaExtension:schemas} of the packet, with the schema descriptions of the engine and of the
      * fragment given from outside in a single bag. It declares the prefixes of the extension schema vocabulary
-     * ({@link Xmp#EXTENSION_SCOPE}); an item that uses another declares it itself ({@link Xmp#serialize}).
+     * ({@link Xmp#EXTENSION_SCOPE}); an item that uses another declares it itself ({@code Xmp.serialize}).
      */
     private static String extensionSchemas(List<String> schemas) {
         StringBuilder out = new StringBuilder();

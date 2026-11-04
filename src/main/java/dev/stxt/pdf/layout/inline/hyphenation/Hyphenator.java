@@ -43,7 +43,7 @@ public final class Hyphenator {
     private static final char APOSTROPHE = '\'';
 
     /** The typographic apostrophe (right single quotation mark), which matches {@link #APOSTROPHE}. */
-    private static final char TYPOGRAPHIC_APOSTROPHE = '’';
+    private static final char TYPOGRAPHIC_APOSTROPHE = '\u2019';
 
     /** A node of the pattern trie: its children by letter and, if a pattern ends here, its levels. */
     private static final class Node {

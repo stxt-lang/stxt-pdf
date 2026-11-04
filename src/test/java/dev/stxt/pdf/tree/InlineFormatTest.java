@@ -152,7 +152,7 @@ class InlineFormatTest {
         assertEquals(new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/check.svg", null))),
                 runs.get(3));
         assertTrue(runs.get(3).format().image().decorative());
-        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false, "https://stxt.dev")
+        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false).withLink("https://stxt.dev")
                 .withImage(new InlineImage("test/shapes.svg", "Web"))), runs.get(5));
     }
 

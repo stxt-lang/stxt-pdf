@@ -1,6 +1,5 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.resources.PdfInspector;
 import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.contentstream.operator.OperatorName;
@@ -86,10 +85,19 @@ final class PdfPages {
         PDFormXObject form = layers.importPageAsForm(source, page);
         PDRectangle crop = page.getCropBox();
         form.setBBox(crop);
-        form.setMatrix(placement(crop, PdfInspector.rotation(page)));
+        form.setMatrix(placement(crop, rotation(page)));
         clean(form);
         nameLayers(name);
         return form;
+    }
+
+    /**
+     * The rotation of the page ({@code Rotate}) in degrees, from 0 to 270, clockwise; one that is not a multiple of 90
+     * does not rotate. The same one {@code resources.PdfInspector} uses to give the size of the page.
+     */
+    private static int rotation(PDPage page) {
+        int degrees = Math.floorMod(page.getRotation(), 360);
+        return degrees % 90 == 0 ? degrees : 0;
     }
 
     /**

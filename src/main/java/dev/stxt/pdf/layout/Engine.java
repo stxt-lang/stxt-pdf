@@ -96,36 +96,16 @@ public final class Engine implements LayoutContext {
      * {@link Limits#DEFAULT}.
      */
     public Engine(TextMeasurer measurer, Resources resources) {
-        this(measurer, resources, Limits.DEFAULT);
-    }
-
-    /** Engine with those metrics, those images and those {@link Limits} (reference/common/limits.md). */
-    public Engine(TextMeasurer measurer, Resources resources, Limits limits) {
-        this(measurer, resources, limits, Set.of());
+        this(measurer, resources, Limits.DEFAULT, Set.of(), Cancellation.NONE, Progress.NONE);
     }
 
     /**
-     * Engine with those metrics, those images and those {@link Limits}, without the checks in {@code excluded} that
-     * are made during layout (those of the PDF images and the size of the barcodes, {@link Check}).
-     */
-    public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded) {
-        this(measurer, resources, limits, excluded, Cancellation.NONE);
-    }
-
-    /**
-     * Like {@link #Engine(TextMeasurer, Resources, Limits, Set)}, stopping with a
-     * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for it
-     * (reference/implementation/api.md): at each element when building the tree, at each layout that is not in the
-     * cache and at each page and each pass when paginating and checking.
-     */
-    public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
-                  Cancellation cancellation) {
-        this(measurer, resources, limits, excluded, cancellation, Progress.NONE);
-    }
-
-    /**
-     * Like {@link #Engine(TextMeasurer, Resources, Limits, Set, Cancellation)}, telling {@code progress} each page of
-     * the flow it lays out and, at the end, the number of pages (reference/implementation/api.md).
+     * Engine with those metrics, those images and those {@link Limits} (reference/common/limits.md), without the
+     * checks in {@code excluded} that are made during layout (those of the PDF images and the size of the barcodes,
+     * {@link Check}), stopping with a {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for
+     * it (reference/implementation/api.md: at each element when building the tree, at each layout that is not in the
+     * cache and at each page and each pass when paginating and checking), and telling {@code progress} each page of
+     * the flow it lays out and, at the end, the number of pages.
      */
     public Engine(TextMeasurer measurer, Resources resources, Limits limits, Set<Check> excluded,
                   Cancellation cancellation, Progress progress) {

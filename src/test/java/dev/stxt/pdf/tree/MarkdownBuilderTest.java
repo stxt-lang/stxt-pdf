@@ -284,7 +284,7 @@ class MarkdownBuilderTest {
         List<TextRun> runs = t.runs().get(p);
         assertEquals(new TextRun(TextRun.IMAGE, TextFormat.PLAIN.withImage(new InlineImage("test/wide.png",
                 "el logo"))), runs.get(1));
-        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false, "https://stxt.dev")
+        assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(false, false, true, false).withLink("https://stxt.dev")
                 .withImage(new InlineImage("test/wide.png", "Web"))), runs.get(3));
         assertEquals(new TextRun(TextRun.IMAGE, new TextFormat(true, false, false, false)
                 .withImage(new InlineImage("test/wide.png", null))), runs.get(5));

@@ -127,6 +127,10 @@ the valid cases, and the invalid ones go to the catalog.
   that the engine asks in every phase and that, requested in any of them, it stops there without wrapping the error and
   without writing anything ([Using from Java](api.md#canceling-a-conversion)).
 - **Architecture:** `ArchitectureTest` checks the dependencies between packages ([Architecture](../architecture.md)).
+- **Public API:** `PublicApiTest` reads the table of "What is promised" in [Using from Java](api.md#what-is-promised)
+  and checks that every promised type and member exists and is public, that no promised signature exposes a type of
+  the engine that is not promised nor one of another library other than those of `stxt-core` or the `PDDocument` and
+  `PDPage` of PDFBox, and that the table in `docs/es/` says the same.
 - **Mutation:** the `pit` profile of the `pom.xml` runs PIT over `layout` and `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min on Linux and close to an hour on
   Windows, with the report in

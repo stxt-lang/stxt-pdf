@@ -47,7 +47,7 @@ import java.util.Set;
  * {@code CIDToGIDMap}, a TrueType font with the wrong encoding, and the glyphs that {@link PdfGlyphs} looks at. An
  * encrypted PDF, one without pages or one that cannot be read is an error of the file.
  */
-public final class PdfInspector {
+final class PdfInspector {
 
     /**
      * A page of the PDF.
@@ -98,9 +98,10 @@ public final class PdfInspector {
 
     /**
      * The rotation of the page ({@code Rotate}) in degrees, from 0 to 270, clockwise; one that is not a multiple of 90
-     * does not rotate. It is the one that gives the size of the page and the one applied by whoever draws it.
+     * does not rotate. It is the one that gives the size of the page and the one applied by whoever draws it
+     * ({@code paint.PdfPages} computes it the same way).
      */
-    public static int rotation(PDPage page) {
+    private static int rotation(PDPage page) {
         int degrees = Math.floorMod(page.getRotation(), 360);
         return degrees % 90 == 0 ? degrees : 0;
     }

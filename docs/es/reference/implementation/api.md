@@ -39,6 +39,59 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 > siguen siendo públicos como capa de bajo nivel. *Alternativa descartada:* un método con una sobrecarga por cada
 > combinación de opciones.
 
+## Lo que se promete
+
+Mientras la versión empieza por `0.`, la API puede cambiar entre versiones menores. Desde la 1.0, lo que el jar promete
+es lo que lista esta tabla, y solo eso: un tipo o un miembro que no está en ella puede cambiar o desaparecer en una
+versión menor. Un tipo prometido entero promete todos sus miembros públicos; de los demás, solo los que nombra la fila.
+Las constantes de un enum entran siempre. De una excepción se promete lo que se lee, no sus constructores.
+
+| Tipo | Lo que se promete |
+|---|---|
+| `convert.Converter`, `convert.Converter.Builder` | Todo |
+| `stxt.DocumentReader` | Todo |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()` |
+| `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | Todo |
+| `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | Todo |
+| `tree.InvalidModelException` | `errorCode()` y lo que hereda |
+| `tree.DocumentSyntaxException` | Lo que hereda |
+| `resources.ResourceException`, `resources.ImageFormatException`, `model.InternalException`, `model.CancelledException` | `CODE` y lo que hereda |
+| `layout.LaidOutDocument` | Todo |
+| `fragment.Page`, `fragment.Fragment`, `fragment.TextLine`, `fragment.TextLine.Run`, `fragment.Rule` | Todo |
+| `tree.PageSetup`, `tree.PageSetup.Paper`, `tree.PageSetup.Orientation`, `tree.Metadata` | Todo |
+| `tree.Box` | `id()`, `element()`, `role()`, `line()`, `anonymous()`, `parent()`, `children()`, `text()` |
+| `tree.Element` | Sus constantes, `canonicalName()`, `label()`, `role()`, `headingLevel()` |
+| `tree.Element.Role` | Todo |
+| `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat` | Todo |
+| `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
+| `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | Todo |
+| `output.StxtDump` | Todo |
+| `paint.PdfPainter` | Todo |
+
+Lo que `layOut` devuelve entra en el contrato: `LaidOutDocument`, sus páginas y sus fragmentos, con la geometría de cada
+uno, sus líneas y el texto de cada tramo, y de la caja de cada fragmento lo que la identifica y la sitúa en el documento.
+Un servicio puede contar las páginas o medir cuánto llena cada una sin pintar nada. Son `record`s que solo ganan
+componentes: lo que un componente dice hoy lo dirá siempre.
+
+Lo demás que el jar expone como público lo es porque otro package del motor lo usa, no para quien convierte: `Engine`,
+`PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` y los grupos de `Style`, `Resources.fonts()` e `images()` con sus
+índices, los algoritmos de `layout`, los lienzos de `paint`. Se puede usar, con la versión fijada, y no se promete.
+
+`PublicApiTest` lee esta tabla y comprueba que cada tipo y cada miembro existe y es público, que ninguna firma
+prometida (parámetros, lo que devuelve, componentes, supertipos) expone un tipo del motor que no esté en la tabla ni uno
+ajeno que no sea de `stxt-core` (`InlineNode`, `ParseException`) o `PDDocument` y `PDPage` de PDFBox, y que la tabla de
+`docs/en/` dice lo mismo. La frontera no se mueve sin tocar esta página.
+
+> **Decisión:** la frontera se escribe en esta tabla y la vigila un test, y no un `module-info.java` con `exports`: en
+> Java sin módulos todo lo que cruza packages tiene que ser público, y con módulos `Fragment.box()` obligaría a exportar
+> `tree` entero. `LaidOutDocument` sigue siendo un `record`: convertirlo en clase no ocultaría `root()`, que `paint`
+> necesita. De `Box` se promete lo que identifica una caja, no su estilo ni lo que el motor le pregunta; de `Resources`,
+> la carpeta y su vista, no sus índices, para que fontbox no llegue al contrato a través de `FontFile.parse`, que `paint`
+> necesita para incrustar cada fuente en un `TrueTypeFont` nuevo. *Alternativas descartadas:* prometer todo lo público,
+> que fija para siempre más de 160 tipos (lo que esta tabla nombra arrastra, siguiendo sus firmas, 64); dejar los
+> fragmentos fuera del contrato hasta que exista el servicio, que obligaría a admitir una excepción en la regla del cierre
+> desde el primer día, porque `LaidOutDocument.pages()` los expone igual.
+
 ## PDF/A y adjuntos
 
 ```java

@@ -38,6 +38,60 @@ List<String> svg = converter.toSvg(laidOut);   // one string per page
 > remain public as a low-level layer. *Rejected alternative:* a method with one overload for each
 > combination of options.
 
+## What is promised
+
+While the version starts with `0.`, the API may change between minor versions. From 1.0 on, what the jar promises is
+what this table lists, and only that: a type or a member that is not in it may change or disappear in a minor version. A
+type promised whole promises all its public members; of the others, only those the row names. The constants of an enum
+are always included. Of an exception, what is read from it is promised, not its constructors.
+
+| Type | What is promised |
+|---|---|
+| `convert.Converter`, `convert.Converter.Builder` | All |
+| `stxt.DocumentReader` | All |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()` |
+| `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | All |
+| `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | All |
+| `tree.InvalidModelException` | `errorCode()` and what it inherits |
+| `tree.DocumentSyntaxException` | What it inherits |
+| `resources.ResourceException`, `resources.ImageFormatException`, `model.InternalException`, `model.CancelledException` | `CODE` and what it inherits |
+| `layout.LaidOutDocument` | All |
+| `fragment.Page`, `fragment.Fragment`, `fragment.TextLine`, `fragment.TextLine.Run`, `fragment.Rule` | All |
+| `tree.PageSetup`, `tree.PageSetup.Paper`, `tree.PageSetup.Orientation`, `tree.Metadata` | All |
+| `tree.Box` | `id()`, `element()`, `role()`, `line()`, `anonymous()`, `parent()`, `children()`, `text()` |
+| `tree.Element` | Its constants, `canonicalName()`, `label()`, `role()`, `headingLevel()` |
+| `tree.Element.Role` | All |
+| `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat` | All |
+| `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
+| `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | All |
+| `output.StxtDump` | All |
+| `paint.PdfPainter` | All |
+
+What `layOut` returns is part of the contract: `LaidOutDocument`, its pages and its fragments, with the geometry of each
+one, its lines and the text of each run, and, of the box of each fragment, what identifies it and places it in the
+document. A service can count the pages or measure how full each one is without painting anything. They are `record`s
+that only gain components: what a component says today it will always say.
+
+Everything else the jar exposes as public is so because another package of the engine uses it, not for the caller:
+`Engine`, `PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` and the groups of `Style`, `Resources.fonts()` and
+`images()` with their indexes, the `layout` algorithms, the `paint` canvases. It can be used, with the version pinned,
+and it is not promised.
+
+`PublicApiTest` reads this table and checks that every type and every member exists and is public, that no promised
+signature (parameters, return type, components, supertypes) exposes a type of the engine that is not in the table nor a
+foreign one other than those of `stxt-core` (`InlineNode`, `ParseException`) or `PDDocument` and `PDPage` of PDFBox, and
+that the table in `docs/es/` says the same. The boundary does not move without touching this page.
+
+> **Decision:** the boundary is written in this table and watched by a test, not by a `module-info.java` with
+> `exports`: in Java without modules everything that crosses packages has to be public, and with modules
+> `Fragment.box()` would force exporting the whole of `tree`. `LaidOutDocument` stays a `record`: turning it into a class
+> would not hide `root()`, which `paint` needs. Of `Box`, what identifies a box is promised, not its style nor what the
+> engine asks it; of `Resources`, the folder and its snapshot, not its indexes, so that fontbox does not reach the
+> contract through `FontFile.parse`, which `paint` needs to embed each font from a fresh `TrueTypeFont`. *Rejected
+> alternatives:* promising everything public, which fixes more than 160 types forever (what this table names drags,
+> following its signatures, 64); leaving the fragments out of the contract until the service exists, which would need an
+> exception to the closure rule from the first day, because `LaidOutDocument.pages()` exposes them anyway.
+
 ## PDF/A and attachments
 
 ```java
