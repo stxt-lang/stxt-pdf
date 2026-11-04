@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,11 +31,8 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.inline;
 import static dev.stxt.pdf.tree.Nodes.is;
 import static dev.stxt.pdf.tree.Nodes.isElement;
-import static dev.stxt.pdf.tree.PropertyReader.stack;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
-import static dev.stxt.pdf.tree.PropertyReader.grid;
 import static dev.stxt.pdf.tree.PropertyReader.item;
-import static dev.stxt.pdf.tree.PropertyReader.columns;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 import static dev.stxt.pdf.tree.TableBuilder.cellText;
 import static dev.stxt.pdf.tree.TableBuilder.table;
@@ -55,10 +54,7 @@ enum ElementReader {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             text(n, box);
-            box.setRuns(ctx.runs.get(n));
-            inlineFormat(ctx, box);
-            runStyles(ctx, box);
-            codeFont(box);
+            runs(ctx, n, box);
         }
     },
 
@@ -117,7 +113,7 @@ enum ElementReader {
      * The {@code Cell} of a table (reference/components/table.md): with a value it is a text box and, without one, a
      * block. Its row ({@code wrapper}) gives it its {@code Typography}, as inheritance, and its {@code Break}.
      */
-    CELL {
+    CELL(Set.of(), null, Set.of("span")) {
         @Override
         Layout layout(InlineNode n, Element kind) {
             return n.getText().isBlank() ? kind.layout() : Layout.INLINE;
@@ -143,54 +139,27 @@ enum ElementReader {
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             if (box.style().layout() == Layout.INLINE) {
                 cellText(n, box);
-                box.setRuns(ctx.runs.get(n));
-                inlineFormat(ctx, box);
-                runStyles(ctx, box);
-                codeFont(box);
+                runs(ctx, n, box);
             } else {
                 builder.buildContent(ctx, n, box);
             }
         }
     },
 
-    /** A {@code Table} (reference/components/table.md): a grid whose cells {@link TableBuilder} places. */
-    TABLE {
-        @Override
-        boolean property(Node p, Style s) {
-            if (!PropertyReader.GRID.contains(p.getCanonicalName())) {
-                return false;
-            }
-            grid(p, s);
-            return true;
-        }
-
+    /**
+     * A {@code Table} (reference/components/table.md): a grid whose cells {@link TableBuilder} places, with its row
+     * groups and its {@code Column align}.
+     */
+    TABLE(PropertyReader.GRID, PropertyReader::grid, Set.of("header-rows", "body", "footer-rows", "column-align")) {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             table(ctx, n, box, (cell, row, at) -> builder.element(ctx, cell, box, row, at));
         }
     },
 
-    GRID {
-        @Override
-        boolean property(Node p, Style s) {
-            if (!PropertyReader.GRID.contains(p.getCanonicalName())) {
-                return false;
-            }
-            grid(p, s);
-            return true;
-        }
-    },
+    GRID(PropertyReader.GRID, PropertyReader::grid, Set.of()),
 
-    STACK {
-        @Override
-        boolean property(Node p, Style s) {
-            if (!PropertyReader.STACK.contains(p.getCanonicalName())) {
-                return false;
-            }
-            stack(p, s);
-            return true;
-        }
-
+    STACK(PropertyReader.STACK, PropertyReader::stack, Set.of()) {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             validateStack(s);
@@ -210,16 +179,7 @@ enum ElementReader {
      * do not leave the columns, and its height is not definite: the distribution into
      * columns decides it.
      */
-    COLUMNS {
-        @Override
-        boolean property(Node p, Style s) {
-            if (!PropertyReader.COLUMNS.contains(p.getCanonicalName())) {
-                return false;
-            }
-            columns(p, s);
-            return true;
-        }
-
+    COLUMNS(PropertyReader.COLUMNS, PropertyReader::columns, Set.of()) {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             validateColumns(s, n.getLine());
@@ -232,21 +192,16 @@ enum ElementReader {
             Box flow = new Box(null, Element.COLUMN_FLOW, s, false, n.getLine());
             columns.addChild(flow);
             ctx.definiteHeight.put(flow, false);
-            boolean outer = ctx.insideColumns;
-            String outerUnbreakable = ctx.unbreakable;
-            ctx.insideColumns = true;
-            ctx.unbreakable = null;
-            builder.buildContent(ctx, n, flow);
-            ctx.insideColumns = outer;
-            ctx.unbreakable = outerUnbreakable;
+            ctx.within(ctx.scope().columns(), () -> builder.buildContent(ctx, n, flow));
         }
     },
 
     /**
      * A {@code Markdown} (reference/components/markdown.md): the elements that {@link MarkdownBuilder} generates,
-     * built as if the author had written them; its formatted texts carry their runs.
+     * built as if the author had written them; its formatted texts carry their runs. Its markers and its
+     * {@code Table columns} are read by the translation.
      */
-    MARKDOWN {
+    MARKDOWN(Set.of(), null, Set.of("bullet-markers", "number-markers", "table-columns")) {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             noCalls(ctx, box);
@@ -254,11 +209,11 @@ enum ElementReader {
             ctx.footnotes.noCalls = null;
             ctx.runs.putAll(t.runs());
             ctx.codeBlocks.addAll(t.codeBlocks());
-            ctx.insideMarkdown = true;
-            for (InlineNode e : t.elements()) {
-                box.addChild(builder.element(ctx, e, box, null, null));
-            }
-            ctx.insideMarkdown = false;
+            ctx.within(ctx.scope().markdown(), () -> {
+                for (InlineNode e : t.elements()) {
+                    box.addChild(builder.element(ctx, e, box, null, null));
+                }
+            });
         }
     },
 
@@ -323,15 +278,7 @@ enum ElementReader {
     FOOTNOTE {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            boolean outerColumns = ctx.insideColumns;
-            String outerUnbreakable = ctx.unbreakable;
-            ctx.insideColumns = false;
-            ctx.unbreakable = null;
-            ctx.footnotes.inside = true;
-            builder.buildContent(ctx, n, box);
-            ctx.footnotes.inside = false;
-            ctx.insideColumns = outerColumns;
-            ctx.unbreakable = outerUnbreakable;
+            ctx.within(ctx.scope().footnote(), () -> builder.buildContent(ctx, n, box));
         }
     },
 
@@ -340,6 +287,26 @@ enum ElementReader {
 
     /** A blank line inside the text: it separates paragraphs (reference/common/typography.md). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
+
+    /** The properties of the type of the element ({@code Stack}, {@code Grid}...), by canonical name. */
+    private final Set<String> properties;
+    /** Reads one of {@link #properties}; {@code null} if there are none. */
+    private final BiConsumer<Node, Style> reader;
+    /**
+     * The children that are not properties and that the content of the family reads ({@link TableBuilder},
+     * {@link MarkdownBuilder}), by canonical name.
+     */
+    private final Set<String> contentChildren;
+
+    ElementReader() {
+        this(Set.of(), null, Set.of());
+    }
+
+    ElementReader(Set<String> properties, BiConsumer<Node, Style> reader, Set<String> contentChildren) {
+        this.properties = properties;
+        this.reader = reader;
+        this.contentChildren = contentChildren;
+    }
 
     /** The family of an element. */
     static ElementReader of(Element kind) {
@@ -382,11 +349,17 @@ enum ElementReader {
     }
 
     /**
-     * Reads {@code p} if it is a property of the type of the element ({@code Stack}, {@code Grid}...); {@code false}
-     * if not.
+     * Claims {@code p} if it belongs to the family: reads it if it is a property of the type of the element
+     * ({@code Stack}, {@code Grid}...) and leaves it if its content reads it (the row groups of a {@code Table}, the
+     * markers of a {@code Markdown}); {@code false} if it is not the family's.
      */
     boolean property(Node p, Style s) {
-        return false;
+        String name = p.getCanonicalName();
+        if (properties.contains(name)) {
+            reader.accept(p, s);
+            return true;
+        }
+        return contentChildren.contains(name);
     }
 
     /** What the family checks of the properties already read, before the box is created. */
@@ -399,13 +372,24 @@ enum ElementReader {
     }
 
     /**
+     * The runs of a text box whose text is already read: those that {@link MarkdownBuilder} generated for {@code n},
+     * those of its inline Markdown, the values of its styled runs and the family of its code.
+     */
+    private static void runs(BuildContext ctx, InlineNode n, Box box) {
+        box.setRuns(ctx.runs.get(n));
+        inlineFormat(ctx, box);
+        runStyles(ctx, box);
+        codeFont(box);
+    }
+
+    /**
      * With {@code Markup: markdown} (reference/common/text-formatting.md), the text of the box is inline Markdown:
      * it becomes the joined text, without the marks, and the formatted runs go in {@link Box#formattedRuns()}. Inside
      * a {@code Markdown} it does nothing, because its texts come already interpreted. The text stops being a block:
      * its errors point to the line where it starts.
      */
     private static void inlineFormat(BuildContext ctx, Box box) {
-        if (box.style().typography().markup() != Markup.MARKDOWN || ctx.insideMarkdown) {
+        if (box.style().typography().markup() != Markup.MARKDOWN || ctx.scope().inMarkdown()) {
             return;
         }
         int first = box.textBlock() ? box.textLine() + 1 : box.textLine();
@@ -422,9 +406,10 @@ enum ElementReader {
      * another footnote. Set while the text of {@code box} is read.
      */
     private static void noCalls(BuildContext ctx, Box box) {
-        ctx.footnotes.noCalls = ctx.insidePageOverlay ? "a Page overlay, which is repeated on every page"
-                : ctx.insideHeading ? "a heading, whose text is copied to the tables of contents and the bookmarks"
-                : ctx.footnotes.inside ? "a Footnote" : null;
+        BuildContext.Scope scope = ctx.scope();
+        ctx.footnotes.noCalls = scope.inPageOverlay() ? "a Page overlay, which is repeated on every page"
+                : scope.inHeading() ? "a heading, whose text is copied to the tables of contents and the bookmarks"
+                : scope.inFootnote() ? "a Footnote" : null;
     }
 
     /**

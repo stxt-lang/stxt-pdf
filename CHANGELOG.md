@@ -80,6 +80,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   and no side box is beside it. In a document of short chapters (a quarter of a page each) the layouts per page go from
   52 to 32, the same as with the margin on the block; a chapter longer than the page is still laid out twice on the page
   where it starts. The output does not change.
+- **The message of a `Break` inside a rotated box that also clips or is a side box names the rotation.** The
+  `BREAK_IN_UNBREAKABLE` error now says "inside a rotated box" (or "a rotated Frame"), as `BREAK_IN_ROTATED` already did
+  for a `Keep together` on that same box, instead of "a box with Overflow: clip" or "a box with Side". The code and the
+  line do not change.
 
 ### Fixed
 

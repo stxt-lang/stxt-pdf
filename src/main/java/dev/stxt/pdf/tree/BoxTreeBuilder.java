@@ -23,9 +23,6 @@ import static dev.stxt.pdf.tree.PropertyReader.box;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 import static dev.stxt.pdf.tree.ValueReader.angle;
-import static dev.stxt.pdf.tree.ValueReader.bool;
-import static dev.stxt.pdf.tree.ValueReader.enumValue;
-import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +36,6 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Value;
@@ -90,12 +86,11 @@ public final class BoxTreeBuilder {
     }
 
     /**
-     * Children of an element that are not its properties: the wrappers and the text, the classes
-     * (already applied with their rules), the row groups and the {@code Span}, which {@link TableBuilder} reads,
-     * and what {@link MarkdownBuilder} reads.
+     * Children of any element that are not its properties: the wrappers, the text and the classes (already applied
+     * with their rules). Those of a single family (the row groups of a {@code Table}, the markers of a
+     * {@code Markdown}) are claimed by its {@link ElementReader#property}.
      */
-    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style", "header-rows", "body",
-            "footer-rows", "span", "bullet-markers", "number-markers", "table-columns", "column-align");
+    private static final Set<String> NOT_PROPERTIES = Set.of("item", "area", "content", "style");
 
     /**
      * Result: the medium of the document, the anonymous root from which its {@code Page overlay} and its sections hang
@@ -184,8 +179,8 @@ public final class BoxTreeBuilder {
 
     /**
      * A {@code Section} (reference/components/document.md): its box, which is the root of its layout and has the height
-     * of the page minus the margins (always definite), with its medium, its numbering and the {@code Page overlay} it
-     * carries.
+     * of the page minus the margins (always definite), with what {@link SectionReader} reads of it and its footnote
+     * area.
      */
     private Section section(BuildContext ctx, InlineNode n, Box documentRoot, PageSetupReader.Spec documentPageSetup,
                             boolean first) {
@@ -193,59 +188,12 @@ public final class BoxTreeBuilder {
         s.setLayout(Layout.BLOCK);
         s.setPosition(Position.STATIC);
         ctx.rules.applySection(n, s);
-        String id = null;
-        PageSetupReader.Spec pageSetup = documentPageSetup;
-        Section.PageNumbering numbering = Section.PageNumbering.CONTINUE;
-        NumberFormat pageNumberFormat = NumberFormat.DECIMAL;
-        Node pageNumberFormatNode = null;
-        Node startNode = null;
-        int start = 1;
-        boolean inheritPageOverlays = true;
-        Section.BeginOn beginOn = Section.BeginOn.ANY;
-        Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
-        NumberFormat footnoteNumberFormat = NumberFormat.DECIMAL;
-        for (Node p : n.getChildren()) {
-            switch (p.getCanonicalName()) {
-                case "id" -> id = ctx.id(p);
-                case "footnote-numbering" -> footnoteNumbering = enumValue(Section.FootnoteNumbering.class, p);
-                case "footnote-number-format" -> footnoteNumberFormat = enumValue(NumberFormat.class, p);
-                case "page" -> pageSetup = PageSetupReader.pageSetup(inline(p), documentPageSetup);
-                case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
-                case "page-number-format" -> {
-                    pageNumberFormat = enumValue(NumberFormat.class, p);
-                    pageNumberFormatNode = p;
-                }
-                case "start" -> {
-                    start = positiveInteger(p);
-                    startNode = p;
-                }
-                case "inherit-page-overlays" -> inheritPageOverlays = bool(p);
-                case "begin-on" -> {
-                    beginOn = enumValue(Section.BeginOn.class, p);
-                    if (first && beginOn == Section.BeginOn.ODD) {
-                        // The first page of the document is already odd (reference/components/document.md).
-                        throw error(p, ErrorCode.BEGIN_ON_FIRST_SECTION, "Begin on: odd has no effect in the first "
-                                + "section, which already starts on page 1: it is not needed");
-                    }
-                }
-                default -> {
-                }
-            }
-        }
-        // What would have no effect (reference/components/document.md#page-numbering).
-        if (startNode != null && numbering != Section.PageNumbering.RESTART) {
-            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start only has an effect with Page numbering: "
-                    + "restart, which is when the numbering starts again: restart is missing or Start is not needed");
-        }
-        if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
-            throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format has no effect with Page "
-                    + "numbering: none, because the pages of the section have no number: it is not needed");
-        }
-        Box box = new Box(id, Element.SECTION, s, false, n.getLine());
+        SectionReader.Properties p = SectionReader.read(ctx, n, documentPageSetup, first);
+        Box box = new Box(p.id(), Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         // The footnote area of the section (reference/components/footnote.md): its notes hang from it, not from the
         // boxes that hold them.
-        Box footnotes = ctx.footnotes.beginSection(ctx, n, box, footnoteNumbering, footnoteNumberFormat);
+        Box footnotes = ctx.footnotes.beginSection(ctx, n, box, p.footnoteNumbering(), p.footnoteNumberFormat());
         buildContent(ctx, n, box);
         // After the content, so that the children of the section are its elements in order, and then the area.
         box.addChild(footnotes);
@@ -254,8 +202,8 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.SECTION_EMPTY, "The section has no content: without elements (Page overlays do not "
                     + "count, they take no space) it has no page");
         }
-        return new Section(box, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays, beginOn,
-                footnoteNumbering, footnoteNumberFormat, footnotes);
+        return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.start(), p.inheritPageOverlays(),
+                p.beginOn(), p.footnoteNumbering(), p.footnoteNumberFormat(), footnotes);
     }
 
     /** Child elements in order: each one is a box; {@code Item} and {@code Area} wrap theirs. */
@@ -284,11 +232,11 @@ public final class BoxTreeBuilder {
      * {@code Page overlay}, which is repeated on every page, nor inside another note.
      */
     private void footnote(BuildContext ctx, InlineNode n) {
-        if (ctx.insidePageOverlay) {
+        if (ctx.scope().inPageOverlay()) {
             throw error(n, ErrorCode.FOOTNOTE_NOT_ALLOWED, "A Footnote cannot be inside a Page overlay, which is "
                     + "repeated on every page: it goes with the text that calls it");
         }
-        if (ctx.footnotes.inside) {
+        if (ctx.scope().inFootnote()) {
             throw error(n, ErrorCode.FOOTNOTE_NOT_ALLOWED, "A Footnote cannot be inside another Footnote");
         }
         Box area = ctx.footnotes.area();
@@ -335,20 +283,9 @@ public final class BoxTreeBuilder {
         if (number != null) {
             listItem(ctx, n, box, parent, number);
         }
-        boolean outerPageOverlay = ctx.insidePageOverlay;
-        boolean outerHeading = ctx.insideHeading;
-        String outerUnbreakable = ctx.unbreakable;
-        ctx.insidePageOverlay |= s.position() == Position.PAGE_OVERLAY;
-        ctx.insideHeading |= kind.headingLevel() > 0;
-        if (ctx.unbreakable == null) {
-            ctx.unbreakable = unbreakable(s);
-        }
-        reader.content(this, ctx, n, box);
+        ctx.within(ctx.scope().element(s, kind.headingLevel() > 0), () -> reader.content(this, ctx, n, box));
         validateShrink(n, box);
         validateMergeBorders(n, box);
-        ctx.insidePageOverlay = outerPageOverlay;
-        ctx.insideHeading = outerHeading;
-        ctx.unbreakable = outerUnbreakable;
         if (kind.headingLevel() > 0) {
             // The texts of the heading are already read: the number is written before the first one.
             String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
@@ -375,7 +312,8 @@ public final class BoxTreeBuilder {
             throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ITEM, "Isolate margins has no effect on an item of "
                     + "Stack or Grid, which already stops margin merging with its children: it is not needed");
         }
-        if (ctx.unbreakable == null) {
+        Style.Unsplittable unbreakable = ctx.scope().unbreakable();
+        if (unbreakable == null) {
             return;
         }
         for (InlineNode owner : wrapper == null || item ? List.of(n) : List.of(n, wrapper)) {
@@ -383,26 +321,9 @@ public final class BoxTreeBuilder {
             if (group.isPresent() && !inline(group.get()).getChildren().isEmpty()) {
                 Node p = inline(group.get()).getChildren().get(0);
                 throw error(p, ErrorCode.BREAK_IN_UNBREAKABLE, p.getName() + " has no effect inside "
-                        + ctx.unbreakable + ", which is not split across pages: it is not needed");
+                        + unbreakable.what() + ", which is not split across pages: it is not needed");
             }
         }
-    }
-
-    /** How the box is named in messages if it is not split across pages, or {@code null} if it is split. */
-    private static String unbreakable(Style s) {
-        if (s.box().clips()) {
-            return "a box with Overflow: clip";
-        }
-        if (s.isSideBox()) {
-            // A side box goes whole to a side of the text (reference/components/block.md).
-            return "a box with Side";
-        }
-        return switch (s.position()) {
-            case OVERLAY -> "an Overlay";
-            case PAGE_OVERLAY -> "a Page overlay";
-            case FRAME -> s.rotation() != null ? "a rotated Frame" : null;
-            default -> s.rotatesInFlow() ? "a rotated box" : null;
-        };
     }
 
     /**
@@ -410,7 +331,7 @@ public final class BoxTreeBuilder {
      * (reference/components/columns.md) and a heading respects the hierarchy (reference/components/heading.md).
      */
     private static void place(BuildContext ctx, InlineNode n, Element kind) {
-        if (ctx.insideColumns && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
+        if (ctx.scope().inColumns() && kind.position() != Position.STATIC && kind.position() != Position.FRAME) {
             throw error(n, ErrorCode.OVERLAY_IN_COLUMNS, n.getName() + " cannot be inside a "
                     + "Columns: its position does not depend on the columns, so its place is outside the Columns");
         }
@@ -488,7 +409,7 @@ public final class BoxTreeBuilder {
      * at most one level from the previous one.
      */
     private static void heading(BuildContext ctx, InlineNode n, int level) {
-        if (ctx.insidePageOverlay) {
+        if (ctx.scope().inPageOverlay()) {
             throw error(n, ErrorCode.HEADING_IN_PAGE_OVERLAY, "A " + n.getName() + " cannot be inside a Page overlay, "
                     + "which is repeated on every page and is not part of the content: a Text belongs there");
         }

@@ -9,9 +9,9 @@ import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
+import static dev.stxt.pdf.model.Measures.pt;
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.parse;
@@ -114,10 +114,6 @@ final class PageSetupReader {
             throw error(marginNode.orElse(n), ErrorCode.PAGE_SIZE, "The margins of the page leave no page area");
         }
         return new Spec(pageSetup, named);
-    }
-
-    private static String pt(double v) {
-        return String.format(Locale.ROOT, "%.2f", v).replaceAll("\\.?0+$", "") + " pt";
     }
 
     /**

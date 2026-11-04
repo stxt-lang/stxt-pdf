@@ -61,8 +61,6 @@ final class Footnotes {
      * {@code a Footnote}); {@code null} if it is allowed.
      */
     String noCalls;
-    /** Whether the content of a {@code Footnote} is being built. */
-    boolean inside;
 
     /** The footnote area of the section being built; {@code null} before the first section. */
     Box area() {

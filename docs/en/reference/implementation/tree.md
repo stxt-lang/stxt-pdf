@@ -63,13 +63,24 @@ chosen with `ElementReader.of`): the layout of the
 box, what its wrapper gives it, the properties of its type, what it checks before creating the box, and its content. A
 new element with nothing of its own is a `CONTAINER`, and one with something of its own, a new family, without touching `element`. The
 `FIGURE` family builds the element and the `Caption` of a `Figure`, orders them by `Caption position`, numbers it
-(`Figures`) and keeps it from being split.
+(`Figures`) and keeps it from being split. Each family claims the children that are its own (`ElementReader.property`): the
+properties of its type, which it reads, and those its content reads, such as the row groups and `Column align` of a
+`Table`, the `Span` of a `Cell` or the markers and `Table columns` of a `Markdown`. The orchestrator only sets aside those
+of any element (`Item`, `Area`, `Content` and `Style`).
+
+Inside which boxes each content is built (a `Page overlay`, a heading, a `Columns`, a `Markdown`, a `Footnote` or a box
+that is not split) is said by `BuildContext.Scope`, a `record` that only changes while the content of a box is built
+(`BuildContext.within`) and is restored afterwards. Why a box is not split across pages is said by a single
+classification, `Style.unsplittable()` (the rotation, `Overflow: clip`, `Side` or the position, in that order): it is used
+by `ModelValidator`, to reject `Keep together` and `Edges` on it, and by the `Scope`, to name it in
+`BREAK_IN_UNBREAKABLE`.
 
 The pieces:
 
 | Class | What it does |
 |---|---|
 | `PageSetupReader` | `Page` (with the inheritance by groups of the sections), `Title`, `Language` and `Subject` |
+| `SectionReader` | The properties of a `Section` (`Id`, `Page`, the page and footnote numbering, `Inherit page overlays`, `Begin on`) and their rules; the box, the footnote area and `SECTION_EMPTY` stay in `BoxTreeBuilder.section` |
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
 | `StyleRules` | The rules of `Styles` from the two origins and their priority |
@@ -223,7 +234,7 @@ of the row. Nor does it give the line of each cell, so the errors of a cell poin
 translates it into STXT nodes (`InlineNode` with the line of its block), which it validates with the schema. The runs of each text go separately,
 per node (`Translation.runs`, in `BuildContext.runs`). The `MARKDOWN` family of `ElementReader` builds those nodes with `element(...)` as
 children of the box of the `Markdown`. Text with `Markup: markdown` goes through `MarkdownBuilder.inline`, the same parser and the
-same translation in `inlineOnly` mode. Inside a `Markdown` it does not act (`BuildContext.insideMarkdown`).
+same translation in `inlineOnly` mode. Inside a `Markdown` it does not act (`BuildContext.Scope.inMarkdown`).
 
 Before parsing, `RunMarks.mark` replaces each styled run with marks, Unicode noncharacters that commonmark-java takes
 as letters: `RunMarks.OPEN`, the digits of the number of the name and `RunMarks.END` in place of the `[`, and

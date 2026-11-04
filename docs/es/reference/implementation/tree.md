@@ -63,13 +63,24 @@ con `ElementReader.of`): el layout de la
 caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
 elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`. La familia
 `FIGURE` construye el elemento y el `Caption` de una `Figure`, los ordena según `Caption position`, la numera
-(`Figures`) y la deja sin partir.
+(`Figures`) y la deja sin partir. Cada familia reclama los hijos que son suyos (`ElementReader.property`): las propiedades
+de su tipo, que lee, y los que lee su contenido, como los grupos de filas y `Column align` de una `Table`, `Span` de una
+`Cell` o los marcadores y `Table columns` de un `Markdown`. El orquestador solo aparta los de cualquier elemento (`Item`,
+`Area`, `Content` y `Style`).
+
+Dentro de qué cajas se construye cada contenido (un `Page overlay`, un encabezado, un `Columns`, un `Markdown`, una
+`Footnote` o una caja que no se parte) lo dice `BuildContext.Scope`, un `record` que solo cambia mientras se construye el
+contenido de una caja (`BuildContext.within`) y que se recupera después. Por qué una caja no se parte entre páginas lo dice
+una sola clasificación, `Style.unsplittable()` (el giro, `Overflow: clip`, `Side` o la posición, en ese orden): la usan
+`ModelValidator`, para rechazar `Keep together` y `Edges` en ella, y el `Scope`, para nombrarla en
+`BREAK_IN_UNBREAKABLE`.
 
 Las piezas:
 
 | Clase | Qué hace |
 |---|---|
 | `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title`, `Language` y `Subject` |
+| `SectionReader` | Las propiedades de una `Section` (`Id`, `Page`, la numeración de páginas y de notas, `Inherit page overlays`, `Begin on`) y sus reglas; la caja, el área de notas y `SECTION_EMPTY` quedan en `BoxTreeBuilder.section` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
 | `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
@@ -222,7 +233,7 @@ de la fila. Tampoco da la línea de cada celda, así que los errores de una celd
 traduce a nodos STXT (`InlineNode` con la línea de su bloque), que valida con el schema. Los tramos de cada texto van aparte,
 por nodo (`Translation.runs`, en `BuildContext.runs`). La familia `MARKDOWN` de `ElementReader` construye esos nodos con `element(...)` como
 hijos de la caja del `Markdown`. El texto con `Markup: markdown` pasa por `MarkdownBuilder.inline`, el mismo parser y la
-misma traducción en modo `inlineOnly`. Dentro de un `Markdown` no actúa (`BuildContext.insideMarkdown`).
+misma traducción en modo `inlineOnly`. Dentro de un `Markdown` no actúa (`BuildContext.Scope.inMarkdown`).
 
 Antes de parsear, `RunMarks.mark` cambia cada tramo con estilo por marcas, no-caracteres de Unicode que commonmark-java
 toma por letras: `RunMarks.OPEN`, los dígitos del número del nombre y `RunMarks.END` en lugar del `[`, y `RunMarks.CLOSE`

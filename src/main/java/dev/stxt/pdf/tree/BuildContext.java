@@ -2,6 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Cancellation;
+import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayList;
@@ -41,24 +42,8 @@ final class BuildContext {
     final Figures figureNumbers = new Figures();
     /** The {@code Figure} boxes of the document, in order: the tables of contents of figures and tables list them. */
     final List<Box> figures = new ArrayList<>();
-    /** Whether the content of a {@code Page overlay} is being built. */
-    boolean insidePageOverlay;
-    /** Whether the texts of a heading are being built: a footnote call is not allowed in them. */
-    boolean insideHeading;
-    /** Whether the content of a {@code Columns} is being built. */
-    boolean insideColumns;
-    /**
-     * The box that is not split across pages (an {@code Overlay}, a {@code Page overlay}, a rotated {@code Frame} or
-     * box, a side box or a box with {@code Overflow: clip}; {@code BoxTreeBuilder.unbreakable}) whose content is being
-     * built, or {@code null}: inside it, a {@code Break} has no effect, except in the
-     * columns of a {@code Columns} (reference/common/breaks.md).
-     */
-    String unbreakable;
-    /**
-     * Whether the content of a {@code Markdown} is being built: its texts come already interpreted
-     * (reference/components/markdown.md).
-     */
-    boolean insideMarkdown;
+    /** Where the content being built is; it changes only with {@link #within}. */
+    private Scope scope = Scope.DOCUMENT;
     /**
      * The {@code Table of contents} of the document, in order: their entries are generated at the end, with all the
      * headings.
@@ -80,6 +65,67 @@ final class BuildContext {
     BuildContext(StyleRules rules, Cancellation cancellation) {
         this.rules = rules;
         this.cancellation = cancellation;
+    }
+
+    /**
+     * Where the content being built is: inside which boxes, among those that change what their descendants can
+     * declare or write.
+     *
+     * @param inPageOverlay inside a {@code Page overlay}
+     * @param inHeading     in the texts of a heading: a footnote call is not allowed in them
+     * @param inColumns     inside a {@code Columns}
+     * @param inMarkdown    inside a {@code Markdown}: its texts come already interpreted
+     *                      (reference/components/markdown.md)
+     * @param inFootnote    inside a {@code Footnote}
+     * @param unbreakable   the box that is not split across pages ({@link Style#unsplittable()}) whose content is
+     *                      being built, or {@code null}: inside it, a {@code Break} has no effect, except in the columns
+     *                      of a {@code Columns} and in a {@code Footnote} (reference/common/breaks.md)
+     */
+    record Scope(boolean inPageOverlay, boolean inHeading, boolean inColumns, boolean inMarkdown, boolean inFootnote,
+                 Style.Unsplittable unbreakable) {
+
+        /** The content of a section, outside any element. */
+        static final Scope DOCUMENT = new Scope(false, false, false, false, false, null);
+
+        /** The content of an element with the style {@code s}; {@code heading} if it is a heading. */
+        Scope element(Style s, boolean heading) {
+            return new Scope(inPageOverlay || s.position() == Position.PAGE_OVERLAY, inHeading || heading, inColumns,
+                    inMarkdown, inFootnote, unbreakable != null ? unbreakable : s.unsplittable());
+        }
+
+        /** The column flow of a {@code Columns}: its columns are split, whatever box holds it. */
+        Scope columns() {
+            return new Scope(inPageOverlay, inHeading, true, inMarkdown, inFootnote, null);
+        }
+
+        /** The elements that a {@code Markdown} generates. */
+        Scope markdown() {
+            return new Scope(inPageOverlay, inHeading, inColumns, true, inFootnote, unbreakable);
+        }
+
+        /**
+         * The content of a {@code Footnote}, which is laid out apart from the box that holds it: what that box forbids
+         * does not reach it.
+         */
+        Scope footnote() {
+            return new Scope(inPageOverlay, inHeading, false, inMarkdown, true, null);
+        }
+    }
+
+    /** Where the content being built is. */
+    Scope scope() {
+        return scope;
+    }
+
+    /** Builds {@code content} in {@code inner}, and goes back to the scope it was in. */
+    void within(Scope inner, Runnable content) {
+        Scope outer = scope;
+        scope = inner;
+        try {
+            content.run();
+        } finally {
+            scope = outer;
+        }
     }
 
     /** The {@code Id} of a box, which is not repeated in the document. */

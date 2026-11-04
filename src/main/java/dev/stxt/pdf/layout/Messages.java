@@ -1,6 +1,6 @@
 package dev.stxt.pdf.layout;
 
-import java.util.Locale;
+import dev.stxt.pdf.model.Measures;
 
 /** Common pieces of the layout error messages ({@link Overflow}, {@code TableLayout}). */
 public final class Messages {
@@ -23,12 +23,8 @@ public final class Messages {
         return text.substring(0, text.offsetByCodePoints(0, EXCERPT)) + "... (" + length + " characters)";
     }
 
-    /**
-     * A measure in points with at most two decimals, no trailing zeros and the unit: {@code 12.5 pt}, {@code 100 pt}.
-     * The unit is always written, because the document may give its lengths in millimeters.
-     */
+    /** A measure in points, as all messages write it ({@link Measures#pt}): {@code 12.5 pt}, {@code 100 pt}. */
     public static String pt(double v) {
-        String s = String.format(Locale.ROOT, "%.2f", v);
-        return s.replaceAll("\\.?0+$", "") + " pt";
+        return Measures.pt(v);
     }
 }

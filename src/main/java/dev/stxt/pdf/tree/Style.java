@@ -292,6 +292,61 @@ public final class Style extends StyleGroup {
         return side != null;
     }
 
+    /**
+     * Why a box is not split across pages (reference/common/breaks.md), apart from an {@code Image} or a
+     * {@code Barcode}, which have no children: how the messages name it and the error of a {@code Keep together} or
+     * an {@code Edges} declared on it, {@code null} where the model does not check them.
+     */
+    enum Unsplittable {
+        ROTATED_BOX("a rotated box", ErrorCode.BREAK_IN_ROTATED),
+        ROTATED_FRAME("a rotated Frame", ErrorCode.BREAK_IN_ROTATED),
+        CLIPPED("a box with Overflow: clip", ErrorCode.BREAK_IN_CLIPPED),
+        // A side box goes whole to a side of the text (reference/components/block.md).
+        SIDE_BOX("a box with Side", ErrorCode.BREAK_IN_SIDE_BOX),
+        OVERLAY("an Overlay", null),
+        PAGE_OVERLAY("a Page overlay", null);
+
+        private final String what;
+        private final ErrorCode code;
+
+        Unsplittable(String what, ErrorCode code) {
+            this.what = what;
+            this.code = code;
+        }
+
+        String what() {
+            return what;
+        }
+
+        ErrorCode code() {
+            return code;
+        }
+    }
+
+    /**
+     * Why the box is not split across pages, or {@code null} if it is split. With more than one reason, the first one
+     * in the order of {@link Unsplittable}: the rotation, {@code Overflow: clip}, {@code Side} and the position.
+     */
+    Unsplittable unsplittable() {
+        if (rotatesInFlow()) {
+            return Unsplittable.ROTATED_BOX;
+        }
+        if (position == Position.FRAME && rotation != null) {
+            return Unsplittable.ROTATED_FRAME;
+        }
+        if (box.clips()) {
+            return Unsplittable.CLIPPED;
+        }
+        if (isSideBox()) {
+            return Unsplittable.SIDE_BOX;
+        }
+        return switch (position) {
+            case OVERLAY -> Unsplittable.OVERLAY;
+            case PAGE_OVERLAY -> Unsplittable.PAGE_OVERLAY;
+            default -> null;
+        };
+    }
+
     public boolean clear() {
         return clear;
     }

@@ -11,15 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MessagesTest {
 
     @Test
-    void pointsWithoutTrailingZerosAndWithTheUnit() {
-        assertEquals("100 pt", Messages.pt(100));
-        assertEquals("12.5 pt", Messages.pt(12.5));
-        assertEquals("0.33 pt", Messages.pt(1 / 3.0));
-        assertEquals("762 pt", Messages.pt(761.999999));
-        assertEquals("10000000 pt", Messages.pt(1e7));
-    }
-
-    @Test
     void aShortExcerptIsKeptWhole() {
         assertEquals("palabra", Messages.excerpt("palabra"));
         assertEquals("x".repeat(40), Messages.excerpt("x".repeat(40)));

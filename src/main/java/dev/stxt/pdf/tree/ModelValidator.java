@@ -16,6 +16,7 @@ import dev.stxt.pdf.model.Value;
 import java.util.List;
 import java.util.Locale;
 
+import static dev.stxt.pdf.model.Measures.pt;
 import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.inline;
@@ -148,11 +149,31 @@ final class ModelValidator {
      * @param element how the element is named in the message: {@code an Image}, {@code a Barcode}
      */
     static void validateImage(Style s, String element) {
+        rejectSplitBreaks(s, ErrorCode.BREAK_IN_IMAGE, element);
+    }
+
+    /**
+     * {@code Keep together} and {@code Edges} only count when a box splits across pages (reference/common/breaks.md):
+     * on one that does not, {@code what}, they are the error {@code code}, also if a rule of {@code Styles} gives them.
+     *
+     * @param what how the box is named in the message: {@code an Image}, {@code a rotated box}
+     */
+    private static void rejectSplitBreaks(Style s, ErrorCode code, String what) {
         for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
             if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_IMAGE, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " has no effect on " + element + ", which does not split across pages: it is not needed");
+                throw error(s.line(p), code, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
+                        + " has no effect on " + what + ", which does not split across pages: it is not needed");
             }
+        }
+    }
+
+    /**
+     * {@link #rejectSplitBreaks(Style, ErrorCode, String)} for a box that is not split because of {@code cause}, if
+     * that is its cause ({@link Style#unsplittable()}).
+     */
+    private static void rejectSplitBreaks(Style s, Style.Unsplittable cause) {
+        if (s.unsplittable() == cause) {
+            rejectSplitBreaks(s, cause.code(), cause.what());
         }
     }
 
@@ -193,16 +214,8 @@ final class ModelValidator {
             }
             return;
         }
-        if (s.position() != Position.FRAME && !s.rotatesInFlow()) {
-            return;
-        }
-        String what = s.rotatesInFlow() ? "a rotated box" : "a rotated Frame";
-        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
-            if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_ROTATED, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " has no effect on " + what + ", which does not split across pages: it is not needed");
-            }
-        }
+        rejectSplitBreaks(s, Style.Unsplittable.ROTATED_BOX);
+        rejectSplitBreaks(s, Style.Unsplittable.ROTATED_FRAME);
         if (s.rotatesInFlow() && s.isolateMargins()) {
             throw error(s.line("isolate-margins"), ErrorCode.ISOLATE_MARGINS_IN_ROTATED, "Isolate margins has no effect on a rotated box, "
                     + "which already stops margin merging with its children: it is not needed");
@@ -214,16 +227,7 @@ final class ModelValidator {
      * and {@code Edges}, also from a rule, have no effect on it.
      */
     static void validateClip(Style s) {
-        if (!s.box().clips()) {
-            return;
-        }
-        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
-            if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_CLIPPED, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " has no effect on a box with Overflow: clip, which does not split across pages: it is not "
-                        + "needed");
-            }
-        }
+        rejectSplitBreaks(s, Style.Unsplittable.CLIPPED);
     }
 
     /**
@@ -281,11 +285,6 @@ final class ModelValidator {
         for (Box child : box.children()) {
             validateOverflow(child);
         }
-    }
-
-    /** A measure in points, as {@code layout.Messages.pt} writes it: at most two decimals and the unit. */
-    private static String pt(double v) {
-        return String.format(Locale.ROOT, "%.2f", v).replaceAll("\\.?0+$", "") + " pt";
     }
 
     /** The first box with text inside {@code box}, itself included, in document order; its marker counts. Or null. */
@@ -363,12 +362,7 @@ final class ModelValidator {
             // An image already rejects them (BREAK_IN_IMAGE), with its own message.
             return;
         }
-        for (String p : List.of(KEEP_TOGETHER, DECORATION)) {
-            if (s.isDeclared(p)) {
-                throw error(s.line(p), ErrorCode.BREAK_IN_SIDE_BOX, (p.equals(KEEP_TOGETHER) ? "Keep together" : "Edges")
-                        + " has no effect on a box with Side, which does not split across pages: it is not needed");
-            }
-        }
+        rejectSplitBreaks(s, Style.Unsplittable.SIDE_BOX);
     }
 
     /**
@@ -433,7 +427,7 @@ final class ModelValidator {
 
     /** {@code Before} and {@code After: column} only inside a {@code Columns}, which is what has columns. */
     private static void validateColumnBreaks(BuildContext ctx, Style s) {
-        if (ctx.insideColumns) {
+        if (ctx.scope().inColumns()) {
             return;
         }
         String property = s.breaks().before() == Break.COLUMN ? BREAK_BEFORE
