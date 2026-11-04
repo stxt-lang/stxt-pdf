@@ -6,12 +6,15 @@
 // it down once laid out (five paragraphs per block, a quarter of a page; "long chapters", twenty, more than a page). The
 // "table", "grid" and "stack" ones are containers of 500 and 2000 units (rows, or items) over many pages: what they
 // arrange before breaking (placement, track sizing, bands, merged borders) is memoized per container, and the misses per
-// page tell whether it is. For the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
+// page tell whether it is. The "contrast" ones are dense pages (a table in small type with cell backgrounds, Merge borders
+// and underlined and struck words): thousands of runs and layers per page, and the time of the contrast check apart.
+// For the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
 // jdk.ExecutionSample".
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.paint.ContrastCheck;
 import dev.stxt.pdf.paint.PdfDocumentWriter;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -103,6 +106,39 @@ public class ScaleProbe {
         return sb.toString();
     }
 
+    /**
+     * A table of rows body rows and six columns in size 6, with a background in every cell, Merge borders and, in each
+     * cell, two underlined and one struck word: each line of a cell is several runs, and each underline, strike and line
+     * of the table is one more layer for the contrast check, which looks for what lies under every run. Without the Page
+     * overlay of the head: it would lie over the last row, on a line of the table, and its contrast would be too low.
+     */
+    static String contrast(int rows) {
+        StringBuilder sb = new StringBuilder(tableHead().replace("\t\t\t\tBorder: 1\n",
+                "\t\t\t\tBorder: 1\n\t\t\t\tBackground: #F4F2EC\n\t\t\tTypography:\n\t\t\t\tSize: 6\n"
+                + "\t\t\t\tMarkup: markdown\n").replaceAll("\tPage overlay:\n(\t\t.*\n)*", ""));
+        sb.append("\t\tTable:\n\t\t\tColumn sizes: * * * * * *\n\t\t\tBody:\n");
+        for (int i = 0; i < rows; i++) {
+            sb.append("\t\t\t\tRow:\n");
+            for (int c = 1; c <= 6; c++) {
+                sb.append("\t\t\t\t\tCell: ++Fila++ ").append(i).append(" ~~col~~ ").append(c).append(" ++fin++\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Like {@link #run}, with the time of the contrast check of the laid-out document apart. */
+    static void runContrast(String label, String text, Resources r) throws Exception {
+        InlineNode doc = new DocumentReader().read(text);
+        long t0 = System.nanoTime();
+        LaidOutDocument lo = new Engine(new PdfMetrics(r), r).layOutDocument(doc);
+        long t1 = System.nanoTime();
+        ContrastCheck.check(lo);
+        long t2 = System.nanoTime();
+        System.out.printf("%-28s pages=%4d  layout=%6d ms  contrast=%6d ms  contrast/page=%.2f ms%n", label,
+            lo.pages().size(), (t1 - t0) / 1_000_000, (t2 - t1) / 1_000_000,
+            (t2 - t1) / 1e6 / lo.pages().size());
+    }
+
     static void run(String label, String text, Resources r) throws Exception {
         long t0 = System.nanoTime();
         InlineNode doc = new DocumentReader().read(text);
@@ -121,14 +157,15 @@ public class ScaleProbe {
     }
 
     /**
-     * Without arguments, every probe; with "text", "chapters" or "units", only those of the long texts, of the chapters
-     * or of the containers.
+     * Without arguments, every probe; with "text", "chapters", "units" or "contrast", only those of the long texts, of
+     * the chapters, of the containers or of the contrast check.
      */
     public static void main(String[] a) throws Exception {
         List<String> only = Arrays.asList(a);
         boolean text = a.length == 0 || only.contains("text");
         boolean chapters = a.length == 0 || only.contains("text") || only.contains("chapters");
         boolean units = a.length == 0 || only.contains("units");
+        boolean contrast = a.length == 0 || only.contains("contrast");
         Resources r = new Resources();
         run("warm-up 50", big(50, false), r);
         run("warm-up 50", big(50, false), r);
@@ -152,6 +189,13 @@ public class ScaleProbe {
                 run("table " + n, table(n), r);
                 run("grid " + n, grid(n), r);
                 run("stack " + n, stack(n), r);
+            }
+        }
+        if (contrast) {
+            runContrast("warm-up contrast 100", contrast(100), r);
+            runContrast("warm-up contrast 100", contrast(100), r);
+            for (int n : new int[]{500, 2000}) {
+                runContrast("contrast " + n, contrast(n), r);
             }
         }
         System.out.println("max heap MB: " + Runtime.getRuntime().maxMemory() / 1048576);

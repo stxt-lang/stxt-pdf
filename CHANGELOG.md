@@ -33,6 +33,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   cells of the table. The rows are now counted once per table, and the `Ref` of each table of contents entry in
   PDF/UA-2 finds its heading in a map built once instead of going through every element. The table of 2000 rows and
   8000 cells of `tools/qa/ScaleProbe.java` paints in 0.24 s instead of 8.7 s. The output does not change.
+- **The contrast check of a dense page is about seven times faster.** The check that `layOut` makes on every page
+  looks, for each run, at every background, image and line painted before it, and kept each of them as a path, whose
+  test for a point counts crossings. An unrotated one is now kept as a rectangle; only what is rotated is still a path.
+  On the dense pages of the new `contrast` probe of `tools/qa/ScaleProbe.java` (a table in size 6 with a background in
+  every cell, `Merge borders` and underlined and struck words: about 1550 layers and 1860 runs per page), 2000 rows and
+  33 pages are checked in 0.34 s instead of 2.4 s. The output does not change.
 - **A long `Stack`, `Grid` or `Table` is arranged once, not once per page.** What a container computes before breaking
   it between its rows, lines or items (placing the items, sizing the tracks, laying out each item at its size, the bands
   of the rows and, in a table, the repeated header and footer and the lines of `Merge borders`) does not depend on the

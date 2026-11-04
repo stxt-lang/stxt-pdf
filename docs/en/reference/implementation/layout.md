@@ -405,7 +405,8 @@ again on each page that changes, and the rest comes from the cache. The flow is 
 `Overflow` walks the paginated result and points to the innermost culprit ([Overflow](../common/overflow.md)),
 using the `PageSetup` of each page. What a box with `Overflow: clip` contains is not checked against it (neither its
 lines nor its children) and, with the `clipped` flag that goes down through its descendants, not against the page either;
-each box inside is still checked against its own parent. `Engine.layout` lays out a box with `Overflow: clip` like a
+each box inside is still checked against its own parent. What is rotated is checked as it is painted, by the rectangle
+that encloses it, with the rotations of its ancestors in a `Turns` ([Painting](painting.md#rotation)). `Engine.layout` lays out a box with `Overflow: clip` like a
 rotated one: without fragmentation, and `BEFORE` if it does not fit in what is left of the page. Where a text could
 shrink, `textOverflow` and `tooTall` say so, and where it already shrinks and does not fit at `Min size`, too. There are two tolerances, with names: `Tolerance.EPSILON` (10⁻⁹), that of the arithmetic of the
 layout, and `Tolerance.MODEL` (0.01 pt), how far a box can stick out without overflowing and the precision of the dumps. Comparisons

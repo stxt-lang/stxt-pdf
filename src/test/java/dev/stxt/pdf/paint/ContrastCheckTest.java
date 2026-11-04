@@ -9,6 +9,8 @@ import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,6 +93,27 @@ class ContrastCheckTest {
         InvalidModelException e = error("\tBlock:", "\t\tBox:", "\t\t\tBackground: linear(90, #FFFFFF, #000000)",
                 "\t\tText: hola");
         assertTrue(e.getMessage().contains("(#000000 on #000000)"), e.getMessage());
+    }
+
+    /**
+     * A block of 200 × 40 rotated 90 degrees in flow takes up the rectangle that encloses it, at the corner of the page
+     * area (20, 20): it is painted over x 20 to 60 and y 20 to 220 of the page, and unrotated it would be over x −60 to
+     * 140 and y 100 to 140. What lies under a text is what is painted there.
+     */
+    @Test
+    void aRotatedBackgroundIsWhereItIsPainted() {
+        String[] block = {"\tBlock:", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 40",
+                "\t\t\tBackground: #000000"};
+        InvalidModelException e = error(concat(block, "\tOverlay:", "\t\tOffset: 20 auto auto 10", "\t\tText: hola"));
+        assertTrue(e.getMessage().contains("(#000000 on #000000)"), e.getMessage());
+        assertDoesNotThrow(() -> layOut(concat(block, "\tOverlay:", "\t\tOffset: 100 auto auto 80",
+                "\t\tText: hola")));
+    }
+
+    private static String[] concat(String[] first, String... rest) {
+        String[] all = Arrays.copyOf(first, first.length + rest.length);
+        System.arraycopy(rest, 0, all, first.length, rest.length);
+        return all;
     }
 
     @Test

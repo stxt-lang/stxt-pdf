@@ -2,7 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Turns;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
@@ -11,8 +11,6 @@ import org.apache.pdfbox.util.Matrix;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,12 +32,10 @@ final class PdfContent {
     /** Opacity graphics states of this page, by opacity (in thousandths). */
     private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
     /**
-     * The current rotations ({@link #rotate}), composed, in page coordinates (with y
-     * pointing down); needed by the link areas and the {@code BBox} of the figures, which
-     * do not follow the content matrix.
+     * The current rotations ({@link #rotate}), in page coordinates (with y pointing down); needed by the link areas and
+     * the {@code BBox} of the figures, which do not follow the content matrix.
      */
-    private AffineTransform turn = new AffineTransform();
-    private final Deque<AffineTransform> turns = new ArrayDeque<>();
+    private final Turns turns = new Turns();
 
     PdfContent(PDPageContentStream out, double pageHeight) {
         this.out = out;
@@ -56,7 +52,7 @@ final class PdfContent {
 
     /** The current rotations, composed; the identity if there are none. */
     AffineTransform turn() {
-        return turn;
+        return turns.current();
     }
 
     /**
@@ -135,22 +131,20 @@ final class PdfContent {
      * angle.
      */
     void rotate(double degrees, double x, double y) throws IOException {
-        turns.push(turn);
-        turn = new AffineTransform(turn);
-        turn.rotate(Math.toRadians(degrees), x, y);
+        turns.push(degrees, x, y);
         out.saveGraphicsState();
         out.transform(new Matrix(AffineTransform.getRotateInstance(-Math.toRadians(degrees), x, pageHeight - y)));
     }
 
     /** Ends the rotation started with {@link #rotate}. */
     void unrotate() throws IOException {
-        turn = turns.pop();
+        turns.pop();
         out.restoreGraphicsState();
     }
 
     /** The rectangle of the page that {@code r} takes with the current rotations, in PDF coordinates. */
     PDRectangle turnedRect(Rect r) {
-        return pdfRect(turn.isIdentity() ? r : Rotation.envelope(turn, r));
+        return pdfRect(turns.envelope(r));
     }
 
     /** A rectangle in PDF coordinates, with the origin at the bottom. */

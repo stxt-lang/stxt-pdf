@@ -11,10 +11,12 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.Tolerance;
+import dev.stxt.pdf.model.Turns;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
@@ -26,9 +28,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,8 +59,7 @@ public final class ContrastCheck implements Canvas {
     }
 
     private final List<Layer> layers = new ArrayList<>();
-    private final Deque<AffineTransform> turns = new ArrayDeque<>();
-    private AffineTransform turn = new AffineTransform();
+    private final Turns turns = new Turns();
     /** The box whose text is being painted ({@link Tagging#beginText}); {@code null} outside a text. */
     private Box current;
 
@@ -114,9 +113,14 @@ public final class ContrastCheck implements Canvas {
         add(area, null);
     }
 
+    /**
+     * Records {@code r} with the current rotations. Unrotated, it stays a rectangle: rotated, it is a path, whose
+     * {@code contains} counts crossings, and {@link #backdrops} asks every layer for every run.
+     */
     private void add(Rect r, List<float[]> colors) {
-        Shape area = turn.createTransformedShape(new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height()));
-        layers.add(new Layer(area, colors));
+        Rectangle2D rect = new Rectangle2D.Double(r.x(), r.y(), r.width(), r.height());
+        AffineTransform turn = turns.current();
+        layers.add(new Layer(turn.isIdentity() ? rect : turn.createTransformedShape(rect), colors));
     }
 
     @Override
@@ -129,14 +133,12 @@ public final class ContrastCheck implements Canvas {
 
     @Override
     public void beginRotation(double degrees, double x, double y) {
-        turns.push(turn);
-        turn = new AffineTransform(turn);
-        turn.rotate(Math.toRadians(degrees), x, y);
+        turns.push(degrees, x, y);
     }
 
     @Override
     public void endRotation() {
-        turn = turns.pop();
+        turns.pop();
     }
 
     /** A clip only removes what lies outside it: what lies under the text, which is inside, does not change. */
@@ -165,7 +167,7 @@ public final class ContrastCheck implements Canvas {
             return;
         }
         // The middle of the first letter: above the baseline, where the underline does not reach.
-        Point2D at = turn.transform(new Point2D.Double(x + fontSize / 4, baselineY - fontSize / 3), null);
+        Point2D at = Rotation.point(turns.current(), x + fontSize / 4, baselineY - fontSize / 3);
         List<float[]> backdrops = backdrops(at);
         if (backdrops == null) {
             return;

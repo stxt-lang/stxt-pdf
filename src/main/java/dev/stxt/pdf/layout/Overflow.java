@@ -8,6 +8,7 @@ import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Tolerance;
+import dev.stxt.pdf.model.Turns;
 import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
@@ -17,7 +18,6 @@ import dev.stxt.pdf.tree.SourceLine;
 import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.Style;
 
-import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -59,9 +59,6 @@ public final class Overflow {
     /** How far a box can stick out without it being an error ({@link Tolerance#MODEL}). */
     private static final double TOLERANCE = Tolerance.MODEL;
 
-    /** No rotations. Nobody modifies it: a rotation is composed on a copy. */
-    private static final AffineTransform NONE = new AffineTransform();
-
     private Overflow() {
     }
 
@@ -77,6 +74,8 @@ public final class Overflow {
      * @throws dev.stxt.pdf.model.CancelledException if the conversion is cancelled
      */
     public static void check(List<Page> pages, Cancellation cancellation) {
+        // Each box pushes its rotation and pops it once its descendants are checked: between boxes, there are none.
+        Turns turns = new Turns();
         for (Page p : pages) {
             cancellation.check();
             // Each page has the medium of its section (reference/components/document.md).
@@ -85,38 +84,39 @@ public final class Overflow {
             Insets m = pageSetup.margin();
             // The physical page, in page area coordinates.
             Rect page = new Rect(-m.left(), -m.top(), pageSetup.width(), pageSetup.height());
-            content(p.content(), 0, 0, area.width(), area.height(), true, page, NONE, false);
+            content(p.content(), 0, 0, area.width(), area.height(), true, page, turns, false);
             if (p.footnotes() != null) {
                 // The footnote area is out of the flow, at the bottom of the page area: it and its notes fit on the page.
-                fragment(p.footnotes(), 0, 0, page, NONE, false);
+                fragment(p.footnotes(), 0, 0, page, turns, false);
             }
             for (Fragment f : p.pageOverlays()) {
-                fragment(f, 0, 0, page, NONE, false);
+                fragment(f, 0, 0, page, turns, false);
             }
         }
     }
 
     /**
      * A fragment whose parent's content box starts at ({@code ox}, {@code oy});
-     * {@code turn} is the rotations of its ancestors (reference/common/layers-and-rotation.md), painted with it, and
-     * {@code clipped}, whether an ancestor has {@code Overflow: clip}: then it is not checked against the page, because
-     * what sticks out of that ancestor is not painted.
+     * {@code turns} is the rotations of its ancestors (reference/common/layers-and-rotation.md), painted with them, to
+     * which it adds its own while its descendants are checked, and {@code clipped}, whether an ancestor has
+     * {@code Overflow: clip}: then it is not checked against the page, because what sticks out of that ancestor is not
+     * painted.
      */
-    private static void fragment(Fragment f, double ox, double oy, Rect page, AffineTransform turn, boolean clipped) {
+    private static void fragment(Fragment f, double ox, double oy, Rect page, Turns turns, boolean clipped) {
         double x = ox + f.x();
         double y = oy + f.y();
         Style s = f.box().style();
         Rect borderBox = f.borderBox(x, y);
-        if (s.rotation() != null) {
-            turn = new AffineTransform(turn);
-            turn.concatenate(s.rotation().transform(borderBox));
+        Rotation rotation = s.rotation();
+        if (rotation != null) {
+            turns.push(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
         }
         if (clipped) {
             // Inside a clipped box: what goes off the page is clipped too.
-        } else if (s.rotation() != null || (s.isOutOfFlow() && !turn.isIdentity())) {
+        } else if (rotation != null || (s.isOutOfFlow() && !turns.current().isIdentity())) {
             // What is rotated is checked as it is painted: the rectangle that encloses it, on the page.
-            if (!inside(Rotation.envelope(turn, borderBox), page)) {
-                boolean own = s.rotation() != null;
+            if (!inside(turns.envelope(borderBox), page)) {
+                boolean own = rotation != null;
                 throw new InvalidModelException(own ? s.line(ROTATE) : SourceLine.of(f.box().line()),
                         ErrorCode.BOX_OVERFLOW,
                         "Box " + f.box().describe() + (own ? ", rotated," : ", inside a rotated box,")
@@ -127,8 +127,7 @@ public final class Overflow {
             throw new InvalidModelException(s.isDeclared(OFFSET) ? s.line(OFFSET) : SourceLine.of(f.box().line()),
                     ErrorCode.BOX_OVERFLOW, "Box " + f.box().describe() + " goes off the page: its Offset and its "
                     + "size have to be checked");
-        } else if (!s.isOutOfFlow() && !inside(turn.isIdentity() ? borderBox : Rotation.envelope(turn, borderBox),
-                page)) {
+        } else if (!s.isOutOfFlow() && !inside(turns.envelope(borderBox), page)) {
             // In flow it fits in its parent, but the Offset of a Frame or a negative Margin can take it off the page.
             String property = s.isDeclared(OFFSET) ? OFFSET : s.isDeclared(MARGIN) ? MARGIN : null;
             throw new InvalidModelException(property != null ? s.line(property) : SourceLine.of(f.box().line()),
@@ -138,7 +137,10 @@ public final class Overflow {
         }
         double cx = borderBox.x() + f.border().left() + f.padding().left();
         double cy = borderBox.y() + f.border().top() + f.padding().top();
-        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turn, clipped);
+        content(f, cx, cy, f.contentWidth(), f.contentHeight(), false, page, turns, clipped);
+        if (rotation != null) {
+            turns.pop();
+        }
     }
 
     /** Whether {@code r} is inside {@code page}, with the tolerance. */
@@ -153,7 +155,7 @@ public final class Overflow {
      * has {@code Overflow: clip}, nothing it contains is checked against it: it is painted clipped.
      */
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
-                                Rect page, AffineTransform turn, boolean clipped) {
+                                Rect page, Turns turns, boolean clipped) {
         boolean window = f.box().style().box().clips();
         for (TextLine l : f.lines()) {
             if (window) {
@@ -169,7 +171,7 @@ public final class Overflow {
         for (Fragment c : f.children()) {
             if (c.box().isMarker()) {
                 // It hangs outside the item: it is checked in the indent of its list (marker).
-                fragment(c, cx, cy, page, turn, clipped || window);
+                fragment(c, cx, cy, page, turns, clipped || window);
                 continue;
             }
             if (f.box().role() == Role.LIST && !window) {
@@ -192,7 +194,7 @@ public final class Overflow {
                     throw tooTall(f, y + c.height(), height, c);
                 }
             }
-            fragment(c, cx, cy, page, turn, clipped || window);
+            fragment(c, cx, cy, page, turns, clipped || window);
         }
     }
 

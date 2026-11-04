@@ -140,7 +140,10 @@ color. The opacity of a plain color is a graphics state `ca` inside a `q`/`Q` of
 ### Rotation
 
 `PdfCanvas` writes a `cm` inside `q`/`Q` and keeps the composed rotation for the `QuadPoints` of the links and the `BBox` of
-the figures. The coordinates of `Rotation` are those of the page, with y pointing down: a positive angle rotates
+the figures. It keeps it in a `Turns` (`model`), the stack of the rotations a box is painted inside: each rotated box
+pushes its own when it starts and pops it when it ends, and `envelope` gives the rectangle that encloses a rotated one.
+With the same stack `PdfDestinations` finds the corner of a rotated box, `ContrastCheck` where each background lies and
+`Overflow` whether what is rotated fits on the page. The coordinates of `Rotation` are those of the page, with y pointing down: a positive angle rotates
 clockwise (in the PDF, with the origin at the bottom, the angle changes sign).
 
 > **Decision:** the annotation of a rotated link has as `Rect` the rectangle that encloses the rotated area and as
@@ -242,7 +245,8 @@ number of the note (its `Lbl`), `goTo` gives the action with the structure desti
 ## Contrast
 
 `ContrastCheck` is a `Canvas` that does not draw: it records, in painting order, the area and the colors of each background
-(`fill` and `background`) and the area of each image, in page coordinates (with the rotation applied). In each `text` it looks at
+(`fill` and `background`) and the area of each image, in page coordinates (with the rotation applied: without rotation the
+area is a rectangle, and with one, a path, which costs much more to ask whether it contains a point). In each `text` it looks at
 the point of the first letter (a quarter of the font size to the right and a third above the baseline, where the
 underline does not reach) and goes through what has been recorded that contains it: an opaque color replaces what is underneath, a translucent one is mixed with each
 possible color underneath and an image leaves it unknown until an opaque color covers it. It knows the box of the text through its

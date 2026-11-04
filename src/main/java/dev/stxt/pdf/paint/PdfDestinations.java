@@ -4,11 +4,11 @@ import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.Turns;
 import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 
-import java.awt.geom.AffineTransform;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +48,16 @@ final class PdfDestinations {
     static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages, double[] lefts,
                                                double[] tops) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
+        Turns turns = new Turns();
         for (int i = 0; i < pages.size(); i++) {
             Page page = pages.get(i);
             Rect area = page.pageSetup().pageArea();
-            find(page.content(), area.x(), area.y(), new AffineTransform(), pdfPages.get(i), lefts[i], tops[i],
-                    targets);
+            find(page.content(), area.x(), area.y(), turns, pdfPages.get(i), lefts[i], tops[i], targets);
             // The notes are not in the flow: they are in the footnote area, relative to the page area like the flow.
             Fragment footnotes = page.footnotes();
             if (footnotes != null) {
-                find(footnotes, area.x() + footnotes.x(), area.y() + footnotes.y(), new AffineTransform(),
-                        pdfPages.get(i), lefts[i], tops[i], targets);
+                find(footnotes, area.x() + footnotes.x(), area.y() + footnotes.y(), turns, pdfPages.get(i), lefts[i],
+                        tops[i], targets);
             }
         }
         return targets;
@@ -65,21 +65,21 @@ final class PdfDestinations {
 
     /**
      * {@code x}, {@code y}: the corner of the border box of the fragment on the page, unrotated;
-     * {@code turn}, the rotations of its ancestors (reference/common/box.md). The corner of a rotated box, or of one
-     * inside a rotated one, is that of the rectangle that encloses what is painted. {@code left} and {@code top},
-     * where the top left corner of the page is on the PDF page.
+     * {@code turns}, the rotations of its ancestors (reference/common/box.md), to which it adds its own while it goes
+     * through its descendants. The corner of a rotated box, or of one inside a rotated one, is that of the rectangle
+     * that encloses what is painted. {@code left} and {@code top}, where the top left corner of the page is on the PDF
+     * page.
      */
-    private static void find(Fragment f, double x, double y, AffineTransform turn, PDPage page, double left,
+    private static void find(Fragment f, double x, double y, Turns turns, PDPage page, double left,
                              double top, Map<Box, PDPageXYZDestination> targets) {
         Box box = f.box();
         Rect borderBox = f.borderBox(x, y);
         Rotation rotation = box.style().rotation();
         if (rotation != null) {
-            turn = new AffineTransform(turn);
-            turn.concatenate(rotation.transform(borderBox));
+            turns.push(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
         }
         if (f.first() && (box.headingLevel() > 0 || box.key() != null) && !targets.containsKey(box)) {
-            Rect painted = turn.isIdentity() ? borderBox : Rotation.envelope(turn, borderBox);
+            Rect painted = turns.envelope(borderBox);
             PDPageXYZDestination d = new PDPageXYZDestination();
             d.setPage(page);
             d.setLeft((int) Math.floor(left + painted.x()));
@@ -88,7 +88,10 @@ final class PdfDestinations {
         }
         Rect content = borderBox.shrink(f.border()).shrink(f.padding());
         for (Fragment c : f.children()) {
-            find(c, content.x() + c.x(), content.y() + c.y(), turn, page, left, top, targets);
+            find(c, content.x() + c.x(), content.y() + c.y(), turns, page, left, top, targets);
+        }
+        if (rotation != null) {
+            turns.pop();
         }
     }
 }

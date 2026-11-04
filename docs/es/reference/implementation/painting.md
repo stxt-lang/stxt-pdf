@@ -140,7 +140,10 @@ color. La opacidad de un color liso es un estado gráfico `ca` dentro de un `q`/
 ### Giro
 
 `PdfCanvas` escribe un `cm` dentro de `q`/`Q` y guarda el giro compuesto para los `QuadPoints` de los enlaces y el `BBox` de
-las figuras. Las coordenadas de `Rotation` son las de la página, con la y hacia abajo: un ángulo positivo gira en el sentido
+las figuras. Lo guarda en un `Turns` (`model`), la pila de los giros dentro de los que se pinta una caja: cada caja girada
+pone el suyo al empezar y lo quita al terminar, y `envelope` da el rectángulo que envuelve uno girado. Con la misma pila
+buscan `PdfDestinations` la esquina de una caja girada, `ContrastCheck` dónde queda cada fondo y `Overflow` si lo girado
+cabe en la página. Las coordenadas de `Rotation` son las de la página, con la y hacia abajo: un ángulo positivo gira en el sentido
 de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de signo).
 
 > **Decisión:** la anotación de un enlace girado tiene como `Rect` el rectángulo que envuelve la zona girada y como
@@ -240,7 +243,8 @@ estructura sin etiquetar con la que pinta `PdfPainter`. Lo que escribe cada una 
 ## El contraste
 
 `ContrastCheck` es un `Canvas` que no dibuja: apunta, en el orden de pintado, la zona y los colores de cada fondo
-(`fill` y `background`) y la zona de cada imagen, en coordenadas de la página (con el giro aplicado). En cada `text` mira
+(`fill` y `background`) y la zona de cada imagen, en coordenadas de la página (con el giro aplicado: sin giro la zona es un
+rectángulo, y con giro, un camino, que cuesta mucho más preguntar si contiene un punto). En cada `text` mira
 el punto de la primera letra (un cuarto del cuerpo a la derecha y un tercio por encima de la línea base, donde no llega el
 subrayado) y recorre lo apuntado que lo contiene: un color opaco sustituye lo de debajo, uno translúcido se mezcla con cada
 color posible de debajo y una imagen lo deja sin conocer hasta que un color opaco la tapa. La caja del texto la sabe por su

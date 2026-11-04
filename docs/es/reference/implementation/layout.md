@@ -399,7 +399,8 @@ cambia, y el resto sale de la caché. El flujo ya está paginado y no se toca: u
 `Overflow` recorre el resultado paginado y señala al culpable más interior ([Desbordamiento](../common/overflow.md)),
 usando el `PageSetup` de cada página. Lo que contiene una caja con `Overflow: clip` no se comprueba contra ella (ni sus
 líneas ni sus hijos) y, con el indicador `clipped` que baja por sus descendientes, tampoco contra la página; cada caja de
-dentro se sigue comprobando contra su propio padre. `Engine.layout` maqueta una caja con `Overflow: clip` como una girada:
+dentro se sigue comprobando contra su propio padre. Lo girado se comprueba como se pinta, por el rectángulo que lo
+envuelve, con los giros de sus antepasados en un `Turns` ([El pintado](painting.md#giro)). `Engine.layout` maqueta una caja con `Overflow: clip` como una girada:
 sin fragmentación, y `BEFORE` si no cabe en lo que queda de la página. Donde un texto podría encoger, `textOverflow` y
 `tooTall` lo dicen, y donde ya encoge y no cabe a `Min size`, también. Las tolerancias son dos, con nombre: `Tolerance.EPSILON` (10⁻⁹), la de la aritmética del
 layout, y `Tolerance.MODEL` (0,01 pt), lo que una caja puede salirse sin desbordar y la precisión de los volcados. Se
