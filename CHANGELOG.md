@@ -5,7 +5,12 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.10.0] - 2026-11-04
+
+Hyphenation in five more languages, a resources folder whose files can change while the `Converter` lives, an error for
+barcodes too small to be read (`BARCODE_TOO_SMALL`), long documents laid out and tagged several times faster, and the
+list of what the Java API will promise from 1.0, with some engine API that nothing used removed. The names of the
+`dev.stxt.pdf` namespace and the Java API may still change before 1.0.
 
 ### Added
 
@@ -21,18 +26,34 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
-- **Only the first page of each example is versioned as an image.** `test/examples/NN-name/<language>/` keeps
-  `page-1.png`, the one the README galleries show, and no longer the other pages: the byte-for-byte comparison of
-  `output.pdf` already checks them, and they added about 8 MB to the history with every accepted change. `ExamplesTest`
-  still writes the images of every page to `target/reference/examples/`, and when the PDF is not the versioned one it
-  also writes the versioned PDF and its pages next to the new ones, in `before/`, to compare both.
-- **A chapter longer than the page is laid out once on the page where it starts.** Before laying out a child of a
-  block, the engine now predicts from the tree the margins that will come out of it at the top (those of its first
-  descendants, while nothing separates them from its top edge) and places it where they put it, instead of laying it
-  out at its own margin and again lower down once the real margins are known. The layout still decides: when the margins
-  it returns differ from the predicted ones, the child is moved and, if that can change the result, laid out again. In
-  a document of chapters longer than a page, each headed by a `Heading 1` with a top margin, the layouts per page go
-  from 33 to 26, the same as with the margin on the block itself. The output does not change.
+- **The files of the resources folder can change while the `Converter` lives.** Each conversion sees the fonts and the
+  images as they are when it starts: a font added, removed or replaced in `fonts/`, and an image replaced in `images/`,
+  are seen by the next conversion without creating another `Converter` or `Resources`. Until 0.9.0 a `Resources` read
+  each file once and did not look at the folder again. What has not changed is not read again: each conversion walks
+  `fonts/` once and looks at each image it uses once, by its size and modification time. A document already laid out
+  is painted with the fonts and images it was laid out with ("Files that change" in `api.md`). A `Resources` used
+  without `Converter` (with `Engine`, `PdfDocumentWriter` or `PdfPainter`) keeps the old behavior unless it is given
+  `resources.snapshot()`.
+- **A barcode too small to be read is an error.** A `Barcode` whose content box, once laid out, leaves its modules
+  narrower than the minimum of its format is `BARCODE_TOO_SMALL` (new code), with the line of the `Barcode`, the module
+  it is left with and the content box it needs. The minimum is 0.25 mm in a QR code and a Code 128, about three dots of a
+  300 dpi printer, and 0.264 mm in an EAN-13, 80 % of its nominal module. A QR code counts its shorter side; a barcode,
+  only its width. Until 0.9.0 the code was drawn as small as its box without a warning. Whoever converts can remove the
+  check with `Converter.builder().exclude(Check.BARCODE_SIZE)`. The golden case `32-barcodes` now draws its last QR code
+  in a box of 60 × 24 instead of 60 × 20, whose modules (0.21 mm) are below the minimum.
+- **The message of a `Break` inside a rotated box that also clips or is a side box names the rotation.** The
+  `BREAK_IN_UNBREAKABLE` error now says "inside a rotated box" (or "a rotated Frame"), as `BREAK_IN_ROTATED` already did
+  for a `Keep together` on that same box, instead of "a box with Overflow: clip" or "a box with Side". The code and the
+  line do not change.
+- **A block child moved down by the margins that come out of it is laid out once.** When the top margin of the first
+  descendant of a child (a chapter `Block` that starts with a `Heading 1` with a `Margin`) is larger than the margins
+  around it, the child ends up lower than its own margin puts it, and until 0.9.0 it was laid out there and again at
+  its real position. The engine now predicts from the tree the margins that will come out of the child at the top
+  (those of its first descendants, while nothing separates them from its top edge) and lays it out where they put it.
+  The layout still decides: when the margins it returns differ from the predicted ones, the child is moved and, if that
+  can change the result, laid out again. The layouts per page go from 52 to 32 in a document of short chapters (a
+  quarter of a page each) and from 33 to 26 in one of chapters longer than a page, the same as with the margin on the
+  block itself. The output does not change.
 - **Tagging a long table no longer costs the square of its cells.** Building the structure tree of the tagged PDF
   asked, for every cell and for every marked content of a cell, how many rows its table has by going through all the
   cells of the table. The rows are now counted once per table, and the `Ref` of each table of contents entry in
@@ -63,32 +84,6 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `Grid` or `Table` went through all the items to find the ones that end before it and start after it, and compared
   every pair of them: quadratic in the rows, and once per page. The same table of 2000 rows laid out in 1.8 s instead of
   7.7 s, and the grid of 2000 rows in 0.7 s instead of 3.0 s, before the change above. The output does not change.
-- **The files of the resources folder can change while the `Converter` lives.** Each conversion sees the fonts and the
-  images as they are when it starts: a font added, removed or replaced in `fonts/`, and an image replaced in `images/`,
-  are seen by the next conversion without creating another `Converter` or `Resources`. Until 0.9.0 a `Resources` read
-  each file once and did not look at the folder again. What has not changed is not read again: each conversion walks
-  `fonts/` once and looks at each image it uses once, by its size and modification time. A document already laid out
-  is painted with the fonts and images it was laid out with ("Files that change" in `api.md`). A `Resources` used
-  without `Converter` (with `Engine`, `PdfDocumentWriter` or `PdfPainter`) keeps the old behavior unless it is given
-  `resources.snapshot()`.
-- **A barcode too small to be read is an error.** A `Barcode` whose content box, once laid out, leaves its modules
-  narrower than the minimum of its format is `BARCODE_TOO_SMALL` (new code), with the line of the `Barcode`, the module
-  it is left with and the content box it needs. The minimum is 0.25 mm in a QR code and a Code 128, about three dots of a
-  300 dpi printer, and 0.264 mm in an EAN-13, 80 % of its nominal module. A QR code counts its shorter side; a barcode,
-  only its width. Until 0.9.0 the code was drawn as small as its box without a warning. Whoever converts can remove the
-  check with `Converter.builder().exclude(Check.BARCODE_SIZE)`. The golden case `32-barcodes` now draws its last QR code
-  in a box of 60 × 24 instead of 60 × 20, whose modules (0.21 mm) are below the minimum.
-- **A block child moved down by the margins that come out of it is laid out once.** When the top margin of the first
-  descendant of a child (a chapter `Block` that starts with a `Heading 1` with a `Margin`) is larger than the margins
-  around it, the child ends up lower than where it was first laid out. Until 0.9.0 it was then laid out again at its
-  position, a second layout of the child on that page; now the first layout is kept when what it placed fits from there
-  and no side box is beside it. In a document of short chapters (a quarter of a page each) the layouts per page go from
-  52 to 32, the same as with the margin on the block; a chapter longer than the page is still laid out twice on the page
-  where it starts. The output does not change.
-- **The message of a `Break` inside a rotated box that also clips or is a side box names the rotation.** The
-  `BREAK_IN_UNBREAKABLE` error now says "inside a rotated box" (or "a rotated Frame"), as `BREAK_IN_ROTATED` already did
-  for a `Keep together` on that same box, instead of "a box with Overflow: clip" or "a box with Side". The code and the
-  line do not change.
 
 ### Fixed
 
@@ -160,6 +155,14 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   no `Progress`, and the `TextFormat` constructors of five to eleven arguments (the one with the four marks and the
   canonical one stay; the rest is `withLink`, `withSmallCaps`, `asCode`...). `FontLibrary.all()`, `Xmp.serialize` and
   the class `PdfInspector` are now package-private.
+
+### Examples
+
+- **Only the first page of each example is versioned as an image.** `test/examples/NN-name/<language>/` keeps
+  `page-1.png`, the one the README galleries show, and no longer the other pages: the byte-for-byte comparison of
+  `output.pdf` already checks them, and they added about 8 MB to the history with every accepted change. `ExamplesTest`
+  still writes the images of every page to `target/reference/examples/`, and when the PDF is not the versioned one it
+  also writes the versioned PDF and its pages next to the new ones, in `before/`, to compare both.
 
 ## [0.9.0] - 2026-11-02
 
