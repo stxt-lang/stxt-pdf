@@ -8,6 +8,8 @@
 // arrange before breaking (placement, track sizing, bands, merged borders) is memoized per container, and the misses per
 // page tell whether it is. The "contrast" ones are dense pages (a table in small type with cell backgrounds, Merge borders
 // and underlined and struck words): thousands of runs and layers per page, and the time of the contrast check apart.
+// The "heads" ones are books with a {heading 1} in the Page overlay and a chapter every 40 paragraphs (about three
+// pages): at each page where the running head changes the engine forgets what it stored of that text and its ancestors.
 // For the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
 // jdk.ExecutionSample".
 import dev.stxt.InlineNode;
@@ -53,6 +55,22 @@ public class ScaleProbe {
                 sb.append("\t\tBlock:\n\t\t\tHeading 1:\n\t\t\t\tText: Capitulo " + i + "\n\t\t\t\tBox:\n\t\t\t\t\tMargin: 24 0 12 0\n");
             }
             sb.append("\t\t\tParagraph: ").append(LOREM).append(' ').append(i).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * A book of paras paragraphs with a Heading 1 every perChapter of them and the running head {heading 1} in the Page
+     * overlay: each page where the chapter changes lays out the Page overlay again, after forgetting what the engine
+     * stored of its text.
+     */
+    static String heads(int paras, int perChapter) {
+        StringBuilder sb = new StringBuilder(head().replace("Text: Pagina {page}", "Text: {heading 1}, pagina {page}"));
+        for (int i = 0; i < paras; i++) {
+            if (i % perChapter == 0) {
+                sb.append("\t\tHeading 1:\n\t\t\tText: Capitulo ").append(i / perChapter + 1).append('\n');
+            }
+            sb.append("\t\tParagraph: ").append(LOREM).append(' ').append(i).append("\n");
         }
         return sb.toString();
     }
@@ -166,6 +184,7 @@ public class ScaleProbe {
         boolean chapters = a.length == 0 || only.contains("text") || only.contains("chapters");
         boolean units = a.length == 0 || only.contains("units");
         boolean contrast = a.length == 0 || only.contains("contrast");
+        boolean heads = a.length == 0 || only.contains("heads");
         Resources r = new Resources();
         run("warm-up 50", big(50, false), r);
         run("warm-up 50", big(50, false), r);
@@ -189,6 +208,13 @@ public class ScaleProbe {
                 run("table " + n, table(n), r);
                 run("grid " + n, grid(n), r);
                 run("stack " + n, stack(n), r);
+            }
+        }
+        if (heads) {
+            for (int n : new int[]{4200, 12800}) {
+                run("heads " + n, heads(n, 40), r);
+                // The same book without the running head: what the heads cost on top.
+                run("heads control " + n, heads(n, 40).replace("{heading 1}, ", ""), r);
             }
         }
         if (contrast) {

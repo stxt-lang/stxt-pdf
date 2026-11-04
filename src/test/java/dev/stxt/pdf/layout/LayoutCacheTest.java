@@ -5,11 +5,16 @@ import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.Box;
+import dev.stxt.pdf.tree.BoxTreeBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
+import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -71,5 +76,32 @@ class LayoutCacheTest {
         // at least 16 times more with every 4 levels.
         assertTrue(eight < 4 * four, () -> "4 levels: " + four + " measurements; 8: " + eight);
         assertTrue(twelve < 3 * eight, () -> "8 levels: " + eight + " measurements; 12: " + twelve);
+    }
+
+    /**
+     * What the cache stores is indexed by box ({@link LayoutCache#forget}): forgetting a box removes its layouts in
+     * every space and its arrangements, and what belongs to another box is still answered from the cache.
+     */
+    @Test
+    void forgettingABoxRemovesAllItStoresAndNothingElse() {
+        Box root = new BoxTreeBuilder().build(READER.read(Docs.sectioned(nested(2)))).root();
+        Box other = root.children().get(0);
+        LayoutCache cache = new LayoutCache();
+        ConstraintSpace narrow = ConstraintSpace.free(100, 100, OptionalDouble.empty(), true);
+        ConstraintSpace wide = ConstraintSpace.free(200, 200, OptionalDouble.empty(), true);
+        for (Box box : List.of(root, other)) {
+            LayoutResult result = LayoutResult.before(box);
+            cache.layout(box, narrow, null, () -> result);
+            cache.layout(box, wide, null, () -> result);
+            cache.arranged(box, narrow, String.class, () -> "arranged");
+        }
+        assertEquals(6, cache.entries());
+        cache.forget(Set.of(root));
+        assertEquals(3, cache.entries());
+        cache.layout(other, wide, null, () -> {
+            throw new AssertionError("the layout of the other box is still stored");
+        });
+        assertEquals("arranged", cache.arranged(other, narrow, String.class, () -> "again"));
+        assertEquals("again", cache.arranged(root, narrow, String.class, () -> "again"));
     }
 }

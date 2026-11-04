@@ -348,7 +348,10 @@ they only grow. With an additive measurer pagination always converges: the error
 **Paginating again does not empty the cache.** When the trial number grows (`Engine.reservePageNumbers`) or
 the page of a reference changes (`Engine.assume`), the `Paginator` passes the texts whose width changes and the engine forgets only what
 the `LayoutCache` and the line breaking store about them and their ancestors (`Engine.forget`), also the arrangement of a
-`Stack`, a `Grid` or a `Table` that contains them. `PaginationCacheTest` and `ArrangementCacheTest` watch it.
+`Stack`, a `Grid` or a `Table` that contains them. The cache and the line breaking store everything by box first (a map
+per box with the rest of the key), so forgetting costs what the forgotten boxes cost and not what is stored: a
+`{heading 1}` in a `Page overlay` forgets its text on every page where the chapter changes. `PaginationCacheTest`,
+`ArrangementCacheTest` and `LayoutCacheTest` watch it.
 
 > **Decision:** paginating again only forgets what depends on the texts that change, because the result of a box
 > depends only on its subtree and on the key (box, space and token): the algorithms read nothing from outside, except the style,

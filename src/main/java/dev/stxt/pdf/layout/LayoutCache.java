@@ -15,22 +15,24 @@ import java.util.function.Supplier;
  * breaking it between its units ({@link #arranged}), which does not depend on the page: without that, every fragment
  * of a long table placed and sized the whole table again.
  *
- * <p>{@code computeIfAbsent} is not used because the computation is recursive and writes again to the
- * same map, which {@link HashMap} does not allow.</p>
+ * <p>Everything is stored by box first, so that {@link #forget} removes what belongs to a box without going through
+ * the rest. {@code computeIfAbsent} is not used for a result because the computation is recursive and writes again to
+ * the same maps, which {@link HashMap} does not allow.</p>
  */
 public final class LayoutCache {
 
-    private record Key(Box box, ConstraintSpace space, BreakToken from) {
+    /** The rest of the key of a layout, inside the box. */
+    private record Key(ConstraintSpace space, BreakToken from) {
     }
 
-    /** The container, its space without fragmentation and the type of what its algorithm memoizes. */
-    private record ArrangedKey(Box box, ConstraintSpace space, Class<?> type) {
+    /** Inside the container: its space without fragmentation and the type of what its algorithm memoizes. */
+    private record ArrangedKey(ConstraintSpace space, Class<?> type) {
     }
 
     private final Map<Box, IntrinsicSizes> intrinsics = new IdentityHashMap<>();
     private final Map<Box, IntrinsicSizes> contents = new IdentityHashMap<>();
-    private final Map<Key, LayoutResult> layouts = new HashMap<>();
-    private final Map<ArrangedKey, Object> arrangements = new HashMap<>();
+    private final Map<Box, Map<Key, LayoutResult>> layouts = new IdentityHashMap<>();
+    private final Map<Box, Map<ArrangedKey, Object>> arrangements = new IdentityHashMap<>();
     private int hits;
     private int misses;
     private int arranged;
@@ -56,15 +58,17 @@ public final class LayoutCache {
 
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from,
                                Supplier<LayoutResult> computation) {
-        Key key = new Key(box, space, from);
-        LayoutResult r = layouts.get(key);
+        Key key = new Key(space, from);
+        Map<Key, LayoutResult> own = layouts.get(box);
+        LayoutResult r = own != null ? own.get(key) : null;
         if (r != null) {
             hits++;
             return r;
         }
         misses++;
         r = computation.get();
-        layouts.put(key, r);
+        // Looked up again: the computation may have stored other layouts of the same box (a rotated box in flow).
+        layouts.computeIfAbsent(box, b -> new HashMap<>()).put(key, r);
         return r;
     }
 
@@ -75,12 +79,14 @@ public final class LayoutCache {
      * top of the arrangement of its grid, both for the same box.
      */
     public <T> T arranged(Box box, ConstraintSpace space, Class<T> type, Supplier<T> computation) {
-        ArrangedKey key = new ArrangedKey(box, space, type);
-        Object r = arrangements.get(key);
+        ArrangedKey key = new ArrangedKey(space, type);
+        Map<ArrangedKey, Object> own = arrangements.get(box);
+        Object r = own != null ? own.get(key) : null;
         if (r == null) {
             arranged++;
             r = computation.get();
-            arrangements.put(key, r);
+            // Looked up again: a table arranges its grid, of the same box, inside its own preparation.
+            arrangements.computeIfAbsent(box, b -> new HashMap<>()).put(key, r);
         }
         return type.cast(r);
     }
@@ -95,12 +101,15 @@ public final class LayoutCache {
     /**
      * Forgets what was stored for those boxes: their intrinsic sizes, all their layouts and their arrangements. What
      * belongs to the others is still valid, because the result of a box only depends on its subtree and on the key.
+     * Its cost is that of the boxes, not that of what the cache stores.
      */
     public void forget(Set<Box> boxes) {
-        intrinsics.keySet().removeIf(boxes::contains);
-        contents.keySet().removeIf(boxes::contains);
-        layouts.keySet().removeIf(k -> boxes.contains(k.box()));
-        arrangements.keySet().removeIf(k -> boxes.contains(k.box()));
+        for (Box box : boxes) {
+            intrinsics.remove(box);
+            contents.remove(box);
+            layouts.remove(box);
+            arrangements.remove(box);
+        }
     }
 
     /** Layouts computed because they were not stored. */
@@ -115,7 +124,8 @@ public final class LayoutCache {
 
     /** How many results it stores right now. */
     int entries() {
-        return intrinsics.size() + contents.size() + layouts.size() + arrangements.size();
+        return intrinsics.size() + contents.size() + layouts.values().stream().mapToInt(Map::size).sum()
+                + arrangements.values().stream().mapToInt(Map::size).sum();
     }
 
     /**

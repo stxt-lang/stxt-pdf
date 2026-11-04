@@ -29,6 +29,7 @@ import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -80,12 +81,14 @@ public final class InlineLayout implements LayoutAlgorithm {
     public static final double SHRINK_STEP = 0.5;
 
     /**
+     * The key of a memorized line breaking inside its box ({@link #broken}).
+     *
      * @param limit  height of the content box the lines have to fit in, if the text shrinks and the height is definite
      *               or has a maximum; empty otherwise (it is not part of the key of a text that does not shrink)
      * @param beside what the side boxes take from the content box, by line ({@link #beside})
      * @param from   position of the text the line breaking starts at (reference/components/block.md); 0 is its start
      */
-    private record BrokenKey(Box box, double available, OptionalDouble limit, List<Exclusion> beside, int from) {
+    private record BrokenKey(double available, OptionalDouble limit, List<Exclusion> beside, int from) {
     }
 
     /**
@@ -112,8 +115,11 @@ public final class InlineLayout implements LayoutAlgorithm {
     /** Measures {@code {page}} and {@code {pages}} as the probe number ({@link PageNumbers}). */
     private TextMeasurer measurer;
     private final TextMeasurer real;
-    /** Line breaking of each text per available width (and height limit); depends on {@link #measurer}. */
-    private final Map<BrokenKey, Broken> broken = new HashMap<>();
+    /**
+     * Line breaking of each text per available width (and height limit); depends on {@link #measurer}. By box first,
+     * so that {@link #forget} does not go through the others.
+     */
+    private final Map<Box, Map<BrokenKey, Broken>> broken = new IdentityHashMap<>();
     /**
      * Page assumed for each box referred to with {@code {page of: id}} (reference/common/references.md); see {@link
      * #assume}.
@@ -203,7 +209,9 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     /** Forgets the memorized line breaking of those boxes. */
     public void forget(Set<Box> boxes) {
-        broken.keySet().removeIf(k -> boxes.contains(k.box()));
+        for (Box box : boxes) {
+            broken.remove(box);
+        }
     }
 
     /**
@@ -406,8 +414,8 @@ public final class InlineLayout implements LayoutAlgorithm {
 
     /** The memorized line breaking of the text with that key, made if it is the first time. */
     private Broken broken(Box box, double available, OptionalDouble limit, List<Exclusion> beside, int from) {
-        return broken.computeIfAbsent(new BrokenKey(box, available, limit, beside, from),
-                k -> shrink(box, available, limit, beside, from));
+        return broken.computeIfAbsent(box, b -> new HashMap<>()).computeIfAbsent(
+                new BrokenKey(available, limit, beside, from), k -> shrink(box, available, limit, beside, from));
     }
 
     /**

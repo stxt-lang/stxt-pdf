@@ -12,7 +12,7 @@ CP="target/classes:$(cat target/cp.txt)"                               # on Wind
 mkdir -p target/qa
 javac -encoding UTF-8 -cp "$CP" -d target/qa tools/qa/*.java
 java -Djava.awt.headless=true -cp "target/qa:$CP" ConcurrencyProbe     # sequential against 8 threads
-java -Djava.awt.headless=true -cp "target/qa:$CP" ScaleProbe           # times by document size ("text", "chapters", "units" or "contrast" for a part)
+java -Djava.awt.headless=true -cp "target/qa:$CP" ScaleProbe           # times by document size ("text", "chapters", "units", "heads" or "contrast" for a part)
 java -Djava.awt.headless=true -cp "target/qa:$CP" GsubCostProbe        # cost of GSUB in PDFBox
 java -Djava.awt.headless=true -cp "target/qa:$CP" GsubGlyphsProbe      # which strings change with GSUB
 java -Djava.awt.headless=true -cp "target/qa:$CP" HostileInputsProbe   # pathological inputs

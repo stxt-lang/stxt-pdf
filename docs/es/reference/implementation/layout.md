@@ -344,7 +344,10 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 **Volver a paginar no vacía la caché.** Cuando el número de prueba crece (`Engine.reservePageNumbers`) o cambia
 la página de una referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo
 que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`), también el reparto de
-un `Stack`, un `Grid` o una `Table` que los contenga. Lo vigilan `PaginationCacheTest` y `ArrangementCacheTest`.
+un `Stack`, un `Grid` o una `Table` que los contenga. La caché y el reparto en líneas guardan todo por caja primero (un mapa
+por caja con el resto de la clave), así que olvidar cuesta lo que las cajas olvidadas y no lo que hay guardado: un
+`{heading 1}` en un `Page overlay` olvida su texto en cada página donde cambia el capítulo. Lo vigilan
+`PaginationCacheTest`, `ArrangementCacheTest` y `LayoutCacheTest`.
 
 > **Decisión:** volver a paginar solo olvida lo que depende de los textos que cambian, porque el resultado de una caja
 > depende solo de su subárbol y de la clave (caja, espacio y token): los algoritmos no leen nada de fuera, salvo el estilo,
