@@ -44,7 +44,7 @@ gives the bytes with the PDF/UA part asked for, and `PdfStructures` reads the st
 The test cases that are not code are in `test/` (`golden/`, `errors/`, `examples/`, `spec/` and `resources/`), which
 the tests read by disk path and not from the classpath. `test/resources/` is a resources folder with a single font, IBM
 Plex Sans SemiBold as an `.otf` with CFF outlines, to test those fonts (`FontLibraryTest`, `FontFileTest` and
-`PdfCanvasTest`) without putting them in the default folder, where they would be embedded whole in the PDFs of the
+`PdfFontsTest`) without putting them in the default folder, where they would be embedded whole in the PDFs of the
 examples. The images of the tests are in the resources folder of the repository,
 `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30, `shapes.svg` 150 × 75 and
 `label.svg` 120 × 36, and `drawing.gif`, `broken.png` and the `bad-*.svg` for the errors), because the layout tests, the
@@ -151,10 +151,10 @@ the valid cases, and the invalid ones go to the catalog.
   `PDPage` of PDFBox, and that the table in `docs/es/` says the same.
 - **Mutation:** the `pit` profile of the `pom.xml` runs PIT over `layout` and `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min on Linux and close to an hour on
-  Windows, with the report in
-  `target/pit-reports/`). It is not in
-  the CI: it is an occasional pass to see whether the asserts measure anything. It leaves out the tests that write in shared folders
-  of `target/` or start another JVM.
+  Windows, with the report in `target/pit-reports/`); over another package, with
+  `-DtargetClasses=dev.stxt.pdf.paint.*` (several, separated by commas). It is not in the CI: it is an occasional pass
+  to see whether the asserts measure anything. It leaves out the golden cases, the examples and the concurrency tests,
+  which write in shared folders of `target/` or start another JVM; the other tests only read their PDFs in memory.
 - **Performance:** the tests with `@Tag("perf")` are run neither by `mvn test` nor by the CI: they are probes to run by
   hand, like those of [`tools/qa/`](../../../../tools/qa), and they print their measurements without asserting anything
   about them. They are run with `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. What the suite does watch is
@@ -186,7 +186,8 @@ Result:
                 Rect: 40 80 150 120
 ```
 
-The dumps have no namespace and are read with `STXT.rawParser()`.
+The dumps have no namespace and are read with `STXT.rawParser()`. `StxtDumpTest` fixes the format with small
+documents laid out with the fixed metrics.
 
 - Only the boxes with `Id` are dumped, and the descendants with `Id` are nested inside.
 - The marker of a `List item` with `Id` is dumped inside the item as `Marker: 3.` (or `Marker image: path`, with an

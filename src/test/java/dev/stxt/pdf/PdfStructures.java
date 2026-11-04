@@ -2,6 +2,7 @@ package dev.stxt.pdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
+import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
 
@@ -32,10 +33,11 @@ public final class PdfStructures {
 
     /**
      * Every kid of {@code e}, in order: the structure type of an element, {@code MCR} for a marked content
-     * reference and the class name of anything else.
+     * reference, {@code OBJR} for an object reference (a link annotation) and the class name of anything else.
      */
     public static List<String> kids(PDStructureElement e) {
         return e.getKids().stream().map(k -> k instanceof PDStructureElement s ? s.getStructureType()
-                : k instanceof PDMarkedContentReference ? "MCR" : k.getClass().getSimpleName()).toList();
+                : k instanceof PDMarkedContentReference ? "MCR"
+                : k instanceof PDObjectReference ? "OBJR" : k.getClass().getSimpleName()).toList();
     }
 }

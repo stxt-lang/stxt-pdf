@@ -43,7 +43,7 @@ cabecera con las líneas y `Docs.read` lo lee con `DocumentReader`. Las dos rees
 Los casos de prueba que no son código están en `test/` (`golden/`, `errors/`, `examples/`, `spec/` y `resources/`), que
 los tests leen por ruta de disco y no del classpath. `test/resources/` es una carpeta de recursos con una sola fuente, IBM
 Plex Sans SemiBold en `.otf` con contornos CFF, para probar esas fuentes (`FontLibraryTest`, `FontFileTest` y
-`PdfCanvasTest`) sin ponerlas en la carpeta por defecto, donde se incrustarían enteras en los PDF de los ejemplos. Las imágenes de los tests están en la carpeta de recursos del repositorio,
+`PdfFontsTest`) sin ponerlas en la carpeta por defecto, donde se incrustarían enteras en los PDF de los ejemplos. Las imágenes de los tests están en la carpeta de recursos del repositorio,
 `resources/images/test/` (`wide.png` 150 × 75 pt, `tall.jpg` 90 × 120, `square.png` 30 × 30, `shapes.svg` 150 × 75 y
 `label.svg` 120 × 36, y `drawing.gif`, `broken.png` y los `bad-*.svg` para los errores), porque los tests de layout, el
 catálogo de errores y los casos golden usan la carpeta por defecto.
@@ -149,10 +149,10 @@ los casos válidos, y los inválidos van al catálogo.
   que la tabla de `docs/en/` dice lo mismo.
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min en Linux y cerca de una hora en
-  Windows, con el informe en
-  `target/pit-reports/`). No está en
-  la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera los tests que escriben en carpetas compartidas
-  de `target/` o arrancan otra JVM.
+  Windows, con el informe en `target/pit-reports/`); por otro package, con `-DtargetClasses=dev.stxt.pdf.paint.*`
+  (varios, separados por comas). No está en la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera
+  los golden, los ejemplos y los tests de concurrencia, que escriben en carpetas compartidas de `target/` o arrancan
+  otra JVM; los demás tests solo leen sus PDF en memoria.
 - **Rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` ni en la CI: son sondas que se ejecutan a mano,
   como las de [`tools/qa/`](../../../../tools/qa), e imprimen sus medidas sin afirmar nada sobre ellas. Se ejecutan con
   `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. Lo que sí vigila la suite es la complejidad: cuánto
@@ -183,7 +183,8 @@ Result:
                 Rect: 40 80 150 120
 ```
 
-Los volcados no tienen namespace y se leen con `STXT.rawParser()`.
+Los volcados no tienen namespace y se leen con `STXT.rawParser()`. `StxtDumpTest` fija el formato con documentos
+pequeños maquetados con las métricas fijas.
 
 - Solo se vuelcan las cajas con `Id`, y las descendientes con `Id` se anidan dentro.
 - El marcador de un `List item` con `Id` se vuelca dentro del ítem como `Marker: 3.` (o `Marker image: ruta`, con una

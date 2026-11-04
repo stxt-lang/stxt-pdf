@@ -31,8 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -118,14 +116,6 @@ class PdfPagesTest {
             "\t\t\t\tBefore: page",
             "");
 
-    private static byte[] pdf(int ua) throws Exception {
-        byte[] pdf = Pdfs.of(DOCUMENT, ua);
-        Path dir = Path.of("target", "pdf");
-        Files.createDirectories(dir);
-        Files.write(dir.resolve("pdf-pages-ua" + ua + ".pdf"), pdf);
-        return pdf;
-    }
-
     private static List<PDFormXObject> forms(PDResources resources) throws Exception {
         List<PDFormXObject> forms = new ArrayList<>();
         for (COSName name : resources.getXObjectNames()) {
@@ -141,7 +131,7 @@ class PdfPagesTest {
      */
     @Test
     void aPageIsAFormWithItsTextAndWithoutItsTags() throws Exception {
-        byte[] bytes = pdf(1);
+        byte[] bytes = Pdfs.of(DOCUMENT, 1);
         try (PDDocument pdf = Loader.loadPDF(bytes)) {
             assertEquals(2, pdf.getNumberOfPages());
             String text = new PDFTextStripper().getText(pdf);
@@ -172,7 +162,7 @@ class PdfPagesTest {
             assertEquals(0xF4F1EA, paper, Integer.toHexString(paper));
         }
         assertEquals(Map.of(), PdfUa.failedRules(bytes));
-        assertEquals(Map.of(), PdfUa.failedRules(pdf(2), 2));
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(DOCUMENT, 2), 2));
     }
 
     /**
