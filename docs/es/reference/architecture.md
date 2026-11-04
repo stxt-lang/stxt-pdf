@@ -117,7 +117,9 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   zonas de los enlaces.
 - **`Canvas`**: la interfaz de los lienzos, que solo dibujan. Cada lienzo da su `Tagging`: el etiquetado del PDF, y en el
   SVG, nada.
-- **`PdfDocumentWriter`**: escribe el documento PDF: páginas, etiquetado (`PdfStructure`), marcadores, destinos
+- **`PdfDocumentWriter`**: escribe el documento PDF: páginas, etiquetado (`PdfStructure`, con sus enlaces en
+  `PdfStructureLinks`, el árbol padre en `PdfParentTree` y las diferencias de PDF/UA-2 en `UaProfile`), marcadores
+  (`PdfOutline`), destinos
   (`PdfDestinations`), enlaces (`PdfLinks`), metadatos y PDF/A (`PdfMetadata`), adjuntos (`PdfAttachments`) y guardado,
   o lo deja en un `PDDocument` abierto que guarda quien lo abrió. `PdfCanvas` dibuja una página, con `PdfContent`, `PdfFonts`,
   `PdfGradients` y `PdfImages`. **`PdfPainter`** pinta una página maquetada sobre una página de un documento ajeno, sin

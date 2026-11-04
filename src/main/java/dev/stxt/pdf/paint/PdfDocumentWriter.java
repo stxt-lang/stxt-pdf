@@ -33,8 +33,8 @@ import java.util.Map;
 
 /**
  * The PDF document: creates the pages, paints each one with its {@link PdfCanvas}, and sets the page labels, the
- * link destinations, the structure tree ({@link PdfStructure}), the metadata ({@link PdfMetadata}) and the embedded
- * files ({@link PdfAttachments}) before saving it.
+ * link destinations, the structure tree ({@link PdfStructure}), the bookmarks ({@link PdfOutline}), the metadata
+ * ({@link PdfMetadata}) and the embedded files ({@link PdfAttachments}) before saving it.
  * One PDF page per page of the result, in pt, with the size of the paper of its section. The file identifier comes from
  * the content ({@link PdfId}): the same document gives the same bytes.
  *
@@ -175,7 +175,7 @@ public final class PdfDocumentWriter {
                 doc.getDocumentCatalog().setVersion("2.0");
             }
             PdfFonts fonts = new PdfFonts(doc, resources);
-            PdfStructure structure = new PdfStructure(doc, document.root(), ua);
+            PdfStructure structure = new PdfStructure(doc, document.root(), UaProfile.of(ua));
             PdfLinks links = new PdfLinks();
             PdfMetadata.write(doc, document.metadata(), ua, pdfA, attachments.xmp());
             // All the pages exist before any is painted: a link may point forward.
@@ -210,7 +210,8 @@ public final class PdfDocumentWriter {
             labels(doc, pages);
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations, structure);
-            structure.finish(doc, destinations);
+            structure.finish();
+            PdfOutline.write(doc, structure.headings(), destinations, structure::goTo);
             PdfAttachments.write(doc, attachments);
         }
     }

@@ -116,7 +116,9 @@ depend on the `LayoutContext` interface.
   link areas.
 - **`Canvas`**: the interface of the canvases, which only draw. Each canvas provides its `Tagging`: the tagging of the PDF, and in the
   SVG, nothing.
-- **`PdfDocumentWriter`**: writes the PDF document: pages, tagging (`PdfStructure`), bookmarks, destinations
+- **`PdfDocumentWriter`**: writes the PDF document: pages, tagging (`PdfStructure`, with its links in
+  `PdfStructureLinks`, the parent tree in `PdfParentTree` and the differences of PDF/UA-2 in `UaProfile`), bookmarks
+  (`PdfOutline`), destinations
   (`PdfDestinations`), links (`PdfLinks`), metadata and PDF/A (`PdfMetadata`), attachments (`PdfAttachments`) and saving,
   or leaves it in an open `PDDocument` that the caller saves. `PdfCanvas` draws a page, with `PdfContent`, `PdfFonts`,
   `PdfGradients` and `PdfImages`. **`PdfPainter`** paints a laid-out page on a page of another document, untagged

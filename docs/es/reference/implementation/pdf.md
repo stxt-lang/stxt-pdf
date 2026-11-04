@@ -190,7 +190,8 @@ llevan `Tabs: S`, para que el visor recorra los enlaces en el orden de la estruc
 En una caja girada, la anotación tiene como `Rect` el rectángulo que envuelve la zona girada y como `QuadPoints` la zona
 girada. El destino de una caja girada es el rectángulo que la envuelve.
 
-El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referencia a objeto (`OBJR`), como pide PDF/UA:
+El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referencia a objeto (`OBJR`), como pide PDF/UA.
+Los elementos `Link` y las anotaciones que cuelgan de ellos los lleva `PdfStructureLinks`:
 
 - *Caja con `Link`:* el `Link` es hijo del elemento de la caja y contiene su contenido (`P → Link → texto`,
   `Div → Link → P, P` o `TOCI → Link → título, número`). Una imagen es la excepción: su `Link` es el padre de su `Figure`
@@ -226,13 +227,15 @@ El elemento `Link` envuelve lo que se pulsa y lleva cada anotación como referen
 
 Uno por encabezado (también los de un `Markdown`), con el texto de sus `Text` unido por espacios (con su número, si lo
 lleva), anidados por nivel y con destino en la esquina superior izquierda de su primer fragmento. El catálogo pide al visor
-que los muestre al abrir el documento (`PageMode: UseOutlines`).
+que los muestre al abrir el documento (`PageMode: UseOutlines`). Los escribe `PdfOutline` con los encabezados que
+`PdfStructure` recogió al construir el árbol.
 
 ## PDF/UA-2
 
 Con `Converter.builder().pdfUa(2)`, el PDF es PDF 2.0 (en la cabecera del fichero y en el `Version` del catálogo) y cumple
 PDF/UA-2 (ISO 14289-2), con `pdfuaid:part` 2 y `pdfuaid:rev` 2024 en los metadatos XMP. Todo lo de arriba vale igual, con
-estas diferencias:
+estas diferencias, reunidas en `UaProfile`, a la que el árbol de estructura y sus enlaces preguntan sin saber qué parte
+escriben:
 
 - **Espacio de nombres:** el árbol de estructura declara el de PDF 2.0 (`Namespaces`, `http://iso.org/pdf2/ssn`) y cada
   elemento lo lleva en `NS`, salvo `TOC`, `TOCI` y `Reference`, que no existen en PDF 2.0 y se quedan en el de PDF 1.7, el

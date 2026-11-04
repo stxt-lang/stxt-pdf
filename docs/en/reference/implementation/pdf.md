@@ -196,7 +196,8 @@ carry `Tabs: S`, so that the viewer goes through the links in the order of the s
 In a rotated box, the annotation has as `Rect` the rectangle that encloses the rotated area and as `QuadPoints` the rotated
 area. The destination of a rotated box is the rectangle that encloses it.
 
-The `Link` element wraps what is clicked and carries each annotation as an object reference (`OBJR`), as PDF/UA requires:
+The `Link` element wraps what is clicked and carries each annotation as an object reference (`OBJR`), as PDF/UA requires.
+The `Link` elements and the annotations that hang from them are kept by `PdfStructureLinks`:
 
 - *Box with `Link`:* the `Link` is a child of the element of the box and contains its content (`P → Link → text`,
   `Div → Link → P, P` or `TOCI → Link → title, number`). An image is the exception: its `Link` is the parent of its `Figure`
@@ -232,13 +233,15 @@ The `Link` element wraps what is clicked and carries each annotation as an objec
 
 One per heading (also those of a `Markdown`), with the text of its `Text` joined by spaces (with its number, if it
 has one), nested by level and with a destination at the top left corner of its first fragment. The catalog asks the viewer
-to show them when the document is opened (`PageMode: UseOutlines`).
+to show them when the document is opened (`PageMode: UseOutlines`). `PdfOutline` writes them with the headings that
+`PdfStructure` collected when building the tree.
 
 ## PDF/UA-2
 
 With `Converter.builder().pdfUa(2)`, the PDF is PDF 2.0 (in the header of the file and in the `Version` of the catalog) and conforms to
 PDF/UA-2 (ISO 14289-2), with `pdfuaid:part` 2 and `pdfuaid:rev` 2024 in the XMP metadata. Everything above applies in the same way, with
-these differences:
+these differences, gathered in `UaProfile`, which the structure tree and its links ask without knowing which part they
+write:
 
 - **Namespace:** the structure tree declares that of PDF 2.0 (`Namespaces`, `http://iso.org/pdf2/ssn`) and each
   element carries it in `NS`, except `TOC`, `TOCI` and `Reference`, which do not exist in PDF 2.0 and stay in that of PDF 1.7, the
