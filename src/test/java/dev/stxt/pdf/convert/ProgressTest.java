@@ -7,7 +7,6 @@ import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Progress;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class ProgressTest {
 
-    private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
 
     /** Every event, in order, as text. */
     private static final class Events implements Progress {
@@ -67,13 +64,9 @@ class ProgressTest {
         return Converter.builder().styles(BASE).build();
     }
 
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
-    }
-
     /** Two pages: a text, a block taller than the page, which breaks, and a last text. */
     private static InlineNode twoPages() {
-        return document("\tParagraph: Primera página.", "\tBlock:", "\t\tBox:", "\t\t\tHeight: 300",
+        return Docs.read(HEADER, "\tParagraph: Primera página.", "\tBlock:", "\t\tBox:", "\t\t\tHeight: 300",
                 "\tParagraph: Tercera página.");
     }
 
@@ -117,7 +110,7 @@ class ProgressTest {
     @Test
     void aSecondPaginationPassCountsFromOneAgain() {
         Events events = new Events();
-        converter().layOut(document("\tText: La meta está en la página {page of: meta}.", "\tBlock:", "\t\tBox:",
+        converter().layOut(Docs.read(HEADER, "\tText: La meta está en la página {page of: meta}.", "\tBlock:", "\t\tBox:",
                 "\t\t\tHeight: 300", "\tText: La meta.", "\t\tId: meta"), Cancellation.NONE, events);
         assertEquals(List.of("laid out 1", "laid out 2", "laid out 1", "laid out 2", "laid out: 2 pages"),
                 events.events);

@@ -1,16 +1,67 @@
 package dev.stxt.pdf;
 
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.stxt.DocumentReader;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helpers for writing test documents. The base typography of the document goes in
- * {@code Styles} (reference/common/styles.md), in the rule {@code For element: Document}; the tests write it
- * apart from the body, which sometimes brings its own {@code Styles}.
+ * Helpers for writing test documents: the smallest header ({@link #header}), the typography the text needs
+ * ({@link #STYLES} apart from the document or {@link #TYPOGRAPHY} inside it), the document from its lines
+ * ({@link #document}, {@link #read}) and the rewriting that wraps the content in a {@code Section}
+ * ({@link #sectioned}) and merges the {@code Styles} ({@link #mergeStyles}). The base typography of the document
+ * goes in {@code Styles} (reference/common/styles.md), in the rule {@code For element: Document}; the tests write
+ * it apart from the body, which sometimes brings its own {@code Styles}.
  */
 public final class Docs {
 
+    private static final DocumentReader READER = new DocumentReader();
+
+    /**
+     * The typography the text needs (reference/common/errors.md), as the {@code Styles} document a test gives apart
+     * from the document ({@code Converter.builder().styles(STYLES)}): IBM Plex Sans, 10 pt, for {@code Document}. A
+     * {@code Typography} line more goes after it, with three tabs.
+     */
+    public static final String STYLES = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
+            + "\t\t\tSize: 10\n";
+
+    /**
+     * The same typography inside the document, as its {@code Styles}, to go right after {@link #header}. A
+     * {@code Typography} line more goes after it, with four tabs.
+     */
+    public static final String TYPOGRAPHY = "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n"
+            + "\t\t\t\tSize: 10\n";
+
     private Docs() {
+    }
+
+    /**
+     * The smallest header of a test document: a {@code Document} in Spanish titled {@code Prueba} with pages of
+     * {@code width} × {@code height} pt and the default margins, and no typography (it goes in {@link #TYPOGRAPHY}
+     * after it, or in {@link #STYLES} apart from the document).
+     */
+    public static String header(int width, int height) {
+        return "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: " + width + "\n\t\tHeight: "
+                + height + "\n";
+    }
+
+    /** {@link #header(int, int)} with margins of {@code margin} pt on the four sides. */
+    public static String header(int width, int height, int margin) {
+        return header(width, height) + "\t\tMargin: " + margin + "\n";
+    }
+
+    /**
+     * The text of a test document: {@code header} and then {@code lines}, one per line with their tabs, ending
+     * with a line break; with its {@code Styles} merged and its content in a {@code Section} ({@link #mergeStyles}).
+     */
+    public static String document(String header, String... lines) {
+        return mergeStyles(header + String.join("\n", lines) + "\n");
+    }
+
+    /** {@link #document} read with {@link DocumentReader}: what the engine takes. */
+    public static InlineNode read(String header, String... lines) {
+        return READER.read(document(header, lines));
     }
 
     /** The children of {@code Document} that do not go inside a {@code Section}. */

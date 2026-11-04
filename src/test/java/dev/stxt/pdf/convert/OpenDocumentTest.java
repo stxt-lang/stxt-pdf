@@ -10,7 +10,6 @@ import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.PdfA;
 import dev.stxt.pdf.model.Progress;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -36,18 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OpenDocumentTest {
 
-    private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n\t\t\tMarkup: markdown\n";
-
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
-    }
+    private static final String HEADER = Docs.header(300, 300);
+    private static final String BASE = Docs.STYLES + "\t\t\tMarkup: markdown\n";
 
     /** Two pages with text, a heading with a link to it, a bitmap and a page of a PDF. */
     private static InlineNode everything() {
-        return document("\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
+        return Docs.read(HEADER, "\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
                 "\tParagraph: Un texto con un [enlace](#dos) y un [cuadrado](https://stxt.dev).",
                 "\tImage: test/square.png", "\t\tAlt: Un cuadrado", "\t\tBox:", "\t\t\tWidth: 40",
                 "\tImage: test/pages.pdf", "\t\tPdf page: 1", "\t\tAlt: La página 1", "\t\tBox:", "\t\t\tHeight: 80",

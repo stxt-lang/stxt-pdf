@@ -7,7 +7,6 @@ import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
@@ -28,18 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class LimitsTest {
 
-    private static final DocumentReader READER = new DocumentReader();
     private static final Resources RESOURCES = new Resources();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
-
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
-    }
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
 
     private static InlineNode image(String path) {
-        return document("\tImage: " + path);
+        return Docs.read(HEADER, "\tImage: " + path);
     }
 
     private static Converter converter(Limits limits) {
@@ -78,7 +71,7 @@ class LimitsTest {
     /** A 500 pt block on 200 pt pages takes three. */
     @Test
     void thePageLimitIsExactlyTheNumberOfPages() throws IOException {
-        InlineNode threePages = document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 500");
+        InlineNode threePages = Docs.read(HEADER, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 500");
         convert(converter(Limits.DEFAULT.withMaxPages(3)), threePages);
         StxtPdfException e = assertThrows(StxtPdfException.class,
                 () -> convert(converter(Limits.DEFAULT.withMaxPages(2)), threePages));
@@ -90,7 +83,7 @@ class LimitsTest {
     /** The limit counts the pages of all the sections: two of 2 pages are 4. */
     @Test
     void thePageLimitCountsEverySection() throws IOException {
-        InlineNode twoSections = document("\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300",
+        InlineNode twoSections = Docs.read(HEADER, "\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300",
                 "\tSection:", "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 300");
         convert(converter(Limits.DEFAULT.withMaxPages(4)), twoSections);
         StxtPdfException e = assertThrows(StxtPdfException.class,
@@ -101,7 +94,7 @@ class LimitsTest {
     @Test
     void theDefaultPageLimitIsTwoThousand() {
         // 2001 pages 200 pt high: it is rejected before painting anything.
-        InlineNode document = document("\tBlock:", "\t\tBox:", "\t\t\tHeight: " + (200 * 2_001));
+        InlineNode document = Docs.read(HEADER, "\tBlock:", "\t\tBox:", "\t\t\tHeight: " + (200 * 2_001));
         StxtPdfException e = assertThrows(StxtPdfException.class, () -> Converter.create().layOut(document));
         assertEquals("PAGE_LIMIT", e.code());
         assertTrue(e.getMessage().contains("more than 2000 pages"), e.getMessage());

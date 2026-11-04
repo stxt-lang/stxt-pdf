@@ -1,10 +1,8 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.Pdfs;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
@@ -38,9 +36,7 @@ class PdfIdTest {
                 "\tSection:",
                 "\t\tParagraph: " + text,
                 "");
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.builder().pdfUa(ua).build().toPdf(new DocumentReader().read(document), out);
-        return out.toByteArray();
+        return Pdfs.of(document, ua);
     }
 
     /**

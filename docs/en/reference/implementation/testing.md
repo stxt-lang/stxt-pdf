@@ -30,6 +30,17 @@ content in a `Section`). With `FixedMetrics`, each character measures 5 pt with 
 180 pt of height, the page area measures 100) and `rect(page, id)` / `has(page, id)` look at a specific page. A layout
 test cannot overflow: overflows go to the error catalog.
 
+The documents of the other tests are written with `Docs` (`src/test/java/dev/stxt/pdf/`), so that the smallest header and
+the typography are in one place. `Docs.header(width, height)` and `header(width, height, margin)` give the header: a
+`Document` in Spanish with a `Page` of that size and no typography. The typography the text needs is in `Docs.STYLES`,
+the `Styles` document given apart (`Converter.builder().styles`), and in `Docs.TYPOGRAPHY`, the same `Styles` written
+inside the document, right after the header. `Docs.document(header, lines...)` joins the header with the lines and
+`Docs.read` reads it with `DocumentReader`. The two rewritings behind them, `Docs.sectioned` (wraps in a `Section` what
+`Document` does not accept directly) and `Docs.mergeStyles` (merges into the first one all the top-level `Styles`, and
+sections), are fixed by `DocsTest`: almost every test class goes through them. For the PDFs, `Pdfs.of(document, ua)`
+gives the bytes with the PDF/UA part asked for, and `PdfStructures` reads the structure tree (`document`, `section`,
+`types` and `kids`).
+
 The test cases that are not code are in `test/` (`golden/`, `errors/`, `examples/`, `spec/` and `resources/`), which
 the tests read by disk path and not from the classpath. `test/resources/` is a resources folder with a single font, IBM
 Plex Sans SemiBold as an `.otf` with CFF outlines, to test those fonts (`FontLibraryTest`, `FontFileTest` and

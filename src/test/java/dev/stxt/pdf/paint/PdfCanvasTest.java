@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import static dev.stxt.pdf.PdfStructures.types;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -853,11 +854,6 @@ class PdfCanvasTest {
             }
         }
         return kids;
-    }
-
-    private static List<String> types(PDStructureElement e) {
-        return e.getKids().stream().filter(k -> k instanceof PDStructureElement)
-                .map(k -> ((PDStructureElement) k).getStructureType()).toList();
     }
 
     @Test

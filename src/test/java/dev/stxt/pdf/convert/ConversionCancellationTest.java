@@ -8,7 +8,6 @@ import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.CancelledException;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,10 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ConversionCancellationTest {
 
-    private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
 
     /** Every piece of the engine that has a point where a cancelled conversion stops. */
     private static final List<String> PHASES = List.of(
@@ -53,13 +50,9 @@ class ConversionCancellationTest {
         return Converter.builder().styles(BASE).build();
     }
 
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
-    }
-
     /** A document with every kind of work: text, a generated image, an image file and several pages. */
     private static InlineNode everything() {
-        return document("\tParagraph: Un párrafo que se maqueta con las métricas reales de la fuente.",
+        return Docs.read(HEADER, "\tParagraph: Un párrafo que se maqueta con las métricas reales de la fuente.",
                 "\tBarcode: https://stxt.dev", "\t\tAlt: Enlace", "\t\tBox:", "\t\t\tWidth: 40",
                 "\tImage: test/square.png", "\t\tBox:", "\t\t\tWidth: 40",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 500",
@@ -193,7 +186,7 @@ class ConversionCancellationTest {
     void aCostlyDocumentStopsSoonAfterItsDeadline() {
         String[] lines = new String[1500];
         Arrays.fill(lines, "\tParagraph: Un párrafo más, de los muchos que hacen que la conversión tarde.");
-        InlineNode costly = document(lines);
+        InlineNode costly = Docs.read(HEADER, lines);
         long start = System.nanoTime();
         assertThrows(CancelledException.class, () -> converter().toPdf(costly, new ByteArrayOutputStream(),
                 Attachments.NONE, Cancellation.timeout(Duration.ofMillis(20))));

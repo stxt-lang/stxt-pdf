@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.Pdfs;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.golden.PdfUa;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -118,12 +119,11 @@ class PdfPagesTest {
             "");
 
     private static byte[] pdf(int ua) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.builder().pdfUa(ua).build().toPdf(new DocumentReader().read(DOCUMENT), out);
+        byte[] pdf = Pdfs.of(DOCUMENT, ua);
         Path dir = Path.of("target", "pdf");
         Files.createDirectories(dir);
-        Files.write(dir.resolve("pdf-pages-ua" + ua + ".pdf"), out.toByteArray());
-        return out.toByteArray();
+        Files.write(dir.resolve("pdf-pages-ua" + ua + ".pdf"), pdf);
+        return pdf;
     }
 
     private static List<PDFormXObject> forms(PDResources resources) throws Exception {

@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /** Images in the SVG output (reference/components/image.md). */
 class SvgCanvasTest {
 
-    private static final String DOC = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
-            + "\t\tMargin: 20\n\tImage: test/wide.png\n\t\tFit: fill\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
+    private static final String DOC = Docs.header(300, 300, 20)
+            + "\tImage: test/wide.png\n\t\tFit: fill\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
 
     private final LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(DOC)));
 

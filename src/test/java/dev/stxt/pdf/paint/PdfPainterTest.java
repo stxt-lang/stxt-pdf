@@ -10,7 +10,6 @@ import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.CancelledException;
 import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -41,14 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PdfPainterTest {
 
-    private static final DocumentReader READER = new DocumentReader();
     private static final Resources RESOURCES = new Resources();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n\t\tMargin: 20\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n\t\t\tMarkup: markdown\n";
+    private static final String HEADER = Docs.header(300, 300, 20);
+    private static final String BASE = Docs.STYLES + "\t\t\tMarkup: markdown\n";
 
     private static LaidOutDocument laidOut(String... lines) {
-        InlineNode document = READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
+        InlineNode document = Docs.read(HEADER, lines);
         return Converter.builder().styles(BASE).resources(RESOURCES).build().layOut(document);
     }
 

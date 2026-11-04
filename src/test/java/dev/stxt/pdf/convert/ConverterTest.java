@@ -32,13 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConverterTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
 
     /** A document with a single box of text, which needs the typography of {@link #BASE}. */
     private static InlineNode document() {
-        return READER.read(Docs.sectioned(HEADER + "\tText: Hola"));
+        return Docs.read(HEADER, "\tText: Hola");
     }
 
     private static byte[] pdf(Converter converter, InlineNode document) throws IOException {

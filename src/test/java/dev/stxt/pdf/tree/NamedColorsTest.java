@@ -22,13 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NamedColorsTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(595, 842);
+    private static final String BASE = Docs.STYLES;
 
     /** The document (header and these lines) with the separate styles document, or without it if {@code null}. */
     private static Box root(String styles, String... lines) {
-        InlineNode document = READER.read(Docs.sectioned(HEADER + String.join("\n", lines)));
+        InlineNode document = Docs.read(HEADER, lines);
         InlineNode external = styles == null ? null : READER.readStyles(styles);
         return new BoxTreeBuilder().build(document, external).sections().get(0).box();
     }

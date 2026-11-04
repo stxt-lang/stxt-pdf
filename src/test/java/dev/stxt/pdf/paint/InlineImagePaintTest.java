@@ -1,10 +1,8 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.Pdfs;
 import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
@@ -13,7 +11,6 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,19 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class InlineImagePaintTest {
 
-    private static final String DOCUMENT = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n"
-            + "\t\tWidth: 300\n\t\tHeight: 300\n\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
-            + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n\t\t\t\tMarkup: markdown\n"
+    private static final String DOCUMENT = Docs.header(300, 300, 20) + Docs.TYPOGRAPHY + "\t\t\t\tMarkup: markdown\n"
             + "\tHeading 1:\n\t\tText: Informe ![Logo](test/shapes.svg) anual\n"
             + "\tParagraph: Ver ![Un cuadrado](test/square.png) y ![](test/check.svg) o "
             + "[![Web](test/shapes.svg)](https://stxt.dev) y ![Alta](test/tall.jpg) al final.\n";
-
-    private static byte[] pdf(int ua) throws Exception {
-        InlineNode document = new DocumentReader().read(Docs.sectioned(DOCUMENT));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.builder().pdfUa(ua).build().toPdf(document, out);
-        return out.toByteArray();
-    }
 
     /** The structure types of the kids of {@code node}, in order, with the {@code Alt} of the figures. */
     private static List<String> kids(PDStructureNode node) {
@@ -59,13 +47,13 @@ class InlineImagePaintTest {
 
     @Test
     void itPassesPdfUa1And2() throws Exception {
-        assertEquals(Map.of(), PdfUa.failedRules(pdf(1), 1));
-        assertEquals(Map.of(), PdfUa.failedRules(pdf(2), 2));
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(DOCUMENT, 1), 1));
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(DOCUMENT, 2), 2));
     }
 
     @Test
     void theImageIsNotACharacterOfTheText() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(1))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 1))) {
             String text = new PDFTextStripper().getText(doc);
             assertFalse(text.contains("￼"), text);
             assertTrue(text.contains("Ver  y  o  y  al final."), text);
@@ -76,7 +64,7 @@ class InlineImagePaintTest {
 
     @Test
     void theFiguresHangFromTheTextInReadingOrder() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(1))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 1))) {
             PDStructureElement document = (PDStructureElement) doc.getDocumentCatalog().getStructureTreeRoot()
                     .getKids().get(0);
             PDStructureElement section = (PDStructureElement) document.getKids().get(0);

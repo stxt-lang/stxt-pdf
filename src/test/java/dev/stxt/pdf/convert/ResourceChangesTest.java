@@ -8,7 +8,6 @@ import dev.stxt.pdf.model.StxtPdfException.Kind;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ResourceException;
 import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,20 +35,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ResourceChangesTest {
 
-    private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
     private static final Path FONTS = Resources.DEFAULT_ROOT.resolve("fonts");
     private static final Path IMAGES = Resources.DEFAULT_ROOT.resolve("images/test");
     private static final String SERIF = "IBM Plex Serif/IBMPlexSerif-Regular.ttf";
 
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
-    }
-
     private static InlineNode image(String path) {
-        return document("\tImage: " + path, "\t\tAlt: Una imagen", "\t\tBox:", "\t\t\tWidth: 40");
+        return Docs.read(HEADER, "\tImage: " + path, "\t\tAlt: Una imagen", "\t\tBox:", "\t\t\tWidth: 40");
     }
 
     /** A resources folder in {@code dir} with IBM Plex Sans and, in {@code images/}, those images of the tests. */
@@ -162,7 +155,7 @@ class ResourceChangesTest {
     @Test
     void theNextConversionSeesTheFontsAddedAndRemoved(@TempDir Path dir) throws IOException {
         Converter converter = converter(folder(dir));
-        InlineNode serif = document("\tText: Hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Serif");
+        InlineNode serif = Docs.read(HEADER, "\tText: Hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Serif");
         assertEquals("FONT_UNKNOWN", assertThrows(StxtPdfException.class, () -> converter.layOut(serif)).code());
         copyFont(dir, SERIF);
         LaidOutDocument laidOut = converter.layOut(serif);

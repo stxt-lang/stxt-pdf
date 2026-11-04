@@ -29,6 +29,17 @@ contenido en una `Section`). Con `FixedMetrics`, cada carácter mide 5 pt con `S
 180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran una página concreta. Un test de
 layout no puede desbordar: los desbordamientos van al catálogo de errores.
 
+Los documentos de los demás tests se escriben con `Docs` (`src/test/java/dev/stxt/pdf/`), para que la cabecera mínima y
+la tipografía estén en un solo sitio. `Docs.header(ancho, alto)` y `header(ancho, alto, margen)` dan la cabecera: un
+`Document` en castellano con una `Page` de ese tamaño y sin tipografía. La tipografía que el texto necesita está en
+`Docs.STYLES`, el documento `Styles` que se pasa aparte (`Converter.builder().styles`), y en `Docs.TYPOGRAPHY`, el mismo
+`Styles` escrito dentro del documento, a continuación de la cabecera. `Docs.document(cabecera, líneas...)` junta la
+cabecera con las líneas y `Docs.read` lo lee con `DocumentReader`. Las dos reescrituras que hay detrás, `Docs.sectioned`
+(envuelve en una `Section` lo que `Document` no admite directamente) y `Docs.mergeStyles` (funde en el primero todos los
+`Styles` de primer nivel, y secciona), las fija `DocsTest`: casi todas las clases de test pasan por ellas. Para los PDF,
+`Pdfs.of(documento, ua)` da los bytes con el nivel PDF/UA pedido, y `PdfStructures` lee el árbol de estructura
+(`document`, `section`, `types` y `kids`).
+
 Los casos de prueba que no son código están en `test/` (`golden/`, `errors/`, `examples/`, `spec/` y `resources/`), que
 los tests leen por ruta de disco y no del classpath. `test/resources/` es una carpeta de recursos con una sola fuente, IBM
 Plex Sans SemiBold en `.otf` con contornos CFF, para probar esas fuentes (`FontLibraryTest`, `FontFileTest` y

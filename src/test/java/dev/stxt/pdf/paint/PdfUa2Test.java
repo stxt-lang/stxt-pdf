@@ -1,10 +1,9 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -15,12 +14,12 @@ import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeOb
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static dev.stxt.pdf.PdfStructures.types;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -34,9 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PdfUa2Test {
 
-    private static final String DOCUMENT = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n"
-            + "\t\tWidth: 300\n\t\tHeight: 300\n\t\tMargin: 20\n\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n"
-            + "\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 10\n"
+    private static final String DOCUMENT = Docs.header(300, 300, 20) + Docs.TYPOGRAPHY
             + "\tTable of contents:\n"
             + "\tHeading 1:\n\t\tText: Uno\n"
             + "\tList:\n\t\tMarker: dash\n\t\tBox:\n\t\t\tPadding: 0 0 0 16\n\t\tList item:\n\t\t\tText: Un ítem\n"
@@ -44,16 +41,9 @@ class PdfUa2Test {
             + "\tHeading 1:\n\t\tId: uno\n\t\tText: Dos\n"
             + "\tPage overlay:\n\t\tOffset: auto 0 0 auto\n\t\tText: ¿Más? Escríbenos\n\t\t\tLink: mailto:a@b.example\n";
 
-    private static byte[] pdf(int ua) throws Exception {
-        InlineNode document = new DocumentReader().read(Docs.sectioned(DOCUMENT));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.builder().pdfUa(ua).build().toPdf(document, out);
-        return out.toByteArray();
-    }
-
     @Test
     void itPassesPdfUa2() throws Exception {
-        byte[] pdf = pdf(2);
+        byte[] pdf = Pdfs.of(DOCUMENT, 2);
         assertEquals(Map.of(), PdfUa.failedRules(pdf, 2));
         assertEquals("%PDF-2.0", new String(pdf, 0, 8, StandardCharsets.US_ASCII));
         try (PDDocument doc = Loader.loadPDF(pdf)) {
@@ -66,7 +56,7 @@ class PdfUa2Test {
 
     @Test
     void theElementsAreInThePdf2Namespace() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(2))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 2))) {
             COSDictionary root = doc.getDocumentCatalog().getStructureTreeRoot().getCOSObject();
             COSDictionary namespace = (COSDictionary) ((COSArray) root.getDictionaryObject("Namespaces")).getObject(0);
             assertEquals("http://iso.org/pdf2/ssn", namespace.getString("NS"));
@@ -80,7 +70,7 @@ class PdfUa2Test {
 
     @Test
     void aContentsEntryIsAReferenceThatPointsToItsHeading() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(2))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 2))) {
             PDStructureElement document = document(doc);
             PDStructureElement toci = find(document, "TOCI");
             assertEquals(List.of("Reference"), types(toci));
@@ -94,17 +84,17 @@ class PdfUa2Test {
 
     @Test
     void aDashListIsUnordered() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(2))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 2))) {
             assertEquals("Unordered", numbering(find(document(doc), "L")));
         }
-        try (PDDocument doc = Loader.loadPDF(pdf(1))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 1))) {
             assertEquals("None", numbering(find(document(doc), "L")));
         }
     }
 
     @Test
     void internalLinksAndBookmarksGoToTheStructureElement() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(2))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 2))) {
             PDStructureElement document = document(doc);
             COSDictionary second = headings(document).get(1).getCOSObject();
             PDAnnotationLink back = links(doc).stream()
@@ -123,14 +113,14 @@ class PdfUa2Test {
 
     @Test
     void aLinkWithAltHasNoContents() throws Exception {
-        try (PDDocument doc = Loader.loadPDF(pdf(2))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 2))) {
             PDStructureElement footer = find(document(doc), "Link", "¿Más? Escríbenos");
             assertNotNull(footer);
             PDAnnotationLink mail = links(doc).stream().filter(a -> a.getAction() != null
                     && a.getAction().getCOSObject().getString(COSName.URI) != null).findFirst().orElseThrow();
             assertNull(mail.getContents());
         }
-        try (PDDocument doc = Loader.loadPDF(pdf(1))) {
+        try (PDDocument doc = Loader.loadPDF(Pdfs.of(DOCUMENT, 1))) {
             assertTrue(links(doc).stream().anyMatch(a -> "¿Más? Escríbenos".equals(a.getContents())));
         }
     }
@@ -185,13 +175,4 @@ class PdfUa2Test {
         }
     }
 
-    private static List<String> types(PDStructureElement e) {
-        List<String> types = new ArrayList<>();
-        for (Object k : e.getKids()) {
-            if (k instanceof PDStructureElement child) {
-                types.add(child.getStructureType());
-            }
-        }
-        return types;
-    }
 }

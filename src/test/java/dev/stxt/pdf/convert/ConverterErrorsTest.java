@@ -39,16 +39,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConverterErrorsTest {
 
     private static final DocumentReader READER = new DocumentReader();
-    private static final String HEADER = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 200\n\t\tHeight: 200\n";
-    private static final String BASE = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tFont: IBM Plex Sans\n"
-            + "\t\t\tSize: 10\n";
+    private static final String HEADER = Docs.header(200, 200);
+    private static final String BASE = Docs.STYLES;
 
     private static Converter converter() {
         return Converter.builder().styles(BASE).build();
-    }
-
-    private static InlineNode document(String... lines) {
-        return READER.read(Docs.sectioned(HEADER + String.join("\n", lines) + "\n"));
     }
 
     /** What a {@code catch (StxtPdfException)} in a service would see of {@code conversion}. */
@@ -58,7 +53,7 @@ class ConverterErrorsTest {
 
     @Test
     void anInvalidDocumentIsTheDocumentsFaultAndSaysWhere() {
-        InlineNode document = document("\tText: Hola"); // without the font of BASE
+        InlineNode document = Docs.read(HEADER, "\tText: Hola"); // without the font of BASE
         StxtPdfException e = failure(() -> Converter.create().toPdf(document, new ByteArrayOutputStream()));
         assertEquals(Kind.INVALID_DOCUMENT, e.kind());
         assertEquals("TEXT_WITHOUT_FONT", e.code());
@@ -101,7 +96,7 @@ class ConverterErrorsTest {
     @Test
     void anUnusableResourcesFolderIsAResourceProblemWithoutLine(@TempDir Path empty) {
         Converter converter = Converter.builder().resources(new Resources(empty)).styles(BASE).build();
-        InlineNode document = document("\tText: Hola");
+        InlineNode document = Docs.read(HEADER, "\tText: Hola");
         StxtPdfException e = failure(() -> converter.toPdf(document, new ByteArrayOutputStream()));
         assertInstanceOf(ResourceException.class, e);
         assertEquals(Kind.RESOURCE, e.kind());
@@ -111,7 +106,7 @@ class ConverterErrorsTest {
 
     @Test
     void tooManyPagesIsALimitWithoutLine() {
-        InlineNode document = document("\tBlock:", "\t\tBox:", "\t\t\tHeight: 10000000");
+        InlineNode document = Docs.read(HEADER, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10000000");
         StxtPdfException e = failure(() -> converter().toPdf(document, new ByteArrayOutputStream()));
         assertEquals(Kind.LIMIT, e.kind());
         assertEquals("PAGE_LIMIT", e.code());
@@ -123,7 +118,7 @@ class ConverterErrorsTest {
     @Test
     void anUnexpectedFailureIsInternalAndKeepsItsCause() {
         Converter converter = converter();
-        LaidOutDocument good = converter.layOut(document("\tText: Hola"));
+        LaidOutDocument good = converter.layOut(Docs.read(HEADER, "\tText: Hola"));
         LaidOutDocument broken = new LaidOutDocument(good.pageSetup(), good.metadata(), good.root(),
                 List.of(new Page(1, null, List.of(), null, 0, 1, NumberFormat.DECIMAL, false)));
         StxtPdfException e = failure(() -> converter.toSvg(broken));
@@ -136,7 +131,7 @@ class ConverterErrorsTest {
     /** A failing target is not an error of the document or of the engine: it is the writer's {@link IOException}. */
     @Test
     void aFailingTargetIsAnIOExceptionNotAnEngineError() {
-        InlineNode document = document("\tText: Hola");
+        InlineNode document = Docs.read(HEADER, "\tText: Hola");
         IOException broken = new IOException("disk full");
         OutputStream target = new OutputStream() {
             @Override
