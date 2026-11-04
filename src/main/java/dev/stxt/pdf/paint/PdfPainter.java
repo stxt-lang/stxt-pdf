@@ -51,7 +51,15 @@ public final class PdfPainter implements Closeable {
     private final List<PDPage> targets = new ArrayList<>();
     private final List<double[]> corners = new ArrayList<>();
 
-    /** A painter for {@code doc}, with the fonts and images of {@code resources} and the {@code limits} of the SVG drawing. */
+    /**
+     * A painter for {@code doc}, with the fonts and images of {@code resources} and the {@code limits} of the SVG
+     * drawing.
+     *
+     * @param doc       the document the pages are painted on, which gets the fonts and images; not {@code null}
+     * @param resources the resources the pages were laid out with; not {@code null}
+     * @param limits    the limits of the conversion, of which the painter applies those of the SVG images (depth and
+     *                  elements); not {@code null}
+     */
     public PdfPainter(PDDocument doc, Resources resources, Limits limits) {
         this(doc, resources, limits, Cancellation.NONE);
     }
@@ -60,6 +68,12 @@ public final class PdfPainter implements Closeable {
      * Like {@link #PdfPainter(PDDocument, Resources, Limits)}, stopping with a
      * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation} asks for it: before each page and at
      * each image the first time it is embedded or drawn.
+     *
+     * @param doc          the document the pages are painted on, which gets the fonts and images; not {@code null}
+     * @param resources    the resources the pages were laid out with; not {@code null}
+     * @param limits       the limits of the conversion, of which the painter applies those of the SVG images (depth
+     *                     and elements); not {@code null}
+     * @param cancellation checked during the painting; {@link Cancellation#NONE} never stops it. Not {@code null}
      */
     public PdfPainter(PDDocument doc, Resources resources, Limits limits, Cancellation cancellation) {
         Objects.requireNonNull(doc, "doc");
@@ -75,6 +89,8 @@ public final class PdfPainter implements Closeable {
      * (its rotation, {@code Rotate}, is not taken into account). The link annotations of the page are added to those
      * of {@code target}.
      *
+     * @param page   a page laid out with the resources of this painter; not {@code null}
+     * @param target a page of the document of this painter; not {@code null}
      * @throws IOException an input and output failure, also those of the canvas primitives
      */
     public void paint(Page page, PDPage target) throws IOException {

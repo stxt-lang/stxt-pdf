@@ -8,6 +8,7 @@ public class ImageFormatException extends ResourceException {
 
     private static final long serialVersionUID = 1L;
 
+    /** The {@link #code()} of every image of an unsupported format or that cannot be read. */
     public static final String CODE = "IMAGE_FORMAT";
 
     public ImageFormatException(String message) {

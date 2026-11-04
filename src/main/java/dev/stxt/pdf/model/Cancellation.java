@@ -26,7 +26,7 @@ public interface Cancellation {
     /** A conversion that is never cancelled. */
     Cancellation NONE = () -> false;
 
-    /** Whether the conversion has to stop now. */
+    /** {@return whether the conversion has to stop now} */
     boolean requested();
 
     /**
@@ -40,7 +40,11 @@ public interface Cancellation {
         }
     }
 
-    /** A cancellation that is requested when this one or {@code other} is. */
+    /**
+     * {@return a cancellation that is requested when this one or {@code other} is}
+     *
+     * @param other the other one to listen to; not {@code null}
+     */
     default Cancellation or(Cancellation other) {
         Objects.requireNonNull(other, "other");
         if (this == NONE) {
@@ -55,6 +59,9 @@ public interface Cancellation {
     /**
      * Requested from {@code when} on, measured with the monotonic clock of the JVM from the moment this is created:
      * a change of the wall clock afterwards does not move it. A moment already past is requested at once.
+     *
+     * @param when the moment from which the conversion has to stop; not {@code null}
+     * @return the cancellation with that deadline
      */
     static Cancellation deadline(Instant when) {
         Objects.requireNonNull(when, "when");
@@ -64,6 +71,9 @@ public interface Cancellation {
     /**
      * Requested once {@code duration} has passed since this is created, by the monotonic clock of the JVM
      * ({@link System#nanoTime()}). Zero or negative is requested at once.
+     *
+     * @param duration the time the conversion has, counted from this call; not {@code null}
+     * @return the cancellation with that timeout
      */
     static Cancellation timeout(Duration duration) {
         Objects.requireNonNull(duration, "duration");
@@ -84,6 +94,8 @@ public interface Cancellation {
      * flag. It is the one for a service that stops a conversion with {@link Thread#interrupt()}: it depends on the
      * thread that asks and not on a document, so it can be shared by every conversion of a {@code Converter}
      * ({@code Converter.builder().cancellation(Cancellation.whenInterrupted())}).
+     *
+     * @return the cancellation that follows the interrupted flag of the current thread at each call
      */
     static Cancellation whenInterrupted() {
         return () -> Thread.currentThread().isInterrupted();

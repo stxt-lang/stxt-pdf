@@ -15,11 +15,18 @@ import java.util.Objects;
  */
 public record InlineImage(String path, String alt) {
 
+    /**
+     * An image of a text.
+     *
+     * @param path the path of the file, relative to {@code images/}; not {@code null}
+     * @param alt  the alternative text; {@code null} for a decorative image
+     * @throws NullPointerException if the path is {@code null}
+     */
     public InlineImage {
         Objects.requireNonNull(path, "path");
     }
 
-    /** Whether the image is decorative: without alternative text, an <em>artifact</em> of the PDF. */
+    /** {@return whether the image is decorative: without alternative text, an <em>artifact</em> of the PDF} */
     public boolean decorative() {
         return alt == null;
     }

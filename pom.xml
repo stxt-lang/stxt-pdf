@@ -277,11 +277,17 @@
                 </executions>
             </plugin>
 
-            <!-- Central also requires the javadoc jar. -->
+            <!-- Central also requires the javadoc jar. doclint checks the HTML, the references and the syntax of the
+                 comments, but not the missing ones (-missing): the code is documented in prose, and a @param or a
+                 @return on every method would mostly repeat it. The promised API (reference/implementation/api.md)
+                 is documented in full by hand. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.11.2</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>

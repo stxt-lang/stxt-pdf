@@ -19,12 +19,21 @@ import dev.stxt.pdf.model.Value;
  */
 public record PageSetup(double width, double height, Insets margin, boolean mirrorMargins) {
 
-    /** A medium without {@code Mirror margins}. */
+    /**
+     * A medium without {@code Mirror margins}.
+     *
+     * @param width  width of the page, in pt
+     * @param height height of the page, in pt
+     * @param margin page margins, in pt, the same on every page
+     */
     public PageSetup(double width, double height, Insets margin) {
         this(width, height, margin, false);
     }
 
-    /** Page area: the initial reference container and the one of {@code Page overlay} boxes. */
+    /**
+     * {@return the page area: the initial reference container and the one of {@code Page overlay} boxes; the page
+     * minus its margins, in page coordinates}
+     */
     public Rect pageArea() {
         return new Rect(margin.left(), margin.top(), width - margin.horizontal(), height - margin.vertical());
     }
@@ -32,6 +41,9 @@ public record PageSetup(double width, double height, Insets margin, boolean mirr
     /**
      * The medium of the physical page {@code number} (from 1): with {@code Mirror margins}, an even page swaps the
      * left and right margins; otherwise it is this one.
+     *
+     * @param number physical page number, from 1, across the whole document
+     * @return the medium of that page: this one, or a copy with the left and right margins swapped
      */
     public PageSetup forPage(int number) {
         if (!mirrorMargins || number % 2 != 0) {
@@ -46,12 +58,26 @@ public record PageSetup(double width, double height, Insets margin, boolean mirr
      * in millimeters (A4 = 210 × 297 mm, 595.28 × 841.89 pt), and the US ones, exact in points.
      */
     public enum Paper {
-        A3(Value.mm(297), Value.mm(420)), A4(Value.mm(210), Value.mm(297)), A5(Value.mm(148), Value.mm(210)),
-        A6(Value.mm(105), Value.mm(148)), B4(Value.mm(250), Value.mm(353)), B5(Value.mm(176), Value.mm(250)),
-        LETTER(Value.pt(612), Value.pt(792)), LEGAL(Value.pt(612), Value.pt(1008));
+        /** ISO A3, 297 x 420 mm. */
+        A3(Value.mm(297), Value.mm(420)),
+        /** ISO A4, 210 x 297 mm. */
+        A4(Value.mm(210), Value.mm(297)),
+        /** ISO A5, 148 x 210 mm. */
+        A5(Value.mm(148), Value.mm(210)),
+        /** ISO A6, 105 x 148 mm. */
+        A6(Value.mm(105), Value.mm(148)),
+        /** ISO B4, 250 x 353 mm. */
+        B4(Value.mm(250), Value.mm(353)),
+        /** ISO B5, 176 x 250 mm. */
+        B5(Value.mm(176), Value.mm(250)),
+        /** US Letter, 8.5 x 11 in (612 x 792 pt). */
+        LETTER(Value.pt(612), Value.pt(792)),
+        /** US Legal, 8.5 x 14 in (612 x 1008 pt). */
+        LEGAL(Value.pt(612), Value.pt(1008));
 
-        /** Width and height in portrait, in pt. */
+        /** Width in portrait, in pt. */
         public final double width;
+        /** Height in portrait, in pt. */
         public final double height;
 
         Paper(Value width, Value height) {
@@ -65,6 +91,9 @@ public record PageSetup(double width, double height, Insets margin, boolean mirr
      * paper.
      */
     public enum Orientation {
-        PORTRAIT, LANDSCAPE
+        /** The width and the height of the paper as {@link Paper} gives them. */
+        PORTRAIT,
+        /** The width and the height of the paper swapped. */
+        LANDSCAPE
     }
 }

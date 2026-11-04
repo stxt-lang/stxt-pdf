@@ -20,15 +20,28 @@ public interface Progress {
     Progress NONE = new Progress() {
     };
 
-    /** A page of the flow has been laid out: {@code number}, from 1, within the current pagination pass. */
+    /**
+     * A page of the flow has been laid out: {@code number}, from 1, within the current pagination pass.
+     *
+     * @param number the number of the page in this pass, from 1
+     */
     default void pageLaidOut(int number) {
     }
 
-    /** The layout has finished, with {@code pages} pages; nothing has been painted yet. */
+    /**
+     * The layout has finished, with {@code pages} pages; nothing has been painted yet.
+     *
+     * @param pages the number of pages of the document, final
+     */
     default void laidOut(int pages) {
     }
 
-    /** Page {@code number} (from 1) of {@code pages} has been painted, to the PDF or to its SVG. */
+    /**
+     * Page {@code number} (from 1) of {@code pages} has been painted, to the PDF or to its SVG.
+     *
+     * @param number the page just painted, from 1
+     * @param pages the number of pages of the document
+     */
     default void pagePainted(int number, int pages) {
     }
 

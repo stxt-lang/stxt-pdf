@@ -51,6 +51,12 @@ public final class Resources {
         this(DEFAULT_ROOT);
     }
 
+    /**
+     * Resources in {@code root}, which does not need to exist yet: it is looked at the first time a font or an image
+     * is requested.
+     *
+     * @param root the resources folder, absolute or relative to the working directory
+     */
     public Resources(Path root) {
         this(root.toAbsolutePath().normalize(), new Shared(), false);
     }
@@ -62,25 +68,26 @@ public final class Resources {
     }
 
     /**
-     * A view of the folder as it is now, which shares with this object (and with its other snapshots) the fonts and
-     * the images already read: those whose files have not changed are not read again. It looks at the folder only the
-     * first time it is asked for its fonts or for each image, and then keeps what it found while it lives, so that one
-     * conversion does not mix two versions of a file. Creating it costs nothing until then.
+     * {@return a view of the folder as it is now, which shares with this object (and with its other snapshots) the
+     * fonts and the images already read} Those whose files have not changed are not read again. It looks at the folder
+     * only the first time it is asked for its fonts or for each image, and then keeps what it found while it lives, so
+     * that one conversion does not mix two versions of a file. Creating it costs nothing until then.
      */
     public Resources snapshot() {
         return new Resources(root, shared, true);
     }
 
+    /** {@return the resources folder, absolute and normalized} */
     public Path root() {
         return root;
     }
 
-    /** Folder of the fonts. */
+    /** {@return the folder of the fonts, {@code fonts/} inside the root} */
     public Path fontsFolder() {
         return root.resolve("fonts");
     }
 
-    /** Folder of the images. */
+    /** {@return the folder of the images, {@code images/} inside the root} */
     public Path imagesFolder() {
         return root.resolve("images");
     }
@@ -153,6 +160,8 @@ public final class Resources {
      * Existing file of the resources folder, from a path relative to it
      * ({@code images/logo.png}). Accepts {@code /} and {@code \} as separators.
      *
+     * @param relative the path inside the resources folder, not blank
+     * @return the absolute, normalized path of the file (its links are checked but not resolved)
      * @throws ResourceException if the path is absolute, contains {@code ..}, leaves the folder
      *                           through a link or does not exist
      */
@@ -165,6 +174,9 @@ public final class Resources {
      * relative to it ({@code logos/acme.png}), with the same checks as
      * {@link #resolve(String)}: the path cannot leave the subfolder.
      *
+     * @param folder the subfolder, relative to the root; {@code ""} for the root itself
+     * @param relative the path inside {@code folder}, not blank
+     * @return the absolute, normalized path of the file (its links are checked but not resolved)
      * @throws ResourceException if the path is absolute, contains {@code ..}, leaves the
      *                           subfolder (also through a link) or does not exist
      */

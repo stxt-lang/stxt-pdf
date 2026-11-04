@@ -44,8 +44,9 @@ public final class Attachments {
     }
 
     /**
-     * These files, in this order, whose names are all different.
+     * {@return these files, in this order, whose names are all different, without extra XMP}
      *
+     * @param files the files to embed; none of them {@code null}
      * @throws IllegalArgumentException if two files have the same name
      */
     public static Attachments of(Attachment... files) {
@@ -69,6 +70,9 @@ public final class Attachments {
      * for the extension schemas ({@code pdfaExtension:schemas}), which it joins with its own, because a packet admits
      * that property once (reference/implementation/pdf.md).
      *
+     * @param descriptions the {@code rdf:Description} elements, as XML text without a document type declaration;
+     *        not {@code null}
+     * @return the same files with this XMP, which replaces any given before
      * @throws IllegalArgumentException if it is not well-formed XML
      */
     public Attachments withXmp(String descriptions) {
@@ -103,17 +107,17 @@ public final class Attachments {
         }
     }
 
-    /** The files, in the order they were given. */
+    /** {@return the files, in the order they were given} */
     public List<Attachment> files() {
         return files;
     }
 
-    /** The extra XMP ({@link #withXmp}), or {@code null}. */
+    /** {@return the extra XMP ({@link #withXmp}), or {@code null}} */
     public String xmp() {
         return xmp;
     }
 
-    /** Whether there is nothing to add: no files and no extra XMP. */
+    /** {@return whether there is nothing to add: no files and no extra XMP} */
     public boolean isEmpty() {
         return files.isEmpty() && xmp == null;
     }

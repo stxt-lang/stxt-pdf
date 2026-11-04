@@ -97,41 +97,48 @@ public final class Converter {
         this.cancellation = builder.cancellation;
     }
 
-    /** A converter with the default configuration: resources in {@code resources/}, no separate styles, no debug. */
+    /**
+     * {@return a converter with the default configuration: resources in {@code resources/}, no separate styles, no
+     * debug}
+     */
     public static Converter create() {
         return builder().build();
     }
 
+    /** {@return a new builder with every option at its default, to configure a converter} */
     public static Builder builder() {
         return new Builder();
     }
 
-    /** The resources folder it converts with. */
+    /** {@return the resources folder it converts with} */
     public Resources resources() {
         return resources;
     }
 
-    /** The most it accepts ({@link Limits}). */
+    /** {@return the most it accepts ({@link Limits})} */
     public Limits limits() {
         return limits;
     }
 
-    /** The checks it does not run ({@link Builder#exclude}); empty if it runs all of them. */
+    /** {@return the checks it does not run ({@link Builder#exclude}); empty if it runs all of them} */
     public Set<Check> excluded() {
         return excluded;
     }
 
-    /** The part of PDF/UA its PDFs comply with ({@link Builder#pdfUa}): 1 or 2. */
+    /** {@return the part of PDF/UA its PDFs comply with ({@link Builder#pdfUa}): 1 or 2} */
     public int pdfUa() {
         return pdfUa;
     }
 
-    /** The PDF/A its PDFs comply with ({@link Builder#pdfA}), or {@code null} if they declare none. */
+    /** {@return the PDF/A its PDFs comply with ({@link Builder#pdfA}), or {@code null} if they declare none} */
     public PdfA pdfA() {
         return pdfA;
     }
 
-    /** What stops every conversion of this converter ({@link Builder#cancellation}); {@link Cancellation#NONE} if nothing. */
+    /**
+     * {@return what stops every conversion of this converter ({@link Builder#cancellation}); {@link Cancellation#NONE}
+     * if nothing}
+     */
     public Cancellation cancellation() {
         return cancellation;
     }
@@ -141,6 +148,9 @@ public final class Converter {
      * resources folder. It fails with the errors of the document (reference/common/errors.md) before anything is
      * written, also with those of the checks that have not been turned off ({@link Builder#exclude}): the low contrast
      * of a text and whatever prevents the page of a PDF from being drawn faithfully.
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @return the laid out pages, ready to paint to PDF or SVG with the fonts and images they were measured with
      */
     public LaidOutDocument layOut(InlineNode document) {
         return layOut(document, Cancellation.NONE);
@@ -150,6 +160,11 @@ public final class Converter {
      * Like {@link #layOut(InlineNode)}, stopping with a {@link dev.stxt.pdf.model.CancelledException} once
      * {@code cancellation}, or the one of the converter ({@link Builder#cancellation}), asks for it
      * (reference/implementation/api.md).
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @return the laid out pages
      */
     public LaidOutDocument layOut(InlineNode document, Cancellation cancellation) {
         return layOut(document, cancellation, Progress.NONE);
@@ -158,6 +173,12 @@ public final class Converter {
     /**
      * Like {@link #layOut(InlineNode, Cancellation)}, telling {@code progress} each page of the flow it lays out and,
      * at the end, the number of pages (reference/implementation/api.md).
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the layout goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @return the laid out pages
      */
     public LaidOutDocument layOut(InlineNode document, Cancellation cancellation, Progress progress) {
         Objects.requireNonNull(document, "document");
@@ -175,7 +196,13 @@ public final class Converter {
         });
     }
 
-    /** Lays out {@code document} and writes the PDF to {@code target}, which is not closed. */
+    /**
+     * Lays out {@code document} and writes the PDF to {@code target}, which is not closed.
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @throws IOException if writing to {@code target} fails
+     */
     public void toPdf(InlineNode document, OutputStream target) throws IOException {
         toPdf(document, target, Attachments.NONE);
     }
@@ -184,6 +211,11 @@ public final class Converter {
      * Lays out {@code document} and writes the PDF, with the files and the XMP of {@code attachments} embedded
      * (reference/implementation/api.md), to {@code target}, which is not closed. A file to embed needs
      * {@link Builder#pdfA PDF/A-3}: otherwise, {@code ATTACHMENT_REQUIRES_PDFA3}.
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(InlineNode document, OutputStream target, Attachments attachments) throws IOException {
         toPdf(document, target, attachments, Cancellation.NONE);
@@ -194,6 +226,13 @@ public final class Converter {
      * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter
      * ({@link Builder#cancellation}), asks for it (reference/implementation/api.md), in any phase; nothing has been
      * written to {@code target} then.
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(InlineNode document, OutputStream target, Attachments attachments, Cancellation cancellation)
             throws IOException {
@@ -203,6 +242,14 @@ public final class Converter {
     /**
      * Like {@link #toPdf(InlineNode, OutputStream, Attachments, Cancellation)}, telling {@code progress} each page
      * laid out and painted and, once the PDF is written, that it is done (reference/implementation/api.md).
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the conversion goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(InlineNode document, OutputStream target, Attachments attachments, Cancellation cancellation,
                       Progress progress) throws IOException {
@@ -214,6 +261,11 @@ public final class Converter {
     /**
      * Lays out {@code document} and writes the PDF into {@code target}, an open PDFBox document without pages, which
      * the caller saves ({@link #toPdf(LaidOutDocument, PDDocument)}).
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target the open PDFBox document, without pages, that receives the PDF; not {@code null}
+     * @throws IOException if PDFBox fails while writing into {@code target}
+     * @throws IllegalArgumentException if {@code target} already has pages
      */
     public void toPdf(InlineNode document, PDDocument target) throws IOException {
         toPdf(document, target, Attachments.NONE, Cancellation.NONE, Progress.NONE);
@@ -223,6 +275,15 @@ public final class Converter {
      * Like {@link #toPdf(InlineNode, PDDocument)}, with the files and the XMP of {@code attachments} embedded,
      * stopping once {@code cancellation} asks for it and telling {@code progress} how it goes
      * ({@link #toPdf(LaidOutDocument, PDDocument, Attachments, Cancellation, Progress)}).
+     *
+     * @param document the document as {@link DocumentReader} returns it; not {@code null}
+     * @param target the open PDFBox document, without pages, that receives the PDF; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the conversion goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @throws IOException if PDFBox fails while writing into {@code target}
+     * @throws IllegalArgumentException if {@code target} already has pages
      */
     public void toPdf(InlineNode document, PDDocument target, Attachments attachments, Cancellation cancellation,
                       Progress progress) throws IOException {
@@ -234,6 +295,10 @@ public final class Converter {
     /**
      * Writes the PDF of a document already laid out by this converter (with the same fonts, which are the ones
      * that get embedded) to {@code target}, which is not closed.
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(LaidOutDocument document, OutputStream target) throws IOException {
         toPdf(document, target, Attachments.NONE);
@@ -242,6 +307,11 @@ public final class Converter {
     /**
      * Like {@link #toPdf(LaidOutDocument, OutputStream)}, with the files and the XMP of {@code attachments}
      * embedded ({@link #toPdf(InlineNode, OutputStream, Attachments)}).
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments) throws IOException {
         toPdf(document, target, attachments, Cancellation.NONE);
@@ -251,6 +321,13 @@ public final class Converter {
      * Like {@link #toPdf(LaidOutDocument, OutputStream, Attachments)}, stopping with a
      * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter
      * ({@link Builder#cancellation}), asks for it: at each page and at each image, before anything is written.
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments,
                       Cancellation cancellation) throws IOException {
@@ -260,6 +337,14 @@ public final class Converter {
     /**
      * Like {@link #toPdf(LaidOutDocument, OutputStream, Attachments, Cancellation)}, telling {@code progress} each
      * page painted and, once the PDF is written, that it is done (reference/implementation/api.md).
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target where the PDF is written; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the painting goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @throws IOException if writing to {@code target} fails
      */
     public void toPdf(LaidOutDocument document, OutputStream target, Attachments attachments,
                       Cancellation cancellation, Progress progress) throws IOException {
@@ -283,6 +368,9 @@ public final class Converter {
      * language and XMP packet). A single page is painted on a page of any document with
      * {@link dev.stxt.pdf.paint.PdfPainter}.
      *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target the open PDFBox document, without pages, that receives the PDF; not {@code null}
+     * @throws IOException if PDFBox fails while writing into {@code target}
      * @throws IllegalArgumentException if {@code target} already has pages
      */
     public void toPdf(LaidOutDocument document, PDDocument target) throws IOException {
@@ -295,6 +383,15 @@ public final class Converter {
      * {@link dev.stxt.pdf.model.CancelledException} once {@code cancellation}, or the one of the converter, asks for
      * it (the document is then half written) and telling {@code progress} each page painted and, at the end, that it
      * is done.
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param target the open PDFBox document, without pages, that receives the PDF; not {@code null}
+     * @param attachments the files and the XMP of this document; {@link Attachments#NONE} for none, not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the painting goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @throws IOException if PDFBox fails while writing into {@code target}
+     * @throws IllegalArgumentException if {@code target} already has pages
      */
     public void toPdf(LaidOutDocument document, PDDocument target, Attachments attachments, Cancellation cancellation,
                       Progress progress) throws IOException {
@@ -311,7 +408,11 @@ public final class Converter {
                 attachments, stop, progress));
     }
 
-    /** The SVG of each page of an already laid out document, in order. */
+    /**
+     * {@return the SVG of each page of an already laid out document, in order}
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     */
     public List<String> toSvg(LaidOutDocument document) {
         return toSvg(document, Cancellation.NONE);
     }
@@ -319,6 +420,11 @@ public final class Converter {
     /**
      * Like {@link #toSvg(LaidOutDocument)}, stopping once {@code cancellation}, or the one of the converter, asks for
      * it, which is asked at each page.
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @return the SVG of each page, in order
      */
     public List<String> toSvg(LaidOutDocument document, Cancellation cancellation) {
         return toSvg(document, cancellation, Progress.NONE);
@@ -327,6 +433,12 @@ public final class Converter {
     /**
      * Like {@link #toSvg(LaidOutDocument, Cancellation)}, telling {@code progress} each page made and, at the end,
      * that it is done.
+     *
+     * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
+     * @param cancellation what stops this conversion, besides the one of the converter; {@link Cancellation#NONE}
+     *        for nothing, not {@code null}
+     * @param progress what is told how the painting goes; {@link Progress#NONE} for nothing, not {@code null}
+     * @return the SVG of each page, in order
      */
     public List<String> toSvg(LaidOutDocument document, Cancellation cancellation, Progress progress) {
         Objects.requireNonNull(document, "document");
@@ -393,7 +505,12 @@ public final class Converter {
         private Builder() {
         }
 
-        /** Resources folder (reference/common/resources.md); by default {@link Resources#DEFAULT_ROOT}. */
+        /**
+         * Resources folder (reference/common/resources.md); by default {@link Resources#DEFAULT_ROOT}.
+         *
+         * @param resources the folder with the fonts and the images; not {@code null}
+         * @return this builder
+         */
         public Builder resources(Resources resources) {
             this.resources = Objects.requireNonNull(resources, "resources");
             return this;
@@ -402,18 +519,31 @@ public final class Converter {
         /**
          * Separate styles document, already read ({@link DocumentReader#readStyles(String)}), whose rules weigh less
          * than those of the document (reference/common/styles.md). Without it, the document carries all its styles.
+         *
+         * @param styles the styles document as {@link DocumentReader#readStyles(String)} returns it; not {@code null}
+         * @return this builder
          */
         public Builder styles(InlineNode styles) {
             this.styles = Objects.requireNonNull(styles, "styles");
             return this;
         }
 
-        /** Like {@link #styles(InlineNode)}, reading it from an STXT text. */
+        /**
+         * Like {@link #styles(InlineNode)}, reading it from an STXT text.
+         *
+         * @param content the STXT text of the styles document
+         * @return this builder
+         */
         public Builder styles(String content) {
             return styles(new DocumentReader().readStyles(content));
         }
 
-        /** Like {@link #styles(InlineNode)}, reading it from a UTF-8 file. */
+        /**
+         * Like {@link #styles(InlineNode)}, reading it from a UTF-8 file.
+         *
+         * @param file the STXT file of the styles document, in UTF-8
+         * @return this builder
+         */
         public Builder styles(Path file) {
             return styles(new DocumentReader().readStyles(file));
         }
@@ -421,6 +551,10 @@ public final class Converter {
         /**
          * The most the conversion accepts (pages, pixels of an image, elements and levels of an SVG, bytes of
          * a PDF); by default {@link Limits#DEFAULT}. A document that exceeds it fails with a {@code LIMIT} error.
+         *
+         * @param limits {@link Limits#DEFAULT} with the values to change ({@link Limits#withMaxPages}...); not
+         *        {@code null}
+         * @return this builder
          */
         public Builder limits(Limits limits) {
             this.limits = Objects.requireNonNull(limits, "limits");
@@ -432,6 +566,9 @@ public final class Converter {
          * (reference/common/pdf.md) and whatever prevents the page of a PDF from being drawn faithfully
          * (reference/components/image.md). By default all of them run; each call adds its own to those already turned
          * off.
+         *
+         * @param checks the checks not to run; none of them {@code null}
+         * @return this builder
          */
         public Builder exclude(Check... checks) {
             for (Check check : checks) {
@@ -444,6 +581,8 @@ public final class Converter {
          * The part of PDF/UA the PDF conforms to (reference/common/pdf.md): 1, in PDF 1.7, or 2, in PDF 2.0. By
          * default 1.
          *
+         * @param part 1 or 2
+         * @return this builder
          * @throws IllegalArgumentException if it is neither 1 nor 2
          */
         public Builder pdfUa(int part) {
@@ -459,6 +598,9 @@ public final class Converter {
          * {@code b} or {@code a}. By default none. PDF/A-3 is the one that admits files of any kind
          * ({@link Attachments}). The PDF/A parts are PDF 1.7 files: with {@link #pdfUa pdfUa(2)}, which is PDF 2.0,
          * {@link #build} fails.
+         *
+         * @param pdfA the part and the level, as {@link PdfA#A3B}; not {@code null}
+         * @return this builder
          */
         public Builder pdfA(PdfA pdfA) {
             this.pdfA = Objects.requireNonNull(pdfA, "pdfA");
@@ -471,19 +613,29 @@ public final class Converter {
          * ({@link Cancellation#NONE}). All the conversions share it, so it is the place for one that depends on the
          * thread that converts ({@link Cancellation#whenInterrupted()}); the deadline of one document goes with its
          * call ({@link Converter#toPdf(InlineNode, OutputStream, Attachments, Cancellation)}), and either stops it.
+         *
+         * @param cancellation what stops every conversion; not {@code null}
+         * @return this builder
          */
         public Builder cancellation(Cancellation cancellation) {
             this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
             return this;
         }
 
-        /** Draws the outline of each box, to review a document by hand; off by default. */
+        /**
+         * Draws the outline of each box, to review a document by hand; off by default.
+         *
+         * @param debug {@code true} to draw the outlines
+         * @return this builder
+         */
         public Builder debug(boolean debug) {
             this.debug = debug;
             return this;
         }
 
         /**
+         * {@return the converter with the options given, immutable and independent of this builder}
+         *
          * @throws IllegalArgumentException with {@link #pdfUa pdfUa(2)} and a {@link #pdfA}: PDF/UA-2 is a PDF 2.0
          *         file and PDF/A-2 and PDF/A-3 are PDF 1.7 ones
          */

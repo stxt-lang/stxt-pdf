@@ -34,7 +34,10 @@ public final class Attachment {
             this.pdfName = pdfName;
         }
 
-        /** The name written in the PDF: {@code Data}, {@code Alternative}, {@code Source} or {@code Supplement}. */
+        /**
+         * {@return the name written in the PDF: {@code Data}, {@code Alternative}, {@code Source} or
+         * {@code Supplement}}
+         */
         public String pdfName() {
             return pdfName;
         }
@@ -64,6 +67,11 @@ public final class Attachment {
      * {@code bytes} its content (copied), {@code mimeType} its media type ({@code text/xml}, {@code application/pdf})
      * and {@code relationship} what it is to the document.
      *
+     * @param name the file name, not blank and unique among the attachments of a PDF
+     * @param bytes the content; it is copied, so later changes to the array do not reach the file
+     * @param mimeType the media type, {@code type/subtype} with no parameters
+     * @param relationship what the file is to the document; for the XML of Factur-X, {@link Relationship#ALTERNATIVE}
+     * @return the file, without description or modification date
      * @throws IllegalArgumentException if the name is blank or the media type is not {@code type/subtype}
      */
     public static Attachment of(String name, byte[] bytes, String mimeType, Relationship relationship) {
@@ -80,7 +88,11 @@ public final class Attachment {
         return new Attachment(name, bytes.clone(), mimeType, relationship, null, null);
     }
 
-    /** The same file with a description ({@code Desc}), which the viewer shows next to the name. */
+    /**
+     * {@return the same file with a description ({@code Desc}), which the viewer shows next to the name}
+     *
+     * @param description the text of the description; not {@code null}
+     */
     public Attachment withDescription(String description) {
         return new Attachment(name, bytes, mimeType, relationship, Objects.requireNonNull(description, "description"),
                 modified);
@@ -89,42 +101,46 @@ public final class Attachment {
     /**
      * The same file with its modification date ({@code ModDate}), which some profiles of embedded files ask for.
      * Without it, the PDF carries no date, and the same document gives the same bytes.
+     *
+     * @param modified the moment the file was last modified; not {@code null}
+     * @return the same file with that date
      */
     public Attachment withModified(Instant modified) {
         return new Attachment(name, bytes, mimeType, relationship, description,
                 Objects.requireNonNull(modified, "modified"));
     }
 
-    /** The file name, unique among the attachments of a PDF. */
+    /** {@return the file name, unique among the attachments of a PDF} */
     public String name() {
         return name;
     }
 
-    /** The content, a copy. */
+    /** {@return the content, a copy} */
     public byte[] bytes() {
         return bytes.clone();
     }
 
-    /** The number of bytes of the content. */
+    /** {@return the number of bytes of the content} */
     public int size() {
         return bytes.length;
     }
 
-    /** The media type ({@code text/xml}). */
+    /** {@return the media type ({@code text/xml})} */
     public String mimeType() {
         return mimeType;
     }
 
+    /** {@return what the file is to the document ({@code AFRelationship})} */
     public Relationship relationship() {
         return relationship;
     }
 
-    /** The description, or {@code null}. */
+    /** {@return the description, or {@code null}} */
     public String description() {
         return description;
     }
 
-    /** The modification date, or {@code null}. */
+    /** {@return the modification date, or {@code null}} */
     public Instant modified() {
         return modified;
     }

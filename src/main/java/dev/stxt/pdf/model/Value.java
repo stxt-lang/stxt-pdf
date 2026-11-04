@@ -15,39 +15,77 @@ public sealed interface Value {
     /**
      * Absolute length in typographic points. A length written in millimeters ({@code 12mm}) is converted to points
      * when it is read (reference/common/values.md).
+     *
+     * @param pt the length in points; negative where the property allows it
      */
     record Points(double pt) implements Value {}
 
-    /** Percentage of the reference container (or of the font size in {@code Line height}). */
+    /**
+     * Percentage of the reference container (or of the font size in {@code Line height}).
+     *
+     * @param percent the percentage as written: {@code 50} for {@code 50%}
+     */
     record Percentage(double percent) implements Value {}
 
-    /** Fraction of free space in grid tracks ({@code *}, {@code 2*}), with its weight. */
+    /**
+     * Fraction of free space in grid tracks ({@code *}, {@code 2*}), with its weight.
+     *
+     * @param weight the weight written before the asterisk: 1 for {@code *}, 2 for {@code 2*}
+     */
     record Fraction(double weight) implements Value {}
 
-    /** {@code between(min, max)} in grid tracks. */
+    /**
+     * {@code between(min, max)} in grid tracks.
+     *
+     * @param min the smallest size of the track; never a fraction
+     * @param max the largest size of the track
+     */
     record Between(Value min, Value max) implements Value {}
 
     /** Keywords that depend on the content. */
-    enum Keyword implements Value { AUTO, NARROWEST, NATURAL, FIT }
+    enum Keyword implements Value {
+        /** {@code auto}: the engine computes the value from the context. */
+        AUTO,
+        /** {@code narrowest}: the smallest size without overflowing (the longest word). */
+        NARROWEST,
+        /** {@code natural}: the size without any line break. */
+        NATURAL,
+        /** {@code fit}: the natural width, without going over the available width or under the narrowest. */
+        FIT
+    }
 
+    /** {@code auto}: {@link Keyword#AUTO}. */
     Value AUTO = Keyword.AUTO;
 
     /** Points in a millimeter: 72 points per inch, 25.4 millimeters per inch. */
     double POINTS_PER_MM = 72 / 25.4;
 
+    /**
+     * A length in points.
+     *
+     * @param points the length, in points
+     * @return the value {@link Points}
+     */
     static Value pt(double points) {
         return new Points(points);
     }
 
+    /**
+     * A length written in millimeters, converted to points.
+     *
+     * @param millimeters the length, in millimeters
+     * @return the value {@link Points}, at {@link #POINTS_PER_MM}
+     */
     static Value mm(double millimeters) {
         return new Points(millimeters * POINTS_PER_MM);
     }
 
+    /** {@return whether it is {@code auto}} */
     default boolean isAuto() {
         return this == Keyword.AUTO;
     }
 
-    /** {@code narrowest}, {@code natural} or {@code fit}. */
+    /** {@return whether it is {@code narrowest}, {@code natural} or {@code fit}} */
     default boolean isIntrinsic() {
         return this instanceof Keyword k && k != Keyword.AUTO;
     }
@@ -71,6 +109,12 @@ public sealed interface Value {
         return OptionalDouble.empty();
     }
 
+    /**
+     * Resolves the value to points against a definite base, as {@link #resolve(OptionalDouble)} does.
+     *
+     * @param base reference size, in points (usually that of the reference container)
+     * @return the points, or empty if the value depends on the content ({@code auto}, intrinsic, fractions)
+     */
     default OptionalDouble resolve(double base) {
         return resolve(OptionalDouble.of(base));
     }

@@ -181,6 +181,11 @@ Las puertas del build, que no piden esfuerzo y solo impiden retroceder:
   `dependencyManagement` fija la del motor para los dos.
 - **Avisos del compilador:** `-Xlint:all`, sin `-Werror`. Se arreglan al aparecer: el 2026-11-04 había siete (seis
   conversiones de tipo redundantes y un método obsoleto de PDFBox) y no queda ninguno.
+- **Javadoc:** el jar de javadoc, que exige Maven Central, se genera en `package` con doclint `all,-missing`: falla con
+  el HTML mal formado o un `{@link}` que no resuelve, y avisa de la sintaxis, pero no de los comentarios y las
+  etiquetas que faltan. El código se documenta en prosa, y un `@param` o un `@return` en cada método repetiría casi
+  siempre lo que ya dice. La API que se promete ([Uso desde Java](api.md#lo-que-se-promete)) sí lleva todas sus
+  etiquetas, escritas a mano.
 
 > **Decisión:** ni Checkstyle, ni Error Prone, ni SpotBugs, ni OWASP dependency-check: con seis dependencias y una
 > persona, `-Xlint:all` y un `mvn versions:display-dependency-updates` al preparar cada versión dan casi lo mismo.

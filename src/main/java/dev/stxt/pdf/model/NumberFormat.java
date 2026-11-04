@@ -9,14 +9,26 @@ import java.util.Locale;
  * reference/components/document.md), which only allows digits and Roman numerals.
  */
 public enum NumberFormat {
-    DECIMAL, LOWER_ALPHA, UPPER_ALPHA, LOWER_ROMAN, UPPER_ROMAN;
+    /** {@code decimal}: in digits ({@code 1}, {@code 2}, {@code 3}). */
+    DECIMAL,
+    /** {@code lower-alpha}: in lowercase letters ({@code a}, {@code b}, {@code c}). */
+    LOWER_ALPHA,
+    /** {@code upper-alpha}: in uppercase letters ({@code A}, {@code B}, {@code C}). */
+    UPPER_ALPHA,
+    /** {@code lower-roman}: in lowercase Roman numerals ({@code i}, {@code ii}, {@code iii}). */
+    LOWER_ROMAN,
+    /** {@code upper-roman}: in uppercase Roman numerals ({@code I}, {@code II}, {@code III}). */
+    UPPER_ROMAN;
 
     private static final int[] ROMAN_VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static final String[] ROMAN_DIGITS = {"m", "cm", "d", "cd", "c", "xc", "l", "xl", "x", "ix", "v", "iv", "i"};
 
     /**
-     * The number written this way ({@code 3}, {@code c}, {@code III}). Letters continue after {@code z} with
+     * {@return the number written this way ({@code 3}, {@code c}, {@code III})} Letters continue after {@code z} with
      * {@code aa}; Roman numerals, past 3999, with more {@code m}. The caller checks the range if it needs to.
+     *
+     * @param number the number to write; with letters and Roman numerals, 0 and the negative ones give an empty
+     *               string
      */
     public String format(int number) {
         return switch (this) {

@@ -418,8 +418,9 @@ public enum ErrorCode {
     }
 
     /**
-     * Whose fault it is: the document's ({@link Kind#INVALID_DOCUMENT}) except for the limits ({@link Kind#LIMIT}) and
-     * the configuration of whoever converts ({@link Kind#RESOURCE}, {@link #ATTACHMENT_REQUIRES_PDFA3}).
+     * {@return whose fault it is} The document's ({@link Kind#INVALID_DOCUMENT}) except for the limits
+     * ({@link Kind#LIMIT}) and the configuration of whoever converts ({@link Kind#RESOURCE},
+     * {@link #ATTACHMENT_REQUIRES_PDFA3}).
      */
     public Kind kind() {
         return kind;

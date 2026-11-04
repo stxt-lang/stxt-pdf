@@ -12,6 +12,7 @@ public class ResourceException extends StxtPdfException {
 
     private static final long serialVersionUID = 1L;
 
+    /** The {@link #code()} of a resource error without a code of its own. */
     public static final String CODE = "RESOURCE";
 
     public ResourceException(String message) {

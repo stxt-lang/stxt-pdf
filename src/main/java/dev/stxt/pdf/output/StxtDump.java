@@ -28,6 +28,16 @@ public final class StxtDump {
     private StxtDump() {
     }
 
+    /**
+     * Dumps the pages in order: for each one, the fragments of its flow, then those of its footnote area and those of
+     * its {@code Page overlay} boxes, each with its {@code Rect} and, in a table with merged borders, its {@code Rule}
+     * lines.
+     *
+     * @param pages            the pages of a {@link dev.stxt.pdf.layout.LaidOutDocument}, in order
+     * @param includeWithoutId whether the fragments without {@code Id} are dumped too, named by a description of their
+     *                         box; {@code false} in the reference tests
+     * @return the dump, starting with {@code Result:}, with tabs for indentation and a line feed after each line
+     */
     public static String dump(List<Page> pages, boolean includeWithoutId) {
         StringBuilder sb = new StringBuilder("Result:\n");
         for (Page p : pages) {

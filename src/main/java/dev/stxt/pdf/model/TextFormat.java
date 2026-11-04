@@ -34,6 +34,19 @@ package dev.stxt.pdf.model;
  * text is the single {@link TextRun#OBJECT_REPLACEMENT}: the layout measures it as the image, as tall as the size of
  * the box, and the painting draws it in its place; it has no letter spacing. The rest of the format is kept
  * (a link, for an image that is clicked), but the font and the decorations do not apply to it.</p>
+ *
+ * @param bold      bold ({@code **text**}), added to the weight of the box
+ * @param italic    italic ({@code *text*})
+ * @param underline underlined ({@code ++text++}, and a Markdown link)
+ * @param strike    struck through ({@code ~~text~~})
+ * @param link      the target of the link of the run; {@code null} if it has none
+ * @param smallCaps whether the letters are already small caps, set by the layout
+ * @param code      whether it is inline code
+ * @param family    the font family of the run; {@code null} for that of the box
+ * @param footnote  the {@code Id} of the footnote the run calls; {@code null} if it calls none
+ * @param label     whether it is the number that opens a footnote
+ * @param style     the style of a styled run; {@code null} if it is not one
+ * @param image     the image the run is; {@code null} if it is text
  */
 public record TextFormat(boolean bold, boolean italic, boolean underline, boolean strike, String link,
                          boolean smallCaps, boolean code, String family, String footnote, boolean label,
@@ -54,6 +67,11 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
     /**
      * The marks alone: no link, small caps, code, family, footnote, label, style or image. The rest is added with the
      * {@code with...} methods.
+     *
+     * @param bold      bold, added to the weight of the box
+     * @param italic    italic
+     * @param underline underlined
+     * @param strike    struck through
      */
     public TextFormat(boolean bold, boolean italic, boolean underline, boolean strike) {
         this(bold, italic, underline, strike, null, false, false, null, null, false, null, null);
@@ -63,6 +81,9 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
      * The font of the run, derived from that of the box: with the family, the weight and the style of its
      * {@link #style()}, if it declares them, and its marks on top. A run with letter spacing has no ligatures, like a
      * box (reference/common/text-formatting.md).
+     *
+     * @param base the font of the box
+     * @return {@code base} itself if the run changes nothing of it, or the font of the run
      */
     public FontFace face(FontFace base) {
         if (!bold && !italic && family == null && style == null) {
@@ -76,14 +97,21 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
                 italic ? FontStyle.ITALIC : fontStyle, ligatures, base.kerning());
     }
 
-    /** The color of the text of the run: that of its {@link #style()} or, if it does not declare one, {@code box}. */
+    /**
+     * {@return the color of the text of the run: that of its {@link #style()} or, if it does not declare one,
+     * {@code box}}
+     *
+     * @param box the color of the box
+     */
     public String color(String box) {
         return style != null && style.color() != null ? style.color() : box;
     }
 
     /**
-     * The letter spacing of the run, in points: that of its {@link #style()} or, if it does not declare one,
-     * {@code box}.
+     * {@return the letter spacing of the run, in points: that of its {@link #style()} or, if it does not declare one,
+     * {@code box}; 0 in an image}
+     *
+     * @param box the letter spacing of the box, in points
      */
     public double letterSpacing(double box) {
         if (image != null) {
@@ -92,82 +120,128 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
         return style != null && style.letterSpacing() != null ? style.letterSpacing() : box;
     }
 
-    /** The case of the run: that of its {@link #style()} or, if it does not declare one, {@code box}. */
+    /**
+     * {@return the case of the run: that of its {@link #style()} or, if it does not declare one, {@code box}}
+     *
+     * @param box the case of the box
+     */
     public TextCase textCase(TextCase box) {
         return style != null && style.textCase() != null ? style.textCase() : box;
     }
 
     /**
-     * Whether the run is painted in small caps ({@code Small caps}): its {@link #style()} or, if it does not declare
-     * it, {@code box}. It is not {@link #smallCaps()}, which marks the letters the layout already turned into them.
+     * {@return whether the run is painted in small caps ({@code Small caps}): its {@link #style()} or, if it does not
+     * declare it, {@code box}} It is not {@link #smallCaps()}, which marks the letters the layout already turned into
+     * them.
+     *
+     * @param box whether the box is painted in small caps
      */
     public boolean smallCaps(boolean box) {
         return style != null && style.smallCaps() != null ? style.smallCaps() : box;
     }
 
-    /** The same format with those marks: bold, italic, underline and strikethrough. */
+    /**
+     * {@return the same format with those marks: bold, italic, underline and strikethrough} They replace those of this
+     * format.
+     *
+     * @param b bold
+     * @param i italic
+     * @param u underlined
+     * @param s struck through
+     */
     public TextFormat withMarks(boolean b, boolean i, boolean u, boolean s) {
         return new TextFormat(b, i, u, s, link, smallCaps, code, family, footnote, label, style, image);
     }
 
-    /** The same format with the style of a styled run ({@code [text]{name}}). */
+    /**
+     * {@return the same format with the style of a styled run ({@code [text]{name}})}
+     *
+     * @param runStyle the style, or {@code null} for none
+     */
     public TextFormat withStyle(RunStyle runStyle) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label,
                 runStyle, image);
     }
 
-    /** Whether it has underline or strikeout, which are painted apart from the text. */
+    /** {@return whether it has underline or strikeout, which are painted apart from the text} */
     public boolean decorated() {
         return underline || strike;
     }
 
-    /** The same format with that link. */
+    /**
+     * {@return the same format with that link}
+     *
+     * @param destination the target of the link ({@link Links}), or {@code null} for none
+     */
     public TextFormat withLink(String destination) {
         return new TextFormat(bold, italic, underline, strike, destination, smallCaps, code, family, footnote, label,
                 style, image);
     }
 
-    /** The same format with small caps turned on or off. */
+    /**
+     * The same format with small caps turned on or off.
+     *
+     * @param small whether the letters of the run are small caps
+     * @return this format if it already has that value, or a copy with it
+     */
     public TextFormat withSmallCaps(boolean small) {
         return small == smallCaps ? this
                 : new TextFormat(bold, italic, underline, strike, link, small, code, family, footnote, label, style,
                         image);
     }
 
-    /** The same format as inline code, still without its family. */
+    /** {@return the same format as inline code, still without its family} */
     public TextFormat asCode() {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, true, family, footnote, label, style,
                 image);
     }
 
-    /** The same format with that font family. */
+    /**
+     * {@return the same format with that font family}
+     *
+     * @param fontFamily the family of the run, or {@code null} for that of the box
+     */
     public TextFormat withFamily(String fontFamily) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, fontFamily, footnote, label,
                 style, image);
     }
 
-    /** The same format as the call of the footnote with that {@code Id}: a superscript. */
+    /**
+     * {@return the same format as the call of the footnote with that {@code Id}: a superscript} It is no longer the
+     * label of a note.
+     *
+     * @param id the {@code Id} of the {@code Footnote} the run calls
+     */
     public TextFormat withFootnote(String id) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, id, false, style, image);
     }
 
-    /** The same format as the label that opens a footnote: a superscript. */
+    /**
+     * {@return the same format as the label that opens a footnote: a superscript} It no longer calls a note.
+     */
     public TextFormat asLabel() {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, null, true, style, image);
     }
 
-    /** The same format as a run that is that image, whose text is {@link TextRun#IMAGE}. */
+    /**
+     * {@return the same format as a run that is that image, whose text is {@link TextRun#IMAGE}}
+     *
+     * @param inlineImage the image, or {@code null} for a run of text
+     */
     public TextFormat withImage(InlineImage inlineImage) {
         return new TextFormat(bold, italic, underline, strike, link, smallCaps, code, family, footnote, label, style,
                 inlineImage);
     }
 
-    /** Whether the run is a superscript: the call or the label of a footnote. */
+    /** {@return whether the run is a superscript: the call or the label of a footnote} */
     public boolean superscript() {
         return footnote != null || label;
     }
 
-    /** The factor applied to the size of the box to paint the run. */
+    /**
+     * {@return the factor applied to the size of the box to paint the run: {@link #SUPERSCRIPT_SCALE},
+     * {@link #SMALL_CAPS_SCALE} or 1}
+     */
     public double scale() {
         if (superscript()) {
             return SUPERSCRIPT_SCALE;
@@ -175,7 +249,10 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
         return smallCaps ? SMALL_CAPS_SCALE : 1;
     }
 
-    /** How much the run is raised above the baseline of the line, as a factor of the size of the box. */
+    /**
+     * {@return how much the run is raised above the baseline of the line, as a factor of the size of the box:
+     * {@link #SUPERSCRIPT_RISE} or 0}
+     */
     public double rise() {
         return superscript() ? SUPERSCRIPT_RISE : 0;
     }

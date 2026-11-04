@@ -38,7 +38,7 @@ public class InvalidModelException extends StxtPdfException {
         return new InvalidModelException(SourceLine.inStyles(line()), errorCode, detail);
     }
 
-    /** The code as an enum value, to compare it; {@link #code()} gives it as text. */
+    /** {@return the code as an enum value, to compare it; {@link #code()} gives it as text} */
     public ErrorCode errorCode() {
         return errorCode;
     }

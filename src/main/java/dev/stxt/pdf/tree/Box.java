@@ -73,14 +73,14 @@ public final class Box {
 
     // --- Reading ---------------------------------------------------------------------------------------
 
-    /** The {@code Id} of the box; {@code null} if it has none. */
+    /** {@return the {@code Id} of the box; {@code null} if it has none} */
     public String id() {
         return id;
     }
 
     /**
-     * Element it comes from; {@code null} in the root. It gives the meaning: {@code For element}
-     * rules, bookmarks and PDF tags.
+     * {@return the element it comes from; {@code null} in the root. It gives the meaning: {@code For element}
+     * rules, bookmarks and PDF tags}
      */
     public Element element() {
         return element;
@@ -90,30 +90,33 @@ public final class Box {
         return style;
     }
 
-    /** Whether it is the anonymous root, which represents the page area. */
+    /** {@return whether it is the anonymous root, which represents the page area} */
     public boolean anonymous() {
         return anonymous;
     }
 
-    /** Line of the document it comes from, for error messages. */
+    /** {@return the line of the document it comes from, for error messages} */
     public int line() {
         return line;
     }
 
     /**
-     * The children, in document order; the list cannot be changed. In the root of the document, also the
-     * sections, which hang from it without being its children (reference/components/document.md).
+     * {@return the children, in document order; the list cannot be changed. In the root of the document, also the
+     * sections, which hang from it without being its children (reference/components/document.md)}
      */
     public List<Box> children() {
         return closed ? children : Collections.unmodifiableList(children);
     }
 
-    /** The parent box; {@code null} in the root and in the box of a section, which is the root of its layout. */
+    /**
+     * {@return the parent box; {@code null} in the root and in the box of a section, which is the root of its
+     * layout}
+     */
     public Box parent() {
         return parent;
     }
 
-    /** Inline content, if the box contains text directly; {@code null} otherwise. */
+    /** {@return the inline content, if the box contains text directly; {@code null} otherwise} */
     public String text() {
         return text;
     }
@@ -457,8 +460,8 @@ public final class Box {
     }
 
     /**
-     * What the box means ({@link Element#role()}); the anonymous root of the document is
-     * {@link Element.Role#DOCUMENT}.
+     * {@return what the box means ({@link Element#role()}); the anonymous root of the document is
+     * {@link Element.Role#DOCUMENT}}
      */
     public Element.Role role() {
         return element == null ? Element.Role.DOCUMENT : element.role();

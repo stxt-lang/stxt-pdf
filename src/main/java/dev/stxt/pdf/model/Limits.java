@@ -25,6 +25,16 @@ public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int 
     /** 2000 pages, 25 million pixels per image, 20,000 elements and 64 levels per SVG and 20 MB per PDF. */
     public static final Limits DEFAULT = new Limits(2_000, 25_000_000L, 20_000, 64, 20_000_000L);
 
+    /**
+     * Checks that every limit is at least 1.
+     *
+     * @param maxPages       pages of the whole document
+     * @param maxImagePixels pixels (width by height) of a PNG or JPEG image
+     * @param maxSvgElements elements an SVG draws, counting each repetition of a {@code <use>}
+     * @param maxSvgDepth    nesting levels of an SVG, counting the root {@code <svg>}
+     * @param maxPdfBytes    bytes of the file of a PDF that an {@code Image} draws
+     * @throws IllegalArgumentException if a limit is zero or negative
+     */
     public Limits {
         require("maxPages", maxPages);
         require("maxImagePixels", maxImagePixels);
@@ -39,22 +49,52 @@ public record Limits(int maxPages, long maxImagePixels, int maxSvgElements, int 
         }
     }
 
+    /**
+     * {@return the same limits with another maximum of pages}
+     *
+     * @param maxPages pages of the whole document, at least 1
+     * @throws IllegalArgumentException if it is less than 1
+     */
     public Limits withMaxPages(int maxPages) {
         return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
+    /**
+     * {@return the same limits with another maximum of pixels per image}
+     *
+     * @param maxImagePixels pixels (width by height) of a PNG or JPEG image, at least 1
+     * @throws IllegalArgumentException if it is less than 1
+     */
     public Limits withMaxImagePixels(long maxImagePixels) {
         return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
+    /**
+     * {@return the same limits with another maximum of elements per SVG}
+     *
+     * @param maxSvgElements elements an SVG draws, counting each repetition of a {@code <use>}, at least 1
+     * @throws IllegalArgumentException if it is less than 1
+     */
     public Limits withMaxSvgElements(int maxSvgElements) {
         return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
+    /**
+     * {@return the same limits with another maximum of nesting levels per SVG}
+     *
+     * @param maxSvgDepth nesting levels of an SVG, counting the root {@code <svg>}, at least 1
+     * @throws IllegalArgumentException if it is less than 1
+     */
     public Limits withMaxSvgDepth(int maxSvgDepth) {
         return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }
 
+    /**
+     * {@return the same limits with another maximum of bytes per PDF drawn as an image}
+     *
+     * @param maxPdfBytes bytes of the file of a PDF that an {@code Image} draws, at least 1
+     * @throws IllegalArgumentException if it is less than 1
+     */
     public Limits withMaxPdfBytes(long maxPdfBytes) {
         return new Limits(maxPages, maxImagePixels, maxSvgElements, maxSvgDepth, maxPdfBytes);
     }

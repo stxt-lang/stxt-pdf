@@ -8,6 +8,7 @@ public class InternalException extends StxtPdfException {
 
     private static final long serialVersionUID = 1L;
 
+    /** The {@link #code()} of every internal failure. */
     public static final String CODE = "INTERNAL";
 
     public InternalException(String message) {

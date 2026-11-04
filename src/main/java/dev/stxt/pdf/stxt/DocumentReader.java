@@ -42,12 +42,22 @@ public final class DocumentReader {
     /** Namespace of the box model, the same one the schema defines. */
     public static final String NAMESPACE = DocumentSchema.NAMESPACE;
 
-    /** Reads and validates a document; returns its root node. */
+    /**
+     * Reads and validates a document; returns its root node.
+     *
+     * @param content the STXT text of the document
+     * @return the root node {@code Document}, ready for {@code Converter.layOut} or {@code Converter.toPdf}
+     */
     public InlineNode read(String content) {
         return root(parse(() -> parser().parse(content), false));
     }
 
-    /** Reads and validates a document from a UTF-8 file; returns its root node. */
+    /**
+     * Reads and validates a document from a UTF-8 file; returns its root node.
+     *
+     * @param file the STXT file of the document, in UTF-8
+     * @return the root node {@code Document}, ready for {@code Converter.layOut} or {@code Converter.toPdf}
+     */
     public InlineNode read(Path file) {
         return root(parse(() -> parser().parseFile(file.toFile()), false));
     }
@@ -55,12 +65,20 @@ public final class DocumentReader {
     /**
      * Reads and validates a separate styles document (root {@code Styles}, reference/common/styles.md), which is
      * passed along with the document when laying it out; returns its root node.
+     *
+     * @param content the STXT text of the styles document
+     * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
      */
     public InlineNode readStyles(String content) {
         return styles(parse(() -> parser().parse(content), true));
     }
 
-    /** Reads and validates a separate styles document from a UTF-8 file; returns its root node. */
+    /**
+     * Reads and validates a separate styles document from a UTF-8 file; returns its root node.
+     *
+     * @param file the STXT file of the styles document, in UTF-8
+     * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
+     */
     public InlineNode readStyles(Path file) {
         return styles(parse(() -> parser().parseFile(file.toFile()), true));
     }

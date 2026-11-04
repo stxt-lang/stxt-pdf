@@ -27,17 +27,42 @@ import java.util.List;
 public record Page(int number, Fragment content, List<Fragment> pageOverlays, PageSetup pageSetup, int section,
                    int printed, NumberFormat style, boolean blank, Fragment footnotes) {
 
+    /**
+     * Copies {@code pageOverlays} into an unmodifiable list; it cannot be {@code null}.
+     *
+     * @param number       physical page number, from 1, across the whole document
+     * @param content      root fragment with the flow of this page, relative to the page area
+     * @param pageOverlays fragments of the {@code Page overlay} boxes that appear on this page
+     * @param pageSetup    the medium of the page, with the margins of its side if it has {@code Mirror margins}
+     * @param section      position of its section in the document, from 0
+     * @param printed      printed number of the page, from 1; 0 if the page is not numbered
+     * @param style        how its number is written ({@code Page number format} of its section)
+     * @param blank        whether it is the blank page added so that the next section starts on an odd page
+     * @param footnotes    fragment of the footnote area with the notes called on this page, relative to the page area;
+     *                     {@code null} if the page has no footnotes
+     */
     public Page {
         pageOverlays = List.copyOf(pageOverlays);
     }
 
-    /** A page without footnotes. */
+    /**
+     * A page without footnotes.
+     *
+     * @param number       physical page number, from 1, across the whole document
+     * @param content      root fragment with the flow of this page, relative to the page area
+     * @param pageOverlays fragments of the {@code Page overlay} boxes that appear on this page
+     * @param pageSetup    the medium of the page, with the margins of its side if it has {@code Mirror margins}
+     * @param section      position of its section in the document, from 0
+     * @param printed      printed number of the page, from 1; 0 if the page is not numbered
+     * @param style        how its number is written ({@code Page number format} of its section)
+     * @param blank        whether it is the blank page added so that the next section starts on an odd page
+     */
     public Page(int number, Fragment content, List<Fragment> pageOverlays, PageSetup pageSetup, int section,
                 int printed, NumberFormat style, boolean blank) {
         this(number, content, pageOverlays, pageSetup, section, printed, style, blank, null);
     }
 
-    /** Whether the page carries a printed number. */
+    /** {@return whether the page carries a printed number: {@link #printed()} is not 0} */
     public boolean numbered() {
         return printed > 0;
     }

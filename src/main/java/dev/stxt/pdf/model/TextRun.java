@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 /**
  * A run of text with its format (reference/common/text-formatting.md). The text of a box is a list of
  * consecutive runs; an unformatted text is a single {@link TextFormat#PLAIN} run.
+ *
+ * @param text   the text of the run, which may hold {@link #LINE_SEPARATOR}; {@link #IMAGE} in a run that is an image
+ * @param format the format of the run; {@link TextFormat#PLAIN} if it has none
  */
 public record TextRun(String text, TextFormat format) {
 
@@ -31,17 +34,30 @@ public record TextRun(String text, TextFormat format) {
         Objects.requireNonNull(format, "format");
     }
 
-    /** An unformatted text. */
+    /**
+     * An unformatted text.
+     *
+     * @param text the text; not {@code null}
+     * @return a single {@link TextFormat#PLAIN} run with that text
+     */
     public static List<TextRun> plain(String text) {
         return List.of(new TextRun(text, TextFormat.PLAIN));
     }
 
-    /** The text of the runs, joined. */
+    /**
+     * {@return the text of the runs, joined}
+     *
+     * @param runs the runs, in order
+     */
     public static String text(List<TextRun> runs) {
         return runs.size() == 1 ? runs.get(0).text() : runs.stream().map(TextRun::text).collect(Collectors.joining());
     }
 
-    /** Whether some run has a format. */
+    /**
+     * {@return whether some run has a format other than {@link TextFormat#PLAIN}}
+     *
+     * @param runs the runs of a text
+     */
     public static boolean formatted(List<TextRun> runs) {
         return runs.stream().anyMatch(r -> !r.format().equals(TextFormat.PLAIN));
     }

@@ -26,17 +26,17 @@ public enum PdfA {
         this.level = level;
     }
 
-    /** The part of ISO 19005: 2 or 3 ({@code pdfaid:part}). */
+    /** {@return the part of ISO 19005: 2 or 3 ({@code pdfaid:part})} */
     public int part() {
         return part;
     }
 
-    /** The conformance level: {@code 'A'} or {@code 'B'} ({@code pdfaid:conformance}). */
+    /** {@return the conformance level: {@code 'A'} or {@code 'B'} ({@code pdfaid:conformance})} */
     public char level() {
         return level;
     }
 
-    /** Whether files of any kind can be embedded ({@link Attachment}): only in part 3. */
+    /** {@return whether files of any kind can be embedded ({@link Attachment}): only in part 3} */
     public boolean allowsAttachments() {
         return part == 3;
     }

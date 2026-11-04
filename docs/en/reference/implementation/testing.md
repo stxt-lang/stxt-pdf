@@ -183,6 +183,11 @@ The gates of the build, which take no effort and only prevent going back:
   `dependencyManagement` sets the engine's version for both.
 - **Compiler warnings:** `-Xlint:all`, without `-Werror`. They are fixed when they appear: on 2026-11-04 there were seven
   (six redundant casts and a deprecated method of PDFBox) and none is left.
+- **Javadoc:** the javadoc jar, which Maven Central requires, is generated in `package` with doclint `all,-missing`: it
+  fails on malformed HTML or a `{@link}` that does not resolve, and warns about the syntax, but not about the missing
+  comments and tags. The code is documented in prose, and a `@param` or a `@return` on every method would almost always
+  repeat what it already says. The promised API ([Using from Java](api.md#what-is-promised)) does carry all its tags,
+  written by hand.
 
 > **Decision:** neither Checkstyle, nor Error Prone, nor SpotBugs, nor OWASP dependency-check: with six dependencies and
 > one person, `-Xlint:all` and a `mvn versions:display-dependency-updates` when preparing each version give almost the

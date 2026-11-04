@@ -45,13 +45,58 @@ public record Fragment(Box box, double x, double y, double width, double height,
                        Insets border, Insets padding, List<Fragment> children, List<TextLine> lines,
                        boolean first, boolean last, double offsetX, double offsetY, Rect turned, List<Rule> rules) {
 
+    /**
+     * Copies {@code children}, {@code lines} and {@code rules} into unmodifiable lists; none can be {@code null}.
+     *
+     * @param box      source box
+     * @param x        position of the border box, in points relative to the content box of the parent; with
+     *                 {@code turned}, that of the rectangle that encloses it
+     * @param y        likewise, vertically
+     * @param width    width of the border box or, with {@code turned}, of the rectangle that encloses it
+     * @param height   height of the border box in this fragment or, with {@code turned}, of the rectangle that
+     *                 encloses it
+     * @param margin   used margins of the box in the layout that produced the fragment ({@code auto} = 0)
+     * @param border   borders painted in this fragment
+     * @param padding  padding of this fragment
+     * @param children child fragments, in tree order, relative to the content box of this one
+     * @param lines    lines of text, relative to the content box; empty if the box has no text
+     * @param first    whether it is the first fragment of the box
+     * @param last     whether it is the last fragment of the box
+     * @param offsetX  horizontal {@code Frame} offset, already added to {@code x}; 0 in the other boxes
+     * @param offsetY  vertical {@code Frame} offset, already added to {@code y}; 0 in the other boxes
+     * @param turned   in a box rotated in flow, its unrotated border box relative to ({@code x}, {@code y});
+     *                 {@code null} in the other boxes
+     * @param rules    lines it draws over the backgrounds of its children: the merged borders of a table; empty in
+     *                 the other boxes
+     */
     public Fragment {
         children = List.copyOf(children);
         lines = List.copyOf(lines);
         rules = List.copyOf(rules);
     }
 
-    /** A fragment without lines of its own ({@link #rules}). */
+    /**
+     * A fragment without lines of its own ({@link #rules}).
+     *
+     * @param box      source box
+     * @param x        position of the border box, in points relative to the content box of the parent; with
+     *                 {@code turned}, that of the rectangle that encloses it
+     * @param y        likewise, vertically
+     * @param width    width of the border box or, with {@code turned}, of the rectangle that encloses it
+     * @param height   height of the border box in this fragment or, with {@code turned}, of the rectangle that
+     *                 encloses it
+     * @param margin   used margins of the box in the layout that produced the fragment ({@code auto} = 0)
+     * @param border   borders painted in this fragment
+     * @param padding  padding of this fragment
+     * @param children child fragments, in tree order, relative to the content box of this one
+     * @param lines    lines of text, relative to the content box; empty if the box has no text
+     * @param first    whether it is the first fragment of the box
+     * @param last     whether it is the last fragment of the box
+     * @param offsetX  horizontal {@code Frame} offset, already added to {@code x}; 0 in the other boxes
+     * @param offsetY  vertical {@code Frame} offset, already added to {@code y}; 0 in the other boxes
+     * @param turned   in a box rotated in flow, its unrotated border box relative to ({@code x}, {@code y});
+     *                 {@code null} in the other boxes
+     */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last,
                     double offsetX, double offsetY, Rect turned) {
@@ -59,7 +104,24 @@ public record Fragment(Box box, double x, double y, double width, double height,
                 turned, List.of());
     }
 
-    /** A fragment that does not belong to a box rotated in flow. */
+    /**
+     * A fragment that does not belong to a box rotated in flow.
+     *
+     * @param box      source box
+     * @param x        position of the border box, in points relative to the content box of the parent
+     * @param y        likewise, vertically
+     * @param width    width of the border box
+     * @param height   height of the border box in this fragment
+     * @param margin   used margins of the box in the layout that produced the fragment ({@code auto} = 0)
+     * @param border   borders painted in this fragment
+     * @param padding  padding of this fragment
+     * @param children child fragments, in tree order, relative to the content box of this one
+     * @param lines    lines of text, relative to the content box; empty if the box has no text
+     * @param first    whether it is the first fragment of the box
+     * @param last     whether it is the last fragment of the box
+     * @param offsetX  horizontal {@code Frame} offset, already added to {@code x}; 0 in the other boxes
+     * @param offsetY  vertical {@code Frame} offset, already added to {@code y}; 0 in the other boxes
+     */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last,
                     double offsetX, double offsetY) {
@@ -67,65 +129,116 @@ public record Fragment(Box box, double x, double y, double width, double height,
                 null);
     }
 
-    /** A fragment without {@code Frame} offset: the one the layout of a box returns. */
+    /**
+     * A fragment without {@code Frame} offset: the one the layout of a box returns.
+     *
+     * @param box      source box
+     * @param x        position of the border box, in points relative to the content box of the parent
+     * @param y        likewise, vertically
+     * @param width    width of the border box
+     * @param height   height of the border box in this fragment
+     * @param margin   used margins of the box in the layout that produced the fragment ({@code auto} = 0)
+     * @param border   borders painted in this fragment
+     * @param padding  padding of this fragment
+     * @param children child fragments, in tree order, relative to the content box of this one
+     * @param lines    lines of text, relative to the content box; empty if the box has no text
+     * @param first    whether it is the first fragment of the box
+     * @param last     whether it is the last fragment of the box
+     */
     public Fragment(Box box, double x, double y, double width, double height, Insets margin, Insets border,
                     Insets padding, List<Fragment> children, List<TextLine> lines, boolean first, boolean last) {
         this(box, x, y, width, height, margin, border, padding, children, lines, first, last, 0, 0);
     }
 
-    /** Empty fragment of a box that does not fit in what is left of the page ({@link BreakToken.Before}). */
+    /**
+     * {@return an empty fragment of a box that does not fit in what is left of the page ({@link BreakToken.Before})}
+     *
+     * @param box the box that does not fit; the fragment is neither its first nor its last
+     */
     public static Fragment empty(Box box) {
         return new Fragment(box, 0, 0, 0, 0, Insets.ZERO, Insets.ZERO, Insets.ZERO, List.of(), List.of(), false, false);
     }
 
     /**
-     * The border box of this fragment if ({@code absX}, {@code absY}) is the position of the fragment: the rectangle
-     * {@code x}, {@code y}, {@code width}, {@code height} or, in a box rotated in flow, its unrotated box.
+     * {@return the border box of this fragment if ({@code absX}, {@code absY}) is the position of the fragment: the
+     * rectangle {@code x}, {@code y}, {@code width}, {@code height} or, in a box rotated in flow, its unrotated box}
+     *
+     * @param absX horizontal position of the fragment in the caller's coordinates (page coordinates in the dump and
+     *             the painting): {@code x} plus the left of the content box of the parent
+     * @param absY vertical position of the fragment, likewise
      */
     public Rect borderBox(double absX, double absY) {
         return turned == null ? new Rect(absX, absY, width, height)
                 : new Rect(absX + turned.x(), absY + turned.y(), turned.width(), turned.height());
     }
 
-    /** Width of the content box of this fragment: the border box minus its border and its padding. */
+    /**
+     * {@return the width of the content box of this fragment: the border box (unrotated, in a box rotated in flow)
+     * minus its border and its padding}
+     */
     public double contentWidth() {
         return (turned == null ? width : turned.width()) - border.horizontal() - padding.horizontal();
     }
 
-    /** Height of the content box of this fragment. */
+    /** {@return the height of the content box of this fragment, measured like {@link #contentWidth()}} */
     public double contentHeight() {
         return (turned == null ? height : turned.height()) - border.vertical() - padding.vertical();
     }
 
     /**
-     * The fragment of a box rotated in flow: it takes up the {@code width} × {@code height} rectangle that encloses its
+     * The fragment of a box rotated in flow: it takes up the {@code width} x {@code height} rectangle that encloses its
      * rotated border box, which is {@code box} inside it.
+     *
+     * @param box    the unrotated border box, relative to ({@code x}, {@code y}) and centered in the rectangle that
+     *               encloses it; it becomes {@link #turned()}
+     * @param width  width of the rectangle that encloses the rotated border box, in points
+     * @param height height of the rectangle that encloses the rotated border box, in points
+     * @return this fragment with that rectangle as its size and {@code box} as its unrotated border box
      */
     public Fragment turned(Rect box, double width, double height) {
         return new Fragment(this.box, x, y, width, height, margin, border, padding, children, lines, first, last,
                 offsetX, offsetY, box, rules);
     }
 
-    /** The same fragment with these lines of its own ({@link #rules}). */
+    /**
+     * {@return the same fragment with these lines of its own ({@link #rules})}
+     *
+     * @param rules the lines, relative to its content box, in the order they are painted; they replace the ones it had
+     */
     public Fragment withRules(List<Rule> rules) {
         return new Fragment(box, x, y, width, height, margin, border, padding, children, lines, first, last, offsetX,
                 offsetY, turned, rules);
     }
 
+    /**
+     * {@return the same fragment at ({@code newX}, {@code newY}), with the {@code Frame} offset it had}
+     *
+     * @param newX the new {@code x}, in points relative to the content box of the parent
+     * @param newY the new {@code y}, likewise
+     */
     public Fragment moved(double newX, double newY) {
         return moved(newX, newY, offsetX, offsetY);
     }
 
     /**
-     * The fragment at ({@code newX}, {@code newY}), which already includes the {@code Frame}
-     * offset ({@code dx}, {@code dy}).
+     * {@return the fragment at ({@code newX}, {@code newY}), which already includes the {@code Frame}
+     * offset ({@code dx}, {@code dy})}
+     *
+     * @param newX the new {@code x}, in points relative to the content box of the parent, {@code dx} included
+     * @param newY the new {@code y}, likewise, {@code dy} included
+     * @param dx   the new {@link #offsetX()}
+     * @param dy   the new {@link #offsetY()}
      */
     public Fragment moved(double newX, double newY, double dx, double dy) {
         return new Fragment(box, newX, newY, width, height, margin, border, padding, children, lines, first, last,
                 dx, dy, turned, rules);
     }
 
-    /** The same fragment with more children at the end (the Overlay boxes this box resolves). */
+    /**
+     * {@return the same fragment with more children at the end (the Overlay boxes this box resolves)}
+     *
+     * @param more the fragments to add after its children, in order, relative to its content box
+     */
     public Fragment withMoreChildren(List<Fragment> more) {
         List<Fragment> all = new ArrayList<>(children);
         all.addAll(more);

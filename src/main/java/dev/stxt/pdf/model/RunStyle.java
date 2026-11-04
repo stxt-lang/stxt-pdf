@@ -25,11 +25,30 @@ import java.util.Objects;
 public record RunStyle(String name, String color, String family, String codeFamily, FontWeight weight,
                        FontStyle style, Double letterSpacing, TextCase textCase, Boolean smallCaps) {
 
+    /**
+     * A style of a run: each value is that of the rule, or {@code null} for that of the box.
+     *
+     * @param name          the name of the style; not {@code null}
+     * @param color         {@code Color}
+     * @param family        {@code Font}
+     * @param codeFamily    {@code Code font}
+     * @param weight        {@code Weight} or {@code Bold}
+     * @param style         {@code Italic}
+     * @param letterSpacing {@code Letter spacing}, in points
+     * @param textCase      {@code Case}
+     * @param smallCaps     {@code Small caps}
+     * @throws NullPointerException if the name is {@code null}
+     */
     public RunStyle {
         Objects.requireNonNull(name, "name");
     }
 
-    /** The style of a run with only its name: the values come when its box is built. */
+    /**
+     * The style of a run with only its name: the values come when its box is built.
+     *
+     * @param name the name of the style, as written in {@code [text]{name}}
+     * @return a style with every value {@code null}
+     */
     public static RunStyle named(String name) {
         return new RunStyle(name, null, null, null, null, null, null, null, null);
     }
