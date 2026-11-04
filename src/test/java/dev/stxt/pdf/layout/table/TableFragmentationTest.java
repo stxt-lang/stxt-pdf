@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Repeated header and footer (reference/components/table.md). Pages of 180 pt with margins of 40: page
@@ -65,7 +64,7 @@ class TableFragmentationTest {
         assertRect(40, 40, 515, 20, l.rect(1, "H"));
         assertRect(40, 90, 515, 30, l.rect(1, "B2"));
         assertRect(40, 120, 515, 10, l.rect(1, "F"));
-        assertFalse(l.has(1, "B3"));
+        l.assertAbsent(1, "B3");
         assertRect(40, 40, 515, 90, l.rect(2, "T"));
         assertRect(40, 40, 515, 20, l.rect(2, "H"));
         assertRect(40, 60, 515, 30, l.rect(2, "B3"));
@@ -111,7 +110,7 @@ class TableFragmentationTest {
         assertRect(40, 40, 515, 20, l.rect(1, "HR"));
         assertRect(40, 90, 515, 30, l.rect(1, "R2"));
         assertRect(40, 120, 515, 10, l.rect(1, "FR"));
-        assertFalse(l.has(1, "R3"));
+        l.assertAbsent(1, "R3");
         assertRect(40, 40, 515, 20, l.rect(2, "HR"));
         assertRect(40, 60, 515, 30, l.rect(2, "R3"));
         assertRect(40, 120, 515, 10, l.rect(2, "FR"));
@@ -162,7 +161,7 @@ class TableFragmentationTest {
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50"}, table(null),
                 group("Header rows"), row("H", 20), group("Body"), row("B1", 30), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "T"));
+        l.assertAbsent(1, "T");
         assertRect(40, 40, 515, 20, l.rect(2, "H"));
         assertRect(40, 60, 515, 30, l.rect(2, "B1"));
     }
@@ -187,7 +186,7 @@ class TableFragmentationTest {
                 group("Header rows"), row("H", 20),
                 group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page")));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "B2"));
+        l.assertAbsent(1, "B2");
         assertRect(40, 40, 515, 50, l.rect(1, "T"));
         assertRect(40, 40, 515, 20, l.rect(2, "H"));
         assertRect(40, 60, 515, 30, l.rect(2, "B2"));
@@ -228,7 +227,7 @@ class TableFragmentationTest {
                 row("B3", 40, "\t\t\t\tBreak:", "\t\t\t\t\tKeep together: true")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "T"));
-        assertFalse(l.has(1, "B3"));
+        l.assertAbsent(1, "B3");
         assertRect(40, 40, 515, 40, l.rect(2, "B3"));
     }
 }

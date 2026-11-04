@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -70,8 +69,8 @@ class FootnoteLayoutTest {
         assertEquals(2, f.pages());
         // Together they would take 112, but the note needs 24.5 more: the paragraph goes with it to page 2.
         assertEquals(new Rect(40, 40, 515, 100), f.rect(1, "filler"));
-        assertFalse(f.has(1, "p"));
-        assertFalse(f.has(1, "n"));
+        f.assertAbsent(1, "p");
+        f.assertAbsent(1, "n");
         assertEquals(new Rect(40, 40, 515, 12), f.rect(2, "p"));
         assertEquals(new Rect(40, 148, 515, 12), f.rect(2, "n"));
     }
@@ -88,8 +87,8 @@ class FootnoteLayoutTest {
         assertEquals(2, f.pages());
         assertEquals(new Rect(40, 100, 515, 12), f.rect(1, "p1"));
         assertEquals(new Rect(40, 148, 515, 12), f.rect(1, "a"));
-        assertFalse(f.has(1, "p2"));
-        assertFalse(f.has(1, "b"));
+        f.assertAbsent(1, "p2");
+        f.assertAbsent(1, "b");
         assertEquals(new Rect(40, 40, 515, 12), f.rect(2, "p2"));
         assertEquals(new Rect(40, 148, 515, 12), f.rect(2, "b"));
     }
@@ -110,7 +109,7 @@ class FootnoteLayoutTest {
         assertEquals(new Rect(40, 40, 515, 36), f.rect(2, "q"));
         assertEquals(new Rect(40, 160 - 60, 515, 60), f.rect(2, "n"));
         assertEquals(new Rect(40, 40, 515, 24), f.rect(3, "q"));
-        assertFalse(f.has(3, "n"));
+        f.assertAbsent(3, "n");
     }
 
     /** Inside a {@code Columns}, the notes go at the bottom of the page, across its whole width. */

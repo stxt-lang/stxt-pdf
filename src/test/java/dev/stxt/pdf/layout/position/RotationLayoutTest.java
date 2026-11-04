@@ -7,7 +7,6 @@ import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,12 +41,12 @@ class RotationLayoutTest {
                 "\tFrame:", "\t\tId: R", "{}", "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30",
                 "\t\tBlock:", "\t\t\tId: Z", "\t\t\tBox:", "\t\t\t\tHeight: 30"};
         LayoutFixture plain = LayoutFixture.layOutPaged(180, with(content, "\t\tLayer: 1"));
-        assertTrue(plain.has(1, "R"));
-        assertTrue(plain.has(1, "A"));
-        assertTrue(plain.has(2, "Z"));
+        plain.assertPresent(1, "R");
+        plain.assertPresent(1, "A");
+        plain.assertPresent(2, "Z");
 
         LayoutFixture turned = LayoutFixture.layOutPaged(180, with(content, "\t\tRotate: 180"));
-        assertFalse(turned.has(1, "R"));
+        turned.assertAbsent(1, "R");
         assertEquals(new Rect(40, 40, 515, 60), turned.rect(2, "R"));
         assertEquals(new Rect(40, 70, 515, 30), turned.rect(2, "Z"));
     }
@@ -153,7 +152,7 @@ class RotationLayoutTest {
     void aBoxRotatedInFlowIsNotSplit() {
         LayoutFixture l = LayoutFixture.layOutPaged(180, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tText: aaa bbb ccc", "\t\tId: T", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 50");
-        assertFalse(l.has(1, "T"));
+        l.assertAbsent(1, "T");
         assertEquals(new Rect(40, 40, 24, 50), l.rect(2, "T"));
     }
 

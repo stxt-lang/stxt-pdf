@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * Lays out a document 595 pt wide with margins of 40 (page area of 515 pt from
  * (40, 40)) and gives the fragments with an {@code Id} and their border box in page coordinates,
@@ -97,13 +99,32 @@ public final class LayoutFixture {
         Rect r = rects.get(page - 1).get(id);
         if (r == null) {
             throw new IllegalArgumentException("There is no fragment with Id " + id + " on page " + page
-                    + ": " + rects.get(page - 1).keySet());
+                    + ": " + ids(page));
         }
         return r;
     }
 
     public boolean has(int page, String id) {
         return rects.get(page - 1).containsKey(id);
+    }
+
+    /** Fails, with the {@code Id}s that are there, if the page has no fragment with that {@code Id}. */
+    public void assertPresent(int page, String id) {
+        if (!has(page, id)) {
+            fail("Expected a fragment with Id " + id + " on page " + page + "; there are " + ids(page));
+        }
+    }
+
+    /** Fails, with the {@code Id}s that are there, if the page has a fragment with that {@code Id}. */
+    public void assertAbsent(int page, String id) {
+        if (has(page, id)) {
+            fail("Expected no fragment with Id " + id + " on page " + page + "; there are " + ids(page));
+        }
+    }
+
+    /** The {@code Id}s of the fragments of a page, sorted (a marker is {@code <id of its item>#marker}). */
+    private List<String> ids(int page) {
+        return rects.get(page - 1).keySet().stream().sorted().toList();
     }
 
     /** Box of the marker of the {@code List item} with that {@code Id} (reference/components/list.md). */
@@ -115,8 +136,9 @@ public final class LayoutFixture {
         return rect(page, id + MARKER);
     }
 
-    public boolean hasMarker(int page, String id) {
-        return has(page, id + MARKER);
+    /** Like {@link #assertAbsent}, for the marker of the {@code List item} with that {@code Id}. */
+    public void assertNoMarker(int page, String id) {
+        assertAbsent(page, id + MARKER);
     }
 
     public Fragment fragment(String id) {

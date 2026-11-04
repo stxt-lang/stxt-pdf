@@ -10,7 +10,6 @@ import java.util.List;
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Drop caps (reference/components/text.md). Page area of 515 from (40, 40); lines of 12 (Size 10), 5 pt per
@@ -71,7 +70,7 @@ class DropCapLayoutTest {
         LayoutFixture l = layOutPaged(180, "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tParagraph: " + words(50), "\t\tId: P", "\t\tDrop cap: 2");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "P"));
+        l.assertAbsent(1, "P");
         assertRect(40, 40, 515, 36, l.rect(2, "P"));
         assertEquals("X", l.fragment(2, "P").lines().get(0).text());
     }

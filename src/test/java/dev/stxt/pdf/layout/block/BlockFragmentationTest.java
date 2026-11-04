@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
@@ -52,7 +51,7 @@ class BlockFragmentationTest {
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 60",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "B"));
+        l.assertAbsent(1, "B");
         assertRect(40, 40, 515, 60, l.rect(2, "B"));
     }
 
@@ -186,7 +185,7 @@ class BlockFragmentationTest {
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\tBreak:", "\t\t\t\tBefore: page",
                 "\tBlock:", "\t\tId: D", "\t\tBox:", "\t\t\tHeight: 10", "\t\tBreak:", "\t\t\tAfter: page");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "P"));
+        l.assertAbsent(1, "P");
         assertRect(40, 40, 515, 10, l.rect(2, "P"));
         assertRect(40, 50, 515, 10, l.rect(2, "D"));
     }
@@ -200,7 +199,7 @@ class BlockFragmentationTest {
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tPadding: 10 0 0 0",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tMargin: 60 0 0 0");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "P"));
+        l.assertAbsent(1, "P");
         assertRect(40, 40, 515, 90, l.rect(2, "P"));
         assertRect(40, 110, 515, 20, l.rect(2, "C"));
     }
@@ -214,7 +213,7 @@ class BlockFragmentationTest {
                 "\tBlock:", "\t\tId: P",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 50", "\t\t\t\tMargin: 60 0 0 0");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "P"));
+        l.assertAbsent(1, "P");
         assertRect(40, 40, 515, 50, l.rect(2, "P"));
         assertRect(40, 40, 515, 50, l.rect(2, "C"));
     }
@@ -241,7 +240,7 @@ class BlockFragmentationTest {
                 "		Block:", "			Id: C", "			Box:", "				Height: 20", "				Margin: 0 0 30 0", "			Break:",
                 "				Keep together: true");
         assertEquals(2, s.pages());
-        assertFalse(s.has(1, "P"));
+        s.assertAbsent(1, "P");
         assertRect(40, 40, 515, 50, s.rect(2, "P"));
         // The root is the page area: the margin of its last child is truncated at the end of the page.
         LayoutFixture r = layOutPaged(PAGE,
@@ -277,7 +276,7 @@ class BlockFragmentationTest {
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 10");
         assertEquals(2, l.pages());
         assertRect(40, 50, 515, 0, l.rect(1, "E"));
-        assertFalse(l.has(1, "B"));
+        l.assertAbsent(1, "B");
         assertRect(40, 40, 515, 10, l.rect(2, "B"));
     }
 
@@ -298,7 +297,7 @@ class BlockFragmentationTest {
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 50, l.rect(1, "X"));
-        assertFalse(l.has(1, "T"));
+        l.assertAbsent(1, "T");
         assertRect(40, 40, 515, 20, l.rect(2, "T"));
         assertRect(40, 60, 515, 60, l.rect(2, "P"));
     }
@@ -311,7 +310,7 @@ class BlockFragmentationTest {
                 "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos",
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 30", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "H"));
+        l.assertAbsent(1, "H");
         assertRect(40, 40, 515, 24, l.rect(2, "H"));
         assertRect(40, 64, 515, 30, l.rect(2, "P"));
     }
@@ -323,7 +322,7 @@ class BlockFragmentationTest {
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tHeading 1:", "\t\tId: H", "\t\tText: Uno", "\t\tText: Dos");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "H"));
+        l.assertAbsent(1, "H");
         assertRect(40, 40, 515, 24, l.rect(2, "H"));
     }
 
@@ -350,7 +349,7 @@ class BlockFragmentationTest {
                 "\t\t\t\tKeep with next: true",
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tHeight: 60", "\t\tBreak:", "\t\t\tKeep together: true");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "T"));
+        l.assertAbsent(1, "T");
         assertRect(40, 40, 515, 30, l.rect(2, "W"));
         assertRect(40, 50, 515, 20, l.rect(2, "T"));
         assertRect(40, 70, 515, 60, l.rect(2, "P"));
@@ -366,7 +365,7 @@ class BlockFragmentationTest {
                 "\t\tBlock:", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\tBreak:",
                 "\t\t\t\tKeep with previous: true", "\t\t\t\tKeep together: true");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "Q"));
+        l.assertAbsent(1, "Q");
         assertRect(40, 40, 515, 20, l.rect(2, "Q"));
         assertRect(40, 60, 515, 20, l.rect(2, "T"));
     }
@@ -393,7 +392,7 @@ class BlockFragmentationTest {
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30",
                 "\t\tOverlay:", "\t\t\tId: S", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 20",
                 "\t\t\t\tHeight: 20");
-        assertFalse(l.has(1, "S"));
+        l.assertAbsent(1, "S");
         assertRect(535, 40, 20, 20, l.rect(2, "S"));
     }
 

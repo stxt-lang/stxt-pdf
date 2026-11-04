@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -81,6 +82,12 @@ class ErrorCatalogTest {
             if (!header.containsKey(key)) {
                 throw new IllegalStateException("'# " + key + ":' is missing in the first three lines of " + file);
             }
+        }
+        // The name is <code>.<description>.stxt: a renamed case or code would leave a name that lies.
+        String prefix = header.get("Code").toLowerCase(Locale.ROOT).replace('_', '-') + ".";
+        if (!file.getFileName().toString().startsWith(prefix)) {
+            throw new IllegalStateException("The name of " + file + " does not start with '" + prefix
+                    + "', the code of its '# Code:' line");
         }
         return new Case(file, header.get("Case"), header.get("Code"), Integer.parseInt(header.get("Line")));
     }

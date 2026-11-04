@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Sizing and placement of {@code Image} (reference/components/image.md), with the images of
@@ -274,7 +273,7 @@ class ImageLayoutTest {
                 "\tImage: test/wide.png",
                 "\t\tId: I");
         assertEquals(2, f.pages());
-        assertFalse(f.has(1, "I"));
+        f.assertAbsent(1, "I");
         assertRect(40, 40, 150, 75, f.rect(2, "I"));
     }
 
@@ -294,7 +293,7 @@ class ImageLayoutTest {
                 "\t\t\tId: T");
         // The first one fits on page 1; the second does not: the block is split between the two.
         assertRect(42, 102, 30, 30, f.rect(1, "S"));
-        assertFalse(f.has(1, "T"));
+        f.assertAbsent(1, "T");
         assertRect(42, 40, 30, 30, f.rect(2, "T"));
     }
 

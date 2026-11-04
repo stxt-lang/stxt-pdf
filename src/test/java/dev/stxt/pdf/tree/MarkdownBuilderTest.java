@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static dev.stxt.pdf.tree.TextRuns.run;
@@ -131,7 +132,7 @@ class MarkdownBuilderTest {
     @Test
     void plainTextHasNoRuns() {
         MarkdownBuilder.Translation t = translate("Sin formato.");
-        assertTrue(t.runs().isEmpty());
+        assertEquals(Map.of(), t.runs());
     }
 
     @Test

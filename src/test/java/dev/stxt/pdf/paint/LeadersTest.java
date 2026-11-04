@@ -34,7 +34,7 @@ class LeadersTest {
 
     @Test
     void aBoxTooNarrowForADotHasNone() {
-        assertTrue(Leaders.shapes(Leader.DOTS, new Rect(100, 20, 0, 12), 29, 10).isEmpty());
-        assertTrue(Leaders.shapes(Leader.NONE, CONTENT, 29, 10).isEmpty());
+        assertEquals(List.of(), Leaders.shapes(Leader.DOTS, new Rect(100, 20, 0, 12), 29, 10));
+        assertEquals(List.of(), Leaders.shapes(Leader.NONE, CONTENT, 29, 10));
     }
 }

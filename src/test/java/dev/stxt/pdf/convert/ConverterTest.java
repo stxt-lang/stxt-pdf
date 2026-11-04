@@ -202,7 +202,7 @@ class ConverterTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Converter.builder().exclude(Check.PDF_IMAGE_ANNOTATIONS).build().toPdf(document, out);
         try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
-            assertTrue(pdf.getPage(0).getAnnotations().isEmpty());
+            assertEquals(List.of(), pdf.getPage(0).getAnnotations());
             assertEquals(null, pdf.getDocumentCatalog().getAcroForm());
         }
     }

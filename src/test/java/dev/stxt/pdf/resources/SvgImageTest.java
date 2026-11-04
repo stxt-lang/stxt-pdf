@@ -217,7 +217,7 @@ class SvgImageTest {
                 face("IBM Plex Sans", false, false));
         assertEquals(expected, f.textFonts().stream().map(font -> font == null ? null : font.face()).toList());
         assertTrue(f.hasText());
-        assertTrue(read("<svg " + NS + " width=\"10\" height=\"10\"/>").textFonts().isEmpty());
+        assertEquals(List.of(), read("<svg " + NS + " width=\"10\" height=\"10\"/>").textFonts());
     }
 
     private static dev.stxt.pdf.model.FontFace face(String family, boolean bold, boolean italic) {

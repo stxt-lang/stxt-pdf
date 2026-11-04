@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
 class GridFragmentationTest {
@@ -54,7 +53,7 @@ class GridFragmentationTest {
                 cell("E", "3 1")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 40, l.rect(1, "G"));
-        assertFalse(l.has(1, "C"));
+        l.assertAbsent(1, "C");
         assertRect(40, 40, 515, 80, l.rect(2, "G"));
         assertRect(297.5, 40, 257.5, 40, l.rect(2, "D"));
         assertRect(40, 80, 257.5, 40, l.rect(2, "E"));
@@ -92,7 +91,7 @@ class GridFragmentationTest {
         assertRect(297.5, 40, 257.5, 60, l.rect(1, "B"));
         assertRect(40, 40, 515, 90, l.rect(2, "G"));
         assertRect(40, 40, 257.5, 50, l.rect(2, "A"));
-        assertFalse(l.has(2, "B"));
+        l.assertAbsent(2, "B");
         assertRect(40, 90, 257.5, 40, l.rect(2, "C"));
     }
 
@@ -104,7 +103,7 @@ class GridFragmentationTest {
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 30"}, GRID,
                 new String[]{"\t\tSplit rows: false"}, box("A", "80", "1 1"), box("B", "40", "1 2")));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "G"));
+        l.assertAbsent(1, "G");
         assertRect(40, 40, 257.5, 80, l.rect(2, "A"));
     }
 
@@ -120,7 +119,7 @@ class GridFragmentationTest {
         assertRect(297.5, 70, 257.5, 40, l.rect(1, "B"));
         assertRect(40, 40, 515, 10, l.rect(2, "G"));
         assertRect(40, 40, 257.5, 10, l.rect(2, "A"));
-        assertFalse(l.has(2, "B"));
+        l.assertAbsent(2, "B");
     }
 
     @Test
@@ -131,7 +130,7 @@ class GridFragmentationTest {
                 box("A", "80", "1 1"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep together: true"},
                 box("B", "40", "1 2")));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "G"));
+        l.assertAbsent(1, "G");
         assertRect(40, 40, 257.5, 80, l.rect(2, "A"));
     }
 
@@ -145,7 +144,7 @@ class GridFragmentationTest {
         assertRect(40, 40, 257.5, 100, l.rect(2, "A"));
         assertRect(297.5, 40, 257.5, 20, l.rect(2, "B"));
         assertRect(40, 40, 515, 50, l.rect(3, "G"));
-        assertFalse(l.has(3, "B"));
+        l.assertAbsent(3, "B");
     }
 
     @Test
@@ -175,7 +174,7 @@ class GridFragmentationTest {
         assertRect(297.5, 120, 257.5, 20, l.rect(1, "E"));
         assertRect(40, 40, 515, 20, l.rect(2, "G"));
         assertRect(297.5, 40, 257.5, 20, l.rect(2, "E"));
-        assertFalse(l.has(2, "S"));
+        l.assertAbsent(2, "S");
     }
 
     @Test
@@ -222,7 +221,7 @@ class GridFragmentationTest {
                 "\t\tArea:", "\t\t\tVertical: start", "\t\t\tText: " + text, "\t\t\t\tId: T",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B");
         assertEquals(4, l.pages());
-        assertFalse(l.has(1, "T"));
+        l.assertAbsent(1, "T");
         assertRect(40, 40, 30, 96, l.rect(2, "T"));
         assertRect(70, 40, 100, 100, l.rect(2, "B"));
         assertRect(70, 40, 100, 40, l.rect(4, "B"));

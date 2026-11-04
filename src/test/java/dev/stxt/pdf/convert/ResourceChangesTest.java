@@ -184,14 +184,14 @@ class ResourceChangesTest {
         Resources resources = folder(dir, "square.png");
         Resources snapshot = resources.snapshot();
         ImageFile square = snapshot.images().find("square.png");
-        assertFalse(snapshot.fonts().families().contains("IBM Plex Serif"));
+        assertFalse(snapshot.fonts().families().contains("IBM Plex Serif"), () -> "families: " + snapshot.fonts().families());
         replace(dir, "square.png", "wide.png");
         copyFont(dir, SERIF);
         assertSame(square, snapshot.images().find("./square.png"));
-        assertFalse(snapshot.fonts().families().contains("IBM Plex Serif"));
+        assertFalse(snapshot.fonts().families().contains("IBM Plex Serif"), () -> "families: " + snapshot.fonts().families());
         Resources next = resources.snapshot();
         assertNotSame(square, next.images().find("square.png"));
-        assertTrue(next.fonts().families().contains("IBM Plex Serif"));
+        assertTrue(next.fonts().families().contains("IBM Plex Serif"), () -> "families: " + next.fonts().families());
     }
 
     /** A {@code Resources} created with a constructor reads each file once and does not look at the folder again. */
@@ -199,11 +199,11 @@ class ResourceChangesTest {
     void aResourcesWithoutSnapshotDoesNotLookAgain(@TempDir Path dir) throws IOException {
         Resources resources = folder(dir, "square.png");
         ImageFile square = resources.images().find("square.png");
-        assertFalse(resources.fonts().families().contains("IBM Plex Serif"));
+        assertFalse(resources.fonts().families().contains("IBM Plex Serif"), () -> "families: " + resources.fonts().families());
         replace(dir, "square.png", "wide.png");
         copyFont(dir, SERIF);
         assertSame(square, resources.images().find("square.png"));
-        assertFalse(resources.fonts().families().contains("IBM Plex Serif"));
+        assertFalse(resources.fonts().families().contains("IBM Plex Serif"), () -> "families: " + resources.fonts().families());
     }
 
     /** The text of an SVG was checked with the fonts: when they are scanned again, the SVG is read again too. */

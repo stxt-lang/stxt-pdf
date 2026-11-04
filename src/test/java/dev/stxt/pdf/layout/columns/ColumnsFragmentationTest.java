@@ -12,7 +12,6 @@ import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.assertRect;
 import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.block;
 import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.columnsElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Blocks in columns on pages of 180 pt with margins of 40: page area of 515 × 100 from
@@ -65,7 +64,7 @@ class ColumnsFragmentationTest {
                 block("B", 25, false, "\t\t\tBreak:", "\t\t\t\tBefore: page"), block("C", 25, false)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 25, l.rect(1, "M"));
-        assertFalse(l.has(1, "B"));
+        l.assertAbsent(1, "B");
         assertRect(40, 40, 250, 25, l.rect(2, "B"));
         assertRect(305, 40, 250, 25, l.rect(2, "C"));
     }
@@ -88,7 +87,7 @@ class ColumnsFragmentationTest {
     void columnsThatCannotStartMoveToTheNextPage() {
         LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
                 "\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tText: Hola");
-        assertFalse(l.has(1, "M"));
+        l.assertAbsent(1, "M");
         assertRect(40, 40, 515, 12, l.rect(2, "M"));
     }
 
@@ -98,7 +97,7 @@ class ColumnsFragmentationTest {
         List<String> lines = new ArrayList<>(List.of("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90"));
         lines.addAll(List.of(columnsElement(TWO, block("A", 25, true))));
         LayoutFixture l = layOutPaged(PAGE, lines.toArray(String[]::new));
-        assertFalse(l.has(1, "M"));
+        l.assertAbsent(1, "M");
         assertRect(40, 40, 250, 25, l.rect(2, "A"));
     }
 
@@ -210,7 +209,7 @@ class ColumnsFragmentationTest {
         assertRect(40, 40, 257.5, 100, l.rect(2, "A"));
         assertEquals(8, l.fragment(2, "T").lines().size());
         assertRect(40, 40, 515, 4, l.rect(3, "G"));
-        assertFalse(l.has(3, "A"));
+        l.assertAbsent(3, "A");
         assertRect(297.5, 40, 257.5, 4, l.rect(3, "M"));
     }
 }

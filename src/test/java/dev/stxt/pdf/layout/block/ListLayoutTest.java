@@ -7,7 +7,6 @@ import dev.stxt.pdf.tree.InvalidModelException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -109,7 +108,7 @@ class ListLayoutTest {
     void noneHasNoMarker() {
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: none",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
-        assertFalse(f.hasMarker(1, "A"));
+        f.assertNoMarker(1, "A");
     }
 
     @Test
@@ -118,7 +117,7 @@ class ListLayoutTest {
         LayoutFixture f = LayoutFixture.layOutPaged(180, doc("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
                 "\tList:", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
-        assertFalse(f.has(1, "A"));
+        f.assertAbsent(1, "A");
         assertRect(f.marker(2, "A"), 45, 40, 15, 12);
     }
 
@@ -132,8 +131,8 @@ class ListLayoutTest {
                 "\t\t\tText: aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa"));
         assertRect(f.rect(1, "A"), 60, 100, 80, 36);
         assertRect(f.marker(1, "A"), 45, 100, 15, 12);
-        assertTrue(f.has(2, "A"));
-        assertFalse(f.hasMarker(2, "A"));
+        f.assertPresent(2, "A");
+        f.assertNoMarker(2, "A");
     }
 
     @Test
@@ -197,7 +196,7 @@ class ListLayoutTest {
         LayoutFixture f = LayoutFixture.layOutPaged(180, doc("\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
                 "\tList:", "\t\tMarker: image", "\t\tMarker image: test/square.png",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno"));
-        assertFalse(f.has(1, "A"));
+        f.assertAbsent(1, "A");
         assertRect(f.marker(2, "A"), 45, 40.5, 15, 10);
     }
 }

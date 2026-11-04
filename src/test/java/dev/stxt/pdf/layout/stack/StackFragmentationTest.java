@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /** Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). */
 class StackFragmentationTest {
@@ -87,7 +86,7 @@ class StackFragmentationTest {
                 item("A"), item("B"), item("C"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with previous: true",
                         "\t\t\t\t\tKeep together: true"}));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "B"));
+        l.assertAbsent(1, "B");
         assertRect(40, 40, 515, 40, l.rect(2, "B"));
         assertRect(40, 80, 515, 40, l.rect(2, "C"));
     }
@@ -131,7 +130,7 @@ class StackFragmentationTest {
                 new String[]{"\tStack:", "\t\tId: F", "\t\tSplit items: false"},
                 item("A")));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "F"));
+        l.assertAbsent(1, "F");
         assertRect(40, 40, 515, 40, l.rect(2, "F"));
     }
 

@@ -101,7 +101,7 @@ class TablesTest {
         assertEquals(List.of(Element.PARAGRAPH, Element.LIST), full.children().stream().map(b -> b.element()).toList());
         Box empty = table.children().get(1);
         assertEquals(Layout.BLOCK, empty.style().layout());
-        assertTrue(empty.children().isEmpty());
+        assertEquals(List.of(), empty.children());
     }
 
     @Test

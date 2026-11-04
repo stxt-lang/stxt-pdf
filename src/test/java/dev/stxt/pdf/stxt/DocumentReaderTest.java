@@ -7,13 +7,20 @@ import dev.stxt.TextNode;
 import dev.stxt.pdf.tree.DocumentSyntaxException;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
+import dev.stxt.pdf.resources.ResourceException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DocumentReaderTest {
 
@@ -131,6 +138,34 @@ class DocumentReaderTest {
         assertEquals(10, row.line());
         assertEquals("CHILD_NOT_DECLARED", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tGrid:", "\t\tArea:", "\t\t\tSpan: 1 2", "\t\t\tBlock:"))).code());
+    }
+
+    /** A styles file is read like its text, and its errors point to the styles document. */
+    @Test
+    void aStylesFileIsReadAndItsErrorsAreInTheStyles(@TempDir Path folder) throws IOException {
+        Path file = folder.resolve("styles.stxt");
+        Files.writeString(file, Docs.STYLES, StandardCharsets.UTF_8);
+        assertEquals("Styles", reader.readStyles(file).getName());
+
+        Files.writeString(file, Docs.STYLES + "\t\t\t\t\tBold: true\n", StandardCharsets.UTF_8);
+        DocumentSyntaxException syntax = assertThrows(DocumentSyntaxException.class, () -> reader.readStyles(file));
+        assertEquals(6, syntax.line());
+        assertTrue(syntax.inStyles());
+
+        Files.writeString(file, "Block (dev.stxt.pdf):\n\tId: a\n", StandardCharsets.UTF_8);
+        InvalidModelException root = assertThrows(InvalidModelException.class, () -> reader.readStyles(file));
+        assertEquals(ErrorCode.DOCUMENT_ROOT, root.errorCode());
+        assertTrue(root.inStyles());
+    }
+
+    /** A file that cannot be read is a ResourceException with its cause, for a document and for a styles document. */
+    @Test
+    void aFileThatCannotBeReadIsAResourceError(@TempDir Path folder) {
+        Path missing = folder.resolve("missing.stxt");
+        ResourceException document = assertThrows(ResourceException.class, () -> reader.read(missing));
+        assertTrue(document.getMessage().contains("cannot be read"), document.getMessage());
+        assertFalse(document.inStyles());
+        assertThrows(ResourceException.class, () -> reader.readStyles(missing));
     }
 
     @Test

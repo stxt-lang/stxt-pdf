@@ -77,16 +77,7 @@ public interface Cancellation {
      */
     static Cancellation timeout(Duration duration) {
         Objects.requireNonNull(duration, "duration");
-        long nanos;
-        try {
-            nanos = duration.toNanos();
-        } catch (ArithmeticException e) {
-            // Further than the clock can count (about 292 years): never, or at once if it is in the past.
-            return duration.isNegative() ? () -> true : NONE;
-        }
-        long end = System.nanoTime() + nanos;
-        // The difference, not the comparison: nanoTime can wrap around.
-        return () -> System.nanoTime() - end >= 0;
+        return Timeout.of(duration, System::nanoTime);
     }
 
     /**

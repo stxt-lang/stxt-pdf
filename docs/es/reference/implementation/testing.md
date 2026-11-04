@@ -27,7 +27,9 @@ así que el schema no la detecta antes. Los tests de un algoritmo maquetan docum
 área útil de 515 × 762 pt desde (40, 40), y `rect(id)` da la caja de borde en coordenadas de página). La fixture declara en
 `For element: Document` `Font: IBM Plex Sans` y `Size: 10` (`Docs.mergeStyles` junta los `Styles` del test con ese y envuelve el
 contenido en una `Section`). Con `FixedMetrics`, cada carácter mide 5 pt con `Size: 10`. `layOutPaged(alto, ...)` pagina (con
-180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran una página concreta. Un test de
+180 pt de alto, el área útil mide 100) y `rect(página, id)` / `has(página, id)` miran una página concreta. Para afirmar
+que un fragmento está o no en una página, `assertPresent(página, id)` y `assertAbsent(página, id)` (y `assertNoMarker` para
+el marcador de un ítem), que al fallar dicen los `Id` que hay en ella; `has` queda para las condiciones. Un test de
 layout no puede desbordar: los desbordamientos van al catálogo de errores.
 
 Los documentos de los demás tests se escriben con `Docs` (`src/test/java/dev/stxt/pdf/`), para que la cabecera mínima y
@@ -125,7 +127,9 @@ de comentarios. Así ningún ejemplo de la documentación deja de funcionar sin 
 familia (`document`, `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`, `images`,
 `references`, `links`, `contents`, `sections`, `styles`, `combinations`, `overflow`, `fonts` y `limits`, y los códigos
 de `stxt-core` van en `schema`). Las tres primeras líneas son comentarios `# Case:` (descripción), `# Code:` y `# Line:`, y la
-línea esperada es la del propio fichero, cabecera incluida (la primera línea del documento es la 4). Se maqueta con las
+línea esperada es la del propio fichero, cabecera incluida (la primera línea del documento es la 4). El nombre empieza
+por el código de `# Code:` en minúsculas y con guiones (`contrast-low.light-gray-text-on-white.stxt`), y un caso que no
+lo cumple hace fallar el catálogo entero: un código o un fichero renombrados no dejan un nombre que miente. Se maqueta con las
 métricas reales. `everyCodeHasACase` exige un caso por cada `ErrorCode` salvo los de `UNCOVERED`. Los tests de layout prueban
 los casos válidos, y los inválidos van al catálogo.
 
@@ -140,7 +144,9 @@ los casos válidos, y los inválidos van al catálogo.
 - **Determinismo:** `CrossJvmDeterminismTest` comprueba que una JVM hija da el mismo PDF, byte a byte, de cada ejemplo y
   golden, y `PdfIdTest`, que el identificador sale del contenido.
 - **Hilos:** `ConcurrentConversionTest` y `EngineContractTest` ([Uso desde Java](api.md#hilos)).
-- **Cancelación:** `CancellationTest` (las `Cancellation` de serie) y `ConversionCancellationTest`, que comprueba que el
+- **Cancelación:** `CancellationTest` (las `Cancellation` de serie; el plazo de `timeout`, con un reloj que el test mueve a
+  mano a través de `model.Timeout`, sin esperar, incluido el desbordamiento de `System.nanoTime`) y
+  `ConversionCancellationTest`, que comprueba que el
   motor pregunta en cada fase y que, pedida en cualquiera de ellas, para allí sin envolver el error y sin escribir nada
   ([Uso desde Java](api.md#cancelar-una-conversión)).
 - **Arquitectura:** `ArchitectureTest` comprueba las dependencias entre packages ([Arquitectura](../architecture.md)).

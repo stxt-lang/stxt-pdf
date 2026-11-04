@@ -8,7 +8,6 @@ import java.util.List;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@code Table of contents} (reference/components/table-of-contents.md). Pages of 180 pt with margins of 40: page
@@ -128,7 +127,7 @@ class TableOfContentsTest {
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\tTable of contents:", "\t\tId: toc");
         // The heading is on page 1; the table of contents, which does not fit, on page 2.
-        assertTrue(l.has(2, "toc"));
+        l.assertPresent(2, "toc");
         assertEquals("1", text(l.fragment(2, "toc").children().get(0).children().get(2)));
     }
 }

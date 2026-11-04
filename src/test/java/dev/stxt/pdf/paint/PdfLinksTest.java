@@ -173,7 +173,8 @@ class PdfLinksTest {
             // The text of the entry, without its page number.
             assertEquals(List.of("Uno", "Dos"), links.stream().map(PDAnnotation::getContents).toList());
             PDStructureElement toc = (PDStructureElement) section(pdf).getKids().get(0);
-            toc.getKids().forEach(k -> assertTrue(types((PDStructureElement) k).contains("Link")));
+            toc.getKids().forEach(k -> assertTrue(types((PDStructureElement) k).contains("Link"),
+                    () -> "types: " + types((PDStructureElement) k)));
         }
     }
 

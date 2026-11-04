@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** {@code Pages} of a {@code Page overlay} (reference/components/frame-and-overlays.md): on which pages it appears. */
 class PageOverlayPagesTest {
@@ -75,8 +73,8 @@ class PageOverlayPagesTest {
         LayoutFixture with = LayoutFixture.layOutPaged(180, both);
         assertEquals(2, with.pages());
         assertEquals(without.rect(2, "B"), with.rect(2, "B"));
-        assertTrue(with.has(1, "F"));
-        assertFalse(with.has(2, "F"));
+        with.assertPresent(1, "F");
+        with.assertAbsent(2, "F");
     }
 
     @Test
@@ -89,7 +87,7 @@ class PageOverlayPagesTest {
                 "\t\tPage overlay:", "\t\t\tId: inner", "\t\t\tPages: last", "\t\t\tBox:", "\t\t\t\tHeight: 10");
         assertEquals(List.of(2, 3), pagesOf(l, "outer"));
         assertEquals(List.of(3), pagesOf(l, "inner"));
-        assertFalse(l.has(1, "inner"));
-        assertTrue(l.has(3, "outer"));
+        l.assertAbsent(1, "inner");
+        l.assertPresent(3, "outer");
     }
 }

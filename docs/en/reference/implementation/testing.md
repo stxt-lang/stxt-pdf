@@ -28,7 +28,9 @@ that the schema does not detect it first. The tests of an algorithm lay out smal
 page area of 515 × 762 pt from (40, 40), and `rect(id)` gives the border box in page coordinates). The fixture declares in
 `For element: Document` `Font: IBM Plex Sans` and `Size: 10` (`Docs.mergeStyles` merges the `Styles` of the test with that one and wraps the
 content in a `Section`). With `FixedMetrics`, each character measures 5 pt with `Size: 10`. `layOutPaged(height, ...)` paginates (with
-180 pt of height, the page area measures 100) and `rect(page, id)` / `has(page, id)` look at a specific page. A layout
+180 pt of height, the page area measures 100) and `rect(page, id)` / `has(page, id)` look at a specific page. To
+assert that a fragment is or is not on a page, `assertPresent(page, id)` and `assertAbsent(page, id)` (and
+`assertNoMarker` for the marker of an item), which name the `Id`s on it when they fail; `has` is for conditions. A layout
 test cannot overflow: overflows go to the error catalog.
 
 The documents of the other tests are written with `Docs` (`src/test/java/dev/stxt/pdf/`), so that the smallest header and
@@ -127,7 +129,9 @@ comments. This way no example in the documentation stops working unnoticed.
 family (`document`, `schema`, `values`, `structure`, `headings`, `lists`, `tables`, `columns`, `markdown`, `images`,
 `references`, `links`, `contents`, `sections`, `styles`, `combinations`, `overflow`, `fonts` and `limits`, and the codes
 of `stxt-core` go in `schema`). The first three lines are `# Case:` (description), `# Code:` and `# Line:` comments, and the
-expected line is that of the file itself, header included (the first line of the document is line 4). It is laid out with the
+expected line is that of the file itself, header included (the first line of the document is line 4). The name starts
+with the code of `# Code:` in lowercase and with hyphens (`contrast-low.light-gray-text-on-white.stxt`), and a case
+that does not follow it fails the whole catalog: a renamed code or file does not leave a name that lies. It is laid out with the
 real metrics. `everyCodeHasACase` requires one case for each `ErrorCode` except those in `UNCOVERED`. The layout tests test
 the valid cases, and the invalid ones go to the catalog.
 
@@ -142,7 +146,9 @@ the valid cases, and the invalid ones go to the catalog.
 - **Determinism:** `CrossJvmDeterminismTest` checks that a child JVM gives the same PDF, byte for byte, for each example
   and golden case, and `PdfIdTest`, that the identifier comes from the content.
 - **Threads:** `ConcurrentConversionTest` and `EngineContractTest` ([Using from Java](api.md#threads)).
-- **Cancellation:** `CancellationTest` (the ready-made `Cancellation`s) and `ConversionCancellationTest`, which checks
+- **Cancellation:** `CancellationTest` (the ready-made `Cancellation`s; the deadline of `timeout`, with a clock the test
+  moves by hand through `model.Timeout`, without waiting, the wrap-around of `System.nanoTime` included) and
+  `ConversionCancellationTest`, which checks
   that the engine asks in every phase and that, requested in any of them, it stops there without wrapping the error and
   without writing anything ([Using from Java](api.md#canceling-a-conversion)).
 - **Architecture:** `ArchitectureTest` checks the dependencies between packages ([Architecture](../architecture.md)).

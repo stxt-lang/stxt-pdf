@@ -13,7 +13,6 @@ import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPagedRuns;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). With
@@ -63,7 +62,7 @@ class InlineFragmentationTest {
                 "\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tText: " + words(9), "\t\tId: P", "\t\tBox:", "\t\t\tWidth: 30");
         assertEquals(3, l.pages());
-        assertFalse(l.has(1, "P"));
+        l.assertAbsent(1, "P");
         assertEquals(7, lines(l, 2, "P"));
         assertEquals(2, lines(l, 3, "P"));
     }

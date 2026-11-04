@@ -11,7 +11,6 @@ import java.util.List;
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -192,7 +191,7 @@ class SideBoxLayoutTest {
         LayoutFixture l = layOutPaged(180, join(new String[]{"\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 60"},
                 LEFT, new String[]{"\tParagraph: " + words(20), "\t\tId: P"}));
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "I"));
+        l.assertAbsent(1, "I");
         assertRect(40, 40, 60, 60, l.rect(2, "I"));
         assertRect(40, 40, 515, 24, l.rect(2, "P"));
     }
@@ -204,7 +203,7 @@ class SideBoxLayoutTest {
                 "\tImage: test/wide.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 8",
                 "\tParagraph: " + words(5), "\t\tId: P");
         assertEquals(2, l.pages());
-        assertFalse(l.has(1, "I"));
+        l.assertAbsent(1, "I");
         assertRect(40, 40, 60, 8, l.rect(2, "I"));
         assertRect(40, 40, 515, 12, l.rect(2, "P"));
     }

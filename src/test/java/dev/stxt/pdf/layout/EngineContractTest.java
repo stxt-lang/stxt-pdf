@@ -39,7 +39,7 @@ class EngineContractTest {
             assertFalse(publicMethods.contains(internal), internal + " belongs to the Paginator and must not be public");
         }
         // What does belong to the caller.
-        assertTrue(publicMethods.containsAll(Set.of("layOutDocument", "layout", "intrinsic", "measurer")));
+        assertTrue(publicMethods.containsAll(Set.of("layOutDocument", "layout", "intrinsic", "measurer")), () -> "public methods: " + publicMethods);
     }
 
     @Test

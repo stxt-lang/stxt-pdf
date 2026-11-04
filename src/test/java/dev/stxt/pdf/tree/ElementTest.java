@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import static dev.stxt.pdf.tree.SchemaNodes.canonical;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -62,9 +63,9 @@ class ElementTest {
         assertEquals(Element.values().length - 14, Element.written().size());
         // The footnote area is named by For element rules, but it is not written; a Footnote is.
         assertEquals(Optional.of(Element.FOOTNOTES), Element.of("footnotes"));
-        assertTrue(Element.selectable().contains(Element.FOOTNOTES));
-        assertTrue(!Element.written().contains(Element.FOOTNOTES));
-        assertTrue(Element.written().contains(Element.FOOTNOTE));
+        assertTrue(Element.selectable().contains(Element.FOOTNOTES), () -> "selectable: " + Element.selectable());
+        assertFalse(Element.written().contains(Element.FOOTNOTES), () -> "written: " + Element.written());
+        assertTrue(Element.written().contains(Element.FOOTNOTE), () -> "written: " + Element.written());
         // A Figure and its Caption are written; the caption carries text and only goes in a Figure.
         assertEquals(Optional.of(Element.FIGURE), Element.of("figure"));
         assertEquals(Optional.of(Element.CAPTION), Element.of("caption"));
@@ -75,8 +76,8 @@ class ElementTest {
         assertEquals(Element.Role.CAPTION, Element.CAPTION.role());
         // The code block is named by For element rules, but it is not written.
         assertEquals(Optional.of(Element.CODE_BLOCK), Element.of("code-block"));
-        assertTrue(Element.selectable().contains(Element.CODE_BLOCK));
-        assertTrue(!Element.written().contains(Element.CODE_BLOCK));
+        assertTrue(Element.selectable().contains(Element.CODE_BLOCK), () -> "selectable: " + Element.selectable());
+        assertFalse(Element.written().contains(Element.CODE_BLOCK), () -> "written: " + Element.written());
         assertTrue(Element.CODE_BLOCK.hasText());
         // The table of contents entries are named by For element rules, but they are not written.
         assertEquals(Optional.of(Element.TOC_2), Element.of("toc-2"));

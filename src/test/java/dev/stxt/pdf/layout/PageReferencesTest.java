@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@code {page of: id}} (reference/common/references.md). Pages of 180 pt with margins of 40: page
@@ -54,7 +53,7 @@ class PageReferencesTest {
                 fullPages(1),
                 new String[]{"\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tId: row",
                         "\t\t\t\tCell: Total"}));
-        assertTrue(l.has(2, "row"));
+        l.assertPresent(2, "row");
         assertEquals("La fila está en la página 2.", text(l, 1, "ref"));
     }
 
@@ -66,7 +65,7 @@ class PageReferencesTest {
                 new String[]{"\tBlock:", "\t\tId: target", "\t\tBox:", "\t\t\tHeight: 10"}));
         // A box with Height is split between pages: 12 + 200 + 10 = 222 pt, over three pages.
         assertEquals(3, l.pages());
-        assertTrue(l.has(3, "target"));
+        l.assertPresent(3, "target");
         assertEquals("Ver la página 3.", text(l, 1, "ref"));
         // The text measures what is written: 16 characters of 5 pt.
         assertEquals(80, l.fragment("ref").lines().get(0).width(), 1e-9);
@@ -89,8 +88,8 @@ class PageReferencesTest {
                 new String[]{"\tBlock:", "\t\tId: other", "\t\tBox:", "\t\t\tHeight: 10"},
                 new String[]{"\tBlock:", "\t\tId: split", "\t\tBox:", "\t\t\tHeight: 150"}));
         // ref (12) + story (60) + other (10) = 82; split starts on page 1 (18 pt) and continues on page 2.
-        assertTrue(l.has(1, "split"));
-        assertTrue(l.has(2, "split"));
+        l.assertPresent(1, "split");
+        l.assertPresent(2, "split");
         assertEquals("Empieza en la 1", text(l, 1, "ref"));
     }
 
