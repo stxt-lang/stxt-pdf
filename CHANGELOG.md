@@ -21,6 +21,11 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
+- **Tagging a long table no longer costs the square of its cells.** Building the structure tree of the tagged PDF
+  asked, for every cell and for every marked content of a cell, how many rows its table has by going through all the
+  cells of the table. The rows are now counted once per table, and the `Ref` of each table of contents entry in
+  PDF/UA-2 finds its heading in a map built once instead of going through every element. The table of 2000 rows and
+  8000 cells of `tools/qa/ScaleProbe.java` paints in 0.24 s instead of 8.7 s. The output does not change.
 - **A long `Stack`, `Grid` or `Table` is arranged once, not once per page.** What a container computes before breaking
   it between its rows, lines or items (placing the items, sizing the tracks, laying out each item at its size, the bands
   of the rows and, in a table, the repeated header and footer and the lines of `Merge borders`) does not depend on the

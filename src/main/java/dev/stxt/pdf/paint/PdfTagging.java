@@ -67,7 +67,7 @@ final class PdfTagging implements Tagging {
             if (mcid < 0) {
                 out.beginMarkedContent(COSName.ARTIFACT);
             } else {
-                out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
+                out.beginMarkedContent(COSName.getPDFName(structure.type(box)), mcid);
             }
         });
     }
@@ -83,7 +83,7 @@ final class PdfTagging implements Tagging {
             if (mcid < 0) {
                 out.beginMarkedContent(COSName.ARTIFACT);
             } else {
-                out.beginMarkedContent(COSName.getPDFName(PdfStructure.type(box)), mcid);
+                out.beginMarkedContent(COSName.getPDFName(structure.type(box)), mcid);
                 structure.figureBox(box, content.turnedRect(area));
             }
         });

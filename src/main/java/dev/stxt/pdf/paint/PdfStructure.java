@@ -90,6 +90,8 @@ final class PdfStructure {
     private final List<Box> headings = new ArrayList<>();
     /** Boxes of the header and the footer of tables, which repeat on every page of their table. */
     private final Set<Box> repeated = new HashSet<>();
+    /** Rows of the grid of each table ({@link #rows}). */
+    private final Map<Box, Integer> tableRows = new HashMap<>();
     /** First page with content of each box of {@link #repeated}: on the others it is an <em>artifact</em>. */
     private final Map<Box, PDPage> firstPage = new HashMap<>();
 
@@ -515,16 +517,29 @@ final class PdfStructure {
     }
 
     /** Group of a table cell: 0 in the header, 1 in the body, 2 in the footer. */
-    private static int group(Box cell) {
+    private int group(Box cell) {
         Box table = cell.parent();
         // Row from 0 of the cell in the grid of the table; the placement comes from TableBuilder.
         int row = cell.style().item().area().row() - 1;
         if (row < table.headerRows()) {
             return 0;
         }
-        int rows = table.children().stream().mapToInt(c -> c.style().item().area().row() - 1 + c.style().item().area().rows())
-                .max().orElse(0);
-        return row >= rows - table.footerRows() ? 2 : 1;
+        return row >= rows(table) - table.footerRows() ? 2 : 1;
+    }
+
+    /**
+     * Rows of the grid of a table: the last one any cell reaches. Computed once per table, because it is asked for
+     * every cell and for every marked content of a cell, and a table of thousands of cells would go through all of them
+     * each time.
+     */
+    private int rows(Box table) {
+        Integer rows = tableRows.get(table);
+        if (rows == null) {
+            rows = table.children().stream()
+                    .mapToInt(c -> c.style().item().area().row() - 1 + c.style().item().area().rows()).max().orElse(0);
+            tableRows.put(table, rows);
+        }
+        return rows;
     }
 
     /**
@@ -545,7 +560,7 @@ final class PdfStructure {
     }
 
     /** Standard structure type of the box (reference/implementation/pdf.md); of an image marker, its {@code Figure}. */
-    static String type(Box box) {
+    String type(Box box) {
         if (box.isMarker() && box.isImage()) {
             return "Figure";
         }
@@ -573,7 +588,7 @@ final class PdfStructure {
     }
 
     /** The structure type of a footnote: {@code Note}, or {@code FENote} with PDF/UA-2, which is PDF 2.0. */
-    private static String type(Box box, int ua) {
+    private String type(Box box, int ua) {
         return box.role() == Role.NOTE && ua == 2 ? "FENote" : type(box);
     }
 
@@ -812,14 +827,15 @@ final class PdfStructure {
         }
     }
 
-    /** The element of the box with that key ({@link Box#key()}), or of the nearest ancestor that has one. */
-    private PDStructureElement target(String key) {
+    /** The boxes with an element that have a key ({@link Box#key()}), by key; built once, when the tree is complete. */
+    private Map<String, Box> byKey() {
+        Map<String, Box> byKey = new HashMap<>();
         for (Box box : elements.keySet()) {
-            if (key.equals(box.key())) {
-                return element(box);
+            if (box.key() != null) {
+                byKey.put(box.key(), box);
             }
         }
-        return null;
+        return byKey;
     }
 
     /** The element of the box or, if it has none, that of the nearest ancestor that has one. */
@@ -896,9 +912,12 @@ final class PdfStructure {
                 }
             }
         }
-        // PDF/UA-2: each table of contents entry points with Ref to the element of its heading.
+        // PDF/UA-2: each table of contents entry points with Ref to the element of its heading, or of the nearest
+        // ancestor of the box with its key that has one.
+        Map<String, Box> byKey = entries.isEmpty() ? Map.of() : byKey();
         entries.forEach((entry, toci) -> {
-            PDStructureElement heading = target(Links.target(entry.style().link()));
+            Box box = byKey.get(Links.target(entry.style().link()));
+            PDStructureElement heading = box == null ? null : element(box);
             if (heading != null) {
                 COSArray ref = new COSArray();
                 ref.add(heading);
