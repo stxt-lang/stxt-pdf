@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,14 +26,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * What the reference tests ({@link GoldenTest}) and the example tests ({@code ExamplesTest}) share: comparing
- * a dump (reference/implementation/testing.md) with the expected one, and the images of each page of the PDF with the
- * ones versioned in the folder of the case.
+ * a dump (reference/implementation/testing.md) with the expected one, the images of the pages of the PDF with the
+ * ones versioned in the folder of the case, and the PDF itself with the versioned one, byte for byte.
  *
  * <p>The PDF and the new images are always written to {@code target/reference/} ({@link #writeActual}), never to
  * {@code test/}: {@code mvn test} changes no versioned file. If a new image is not the versioned one (beyond
  * antialiasing, {@link #PIXEL_TOLERANCE}), or there are pages too many or too few, the test fails
  * ({@link #checkImages}) and says how to accept the change: with the update property of its test
- * ({@code -Dgolden.update=true} or {@code -Dexamples.update=true}), which rewrites the versioned ones.</p>
+ * ({@code -Dgolden.update=true} or {@code -Dexamples.update=true}), which rewrites the versioned ones. A case can
+ * version only its first pages ({@link #checkImages(Path, Path, List, String, int)}): the rest are only written to
+ * {@code target/}, to look at them. When the PDF is compared ({@link #checkPdf}) and is not the versioned one, the
+ * versioned one and its pages are written next to the new ones, in {@code before/}, so that both can be compared.</p>
  */
 public final class ReferenceFiles {
 
@@ -88,9 +93,21 @@ public final class ReferenceFiles {
      */
     public static void checkImages(Path reference, Path actual, List<BufferedImage> images, String update)
             throws IOException {
+        checkImages(reference, actual, images, update, images.size());
+    }
+
+    /**
+     * Like {@link #checkImages(Path, Path, List, String)}, but only the first {@code versionedPages} pages are
+     * versioned and compared: a {@code page-N.png} of a later page is extra (and is deleted when updating), and the
+     * images of those pages are only the ones {@link #writeActual} wrote to {@code actual}, to look at them. The PDF
+     * is what checks the rest of the pages ({@link #checkPdf}).
+     */
+    public static void checkImages(Path reference, Path actual, List<BufferedImage> images, String update,
+            int versionedPages) throws IOException {
         boolean updating = Boolean.getBoolean(update);
+        int versioned = Math.min(images.size(), versionedPages);
         List<String> problems = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++) {
+        for (int i = 0; i < versioned; i++) {
             Path file = reference.resolve(page(i + 1));
             BufferedImage old = Files.exists(file) ? ImageIO.read(file.toFile()) : null;
             int differences = old == null ? -1 : differences(old, images.get(i));
@@ -105,17 +122,62 @@ public final class ReferenceFiles {
             }
         }
         for (Path extra : pageImages(reference)) {
-            if (pageNumber(extra) > images.size()) {
+            if (pageNumber(extra) > versioned) {
                 if (updating) {
                     Files.delete(extra);
                 } else {
-                    problems.add(extra.getFileName() + " is extra: the PDF has " + images.size() + " pages");
+                    problems.add(extra.getFileName() + " is extra: " + (versioned < images.size()
+                            ? "only the first " + (versioned == 1 ? "page is" : versioned + " pages are") + " versioned"
+                            : "the PDF has " + images.size() + " pages"));
                 }
             }
         }
         if (!problems.isEmpty()) {
             fail(reference + ": " + String.join("; ", problems) + ". The new images are in " + actual
                     + ". If the change is the intended one, once they are reviewed it is accepted with -D" + update + "=true");
+        }
+    }
+
+    /**
+     * Compares a PDF with the {@code output.pdf} versioned in {@code reference}, byte for byte. When they differ, the
+     * versioned one and its pages, rendered at {@code dpi}, are written to {@link #before}, next to the new ones in
+     * {@code actual}, so that both can be compared; when they are the same, the {@code before/} of a previous run is
+     * deleted. With the property {@code update} set to {@code true} the versioned one is rewritten instead. The
+     * versioned {@code output.pdf} must exist: the caller says what to do when it does not.
+     *
+     * @return whether the PDF is the versioned one; always {@code true} after updating. The caller fails, with its own
+     *         message, when it is not: this way it can compare the dump first, whose message names the box that moved.
+     */
+    public static boolean checkPdf(Path reference, Path actual, byte[] pdf, float dpi, String update)
+            throws IOException {
+        Path file = reference.resolve("output.pdf");
+        if (Boolean.getBoolean(update)) {
+            Files.write(file, pdf);
+            return true;
+        }
+        byte[] versioned = Files.readAllBytes(file);
+        Path before = before(actual);
+        if (Arrays.equals(versioned, pdf)) {
+            deleteTree(before);
+            return true;
+        }
+        writeActual(before, versioned, dpi);
+        return false;
+    }
+
+    /** Where {@link #checkPdf} leaves the versioned PDF and its pages when the new one differs: {@code actual/before/}. */
+    public static Path before(Path actual) {
+        return actual.resolve("before");
+    }
+
+    private static void deleteTree(Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return;
+        }
+        try (Stream<Path> files = Files.walk(dir)) {
+            for (Path file : files.sorted(Comparator.reverseOrder()).toList()) {
+                Files.delete(file);
+            }
         }
     }
 

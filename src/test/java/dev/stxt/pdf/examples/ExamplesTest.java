@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -49,22 +49,30 @@ import static org.junit.jupiter.api.Assertions.fail;
  * can have {@code styles.stxt}, the separate styles document that is passed along with the document of every language
  * (reference/common/styles.md). Each language folder has {@code input.stxt}, which must validate and lay out without
  * errors; the dump of the boxes with {@code Id} ({@code expected.stxt},
- * reference/implementation/testing.md), which is compared with a tolerance of 0.01 pt; one image per page ({@code
- * page-N.png}, versioned) and the PDF ({@code output.pdf}, versioned and compared byte for byte: the same document
- * gives the same bytes). The PDF and the new images are written to
- * {@code target/reference/examples/NN-name/<language>/}, and if the PDF or any image is not the versioned one the
- * example fails.</p>
+ * reference/implementation/testing.md), which is compared with a tolerance of 0.01 pt; the PDF ({@code output.pdf},
+ * versioned and compared byte for byte: the same document gives the same bytes) and the image of its first page
+ * ({@code page-1.png}, the one the README galleries show, versioned and compared like a golden image). The PDF and
+ * the images of all its pages are written to {@code target/reference/examples/NN-name/<language>/}, and if the PDF
+ * or the first page is not the versioned one the example fails; the other pages are not versioned
+ * ({@link #VERSIONED_PAGES}), because the PDF already checks them and they weighed down the history.</p>
  *
  * <p>The expected dump is not calculated by hand: it is a snapshot of what the engine gives, which the
- * author reviews by looking at the images. {@code -Dexamples.update=true} accepts the changes (it rewrites the dump,
- * the PDF and the images that change). {@code -Dexamples.only} limits the run to an example
- * ({@code 01-invoice}), a language ({@code en}) or both ({@code 01-invoice/en}).</p>
+ * author reviews by looking at the images: when the PDF is not the versioned one, the versioned one and its pages are
+ * written next to the new ones, in {@code before/}, to compare both. {@code -Dexamples.update=true} accepts the
+ * changes (it rewrites the dump, the PDF and the first page if it changes). {@code -Dexamples.only} limits the run to
+ * an example ({@code 01-invoice}), a language ({@code en}) or both ({@code 01-invoice/en}).</p>
  */
 class ExamplesTest {
 
     private static final Path ROOT = Path.of("test", "examples");
     private static final Path ACTUAL_DIR = ReferenceFiles.ACTUAL_ROOT.resolve("examples");
     private static final float IMAGE_DPI = 110;
+    /**
+     * How many pages of each language are versioned as {@code page-N.png}: only the first, which the README galleries
+     * show. The rest are only written to {@code target/}: the byte-for-byte comparison of the PDF checks them, and
+     * versioning them added about 8 MB to the history with every accepted change.
+     */
+    private static final int VERSIONED_PAGES = 1;
     /** The languages of each example, the original first. */
     private static final List<String> LANGUAGES = List.of("es", "en");
     /** The PDF/A variant each example is also validated in: level A, whose rules include those of level B. */
@@ -160,19 +168,22 @@ class ExamplesTest {
         List<BufferedImage> images = ReferenceFiles.writeActual(actual, pdf, IMAGE_DPI);
 
         Path expectedFile = dir.resolve("expected.stxt");
-        Path pdfFile = dir.resolve("output.pdf");
-        if (Boolean.getBoolean("examples.update")) {
-            Files.writeString(expectedFile, dump, StandardCharsets.UTF_8);
-            Files.write(pdfFile, pdf);
-        } else if (!Files.exists(expectedFile) || !Files.exists(pdfFile)) {
+        boolean updating = Boolean.getBoolean("examples.update");
+        if (!updating && (!Files.exists(expectedFile) || !Files.exists(dir.resolve("output.pdf")))) {
             fail(dir + ": expected.stxt or output.pdf is missing; -Dexamples.update=true generates them, and the images have to be reviewed");
+        }
+        // The PDF first: when it differs, the versioned one and its pages are left in before/ whatever fails next.
+        boolean samePdf = ReferenceFiles.checkPdf(dir, actual, pdf, IMAGE_DPI, "examples.update");
+        if (updating) {
+            Files.writeString(expectedFile, dump, StandardCharsets.UTF_8);
         } else {
             Node expected = STXT.rawParser().parseFile(expectedFile.toFile()).get(0);
             ReferenceFiles.compare(expected, STXT.rawParser().parse(dump).get(0), id + "/");
+            assertTrue(samePdf, id + ": output.pdf is not the versioned one (the new one and its pages are in " + actual
+                    + ", and the versioned one and its pages in " + ReferenceFiles.before(actual)
+                    + "); if the change is intended, once they are compared, -Dexamples.update=true accepts it");
         }
-        ReferenceFiles.checkImages(dir, actual, images, "examples.update");
-        assertArrayEquals(Files.readAllBytes(pdfFile), pdf, id + ": output.pdf is not the versioned one (the new one "
-                + "is in " + actual + "); if the change is intended, -Dexamples.update=true accepts it");
+        ReferenceFiles.checkImages(dir, actual, images, "examples.update", VERSIONED_PAGES);
         accessibility(id, pdf, 1);
         accessibility(id, pdf(document, resources, 2), 2);
         // PDF/A only once, as PDF/A-3a: the variant only changes the pdfaid of the XMP (the content is the same), the

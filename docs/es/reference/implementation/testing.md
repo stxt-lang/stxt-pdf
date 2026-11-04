@@ -56,11 +56,13 @@ las que cambian. La CI sube `target/reference` cuando falla.
 
 Cada carpeta de `test/examples/NN-nombre/` es un documento completo escrito en dos idiomas, cada uno en su subcarpeta:
 castellano (`es/`), el original, e inglés (`en/`), su espejo. Las dos versiones comparten el `styles.stxt` de la carpeta del
-ejemplo. Cada idioma tiene su `input.stxt`, un `page-N.png` por página (versionados, sin contornos, a 110 ppp), el
-`output.pdf` y un `expected.stxt` con el volcado de las cajas con `Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
+ejemplo. Cada idioma tiene su `input.stxt`, la imagen de su primera página (`page-1.png`, versionada, sin contornos, a 110
+ppp), el `output.pdf` y un `expected.stxt` con el volcado de las cajas con `Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
 valida con veraPDF, como PDF/UA-1, escrito también como PDF/UA-2 y escrito como PDF/A-3a. El
-volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta las imágenes que
-cambian y el `output.pdf`, y se revisa mirando las imágenes. `-Dexamples.only` limita la prueba a un ejemplo
+volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta el
+`output.pdf` y la portada si cambia, y se revisa mirando las imágenes: el test escribe las de todas las páginas en
+`target/reference/examples/NN-nombre/<idioma>/` y, cuando el PDF no es el versionado, el versionado y sus páginas en el
+`before/` de esa carpeta, para comparar el antes y el después. `-Dexamples.only` limita la prueba a un ejemplo
 (`01-invoice`), a un idioma (`en`) o a los dos (`01-invoice/en`). Un test comprueba además que la versión inglesa es espejo
 de la castellana: los mismos nodos en el mismo orden, los mismos `Id` y `Style`, la misma imagen en su carpeta de idioma y
 `Language: en`. Solo cambian los textos. Las imágenes de los ejemplos están en `resources/images/examples/` y las genera
@@ -76,9 +78,14 @@ figuras del manual y el sello del certificado) se generan una vez por idioma, en
 > imágenes, que no detecta cambios de un punto.
 
 > **Decisión:** el `output.pdf` de cada ejemplo se versiona para poder abrirlo desde el repositorio y se compara byte a
-> byte, como las imágenes: el mismo documento da los mismos bytes ([El PDF](pdf.md#páginas-fuentes-y-metadatos)), así que
-> un `output.pdf` distinto es un cambio de verdad, y el nuevo queda en `target/reference/`. *Alternativa descartada:* no
-> compararlo, que dejó en el repositorio PDF que ya no eran los que daba el motor.
+> byte: el mismo documento da los mismos bytes ([El PDF](pdf.md#páginas-fuentes-y-metadatos)), así que
+> un `output.pdf` distinto es un cambio de verdad, y el nuevo queda en `target/reference/`. De las imágenes solo se
+> versiona la primera página de cada idioma, la que enseñan las galerías de los README, comparada como una golden; las
+> demás solo se escriben en `target/`, para mirarlas. *Alternativas descartadas:* no comparar el PDF, que dejó en el
+> repositorio PDF que ya no eran los que daba el motor; versionar todas las páginas, que no comprobaba nada que el PDF no
+> compruebe (la imagen sale de él) y sumaba unos 8 MB al historial con cada aceptación; bajarlas a 72 ppp, que solo
+> ahorraba la mitad; versionar el SHA-256 del PDF en lugar del fichero, que quita el PDF que el README abre; y Git LFS,
+> cuya cuota agota una CI que descarga los ficheros en cada ejecución.
 
 > **Decisión:** cada ejemplo se valida en una sola variante de PDF/A, la 3a. La variante solo cambia la identificación
 > del XMP (`pdfaid`), no el contenido; las reglas del nivel A incluyen las del B, y sin adjuntos la parte 3 comprueba lo

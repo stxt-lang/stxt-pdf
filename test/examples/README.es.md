@@ -15,24 +15,24 @@ idiomas, y una subcarpeta por idioma con el documento y su resultado:
 |---|---|
 | `styles.stxt` | Las reglas de `Styles` y la tipografía base (`For element: Document`), en un [documento de estilos aparte](../../docs/es/reference/common/styles.md#documento-de-estilos-aparte) que se pasa junto al documento al maquetar. El documento queda con el contenido y la estructura, y el mismo estilo sirve para los dos idiomas. |
 | `es/input.stxt`, `en/input.stxt` | El documento. Valida con el schema y se maqueta sin errores. |
-| `page-N.png` | Una imagen por página del PDF, a 110 ppp. Se versionan. |
+| `page-1.png` | La imagen de la primera página del PDF, a 110 ppp, la que enseña la galería de abajo. Se versiona y se compara como las imágenes golden; las demás páginas solo se escriben en `target/`. |
 | `expected.stxt` | El [volcado](../../docs/es/reference/implementation/testing.md#el-volcado) de las cajas con `Id`, con las métricas reales. |
-| `output.pdf` | El PDF, para abrirlo desde el repositorio. Se compara byte a byte, como las imágenes, y se reescribe con `-Dexamples.update=true`. |
+| `output.pdf` | El PDF, para abrirlo desde el repositorio. Se compara byte a byte y se reescribe con `-Dexamples.update=true`. |
 
 Los ejemplos los ejecuta `ExamplesTest` con `mvn test`: comprueba que el documento se lee y se
-maqueta, que el volcado no cambia (tolerancia de 0,01 pt), que las imágenes de las páginas son las
-versionadas (salvo el antialiasing) y que el PDF también lo es, byte a byte. El PDF (etiquetado, con marcadores y las
-fuentes incrustadas) y las imágenes nuevas se escriben en `target/reference/examples/NN-nombre/es/` (o `en/`). Si el PDF
-o una imagen cambian, el test falla, y si el cambio es el que se busca, se acepta con `-Dexamples.update=true` después de mirar
-las imágenes. El volcado esperado no se calcula a mano: es una instantánea de lo que da el motor, que se
-revisa mirando las imágenes.
+maqueta, que el volcado no cambia (tolerancia de 0,01 pt), que el PDF es el versionado, byte a byte, y que la primera
+página lo es (salvo el antialiasing). El PDF (etiquetado, con marcadores y las fuentes incrustadas) y las imágenes de
+todas las páginas se escriben en `target/reference/examples/NN-nombre/es/` (o `en/`). Si el PDF cambia, el test falla y
+deja el PDF versionado y sus páginas al lado de las nuevas, en `before/`; si el cambio es el que se busca, se acepta con
+`-Dexamples.update=true` después de comparar las imágenes. El volcado esperado no se calcula a mano: es una instantánea
+de lo que da el motor, que se revisa mirando las imágenes.
 
 ```bash
 mvn test -Dtest=ExamplesTest                                   # todos
 mvn test -Dtest=ExamplesTest -Dexamples.only=01-invoice        # uno, en los dos idiomas
 mvn test -Dtest=ExamplesTest -Dexamples.only=en                # todos, en inglés
 mvn test -Dtest=ExamplesTest -Dexamples.only=01-invoice/en     # uno, en inglés
-mvn test -Dtest=ExamplesTest -Dexamples.update=true            # acepta los cambios: expected.stxt y page-N.png
+mvn test -Dtest=ExamplesTest -Dexamples.update=true            # acepta los cambios: expected.stxt, output.pdf y page-1.png
 ```
 
 Las imágenes están en [`resources/images/examples/`](../../resources/images/examples) y las

@@ -21,6 +21,11 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
+- **Only the first page of each example is versioned as an image.** `test/examples/NN-name/<language>/` keeps
+  `page-1.png`, the one the README galleries show, and no longer the other pages: the byte-for-byte comparison of
+  `output.pdf` already checks them, and they added about 8 MB to the history with every accepted change. `ExamplesTest`
+  still writes the images of every page to `target/reference/examples/`, and when the PDF is not the versioned one it
+  also writes the versioned PDF and its pages next to the new ones, in `before/`, to compare both.
 - **A chapter longer than the page is laid out once on the page where it starts.** Before laying out a child of a
   block, the engine now predicts from the tree the margins that will come out of it at the top (those of its first
   descendants, while nothing separates them from its top edge) and places it where they put it, instead of laying it
