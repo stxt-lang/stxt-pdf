@@ -2,7 +2,6 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.PdfA;
-import dev.stxt.pdf.model.Xmp;
 import dev.stxt.pdf.tree.Metadata;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -94,7 +93,7 @@ final class PdfMetadata {
      * 1 or 2; 2 with the revision of the standard, {@code pdfuaid:rev}), the PDF/A declaration ({@code pdfaid:part}
      * and {@code pdfaid:conformance}, if {@code pdfA} is not {@code null}), the extension schemas (the description
      * of {@code pdfuaid} that PDF/A asks for, and those of {@code extra}) and the rest of {@code extra}
-     * ({@link Xmp}), at the end.
+     * ({@link XmpFragment}), at the end.
      */
     static String xmp(String title, String subject, int ua, PdfA pdfA, String extra) {
         StringBuilder packet = new StringBuilder();
@@ -131,7 +130,7 @@ final class PdfMetadata {
         }
         String descriptions = "";
         if (extra != null) {
-            Xmp xmp = Xmp.parse(extra);
+            XmpFragment xmp = XmpFragment.parse(extra);
             schemas.addAll(xmp.schemas());
             descriptions = xmp.descriptions();
         }
@@ -150,12 +149,13 @@ final class PdfMetadata {
     /**
      * The one {@code pdfaExtension:schemas} of the packet, with the schema descriptions of the engine and of the
      * fragment given from outside in a single bag. It declares the prefixes of the extension schema vocabulary
-     * ({@link Xmp#EXTENSION_SCOPE}); an item that uses another declares it itself ({@code Xmp.serialize}).
+     * ({@link XmpFragment#EXTENSION_SCOPE}); an item that uses another declares it itself
+     * ({@code XmpFragment.serialize}).
      */
     private static String extensionSchemas(List<String> schemas) {
         StringBuilder out = new StringBuilder();
         out.append("<rdf:Description rdf:about=\"\"");
-        new TreeMap<>(Xmp.EXTENSION_SCOPE).forEach((prefix, uri) -> {
+        new TreeMap<>(XmpFragment.EXTENSION_SCOPE).forEach((prefix, uri) -> {
             if (!prefix.equals("rdf")) {
                 out.append(" xmlns:").append(prefix).append("=\"").append(uri).append('"');
             }

@@ -1,7 +1,6 @@
 package dev.stxt.pdf.convert;
 
 import dev.stxt.InlineNode;
-import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
@@ -23,7 +22,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -334,18 +332,7 @@ public final class Converter {
         Objects.requireNonNull(document, "document");
         Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
-        return guarded(() -> {
-            List<Page> pages = document.pages();
-            List<String> svg = new ArrayList<>(pages.size());
-            for (int i = 0; i < pages.size(); i++) {
-                stop.check();
-                Page page = pages.get(i);
-                svg.add(SvgCanvas.page(page, page.pageSetup(), debug, resources(document)));
-                progress.pagePainted(i + 1, pages.size());
-            }
-            progress.done();
-            return List.copyOf(svg);
-        });
+        return guarded(() -> SvgCanvas.pages(document, debug, resources(document), stop, progress));
     }
 
     /**

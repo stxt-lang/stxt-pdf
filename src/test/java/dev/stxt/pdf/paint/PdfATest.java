@@ -312,6 +312,9 @@ class PdfATest {
         assertThrows(IllegalArgumentException.class, () -> Attachments.NONE.withXmp("<rdf:Description>"));
         assertThrows(IllegalArgumentException.class, () -> Attachments.NONE.withXmp("<a xmlns:b=\"x\"><b:c/></b>"));
         assertThrows(IllegalArgumentException.class, () -> Attachments.NONE.withXmp("<!DOCTYPE a><a/>"));
+        // Only rdf is declared from outside.
+        assertThrows(IllegalArgumentException.class, () -> Attachments.NONE.withXmp("<fx:a/>"));
+        Attachments.NONE.withXmp("<rdf:Description rdf:about=\"\"/>");
         Attachment one = Attachment.of("a.xml", new byte[0], "text/xml", Relationship.DATA);
         assertThrows(IllegalArgumentException.class, () -> Attachments.of(one, one));
         assertThrows(IllegalArgumentException.class,

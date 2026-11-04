@@ -320,7 +320,7 @@ Dónde se consulta: `BoxTreeBuilder`, en cada elemento (un `Barcode` se genera a
 layout que no está en la caché (`layoutOnce` y `contentIntrinsic`); `Paginator`, en cada vuelta de la convergencia de las
 referencias y en cada página, al paginar el flujo y al colocar los `Page overlay`; `Overflow`, `ModuleSizes` y `ContrastCheck`, en cada
 página; `PdfDocumentWriter`, en cada página que pinta y antes de guardar; `PdfImages`, en cada imagen que incrusta o dibuja
-por primera vez, y `Converter.toSvg`, en cada página. Cada consulta cuesta una lectura del reloj monótono o de la marca del
+por primera vez, y `SvgCanvas.pages` (el de `Converter.toSvg`), en cada página. Cada consulta cuesta una lectura del reloj monótono o de la marca del
 hilo. Lo que no se corta es una sola llamada a PDFBox, a JSVG o a ZXing (dibujar un SVG, generar un código, guardar el
 PDF), que termina sola; los [límites](#límites) acotan lo que puede tardar cada una.
 

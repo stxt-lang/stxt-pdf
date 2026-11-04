@@ -1,4 +1,4 @@
-package dev.stxt.pdf.model;
+package dev.stxt.pdf.paint;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -24,20 +24,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An XMP fragment given from outside ({@link Attachments#withXmp}): one or more {@code rdf:Description} elements, as
- * they go inside the {@code rdf:RDF} of the packet. It is parsed to check that it is XML and to take out of it the
- * extension schemas it describes ({@code pdfaExtension:schemas}), because an XMP packet admits that property once and
- * the engine writes its own (reference/implementation/pdf.md).
+ * An XMP fragment given from outside ({@link dev.stxt.pdf.model.Attachments#withXmp}), which {@link PdfMetadata} writes
+ * in the packet: one or more {@code rdf:Description} elements, as they go inside the {@code rdf:RDF} of the packet. It
+ * is parsed to take out of it the extension schemas it describes ({@code pdfaExtension:schemas}), because an XMP packet
+ * admits that property once and the engine writes its own (reference/implementation/pdf.md). That it is well-formed XML
+ * was already checked by {@code withXmp}.
  *
  * @param schemas      the schema descriptions ({@code rdf:li} of the {@code rdf:Bag} of {@code pdfaExtension:schemas}),
  *                     serialized, in order
  * @param descriptions the rest, serialized: the {@code rdf:Description} elements without their
  *                     {@code pdfaExtension:schemas}, and without those that had nothing else
  */
-public record Xmp(List<String> schemas, String descriptions) {
+record XmpFragment(List<String> schemas, String descriptions) {
 
-    public static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    public static final String PDFA_EXTENSION = "http://www.aiim.org/pdfa/ns/extension/";
+    static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    static final String PDFA_EXTENSION = "http://www.aiim.org/pdfa/ns/extension/";
 
     /** The prefixes the packet declares around a fragment: on {@code rdf:RDF}, {@code rdf}. */
     private static final Map<String, String> PACKET_SCOPE = Map.of("rdf", RDF);
@@ -47,7 +48,7 @@ public record Xmp(List<String> schemas, String descriptions) {
      * extension schema vocabulary of PDF/A (ISO 19005-2, 6.6.2.3.2), besides {@code rdf}: a schema description is
      * serialized inside it.
      */
-    public static final Map<String, String> EXTENSION_SCOPE = Map.of(
+    static final Map<String, String> EXTENSION_SCOPE = Map.of(
             "rdf", RDF,
             "pdfaExtension", PDFA_EXTENSION,
             "pdfaSchema", "http://www.aiim.org/pdfa/ns/schema#",
@@ -60,7 +61,7 @@ public record Xmp(List<String> schemas, String descriptions) {
      *
      * @throws IllegalArgumentException if it is not well-formed XML
      */
-    public static Xmp parse(String fragment) {
+    static XmpFragment parse(String fragment) {
         Element root;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -100,7 +101,7 @@ public record Xmp(List<String> schemas, String descriptions) {
                 descriptions.append(serialize(description, PACKET_SCOPE)).append('\n');
             }
         }
-        return new Xmp(List.copyOf(schemas), descriptions.toString());
+        return new XmpFragment(List.copyOf(schemas), descriptions.toString());
     }
 
     private static List<Element> children(Element element) {

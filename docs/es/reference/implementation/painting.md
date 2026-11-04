@@ -80,6 +80,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `UaProfile` | Lo que PDF/UA-2 hace distinto de PDF/UA-1 en el árbol de estructura |
 | `PdfOutline` | Los marcadores de los encabezados |
 | `PdfMetadata` | El título, el idioma, el paquete XMP (PDF/UA, PDF/A y el XMP de los adjuntos) y el perfil de salida de PDF/A |
+| `XmpFragment` | El fragmento XMP de los adjuntos, separado en sus esquemas de extensión y el resto de sus descripciones |
 | `PdfAttachments` | Los ficheros adjuntos de PDF/A-3: las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
 | `PdfId` | El identificador del tráiler (`/ID`), calculado del contenido al guardar |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
@@ -279,7 +280,8 @@ color posible de debajo y una imagen lo deja sin conocer hasta que un color opac
 
 ## El SVG de depuración
 
-`SvgCanvas` escribe el SVG de los tests: `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para
+`SvgCanvas` escribe el SVG de los tests, una página con `page` y todo el documento con `pages`, que es lo que llama
+`Converter.toSvg` (consulta la cancelación y avisa a `Progress` en cada página, como `PdfDocumentWriter`): `<path>` para las cajas redondeadas, `linearGradient` y `clipPath`, y `<rect>` para
 lo liso y cuadrado, un `<g transform>` para el giro, los módulos de un `Barcode` como un `<path>` con un rectángulo por
 tramo y las imágenes como `data:` (la página de un PDF, dibujada en un PNG a
 144 ppp con `PDFRenderer`, porque un navegador no dibuja un PDF dentro de un SVG). No pinta enlaces ni distingue las ligaduras.

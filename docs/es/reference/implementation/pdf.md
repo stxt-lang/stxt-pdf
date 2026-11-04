@@ -304,9 +304,10 @@ hace ficheros asociados del documento, como piden PDF/A-3 y Factur-X.
 
 El XMP de `Attachments.withXmp` se escribe tras el del motor, tal cual salvo su `pdfaExtension:schemas`: un paquete XMP
 solo admite esa propiedad una vez, así que sus descripciones de esquema pasan a la bolsa del motor, junto a la de
-`pdfuaid`, y el resto de cada `rdf:Description` queda donde estaba. Lo hace `Xmp` (`model`), que analiza el fragmento
-con el parser XML del JDK, sin DTD ni entidades, y lo vuelve a escribir declarando en cada elemento los espacios de
-nombres que necesita. Un fragmento que no es XML es un `IllegalArgumentException` al construir los `Attachments`.
+`pdfuaid`, y el resto de cada `rdf:Description` queda donde estaba. Lo hace `XmpFragment` (`paint`), que analiza el
+fragmento con el parser XML del JDK, sin DTD ni entidades, y lo vuelve a escribir declarando en cada elemento los espacios
+de nombres que necesita; lo usa `PdfMetadata`. Un fragmento que no es XML es un `IllegalArgumentException` al construir
+los `Attachments`, que lo comprueban por su cuenta con el mismo parser y las mismas restricciones.
 
 > **Decisión:** el fragmento XMP se pasa como texto y el motor lo recoloca, en lugar de pedirlo por partes: la
 > especificación de Factur-X da el fragmento entero, con sus esquemas de extensión, y así se copia sin más.

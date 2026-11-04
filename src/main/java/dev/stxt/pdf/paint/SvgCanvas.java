@@ -1,6 +1,8 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
@@ -9,6 +11,7 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
+import dev.stxt.pdf.model.Progress;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
@@ -27,7 +30,9 @@ import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -54,6 +59,27 @@ public final class SvgCanvas implements Canvas {
     public SvgCanvas(boolean debug, Resources resources) {
         this.debug = debug;
         this.resources = resources;
+    }
+
+    /**
+     * The SVG of each page of {@code document}, in order, with the images of {@code resources} ({@code null}: without
+     * them): {@link #page(Page, PageSetup, boolean, Resources)} for each one. {@code cancellation} is asked before each
+     * page and {@code progress} is told each page made and, at the end, that it is done.
+     *
+     * @throws dev.stxt.pdf.model.CancelledException once {@code cancellation} asks for it
+     */
+    public static List<String> pages(LaidOutDocument document, boolean debug, Resources resources,
+                                     Cancellation cancellation, Progress progress) {
+        List<Page> pages = document.pages();
+        List<String> svg = new ArrayList<>(pages.size());
+        for (int i = 0; i < pages.size(); i++) {
+            cancellation.check();
+            Page page = pages.get(i);
+            svg.add(page(page, page.pageSetup(), debug, resources));
+            progress.pagePainted(i + 1, pages.size());
+        }
+        progress.done();
+        return List.copyOf(svg);
     }
 
     /** Complete SVG of a page, of the size of the paper, without images. */

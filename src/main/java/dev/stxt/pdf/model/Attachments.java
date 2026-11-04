@@ -1,5 +1,15 @@
 package dev.stxt.pdf.model;
 
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +32,8 @@ public final class Attachments {
 
     /** No attachments and no extra XMP. */
     public static final Attachments NONE = new Attachments(List.of(), null);
+
+    private static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
     private final List<Attachment> files;
     private final String xmp;
@@ -55,14 +67,40 @@ public final class Attachments {
      * already declared). For Factur-X, the fragment its specification gives, with the {@code fx} properties and the
      * {@code pdfaExtension} schema that describes them. The engine writes it after its own metadata, as it is except
      * for the extension schemas ({@code pdfaExtension:schemas}), which it joins with its own, because a packet admits
-     * that property once ({@link Xmp}).
+     * that property once (reference/implementation/pdf.md).
      *
      * @throws IllegalArgumentException if it is not well-formed XML
      */
     public Attachments withXmp(String descriptions) {
         Objects.requireNonNull(descriptions, "descriptions");
-        Xmp.parse(descriptions);
+        checkWellFormed(descriptions);
         return new Attachments(files, descriptions);
+    }
+
+    /**
+     * Checks that {@code fragment} is well-formed XML inside the {@code rdf:RDF} of a packet, with {@code rdf} as the
+     * only prefix declared from outside: every other prefix it uses has to be declared in it. A document type
+     * declaration is not admitted, so that no entity is expanded.
+     *
+     * @throws IllegalArgumentException if it is not
+     */
+    private static void checkWellFormed(String fragment) {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setNamespaceAware(true);
+            String wrapped = "<rdf:RDF xmlns:rdf=\"" + RDF + "\">" + fragment + "</rdf:RDF>";
+            // A handler that stops at any error; without one, the parser also prints it to the standard error.
+            factory.newSAXParser().parse(new InputSource(new StringReader(wrapped)), new DefaultHandler() {
+                @Override
+                public void error(SAXParseException e) throws SAXException {
+                    throw e;
+                }
+            });
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new IllegalArgumentException("The XMP fragment is not well-formed XML: " + e.getMessage(), e);
+        }
     }
 
     /** The files, in the order they were given. */

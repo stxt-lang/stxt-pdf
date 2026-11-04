@@ -81,6 +81,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `UaProfile` | What PDF/UA-2 does differently from PDF/UA-1 in the structure tree |
 | `PdfOutline` | The bookmarks of the headings |
 | `PdfMetadata` | The title, the language, the XMP packet (PDF/UA, PDF/A and the XMP of the attachments) and the output intent of PDF/A |
+| `XmpFragment` | The XMP fragment of the attachments, split into its extension schemas and the rest of its descriptions |
 | `PdfAttachments` | The embedded files of PDF/A-3: the file specifications, the `EmbeddedFiles` tree and the `AF` array |
 | `PdfId` | The identifier of the trailer (`/ID`), computed from the content when saving |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
@@ -282,7 +283,8 @@ possible color underneath and an image leaves it unknown until an opaque color c
 
 ## The debug SVG
 
-`SvgCanvas` writes the SVG of the tests: `<path>` for the rounded boxes, `linearGradient` and `clipPath`, and `<rect>` for
+`SvgCanvas` writes the SVG of the tests, one page with `page` and the whole document with `pages`, which is what
+`Converter.toSvg` calls (it asks the cancellation and tells `Progress` at each page, as `PdfDocumentWriter` does): `<path>` for the rounded boxes, `linearGradient` and `clipPath`, and `<rect>` for
 what is plain and square, a `<g transform>` for the rotation, the modules of a `Barcode` as a `<path>` with one rectangle per
 run and the images as `data:` (the page of a PDF, drawn into a PNG at
 144 dpi with `PDFRenderer`, because a browser does not draw a PDF inside an SVG). It does not paint links or distinguish ligatures.

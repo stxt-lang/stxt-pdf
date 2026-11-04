@@ -327,7 +327,7 @@ Where it is asked: `BoxTreeBuilder`, at each element (a `Barcode` is generated w
 each layout that is not in the cache (`layoutOnce` and `contentIntrinsic`); `Paginator`, at each pass of the convergence
 of the references and at each page, when paginating the flow and when placing the `Page overlay` boxes; `Overflow`,
 `ModuleSizes` and `ContrastCheck`, at each page; `PdfDocumentWriter`, at each page it paints and before saving; `PdfImages`, at each image
-it embeds or draws for the first time, and `Converter.toSvg`, at each page. Each question costs one reading of the
+it embeds or draws for the first time, and `SvgCanvas.pages` (that of `Converter.toSvg`), at each page. Each question costs one reading of the
 monotonic clock or of the flag of the thread. What is not cut short is a single call to PDFBox, JSVG or ZXing (drawing an
 SVG, generating a code, saving the PDF), which finishes on its own; the [limits](#limits) bound how long each can take.
 
