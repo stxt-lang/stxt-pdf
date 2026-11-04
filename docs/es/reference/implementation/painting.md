@@ -10,8 +10,9 @@ antes que texto) y llama a un `Canvas`. Resuelve los radios de cada fragmento (`
 `Edges: open`, `forFragment(first, last)` deja solo las esquinas de su lado) y llama a `Canvas.fill` (el fondo, con
 `radii.inset(borde)`), `Canvas.border` (un color por lado, ya resuelto) e `image` (con los radios de la caja de contenido).
 `Canvas.background(Rect, String)` queda para los rectángulos lisos (guías, líneas entre columnas, rayas del texto). La
-línea base la calcula con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en SVG). `Shapes` da el camino de
-una caja redondeada (cuartos de elipse como Bézier) y el trapecio de cada lado del borde.
+línea base la calcula con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en SVG). `Shapes` da lo que los dos
+lienzos pintan igual: el camino de una caja redondeada (cuartos de elipse como Bézier), el anillo del borde (`ring`), el
+trapecio de cada lado y el color de un borde que se pinta entero (`uniformColor`).
 
 Cada `Piece` lleva en `frames` la cadena de giros y recortes de sus ancestros, de la página hacia dentro, y cada paso del
 pintado se la aplica con `Canvas.beginRotation`/`endRotation` y `beginClip`/`endClip`, y después el giro de la propia caja:
@@ -47,7 +48,8 @@ y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCa
 superíndice se pinta elevado `TextFormat.rise()` del cuerpo.
 
 `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (`PdfTagging` en el PDF y `Tagging.NONE` en el
-SVG): el texto marcado del PDF etiquetado y los enlaces.
+SVG): el texto marcado del PDF etiquetado y los enlaces. Los métodos de `Tagging` no hacen nada por defecto: `NONE` no
+sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el texto que se pinta.
 
 > **Decisión:** `Canvas` solo dibuja y cada lienzo da su `Tagging` con un método explícito y no con `instanceof`: un lienzo
 > nuevo tiene que decir qué hace con el etiquetado. Las primitivas no declaran `IOException` y la convierte un único punto
@@ -63,6 +65,7 @@ SVG): el texto marcado del PDF etiquetado y los enlaces.
 |---|---|
 | `PdfDocumentWriter` | El documento: crea todas las páginas antes de pintar, pinta cada una, escribe la estructura, los marcadores, los destinos y las etiquetas de página, y guarda, o lo deja en un `PDDocument` abierto que guarda quien lo abrió. Su `write` es la entrada |
 | `PdfPainter` | Una página maquetada sobre una página de un documento ajeno, sin etiquetar ([Uso desde Java](api.md#integración-con-pdfbox)) |
+| `PdfPageWriter` | Lo que comparten las páginas de un documento (las fuentes, las imágenes, la estructura y los enlaces) y el pintado de una de ellas, que usan `PdfDocumentWriter` y `PdfPainter` |
 | `PdfCanvas` | El dibujo de una página |
 | `PdfContent` | El flujo de una página con el origen abajo: caminos, color, giros y `io`, el único punto que convierte las `IOException` |
 | `PdfTagging` | El contenido marcado y las anotaciones de una página |
@@ -212,8 +215,8 @@ configuración sin `Name` (la `D` y las de `Configs`) y le quita sus `AS`: PDF/U
 > página girada 90°.
 
 Una imagen generada, como un `Barcode` (`Box.modules()`), no pasa por `PdfImages`: `PdfCanvas.modules` coloca la matriz
-con `ImageFit` (`Modules.fit()`: `inside` si tiene varias filas, `stretch` si tiene una) y escribe un rectángulo por cada
-tramo de módulos oscuros seguidos de cada fila (`Modules.runs`), todos en un mismo trazado que se rellena una vez (`f`) con
+con `ImageFit.modules` (`Modules.fit()`: `inside` si tiene varias filas, `stretch` si tiene una) y escribe un rectángulo
+por cada tramo de módulos oscuros seguidos de cada fila (`Modules.rects`), todos en un mismo trazado que se rellena una vez (`f`) con
 el color de la tipografía, dentro del recorte de las esquinas y del contenido marcado de su figura.
 
 > **Decisión:** un solo trazado y un solo relleno, y no un relleno por módulo: dos rectángulos rellenados por separado

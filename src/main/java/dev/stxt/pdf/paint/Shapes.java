@@ -3,10 +3,11 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Sides;
 
 /**
  * The shapes the canvases paint (reference/common/box.md): a rectangle with rounded
- * corners and the four trapezoids a border is split into. They are described as a path that
+ * corners, the ring of a border and the four trapezoids it is split into. They are described as a path that
  * each canvas draws its own way ({@link Path}), so that the PDF and the SVG paint the same.
  */
 final class Shapes {
@@ -38,7 +39,60 @@ final class Shapes {
     }
 
     /** A side of the box, to split the border. */
-    enum Side { TOP, RIGHT, BOTTOM, LEFT }
+    enum Side {
+        TOP, RIGHT, BOTTOM, LEFT;
+
+        /** The width of this side in {@code widths}. */
+        double of(Insets widths) {
+            return switch (this) {
+                case TOP -> widths.top();
+                case RIGHT -> widths.right();
+                case BOTTOM -> widths.bottom();
+                case LEFT -> widths.left();
+            };
+        }
+
+        /** The value of this side in {@code sides}. */
+        <T> T of(Sides<T> sides) {
+            return switch (this) {
+                case TOP -> sides.top();
+                case RIGHT -> sides.right();
+                case BOTTOM -> sides.bottom();
+                case LEFT -> sides.left();
+            };
+        }
+    }
+
+    /**
+     * The color of a border painted as a whole: that of its sides with a width, if they all have the same one;
+     * {@code null} if two of them differ, so that each side is painted with its own, or if no side has a width.
+     */
+    static String uniformColor(Insets widths, Sides<String> colors) {
+        String uniform = null;
+        for (Side side : Side.values()) {
+            if (side.of(widths) > 0) {
+                String color = side.of(colors);
+                if (uniform == null) {
+                    uniform = color;
+                } else if (!uniform.equals(color)) {
+                    return null;
+                }
+            }
+        }
+        return uniform;
+    }
+
+    /**
+     * The ring of a border, to be filled with the even-odd rule: the border box {@code r} with its corners and, inside
+     * it, the padding box, which is left out if nothing remains of it.
+     */
+    static void ring(Path path, Rect r, Insets widths, Radii radii) {
+        roundedRect(path, r, radii);
+        Rect inner = r.shrink(widths);
+        if (inner.width() > 0 && inner.height() > 0) {
+            roundedRect(path, inner, radii.inset(widths));
+        }
+    }
 
     /** The rectangle {@code r} with the corners {@code radii}, clockwise. */
     static void roundedRect(Path target, Rect r, Radii radii) {

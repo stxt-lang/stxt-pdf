@@ -8,7 +8,6 @@ import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.PdfA;
 import dev.stxt.pdf.model.Progress;
-import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.ErrorCode;
@@ -17,10 +16,10 @@ import dev.stxt.pdf.tree.PageSetup;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
 import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
 
 import java.io.ByteArrayOutputStream;
@@ -100,9 +99,9 @@ public final class PdfDocumentWriter {
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
             throws IOException {
-        check(ua, pdfA, attachments);
+        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress);
         try (PDDocument doc = new PDDocument()) {
-            paint(document, resources, limits, doc, debug, ua, pdfA, attachments, cancellation, progress);
+            paint(document, resources, limits, doc, options);
             cancellation.check();
             PdfId.prepare(doc);
             ByteArrayOutputStream pdf = new ByteArrayOutputStream();
@@ -138,46 +137,60 @@ public final class PdfDocumentWriter {
             throw new IllegalArgumentException("The document is written into a PDDocument without pages, and this "
                     + "one has " + target.getNumberOfPages() + "; one page at a time goes with PdfPainter");
         }
-        check(ua, pdfA, attachments);
+        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress);
         try {
-            paint(document, resources, limits, target, debug, ua, pdfA, attachments, cancellation, progress);
+            paint(document, resources, limits, target, options);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
         progress.done();
     }
 
-    private static void check(int ua, PdfA pdfA, Attachments attachments) {
-        if (ua != 1 && ua != 2) {
-            throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + ua);
-        }
-        if (ua == 2 && pdfA != null) {
-            throw new IllegalArgumentException("PDF/UA-2 is a PDF 2.0 file and " + pdfA + " a PDF 1.7 one: "
-                    + "a PDF cannot comply with both");
-        }
-        if (!attachments.files().isEmpty() && (pdfA == null || !pdfA.allowsAttachments())) {
-            throw new InvalidModelException(InvalidModelException.NO_LINE, ErrorCode.ATTACHMENT_REQUIRES_PDFA3,
-                    "Embedding a file (" + attachments.files().get(0).name() + ") needs PDF/A-3, "
-                    + "Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is "
-                    + (pdfA == null ? "not PDF/A" : pdfA));
+    /**
+     * How the document is written, what the public {@code write} methods receive: the outlines of {@code debug}, the
+     * part of PDF/UA, the PDF/A ({@code null} for none), the embedded files and the extra XMP, the cancellation and the
+     * progress.
+     *
+     * @throws IllegalArgumentException if {@code ua} is neither 1 nor 2, or if it is 2 (PDF 2.0) with a PDF/A, which
+     *         are PDF 1.7 files
+     * @throws InvalidModelException {@code ATTACHMENT_REQUIRES_PDFA3} if there are files to embed and the PDF is not
+     *         PDF/A-3
+     */
+    private record PdfOptions(boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation,
+                              Progress progress) {
+
+        PdfOptions {
+            if (ua != 1 && ua != 2) {
+                throw new IllegalArgumentException("PDF/UA has parts 1 and 2: " + ua);
+            }
+            if (ua == 2 && pdfA != null) {
+                throw new IllegalArgumentException("PDF/UA-2 is a PDF 2.0 file and " + pdfA + " a PDF 1.7 one: "
+                        + "a PDF cannot comply with both");
+            }
+            if (!attachments.files().isEmpty() && (pdfA == null || !pdfA.allowsAttachments())) {
+                throw new InvalidModelException(InvalidModelException.NO_LINE, ErrorCode.ATTACHMENT_REQUIRES_PDFA3,
+                        "Embedding a file (" + attachments.files().get(0).name() + ") needs PDF/A-3, "
+                        + "Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is "
+                        + (pdfA == null ? "not PDF/A" : pdfA));
+            }
         }
     }
 
     /** Everything but saving: the pages, their content and what hangs from the catalog. */
     private static void paint(LaidOutDocument document, Resources resources, Limits limits, PDDocument doc,
-            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
-            throws IOException {
+            PdfOptions options) throws IOException {
         List<Page> pages = document.pages();
-        try (PdfImages images = new PdfImages(doc, limits, cancellation)) {
-            if (ua == 2) {
+        try (PdfImages images = new PdfImages(doc, limits, options.cancellation())) {
+            if (options.ua() == 2) {
                 // The file header and the catalog version.
                 doc.getDocument().setVersion(2.0f);
                 doc.getDocumentCatalog().setVersion("2.0");
             }
             PdfFonts fonts = new PdfFonts(doc, resources);
-            PdfStructure structure = new PdfStructure(doc, document.root(), UaProfile.of(ua));
+            PdfStructure structure = new PdfStructure(doc, document.root(), UaProfile.of(options.ua()));
             PdfLinks links = new PdfLinks();
-            PdfMetadata.write(doc, document.metadata(), ua, pdfA, attachments.xmp());
+            PdfPageWriter writer = new PdfPageWriter(doc, resources, fonts, images, structure, links);
+            PdfMetadata.write(doc, document.metadata(), options.ua(), options.pdfA(), options.attachments().xmp());
             // All the pages exist before any is painted: a link may point forward.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {
@@ -187,32 +200,25 @@ public final class PdfDocumentWriter {
                 pdfPages.add(page);
             }
             for (int i = 0; i < pages.size(); i++) {
-                cancellation.check();
+                options.cancellation().check();
                 Page p = pages.get(i);
-                // Each page has the paper of its section (reference/components/document.md).
-                PageSetup pageSetup = p.pageSetup();
-                Rect area = pageSetup.pageArea();
                 PDPage page = pdfPages.get(i);
-                structure.startPage(page);
-                PdfCanvas canvas;
-                try (PDPageContentStream cs = new PDPageContentStream(doc, page)) {
-                    canvas = new PdfCanvas(doc, cs, pageSetup.height(), resources, fonts, images, structure, links,
-                            debug);
-                    StackingContext.build(p.content(), p.footnotes(), p.pageOverlays(), area.x(), area.y()).paint(canvas);
-                }
-                if (!canvas.tagging().annotations().isEmpty()) {
-                    page.setAnnotations(canvas.tagging().annotations());
+                // Each page has the paper of its section (reference/components/document.md).
+                List<PDAnnotation> annotations = writer.paint(p, page, false, 0, p.pageSetup().height(),
+                        options.debug());
+                if (!annotations.isEmpty()) {
+                    page.setAnnotations(annotations);
                     // Annotations are traversed in structure order (PDF/UA, 7.18.3).
                     page.getCOSObject().setName(COSName.getPDFName("Tabs"), "S");
                 }
-                progress.pagePainted(i + 1, pages.size());
+                options.progress().pagePainted(i + 1, pages.size());
             }
             labels(doc, pages);
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations, structure);
             structure.finish();
             PdfOutline.write(doc, structure.headings(), destinations, structure::goTo);
-            PdfAttachments.write(doc, attachments);
+            PdfAttachments.write(doc, options.attachments());
         }
     }
 

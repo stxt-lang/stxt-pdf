@@ -4,14 +4,17 @@ import dev.stxt.pdf.model.Corners;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /** The paths of the shapes that the canvases paint (reference/common/box.md). */
 class ShapesTest {
@@ -144,5 +147,32 @@ class ShapesTest {
         Recorder bottom = new Recorder();
         Shapes.sidePolygon(bottom, Shapes.Side.BOTTOM, BOX, w, Radii.NONE);
         assertEquals(List.of("M 110.00 80.00", "L 10.00 80.00", "L 18.00 74.00", "L 106.00 74.00", "Z"), bottom.ops);
+    }
+
+    @Test
+    void aBorderHasOneColorIfItsSidesWithAWidthShareIt() {
+        Insets w = new Insets(2, 0, 2, 2);
+        assertEquals("#000", Shapes.uniformColor(w, new Sides<>("#000", "#f00", "#000", "#000")),
+                "a side without a width does not count");
+        assertNull(Shapes.uniformColor(w, new Sides<>("#000", "#000", "#f00", "#000")));
+        assertNull(Shapes.uniformColor(Insets.ZERO, Sides.all("#000")), "without a width there is no color");
+    }
+
+    @Test
+    void theRingOfABorderIsTheBorderBoxAndThePaddingBox() {
+        Recorder ring = new Recorder();
+        Shapes.ring(ring, BOX, new Insets(2, 4, 6, 8), Radii.NONE);
+        assertEquals(List.of("R 10.00 20.00 100.00 60.00", "R 18.00 22.00 88.00 52.00"), ring.ops);
+        Recorder full = new Recorder();
+        Shapes.ring(full, BOX, new Insets(30, 0, 30, 0), Radii.NONE);
+        assertEquals(List.of("R 10.00 20.00 100.00 60.00"), full.ops, "nothing remains of the padding box");
+    }
+
+    @Test
+    void eachSideReadsItsOwnValue() {
+        Insets w = new Insets(1, 2, 3, 4);
+        Sides<String> s = new Sides<>("t", "r", "b", "l");
+        assertEquals(List.of(1.0, 2.0, 3.0, 4.0), Arrays.stream(Shapes.Side.values()).map(side -> side.of(w)).toList());
+        assertEquals(List.of("t", "r", "b", "l"), Arrays.stream(Shapes.Side.values()).map(side -> side.of(s)).toList());
     }
 }

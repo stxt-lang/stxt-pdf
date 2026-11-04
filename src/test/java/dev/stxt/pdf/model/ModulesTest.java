@@ -58,6 +58,13 @@ class ModulesTest {
     }
 
     @Test
+    void eachRunIsARectangleOfTheTarget() {
+        // The target is 50 × 20: modules of 10 × 10.
+        assertEquals(List.of(new Rect(100, 200, 20, 10), new Rect(130, 200, 20, 10), new Rect(110, 210, 30, 10)),
+                sample().rects(new Rect(100, 200, 50, 20)));
+    }
+
+    @Test
     void naturalSizeAndFit() {
         Modules m = sample();
         assertEquals(10, m.naturalWidth());

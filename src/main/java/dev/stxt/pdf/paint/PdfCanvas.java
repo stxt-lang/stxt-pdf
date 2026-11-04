@@ -5,7 +5,6 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -21,6 +20,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.util.Matrix;
 
 import java.io.IOException;
+import java.util.List;
 
 import static dev.stxt.pdf.paint.PdfContent.io;
 
@@ -60,16 +60,16 @@ public final class PdfCanvas implements Canvas {
     private final PdfTagging tagging;
     private final boolean debug;
 
-    PdfCanvas(PDDocument doc, PDPageContentStream out, double pageHeight, Resources resources, PdfFonts fonts,
-              PdfImages images, PdfStructure structure, PdfLinks links, boolean debug) {
-        this.doc = doc;
+    /** The canvas of a page of {@code document}, which is written to {@code out} and has its top at {@code pageHeight}. */
+    PdfCanvas(PdfPageWriter document, PDPageContentStream out, double pageHeight, boolean debug) {
+        this.doc = document.doc();
         this.page = new PdfContent(out, pageHeight);
         this.out = out;
         this.pageHeight = pageHeight;
-        this.resources = resources;
-        this.fonts = fonts;
-        this.images = images;
-        this.tagging = new PdfTagging(page, structure, links);
+        this.resources = document.resources();
+        this.fonts = document.fonts();
+        this.images = document.images();
+        this.tagging = new PdfTagging(page, document.structure(), document.links());
         this.debug = debug;
     }
 
@@ -143,22 +143,12 @@ public final class PdfCanvas implements Canvas {
      */
     @Override
     public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
-        double[] widths = {w.top(), w.right(), w.bottom(), w.left()};
-        String[] sideColors = {colors.top(), colors.right(), colors.bottom(), colors.left()};
         if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
-            String uniform = null;
-            boolean same = true;
-            for (int i = 0; i < 4; i++) {
-                if (widths[i] > 0) {
-                    uniform = uniform == null ? sideColors[i] : uniform;
-                    same &= uniform.equals(sideColors[i]);
-                }
-            }
-            if (same && radii.isSquare() && !Colors.isTranslucent(uniform)) {
+            String uniform = Shapes.uniformColor(w, colors);
+            if (uniform != null && radii.isSquare() && !Colors.isTranslucent(uniform)) {
                 squareBorder(r, w, uniform);
             } else {
-                String color = same ? uniform : null;
-                io(() -> ringBorder(r, w, radii, color, widths, sideColors));
+                io(() -> ringBorder(r, w, radii, uniform, colors));
             }
         }
     }
@@ -167,19 +157,17 @@ public final class PdfCanvas implements Canvas {
      * The ring of the border: in one color ({@code color}) or, if it is {@code null}, once per side with a width,
      * clipped to its trapezoid and with its color.
      */
-    private void ringBorder(Rect r, Insets w, Radii radii, String color, double[] widths, String[] sideColors)
-            throws IOException {
+    private void ringBorder(Rect r, Insets w, Radii radii, String color, Sides<String> colors) throws IOException {
         out.beginMarkedContent(COSName.ARTIFACT);
         if (color != null) {
             page.painting(color, () -> ring(r, w, radii));
         } else {
-            Shapes.Side[] sides = Shapes.Side.values();
-            for (int i = 0; i < 4; i++) {
-                if (widths[i] > 0) {
+            for (Shapes.Side side : Shapes.Side.values()) {
+                if (side.of(w) > 0) {
                     out.saveGraphicsState();
-                    Shapes.sidePolygon(page.path(), sides[i], r, w, radii.inset(w));
+                    Shapes.sidePolygon(page.path(), side, r, w, radii.inset(w));
                     out.clip();
-                    page.painting(sideColors[i], () -> ring(r, w, radii));
+                    page.painting(side.of(colors), () -> ring(r, w, radii));
                     out.restoreGraphicsState();
                 }
             }
@@ -210,11 +198,7 @@ public final class PdfCanvas implements Canvas {
 
     /** Fills the ring of the border: the border box minus the padding box, not subtracted if nothing is left of it. */
     private void ring(Rect r, Insets w, Radii radii) throws IOException {
-        Shapes.roundedRect(page.path(), r, radii);
-        Rect inner = r.shrink(w);
-        if (inner.width() > 0 && inner.height() > 0) {
-            Shapes.roundedRect(page.path(), inner, radii.inset(w));
-        }
+        Shapes.ring(page.path(), r, w, radii);
         out.fillEvenOdd();
     }
 
@@ -296,21 +280,15 @@ public final class PdfCanvas implements Canvas {
      * are the background of the box.
      */
     private void modules(Box box, Rect content, Radii radii) {
-        Modules m = box.modules();
-        Rect target = ImageFit.place(m.fit(), content, m.naturalWidth(), m.naturalHeight());
-        double w = target.width() / m.columns();
-        double h = target.height() / m.rows();
+        List<Rect> modules = ImageFit.modules(box.modules(), content);
         io(() -> {
             tagging.beginImage(box, content);
             out.saveGraphicsState();
             Shapes.roundedRect(page.path(), content, radii);
             out.clip();
             page.painting(box.style().typography().color(), () -> {
-                for (int row = 0; row < m.rows(); row++) {
-                    for (int[] run : m.runs(row)) {
-                        out.addRect((float) (target.x() + run[0] * w),
-                                (float) (pageHeight - target.y() - (row + 1) * h), (float) (run[1] * w), (float) h);
-                    }
+                for (Rect m : modules) {
+                    out.addRect((float) m.x(), (float) (pageHeight - m.bottom()), (float) m.width(), (float) m.height());
                 }
                 out.fill();
             });

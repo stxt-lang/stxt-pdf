@@ -4,19 +4,14 @@ import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
-import dev.stxt.pdf.tree.PageSetup;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
-import org.apache.pdfbox.util.Matrix;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -49,14 +44,10 @@ import java.util.Set;
  */
 public final class PdfPainter implements Closeable {
 
-    private final PDDocument doc;
-    private final Resources resources;
-    private final PdfFonts fonts;
-    private final PdfImages images;
+    /** The document with its fonts, images and links, without a structure tree: nothing is tagged. */
+    private final PdfPageWriter pages;
     private final Cancellation cancellation;
-    private final PdfLinks links = new PdfLinks();
-    private final PdfStructure structure = PdfStructure.none();
-    private final List<Page> pages = new ArrayList<>();
+    private final List<Page> painted = new ArrayList<>();
     private final List<PDPage> targets = new ArrayList<>();
     private final List<double[]> corners = new ArrayList<>();
 
@@ -71,11 +62,11 @@ public final class PdfPainter implements Closeable {
      * each image the first time it is embedded or drawn.
      */
     public PdfPainter(PDDocument doc, Resources resources, Limits limits, Cancellation cancellation) {
-        this.doc = Objects.requireNonNull(doc, "doc");
-        this.resources = Objects.requireNonNull(resources, "resources");
-        this.fonts = new PdfFonts(doc, resources);
+        Objects.requireNonNull(doc, "doc");
+        PdfFonts fonts = new PdfFonts(doc, Objects.requireNonNull(resources, "resources"));
         this.cancellation = Objects.requireNonNull(cancellation, "cancellation");
-        this.images = new PdfImages(doc, Objects.requireNonNull(limits, "limits"), this.cancellation);
+        PdfImages images = new PdfImages(doc, Objects.requireNonNull(limits, "limits"), cancellation);
+        this.pages = new PdfPageWriter(doc, resources, fonts, images, PdfStructure.none(), new PdfLinks());
     }
 
     /**
@@ -93,23 +84,15 @@ public final class PdfPainter implements Closeable {
         PDRectangle box = target.getMediaBox();
         double left = box.getLowerLeftX();
         double top = box.getUpperRightY();
-        PageSetup pageSetup = page.pageSetup();
-        Rect area = pageSetup.pageArea();
-        PdfCanvas canvas;
-        try (PDPageContentStream cs = new PDPageContentStream(doc, target, AppendMode.APPEND, true, true)) {
-            if (left != 0) {
-                cs.transform(Matrix.getTranslateInstance((float) left, 0));
-            }
-            structure.startPage(target);
-            canvas = new PdfCanvas(doc, cs, top, resources, fonts, images, structure, links, false);
-            StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())
-                    .paint(canvas);
+        List<PDAnnotation> added;
+        try {
+            added = pages.paint(page, target, true, left, top, false);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
-        if (!canvas.tagging().annotations().isEmpty()) {
+        if (!added.isEmpty()) {
             List<PDAnnotation> annotations = new ArrayList<>(target.getAnnotations());
-            for (PDAnnotation annotation : canvas.tagging().annotations()) {
+            for (PDAnnotation annotation : added) {
                 // The content was translated to the media box; the annotations are outside the content stream.
                 if (left != 0) {
                     shift(annotation, (float) left);
@@ -118,7 +101,7 @@ public final class PdfPainter implements Closeable {
             }
             target.setAnnotations(annotations);
         }
-        pages.add(page);
+        painted.add(page);
         targets.add(target);
         corners.add(new double[] {left, top});
     }
@@ -144,14 +127,14 @@ public final class PdfPainter implements Closeable {
     @Override
     public void close() throws IOException {
         try {
-            double[] lefts = new double[pages.size()];
-            double[] tops = new double[pages.size()];
-            for (int i = 0; i < pages.size(); i++) {
+            double[] lefts = new double[painted.size()];
+            double[] tops = new double[painted.size()];
+            for (int i = 0; i < painted.size(); i++) {
                 lefts[i] = corners.get(i)[0];
                 tops[i] = corners.get(i)[1];
             }
-            Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, targets, lefts, tops);
-            List<PDAnnotationLink> unresolved = links.resolve(destinations);
+            Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(painted, targets, lefts, tops);
+            List<PDAnnotationLink> unresolved = pages.links().resolve(destinations);
             if (!unresolved.isEmpty()) {
                 Set<PDAnnotation> dropped = Set.copyOf(unresolved);
                 for (PDPage target : targets) {
@@ -162,7 +145,7 @@ public final class PdfPainter implements Closeable {
                 }
             }
         } finally {
-            images.close();
+            pages.images().close();
         }
     }
 }

@@ -110,4 +110,20 @@ public record Modules(int columns, int rows, BitSet dark, double moduleWidth, do
         }
         return runs;
     }
+
+    /**
+     * The dark modules once the whole drawing takes {@code target}: one rectangle per run of each row ({@link #runs}),
+     * row by row from the top and from left to right, in the coordinates of {@code target}.
+     */
+    public List<Rect> rects(Rect target) {
+        double w = target.width() / columns;
+        double h = target.height() / rows;
+        List<Rect> rects = new ArrayList<>();
+        for (int row = 0; row < rows; row++) {
+            for (int[] run : runs(row)) {
+                rects.add(new Rect(target.x() + run[0] * w, target.y() + row * h, run[1] * w, h));
+            }
+        }
+        return rects;
+    }
 }

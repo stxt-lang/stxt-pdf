@@ -8,7 +8,6 @@ import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -201,35 +200,21 @@ public final class SvgCanvas implements Canvas {
     public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
         if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
             StringBuilder ring = new StringBuilder();
-            Shapes.roundedRect(pathWriter(ring), r, radii);
-            Rect inner = r.shrink(w);
-            if (inner.width() > 0 && inner.height() > 0) {
-                Shapes.roundedRect(pathWriter(ring), inner, radii.inset(w));
-            }
+            Shapes.ring(pathWriter(ring), r, w, radii);
             String d = ring.toString().strip();
-            Shapes.Side[] sides = Shapes.Side.values();
-            double[] widths = {w.top(), w.right(), w.bottom(), w.left()};
-            String[] sideColors = {colors.top(), colors.right(), colors.bottom(), colors.left()};
-            boolean uniform = true;
-            String first = null;
-            for (int i = 0; i < 4; i++) {
-                if (widths[i] > 0) {
-                    first = first == null ? sideColors[i] : first;
-                    uniform &= first.equals(sideColors[i]);
-                }
-            }
-            if (uniform) {
-                svg.append("<path d=\"").append(d).append("\" fill-rule=\"evenodd\"").append(fillAttr(first)).append("/>\n");
+            String uniform = Shapes.uniformColor(w, colors);
+            if (uniform != null) {
+                svg.append("<path d=\"").append(d).append("\" fill-rule=\"evenodd\"").append(fillAttr(uniform)).append("/>\n");
             } else {
-                for (int i = 0; i < 4; i++) {
-                    if (widths[i] > 0) {
+                for (Shapes.Side side : Shapes.Side.values()) {
+                    if (side.of(w) > 0) {
                         String id = "c" + ids++;
                         StringBuilder polygon = new StringBuilder();
-                        Shapes.sidePolygon(pathWriter(polygon), sides[i], r, w, radii.inset(w));
+                        Shapes.sidePolygon(pathWriter(polygon), side, r, w, radii.inset(w));
                         svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(polygon.toString().strip())
                                 .append("\"/></clipPath>\n<path d=\"").append(d)
                                 .append("\" fill-rule=\"evenodd\" clip-path=\"url(#").append(id).append(")\"")
-                                .append(fillAttr(sideColors[i])).append("/>\n");
+                                .append(fillAttr(side.of(colors))).append("/>\n");
                     }
                 }
             }
@@ -376,18 +361,12 @@ public final class SvgCanvas implements Canvas {
      * content box with its corners.
      */
     private void modules(Box box, Rect content, Radii radii) {
-        Modules m = box.modules();
-        Rect target = ImageFit.place(m.fit(), content, m.naturalWidth(), m.naturalHeight());
-        double w = target.width() / m.columns();
-        double h = target.height() / m.rows();
         String id = "c" + ids++;
         svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(path(content, radii))
                 .append("\"/></clipPath>\n<path clip-path=\"url(#").append(id).append(")\" d=\"");
-        for (int row = 0; row < m.rows(); row++) {
-            for (int[] run : m.runs(row)) {
-                svg.append(String.format(Locale.ROOT, "M%.2f %.2fh%.2fv%.2fh%.2fz", target.x() + run[0] * w,
-                        target.y() + row * h, run[1] * w, h, -run[1] * w));
-            }
+        for (Rect m : ImageFit.modules(box.modules(), content)) {
+            svg.append(String.format(Locale.ROOT, "M%.2f %.2fh%.2fv%.2fh%.2fz", m.x(), m.y(), m.width(), m.height(),
+                    -m.width()));
         }
         svg.append("\"").append(fillAttr(box.style().typography().color())).append("/>\n");
     }

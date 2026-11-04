@@ -48,28 +48,14 @@ final class PdfTagging implements Tagging {
 
     @Override
     public void beginLinkText(Box box) {
-        io(() -> {
-            int mcid = structure.markLink(box);
-            linkText = true;
-            if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
-            } else {
-                out.beginMarkedContent(COSName.getPDFName("Link"), mcid);
-            }
-        });
+        linkText = true;
+        begin(structure.markLink(box), "Link");
     }
 
     @Override
     public void beginText(Box box) {
         linkText = false;
-        io(() -> {
-            int mcid = structure.mark(box);
-            if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
-            } else {
-                out.beginMarkedContent(COSName.getPDFName(structure.type(box)), mcid);
-            }
-        });
+        begin(structure.mark(box), structure.type(box));
     }
 
     /**
@@ -78,15 +64,11 @@ final class PdfTagging implements Tagging {
      * without it, an <em>artifact</em>.
      */
     void beginImage(Box box, Rect area) {
-        io(() -> {
-            int mcid = structure.mark(box);
-            if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
-            } else {
-                out.beginMarkedContent(COSName.getPDFName(structure.type(box)), mcid);
-                structure.figureBox(box, content.turnedRect(area));
-            }
-        });
+        int mcid = structure.mark(box);
+        begin(mcid, structure.type(box));
+        if (mcid >= 0) {
+            structure.figureBox(box, content.turnedRect(area));
+        }
     }
 
     /**
@@ -97,14 +79,7 @@ final class PdfTagging implements Tagging {
      */
     void beginInlineImage(Box box, InlineImage image, String link, Rect area) {
         linkText = link != null;
-        io(() -> {
-            int mcid = structure.markInlineImage(box, image, link != null, content.turnedRect(area));
-            if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
-            } else {
-                out.beginMarkedContent(COSName.getPDFName("Figure"), mcid);
-            }
-        });
+        begin(structure.markInlineImage(box, image, link != null, content.turnedRect(area)), "Figure");
     }
 
     /**
@@ -138,24 +113,24 @@ final class PdfTagging implements Tagging {
 
     @Override
     public void beginFootnoteCall(Box box, String footnote) {
-        io(() -> {
-            int mcid = structure.markFootnoteCall(box, footnote);
-            if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
-            } else {
-                out.beginMarkedContent(COSName.getPDFName("Reference"), mcid);
-            }
-        });
+        begin(structure.markFootnoteCall(box, footnote), "Reference");
     }
 
     @Override
     public void beginFootnoteLabel(Box box) {
+        begin(structure.markFootnoteLabel(box), "Lbl");
+    }
+
+    /**
+     * Opens the marked content of what follows: of structure type {@code type} with its {@code mcid}, or an
+     * <em>artifact</em> if {@code mcid} is negative (it hangs from no element).
+     */
+    private void begin(int mcid, String type) {
         io(() -> {
-            int mcid = structure.markFootnoteLabel(box);
             if (mcid < 0) {
                 out.beginMarkedContent(COSName.ARTIFACT);
             } else {
-                out.beginMarkedContent(COSName.getPDFName("Lbl"), mcid);
+                out.beginMarkedContent(COSName.getPDFName(type), mcid);
             }
         });
     }

@@ -10,8 +10,9 @@ before text) and calls a `Canvas`. It resolves the radii of each fragment (`Radi
 `Edges: open`, `forFragment(first, last)` keeps only the corners on its side) and calls `Canvas.fill` (the background, with
 `radii.inset(border)`), `Canvas.border` (one color per side, already resolved) and `image` (with the radii of the content box).
 `Canvas.background(Rect, String)` remains for plain rectangles (leaders, lines between columns, text lines). It computes the
-baseline with `Canvas.vertical(font)` (`hhea` in PDF, the 0.8/0.2 approximation in SVG). `Shapes` gives the path of
-a rounded box (quarter ellipses as Bézier curves) and the trapezoid of each side of the border.
+baseline with `Canvas.vertical(font)` (`hhea` in PDF, the 0.8/0.2 approximation in SVG). `Shapes` gives what both
+canvases paint the same: the path of a rounded box (quarter ellipses as Bézier curves), the ring of the border (`ring`),
+the trapezoid of each side and the color of a border painted whole (`uniformColor`).
 
 Each `Piece` carries in `frames` the chain of rotations and clips of its ancestors, from the page inwards, and each step of
 painting applies it with `Canvas.beginRotation`/`endRotation` and `beginClip`/`endClip`, and then the rotation of the box itself:
@@ -48,7 +49,8 @@ number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `b
 run is painted raised `TextFormat.rise()` of the size.
 
 `Canvas` only draws and each canvas gives its `Tagging` with `Canvas.tagging()` (`PdfTagging` in the PDF and `Tagging.NONE` in the
-SVG): the marked text of the tagged PDF and the links.
+SVG): the marked text of the tagged PDF and the links. The methods of `Tagging` do nothing by default: `NONE` overrides
+none of them and `ContrastCheck`, only those that tell it which box the painted text belongs to.
 
 > **Decision:** `Canvas` only draws and each canvas gives its `Tagging` with an explicit method and not with `instanceof`: a new
 > canvas has to state what it does with the tagging. The primitives do not declare `IOException` and a single point
@@ -64,6 +66,7 @@ SVG): the marked text of the tagged PDF and the links.
 |---|---|
 | `PdfDocumentWriter` | The document: creates all the pages before painting, paints each one, writes the structure, the bookmarks, the destinations and the page labels, and saves, or leaves it in an open `PDDocument` that the caller saves. Its `write` is the entry point |
 | `PdfPainter` | A laid-out page on a page of another document, untagged ([Using from Java](api.md#integration-with-pdfbox)) |
+| `PdfPageWriter` | What the pages of a document share (the fonts, the images, the structure and the links) and the painting of one of them, used by `PdfDocumentWriter` and `PdfPainter` |
 | `PdfCanvas` | The drawing of a page |
 | `PdfContent` | The stream of a page with the origin at the bottom: paths, color, rotations and `io`, the only point that converts the `IOException` |
 | `PdfTagging` | The marked content and the annotations of a page |
@@ -215,8 +218,8 @@ error of those that have not been removed. `LayerUtility` also copies the layers
 > page rotated 90°.
 
 A generated image, such as a `Barcode` (`Box.modules()`), does not go through `PdfImages`: `PdfCanvas.modules` places the
-matrix with `ImageFit` (`Modules.fit()`: `inside` if it has several rows, `stretch` if it has one) and writes one rectangle
-for each run of consecutive dark modules of each row (`Modules.runs`), all in a single path that is filled once (`f`) with
+matrix with `ImageFit.modules` (`Modules.fit()`: `inside` if it has several rows, `stretch` if it has one) and writes one
+rectangle for each run of consecutive dark modules of each row (`Modules.rects`), all in a single path that is filled once (`f`) with
 the color of the typography, inside the clip of the corners and the marked content of its figure.
 
 > **Decision:** a single path and a single fill, and not one fill per module: two rectangles filled separately show a thin

@@ -1,7 +1,10 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.Fit;
+import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Rect;
+
+import java.util.List;
 
 /**
  * Where an image is drawn in its content box according to {@code Fit}
@@ -30,5 +33,13 @@ final class ImageFit {
         double w = width * scale;
         double h = height * scale;
         return new Rect(content.x() + (content.width() - w) / 2, content.y() + (content.height() - h) / 2, w, h);
+    }
+
+    /**
+     * The dark modules of a generated image, such as a {@code Barcode} (reference/components/barcode.md), placed in its
+     * content box as {@link Modules#fit()} says: one rectangle per run of dark modules of each row.
+     */
+    static List<Rect> modules(Modules modules, Rect content) {
+        return modules.rects(place(modules.fit(), content, modules.naturalWidth(), modules.naturalHeight()));
     }
 }

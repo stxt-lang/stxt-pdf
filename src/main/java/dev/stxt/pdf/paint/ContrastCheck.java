@@ -310,17 +310,5 @@ public final class ContrastCheck implements Canvas {
         public void endText() {
             current = null;
         }
-
-        @Override
-        public void beginActualText(String text) {
-        }
-
-        @Override
-        public void endActualText() {
-        }
-
-        @Override
-        public void link(Box box, Rect area, String destination, String description) {
-        }
     };
 }
