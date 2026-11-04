@@ -114,8 +114,9 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 
 ### Pintado (`paint`)
 
-- **`StackingContext`**: ordena el pintado de una página en contextos de apilamiento y llama al lienzo. Calcula también las
-  zonas de los enlaces.
+- **`StackingContext`**: ordena el pintado de una página en contextos de apilamiento y llama al lienzo. Es el único que
+  calcula dónde queda cada fragmento en la página: los destinos del PDF lo toman de su recorrido (`visit`). Las líneas de
+  texto las pinta **`TextPainter`**, que calcula también las zonas de los enlaces de los tramos.
 - **`Canvas`**: la interfaz de los lienzos, que solo dibujan. Cada lienzo da su `Tagging`: el etiquetado del PDF, y en el
   SVG, nada.
 - **`PdfDocumentWriter`**: escribe el documento PDF: páginas, etiquetado (`PdfStructure`, con sus enlaces en

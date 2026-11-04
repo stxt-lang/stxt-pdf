@@ -23,17 +23,28 @@ esquinas, y un `Page overlay`, nada. El fondo, el borde y la imagen se pintan co
 se pinta con los giros y las ventanas (`Clips.WINDOWS`), cada línea con su tamaño (`TextLine.fontSize`, el de la caja o el
 que `Overflow: shrink` le dejó), y el contorno de depuración (`Canvas.outlines()`), sin recortes (`Clips.NONE`), para que se
 vea la caja entera. El paso de los fondos de una caja que no pinta nada, y el del contenido de una caja sin texto ni
-imagen (salvo la guía de un índice, que recorta por las ventanas), no recortan. Las zonas de los enlaces las calcula
-`StackingContext.paintLinks` al pintar (la caja de borde de cada fragmento con `Link`, y el rectángulo de cada tramo con
-enlace de cada línea, uniendo los seguidos con el mismo destino) y llama a `Tagging.link`. `StackingContext.paintText` parte el
-texto en secuencias de tramos con el mismo destino y añade el espacio invisible al final de las líneas partidas; la
-llamada y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un
-tramo en superíndice se pinta elevado `TextFormat.rise()` del cuerpo. El área de notas de una página (`Page.footnotes`)
-se pinta como una caja más en flujo, después del flujo y antes de los `Page overlay`. Las líneas de un fragmento
-(`Fragment.rules`, los bordes fusionados de una tabla) son un `Piece` más en flujo (`rules`), detrás de todos los
-descendientes del fragmento: se pintan con `Canvas.background` sobre los fondos de las celdas y debajo de su texto, con los
-giros y los recortes de lo que contiene el fragmento. Una celda con bordes fusionados (`Box.mergedBorder()`) no pinta su
-borde, que es solo el sitio de esas líneas.
+imagen (salvo la guía de un índice, que recorta por las ventanas), no recortan. Las zonas de los enlaces se calculan al
+pintar y llaman a `Tagging.link`: la caja de borde de cada fragmento con `Link`, en `StackingContext.paintLinks`, y el
+rectángulo de cada tramo con enlace de cada línea, uniendo los seguidos con el mismo destino, en `TextPainter`. El área de
+notas de una página (`Page.footnotes`) se pinta como una caja más en flujo, después del flujo y antes de los
+`Page overlay`. Las líneas de un fragmento (`Fragment.rules`, los bordes fusionados de una tabla) son un `Piece` más en
+flujo (`rules`), detrás de todos los descendientes del fragmento: se pintan con `Canvas.background` sobre los fondos de
+las celdas y debajo de su texto, con los giros y los recortes de lo que contiene el fragmento. Una celda con bordes
+fusionados (`Box.mergedBorder()`) no pinta su borde, que es solo el sitio de esas líneas.
+
+`StackingContext` es el único que calcula dónde queda cada fragmento en la página. Quien necesita esas posiciones fuera
+del pintado las toma de su recorrido, `visit(FragmentVisitor)`: los fragmentos del flujo y del área de notas en orden del
+documento, cada uno con su caja de borde sin girar y los giros dentro de los que se pinta (un `Turns`, los de sus
+ancestros y el suyo). Los `Page overlay` no entran, porque se repiten en cada página. Lo usa `PdfDestinations` para la
+esquina de cada caja con nombre, también la de una nota en el área de notas.
+
+`TextPainter` pinta las líneas de texto de un fragmento en el paso del contenido de su caja. Parte antes los tramos de
+cada línea en secuencias (`Sequence`: los tramos seguidos que son un mismo contenido marcado, con el mismo destino, la
+llamada o el número de una nota, o una imagen en línea, que va sola) y pinta cada una; dos secuencias de texto seguidas
+del mismo tipo y destino, también de una línea a la siguiente, comparten su contenido marcado. Añade el espacio
+invisible al final de las líneas partidas y el `ActualText` de las que acaban en guion o llevan interletraje; la llamada
+y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un tramo en
+superíndice se pinta elevado `TextFormat.rise()` del cuerpo.
 
 `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (`PdfTagging` en el PDF y `Tagging.NONE` en el
 SVG): el texto marcado del PDF etiquetado y los enlaces.
@@ -146,7 +157,7 @@ color. La opacidad de un color liso es un estado gráfico `ca` dentro de un `q`/
 `PdfCanvas` escribe un `cm` dentro de `q`/`Q` y guarda el giro compuesto para los `QuadPoints` de los enlaces y el `BBox` de
 las figuras. Lo guarda en un `Turns` (`model`), la pila de los giros dentro de los que se pinta una caja: cada caja girada
 pone el suyo al empezar y lo quita al terminar, y `envelope` da el rectángulo que envuelve uno girado. Con la misma pila
-buscan `PdfDestinations` la esquina de una caja girada, `ContrastCheck` dónde queda cada fondo y `Overflow` si lo girado
+da `StackingContext.visit` los giros de cada fragmento (de ahí saca `PdfDestinations` la esquina de una caja girada), `ContrastCheck` dónde queda cada fondo y `Overflow` si lo girado
 cabe en la página. Las coordenadas de `Rotation` son las de la página, con la y hacia abajo: un ángulo positivo gira en el sentido
 de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de signo).
 
@@ -165,7 +176,7 @@ de cada imagen.
 `PdfCanvas.image` lo coloca con una matriz `cm` de escala a donde manda `ImageFit` y restablece los guiones antes de
 dibujarlo. JSVG dibuja el texto como contornos. `PdfCanvas.inlineImage` dibuja una imagen en línea
 ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) en el rectángulo de su tramo, que
-`StackingContext` calcula como el del marcador con imagen (centrado en las mayúsculas sobre la línea base), fuera de las
+`TextPainter` calcula como el del marcador con imagen (centrado en las mayúsculas sobre la línea base), fuera de las
 secuencias de texto y sin subrayado ni tachado; el `Figure` o el *artifact* lo abre `PdfTagging.beginInlineImage`.
 
 > **Decisión:** el texto de un SVG son contornos y no texto del PDF, porque JSVG no permite otra cosa. *Alternativa

@@ -247,7 +247,7 @@ a `Paragraph` with `Drop cap` in every fragment (so the positions of the text do
 cap height of the font gives (`VerticalMetrics.capHeight`, from the `OS/2` table, or 0.7 without it) and places it as the
 first `TextLine` of the first fragment, with its baseline on that of line `N − 1`; the first `N` lines get its width as
 one more exclusion (`LineWidths.withDropCap`), the paragraph is at least `N` lines tall and `cutLines` gets
-`Orphans` ≥ `N`. `StackingContext` does not write the invisible space after the line of the drop cap, so that the text
+`Orphans` ≥ `N`. `TextPainter` does not write the invisible space after the line of the drop cap, so that the text
 that is read is still one word.
 
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the

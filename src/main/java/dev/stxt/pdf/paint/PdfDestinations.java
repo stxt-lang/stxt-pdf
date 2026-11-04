@@ -1,10 +1,7 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.model.Rotation;
-import dev.stxt.pdf.model.Turns;
 import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
@@ -48,50 +45,28 @@ final class PdfDestinations {
     static Map<Box, PDPageXYZDestination> find(List<Page> pages, List<PDPage> pdfPages, double[] lefts,
                                                double[] tops) {
         Map<Box, PDPageXYZDestination> targets = new LinkedHashMap<>();
-        Turns turns = new Turns();
         for (int i = 0; i < pages.size(); i++) {
             Page page = pages.get(i);
             Rect area = page.pageSetup().pageArea();
-            find(page.content(), area.x(), area.y(), turns, pdfPages.get(i), lefts[i], tops[i], targets);
-            // The notes are not in the flow: they are in the footnote area, relative to the page area like the flow.
-            Fragment footnotes = page.footnotes();
-            if (footnotes != null) {
-                find(footnotes, area.x() + footnotes.x(), area.y() + footnotes.y(), turns, pdfPages.get(i), lefts[i],
-                        tops[i], targets);
-            }
+            PDPage pdfPage = pdfPages.get(i);
+            double left = lefts[i];
+            double top = tops[i];
+            // The same positions with which the page is painted, the notes of the footnote area included
+            // (reference/components/footnote.md). The corner of a rotated box, or of one inside a rotated one, is that
+            // of the rectangle that encloses what is painted (reference/common/box.md).
+            StackingContext.build(page.content(), page.footnotes(), List.of(), area.x(), area.y())
+                    .visit((f, borderBox, turns) -> {
+                        Box box = f.box();
+                        if (f.first() && (box.headingLevel() > 0 || box.key() != null) && !targets.containsKey(box)) {
+                            Rect painted = turns.envelope(borderBox);
+                            PDPageXYZDestination d = new PDPageXYZDestination();
+                            d.setPage(pdfPage);
+                            d.setLeft((int) Math.floor(left + painted.x()));
+                            d.setTop((int) Math.ceil(top - painted.y()));
+                            targets.put(box, d);
+                        }
+                    });
         }
         return targets;
-    }
-
-    /**
-     * {@code x}, {@code y}: the corner of the border box of the fragment on the page, unrotated;
-     * {@code turns}, the rotations of its ancestors (reference/common/box.md), to which it adds its own while it goes
-     * through its descendants. The corner of a rotated box, or of one inside a rotated one, is that of the rectangle
-     * that encloses what is painted. {@code left} and {@code top}, where the top left corner of the page is on the PDF
-     * page.
-     */
-    private static void find(Fragment f, double x, double y, Turns turns, PDPage page, double left,
-                             double top, Map<Box, PDPageXYZDestination> targets) {
-        Box box = f.box();
-        Rect borderBox = f.borderBox(x, y);
-        Rotation rotation = box.style().rotation();
-        if (rotation != null) {
-            turns.push(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
-        }
-        if (f.first() && (box.headingLevel() > 0 || box.key() != null) && !targets.containsKey(box)) {
-            Rect painted = turns.envelope(borderBox);
-            PDPageXYZDestination d = new PDPageXYZDestination();
-            d.setPage(page);
-            d.setLeft((int) Math.floor(left + painted.x()));
-            d.setTop((int) Math.ceil(top - painted.y()));
-            targets.put(box, d);
-        }
-        Rect content = borderBox.shrink(f.border()).shrink(f.padding());
-        for (Fragment c : f.children()) {
-            find(c, content.x() + c.x(), content.y() + c.y(), turns, page, left, top, targets);
-        }
-        if (rotation != null) {
-            turns.pop();
-        }
     }
 }

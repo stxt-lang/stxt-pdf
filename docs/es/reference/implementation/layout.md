@@ -243,7 +243,7 @@ tramos de un `Paragraph` con `Drop cap` en todos los fragmentos (así las posici
 cuerpo que da la altura de mayúsculas de la fuente (`VerticalMetrics.capHeight`, de la tabla `OS/2`, o 0,7 sin ella) y la
 coloca como la primera `TextLine` del primer fragmento, con la base en la de la línea `N − 1`; las `N` primeras líneas
 reciben su ancho como una exclusión más (`LineWidths.withDropCap`), el párrafo mide al menos `N` líneas y `cutLines` recibe
-`Orphans` ≥ `N`. `StackingContext` no escribe el espacio invisible tras la línea de la capitular, para que el texto que se
+`Orphans` ≥ `N`. `TextPainter` no escribe el espacio invisible tras la línea de la capitular, para que el texto que se
 lee siga siendo una palabra.
 
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja

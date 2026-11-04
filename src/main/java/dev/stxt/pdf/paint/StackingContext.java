@@ -2,12 +2,7 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Rule;
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.inline.LineBreaker;
 import dev.stxt.pdf.model.Edges;
-import dev.stxt.pdf.model.DecorationMetrics;
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Position;
@@ -15,9 +10,7 @@ import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Sides;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.VerticalMetrics;
-import dev.stxt.pdf.model.Preformatted;
+import dev.stxt.pdf.model.Turns;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element.Role;
 import dev.stxt.pdf.tree.Style;
@@ -26,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Tree of stacking contexts (reference/common/layers-and-rotation.md), built on the
@@ -57,8 +49,23 @@ import java.util.Objects;
  * <p>The "tree order" is that of the document, not that of the fragments: {@code Overlay}
  * boxes hang from the fragment of their reference container, after its in-flow children, and
  * {@code Page overlay} boxes are added at the end, so contexts are sorted by their box.</p>
+ *
+ * <p>It is the only place where the position of a fragment on the page is computed: whoever else needs it (the
+ * destinations of the PDF, {@link PdfDestinations}) goes through the fragments with {@link #visit}. The text lines of a
+ * fragment are painted by {@link TextPainter}.</p>
  */
 public final class StackingContext {
+
+    /** What {@link #visit} gives of each fragment. */
+    interface FragmentVisitor {
+
+        /**
+         * {@code borderBox}: the border box of the fragment on the page, unrotated; {@code turns}: the rotations within
+         * which it is painted, those of its ancestors and its own, if it has {@code Rotate}. {@code turns} only holds
+         * them during the call.
+         */
+        void visit(Fragment fragment, Rect borderBox, Turns turns);
+    }
 
     /**
      * Fragment with its absolute origin already computed and the rotations and clips of its ancestors, from the page
@@ -128,14 +135,21 @@ public final class StackingContext {
 
     private final Piece root;
     private final int layer;
+    /**
+     * The pieces of the flow and of the footnote area of the page, in document order (an ancestor before its
+     * descendants), without the lines of the fragments: what {@link #visit} goes through. All the contexts of the
+     * flow of a page share it; those of the {@code Page overlay} boxes have their own, which nobody reads.
+     */
+    private final List<Piece> visited;
     private final List<StackingContext> negative = new ArrayList<>();
     private final List<Piece> inFlow = new ArrayList<>();
     private final List<StackingContext> positionedZero = new ArrayList<>();
     private final List<StackingContext> positive = new ArrayList<>();
 
-    private StackingContext(Piece root, int layer) {
+    private StackingContext(Piece root, int layer, List<Piece> visited) {
         this.root = root;
         this.layer = layer;
+        this.visited = visited;
     }
 
     /** Root context of a page; {@code originX/Y} is the corner of the page area. */
@@ -158,23 +172,63 @@ public final class StackingContext {
      */
     public static StackingContext build(Fragment root, Fragment footnotes, List<Fragment> pageOverlays, double originX,
                                         double originY) {
-        StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0);
+        StackingContext sc = new StackingContext(new Piece(root, originX, originY, List.of()), 0, new ArrayList<>());
+        sc.visited.add(sc.root);
         sc.walkChildren(sc.root);
         if (footnotes != null) {
             Piece p = new Piece(footnotes, originX + footnotes.x(), originY + footnotes.y(), List.of());
             sc.inFlow.add(p);
+            sc.visited.add(p);
             sc.walkChildren(p);
         }
         for (Fragment f : pageOverlays) {
-            sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()));
+            // They repeat on every page: visit does not go through them.
+            sc.addContext(new Piece(f, originX + f.x(), originY + f.y(), List.of()), new ArrayList<>());
         }
         sc.sort();
         return sc;
     }
 
+    /**
+     * Goes through the fragments of the flow and of the footnote area of the page, in document order (an ancestor
+     * before its descendants), with the coordinates with which they are painted; not through those of the
+     * {@code Page overlay} boxes, which repeat on every page.
+     */
+    void visit(FragmentVisitor visitor) {
+        Turns turns = new Turns();
+        for (Piece p : visited) {
+            int pushed = 0;
+            for (Frame frame : p.frames()) {
+                if (frame.kind() == Frame.Kind.ROTATION) {
+                    pushed += push(turns, frame.piece());
+                }
+            }
+            pushed += push(turns, p);
+            visitor.visit(p.f(), p.borderBox(), turns);
+            for (; pushed > 0; pushed--) {
+                turns.pop();
+            }
+        }
+    }
+
+    /** Adds the rotation of the box of {@code p} to {@code turns}, if it has {@code Rotate}; returns how many it added. */
+    private static int push(Turns turns, Piece p) {
+        Rotation rotation = p.f().box().style().rotation();
+        if (rotation == null) {
+            return 0;
+        }
+        Rect borderBox = p.borderBox();
+        turns.push(rotation.degrees(), rotation.pivotX(borderBox), rotation.pivotY(borderBox));
+        return 1;
+    }
+
     private void addContext(Piece p) {
+        addContext(p, visited);
+    }
+
+    private void addContext(Piece p, List<Piece> visited) {
         Style s = p.f().box().style();
-        StackingContext child = new StackingContext(p, s.layer() != null ? s.layer() : 0);
+        StackingContext child = new StackingContext(p, s.layer() != null ? s.layer() : 0, visited);
         child.walkChildren(p);
         child.sort();
         if (child.layer < 0) {
@@ -199,10 +253,11 @@ public final class StackingContext {
             List<Frame> frames = s.position() == Position.PAGE_OVERLAY ? List.of()
                     : s.position() == Position.OVERLAY ? forOverlay(inner) : inner;
             Piece p = new Piece(h, content.x() + h.x(), content.y() + h.y(), frames);
+            visited.add(p);
             if (createsContext(h)) {
                 addContext(p);
             } else if (s.isPositioned()) {
-                StackingContext pseudo = new StackingContext(p, 0);
+                StackingContext pseudo = new StackingContext(p, 0, visited);
                 pseudo.walkChildren(p);
                 pseudo.sort();
                 positionedZero.add(pseudo);
@@ -450,52 +505,22 @@ public final class StackingContext {
         } else if (p.f().box().role() == Role.LEADER) {
             paintLeader(canvas, p);
         } else {
-            paintText(canvas, p);
+            TextPainter.paint(canvas, p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()),
+                    p.f().lines());
         }
         paintLinks(canvas, p);
     }
 
     /**
      * The clickable area of the whole box (reference/common/links.md): its border box if the box has {@code Link}.
-     * Those of the runs with a link in its text lines are painted by {@link #paintText}, inside the content of the
+     * Those of the runs with a link in its text lines are painted by {@link TextPainter}, inside the content of the
      * link. A box broken across pages has one area per fragment.
      */
     private static void paintLinks(Canvas canvas, Piece p) {
         Box box = p.f().box();
         if (box.style().link() != null && p.f().width() > 0 && p.f().height() > 0) {
-            canvas.tagging().link(box, p.borderBox(), box.style().link(), describe(box));
+            canvas.tagging().link(box, p.borderBox(), box.style().link(), TextPainter.describe(box));
         }
-    }
-
-    /**
-     * What the box with a link says, for whoever cannot see it: the alternative text of an image or the
-     * text of the box and of what it contains (without the page number of the entries of a
-     * table of contents); {@code null} if it has no text.
-     */
-    private static String describe(Box box) {
-        if (box.style().image().alt() != null) {
-            return box.style().image().alt();
-        }
-        StringBuilder out = new StringBuilder();
-        collectText(box, out);
-        // A forced line break (U+2028) is a space too.
-        String text = out.toString().replaceAll("[\\s\\u2028]+", " ").strip();
-        return text.isEmpty() ? null : text;
-    }
-
-    private static void collectText(Box box, StringBuilder out) {
-        if (box.role() == Role.PAGE_NUMBER) {
-            return;
-        }
-        if (box.hasText()) {
-            out.append(box.text()).append(' ');
-        }
-        box.children().forEach(child -> collectText(child, out));
-    }
-
-    /** Area of a run of the line {@code l}, from {@code from} to {@code to} (relative to the line). */
-    private static Rect linkArea(Rect content, TextLine l, double from, double to) {
-        return new Rect(content.x() + l.x() + from, content.y() + l.y(), to - from, l.height());
     }
 
     /**
@@ -508,218 +533,6 @@ public final class StackingContext {
         double baseline = canvas.vertical(s.typography().fontFace()).baseline(content.y(), s.typography().usedLineHeight(), s.typography().fontSize());
         for (Rect shape : Leaders.shapes(s.tableOfContents().leader(), content, baseline, s.typography().fontSize())) {
             canvas.background(shape, s.typography().color());
-        }
-    }
-
-    /**
-     * The text lines, each run with its font (reference/common/text-formatting.md). The underline
-     * is painted before the text and the strikethrough after it; both outside the marked content, because they are not
-     * text (in the tagged PDF, <em>artifacts</em>).
-     *
-     * <p>Text is painted in sequences of consecutive runs with the same link, also from one line
-     * to the next ({@link Tagging#beginText} if they have none, {@link Tagging#beginLinkText} if they have one): each
-     * sequence is a separate marked content, and that of a link hangs from the {@code Link} of the tagged PDF
-     * (reference/common/links.md). Inside each link sequence, one clickable area per line ({@link
-     * #paintLinkZone}).</p>
-     *
-     * <p>A line that is not the last one ends with an invisible space, so that whoever joins the lines does not run
-     * the words together; a line split inside a word ({@link TextLine#hyphenated()}) does not, and the sequence that
-     * ends it carries an {@code ActualText} in which the hyphen is the soft hyphen U+00AD, which is how a tagged PDF
-     * says that the hyphen was added by the line breaking (reference/implementation/pdf.md).</p>
-     */
-    private static void paintText(Canvas canvas, Piece p) {
-        if (p.f().lines().isEmpty()) {
-            return;
-        }
-        Box box = p.f().box();
-        Style s = box.style();
-        FontFace font = s.typography().fontFace();
-        VerticalMetrics metrics = canvas.vertical(font);
-        Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
-        paintDecorations(canvas, p, content, metrics, true);
-        Tagging tags = canvas.tagging();
-        // With letter spacing, whoever extracts the text guesses spaces between the letters: each sequence of runs of
-        // a line carries its text separately (reference/implementation/pdf.md). A styled run can have its own.
-        double letterSpacing = s.typography().letterSpacing();
-        boolean open = false;
-        String current = null;
-        List<TextLine> lines = p.f().lines();
-        for (int n = 0; n < lines.size(); n++) {
-            TextLine l = lines.get(n);
-            // The line break swallows the space: it is written invisible after the last word, so that whoever
-            // joins the text of the lines (screen reader, extraction, search) does not run the words together. A
-            // line split inside a word has no space: its two parts are one word, and neither does the drop cap
-            // (the first line of a Paragraph with Drop cap, reference/components/text.md), which is the first
-            // letter of the word that starts the line after it.
-            boolean spaceAfter = n < lines.size() - 1 && s.typography().preformatted() == Preformatted.FALSE
-                    && !l.hyphenated() && !(n == 0 && s.dropCap() > 0);
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
-            List<TextLine.Run> runs = l.runs();
-            boolean spaced = runs.stream().anyMatch(r -> r.format().letterSpacing(letterSpacing) != 0);
-            for (int i = 0; i < runs.size(); i++) {
-                TextLine.Run r = runs.get(i);
-                String link = r.format().link();
-                if (r.format().image() != null) {
-                    // An image inside the text (reference/common/text-formatting.md): as tall as the size of the
-                    // line, centered on the capitals on the baseline, like the image marker of a list; outside any
-                    // text sequence, with its own marked content.
-                    if (open) {
-                        tags.endText();
-                        open = false;
-                    }
-                    double height = l.fontSize();
-                    double capitals = metrics.capHeight() * l.fontSize();
-                    double x = content.x() + l.x() + r.x();
-                    canvas.inlineImage(box, r.format().image(), link,
-                            new Rect(x, baseline - capitals / 2 - height / 2, r.width(), height));
-                    if (link != null) {
-                        paintLinkZone(tags, box, content, l, i, link);
-                    }
-                    if (spaceAfter && i == runs.size() - 1) {
-                        // The invisible space of the line break, which the image cannot carry.
-                        tags.beginText(box);
-                        canvas.text(x + r.width(), baseline, " ", font, l.fontSize(),
-                                r.format().color(s.typography().color()), 0, 0);
-                        tags.endText();
-                    }
-                    continue;
-                }
-                String sequence = sequence(r.format());
-                if (!open || !Objects.equals(sequence, current)) {
-                    if (open) {
-                        tags.endText();
-                    }
-                    if (r.format().footnote() != null) {
-                        tags.beginFootnoteCall(box, r.format().footnote());
-                    } else if (r.format().label()) {
-                        tags.beginFootnoteLabel(box);
-                    } else if (link == null) {
-                        tags.beginText(box);
-                    } else {
-                        tags.beginLinkText(box);
-                    }
-                    open = true;
-                    current = sequence;
-                }
-                boolean first = i == 0 || !sameSequence(r.format(), runs.get(i - 1).format());
-                boolean last = i == runs.size() - 1 || !sameSequence(r.format(), runs.get(i + 1).format());
-                if (link != null && first) {
-                    paintLinkZone(tags, box, content, l, i, link);
-                }
-                // The sequence carries its text when letter spacing would make extractors guess spaces, and when it
-                // ends the line with the hyphen of a split word, which is read as a soft hyphen.
-                boolean actual = spaced || l.hyphenated() && sequenceEnd(runs, i) == runs.size();
-                if (actual && first) {
-                    tags.beginActualText(sameLinkText(runs, i, spaceAfter, l.hyphenated()));
-                }
-                String shown = spaceAfter && i == runs.size() - 1 ? r.text() + " " : r.text();
-                // A superscript (the call or the label of a footnote) is raised above the baseline.
-                canvas.text(content.x() + l.x() + r.x(), baseline - r.format().rise() * l.fontSize(), shown,
-                        r.format().face(font),
-                        l.fontSize() * r.format().scale(), r.format().color(s.typography().color()), l.wordSpacing(),
-                        r.format().letterSpacing(letterSpacing));
-                if (actual && last) {
-                    tags.endActualText();
-                }
-            }
-        }
-        if (open) {
-            tags.endText();
-        }
-        paintDecorations(canvas, p, content, metrics, false);
-    }
-
-    /**
-     * The text of the runs of a line that start at {@code first} and follow one another with the same link, with the
-     * invisible trailing space if they reach the end of the line and it has one ({@code spaceAfter}), and with the
-     * hyphen of a split word ({@code hyphenated}) turned into the soft hyphen U+00AD if they reach it.
-     */
-    private static String sameLinkText(List<TextLine.Run> runs, int first, boolean spaceAfter, boolean hyphenated) {
-        StringBuilder text = new StringBuilder();
-        int end = sequenceEnd(runs, first);
-        for (int i = first; i < end; i++) {
-            text.append(runs.get(i).text());
-        }
-        if (end == runs.size()) {
-            if (hyphenated && text.length() > 0 && text.charAt(text.length() - 1) == LineBreaker.HYPHEN.charAt(0)) {
-                text.setCharAt(text.length() - 1, LineBreaker.SOFT_HYPHEN);
-            }
-            if (spaceAfter) {
-                text.append(' ');
-            }
-        }
-        return text.toString();
-    }
-
-    /**
-     * Where the runs that start at {@code first} and follow one another in the same sequence (same link, and neither
-     * the call nor the label of a footnote) end (exclusive).
-     */
-    private static int sequenceEnd(List<TextLine.Run> runs, int first) {
-        TextFormat f = runs.get(first).format();
-        int end = first;
-        while (end < runs.size() && sameSequence(f, runs.get(end).format())) {
-            end++;
-        }
-        return end;
-    }
-
-    /**
-     * What makes two runs the same marked content of the tagged PDF: their link, and whether they are the call or
-     * the label of a footnote, which are marked apart (reference/implementation/pdf.md).
-     */
-    private static String sequence(TextFormat f) {
-        if (f.footnote() != null) {
-            return "footnote:" + f.footnote();
-        }
-        if (f.label()) {
-            return "label";
-        }
-        return f.link() == null ? null : "link:" + f.link();
-    }
-
-    /** Whether two runs are in the same sequence; an image is a sequence of its own. */
-    private static boolean sameSequence(TextFormat a, TextFormat b) {
-        return a.image() == null && b.image() == null && Objects.equals(sequence(a), sequence(b));
-    }
-
-    /**
-     * The clickable area (reference/common/links.md) of the runs of the line {@code l} that start at {@code first}
-     * and follow one another with the same destination (a bold part inside a link is a single area).
-     */
-    private static void paintLinkZone(Tagging tags, Box box, Rect content, TextLine l, int first,
-                                      String destination) {
-        List<TextLine.Run> runs = l.runs();
-        StringBuilder text = new StringBuilder();
-        int end = first;
-        while (end < runs.size() && (end == first
-                || sameSequence(runs.get(first).format(), runs.get(end).format()))) {
-            // An image says its alternative text, if it has one; what is read of a link is its text.
-            InlineImage image = runs.get(end).format().image();
-            text.append(image != null ? (image.alt() != null ? image.alt() : "") : runs.get(end).text());
-            end++;
-        }
-        TextLine.Run last = runs.get(end - 1);
-        tags.link(box, linkArea(content, l, runs.get(first).x(), last.x() + last.width()), destination,
-                text.toString());
-    }
-
-    /** Underline ({@code underline}) or strikethrough lines of the runs, with the color of the text of each run. */
-    private static void paintDecorations(Canvas canvas, Piece p, Rect content, VerticalMetrics metrics,
-                                         boolean underline) {
-        Style s = p.f().box().style();
-        for (TextLine l : p.f().lines()) {
-            double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
-            for (TextLine.Run r : l.runs()) {
-                // An image is neither underlined nor struck out, not even inside a link.
-                if (r.format().image() != null || (underline ? !r.format().underline() : !r.format().strike())) {
-                    continue;
-                }
-                DecorationMetrics d = canvas.decoration(r.format().face(s.typography().fontFace()));
-                double x = content.x() + l.x() + r.x();
-                canvas.background(underline ? d.underline(x, baseline, r.width(), l.fontSize())
-                        : d.strikeout(x, baseline, r.width(), l.fontSize()), r.format().color(s.typography().color()));
-            }
         }
     }
 }

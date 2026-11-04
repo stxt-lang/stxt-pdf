@@ -23,17 +23,29 @@ it contains (`Frame.Kind.WINDOW`). An `Overlay` inherits the rotations and the w
 painted with the rotations and the windows (`Clips.WINDOWS`), each line at its size (`TextLine.fontSize`, that of the box or
 the one `Overflow: shrink` left it), and the debug outline (`Canvas.outlines()`), without clips (`Clips.NONE`), so that the
 whole box is visible. The backgrounds step of a box that paints nothing, and the content step of a box without text or
-image (except the leader of a table of contents, which clips by the windows), do not clip. The areas of the links are computed by
-`StackingContext.paintLinks` when painting (the border box of each fragment with `Link`, and the rectangle of each run with a
-link on each line, joining consecutive ones with the same destination), which calls `Tagging.link`. `StackingContext.paintText` splits the
-text into sequences of runs with the same destination and adds the invisible space at the end of the broken lines; the
-call and the number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a
-superscript run is painted raised `TextFormat.rise()` of the size. The footnote area of a page (`Page.footnotes`) is
-painted as one more in-flow box, after the flow and before the `Page overlay` boxes. The lines of a fragment
-(`Fragment.rules`, the merged borders of a table) are one more in-flow `Piece` (`rules`), after all the descendants of the
-fragment: they are painted with `Canvas.background` over the backgrounds of the cells and under their text, with the
-rotations and clips of what the fragment contains. A cell with merged borders (`Box.mergedBorder()`) does not paint its
-border, which is only the room for those lines.
+image (except the leader of a table of contents, which clips by the windows), do not clip. The areas of the links are
+computed when painting and call `Tagging.link`: the border box of each fragment with `Link`, in
+`StackingContext.paintLinks`, and the rectangle of each run with a link on each line, joining consecutive ones with the
+same destination, in `TextPainter`. The footnote area of a page (`Page.footnotes`) is painted as one more in-flow box,
+after the flow and before the `Page overlay` boxes. The lines of a fragment (`Fragment.rules`, the merged borders of a
+table) are one more in-flow `Piece` (`rules`), after all the descendants of the fragment: they are painted with
+`Canvas.background` over the backgrounds of the cells and under their text, with the rotations and clips of what the
+fragment contains. A cell with merged borders (`Box.mergedBorder()`) does not paint its border, which is only the room
+for those lines.
+
+`StackingContext` is the only one that computes where each fragment lies on the page. Whoever needs those positions
+outside painting takes them from its traversal, `visit(FragmentVisitor)`: the fragments of the flow and of the footnote
+area in document order, each one with its unrotated border box and the rotations within which it is painted (a
+`Turns`, those of its ancestors and its own). The `Page overlay` boxes are not included, because they repeat on every
+page. `PdfDestinations` uses it for the corner of each named box, also that of a note in the footnote area.
+
+`TextPainter` paints the text lines of a fragment in the content step of its box. It first splits the runs of each line
+into sequences (`Sequence`: the consecutive runs that are one marked content, with the same destination, the call or the
+number of a note, or an inline image, which goes alone) and paints each one; two consecutive text sequences of the same
+kind and destination, also from one line to the next, share their marked content. It adds the invisible space at the
+end of the broken lines and the `ActualText` of those that end in a hyphen or have letter spacing; the call and the
+number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a superscript
+run is painted raised `TextFormat.rise()` of the size.
 
 `Canvas` only draws and each canvas gives its `Tagging` with `Canvas.tagging()` (`PdfTagging` in the PDF and `Tagging.NONE` in the
 SVG): the marked text of the tagged PDF and the links.
@@ -146,7 +158,8 @@ color. The opacity of a plain color is a graphics state `ca` inside a `q`/`Q` of
 `PdfCanvas` writes a `cm` inside `q`/`Q` and keeps the composed rotation for the `QuadPoints` of the links and the `BBox` of
 the figures. It keeps it in a `Turns` (`model`), the stack of the rotations a box is painted inside: each rotated box
 pushes its own when it starts and pops it when it ends, and `envelope` gives the rectangle that encloses a rotated one.
-With the same stack `PdfDestinations` finds the corner of a rotated box, `ContrastCheck` where each background lies and
+With the same stack `StackingContext.visit` gives the rotations of each fragment (from which `PdfDestinations` takes the
+corner of a rotated box), `ContrastCheck` where each background lies and
 `Overflow` whether what is rotated fits on the page. The coordinates of `Rotation` are those of the page, with y pointing down: a positive angle rotates
 clockwise (in the PDF, with the origin at the bottom, the angle changes sign).
 
@@ -165,7 +178,7 @@ of each image.
 `PdfCanvas.image` places it with a scaling `cm` matrix where `ImageFit` says and resets the dash pattern before
 drawing it. JSVG draws the text as outlines. `PdfCanvas.inlineImage` draws an inline image
 ([Text formatting](../common/text-formatting.md#images-inside-a-text)) in the rectangle of its run, which
-`StackingContext` computes like that of the image marker (centered on the capitals on the baseline), outside the text
+`TextPainter` computes like that of the image marker (centered on the capitals on the baseline), outside the text
 sequences and without underline or strikethrough; the `Figure` or the *artifact* is opened by
 `PdfTagging.beginInlineImage`.
 

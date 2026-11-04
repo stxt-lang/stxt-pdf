@@ -113,8 +113,9 @@ depend on the `LayoutContext` interface.
 
 ### Painting (`paint`)
 
-- **`StackingContext`**: orders the painting of a page into stacking contexts and calls the canvas. It also computes the
-  link areas.
+- **`StackingContext`**: orders the painting of a page into stacking contexts and calls the canvas. It is the only one that
+  computes where each fragment lies on the page: the destinations of the PDF take it from its traversal (`visit`). The
+  text lines are painted by **`TextPainter`**, which also computes the link areas of the runs.
 - **`Canvas`**: the interface of the canvases, which only draw. Each canvas provides its `Tagging`: the tagging of the PDF, and in the
   SVG, nothing.
 - **`PdfDocumentWriter`**: writes the PDF document: pages, tagging (`PdfStructure`, with its links in

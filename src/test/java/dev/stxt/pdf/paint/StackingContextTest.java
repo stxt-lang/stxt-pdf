@@ -8,6 +8,7 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Paint;
+import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
@@ -588,6 +589,40 @@ class StackingContextTest {
         assertEquals(List.of(rotate, "background #555", "end rotate", rotate, "background #666", "end rotate",
                 "background #888", rotate, "end rotate", rotate, "end rotate",
                 rotate, "background #777", "end rotate", rotate, "end rotate"), r.events);
+    }
+
+    /**
+     * The traversal of the fragments gives each one, in document order, where it is painted: its border box and the
+     * rotations of its ancestors and its own, also to an {@code Overlay} inside a rotated block; the
+     * {@code Page overlay} boxes are left out.
+     */
+    @Test
+    void theVisitGivesEachFragmentWhereItIsPainted() {
+        String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 595\n\t\tHeight: 842\n"
+                + "\t\tMargin: 40\n" + String.join("\n",
+                "\tPage overlay:", "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10", "\t\t\tBackground: #111",
+                "\tBlock:", "\t\tId: turned", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 100", "\t\t\tHeight: 20",
+                "\t\tBlock:", "\t\t\tId: inner", "\t\t\tBox:", "\t\t\t\tHeight: 10",
+                "\t\tOverlay:", "\t\t\tId: stamp", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:", "\t\t\t\tWidth: 10",
+                "\t\t\t\tHeight: 10",
+                "\tBlock:", "\t\tId: after", "\t\tBox:", "\t\t\tHeight: 10");
+        Page page = new Engine().layOutDocument(READER.read(Docs.sectioned(doc))).pages().get(0);
+        assertEquals(1, page.pageOverlays().size());
+        List<String> visited = new ArrayList<>();
+        StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), 40, 40)
+                .visit((f, borderBox, turns) -> {
+                    assertTrue(f.box().style().position() != Position.PAGE_OVERLAY, f.box().toString());
+                    if (f.box().id() != null) {
+                        visited.add(f.box().id() + " " + round(borderBox) + " " + round(turns.envelope(borderBox)));
+                    }
+                });
+        // The 100 × 20 block takes, rotated, 20 × 100 at (40, 40): unrotated, it is at (0, 80), and its center is
+        // (50, 90). Its child, 100 × 10 at (0, 80), and the Overlay, 10 × 10 at its top right corner, turn with it.
+        assertEquals(List.of(
+                "turned " + new Rect(0, 80, 100, 20) + " " + new Rect(40, 40, 20, 100),
+                "inner " + new Rect(0, 80, 100, 10) + " " + new Rect(50, 40, 10, 100),
+                "stamp " + new Rect(90, 80, 10, 10) + " " + new Rect(50, 130, 10, 10),
+                "after " + new Rect(40, 140, 515, 10) + " " + new Rect(40, 140, 515, 10)), visited);
     }
 
     /**
