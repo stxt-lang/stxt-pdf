@@ -31,9 +31,7 @@ final class PdfId {
     static void prepare(PDDocument doc) {
         COSArray id = new COSArray();
         for (int i = 0; i < 2; i++) {
-            COSString half = new COSString(new byte[LENGTH]);
-            half.setForceHexForm(true);
-            id.add(half);
+            id.add(new COSString(new byte[LENGTH], true));
         }
         doc.getDocument().setDocumentID(id);
     }

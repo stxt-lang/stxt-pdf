@@ -232,7 +232,7 @@ final class PdfStructureLinks {
         for (Map<String, PDStructureElement> links : standIns.values()) {
             for (PDStructureElement link : links.values()) {
                 if (link.getKids().isEmpty()) {
-                    ((PDStructureNode) link.getParent()).removeKid(link);
+                    link.getParent().removeKid(link);
                 }
             }
         }

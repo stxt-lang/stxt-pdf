@@ -5,6 +5,7 @@ mvn test                                   # compila, ejecuta todos los tests y 
 mvn test -Dtest=ValueParserTest            # una clase
 mvn test -Dtest='TrackSizingTest#nombre'   # un método
 mvn -Pquick test                           # el bucle de desarrollo: sin los tests lentos ni la cobertura
+mvn verify                                 # lo de mvn test, más la cobertura mínima y los jar, javadoc incluido
 ```
 
 `mvn test` no escribe nada en `test/`: lo que generan los tests va a `target/`.
@@ -14,7 +15,7 @@ documentación (`DocumentationExamplesTest.documentationDocuments`), las convers
 (`ConcurrentConversionTest`) y los que arrancan otra JVM (`CrossJvmDeterminismTest` y
 `PdfImagesTest.theLanguageOfTheJvmDoesNotChangeTheText`). Suman más de la mitad de lo que tarda la suite. El perfil
 `quick` los deja fuera, junto con JaCoCo, para que el informe de `target/site/jacoco/` sea siempre el de una suite
-completa. Es para las vueltas de un cambio: antes de darlo por terminado se pasa `mvn test`, que es lo que pasa la CI.
+completa. Es para las vueltas de un cambio: antes de darlo por terminado se pasa `mvn verify`, que es lo que pasa la CI.
 
 ## Tests unitarios y de layout
 
@@ -150,7 +151,9 @@ los casos válidos, y los inválidos van al catálogo.
 - **Mutación:** el perfil `pit` del `pom.xml` pasa PIT por `layout` y `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, unos 13 min en Linux y cerca de una hora en
   Windows, con el informe en `target/pit-reports/`); por otro package, con `-DtargetClasses=dev.stxt.pdf.paint.*`
-  (varios, separados por comas). No está en la CI: es una pasada puntual para ver si los asserts miden algo. Deja fuera
+  (varios, separados por comas). No va en cada push: `.github/workflows/pit.yml` lo pasa cada semana (y a mano) por
+  todo el código, en cuatro grupos de packages a la vez, y sube el informe de cada grupo como artefacto (`pit-layout`,
+  `pit-tree`, `pit-paint`, `pit-model`). Solo informa: no falla por ningún porcentaje. Deja fuera
   los golden, los ejemplos y los tests de concurrencia, que escriben en carpetas compartidas de `target/` o arrancan
   otra JVM; los demás tests solo leen sus PDF en memoria.
 - **Rendimiento:** los tests con `@Tag("perf")` no van en `mvn test` ni en la CI: son sondas que se ejecutan a mano,
@@ -161,11 +164,27 @@ los casos válidos, y los inválidos van al catálogo.
 
 ## Integración continua
 
-`.github/workflows/ci.yml` ejecuta `mvn test` con JDK 17 y 21 y con la JVM en turco (que comprueba que el idioma de la JVM no
-cambia nada y que el árbol queda limpio), y, en la ejecución diaria y a mano, en Windows. veraPDF (`PdfUa`) valida con el
-locale neutro como predeterminado de la JVM, porque en 1.28.2 pasa a minúsculas los tipos de valor de los esquemas de
-extensión XMP con el locale predeterminado y en turco `Integer`, el tipo de `pdfuaid:part`, se convierte en un tipo que no
-conoce: todo PDF/A fallaría 6.6.2.3.1 y 6.6.2.3.3 con un PDF que es byte a byte el de cualquier otro locale.
+`.github/workflows/ci.yml` ejecuta `mvn verify` con JDK 17 y 21, y `mvn test` con la JVM en turco (que comprueba que el
+idioma de la JVM no cambia nada y que el árbol queda limpio) y, en la ejecución diaria y a mano, en Windows. veraPDF
+(`PdfUa`) valida con el locale neutro como predeterminado de la JVM, porque en 1.28.2 pasa a minúsculas los tipos de valor
+de los esquemas de extensión XMP con el locale predeterminado y en turco `Integer`, el tipo de `pdfuaid:part`, se
+convierte en un tipo que no conoce: todo PDF/A fallaría 6.6.2.3.1 y 6.6.2.3.3 con un PDF que es byte a byte el de
+cualquier otro locale.
+
+Las puertas del build, que no piden esfuerzo y solo impiden retroceder:
+
+- **Cobertura mínima:** `jacoco:check`, en `verify`, falla si la del jar entero baja del 95 % de las instrucciones o del
+  85 % de las ramas (el 2026-11-03 eran el 97,3 % y el 90,3 %). Es un suelo, no un objetivo. `-Pquick` se lo salta con
+  el resto de JaCoCo.
+- **Una versión de cada dependencia:** `maven-enforcer-plugin`, en `validate`, exige JDK 17 o posterior y que el árbol de
+  dependencias converja (`dependencyConvergence`). `pdfbox-graphics2d` 3.0.5 depende de PDFBox 3.0.5: el
+  `dependencyManagement` fija la del motor para los dos.
+- **Avisos del compilador:** `-Xlint:all`, sin `-Werror`. Se arreglan al aparecer: el 2026-11-04 había siete (seis
+  conversiones de tipo redundantes y un método obsoleto de PDFBox) y no queda ninguno.
+
+> **Decisión:** ni Checkstyle, ni Error Prone, ni SpotBugs, ni OWASP dependency-check: con seis dependencias y una
+> persona, `-Xlint:all` y un `mvn versions:display-dependency-updates` al preparar cada versión dan casi lo mismo.
+> *Alternativa descartada:* esas herramientas en la CI, con su configuración y sus falsos positivos que mantener.
 
 ## El volcado
 

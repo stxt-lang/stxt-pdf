@@ -51,8 +51,21 @@
         <project.build.outputTimestamp>2026-11-02T20:00:00Z</project.build.outputTimestamp>
         <junit.version>5.10.2</junit.version>
         <commonmark.version>0.30.1</commonmark.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
         <excludedGroups>perf</excludedGroups>
     </properties>
+
+    <!-- de.rototor.pdfbox:graphics2d 3.0.5 depends on PDFBox 3.0.5: the engine's version is the one for both, which
+         is what the enforcer's dependencyConvergence asks for. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Official STXT parser and validator. Used by stxt.DocumentReader, and the engine works with its nodes.
@@ -69,7 +82,7 @@
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>3.0.8</version>
+            <version>${pdfbox.version}</version>
         </dependency>
 
         <!-- Markdown element (tree.MarkdownBuilder): CommonMark with the GFM tables and strikethrough
@@ -134,10 +147,41 @@
 
     <build>
         <plugins>
+            <!-- Build rules, checked first (validate): the JDK the code is written for, and a single version of each
+                 dependency in the tree, so that a transitive dependency cannot bring an older copy of another one. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[17,)</version>
+                                </requireJavaVersion>
+                                <dependencyConvergence/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
+                <configuration>
+                    <!-- Every javac warning is shown, without failing the build (no -Werror). -->
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
+                    <showWarnings>true</showWarnings>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -152,8 +196,9 @@
                 </configuration>
             </plugin>
 
-            <!-- Test coverage: mvn test leaves the report in target/site/jacoco/index.html.
-                 Report only, no threshold. -->
+            <!-- Test coverage: mvn test leaves the report in target/site/jacoco/index.html, and mvn verify fails if the
+                 coverage of the whole jar falls below 95 % of the instructions or 85 % of the branches (it was
+                 97.3 % and 90.3 % on 2026-11-03): a floor so as not to go back, not a goal. -Pquick skips both. -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -170,6 +215,32 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.95</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.85</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -282,7 +353,8 @@
             </properties>
         </profile>
 
-        <!-- Mutation testing: an occasional run over layout and fragment, not in CI.
+        <!-- Mutation testing: by hand over layout and fragment, and weekly in CI over the whole code (.github/workflows/
+             pit.yml, which uploads the reports), never on each push.
              mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage
              The report is left in target/pit-reports/index.html. Another package (or several, separated by commas):
              mvn -Ppit -DtargetClasses=dev.stxt.pdf.paint.* test-compile org.pitest:pitest-maven:mutationCoverage -->

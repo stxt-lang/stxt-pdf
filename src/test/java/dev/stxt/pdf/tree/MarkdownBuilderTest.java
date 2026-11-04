@@ -69,7 +69,7 @@ class MarkdownBuilderTest {
         assertEquals(List.of("Heading 1 @15", "  Text: Título grande @15"), outline(t.elements().get(0)));
         // A single line break is a space; a lone tilde does not strike through.
         assertEquals(List.of("Paragraph: Uno dos tres ~sin~ tachar @17"), outline(t.elements().get(1)));
-        Node text = ((InlineNode) t.elements().get(0)).getChildren().get(0);
+        Node text = t.elements().get(0).getChildren().get(0);
         assertEquals(List.of(run("Título "), run("grande", "b")), t.runs().get(text));
         assertEquals(List.of(run("Uno "), run("dos", "i"), run(" tres ~sin~ tachar")),
                 t.runs().get(t.elements().get(1)));
@@ -184,7 +184,7 @@ class MarkdownBuilderTest {
                 "      Cell: Feb @19",
                 // GFM completes the row with an empty cell.
                 "      Cell @19"), outline(t.elements().get(0)));
-        InlineNode body = (InlineNode) ((InlineNode) t.elements().get(0)).getChild("body");
+        InlineNode body = (InlineNode) t.elements().get(0).getChild("body");
         Node cell = ((InlineNode) body.getChildren().get(0)).getChildren().get(1);
         assertEquals(List.of(run("120", "b")), t.runs().get(cell));
     }
@@ -205,7 +205,7 @@ class MarkdownBuilderTest {
     @Test
     void autoColumns() {
         MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "| A |", "|---|", "| 1 |");
-        assertEquals("repeat(1, auto)", ((InlineNode) t.elements().get(0)).getChild("column-sizes").getText());
+        assertEquals("repeat(1, auto)", t.elements().get(0).getChild("column-sizes").getText());
     }
 
     @Test
@@ -242,7 +242,7 @@ class MarkdownBuilderTest {
         assertEquals(List.of(run("Ver "), link("anexo", "u", "#anexo")),
                 t.runs().get(t.elements().get(0).getChildren().get(0)));
         // Table: Columns, Header rows, Body; the first cell of the first row of the body.
-        Node body = ((InlineNode) t.elements().get(1)).getChildren().get(2);
+        Node body = t.elements().get(1).getChildren().get(2);
         Node cell = ((InlineNode) ((InlineNode) body).getChildren().get(0)).getChildren().get(0);
         assertEquals(List.of(link("uno", "u", "https://a.example")), t.runs().get(cell));
     }
@@ -382,7 +382,7 @@ class MarkdownBuilderTest {
     void anIndentedCodeBlockKeepsItsRelativeIndentation() {
         MarkdownBuilder.Translation t = translate("Antes.", "", "    uno", "      dos");
         InlineNode code = t.elements().get(1);
-        assertEquals("uno\n  dos", ((InlineNode) code).getChild("content").getText());
+        assertEquals("uno\n  dos", code.getChild("content").getText());
         // The Content >> goes on the line before the first line of the code (line 17).
         assertEquals(16, code.getChild("content").getLine());
     }

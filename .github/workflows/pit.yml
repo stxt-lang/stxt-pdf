@@ -1,0 +1,44 @@
+# Mutation testing (PIT), weekly and on demand: too slow for each push. It only reports, it fails on nothing: the
+# report of each group of packages is uploaded as an artifact (pit-<group>), with index.html and mutations.csv.
+# The same run by hand: mvn -Ppit -DtargetClasses=<packages> test-compile org.pitest:pitest-maven:mutationCoverage
+name: PIT
+
+on:
+  schedule:
+    - cron: '41 4 * * 0'
+  workflow_dispatch:
+
+jobs:
+  pit:
+    name: PIT (${{ matrix.group }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      # The whole code, in four groups of similar size that run at the same time.
+      matrix:
+        include:
+          - group: layout
+            classes: dev.stxt.pdf.layout.*,dev.stxt.pdf.fragment.*
+          - group: tree
+            classes: dev.stxt.pdf.tree.*
+          - group: paint
+            classes: dev.stxt.pdf.paint.*,dev.stxt.pdf.convert.*,dev.stxt.pdf.output.*
+          - group: model
+            classes: dev.stxt.pdf.model.*,dev.stxt.pdf.resources.*,dev.stxt.pdf.stxt.*
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+      - name: Mutation coverage
+        run: mvn -B -Ppit "-DtargetClasses=${{ matrix.classes }}" test-compile org.pitest:pitest-maven:mutationCoverage
+      - name: Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-${{ matrix.group }}
+          path: target/pit-reports
+          if-no-files-found: ignore

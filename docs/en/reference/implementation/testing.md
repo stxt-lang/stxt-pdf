@@ -5,6 +5,7 @@ mvn test                                   # compiles, runs all the tests and le
 mvn test -Dtest=ValueParserTest            # one class
 mvn test -Dtest='TrackSizingTest#name'     # one method
 mvn -Pquick test                           # the development loop: without the slow tests or the coverage
+mvn verify                                 # what mvn test does, plus the minimum coverage and the jars, javadoc included
 ```
 
 `mvn test` writes nothing in `test/`: what the tests generate goes to `target/`.
@@ -14,7 +15,7 @@ documentation (`DocumentationExamplesTest.documentationDocuments`), the conversi
 (`ConcurrentConversionTest`) and those that start another JVM (`CrossJvmDeterminismTest` and
 `PdfImagesTest.theLanguageOfTheJvmDoesNotChangeTheText`). They add up to more than half the time of the suite. The
 `quick` profile leaves them out, together with JaCoCo, so that the report in `target/site/jacoco/` is always that of a
-whole suite. It is for the rounds of a change: before considering it finished, `mvn test` is run, which is what the CI
+whole suite. It is for the rounds of a change: before considering it finished, `mvn verify` is run, which is what the CI
 runs.
 
 ## Unit and layout tests
@@ -152,8 +153,10 @@ the valid cases, and the invalid ones go to the catalog.
 - **Mutation:** the `pit` profile of the `pom.xml` runs PIT over `layout` and `fragment`
   (`mvn -Ppit test-compile org.pitest:pitest-maven:mutationCoverage`, about 13 min on Linux and close to an hour on
   Windows, with the report in `target/pit-reports/`); over another package, with
-  `-DtargetClasses=dev.stxt.pdf.paint.*` (several, separated by commas). It is not in the CI: it is an occasional pass
-  to see whether the asserts measure anything. It leaves out the golden cases, the examples and the concurrency tests,
+  `-DtargetClasses=dev.stxt.pdf.paint.*` (several, separated by commas). It is not run on each push:
+  `.github/workflows/pit.yml` runs it every week (and by hand) over the whole code, in four groups of packages at the
+  same time, and uploads the report of each group as an artifact (`pit-layout`, `pit-tree`, `pit-paint`, `pit-model`).
+  It only reports: it fails on no percentage. It leaves out the golden cases, the examples and the concurrency tests,
   which write in shared folders of `target/` or start another JVM; the other tests only read their PDFs in memory.
 - **Performance:** the tests with `@Tag("perf")` are run neither by `mvn test` nor by the CI: they are probes to run by
   hand, like those of [`tools/qa/`](../../../../tools/qa), and they print their measurements without asserting anything
@@ -163,12 +166,27 @@ the valid cases, and the invalid ones go to the catalog.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs `mvn test` with JDK 17 and 21 and with the JVM in Turkish (which checks that the locale of the JVM does not
-change anything and that the tree is left clean), and, in the daily run and when run by hand, on Windows. veraPDF
-(`PdfUa`) validates with the neutral locale as the default of the JVM, because in 1.28.2 it lowercases the value types of
-the XMP extension schemas with the default locale and in Turkish `Integer`, the type of `pdfuaid:part`, becomes a type it
-does not know: every PDF/A would fail 6.6.2.3.1 and 6.6.2.3.3 with a PDF that is byte for byte the one of any other
-locale.
+`.github/workflows/ci.yml` runs `mvn verify` with JDK 17 and 21, and `mvn test` with the JVM in Turkish (which checks
+that the locale of the JVM does not change anything and that the tree is left clean) and, in the daily run and when run
+by hand, on Windows. veraPDF (`PdfUa`) validates with the neutral locale as the default of the JVM, because in 1.28.2 it
+lowercases the value types of the XMP extension schemas with the default locale and in Turkish `Integer`, the type of
+`pdfuaid:part`, becomes a type it does not know: every PDF/A would fail 6.6.2.3.1 and 6.6.2.3.3 with a PDF that is byte
+for byte the one of any other locale.
+
+The gates of the build, which take no effort and only prevent going back:
+
+- **Minimum coverage:** `jacoco:check`, in `verify`, fails if that of the whole jar falls below 95 % of the
+  instructions or 85 % of the branches (on 2026-11-03 they were 97.3 % and 90.3 %). It is a floor, not a goal.
+  `-Pquick` skips it with the rest of JaCoCo.
+- **One version of each dependency:** `maven-enforcer-plugin`, in `validate`, requires JDK 17 or later and that the
+  dependency tree converges (`dependencyConvergence`). `pdfbox-graphics2d` 3.0.5 depends on PDFBox 3.0.5: the
+  `dependencyManagement` sets the engine's version for both.
+- **Compiler warnings:** `-Xlint:all`, without `-Werror`. They are fixed when they appear: on 2026-11-04 there were seven
+  (six redundant casts and a deprecated method of PDFBox) and none is left.
+
+> **Decision:** neither Checkstyle, nor Error Prone, nor SpotBugs, nor OWASP dependency-check: with six dependencies and
+> one person, `-Xlint:all` and a `mvn versions:display-dependency-updates` when preparing each version give almost the
+> same. *Rejected alternative:* those tools in the CI, with their configuration and their false positives to maintain.
 
 ## The dump
 

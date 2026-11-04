@@ -24,8 +24,10 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: maven
+      # verify, not only test: also the minimum coverage (jacoco:check) and the javadoc jar, whose doclint errors
+      # otherwise only show up when publishing.
       - name: Tests
-        run: mvn -B test
+        run: mvn -B verify
       # The tests must not modify anything under version control: they write to target/ and fail
       # if a reference PNG changes.
       - name: The tree is still clean
