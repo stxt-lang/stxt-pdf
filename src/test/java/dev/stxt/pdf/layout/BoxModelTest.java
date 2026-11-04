@@ -1,5 +1,6 @@
 package dev.stxt.pdf.layout;
 
+import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
@@ -8,6 +9,7 @@ import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
@@ -182,6 +184,25 @@ class BoxModelTest {
                 m.childSpace(space, false));
         ConstraintSpace free = ConstraintSpace.free(200, 200, NONE, false);
         assertEquals(NONE, resolve(free).childSpace(free, true).fragmentainerRemaining());
+    }
+
+    @Test
+    void theExclusionsGoToTheContentBox() {
+        style.border(Sides.all(pt(1)));
+        style.padding(Sides.all(pt(4)));
+        ConstraintSpace space = ConstraintSpace.forChildren(200, NONE, NONE, true).withExclusions(List.of(
+                new Exclusion(-10, 30, 50, 0),
+                // It ends inside the top border and padding: it does not reach the content.
+                new Exclusion(0, 3, 50, 0),
+                // The right border and padding take its whole intrusion.
+                new Exclusion(0, 30, 0, 3)));
+        BoxModel m = resolve(space);
+        assertEquals(List.of(new Exclusion(-15, 25, 45, 0)), m.exclusionsInContent(space, true));
+        // A following fragment has no top decoration: the bands only lose the left one.
+        assertEquals(List.of(new Exclusion(-10, 30, 45, 0), new Exclusion(0, 3, 45, 0)),
+                m.exclusionsInContent(space, false));
+        ConstraintSpace without = ConstraintSpace.forChildren(200, NONE, NONE, true);
+        assertEquals(List.of(), resolve(without).exclusionsInContent(without, true));
     }
 
     @Test

@@ -328,25 +328,14 @@ public final class InlineLayout implements LayoutAlgorithm {
     }
 
     /**
-     * What the side boxes of the parent take from the content box of this fragment (reference/components/block.md),
-     * from the exclusions of the space, which are measured from its border box: the top border and padding of the
-     * fragment move them up, and its left and right border and padding take part of the intrusion. Only the ones that
-     * reach the content and take something. A preformatted text never gets them: it goes below the side boxes.
+     * What the side boxes of the parent take from the content box of this fragment ({@link
+     * BoxModel#exclusionsInContent}). A preformatted text never gets them: it goes below the side boxes.
      */
     private static List<Exclusion> beside(Box box, ConstraintSpace space, BoxModel model, boolean first) {
-        if (!space.hasExclusions() || box.style().typography().preformatted().enabled()) {
+        if (box.style().typography().preformatted().enabled()) {
             return List.of();
         }
-        double top = Slice.top(model, first);
-        double left = model.border().left() + model.padding().left();
-        List<Exclusion> beside = new ArrayList<>();
-        for (Exclusion e : space.exclusions()) {
-            Exclusion moved = e.shifted(left, top, model.width(), model.contentWidth());
-            if (moved.bottom() > Tolerance.EPSILON && moved.intrudes()) {
-                beside.add(moved);
-            }
-        }
-        return List.copyOf(beside);
+        return model.exclusionsInContent(space, first);
     }
 
     @Override

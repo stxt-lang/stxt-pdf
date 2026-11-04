@@ -2,11 +2,15 @@ package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.layout.image.NaturalSize;
 import dev.stxt.pdf.model.Edges;
+import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Style;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
@@ -258,5 +262,29 @@ public record BoxModel(Insets margin, Insets border, Insets padding, double widt
                 ? OptionalDouble.of(Slice.contentRemaining(this, first, space))
                 : OptionalDouble.empty();
         return ConstraintSpace.forChildren(w, h, remaining, space.atFragmentainerStart());
+    }
+
+    /**
+     * What the side boxes of the parent take from the content box of this fragment (reference/components/block.md),
+     * from the exclusions of {@code space}, which are measured from its border box: the top border and padding of the
+     * fragment move them up, and its left and right border and padding take part of the intrusion. Only the ones that
+     * reach the content and still take something.
+     *
+     * @param first it is the first fragment of the box (see {@link Slice#top})
+     */
+    public List<Exclusion> exclusionsInContent(ConstraintSpace space, boolean first) {
+        if (!space.hasExclusions()) {
+            return List.of();
+        }
+        double top = Slice.top(this, first);
+        double left = border.left() + padding.left();
+        List<Exclusion> inContent = new ArrayList<>();
+        for (Exclusion e : space.exclusions()) {
+            Exclusion moved = e.shifted(left, top, width, contentWidth());
+            if (moved.bottom() > Tolerance.EPSILON && moved.intrudes()) {
+                inContent.add(moved);
+            }
+        }
+        return List.copyOf(inContent);
     }
 }

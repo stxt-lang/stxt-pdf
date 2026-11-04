@@ -47,12 +47,15 @@ la caja (vacío = sin fragmentación), si la caja empieza la página y si se mid
 
 **`LayoutResult`**: el `Fragment`, el `BreakToken` (`null` = la caja ha terminado), la calidad del corte
 (de `BreakAppeal.PERFECT_BREAK` a `FORCED`), las `PendingOverlay` que suben hasta su contenedor de referencia (con la posición
-estática relativa a la caja de contenido de quien devuelve el resultado) y los `AdjoiningMargins`.
+estática relativa a la caja de contenido de quien devuelve el resultado) y los `AdjoiningMargins`. El padre coloca un resultado
+con `placedAt(x, y)` (o con el desplazamiento de un `Frame`), que da un `LayoutResult.Placement`: el fragmento movido y sus
+`PendingOverlay` trasladadas a su propia caja de contenido. Lo usan `BlockLayout` y `UnitBreaker`.
 
 ## `BoxModel`
 
 Margen, borde, relleno, ancho de la caja de borde y alto si es definido, a partir del `ConstraintSpace`. Es la parte común de
-todos los algoritmos. `childSpace()` da el espacio de los hijos en flujo y `BoxModel.intrinsic(...)` pasa de tamaños
+todos los algoritmos. `childSpace()` da el espacio de los hijos en flujo, `exclusionsInContent(space, first)` pasa las
+exclusiones del espacio a la caja de contenido del fragmento y `BoxModel.intrinsic(...)` pasa de tamaños
 intrínsecos del contenido a los de la caja de margen. Los márgenes `auto` valen 0: el centrado lo hace el padre, que es quien
 coloca al hijo. El dimensionado de una imagen está en `BoxModel.replaced`, para que las sondas de `Stack`, `Grid` y los posicionados midan
 bien la imagen: se usa siempre `BoxModel.resolve(box, space, context)`, que le pasa el tamaño natural. Primero se aplica el
@@ -242,7 +245,8 @@ posición, `Rotate` u `Overflow: clip`; las listas, solo junto a cajas derechas)
 `ConstraintSpace` las **exclusiones** (`model.Exclusion`: banda y lo que quita por cada lado, medidas desde la caja de
 borde del hijo), que forman parte de la clave de la caché; los demás hijos bajan hasta el final de las cajas laterales. Un
 `Block` que recibe exclusiones las trata como cajas laterales heredadas para sus propios hijos, sin que cuenten para su
-alto. `InlineLayout` las pasa a la caja de contenido y `LineWidths` da a cada línea su caja de línea (desde dónde empieza
+alto. `BlockLayout` e `InlineLayout` las pasan a la caja de contenido con `BoxModel.exclusionsInContent` y `LineWidths`
+da a cada línea su caja de línea (desde dónde empieza
 y cuánto mide, con `varying()` como la primera línea de ancho entero); `LineBreaker` reparte con el ancho de cada línea,
 el voraz línea a línea y Knuth-Plass con el número de línea en el estado de la programación dinámica (hasta `varying()`),
 y una palabra que no cabe sola en una línea corta la deja vacía (`Line.isEmpty`) y pasa a la siguiente. Cada `Line` lleva la

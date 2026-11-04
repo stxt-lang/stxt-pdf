@@ -47,12 +47,15 @@ the box (empty = no fragmentation), whether the box starts the page and whether 
 
 **`LayoutResult`**: the `Fragment`, the `BreakToken` (`null` = the box has finished), the quality of the break
 (from `BreakAppeal.PERFECT_BREAK` to `FORCED`), the `PendingOverlay` that go up to their reference container (with the static
-position relative to the content box of whoever returns the result) and the `AdjoiningMargins`.
+position relative to the content box of whoever returns the result) and the `AdjoiningMargins`. The parent places a result
+with `placedAt(x, y)` (or with the offset of a `Frame`), which gives a `LayoutResult.Placement`: the moved fragment and its
+`PendingOverlay` translated to its own content box. `BlockLayout` and `UnitBreaker` use it.
 
 ## `BoxModel`
 
 Margin, border, padding, width of the border box and height if it is definite, from the `ConstraintSpace`. It is the common part of
-all the algorithms. `childSpace()` gives the space of the in-flow children and `BoxModel.intrinsic(...)` goes from the intrinsic
+all the algorithms. `childSpace()` gives the space of the in-flow children, `exclusionsInContent(space, first)` moves the
+exclusions of the space to the content box of the fragment and `BoxModel.intrinsic(...)` goes from the intrinsic
 sizes of the content to those of the margin box. `auto` margins are 0: centering is done by the parent, which is the one that
 places the child. The sizing of an image is in `BoxModel.replaced`, so that the probes of `Stack`, `Grid` and the positioned elements measure
 the image correctly: `BoxModel.resolve(box, space, context)` is always used, which passes it the natural size. The maximum is applied first
@@ -246,7 +249,8 @@ are not side boxes and have no `Clear`, position, `Rotate` or `Overflow: clip`; 
 passes in the `ConstraintSpace` the **exclusions** (`model.Exclusion`: band and what it
 takes from each side, measured from the border box of the child), which are part of the key of the cache; the other
 children go down to the bottom of the side boxes. A `Block` that receives exclusions treats them as inherited side boxes
-for its own children, without counting them for its height. `InlineLayout` moves them to the content box and
+for its own children, without counting them for its height. `BlockLayout` and `InlineLayout` move them to the content box
+with `BoxModel.exclusionsInContent` and
 `LineWidths` gives each line its line box (where it starts and how wide it is, with `varying()` as the first line with
 the whole width); `LineBreaker` breaks with the width of each line, the greedy algorithm line by line and Knuth-Plass
 with the line number in the state of the dynamic programming (up to `varying()`), and a word that does not fit alone in

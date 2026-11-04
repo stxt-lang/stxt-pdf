@@ -203,21 +203,12 @@ public final class BlockLayout implements LayoutAlgorithm {
         }
 
         /**
-         * The exclusions of the space of the box, measured from its border box, as side boxes of the content box: the
-         * top border and padding of this fragment move them up, and the left and right ones take part of them.
+         * The exclusions of the space of the box as side boxes of the content box ({@link
+         * BoxModel#exclusionsInContent}), inherited: none is a fragment of this box.
          */
         void inherit() {
-            if (!space.hasExclusions()) {
-                return;
-            }
-            double top = Slice.top(model, first);
-            double left = model.border().left() + model.padding().left();
-            for (Exclusion e : space.exclusions()) {
-                Exclusion m = e.shifted(left, top, model.width(), model.contentWidth());
-                Beside b = new Beside(m.top(), m.bottom(), m.left(), m.right(), -1);
-                if (b.bottom() > EPSILON && (b.onLeft() || b.onRight())) {
-                    beside.add(b);
-                }
+            for (Exclusion e : model.exclusionsInContent(space, first)) {
+                beside.add(new Beside(e.top(), e.bottom(), e.left(), e.right(), -1));
             }
         }
 
@@ -324,12 +315,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             // A Frame is shifted after it is placed; the cursor is not affected
             // (reference/components/frame-and-overlays.md).
             FrameOffset offset = FrameOffset.of(child.style(), contentWidth, childSpace.percentBaseHeight());
-            double childX = x + offset.dx();
-            double childY = flowY + offset.dy();
-            fragments.add(f.moved(childX, childY, offset.dx(), offset.dy()));
-            double dx = childX + f.border().left() + f.padding().left();
-            double dy = childY + f.border().top() + f.padding().top();
-            r.pending().forEach(p -> pending.add(p.translated(dx, dy)));
+            place(r.placedAt(x + offset.dx(), flowY + offset.dy(), offset.dx(), offset.dy()));
 
             boolean hadProgress = progress;
             previous = child;
@@ -349,6 +335,12 @@ public final class BlockLayout implements LayoutAlgorithm {
                 return broken(BreakRules.best(marks, Mark::appeal));
             }
             return null;
+        }
+
+        /** A child already placed: its fragment and the Overlay boxes it brings up. */
+        void place(LayoutResult.Placement placed) {
+            fragments.add(placed.fragment());
+            pending.addAll(placed.pending());
         }
 
         /**
@@ -371,11 +363,7 @@ public final class BlockLayout implements LayoutAlgorithm {
                 return breakBefore();
             }
             double x = onLeft ? margin.left() : contentWidth - margin.right() - f.width();
-            double childY = y + margin.top();
-            fragments.add(f.moved(x, childY));
-            double dx = x + f.border().left() + f.padding().left();
-            double dy = childY + f.border().top() + f.padding().top();
-            r.pending().forEach(p -> pending.add(p.translated(dx, dy)));
+            place(r.placedAt(x, y + margin.top()));
             beside.add(new Beside(y, y + height, onLeft ? x + f.width() + margin.right() : 0,
                     onLeft ? 0 : contentWidth - x + margin.left(), fragments.size() - 1));
             previous = child;

@@ -6,6 +6,7 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Rule;
 import dev.stxt.pdf.fragment.Unit;
+import dev.stxt.pdf.layout.LayoutResult.Placement;
 import dev.stxt.pdf.layout.position.FrameOffset;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
@@ -239,10 +240,6 @@ public final class UnitBreaker {
         return new Run(context, box, space, (BreakToken.Container) from, arranged, repeat).layOut();
     }
 
-    /** An item in this fragment: its fragment already placed and its Overlay boxes. */
-    private record Piece(Fragment fragment, List<PendingOverlay> pending) {
-    }
-
     /**
      * The items of a group broken in parallel.
      *
@@ -252,7 +249,7 @@ public final class UnitBreaker {
      * @param occupied end of what the items take up ({@link LayoutResult#occupied}); at most {@code bottom}
      * @param broken   some item continues on the next page
      */
-    private record Split(Piece[] pieces, List<BreakToken> tokens, int appeal, double bottom, double occupied,
+    private record Split(Placement[] pieces, List<BreakToken> tokens, int appeal, double bottom, double occupied,
                          boolean broken) {
     }
 
@@ -273,7 +270,7 @@ public final class UnitBreaker {
         /** What is left of the page for the units; without fragmentation there is no limit. */
         final double remaining;
         /** Item of each index of {@code placed} placed in this fragment. */
-        final Piece[] pieces;
+        final Placement[] pieces;
         /** Fragment of each band of {@code bands} in this fragment. */
         final Fragment[] bandPieces;
         /** What this fragment shows of each unit; {@code null} if nothing. */
@@ -308,7 +305,7 @@ public final class UnitBreaker {
             this.remaining = space.fragmenting()
                     ? Slice.contentRemaining(model, first, space) - repeat.headHeight() - repeat.footHeight()
                     : Double.POSITIVE_INFINITY;
-            this.pieces = new Piece[placed.size()];
+            this.pieces = new Placement[placed.size()];
             this.bandPieces = new Fragment[bands.size()];
             this.unitPieces = new UnitPiece[n];
         }
@@ -468,7 +465,7 @@ public final class UnitBreaker {
          * @param atStart the items start the page: they have to place something even if it overflows
          */
         Split split(int start, int end, List<BreakToken> tokens, double origin, boolean atStart) {
-            Piece[] split = new Piece[placed.size()];
+            Placement[] split = new Placement[placed.size()];
             List<BreakToken> next = new ArrayList<>();
             int appeal = BreakAppeal.PERFECT_BREAK;
             double bottom = 0;
@@ -544,19 +541,15 @@ public final class UnitBreaker {
         }
 
         /** Places the fragment of an item at {@code y} of the container's fragment. */
-        Piece piece(Placed p, LayoutResult r, double y) {
-            Fragment f = r.fragment();
-            double dx = p.x() + f.border().left() + f.padding().left();
-            double dy = y + f.border().top() + f.padding().top();
-            return new Piece(f.moved(p.x(), y, p.frameOffset().dx(), p.frameOffset().dy()),
-                    r.pending().stream().map(q -> q.translated(dx, dy)).toList());
+        Placement piece(Placed p, LayoutResult r, double y) {
+            return r.placedAt(p.x(), y, p.frameOffset().dx(), p.frameOffset().dy());
         }
 
         /**
          * An item that is repeated: its fragment goes in all of them, but its Overlay boxes only in the
          * first one, like those of the container.
          */
-        void repeated(Piece piece, List<Fragment> fragments, List<PendingOverlay> pending) {
+        void repeated(Placement piece, List<Fragment> fragments, List<PendingOverlay> pending) {
             fragments.add(piece.fragment());
             if (first) {
                 pending.addAll(piece.pending());
@@ -604,7 +597,7 @@ public final class UnitBreaker {
                     fragments.add(band);
                 }
             }
-            for (Piece piece : pieces) {
+            for (Placement piece : pieces) {
                 if (piece != null) {
                     fragments.add(piece.fragment());
                     pending.addAll(piece.pending());

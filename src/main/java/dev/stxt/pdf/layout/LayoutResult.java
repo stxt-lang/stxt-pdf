@@ -26,6 +26,36 @@ public record LayoutResult(Fragment fragment, BreakToken breakToken, int breakAp
         pending = List.copyOf(pending);
     }
 
+    /**
+     * The fragment of a result once its parent places it, and its {@link #pending} boxes with the static position
+     * measured from the content box of the parent.
+     */
+    public record Placement(Fragment fragment, List<PendingOverlay> pending) {
+
+        public Placement {
+            pending = List.copyOf(pending);
+        }
+    }
+
+    /**
+     * The fragment at ({@code x}, {@code y}) of the content box of the parent, keeping its {@code Frame} offset, and the
+     * pending boxes moved with it.
+     */
+    public Placement placedAt(double x, double y) {
+        return placedAt(x, y, fragment.offsetX(), fragment.offsetY());
+    }
+
+    /**
+     * Like {@link #placedAt(double, double)}, for a {@code Frame} whose offset ({@code dx}, {@code dy}) is already
+     * included in {@code x} and {@code y} (reference/components/frame-and-overlays.md).
+     */
+    public Placement placedAt(double x, double y, double dx, double dy) {
+        double contentX = x + fragment.border().left() + fragment.padding().left();
+        double contentY = y + fragment.border().top() + fragment.padding().top();
+        return new Placement(fragment.moved(x, y, dx, dy),
+                pending.stream().map(p -> p.translated(contentX, contentY)).toList());
+    }
+
     /** Nothing of the box fits in what is left of the page: the parent must break before it. */
     public static LayoutResult before(Box box) {
         return new LayoutResult(Fragment.empty(box), BreakToken.BEFORE, BreakAppeal.PERFECT_BREAK,
