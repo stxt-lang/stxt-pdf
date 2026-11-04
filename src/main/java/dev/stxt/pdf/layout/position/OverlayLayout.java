@@ -5,10 +5,10 @@ import dev.stxt.pdf.layout.AdjoiningMargins;
 import dev.stxt.pdf.layout.BoxModel;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
+import dev.stxt.pdf.layout.ItemSizing;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.PendingOverlay;
-import dev.stxt.pdf.layout.Sizing;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Value;
@@ -131,12 +131,14 @@ public final class OverlayLayout {
                 containerHeightBase, false);
         BoxModel sized = BoxModel.resolve(box, space, intrinsic);
         OptionalDouble height = sized.height();
-        if (height.isEmpty() && top.isPresent() && bottom.isPresent()) {
-            // Only the height is auto: the box stretches between top and bottom.
-            double stretched = Math.max(0, containerHeight - top.getAsDouble() - bottom.getAsDouble()
-                    - marginTop.orElse(0) - marginBottom.orElse(0));
-            height = OptionalDouble.of(Sizing.constrain(stretched, sized.minHeight(), sized.maxHeight()));
-            space = ConstraintSpace.fixed(h.size(), height, containerWidth, containerHeightBase, false);
+        if (top.isPresent() && bottom.isPresent()) {
+            // If only the height is auto, the box stretches between top and bottom (an auto margin counts as 0).
+            OptionalDouble stretched = ItemSizing.stretchedHeight(sized,
+                    containerHeight - top.getAsDouble() - bottom.getAsDouble(), margin);
+            if (stretched.isPresent()) {
+                height = stretched;
+                space = ConstraintSpace.fixed(h.size(), height, containerWidth, containerHeightBase, false);
+            }
         }
         LayoutResult r = context.layout(box, space, null);
         Fragment f = r.fragment();

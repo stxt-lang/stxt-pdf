@@ -58,6 +58,14 @@ places the child. The sizing of an image is in `BoxModel.replaced`, so that the 
 the image correctly: `BoxModel.resolve(box, space, context)` is always used, which passes it the natural size. The maximum is applied first
 and then the minimum. If they clash, the minimum wins (`Sizing.constrain`).
 
+What decides the size of an item that its container places in a space of its own is in `ItemSizing`, once: the width on
+the cross axis (the declared one, the one of the space minus the margins with `stretch` or the fit to the content, limited
+by `Min width` and `Max width`), the stretched width and height, the item's own alignment or the container's, and the
+out-of-flow children that wait at the corner of the content box. `StackLayout` and `GridLayout` use it, and `OverlayLayout`
+for the height stretched between top and bottom. The rules are the same; the base of the percentages is not: each one
+resolves the `BoxModel` of the item with its own ([Values](../common/values.md#definite-height)), the content box of the
+`Stack`, the area of the grid item or the reference container of the `Overlay`.
+
 ## Margin merging
 
 Each box returns in `AdjoiningMargins` the margins of its descendants that come out at the top or at the bottom (and whether it is empty and

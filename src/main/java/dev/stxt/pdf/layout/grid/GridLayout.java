@@ -7,6 +7,7 @@ import dev.stxt.pdf.fragment.Unit;
 import dev.stxt.pdf.layout.BoxModel;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
+import dev.stxt.pdf.layout.ItemSizing;
 import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
@@ -223,12 +224,7 @@ public final class GridLayout implements LayoutAlgorithm {
 
         // Align each item in its area.
         List<UnitBreaker.Placed> placed = new ArrayList<>();
-        List<PendingOverlay> pending = new ArrayList<>();
-        for (Box child : box.children()) {
-            if (child.style().isOutOfFlow()) {
-                pending.add(new PendingOverlay(child, 0, 0));
-            }
-        }
+        List<PendingOverlay> pending = ItemSizing.outOfFlow(box);
         for (int i = 0; i < n; i++) {
             Box item = g.items().get(i);
             Area a = g.areas().get(i);
@@ -303,16 +299,10 @@ public final class GridLayout implements LayoutAlgorithm {
 
     /** Border box width of the item: the declared one, the area's ({@code stretch}) or the fit to the content. */
     private double itemWidth(Box item, double areaWidth, Insets margin, Alignment horizontal, boolean atStart) {
-        Style is = item.style();
         ConstraintSpace free = ConstraintSpace.free(areaWidth, areaWidth, OptionalDouble.empty(), atStart);
         BoxModel probe = BoxModel.resolve(item, free, context);
-        if (!is.box().width().isAuto()) {
-            return probe.width();
-        }
-        double width = horizontal == Alignment.STRETCH
-                ? areaWidth - margin.horizontal()
-                : context.intrinsic(item).fit(areaWidth) - margin.horizontal();
-        return BoxModel.constrainWidth(is, Math.max(0, width), areaWidth);
+        return ItemSizing.width(item.style(), probe, areaWidth, margin, horizontal == Alignment.STRETCH,
+                () -> context.intrinsic(item));
     }
 
     /**
@@ -327,12 +317,9 @@ public final class GridLayout implements LayoutAlgorithm {
         OptionalDouble base = OptionalDouble.of(areaHeight);
         OptionalDouble fixedHeight = OptionalDouble.empty();
         if (vertical == Alignment.STRETCH) {
+            // The percentages of the item resolve against its area.
             ConstraintSpace probe = ConstraintSpace.fixed(width, OptionalDouble.empty(), areaWidth, base, atStart);
-            BoxModel m = BoxModel.resolve(item, probe, context);
-            if (m.height().isEmpty()) {
-                fixedHeight = OptionalDouble.of(Sizing.constrain(
-                        Math.max(0, areaHeight - margin.vertical()), m.minHeight(), m.maxHeight()));
-            }
+            fixedHeight = ItemSizing.stretchedHeight(BoxModel.resolve(item, probe, context), areaHeight, margin);
         }
         // A stretched item is always laid out with its height fixed, even if it measures the same: it is the
         // definite base of the percentages of its children (reference/common/values.md).
@@ -352,13 +339,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     private static Alignment horizontal(Box item, Style container) {
-        Alignment own = item.style().item().horizontal();
-        return own != null ? own : container.grid().horizontal();
+        return ItemSizing.effective(item.style().item().horizontal(), container.grid().horizontal());
     }
 
     private static Alignment vertical(Box item, Style container) {
-        Alignment own = item.style().item().vertical();
-        return own != null ? own : container.grid().vertical();
+        return ItemSizing.effective(item.style().item().vertical(), container.grid().vertical());
     }
 
     /** Position of each track from the start of the content box. */

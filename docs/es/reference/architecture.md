@@ -105,7 +105,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`ModuleSizes`**: comprueba en el resultado ya paginado que los módulos de cada código no quedan por debajo de su
   mínimo.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas, con el `Hyphenator` de `inline.hyphenation` para
-  partir palabras), `StackResolver`, `TrackSizing` y `Placement` (grid),
+  partir palabras), `StackResolver`, `TrackSizing` y `Placement` (grid), `ItemSizing` (el tamaño de un ítem de `Stack` o
+  `Grid` en su espacio y el alto estirado de un `Overlay`),
   `Columns` (cuántas columnas y de qué ancho), `OverlayEquation`, `UnitBreaker` (cortes de `Stack`, `Grid` y tablas), `Slice` (alto, borde y
   relleno de cada fragmento), `LineWidths` (el ancho de cada línea junto a las cajas laterales), `MergedBorders` (las
   líneas de una tabla con bordes fusionados) y `RunningHeads` (el encabezado en vigor en cada página)

@@ -7,6 +7,7 @@ import dev.stxt.pdf.fragment.Unit;
 import dev.stxt.pdf.layout.BoxModel;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
+import dev.stxt.pdf.layout.ItemSizing;
 import dev.stxt.pdf.layout.LayoutAlgorithm;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.LayoutResult;
@@ -176,14 +177,10 @@ public final class StackLayout implements LayoutAlgorithm {
 
         /** The container laid out without fragmenting: steps 1 to 8. */
         UnitBreaker.Arranged arranged() {
-            List<PendingOverlay> pending = new ArrayList<>();
+            List<PendingOverlay> pending = ItemSizing.outOfFlow(box);
             List<Item> items = new ArrayList<>();
-            for (Box child : box.children()) {
-                if (child.style().isOutOfFlow()) {
-                    pending.add(new PendingOverlay(child, 0, 0));
-                } else {
-                    items.add(row ? rowItem(child) : columnItem(child));
-                }
+            for (Box child : box.inFlowChildren()) {
+                items.add(row ? rowItem(child) : columnItem(child));
             }
 
             // Steps 4 and 5: lines and flexible sizes.
@@ -332,15 +329,8 @@ public final class StackLayout implements LayoutAlgorithm {
             BoxModel probe = BoxModel.resolve(b, probeSpace(), context);
 
             // Width it is measured with: the declared one, the container's (stretch) or the fit to the content.
-            double width;
-            if (!is.box().width().isAuto()) {
-                width = probe.width();
-            } else if (it.align == Alignment.STRETCH && !multiLine) {
-                width = Math.max(0, contentWidth - it.margin.horizontal());
-            } else {
-                width = Math.max(0, context.intrinsic(b).fit(contentWidth) - it.margin.horizontal());
-            }
-            it.crossWidth = BoxModel.constrainWidth(is, width, contentWidth);
+            it.crossWidth = ItemSizing.width(is, probe, contentWidth, it.margin,
+                    it.align == Alignment.STRETCH && !multiLine, () -> context.intrinsic(b));
 
             ConstraintSpace measure = itemSpace(it.crossWidth, OptionalDouble.empty());
             BoxModel sized = BoxModel.resolve(b, measure, context);
@@ -371,8 +361,8 @@ public final class StackLayout implements LayoutAlgorithm {
         }
 
         Alignment alignment(Style is) {
-            Alignment own = s.stack().isHorizontal() ? is.item().vertical() : is.item().horizontal();
-            return own != null ? own : s.stack().crossAxis();
+            return ItemSizing.effective(s.stack().isHorizontal() ? is.item().vertical() : is.item().horizontal(),
+                    s.stack().crossAxis());
         }
 
         // --- Steps 4 to 7 -----------------------------------------------------------------------------
@@ -438,23 +428,18 @@ public final class StackLayout implements LayoutAlgorithm {
 
         /** An item without a declared cross size takes the size of the line (step 7). */
         void stretch(Item it, double lineCross) {
-            Style is = it.box.style();
-            double target;
+            OptionalDouble target;
             if (row) {
+                // The percentages of the item resolve against the content box of the container, not its line.
                 Fragment f = it.result.fragment();
                 BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()), context);
-                if (m.height().isPresent()) {
-                    return;
-                }
-                target = Sizing.constrain(Math.max(0, lineCross - it.margin.vertical()), m.minHeight(), m.maxHeight());
+                target = ItemSizing.stretchedHeight(m, lineCross, it.margin);
             } else {
-                if (!is.box().width().isAuto()) {
-                    return;
-                }
-                target = BoxModel.constrainWidth(is, Math.max(0, lineCross - it.margin.horizontal()), contentWidth);
+                target = ItemSizing.stretchedWidth(it.box.style(), lineCross, it.margin, contentWidth);
             }
-            if (!same(target + (row ? it.margin.vertical() : it.margin.horizontal()), it.cross)) {
-                layOutItem(it, OptionalDouble.of(target));
+            if (target.isPresent()
+                    && !same(target.getAsDouble() + (row ? it.margin.vertical() : it.margin.horizontal()), it.cross)) {
+                layOutItem(it, target);
             }
         }
 

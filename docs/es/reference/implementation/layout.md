@@ -58,6 +58,14 @@ coloca al hijo. El dimensionado de una imagen está en `BoxModel.replaced`, para
 bien la imagen: se usa siempre `BoxModel.resolve(box, space, context)`, que le pasa el tamaño natural. Primero se aplica el
 máximo y luego el mínimo. Si chocan, gana el mínimo (`Sizing.constrain`).
 
+Lo que decide el tamaño de un ítem que su contenedor coloca en un espacio propio está en `ItemSizing`, una sola vez: el
+ancho en el eje cruzado (el declarado, el del espacio menos los márgenes con `stretch` o el ajuste al contenido, limitado
+por `Min width` y `Max width`), el ancho y el alto estirados, la alineación propia o la del contenedor y los hijos fuera de
+flujo que esperan en la esquina de la caja de contenido. Lo usan `StackLayout` y `GridLayout`, y `OverlayLayout` para el
+alto estirado entre arriba y abajo. Las reglas son las mismas; la base de los porcentajes, no: cada uno resuelve el
+`BoxModel` del ítem con la suya ([Valores](../common/values.md#alto-definido)), la caja de contenido del `Stack`, el área del
+ítem de grid o el contenedor de referencia del `Overlay`.
+
 ## Fusión de márgenes
 
 Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que salen por arriba o por abajo (y si está vacía y

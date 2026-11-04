@@ -104,7 +104,8 @@ depend on the `LayoutContext` interface.
 - **`Overflow`**: looks for overflows in the already paginated result.
 - **`ModuleSizes`**: checks in the already paginated result that the modules of each code are not below their minimum.
 - Pure parts of each algorithm: `LineBreaker` (line breaking, with the `Hyphenator` of `inline.hyphenation` to split
-  words), `StackResolver`, `TrackSizing` and `Placement` (grid),
+  words), `StackResolver`, `TrackSizing` and `Placement` (grid), `ItemSizing` (the size of a `Stack` or `Grid` item in
+  its space and the stretched height of an `Overlay`),
   `Columns` (how many columns and how wide), `OverlayEquation`, `UnitBreaker` (breaks of `Stack`, `Grid` and tables), `Slice` (height, border and
   padding of each fragment), `LineWidths` (the width of each line beside the side boxes), `MergedBorders` (the lines of a
   table with merged borders) and `RunningHeads` (the heading in effect on each page)

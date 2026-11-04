@@ -2,6 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
@@ -34,6 +35,11 @@ public final class StyleEditor {
 
     public StyleEditor layout(Layout v) {
         style.setLayout(v);
+        return this;
+    }
+
+    public StyleEditor position(Position v) {
+        style.setPosition(v);
         return this;
     }
 
