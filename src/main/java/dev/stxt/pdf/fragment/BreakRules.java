@@ -206,19 +206,28 @@ public final class BreakRules {
 
     /**
      * Quality of the break between two groups of boxes, such as two stack lines or two rows of a
-     * grid: the worst of all the pairs.
+     * grid: the worst of all the pairs, which is {@link BreakAppeal#VIOLATES_KEEP_BETWEEN} if there are boxes on both
+     * sides and any of the first keeps with the next or any of the second keeps with the previous. Each box is looked
+     * at once, not once per pair.
      *
      * @param before boxes that end before the break
      * @param after  boxes that start after it
      */
     public static int between(List<Box> before, List<Box> after) {
-        int appeal = BreakAppeal.PERFECT_BREAK;
+        if (before.isEmpty() || after.isEmpty()) {
+            return BreakAppeal.PERFECT_BREAK;
+        }
         for (Box b : before) {
-            for (Box a : after) {
-                appeal = Math.min(appeal, between(b, a));
+            if (keepsWithNext(b)) {
+                return BreakAppeal.VIOLATES_KEEP_BETWEEN;
             }
         }
-        return appeal;
+        for (Box a : after) {
+            if (keepsWithPrevious(a)) {
+                return BreakAppeal.VIOLATES_KEEP_BETWEEN;
+            }
+        }
+        return BreakAppeal.PERFECT_BREAK;
     }
 
     /** The forced break between two groups of boxes (as {@link #between(List, List)} and {@link #forcedBetween}). */

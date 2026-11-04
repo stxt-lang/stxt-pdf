@@ -176,4 +176,36 @@ class BreakRulesTest {
         assertEquals(Break.AUTO, BreakRules.forcedBefore(columnsBox));
         assertEquals(Break.PAGE, BreakRules.forcedAfter(columnsBox));
     }
+
+    // --- Breaks between groups of boxes ----------------------------------------------------------------
+
+    private static Box keeping(boolean withNext, boolean withPrevious) {
+        return new StyleEditor().layout(Element.BLOCK.layout()).keepWithNext(withNext).keepWithPrevious(withPrevious)
+                .box(null, Element.BLOCK);
+    }
+
+    /**
+     * The break between two rows is the worst of all the pairs of their items: one {@code Keep with next} before it or
+     * one {@code Keep with previous} after it is enough, whichever item asks for it.
+     */
+    @Test
+    void betweenGroupsIsTheWorstPair() {
+        Box plain = keeping(false, false);
+        Box next = keeping(true, false);
+        Box previous = keeping(false, true);
+        assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.between(List.of(plain, plain), List.of(plain, plain)));
+        assertEquals(BreakAppeal.VIOLATES_KEEP_BETWEEN, BreakRules.between(List.of(plain, next), List.of(plain)));
+        assertEquals(BreakAppeal.VIOLATES_KEEP_BETWEEN, BreakRules.between(List.of(plain), List.of(plain, previous)));
+        // Keep with previous before the break and Keep with next after it say nothing about this break.
+        assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.between(List.of(previous), List.of(next)));
+    }
+
+    /** Without items on one of the two sides there is no pair, and nothing to keep together. */
+    @Test
+    void betweenGroupsWithAnEmptySideIsPerfect() {
+        Box next = keeping(true, false);
+        Box previous = keeping(false, true);
+        assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.between(List.of(next), List.of()));
+        assertEquals(BreakAppeal.PERFECT_BREAK, BreakRules.between(List.of(), List.of(previous)));
+    }
 }

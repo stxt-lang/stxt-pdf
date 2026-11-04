@@ -98,17 +98,22 @@ public final class UnitBreaker {
     }
 
     /**
-     * A container laid out without fragmenting, before breaking it: produced by stack and grid.
+     * A container laid out without fragmenting, before breaking it: produced by stack and grid. It is memoized by the
+     * container ({@link LayoutContext#arranged}) and shared by all its fragments, so it is immutable: the lists are
+     * copied.
      *
      * @param model     box model of the container
      * @param placed    placed items, in tree order
      * @param outOfFlow {@code Overlay} and {@code Page overlay} boxes of the container; they go with the first fragment
      * @param units     the units in which the items are grouped
+     * @param bands     the bands of the rows of a table
      */
     public record Arranged(BoxModel model, List<Placed> placed, List<PendingOverlay> outOfFlow, Units units,
                            List<Band> bands) {
 
         public Arranged {
+            placed = List.copyOf(placed);
+            outOfFlow = List.copyOf(outOfFlow);
             bands = List.copyOf(bands);
         }
 
@@ -192,6 +197,14 @@ public final class UnitBreaker {
     public record Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight,
                          List<Fragment> headBands, List<Fragment> footBands, Rules rules) {
         public static final Repeat NONE = new Repeat(List.of(), 0, List.of(), 0);
+
+        /** Memoized with the arrangement of the table, so immutable: the lists are copied. */
+        public Repeat {
+            head = List.copyOf(head);
+            foot = List.copyOf(foot);
+            headBands = List.copyOf(headBands);
+            footBands = List.copyOf(footBands);
+        }
 
         /** Without bands. */
         public Repeat(List<Placed> head, double headHeight, List<Placed> foot, double footHeight) {

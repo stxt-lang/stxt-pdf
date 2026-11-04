@@ -14,6 +14,7 @@ import dev.stxt.pdf.tree.StyleEditor;
 import org.junit.jupiter.api.Test;
 
 import java.util.OptionalDouble;
+import java.util.function.Supplier;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
@@ -371,6 +372,11 @@ class ImageLayoutTest {
             @Override
             public double imageRatio(String path) {
                 throw new AssertionError("an image has no text");
+            }
+
+            @Override
+            public <T> T arranged(Box box, ConstraintSpace space, Class<T> type, Supplier<T> computation) {
+                throw new AssertionError("an image has no units to arrange");
             }
         };
         Box image = new StyleEditor().box("I", Element.IMAGE);

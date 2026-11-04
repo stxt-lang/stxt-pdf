@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static dev.stxt.pdf.model.Tolerance.fits;
 
@@ -221,6 +222,11 @@ public final class Engine implements LayoutContext {
         return cache.misses();
     }
 
+    /** Arrangements of stack, grid and table this engine has computed since it was created ({@link #arranged}). */
+    int arrangements() {
+        return cache.arrangements();
+    }
+
     /** Entries of the cache right now, to check that {@link #release} empties it. */
     int cachedEntries() {
         return cache.entries();
@@ -290,6 +296,11 @@ public final class Engine implements LayoutContext {
     @Override
     public double imageRatio(String path) {
         return images.ratio(path);
+    }
+
+    @Override
+    public <T> T arranged(Box box, ConstraintSpace space, Class<T> type, Supplier<T> computation) {
+        return cache.arranged(box, space, type, computation);
     }
 
     /**

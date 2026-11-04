@@ -163,8 +163,18 @@ public final class GridLayout implements LayoutAlgorithm {
         return arrangeWithColumns(box, space).arranged();
     }
 
-    /** Like {@link #arrange}, with the columns. */
+    /**
+     * Like {@link #arrange}, with the columns. The arrangement depends on the box and on its space without
+     * fragmentation, not on what is left of the page: it is computed once per container and space
+     * ({@link LayoutContext#arranged}) and every fragment breaks the same one.
+     */
     public ArrangedWithColumns arrangeWithColumns(Box box, ConstraintSpace space) {
+        ConstraintSpace key = space.unfragmented();
+        return context.arranged(box, key, ArrangedWithColumns.class, () -> computeArrangement(box, key));
+    }
+
+    /** The arrangement of {@link #arrangeWithColumns}: placement, tracks, items at their sizes, bands. */
+    private ArrangedWithColumns computeArrangement(Box box, ConstraintSpace space) {
         BoxModel model = BoxModel.resolve(box, space, context);
         Style s = box.style();
         double contentWidth = model.contentWidth();
@@ -253,36 +263,42 @@ public final class GridLayout implements LayoutAlgorithm {
     /**
      * The rows as fragmentation units (reference/common/breaks.md). There can be no break between two rows that the
      * same item spans; between the others, the quality of the break comes from the items that end
-     * before and the ones that start after.
+     * before and the ones that start after. One pass over the items sorts them by the row they end at and the one they
+     * start at, and marks the rows an item spans: the cost is that of the items, not that of the items for each row.
      */
     private static UnitBreaker.Units rowUnits(Grid g, double[] rows, double[] y, double extent, boolean split) {
-        List<Unit> units = new ArrayList<>();
-        for (int r = 0; r < rows.length; r++) {
-            units.add(r == 0 ? new Unit(y[r], y[r] + rows[r], 0, Break.AUTO) : rowUnit(g, r, y[r], y[r] + rows[r]));
+        int n = rows.length;
+        List<List<Box>> endsAt = new ArrayList<>(n + 1);
+        List<List<Box>> startsAt = new ArrayList<>(n + 1);
+        for (int r = 0; r <= n; r++) {
+            endsAt.add(new ArrayList<>());
+            startsAt.add(new ArrayList<>());
         }
-        return new UnitBreaker.Units(units, extent, true, split);
-    }
-
-    /** The row of index {@code r} (not the first) as a unit, with the quality of the break before it. */
-    private static Unit rowUnit(Grid g, int r, double start, double end) {
-        List<Box> before = new ArrayList<>();
-        List<Box> after = new ArrayList<>();
-        boolean spanned = false;
+        boolean[] spanned = new boolean[n];
         for (int i = 0; i < g.items().size(); i++) {
             Area a = g.areas().get(i);
             int from = a.row() - 1;
             int to = from + a.rows();
-            spanned |= from < r && to > r;
-            if (to == r) {
-                before.add(g.items().get(i));
-            } else if (from == r) {
-                after.add(g.items().get(i));
+            startsAt.get(from).add(g.items().get(i));
+            endsAt.get(to).add(g.items().get(i));
+            for (int r = from + 1; r < to; r++) {
+                spanned[r] = true;
             }
         }
-        if (spanned) {
-            return new Unit(start, end, -1, Break.AUTO);
+        List<Unit> units = new ArrayList<>(n);
+        for (int r = 0; r < n; r++) {
+            double start = y[r];
+            double end = y[r] + rows[r];
+            if (r == 0) {
+                units.add(new Unit(start, end, 0, Break.AUTO));
+            } else if (spanned[r]) {
+                units.add(new Unit(start, end, -1, Break.AUTO));
+            } else {
+                units.add(new Unit(start, end, BreakRules.between(endsAt.get(r), startsAt.get(r)),
+                        BreakRules.forcedBetween(endsAt.get(r), startsAt.get(r))));
+            }
         }
-        return new Unit(start, end, BreakRules.between(before, after), BreakRules.forcedBetween(before, after));
+        return new UnitBreaker.Units(units, extent, true, split);
     }
 
     /** Border box width of the item: the declared one, the area's ({@code stretch}) or the fit to the content. */

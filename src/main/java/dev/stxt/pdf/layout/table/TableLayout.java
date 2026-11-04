@@ -54,8 +54,33 @@ public final class TableLayout implements LayoutAlgorithm {
         return grid.contentIntrinsic(box);
     }
 
+    /**
+     * What the table computes once, before breaking its body ({@link LayoutContext#arranged}): the grid arranged with
+     * the rows of the body alone as units, the header and the footer repeated in each fragment (with the lines of the
+     * merged borders), and where the body starts and how tall the footer is, for the check of
+     * {@link ErrorCode#TABLE_REPEAT_OVERFLOW}, which depends on the page.
+     */
+    private record Prepared(UnitBreaker.Arranged bodyOnly, UnitBreaker.Repeat repeat, double bodyStart,
+                            double footHeight) {
+    }
+
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
+        ConstraintSpace key = space.unfragmented();
+        Prepared p = context.arranged(box, key, Prepared.class, () -> prepare(box, key));
+        if (box.headerRows() + box.footerRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
+                && Slice.contentRemaining(p.bodyOnly().model(), from == null, space) - p.bodyStart() - p.footHeight()
+                <= EPSILON) {
+            throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "The header and footer of the "
+                    + "table " + box.describe() + " measure " + pt(p.bodyStart() + p.footHeight()) + " and leave no room"
+                    + " for the body on an empty page, and they repeat on every page: their height has to be reduced or"
+                    + " rows removed from Header rows and Footer rows");
+        }
+        return UnitBreaker.fragment(context, box, space, from, p.bodyOnly(), p.repeat());
+    }
+
+    /** The table arranged by its grid and split into header, body and footer. */
+    private Prepared prepare(Box box, ConstraintSpace space) {
         GridLayout.ArrangedWithColumns arranged = grid.arrangeWithColumns(box, space);
         UnitBreaker.Arranged a = arranged.arranged();
         UnitBreaker.Units all = a.units();
@@ -65,13 +90,6 @@ public final class TableLayout implements LayoutAlgorithm {
         double bodyStart = all.get(head).start();
         double bodyBottom = all.get(bodyEnd - 1).end();
         double footHeight = box.footerRows() == 0 ? 0 : all.extent() - bodyBottom;
-        if (head + box.footerRows() > 0 && space.fragmenting() && space.atFragmentainerStart()
-                && Slice.contentRemaining(a.model(), from == null, space) - bodyStart - footHeight <= EPSILON) {
-            throw new InvalidModelException(box.line(), ErrorCode.TABLE_REPEAT_OVERFLOW, "The header and footer of the "
-                    + "table " + box.describe() + " measure " + pt(bodyStart + footHeight) + " and leave no room for the "
-                    + "body on an empty page, and they repeat on every page: their height has to be reduced or rows "
-                    + "removed from Header rows and Footer rows");
-        }
 
         List<UnitBreaker.Placed> headItems = new ArrayList<>();
         List<UnitBreaker.Placed> body = new ArrayList<>();
@@ -111,7 +129,7 @@ public final class TableLayout implements LayoutAlgorithm {
         }
         UnitBreaker.Repeat repeat = new UnitBreaker.Repeat(headItems, bodyStart, footItems, footHeight, headBands,
                 footBands, rules);
-        return UnitBreaker.fragment(context, box, space, from, bodyOnly, repeat);
+        return new Prepared(bodyOnly, repeat, bodyStart, footHeight);
     }
 
     /**

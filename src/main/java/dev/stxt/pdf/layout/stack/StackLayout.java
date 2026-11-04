@@ -101,8 +101,12 @@ public final class StackLayout implements LayoutAlgorithm {
 
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
-        BoxModel model = BoxModel.resolve(box, space, context);
-        return new Run(box, model, space).layOut(from);
+        // The eight steps depend on the box and on its space without fragmentation, not on what is left of the page:
+        // they are done once per container and space (LayoutContext.arranged) and each fragment only breaks the result.
+        ConstraintSpace key = space.unfragmented();
+        UnitBreaker.Arranged arranged = context.arranged(box, key, UnitBreaker.Arranged.class,
+                () -> new Run(box, BoxModel.resolve(box, key, context), key).arranged());
+        return UnitBreaker.fragment(context, box, space, from, arranged);
     }
 
     /** An item and its state during the layout. */
@@ -150,8 +154,8 @@ public final class StackLayout implements LayoutAlgorithm {
         final double mainGap;
         final double crossGap;
         final boolean atStart;
-        final ConstraintSpace space;
 
+        /** @param space the space of the container without fragmentation: only {@code atFragmentainerStart} is read */
         Run(Box box, BoxModel model, ConstraintSpace space) {
             this.box = box;
             this.s = box.style();
@@ -168,10 +172,10 @@ public final class StackLayout implements LayoutAlgorithm {
             this.mainGap = row ? columnGap : rowGap;
             this.crossGap = row ? rowGap : columnGap;
             this.atStart = space.atFragmentainerStart();
-            this.space = space;
         }
 
-        LayoutResult layOut(BreakToken from) {
+        /** The container laid out without fragmenting: steps 1 to 8. */
+        UnitBreaker.Arranged arranged() {
             List<PendingOverlay> pending = new ArrayList<>();
             List<Item> items = new ArrayList<>();
             for (Box child : box.children()) {
@@ -191,7 +195,7 @@ public final class StackLayout implements LayoutAlgorithm {
 
             CrossSizes cross = crossSizes(lines);
             stretchItems(lines, cross.lines());
-            return UnitBreaker.fragment(context, box, space, from, arrange(lines, cross, pending));
+            return arrange(lines, cross, pending);
         }
 
         /** Step 6: cross size of each line and the space left over on the cross axis. */

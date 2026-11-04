@@ -21,6 +21,19 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
+- **A long `Stack`, `Grid` or `Table` is arranged once, not once per page.** What a container computes before breaking
+  it between its rows, lines or items (placing the items, sizing the tracks, laying out each item at its size, the bands
+  of the rows and, in a table, the repeated header and footer and the lines of `Merge borders`) does not depend on the
+  page, and until 0.9.0 it was computed again for every fragment and for every pass of the pagination. It is now kept by
+  container and forgotten with the layouts of its items when paginating again. Measured with the container probes of
+  `tools/qa/ScaleProbe.java` (`units`), after the change below: a table of 2000 rows and 47 pages, with a repeated header
+  and `Merge borders`, lays out in 0.4 s instead of 1.8 s; a grid of 2000 rows and 32 pages, in 0.3 s instead of 0.7 s; a
+  vertical stack of 2000 items and 32 pages, in 0.09 s instead of 0.23 s. The output does not change. For whoever
+  implements `LayoutContext`: it has a new method, `arranged`.
+- **The break quality between the rows of a grid is computed in one pass over its items.** Until 0.9.0 every row of a
+  `Grid` or `Table` went through all the items to find the ones that end before it and start after it, and compared
+  every pair of them: quadratic in the rows, and once per page. The same table of 2000 rows laid out in 1.8 s instead of
+  7.7 s, and the grid of 2000 rows in 0.7 s instead of 3.0 s, before the change above. The output does not change.
 - **The files of the resources folder can change while the `Converter` lives.** Each conversion sees the fonts and the
   images as they are when it starts: a font added, removed or replaced in `fonts/`, and an image replaced in `images/`,
   are seen by the next conversion without creating another `Converter` or `Resources`. Until 0.9.0 a `Resources` read

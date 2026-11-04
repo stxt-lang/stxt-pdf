@@ -45,6 +45,22 @@ class GridFragmentationTest {
     }
 
     @Test
+    void keepWithNextOfAnItemMovesTheBreakBeforeItsRow() {
+        // The same grid with Keep with next on D, in row 2: the break before row 3 violates it, so the last of the
+        // perfect breaks is before row 2, and page 1 only holds the first row.
+        LayoutFixture l = layOutPaged(PAGE, concat(GRID, new String[]{"\t\tSplit rows: false"},
+                cell("A", "1 1"), cell("B", "1 2"), cell("C", "2 1"),
+                cell("D", "2 2"), new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tKeep with next: true"},
+                cell("E", "3 1")));
+        assertEquals(2, l.pages());
+        assertRect(40, 40, 515, 40, l.rect(1, "G"));
+        assertFalse(l.has(1, "C"));
+        assertRect(40, 40, 515, 80, l.rect(2, "G"));
+        assertRect(297.5, 40, 257.5, 40, l.rect(2, "D"));
+        assertRect(40, 80, 257.5, 40, l.rect(2, "E"));
+    }
+
+    @Test
     void splitsTheRowThatDoesNotFitOnThisPage() {
         // Rows of 40 at 0, 40 and 80: the third does not fit in the 20 left and is split, 20 + 20 (Split rows by
         // default).

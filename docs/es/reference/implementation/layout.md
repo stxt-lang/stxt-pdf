@@ -7,7 +7,7 @@ páginas de comportamiento común y de cada componente, y aquí, cómo está hec
 
 `Engine` despacha por `Style.layout` al algoritmo correspondiente (un `EnumMap`, y la tabla, que es un grid, tiene el suyo).
 Los algoritmos no conocen el motor: dependen de **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
-`measurer`, `natural`, `imageRatio`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
+`measurer`, `natural`, `imageRatio`, `arranged`), que `Engine` implementa y que un test puede sustituir por un doble. **Toda llamada recursiva de
 layout o de tamaños intrínsecos pasa por `context.layout(...)` / `context.intrinsic(...)`**, nunca directamente al
 algoritmo, para usar la `LayoutCache` (sin ella, `Stack` y `Grid` anidados crecen de forma exponencial).
 
@@ -140,7 +140,14 @@ partido), `UnitBreaker` (en `Split`) y `ColumnsLayout` (en `Fill`: el mayor de s
 `occupied`, aparte del alto visible del contenido.
 Stack y grid cortan entre unidades (líneas, ítems o filas, que son `fragment.Unit`) con `UnitBreaker`: se
 maquetan enteros sin fragmentar (`UnitBreaker.Arranged`: ítems colocados y `Units`) y `UnitBreaker.fragment` se queda con lo
-que cabe en la página. Una unidad que no cabe en lo que queda de página parte sus ítems en paralelo en esa página
+que cabe en la página. Ese reparto sin fragmentar (la colocación, las pistas, los ítems maquetados a su tamaño, las
+franjas y, en una tabla, la cabecera, el pie y las líneas de `Merge borders`) depende de la caja y de su espacio sin
+fragmentación (`ConstraintSpace.unfragmented`, que conserva `atFragmentainerStart`), no de lo que queda de página ni del
+token: se calcula una vez por contenedor y espacio (`LayoutContext.arranged`, un memo más de la `LayoutCache`, por caja,
+espacio y tipo de lo memoizado, que `clear` y `Engine.forget` vacían como el resto) y cada fragmento solo lo corta. Lo
+memoizado es inmutable (`Arranged` y `Repeat` copian sus listas). Hasta la 0.9.0 cada fragmento de una tabla la colocaba y
+medía entera otra vez, y las unidades de un grid se calculaban recorriendo todos los ítems por cada fila (ahora, una
+pasada por los ítems); `ArrangementCacheTest` cuenta los repartos. Una unidad que no cabe en lo que queda de página parte sus ítems en paralelo en esa página
 (`Units.split`, de `Split rows` y `Split items`, y solo donde `Units.splittable` lo admite, que no es el caso de las líneas
 de un `Stack` horizontal con `Wrap`; con `false`, solo la que no cabe ni al principio de página), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
 `UnitBreaker.splitOnThisPage` compara la calidad de ese corte con la del mejor corte entre unidades (`BreakRules.cutUnits`)
@@ -155,6 +162,12 @@ sin hijos: el pintado las trata como cualquier caja en flujo. Con `Merge borders
 `Repeat.rules`; `TableLayout` añade las filas de la cabecera y del pie y `layout.table.MergedBorders` calcula las líneas
 de ese fragmento sobre las columnas de `GridLayout.arrangeWithColumns`, que van en `Fragment.rules`. Los cortes forzados son `PAGE` o `COLUMN`
 (`BreakRules.forcedBetween` devuelve el tipo). El de página tiene la calidad `BreakAppeal.FORCED_PAGE`, por encima de `PERFECT_BREAK`.
+
+> **Decisión:** el memo del reparto vive en `LayoutContext` y `LayoutCache`, no dentro de cada algoritmo: así se vacía con
+> la caché (`clear` al terminar y `Engine.forget` al volver a paginar, que alcanza al contenedor como antepasado del texto
+> que cambia) y los algoritmos siguen sin estado. El tipo forma parte de la clave porque la tabla memoiza su preparación
+> (cuerpo, cabecera y pie) encima del reparto de su grid, los dos para la misma caja. *Alternativa descartada:* un campo en
+> cada algoritmo, que `Engine.forget` no alcanzaría y que un `Engine` reutilizado arrastraría.
 
 El contenido de un `Columns` va en una caja generada, el flujo de columnas (`Element.COLUMN_FLOW`), su único hijo: cada
 columna es un fragmento de esa caja, maquetado con los algoritmos de siempre. Las columnas solo están al principio del
@@ -318,8 +331,8 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 
 **Volver a paginar no vacía la caché.** Cuando el número de prueba crece (`Engine.reservePageNumbers`) o cambia
 la página de una referencia (`Engine.assume`), el `Paginator` pasa los textos que cambian de ancho y el motor olvida solo lo
-que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`). Lo vigila
-`PaginationCacheTest`.
+que la `LayoutCache` y el reparto en líneas guardan de ellos y de sus antepasados (`Engine.forget`), también el reparto de
+un `Stack`, un `Grid` o una `Table` que los contenga. Lo vigilan `PaginationCacheTest` y `ArrangementCacheTest`.
 
 > **Decisión:** volver a paginar solo olvida lo que depende de los textos que cambian, porque el resultado de una caja
 > depende solo de su subárbol y de la clave (caja, espacio y token): los algoritmos no leen nada de fuera, salvo el estilo,

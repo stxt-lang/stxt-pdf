@@ -3,8 +3,10 @@
 // page. Those of 2000 and 2100 paragraphs fall on both sides of page 100, where {pages} needs one more digit;
 // the "toc" ones also carry a Table of contents and a {page of: ...} per chapter, which repeat until they converge; the
 // "chapters" ones group the paragraphs in blocks headed by a Heading 1 whose top margin comes out of the block and moves
-// it down once laid out (five paragraphs per block, a quarter of a page; "long chapters", twenty, more than a page). For
-// the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
+// it down once laid out (five paragraphs per block, a quarter of a page; "long chapters", twenty, more than a page). The
+// "table", "grid" and "stack" ones are containers of 500 and 2000 units (rows, or items) over many pages: what they
+// arrange before breaking (placement, track sizing, bands, merged borders) is memoized per container, and the misses per
+// page tell whether it is. For the profile: -XX:StartFlightRecording=filename=rec.jfr,settings=profile, then "jfr print --events
 // jdk.ExecutionSample".
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.layout.Engine;
@@ -52,6 +54,55 @@ public class ScaleProbe {
         return sb.toString();
     }
 
+    /** The head with the rules of the tables: cells with padding and border, and Merge borders on every table. */
+    static String tableHead() {
+        return head().replace("\tPage overlay:", "\t\tFor element: Cell\n\t\t\tBox:\n\t\t\t\tPadding: 2\n\t\t\t\tBorder: 1\n"
+             + "\t\tFor element: Table\n\t\t\tBox:\n\t\t\t\tMerge borders: true\n\tPage overlay:");
+    }
+
+    /**
+     * A table of rows body rows and four columns, with a header row repeated on each page and Merge borders from a rule:
+     * each page repeats the header and draws its lines. The whole table is arranged (placement, track sizing, bands,
+     * lines) before breaking it between rows.
+     */
+    static String table(int rows) {
+        StringBuilder sb = new StringBuilder(tableHead());
+        sb.append("\t\tTable:\n\t\t\tColumn sizes: auto auto auto *\n\t\t\tHeader rows:\n\t\t\t\tRow:\n");
+        for (int c = 1; c <= 4; c++) {
+            sb.append("\t\t\t\t\tCell: Columna ").append(c).append('\n');
+        }
+        sb.append("\t\t\tBody:\n");
+        for (int i = 0; i < rows; i++) {
+            sb.append("\t\t\t\tRow:\n");
+            for (int c = 1; c <= 4; c++) {
+                sb.append("\t\t\t\t\tCell: Fila ").append(i).append(", columna ").append(c).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /** A grid of rows rows and three columns of short texts; the rows are the fragmentation units. */
+    static String grid(int rows) {
+        StringBuilder sb = new StringBuilder(head());
+        sb.append("\t\tGrid:\n\t\t\tColumn sizes: * * *\n");
+        for (int i = 0; i < rows; i++) {
+            for (int c = 1; c <= 3; c++) {
+                sb.append("\t\t\tArea:\n\t\t\t\tText: Fila ").append(i).append(", columna ").append(c).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /** A vertical stack of items short paragraphs; the items are the fragmentation units. */
+    static String stack(int items) {
+        StringBuilder sb = new StringBuilder(head());
+        sb.append("\t\tStack:\n\t\t\tDirection: vertical\n");
+        for (int i = 0; i < items; i++) {
+            sb.append("\t\t\tItem:\n\t\t\t\tText: Elemento ").append(i).append(" de la pila.\n");
+        }
+        return sb.toString();
+    }
+
     static void run(String label, String text, Resources r) throws Exception {
         long t0 = System.nanoTime();
         InlineNode doc = new DocumentReader().read(text);
@@ -69,19 +120,32 @@ public class ScaleProbe {
             stats, (double) misses / lo.pages().size());
     }
 
+    /** Without arguments, every probe; with "text" or "units", only those of the long texts or of the containers. */
     public static void main(String[] a) throws Exception {
+        boolean text = a.length == 0 || Arrays.asList(a).contains("text");
+        boolean units = a.length == 0 || Arrays.asList(a).contains("units");
         Resources r = new Resources();
         run("warm-up 50", big(50, false), r);
         run("warm-up 50", big(50, false), r);
-        for (int n : new int[]{200, 800, 2000, 2100, 3200, 12800}) {
-            run("paragraphs " + n, big(n, false), r);
+        if (text) {
+            for (int n : new int[]{200, 800, 2000, 2100, 3200, 12800}) {
+                run("paragraphs " + n, big(n, false), r);
+            }
+            for (int n : new int[]{800, 3200}) {
+                run("toc " + n, big(n, true), r);
+            }
+            for (int n : new int[]{800, 3200}) {
+                run("chapters " + n, chapters(n, 5), r);
+                run("long chapters " + n, chapters(n, 20), r);
+            }
         }
-        for (int n : new int[]{800, 3200}) {
-            run("toc " + n, big(n, true), r);
-        }
-        for (int n : new int[]{800, 3200}) {
-            run("chapters " + n, chapters(n, 5), r);
-            run("long chapters " + n, chapters(n, 20), r);
+        if (units) {
+            run("warm-up table 100", table(100), r);
+            for (int n : new int[]{500, 2000}) {
+                run("table " + n, table(n), r);
+                run("grid " + n, grid(n), r);
+                run("stack " + n, stack(n), r);
+            }
         }
         System.out.println("max heap MB: " + Runtime.getRuntime().maxMemory() / 1048576);
     }

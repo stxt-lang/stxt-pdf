@@ -7,7 +7,7 @@ pages of common behavior and of each component; here, how it is built.
 
 `Engine` dispatches by `Style.layout` to the corresponding algorithm (an `EnumMap`, and the table, which is a grid, has its own).
 The algorithms do not know the engine: they depend on **`LayoutContext`** (`layout`, `intrinsic`, `contentIntrinsic`,
-`measurer`, `natural`, `imageRatio`), which `Engine` implements and which a test can replace with a double. **Every recursive call for
+`measurer`, `natural`, `imageRatio`, `arranged`), which `Engine` implements and which a test can replace with a double. **Every recursive call for
 layout or intrinsic sizes goes through `context.layout(...)` / `context.intrinsic(...)`**, never directly to the
 algorithm, so that the `LayoutCache` is used (without it, nested `Stack` and `Grid` grow exponentially).
 
@@ -139,7 +139,14 @@ fragment takes up for its parent (what its token consumed in that fragment, not 
 `Mark` of the broken child), `UnitBreaker` (in `Split`) and `ColumnsLayout` (in `Fill`: the tallest of its columns) pass
 it to `Slice.of` as `occupied`, apart from the visible height of the content. Stack and grid break between units (lines, items or rows, which are `fragment.Unit`) with `UnitBreaker`: they are
 laid out whole without fragmenting (`UnitBreaker.Arranged`: placed items and `Units`) and `UnitBreaker.fragment` keeps what
-fits on the page. A unit that does not fit in what is left of the page splits its items in parallel on that page
+fits on the page. That unfragmented arrangement (the placement, the tracks, the items laid out at their sizes, the bands
+and, in a table, the header, the footer and the lines of `Merge borders`) depends on the box and on its space without
+fragmentation (`ConstraintSpace.unfragmented`, which keeps `atFragmentainerStart`), not on what is left of the page or on
+the token: it is computed once per container and space (`LayoutContext.arranged`, one more memo of the `LayoutCache`, by
+box, space and type of what is memoized, which `clear` and `Engine.forget` empty like the rest) and each fragment only
+breaks it. What is memoized is immutable (`Arranged` and `Repeat` copy their lists). Until 0.9.0 every fragment of a table
+placed and sized the whole table again, and the units of a grid were computed by going through all the items for each row
+(now, one pass over the items); `ArrangementCacheTest` counts the arrangements. A unit that does not fit in what is left of the page splits its items in parallel on that page
 (`Units.split`, from `Split rows` and `Split items`, and only where `Units.splittable` allows it, which the lines of a
 horizontal `Stack` with `Wrap` do not; with `false`, only the one that does not fit even at the start of a page),
 repeating their layout with `ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`;
@@ -155,6 +162,13 @@ without children: painting treats them like any in-flow box. With `Merge borders
 to `Repeat.rules`; `TableLayout` adds the rows of the header and the footer and `layout.table.MergedBorders` computes the
 lines of that fragment over the columns of `GridLayout.arrangeWithColumns`, which go in `Fragment.rules`. Forced breaks are `PAGE` or `COLUMN`
 (`BreakRules.forcedBetween` returns the type). The page break has the quality `BreakAppeal.FORCED_PAGE`, above `PERFECT_BREAK`.
+
+> **Decision:** the memo of the arrangement lives in `LayoutContext` and `LayoutCache`, not inside each algorithm: so it
+> is emptied with the cache (`clear` when finishing and `Engine.forget` when paginating again, which reaches the container
+> as an ancestor of the text that changes) and the algorithms stay stateless. The type is part of the key because the
+> table memoizes its preparation (body, header and footer) on top of the arrangement of its grid, both for the same box.
+> *Rejected alternative:* a field in each algorithm, which `Engine.forget` would not reach and a reused `Engine` would
+> carry along.
 
 The content of a `Columns` goes in a generated box, the column flow (`Element.COLUMN_FLOW`), its only child: each
 column is a fragment of that box, laid out with the usual algorithms. The columns are only at the start of the
@@ -320,8 +334,8 @@ they only grow. With an additive measurer pagination always converges: the error
 
 **Paginating again does not empty the cache.** When the trial number grows (`Engine.reservePageNumbers`) or
 the page of a reference changes (`Engine.assume`), the `Paginator` passes the texts whose width changes and the engine forgets only what
-the `LayoutCache` and the line breaking store about them and their ancestors (`Engine.forget`).
-`PaginationCacheTest` watches it.
+the `LayoutCache` and the line breaking store about them and their ancestors (`Engine.forget`), also the arrangement of a
+`Stack`, a `Grid` or a `Table` that contains them. `PaginationCacheTest` and `ArrangementCacheTest` watch it.
 
 > **Decision:** paginating again only forgets what depends on the texts that change, because the result of a box
 > depends only on its subtree and on the key (box, space and token): the algorithms read nothing from outside, except the style,

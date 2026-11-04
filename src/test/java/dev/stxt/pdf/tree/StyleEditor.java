@@ -52,6 +52,16 @@ public final class StyleEditor {
         return this;
     }
 
+    public StyleEditor keepWithNext(boolean v) {
+        style.breaks().setKeepWithNext(v);
+        return this;
+    }
+
+    public StyleEditor keepWithPrevious(boolean v) {
+        style.breaks().setKeepWithPrevious(v);
+        return this;
+    }
+
     public StyleEditor font(String v) {
         style.typography().setFont(v);
         return this;
