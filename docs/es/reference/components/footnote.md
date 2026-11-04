@@ -59,7 +59,9 @@ generar encabezados, imágenes ni bloques de código (`FOOTNOTE_CONTENT`).
 
 La nota hereda la tipografía del **área de notas** de su sección, no de la caja donde se escribe: una nota escrita en
 una celda alineada a la derecha no sale alineada a la derecha. `For element: Footnote` estila todas las notas (un
-`Margin` inferior las separa), y `Style` o `Id`, una en concreto.
+`Margin` inferior las separa), y `Style` o `Id`, una en concreto. Las notas de una página se apilan en el área como los
+hijos de un bloque: sus márgenes y los que salen de ellas (el margen superior de su primer párrafo, por ejemplo) se
+fusionan entre notas ([Fusión de márgenes](block.md#fusión-de-márgenes)).
 
 Una `Footnote` no puede estar dentro de un `Page overlay`, que se repite en cada página, ni dentro de otra `Footnote`
 (`FOOTNOTE_NOT_ALLOWED`). La nota va en la **sección de su llamada**: una llamada cuya nota está en otra sección es

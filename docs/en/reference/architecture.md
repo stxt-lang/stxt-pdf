@@ -97,7 +97,8 @@ depend on the `LayoutContext` interface.
 - **`ConstraintSpace`** and **`LayoutResult`**: the immutable input and output of the layout of a box. The result carries
   the `Fragment`, the `BreakToken` to continue on the next page and the quality of the break.
 - **`FootnoteLayout`**: each page of a section with footnotes: the flow with the bottom reservation and the notes of
-  its calls stacked in the footnote area ([Layout](implementation/layout.md#pagination)).
+  its calls stacked in the footnote area ([Layout](implementation/layout.md#pagination)), with the same `Stacking` that
+  stacks the children of a block in `BlockLayout`.
 - **`Paginator`**: splits each section into pages, makes the references converge, numbers the pages and places the
   `Page overlay` elements.
 - **`Overflow`**: looks for overflows in the already paginated result.

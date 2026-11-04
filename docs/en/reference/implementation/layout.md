@@ -62,7 +62,11 @@ and then the minimum. If they clash, the minimum wins (`Sizing.constrain`).
 
 Each box returns in `AdjoiningMargins` the margins of its descendants that come out at the top or at the bottom (and whether it is empty and
 lets its own through). The parent merges them with the child's own margins, which it resolves itself. `MarginStrut` is immutable and
-keeps the largest positive and the most negative separately. `Box.isolatesMargins()` says which boxes cut it off.
+keeps the largest positive and the most negative separately. `Box.isolatesMargins()` says which boxes cut it off. The
+account of the stacking (the cursor, the margins waiting below it, those that come out of the box at the top and the
+horizontal placement of a child with its side margins) is kept by `Stacking`, which `BlockLayout` uses with the children
+of a block and `FootnoteLayout` with the notes of the footnote area, so that a rule of merging or of centering is the
+same in both.
 
 The margins that come out of a child at the top (the top margin of its first descendant, when it is larger than those
 around it) move it down from where its own margin would put it. `BlockLayout` **predicts them before laying it out** with
@@ -377,7 +381,9 @@ fits, down to what its notes need and, where a smaller one brings back a call th
 the two (`PRECISION`, 0.001 pt). Notes that do not fit even with the whole reservation are `FOOTNOTE_TOO_TALL`, and a
 reservation that does not settle in 60 probes (`MAX_PROBES`) is an `InternalException`. Each note is laid out with
 `context.layout` like any block, so the cache answers the
-repeated probes; only the last one may be left broken, with a break without violations (`BreakAppeal.PERFECT_BREAK`)
+repeated probes (`FootnoteLayout` gets the `LayoutContext`, not the engine), and they are stacked with `Stacking` like
+the children of a block: a note moved down by the margins that come out of it at the top is laid out again with what
+is left for it; only the last one may be left broken, with a break without violations (`BreakAppeal.PERFECT_BREAK`)
 and only if the flow continues, and its rest (`FootnoteLayout.Carry`) heads the area of the next page. The area
 measures what its notes measure and is anchored at the end of the page area: the surplus of the reservation stays
 between the text and the rule. `Paginator.flow` keeps the fragment of the area of each page (`Flow.footnotes`), which

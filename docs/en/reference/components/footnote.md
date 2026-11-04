@@ -59,7 +59,9 @@ headings, images or code blocks (`FOOTNOTE_CONTENT`).
 
 The note inherits the typography of the **footnote area** of its section, not that of the box where it is written: a
 note written in a right-aligned cell does not come out right-aligned. `For element: Footnote` styles all the notes (a
-bottom `Margin` separates them), and `Style` or `Id`, one in particular.
+bottom `Margin` separates them), and `Style` or `Id`, one in particular. The notes of a page are stacked in the area
+like the children of a block: their margins and those that come out of them (the top margin of their first paragraph,
+for example) merge between notes ([Margin merging](block.md#margin-merging)).
 
 A `Footnote` cannot be inside a `Page overlay`, which is repeated on every page, nor inside another `Footnote`
 (`FOOTNOTE_NOT_ALLOWED`). The note goes in the **section of its call**: a call whose note is in another section is

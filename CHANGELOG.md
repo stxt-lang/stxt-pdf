@@ -83,6 +83,11 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Fixed
 
+- The top margin of the first child of a `Footnote` (a `Margin` on its first `Paragraph`, or a `For element: Paragraph`
+  rule with one) was lost: the notes of a page touched each other, while two blocks with the same content in the flow
+  are separated by that margin. The notes are now stacked like the children of a block, and the margins that come out
+  of a note at the top merge with those of the note above (or count below the padding of the footnote area, for the
+  first one).
 - A `Columns` with a definite height (its `Height`, or the height of the grid row or stack line that stretches it) whose
   content left a gap at the end of a column (a box with a definite height, or a stretched grid item, broken inside the
   column) consumed that gap from its height and could run out of room on the next page (`BOX_OVERFLOW`). As any other

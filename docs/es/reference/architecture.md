@@ -97,7 +97,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
 - **`ConstraintSpace`** y **`LayoutResult`**: la entrada y la salida inmutables del layout de una caja. El resultado lleva
   el `Fragment`, el `BreakToken` para continuar en la página siguiente y la calidad del corte.
 - **`FootnoteLayout`**: cada página de una sección con notas al pie: el flujo con la reserva del pie y las notas de sus
-  llamadas apiladas en el área de notas ([El layout](implementation/layout.md#paginación)).
+  llamadas apiladas en el área de notas ([El layout](implementation/layout.md#paginación)), con el mismo `Stacking` que
+  apila los hijos de un bloque en `BlockLayout`.
 - **`Paginator`**: reparte cada sección en páginas, hace converger las referencias, numera las páginas y coloca los
   `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.

@@ -40,7 +40,8 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * larger reservation are a subset of those of a smaller one: the first reservation that fits is found going up to the
  * full height of the notes, and then it is tightened going down, with a binary search where a smaller one brings a
  * call back ({@link #PRECISION}). Each note is laid out with the algorithms of the flow, so the layout cache answers
- * the repeated probes.</p>
+ * the repeated probes, and the notes are stacked like the children of a block ({@link Stacking}): their margins, and
+ * those that come out of them, merge between notes.</p>
  */
 final class FootnoteLayout {
 
@@ -104,15 +105,15 @@ final class FootnoteLayout {
     private record Stacked(List<Fragment> fragments, double height, Carry carry) {
     }
 
-    private final Engine engine;
+    private final LayoutContext context;
     private final Section section;
     private final Box area;
     private final Map<String, Box> notes;
     /** Probes of the page being laid out, against {@link #MAX_PROBES}. */
     private int probes;
 
-    FootnoteLayout(Engine engine, Section section) {
-        this.engine = engine;
+    FootnoteLayout(LayoutContext context, Section section) {
+        this.context = context;
         this.section = section;
         this.area = section.footnotes();
         this.notes = area.children().stream().collect(Collectors.toMap(Box::id, Function.identity()));
@@ -124,12 +125,12 @@ final class FootnoteLayout {
      */
     Result page(BreakToken from, Carry carry) {
         if (!section.hasFootnotes()) {
-            return new Result(engine.layout(section.box(), ConstraintSpace.forPage(section.pageSetup()), from), null,
+            return new Result(context.layout(section.box(), ConstraintSpace.forPage(section.pageSetup()), from), null,
                     null);
         }
         Rect pageArea = section.pageSetup().pageArea();
         BoxModel model = BoxModel.resolve(area, ConstraintSpace.fixed(pageArea.width(), OptionalDouble.empty(),
-                pageArea.width(), OptionalDouble.of(pageArea.height()), true), engine);
+                pageArea.width(), OptionalDouble.of(pageArea.height()), true), context);
         probes = 0;
         Probe p = reserve(from, carry, model, pageArea.height());
         if (p.stacked().fragments().isEmpty()) {
@@ -139,8 +140,7 @@ final class FootnoteLayout {
         // The area is as tall as its notes, at the bottom of the page: the room the reservation leaves over, if any,
         // stays between the text and the rule.
         double height = model.border().vertical() + model.padding().vertical() + stacked.height();
-        double x = Sizing.horizontalMargins(pageArea.width(), model.width(), area.style().box().margin().left(),
-                area.style().box().margin().right())[0];
+        double x = Stacking.x(pageArea.width(), model.width(), area);
         double y = pageArea.height() - model.margin().bottom() - height;
         Fragment fragment = new Fragment(area, x, y, model.width(), height, model.margin(), model.border(),
                 model.padding(), stacked.fragments(), List.of(), true, true);
@@ -219,7 +219,7 @@ final class FootnoteLayout {
             throw new InternalException("The reservation for the footnotes does not settle after " + MAX_PROBES
                     + " probes (reference/components/footnote.md)");
         }
-        LayoutResult body = engine.layout(section.box(), ConstraintSpace.forPage(section.pageSetup(), reserved), from);
+        LayoutResult body = context.layout(section.box(), ConstraintSpace.forPage(section.pageSetup(), reserved), from);
         List<String> calls = new ArrayList<>(calls(body.fragment(), new LinkedHashSet<>()));
         boolean overflows = overflows(body.fragment(), pageHeight - reserved);
         if (overflows) {
@@ -249,9 +249,11 @@ final class FootnoteLayout {
 
     /**
      * Stacks the notes in the content box of the area, in order: the one carried from the previous page and then
-     * those of {@code calls}, each with its margins, which merge with those of the previous one. Only the last one may
-     * continue on the next page, with a break that violates no rule, and only if the flow continues too
-     * ({@code bodyContinues}). {@code null} if they do not fit that way.
+     * those of {@code calls}, as the children of a block ({@link Stacking}): each with its margins and those that come
+     * out of it, which merge with those of the previous one; the first touches the padding of the area, so its top
+     * margins count, and a continued note has none. Only the last one may continue on the next page, with a break that
+     * violates no rule, and only if the flow continues too ({@code bodyContinues}). {@code null} if they do not fit
+     * that way.
      */
     private Stacked stack(Carry carry, List<String> calls, double width, double available, boolean bodyContinues) {
         List<Box> boxes = new ArrayList<>();
@@ -265,20 +267,28 @@ final class FootnoteLayout {
             tokens.add(null);
         }
         List<Fragment> fragments = new ArrayList<>();
-        MarginStrut strut = MarginStrut.EMPTY;
-        double cursor = 0;
+        Stacking stack = new Stacking(false);
         Carry next = null;
         for (int i = 0; i < boxes.size(); i++) {
             Box note = boxes.get(i);
+            BreakToken token = tokens.get(i);
             Insets margin = Insets.resolve(note.style().box().margin(), width);
-            // The first note touches the padding of the area: its top margin counts; a continued note has none.
-            double top = cursor + strut.add(tokens.get(i) != null ? 0 : margin.top()).resolve();
+            MarginStrut own = MarginStrut.EMPTY.add(token != null ? 0 : margin.top());
+            double top = stack.top(own);
             if (!fits(top, available) && i > 0) {
                 return null;
             }
-            ConstraintSpace space = ConstraintSpace.forChildren(width, OptionalDouble.empty(),
-                    OptionalDouble.of(available - top), i == 0);
-            LayoutResult r = engine.layout(note, space, tokens.get(i));
+            LayoutResult r = layOutNote(note, token, width, available - top, i == 0);
+            // The margins that come out of the note at the top (those of its first child) move it down: what is left
+            // for it is then less.
+            MarginStrut childTop = token != null ? MarginStrut.EMPTY : r.adjoining().top().add(margin.top());
+            double y = stack.top(childTop);
+            if (!Tolerance.same(y, top)) {
+                if (!fits(y, available) && i > 0) {
+                    return null;
+                }
+                r = layOutNote(note, token, width, available - y, i == 0);
+            }
             if (r.breakToken() instanceof BreakToken.Before) {
                 return null;
             }
@@ -289,41 +299,43 @@ final class FootnoteLayout {
                 next = new Carry(note, r.breakToken());
             }
             Fragment f = r.fragment();
-            double x = Sizing.horizontalMargins(width, f.width(), note.style().box().margin().left(),
-                    note.style().box().margin().right())[0];
-            fragments.add(f.moved(x, top));
-            cursor = top + f.height();
-            strut = r.adjoining().bottom().add(margin.bottom());
+            fragments.add(f.moved(Stacking.x(width, f.width(), note), y));
+            stack.place(childTop, y + f.height(), r.adjoining().bottom().add(margin.bottom()));
         }
-        if (!fits(cursor, available)) {
+        if (!fits(stack.cursor(), available)) {
             return null;
         }
-        return new Stacked(fragments, cursor, next);
+        return new Stacked(fragments, stack.cursor(), next);
+    }
+
+    /** A note laid out in the content box of the area, from {@code token}, with {@code remaining} of the page left. */
+    private LayoutResult layOutNote(Box note, BreakToken token, double width, double remaining, boolean first) {
+        return context.layout(note, ConstraintSpace.forChildren(width, OptionalDouble.empty(),
+                OptionalDouble.of(remaining), first), token);
     }
 
     /**
-     * The full height of the notes, laid out without breaking and stacked with their margins, which merge between
-     * notes as in block flow: the reservation in which they surely fit.
+     * The full height of the notes, laid out without breaking and stacked as in {@link #stack}: the reservation in
+     * which they surely fit.
      */
     private double total(Carry carry, List<String> calls, BoxModel model) {
         double width = model.contentWidth();
         ConstraintSpace space = ConstraintSpace.forChildren(width, OptionalDouble.empty(), OptionalDouble.empty(), true);
-        MarginStrut strut = MarginStrut.EMPTY;
-        double cursor = 0;
+        Stacking stack = new Stacking(false);
         if (carry != null) {
-            LayoutResult r = engine.layout(carry.note(), space, carry.token());
-            cursor = r.fragment().height();
-            strut = r.adjoining().bottom().add(Insets.resolve(carry.note().style().box().margin(), width).bottom());
+            LayoutResult r = context.layout(carry.note(), space, carry.token());
+            Insets margin = Insets.resolve(carry.note().style().box().margin(), width);
+            stack.place(MarginStrut.EMPTY, r.fragment().height(), r.adjoining().bottom().add(margin.bottom()));
         }
         for (String id : calls) {
             Box note = notes.get(id);
             Insets margin = Insets.resolve(note.style().box().margin(), width);
-            LayoutResult r = engine.layout(note, space, null);
-            double top = cursor + strut.add(margin.top()).resolve();
-            cursor = top + r.fragment().height();
-            strut = r.adjoining().bottom().add(margin.bottom());
+            LayoutResult r = context.layout(note, space, null);
+            MarginStrut childTop = r.adjoining().top().add(margin.top());
+            stack.place(childTop, stack.top(childTop) + r.fragment().height(),
+                    r.adjoining().bottom().add(margin.bottom()));
         }
-        return model.margin().vertical() + model.border().vertical() + model.padding().vertical() + cursor;
+        return model.margin().vertical() + model.border().vertical() + model.padding().vertical() + stack.cursor();
     }
 
     /** The {@code Id}s of the footnotes called in the lines of a fragment and its descendants, in order. */

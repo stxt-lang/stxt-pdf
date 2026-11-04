@@ -45,6 +45,22 @@ class FootnoteLayoutTest {
         assertEquals(new Rect(40, 148, 515, 12), f.rect("n"));
     }
 
+    /**
+     * The notes are stacked like the children of a block: the top margin of the first child of a note comes out of
+     * it and separates it from what is above, as in the flow. Until the 2026-11-04 it was lost and the notes touched.
+     */
+    @Test
+    void theMarginsThatComeOutOfANoteSeparateItAsInTheFlow() {
+        LayoutFixture f = LayoutFixture.layOutPaged(200, MARKDOWN,
+                "\tParagraph: aaaa[^a] bbbb[^b]", "\t\tId: p",
+                "\tFootnote:", "\t\tId: a", "\t\tParagraph: nnnnnnnnn", "\t\t\tBox:", "\t\t\t\tMargin: 10 0 0 0",
+                "\tFootnote:", "\t\tId: b", "\t\tParagraph: nnnnnnnnn", "\t\t\tBox:", "\t\t\t\tMargin: 10 0 0 0");
+        assertEquals(1, f.pages());
+        // The area measures 0.5 + 4 + (10 + 12) + (10 + 12) = 48.5 and starts at 111.5: its content, at 116.
+        assertEquals(new Rect(40, 126, 515, 12), f.rect("a"));
+        assertEquals(new Rect(40, 148, 515, 12), f.rect("b"));
+    }
+
     /** A line enters the page only if its note fits under it; otherwise it moves to the next page with the note. */
     @Test
     void aLineMovesToTheNextPageWithItsNote() {

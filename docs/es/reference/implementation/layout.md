@@ -62,7 +62,10 @@ máximo y luego el mínimo. Si chocan, gana el mínimo (`Sizing.constrain`).
 
 Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que salen por arriba o por abajo (y si está vacía y
 deja pasar los suyos). El padre los fusiona con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
-guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
+guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan. La cuenta del
+apilado (el cursor, los márgenes que esperan bajo él, los que salen de la caja por arriba y la colocación horizontal de
+un hijo con sus márgenes laterales) la lleva `Stacking`, que usan `BlockLayout` con los hijos de un bloque y
+`FootnoteLayout` con las notas del área de notas, para que una regla de fusión o de centrado sea la misma en los dos.
 
 Los márgenes que salen de un hijo por arriba (el margen superior de su primer descendiente, si es mayor que los de
 alrededor) lo mueven hacia abajo respecto a donde lo pondría su propio margen. `BlockLayout` los **predice antes de
@@ -371,7 +374,9 @@ reserva que no lo fuerza, por bisección); y desde una que cabe, hacia abajo has
 una menor trae una llamada que ya no cabe, por bisección entre las dos (`PRECISION`, 0,001 pt). Unas notas que no caben ni
 con la reserva entera son `FOOTNOTE_TOO_TALL`, y una reserva que no asienta en 60 sondas (`MAX_PROBES`), un
 `InternalException`. Cada nota se maqueta con
-`context.layout` como cualquier bloque, así que la caché responde a las sondas repetidas; solo la última puede quedar
+`context.layout` como cualquier bloque, así que la caché responde a las sondas repetidas (`FootnoteLayout` recibe el
+`LayoutContext`, no el motor), y se apilan con `Stacking` como los hijos de un bloque: una nota que baja por los
+márgenes que salen de ella por arriba se maqueta otra vez con lo que le queda; solo la última puede quedar
 partida, con un corte sin violaciones (`BreakAppeal.PERFECT_BREAK`) y solo si el flujo continúa, y su resto
 (`FootnoteLayout.Carry`) encabeza el área de la página siguiente. El área mide lo que miden sus notas y se ancla al final
 del área útil: el sobrante de la reserva queda entre el texto y el filete. `Paginator.flow` guarda el fragmento del
