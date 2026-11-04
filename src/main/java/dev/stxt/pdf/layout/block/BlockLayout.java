@@ -74,9 +74,10 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * last break of highest quality among the previous ones and the one inside the child is chosen. Forced breaks
  * apply as soon as they appear, also after an empty child, except at the start of a page. A child whose top border
  * would fall past the end of the page (its merged margins push it there) is not laid out: the break goes before it. In a non-forced break, the margins that touch it are truncated; in a forced one,
- * the top margin of the child that starts the page is kept. A child that, once laid out, the margins coming out of it
- * at the top move down is laid out again at its position only if the result can change: what it placed does not fit in
- * what is left from there, or there are side boxes beside it ({@link Run#holdsAt}).</p>
+ * the top margin of the child that starts the page is kept. A child is placed where the margins that will come out of
+ * it at the top put it, predicted from the tree ({@link LeadingMargins}); if the ones its layout returns differ and
+ * move it, it is laid out again at its position only if the result can change: it moves up, what it placed does not
+ * fit in what is left from there, or there are side boxes beside it ({@link Run#holdsAt}).</p>
  *
  * <p>A {@code List item} also carries its marker in the first fragment, hanging to its
  * left ({@link MarkerLayout}).</p>
@@ -264,14 +265,25 @@ public final class BlockLayout implements LayoutAlgorithm {
             // The child that starts a continuation fragment touches the break: its margins are
             // truncated, unless the break was forced. A resumed child no longer has a top margin.
             boolean noTopMargin = childToken != null || (!first && i == start && !forcedBeforeStart());
+            // The child is placed where the margins that come out of it at the top will put it, predicted from the
+            // tree (LeadingMargins), so that it is usually laid out once; what the layout returns decides, below.
+            MarginStrut own = MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top());
+            MarginStrut predicted = noTopMargin ? own : own.add(LeadingMargins.predict(child, childSpace, context));
             // A child that does not run beside the side boxes goes below them (reference/components/block.md).
-            double flow = top(MarginStrut.EMPTY.add(noTopMargin ? 0 : margin.top()));
+            double flow = top(predicted);
             boolean wraps = wraps(child, flow);
             double clear = beside.isEmpty() || wraps ? Double.NEGATIVE_INFINITY : clearance();
-
             double y = Math.max(flow, clear);
             if (noRoom(y)) {
-                return breakBefore();
+                // Only the margins the layout confirms break before a child: a prediction that overestimates them (a
+                // negative margin that does not come out) starts, as before, from the child's own margin.
+                flow = top(own);
+                wraps = wraps(child, flow);
+                clear = beside.isEmpty() || wraps ? Double.NEGATIVE_INFINITY : clearance();
+                y = Math.max(flow, clear);
+                if (noRoom(y)) {
+                    return breakBefore();
+                }
             }
             LayoutResult r = layOutChild(child, y, childToken, wraps);
             if (r.breakToken() instanceof BreakToken.Before) {
@@ -284,12 +296,13 @@ public final class BlockLayout implements LayoutAlgorithm {
                     ? top(childTop.add(margin.bottom()))
                     : top(childTop), clear);
             if (!same(flowY, y) && (fragmenting || wraps)) {
-                // The margins that come out of the child at the top have moved it down: what is left of the page
-                // for it, and what is beside it, change, and the page may have run out.
+                // The margins that come out of the child at the top are not the predicted ones and move it: what is
+                // left of the page for it, and what is beside it, change, and the page may have run out. Moved up,
+                // it has more room and may place more, so it is always laid out again.
                 if (noRoom(flowY)) {
                     return breakBefore();
                 }
-                if (!holdsAt(r, flowY, wraps)) {
+                if (flowY < y || !holdsAt(r, flowY, wraps)) {
                     r = layOutChild(child, flowY, childToken, wraps);
                     if (r.breakToken() instanceof BreakToken.Before) {
                         return breakBefore();

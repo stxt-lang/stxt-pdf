@@ -21,6 +21,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
+- **A chapter longer than the page is laid out once on the page where it starts.** Before laying out a child of a
+  block, the engine now predicts from the tree the margins that will come out of it at the top (those of its first
+  descendants, while nothing separates them from its top edge) and places it where they put it, instead of laying it
+  out at its own margin and again lower down once the real margins are known. The layout still decides: when the margins
+  it returns differ from the predicted ones, the child is moved and, if that can change the result, laid out again. In
+  a document of chapters longer than a page, each headed by a `Heading 1` with a top margin, the layouts per page go
+  from 33 to 26, the same as with the margin on the block itself. The output does not change.
 - **Tagging a long table no longer costs the square of its cells.** Building the structure tree of the tagged PDF
   asked, for every cell and for every marked content of a cell, how many rows its table has by going through all the
   cells of the table. The rows are now counted once per table, and the `Ref` of each table of contents entry in

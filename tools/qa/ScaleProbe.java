@@ -120,10 +120,15 @@ public class ScaleProbe {
             stats, (double) misses / lo.pages().size());
     }
 
-    /** Without arguments, every probe; with "text" or "units", only those of the long texts or of the containers. */
+    /**
+     * Without arguments, every probe; with "text", "chapters" or "units", only those of the long texts, of the chapters
+     * or of the containers.
+     */
     public static void main(String[] a) throws Exception {
-        boolean text = a.length == 0 || Arrays.asList(a).contains("text");
-        boolean units = a.length == 0 || Arrays.asList(a).contains("units");
+        List<String> only = Arrays.asList(a);
+        boolean text = a.length == 0 || only.contains("text");
+        boolean chapters = a.length == 0 || only.contains("text") || only.contains("chapters");
+        boolean units = a.length == 0 || only.contains("units");
         Resources r = new Resources();
         run("warm-up 50", big(50, false), r);
         run("warm-up 50", big(50, false), r);
@@ -134,6 +139,8 @@ public class ScaleProbe {
             for (int n : new int[]{800, 3200}) {
                 run("toc " + n, big(n, true), r);
             }
+        }
+        if (chapters) {
             for (int n : new int[]{800, 3200}) {
                 run("chapters " + n, chapters(n, 5), r);
                 run("long chapters " + n, chapters(n, 20), r);

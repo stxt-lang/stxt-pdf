@@ -58,15 +58,27 @@ Cada caja devuelve en `AdjoiningMargins` los márgenes de sus descendientes que 
 deja pasar los suyos). El padre los fusiona con los márgenes propios del hijo, que resuelve él. `MarginStrut` es inmutable y
 guarda el mayor positivo y el más negativo por separado. `Box.isolatesMargins()` dice qué cajas lo cortan.
 
-Cuando los márgenes que salen de un hijo por arriba lo mueven hacia abajo una vez maquetado (el margen superior de su primer
-descendiente es mayor que los de alrededor), lo que le queda de página y lo que tiene al lado cambian, y `BlockLayout` lo
-maqueta otra vez en su posición solo si el resultado puede cambiar: si lo que colocó no cabe en lo que queda desde ahí o si
-tiene cajas laterales al lado (`Run.holdsAt`). Si cabe y no hay nada al lado, el primer layout vale, aunque el hijo quedara
-cortado: con menos sitio nada nuevo cabe y lo colocado sigue cabiendo, así que los algoritmos deciden lo mismo, y repetirlo
-calcularía el mismo subárbol con otra clave en la caché. Un fragmento que llega al final de la página (un alto definido, una
-fila partida, las columnas de un `Columns`, un hijo cortado que llena la página) no cabe desde más abajo y se repite: un
-capítulo más largo que la página se maqueta dos veces en la página donde empieza. Hasta la 0.9.0 se repetía siempre, y un
-bloque corto que empezaba a media página costaba el doble.
+Los márgenes que salen de un hijo por arriba (el margen superior de su primer descendiente, si es mayor que los de
+alrededor) lo mueven hacia abajo respecto a donde lo pondría su propio margen. `BlockLayout` los **predice antes de
+maquetarlo** con `LeadingMargins`, una función pura del árbol: recorre la cadena de primeros descendientes en flujo mientras
+cada caja esté abierta por arriba (flujo de bloque, sin borde ni relleno arriba, sin aislar los márgenes) y acumula sus
+márgenes superiores, más los dos márgenes de los hijos vacíos que preceden a cada uno, resolviendo los porcentajes contra el
+ancho de contenido de cada nivel, y salta las cajas laterales y las fuera de flujo. Es una predicción: un texto cuenta como
+no vacío (si tiene líneas solo se sabe al maquetarlo) y un bloque como vacío solo si no tiene hijos en flujo. El hijo se
+coloca donde dice la predicción y lo que decide son los `AdjoiningMargins` que devuelve su layout: si coinciden, un solo
+layout; si difieren y lo mueven, lo que le queda de página y lo que tiene al lado cambian, y se maqueta otra vez en su
+posición solo si el resultado puede cambiar: si sube (tiene más sitio), si lo que colocó no cabe en lo que queda desde
+ahí o si tiene cajas laterales al lado (`Run.holdsAt`). Si baja, cabe y no hay nada al lado, el primer layout vale, aunque el
+hijo quedara cortado: con menos sitio nada nuevo cabe y lo colocado sigue cabiendo, así que los algoritmos deciden lo
+mismo. Una predicción que se pasa (un margen negativo que al final no sale) no corta antes del hijo: si donde lo pone no
+queda sitio, se parte de su propio margen, como antes. Hasta la 0.9.0 se maquetaba en la posición de su propio margen y se
+repetía siempre al moverlo; después, solo cuando el primer layout no valía más abajo, lo que dejaba dos layouts por
+capítulo más largo que la página en la página donde empieza.
+
+> **Decisión:** los márgenes previstos son una predicción con red y no sustituyen a los que devuelve el layout: un texto
+> solo se sabe vacío al maquetarlo (un título corrido o una referencia pueden dejarlo sin líneas), así que un sustituto no
+> podría ser exacto sin maquetar. *Alternativa descartada:* reemplazar `adjoining.top()` por la predicción y quitar
+> `holdsAt`, que cambiaría la salida en esos casos.
 
 ## Grid
 

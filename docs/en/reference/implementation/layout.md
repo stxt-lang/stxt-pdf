@@ -58,15 +58,28 @@ Each box returns in `AdjoiningMargins` the margins of its descendants that come 
 lets its own through). The parent merges them with the child's own margins, which it resolves itself. `MarginStrut` is immutable and
 keeps the largest positive and the most negative separately. `Box.isolatesMargins()` says which boxes cut it off.
 
-When the margins that come out of a child at the top move it down once laid out (the top margin of its first descendant is
-larger than those around it), what is left of the page for it and what is beside it change, and `BlockLayout` lays it out
-again at its position only if the result can change: if what it placed does not fit in what is left from there or if there
-are side boxes beside it (`Run.holdsAt`). If it fits and has nothing beside it, the first layout holds, even if the child
-was broken: with less room nothing new fits and what fitted still fits, so the algorithms take the same decisions, and
-repeating it would compute the same subtree with another key in the cache. A fragment that reaches the end of the page (a
-definite height, a split row, the columns of a `Columns`, a broken child that fills the page) does not fit from lower down
-and is repeated: a chapter longer than the page is laid out twice on the page where it starts. Until 0.9.0 it was always
-repeated, and a short block that started in the middle of a page cost twice.
+The margins that come out of a child at the top (the top margin of its first descendant, when it is larger than those
+around it) move it down from where its own margin would put it. `BlockLayout` **predicts them before laying it out** with
+`LeadingMargins`, a pure function of the tree: it walks the chain of first in-flow descendants while each box is open at
+the top (block flow, without border or padding at the top, not isolating margins) and accumulates their top margins, plus
+the two margins of the empty children that precede each of them, resolving the percentages against the content width of
+each level, and skips the side boxes and the out-of-flow ones. It is a prediction: a text counts as non-empty (whether
+it has lines is only known once laid out) and a block as empty only when it has no in-flow children. The child is placed
+where the prediction says, and what decides is the `AdjoiningMargins` its layout returns: if they match, one layout; if
+they differ and move it, what is left of the page for it and what is beside it change, and it is laid out again at its
+position only if the result can change: if it moves up (it has more room), if what it placed does not fit in what is left
+from there or if there are side boxes beside it (`Run.holdsAt`). If it moves down, fits and has nothing beside it, the
+first layout holds, even if the child was broken: with less room nothing new fits and what fitted still fits, so the
+algorithms take the same decisions. A prediction that overshoots (a negative margin that does not come out in the end)
+does not break before the child: if there is no room where it puts it, the child starts from its own margin, as before.
+Until 0.9.0 the child was laid out at the position of its own margin and always repeated when moved; afterwards, only
+when the first layout did not hold lower down, which left two layouts per chapter longer than the page on the page where
+it starts.
+
+> **Decision:** the predicted margins are a prediction with a safety net and do not replace the ones the layout returns:
+> a text is only known to be empty once laid out (a running head or a reference can leave it without lines), so a
+> replacement could not be exact without laying out. *Rejected alternative:* replacing `adjoining.top()` with the
+> prediction and removing `holdsAt`, which would change the output in those cases.
 
 ## Grid
 

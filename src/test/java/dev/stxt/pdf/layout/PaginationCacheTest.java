@@ -82,12 +82,12 @@ class PaginationCacheTest {
     }
 
     /**
-     * The top margin of the heading comes out of the chapter and moves it down once laid out; the chapter is not laid
-     * out again at its position when the first layout holds there (what it placed fits), so each one costs the same as
-     * with the margin on the block itself, which does not move it. It used to cost a second layout of the chapter on
-     * the page where it starts: with short chapters, almost twice the layouts (944 versus 505). The chapter that
-     * crosses the end of each page fills it and does not hold lower down, so it is still laid out twice on that page:
-     * that is the margin the test allows.
+     * The top margin of the heading comes out of the chapter and moves it down: the chapter is placed where the margins
+     * predicted from the tree put it ({@code LeadingMargins}) and laid out once, so each one costs the same as with the
+     * margin on the block itself, which does not move it. It used to cost a second layout of the chapter on the page
+     * where it starts: with short chapters, almost twice the layouts (944 versus 505). What is left (526) is the
+     * chapter that starts where its margin no longer fits: the prediction alone does not break before it, so it is laid
+     * out once at the position of its own margin to confirm that it does not fit, as it always was.
      */
     @Test
     void aChildMovedByTheMarginsThatComeOutOfItIsLaidOutOnce() {
@@ -95,7 +95,22 @@ class PaginationCacheTest {
         int[] onBlock = layOut(chapters(60, 5, true));
         assertEquals(onBlock[0], onHeading[0]);
         assertTrue(onHeading[0] > 10, "the test needs chapters that start in the middle of a page: " + onHeading[0]);
-        assertTrue(onHeading[1] <= onBlock[1] * 1.15, onHeading[1] + " layouts versus " + onBlock[1]);
+        assertTrue(onHeading[1] <= onBlock[1] * 1.05, onHeading[1] + " layouts versus " + onBlock[1]);
+    }
+
+    /**
+     * A chapter longer than the page is laid out once too on the page where it starts: it is placed where the margins
+     * predicted from the tree put it ({@code LeadingMargins}), so its layout fills the page from there and does not have
+     * to be repeated lower down. Until then each of them cost a second layout on that page: 33 layouts per page versus
+     * 27 with the margin on the block.
+     */
+    @Test
+    void aLongChildMovedByTheMarginsThatComeOutOfItIsLaidOutOnce() {
+        int[] onHeading = layOut(chapters(20, 40, false));
+        int[] onBlock = layOut(chapters(20, 40, true));
+        assertEquals(onBlock[0], onHeading[0]);
+        assertTrue(onHeading[0] > 20, "the test needs chapters longer than a page: " + onHeading[0]);
+        assertTrue(onHeading[1] <= onBlock[1] * 1.02, onHeading[1] + " layouts versus " + onBlock[1]);
     }
 
     /**
