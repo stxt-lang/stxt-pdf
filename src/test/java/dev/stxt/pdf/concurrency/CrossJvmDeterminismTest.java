@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.stxt.DocumentReader;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * {@code IdentityHashMap} or a {@code HashSet} of boxes is traversed: if the result depended on that order, it would
  * show here. Within the same JVM, {@link ConcurrentConversionTest} checks it.
  */
+@Tag("slow")
 class CrossJvmDeterminismTest {
 
     @Test

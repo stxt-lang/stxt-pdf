@@ -101,7 +101,7 @@ four options, parts 2 and 3 in their levels `b` and `a` (`A2B`, `A2A`, `A3B`, `A
 PDF/A adds to the PDF a 3 KB sRGB color profile and the metadata the standard asks for
 ([The PDF inside](../implementation/pdf.md#pdfa)). Every PDF of the engine already meets the rest: the fonts are
 embedded, the colors are defined, and there is no JavaScript, encryption or forms. The tests validate the eleven
-examples with veraPDF in the four variants.
+examples with veraPDF as PDF/A-3a, and the four variants with a test document.
 
 PDF/UA-2 writes a PDF 2.0, and PDF/A-2 and PDF/A-3 are PDF 1.7: asking for both is an `IllegalArgumentException`.
 PDF/A-4, on PDF 2.0, is not done.

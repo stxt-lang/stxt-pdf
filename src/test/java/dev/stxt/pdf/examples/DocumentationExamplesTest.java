@@ -11,6 +11,7 @@ import dev.stxt.pdf.paint.PdfDocumentWriter;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
@@ -56,6 +57,7 @@ class DocumentationExamplesTest {
     private record DocDocument(String name, String text) {
     }
 
+    @Tag("slow")
     @TestFactory
     Stream<DynamicTest> documentationDocuments() throws IOException {
         List<DocDocument> documents = new ArrayList<>();

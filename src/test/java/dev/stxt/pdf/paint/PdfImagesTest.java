@@ -4,6 +4,7 @@ import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.resources.Resources;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -62,6 +63,7 @@ class PdfImagesTest {
                 + "\" font-size=\"16\">Nogal fina</text></svg>";
     }
 
+    @Tag("slow")
     @Test
     void theLanguageOfTheJvmDoesNotChangeTheText() throws Exception {
         // In a JVM that starts in Turkish, AWT does not find "IBM Plex Sans" by its name (the capital I becomes ı) and

@@ -17,6 +17,7 @@ import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.runtime.STXT;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 
 import java.awt.image.BufferedImage;
@@ -66,6 +67,8 @@ class ExamplesTest {
     private static final float IMAGE_DPI = 110;
     /** The languages of each example, the original first. */
     private static final List<String> LANGUAGES = List.of("es", "en");
+    /** The PDF/A variant each example is also validated in: level A, whose rules include those of level B. */
+    private static final PdfA PDF_A = PdfA.A3A;
 
     /**
      * PDF/UA-1 rules that the examples still fail and that are not what is checked here; the rest
@@ -76,6 +79,7 @@ class ExamplesTest {
 
     private final DocumentReader reader = new DocumentReader();
 
+    @Tag("slow")
     @TestFactory
     Stream<DynamicTest> examples() throws IOException {
         String only = System.getProperty("examples.only");
@@ -171,12 +175,13 @@ class ExamplesTest {
                 + "is in " + actual + "); if the change is intended, -Dexamples.update=true accepts it");
         accessibility(id, pdf, 1);
         accessibility(id, pdf(document, resources, 2), 2);
-        for (PdfA pdfA : PdfA.values()) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false, 1, pdfA, Attachments.NONE);
-            assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), PdfUa.flavour(pdfA)), id + ": " + pdfA
-                    + " rules failed");
-        }
+        // PDF/A only once, as PDF/A-3a: the variant only changes the pdfaid of the XMP (the content is the same), the
+        // rules of level A include those of level B, and without attachments part 3 checks what part 2 does. That each
+        // variant declares itself and passes its own profile is checked by PdfATest.
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfDocumentWriter.write(document, resources, Limits.DEFAULT, out, false, 1, PDF_A, Attachments.NONE);
+        assertEquals(Map.of(), PdfUa.failedRules(out.toByteArray(), PdfUa.flavour(PDF_A)), id + ": " + PDF_A
+                + " rules failed");
     }
 
     private static byte[] pdf(LaidOutDocument document, Resources resources) throws IOException {

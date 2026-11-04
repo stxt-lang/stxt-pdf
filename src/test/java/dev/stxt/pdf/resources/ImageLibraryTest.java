@@ -64,11 +64,22 @@ class ImageLibraryTest {
             assertSame(image, library.find("TEST/SQUARE.PNG"));
         }
         assertEquals(1, library.files());
-        for (int i = 0; i < 3 * ImageLibrary.MAX_SPELLINGS; i++) {
-            library.find("./".repeat(i) + "test/square.png");
+        // Enough new spellings to reach the limit once, all short: each one costs a toRealPath, slow on Windows, and
+        // there normalizing a long path costs more than the file system.
+        for (int i = 0; i < ImageLibrary.MAX_SPELLINGS + 2; i++) {
+            library.find(spelling(i) + "test/square.png");
         }
         assertEquals(1, library.files());
         assertTrue(library.spellings() <= ImageLibrary.MAX_SPELLINGS, "spellings: " + library.spellings());
+    }
+
+    /** A different spelling of the current folder for each {@code i} below 2048: one {@code ./} or {@code .//} per bit. */
+    private static String spelling(int i) {
+        StringBuilder spelling = new StringBuilder();
+        for (int bit = 0; bit < 11; bit++) {
+            spelling.append((i >> bit & 1) == 0 ? "./" : ".//");
+        }
+        return spelling.toString();
     }
 
     @Test

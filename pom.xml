@@ -146,7 +146,8 @@
                 <version>3.2.5</version>
                 <configuration>
                     <!-- The performance measurements (@Tag("perf")) are not part of the normal suite:
-                         mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest -->
+                         mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=LongTextTest
+                         The slow integration tests (@Tag("slow")) are, but not of -Pquick. -->
                     <excludedGroups>${excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
@@ -267,6 +268,18 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- The development loop: mvn -Pquick test leaves out the slow integration tests (@Tag("slow"): the
+             examples, the documents of the documentation, the conversions from several threads and those that start
+             another JVM) and the coverage, so that the report in target/site/jacoco/ is always that of a whole run.
+             CI runs the whole suite. -->
+        <profile>
+            <id>quick</id>
+            <properties>
+                <excludedGroups>perf,slow</excludedGroups>
+                <jacoco.skip>true</jacoco.skip>
+            </properties>
         </profile>
 
         <!-- Mutation testing: an occasional run over layout and fragment, not in CI.

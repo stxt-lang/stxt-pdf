@@ -6,6 +6,7 @@ import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * one shared by all, one {@link Converter} used from several threads and one {@link LaidOutDocument} painted from
  * several threads.</p>
  */
+@Tag("slow")
 class ConcurrentConversionTest {
 
     private static final Path EXAMPLES = Path.of("test", "examples");

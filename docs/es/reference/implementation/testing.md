@@ -4,9 +4,17 @@
 mvn test                                   # compila, ejecuta todos los tests y deja la cobertura en target/site/jacoco/index.html
 mvn test -Dtest=ValueParserTest            # una clase
 mvn test -Dtest='TrackSizingTest#nombre'   # un método
+mvn -Pquick test                           # el bucle de desarrollo: sin los tests lentos ni la cobertura
 ```
 
 `mvn test` no escribe nada en `test/`: lo que generan los tests va a `target/`.
+
+Los tests de integración lentos llevan `@Tag("slow")`: los ejemplos (`ExamplesTest.examples`), los documentos de la
+documentación (`DocumentationExamplesTest.documentationDocuments`), las conversiones desde varios hilos
+(`ConcurrentConversionTest`) y los que arrancan otra JVM (`CrossJvmDeterminismTest` y
+`PdfImagesTest.theLanguageOfTheJvmDoesNotChangeTheText`). Suman más de la mitad de lo que tarda la suite. El perfil
+`quick` los deja fuera, junto con JaCoCo, para que el informe de `target/site/jacoco/` sea siempre el de una suite
+completa. Es para las vueltas de un cambio: antes de darlo por terminado se pasa `mvn test`, que es lo que pasa la CI.
 
 ## Tests unitarios y de layout
 
@@ -50,8 +58,7 @@ Cada carpeta de `test/examples/NN-nombre/` es un documento completo escrito en d
 castellano (`es/`), el original, e inglés (`en/`), su espejo. Las dos versiones comparten el `styles.stxt` de la carpeta del
 ejemplo. Cada idioma tiene su `input.stxt`, un `page-N.png` por página (versionados, sin contornos, a 110 ppp), el
 `output.pdf` y un `expected.stxt` con el volcado de las cajas con `Id`. Se maquetan con las **métricas reales** y la carpeta `resources/`, se comprueba el contraste del texto, y el PDF se
-valida con veraPDF, como PDF/UA-1, escrito también como PDF/UA-2 y escrito como PDF/A en sus cuatro variantes (`2b`,
-`2a`, `3b` y `3a`). El
+valida con veraPDF, como PDF/UA-1, escrito también como PDF/UA-2 y escrito como PDF/A-3a. El
 volcado no se calcula a mano: es una instantánea que se genera con `-Dexamples.update=true`, que también acepta las imágenes que
 cambian y el `output.pdf`, y se revisa mirando las imágenes. `-Dexamples.only` limita la prueba a un ejemplo
 (`01-invoice`), a un idioma (`en`) o a los dos (`01-invoice/en`). Un test comprueba además que la versión inglesa es espejo
@@ -72,6 +79,13 @@ figuras del manual y el sello del certificado) se generan una vez por idioma, en
 > byte, como las imágenes: el mismo documento da los mismos bytes ([El PDF](pdf.md#páginas-fuentes-y-metadatos)), así que
 > un `output.pdf` distinto es un cambio de verdad, y el nuevo queda en `target/reference/`. *Alternativa descartada:* no
 > compararlo, que dejó en el repositorio PDF que ya no eran los que daba el motor.
+
+> **Decisión:** cada ejemplo se valida en una sola variante de PDF/A, la 3a. La variante solo cambia la identificación
+> del XMP (`pdfaid`), no el contenido; las reglas del nivel A incluyen las del B, y sin adjuntos la parte 3 comprueba lo
+> mismo que la 2. Que cada variante se declara y cumple su perfil lo comprueba `PdfATest`. *Alternativa descartada:* las
+> cuatro variantes en cada ejemplo, que repetía las mismas reglas sobre el mismo contenido cuatro veces;
+> y una variante en un solo ejemplo, que dejaba sin comprobar en los demás las reglas que dependen del contenido (SVG,
+> páginas de PDF, degradados, opacidades).
 
 > **Decisión:** las imágenes de los ejemplos las genera un programa (`tools/ExampleImages.java`): no hay ficheros de
 > terceros ni derechos que respetar, y se pueden cambiar retocando el programa. Las fuentes son IBM Plex Sans, Serif y Mono,
@@ -119,6 +133,7 @@ los casos válidos, y los inválidos van al catálogo.
   de `target/` o arrancan otra JVM.
 - **Rendimiento:** los tests con `@Tag("perf")` no van en `mvn test`. Se ejecutan con
   `mvn test -Dgroups=perf -DexcludedGroups=none -Dtest=...`. Las sondas de medición están en [`tools/qa/`](../../../../tools/qa).
+  Los de `@Tag("slow")` sí van en `mvn test`, y solo los deja fuera `-Pquick` (ver el principio de esta página).
 
 ## Integración continua
 
