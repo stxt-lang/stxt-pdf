@@ -252,7 +252,7 @@ public final class InlineLayout implements LayoutAlgorithm {
                 }
             }
         }
-        LineBreaker.Paragraph paragraph = LineBreaker.paragraph(runs, measurer(), s.typography().fontFace(), fontSize,
+        Paragraph paragraph = Paragraph.of(runs, measurer(), s.typography().fontFace(), fontSize,
                 s.typography().letterSpacing(), hyphenator(s));
         if (paragraph == null) {
             return new Broken(List.of(), fontSize, widths, dropCap);
@@ -298,7 +298,7 @@ public final class InlineLayout implements LayoutAlgorithm {
         FontFace font = s.typography().fontFace();
         List<LineBreaker.Line> lines = b.lines();
         for (int k = 0; k < lines.size(); k++) {
-            if (LineBreaker.width(lines.get(k).runs(), measurer(), font, b.fontSize(), s.typography().letterSpacing())
+            if (LinePlacer.width(lines.get(k).runs(), measurer(), font, b.fontSize(), s.typography().letterSpacing())
                     > b.widths().width(k) + Tolerance.MODEL) {
                 return false;
             }
@@ -429,7 +429,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             }
             // Preformatted lines are not justified, nor is the one a forced line break ends.
             boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1 && !text.forced();
-            lines.add(LineBreaker.place(text.runs(), measurer(), s, fontSize, left, right, b.widths().width(j), justify,
+            lines.add(LinePlacer.place(text.runs(), measurer(), s, fontSize, left, right, b.widths().width(j), justify,
                     y, lineHeight, text.hyphenated()));
         }
 

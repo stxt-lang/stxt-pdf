@@ -113,7 +113,7 @@ public final class PageNumbers {
             changed = true;
             List<TextRun> runs = l.runs().stream()
                     .map(r -> new TextRun(apply(r.text(), page, pages), r.format())).toList();
-            lines.add(LineBreaker.place(runs, measurer, s, l.fontSize(), l.left(), l.right(),
+            lines.add(LinePlacer.place(runs, measurer, s, l.fontSize(), l.left(), l.right(),
                     Math.max(0, contentWidth - l.left() - l.right()), l.wordSpacing() > 0, l.y(), l.height(),
                     l.hyphenated()));
         }

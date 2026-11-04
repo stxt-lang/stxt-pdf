@@ -50,7 +50,7 @@ final class PreformattedText {
         double min = 0;
         double max = 0;
         for (List<TextRun> source : sourceLines(runs, tabSize)) {
-            double width = LineBreaker.width(source, measurer, font, fontSize, letterSpacing);
+            double width = LinePlacer.width(source, measurer, font, fontSize, letterSpacing);
             max = Math.max(max, width);
             if (!wrap) {
                 min = max;
@@ -59,7 +59,7 @@ final class PreformattedText {
             String text = TextRun.text(source);
             int[] starts = starts(source);
             for (int[] word : words(text)) {
-                min = Math.max(min, LineBreaker.width(slice(source, starts, text, word[0], word[1]), measurer, font,
+                min = Math.max(min, LinePlacer.width(slice(source, starts, text, word[0], word[1]), measurer, font,
                         fontSize, letterSpacing));
             }
         }
@@ -117,7 +117,7 @@ final class PreformattedText {
      */
     private static List<LineBreaker.Line> wrap(List<TextRun> source, double available, TextMeasurer measurer,
                                                FontFace font, double fontSize, double letterSpacing) {
-        if (fits(LineBreaker.width(source, measurer, font, fontSize, letterSpacing), available)) {
+        if (fits(LinePlacer.width(source, measurer, font, fontSize, letterSpacing), available)) {
             return List.of(new LineBreaker.Line(source));
         }
         String text = TextRun.text(source);
@@ -126,7 +126,7 @@ final class PreformattedText {
         int lineStart = 0;
         int lastEnd = 0;
         for (int[] word : words(text)) {
-            if (lastEnd > lineStart && !fits(LineBreaker.width(slice(source, starts, text, lineStart, word[1]),
+            if (lastEnd > lineStart && !fits(LinePlacer.width(slice(source, starts, text, lineStart, word[1]),
                     measurer, font, fontSize, letterSpacing), available)) {
                 lines.add(new LineBreaker.Line(slice(source, starts, text, lineStart, lastEnd)));
                 lineStart = word[0];
@@ -148,7 +148,7 @@ final class PreformattedText {
 
     /** The runs of the text between two positions, each one with its format. */
     private static List<TextRun> slice(List<TextRun> runs, int[] starts, String text, int from, int to) {
-        return new LineBreaker.RunCursor(runs, starts).parts(text, from, to);
+        return new Words.RunCursor(runs, starts).parts(text, from, to);
     }
 
     /** The words of the line (what is not a space), as {@code [start, end)}. */

@@ -32,8 +32,8 @@ class LineWidthsTest {
         return lines.stream().map(LineBreaker.Line::text).toList();
     }
 
-    private LineBreaker.Paragraph paragraph(int words) {
-        return LineBreaker.paragraph(words(words), measurer, F, 10, 0, null);
+    private Paragraph paragraph(int words) {
+        return Paragraph.of(words(words), measurer, F, 10, 0, null);
     }
 
     @Test
@@ -103,7 +103,7 @@ class LineWidthsTest {
         StyleEditor s = new StyleEditor();
         s.font("F");
         s.fontSize(10);
-        TextLine l = LineBreaker.place(words(2), measurer, s.style(), 10, 30, 20, 50, false, 0, 12, false);
+        TextLine l = LinePlacer.place(words(2), measurer, s.style(), 10, 30, 20, 50, false, 0, 12, false);
         assertEquals(30, l.x(), 1e-9);
         assertEquals(45, l.width(), 1e-9);
         assertEquals(30, l.left(), 1e-9);

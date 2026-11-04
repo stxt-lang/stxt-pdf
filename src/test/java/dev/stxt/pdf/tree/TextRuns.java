@@ -1,6 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.InlineNode;
+import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
@@ -30,6 +31,12 @@ public final class TextRuns {
     /** A run with the formatting of {@code format} and a link to {@code destination}. */
     public static TextRun link(String text, String format, String destination) {
         return new TextRun(text, run(text, format).format().withLink(destination));
+    }
+
+    /** A run with the letter spacing of a styled run (reference/common/text-formatting.md). */
+    public static TextRun spaced(String text, double letterSpacing) {
+        return new TextRun(text, TextFormat.PLAIN.withStyle(
+                new RunStyle("wide", null, null, null, null, null, letterSpacing, null, null)));
     }
 
     /** Builds the document tree and sets the runs of each text box by its {@code Id}. */

@@ -217,10 +217,14 @@ than those of the in-order distribution.
 ## Text
 
 `InlineLayout` breaks the text into lines with `LineBreaker` (greedy or Knuth-Plass) or, with `Preformatted: true` or `wrap`, with `PreformattedText`.
+The line breaking goes in four pieces of `layout.inline`: `Words` splits the text into words with their break points,
+`Paragraph` measures them and gives the positions where a line may end, `LineBreaker` chooses among them with one of the
+two algorithms and `LinePlacer` places each line in the content box (alignment, `justify` and the measures of the runs).
+`PreformattedText` only uses `Words.RunCursor` and the measures of `LinePlacer`.
 The text of a box is always a single paragraph (blank lines are an error when reading it, except in a preformatted one,
 where they are content): `BreakRules.cutLines` applies widows and orphans to all its lines and only the last one is not justified.
 `InlineLayout.runs` replaces the references with their value (the one the `Paginator` left in `TextValues`) and applies `TextTransform` to the runs **before** breaking them into lines,
-with the `Case` and the `Small caps` of each styled run (`TextFormat.textCase`, `smallCaps`). `LineBreaker` measures each
+with the `Case` and the `Small caps` of each styled run (`TextFormat.textCase`, `smallCaps`). `LinePlacer` measures each
 character with the letter spacing of its run (`TextFormat.letterSpacing`, in `advance`) and takes from a line that of its
 last character (`trailing`, `Paragraph.width`), which is that of its run. A run that is an image (`TextFormat.image`,
 with the text `TextRun.IMAGE`, U+FFFC) measures in `advance` what `TextMeasurer.imageWidth` gives: as tall as the size of
@@ -264,10 +268,10 @@ that is read is still one word.
 
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
 box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns
-of the resource of the language, with a cache per word. `LineBreaker.words` gives each word its break points (those of
+of the resource of the language, with a cache per word. `Words.words` gives each word its break points (those of
 its soft hyphens, which it removes from the text, or those of the patterns over its letters, which are those of
 `Hyphenator.isLetter`: the Unicode ones and, if the patterns have it, the apostrophe), and both line breakings
-work over the **positions** of the text (`LineBreaker.Paragraph`): the start of each word and each break point. A
+work over the **positions** of the text (`Paragraph`): the start of each word and each break point. A
 line goes from one position to another; if it ends at a break point it carries the hyphen, measured with the format of
 the previous letter, and the `Line` (and the placed `TextLine`) says so with `hyphenated`. The greedy breaking tries,
 when a word does not fit, its break points from the longest to the shortest; Knuth-Plass adds to the demerits TeX's
@@ -276,7 +280,7 @@ the spaces and the parts of a split word, each one measured once. `Hyphenations.
 like the fonts, that every box with text and `Hyphenate: true` is in a language with patterns.
 
 **Forced line breaks.** The break of a Markdown (`\` at the end of the line) reaches the text as the character U+2028
-(`TextRun.LINE_SEPARATOR`), which `MarkdownBuilder` writes in its place. `LineBreaker.words` treats it as a space that
+(`TextRun.LINE_SEPARATOR`), which `MarkdownBuilder` writes in its place. `Words.words` treats it as a space that
 separates words and marks the word before it (`Word.forced`); the position where the next one starts is a mandatory end
 (`Paragraph.forced`). The greedy breaking closes the line there, and Knuth-Plass lets no line go past it and gives no
 badness to the one that ends at it, like the last one. The `Line` says so with `forced`, and `InlineLayout` does not
@@ -295,7 +299,7 @@ of `Overflow`, `Tolerance.MODEL`) or the lines add up to more than the height li
 of the definite `BoxModel.height()` or, without one, of the `maxHeight()`), breaks it again at a size 0.5 pt smaller, with
 `Min size` as the last step. The limit is part of the key of the memorized line breaking (`BrokenKey`), because the same
 box is measured without a height (`measuringContentHeight`) and laid out stretched afterwards. The lines keep the size they
-were broken at (`TextLine.fontSize`, the one `LineBreaker.place`, `Engine.number` and the painting use), and the line
+were broken at (`TextLine.fontSize`, the one `LinePlacer.place`, `Engine.number` and the painting use), and the line
 height comes from `TypographyStyle.usedLineHeight(size)`. The intrinsic sizes (`contentIntrinsic`) are measured at `Size`.
 
 **Measurement.** A `TextMeasurer` has to be **additive between words** (the width of a text is the sum of those of its words

@@ -214,10 +214,14 @@ que los del reparto en orden.
 ## Texto
 
 `InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `Preformatted: true` o `wrap`, con `PreformattedText`.
+El reparto va en cuatro piezas de `layout.inline`: `Words` parte el texto en palabras con sus puntos de corte,
+`Paragraph` las mide y da las posiciones donde puede acabar una línea, `LineBreaker` elige entre ellas con uno de los dos
+algoritmos y `LinePlacer` coloca cada línea en la caja de contenido (alineación, `justify` y las medidas de los tramos).
+`PreformattedText` usa solo `Words.RunCursor` y las medidas de `LinePlacer`.
 El texto de una caja es siempre un solo párrafo (las líneas en blanco son un error al leerlo, salvo en uno preformateado,
 donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
 `InlineLayout.runs` sustituye las referencias por su valor (el que el `Paginator` dejó en `TextValues`) y aplica `TextTransform` a los tramos **antes** de repartirlos,
-con el `Case` y el `Small caps` de cada tramo con estilo (`TextFormat.textCase`, `smallCaps`). `LineBreaker` mide cada
+con el `Case` y el `Small caps` de cada tramo con estilo (`TextFormat.textCase`, `smallCaps`). `LinePlacer` mide cada
 carácter con el interletraje de su tramo (`TextFormat.letterSpacing`, en `advance`) y quita a una línea el del último
 carácter (`trailing`, `Paragraph.width`), que es el de su tramo. Un tramo que es una imagen (`TextFormat.image`, con el
 texto `TextRun.IMAGE`, U+FFFC) mide en `advance` lo que da `TextMeasurer.imageWidth`: tan alto como el tamaño de la línea
@@ -259,10 +263,10 @@ lee siga siendo una palabra.
 
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
 (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones
-del recurso del idioma, con una caché por palabra. `LineBreaker.words` da a cada palabra sus puntos de corte (los de sus
+del recurso del idioma, con una caché por palabra. `Words.words` da a cada palabra sus puntos de corte (los de sus
 guiones blandos, que quita del texto, o los de los patrones sobre sus letras, que son las de `Hyphenator.isLetter`: las
 de Unicode y, si los patrones lo tienen, el apóstrofo), y los dos repartos trabajan sobre las
-**posiciones** del texto (`LineBreaker.Paragraph`): el inicio de cada palabra y cada punto de corte. Una línea va de
+**posiciones** del texto (`Paragraph`): el inicio de cada palabra y cada punto de corte. Una línea va de
 una posición a otra; si acaba en un punto de corte lleva el guion, medido con el formato de la letra anterior, y la
 `Line` (y la `TextLine` colocada) lo dice con `hyphenated`. El reparto voraz prueba, cuando una palabra no cabe, sus
 puntos de corte de mayor a menor; Knuth-Plass suma a los deméritos la penalización de TeX por guion (50²) y por dos
@@ -271,7 +275,7 @@ palabra partida, cada uno medido una vez. `Hyphenations.validate` comprueba ante
 caja con texto y `Hyphenate: true` está en un idioma con patrones.
 
 **Saltos de línea forzados.** El salto de un Markdown (`\` al final de la línea) llega al texto como el carácter U+2028
-(`TextRun.LINE_SEPARATOR`), que `MarkdownBuilder` escribe en su lugar. `LineBreaker.words` lo trata como un espacio que
+(`TextRun.LINE_SEPARATOR`), que `MarkdownBuilder` escribe en su lugar. `Words.words` lo trata como un espacio que
 separa palabras y marca la palabra de antes (`Word.forced`); la posición donde empieza la siguiente es un final
 obligatorio (`Paragraph.forced`). El reparto voraz cierra ahí la línea, y Knuth-Plass no deja que ninguna línea lo
 cruce y no da maldad a la que acaba en él, como a la última. La `Line` lo dice con `forced`, e `InlineLayout` no la
@@ -290,7 +294,7 @@ la tolerancia de `Overflow`, `Tolerance.MODEL`) o las líneas sumen más que el 
 contenido del `BoxModel.height()` definido o, sin él, del `maxHeight()`), vuelve a repartirlo a un tamaño 0,5 pt menor, con
 `Min size` como último paso. El límite forma parte de la clave del reparto memorizado (`BrokenKey`), porque la misma caja se
 mide sin alto (`measuringContentHeight`) y se maqueta después estirada. Las líneas guardan el tamaño al que se repartieron
-(`TextLine.fontSize`, el que usan `LineBreaker.place`, `Engine.number` y el pintado), y el interlineado sale de
+(`TextLine.fontSize`, el que usan `LinePlacer.place`, `Engine.number` y el pintado), y el interlineado sale de
 `TypographyStyle.usedLineHeight(size)`. Los tamaños intrínsecos (`contentIntrinsic`) se miden al `Size`.
 
 **Medida.** Un `TextMeasurer` tiene que ser **aditivo entre palabras** (el ancho de un texto es la suma de los de sus palabras

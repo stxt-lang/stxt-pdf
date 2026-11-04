@@ -68,7 +68,7 @@ class LineBreakerPropertiesTest {
             for (LineBreaking wrap : LineBreaking.values()) {
                 String where = wrap + ", " + available + " pt: \"" + text.replace("\n", "\\n") + "\"";
                 List<String> words = new ArrayList<>();
-                for (String line : LineBreaker.breakLines(text, available, METRICS, FONT, 10, wrap)) {
+                for (String line : Lines.breakLines(text, available, METRICS, FONT, 10, wrap)) {
                     assertFalse(line.isEmpty(), "empty line with " + where);
                     assertEquals(line.strip(), line, "spaces at the ends with " + where);
                     List<String> inLine = Arrays.asList(line.split(" "));
@@ -109,18 +109,18 @@ class LineBreakerPropertiesTest {
     private static List<LineBreaker.Line> measuringEveryLine(List<TextRun> runs, double available,
             TextMeasurer metrics, FontFace font, double size, double spacing) {
         List<LineBreaker.Line> lines = new ArrayList<>();
-        List<LineBreaker.Word> current = new ArrayList<>();
-        for (LineBreaker.Word word : LineBreaker.words(runs)) {
+        List<Words.Word> current = new ArrayList<>();
+        for (Words.Word word : Lines.words(runs)) {
             current.add(word);
-            if (current.size() > 1 && !fits(LineBreaker.width(LineBreaker.line(current).runs(), metrics, font,
+            if (current.size() > 1 && !fits(LinePlacer.width(Words.line(current).runs(), metrics, font,
                     size, spacing), available)) {
                 current.remove(current.size() - 1);
-                lines.add(LineBreaker.line(current));
+                lines.add(Words.line(current));
                 current.clear();
                 current.add(word);
             }
         }
-        lines.add(LineBreaker.line(current));
+        lines.add(Words.line(current));
         return lines;
     }
 
@@ -145,35 +145,35 @@ class LineBreakerPropertiesTest {
                 available = 20 + random.nextInt(300);
             } else {
                 // The width of the first words, exactly at the limit.
-                List<LineBreaker.Word> words = LineBreaker.words(runs);
-                List<LineBreaker.Word> first = words.subList(0, 1 + random.nextInt(words.size()));
-                available = LineBreaker.width(LineBreaker.line(first).runs(), metrics, font, size, spacing)
+                List<Words.Word> words = Lines.words(runs);
+                List<Words.Word> first = words.subList(0, 1 + random.nextInt(words.size()));
+                available = LinePlacer.width(Words.line(first).runs(), metrics, font, size, spacing)
                         + nudges[random.nextInt(nudges.length)];
             }
             // The reference does not know the positions of the lines: only their runs are compared.
             assertEquals(measuringEveryLine(runs, available, metrics, font, size, spacing).stream()
                             .map(LineBreaker.Line::runs).toList(),
-                    LineBreaker.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE).stream()
+                    Lines.breakLines(runs, available, metrics, font, size, spacing, LineBreaking.SIMPLE).stream()
                             .map(LineBreaker.Line::runs).toList(),
                     available + " pt, " + size + " pt, letter spacing " + spacing + ": " + runs);
         }
     }
 
     /** The words from before, with {@code \\S+}: the reference of {@link #theWordsAreTheSameAsWithTheRegex}. */
-    private static List<LineBreaker.Word> wordsWithTheRegex(List<TextRun> runs) {
+    private static List<Words.Word> wordsWithTheRegex(List<TextRun> runs) {
         String text = TextRun.text(runs);
         int[] starts = new int[runs.size() + 1];
         for (int i = 0; i < runs.size(); i++) {
             starts[i + 1] = starts[i] + runs.get(i).text().length();
         }
-        LineBreaker.RunCursor cursor = new LineBreaker.RunCursor(runs, starts);
-        List<LineBreaker.Word> result = new ArrayList<>();
+        Words.RunCursor cursor = new Words.RunCursor(runs, starts);
+        List<Words.Word> result = new ArrayList<>();
         List<TextRun> previous = null;
         int previousEnd = 0;
         Matcher m = WORD.matcher(text);
         while (m.find()) {
             if (previous != null) {
-                result.add(new LineBreaker.Word(previous, cursor.format(previousEnd)));
+                result.add(new Words.Word(previous, cursor.format(previousEnd)));
             }
             TextRun.Joiner parts = new TextRun.Joiner();
             for (int i = m.start(); i < m.end(); ) {
@@ -190,7 +190,7 @@ class LineBreakerPropertiesTest {
             previousEnd = m.end();
         }
         if (previous != null) {
-            result.add(new LineBreaker.Word(previous, TextFormat.PLAIN));
+            result.add(new Words.Word(previous, TextFormat.PLAIN));
         }
         return result;
     }
@@ -212,7 +212,7 @@ class LineBreakerPropertiesTest {
                 runs.add(pieces[random.nextInt(pieces.length)], FORMATS[random.nextInt(FORMATS.length)]);
             }
             List<TextRun> text = runs.build();
-            assertEquals(wordsWithTheRegex(text), LineBreaker.words(text), text.toString());
+            assertEquals(wordsWithTheRegex(text), Lines.words(text), text.toString());
         }
     }
 }
