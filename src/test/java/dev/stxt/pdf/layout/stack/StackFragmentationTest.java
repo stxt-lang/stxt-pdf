@@ -93,8 +93,8 @@ class StackFragmentationTest {
 
     @Test
     void rowLineTallerThanAPageBreaksItsItemsInParallel() {
-        // A: 20 lines of 12 (240). B stretches to the line (240) and distributes that height across the
-        // pages. Lines of A: 8 + 8 + 4; B: 100 + 100 + 40. Page 3 measures what A does.
+        // A: 20 lines of 12 (240). B stretches to the line and measures on each page what the line does. Lines of
+        // A: 8 + 8 + 4; B: 100 + 100 + 48, not the 40 left of 240: page 3 measures what A does, and so does B.
         String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE,
                 "\tStack:", "\t\tId: F",
@@ -106,7 +106,7 @@ class StackFragmentationTest {
         assertRect(40, 40, 515, 100, l.rect(2, "F"));
         assertRect(70, 40, 100, 100, l.rect(2, "B"));
         assertRect(40, 40, 30, 48, l.rect(3, "A"));
-        assertRect(70, 40, 100, 40, l.rect(3, "B"));
+        assertRect(70, 40, 100, 48, l.rect(3, "B"));
         assertRect(40, 40, 515, 48, l.rect(3, "F"));
     }
 

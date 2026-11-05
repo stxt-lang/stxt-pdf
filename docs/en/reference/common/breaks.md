@@ -134,8 +134,21 @@ row or item that does not fit in what is left of the page is split **in parallel
 `Table`, `Split items` in `Stack`; both `true` by default): each item is split on its own and the row continues on the next
 page with the items that have not finished, all from the top, and with the height of the longest of them. The following
 rows come after, with the gap that separated them. The rows taken up by the same item are split together, each item from
-its position. A stretched item distributes across the pages the height its line or area imposes on it, so it can end
-before or after the text of its siblings.
+its position. A stretched item (`stretch`, without a height of its own) measures on each page what its row or line does:
+it reaches the end of the page while the row goes on and, on the last one, it ends where the row ends, which is where
+the longest of the items ends with its bottom margin, even if the height the unsplit row imposes on it gives it less.
+The bottom margin of the stretched item is taken off. So two columns with a background end at the same height on each
+page, also on the last one.
+
+Three stretched items are not lengthened and keep the height they had unsplit: that of a row that
+is split together with the following ones, which ends with its own row and not with the last one; the one that
+`Max height` keeps shorter than its row; and the box that is not broken (`Rotate`, `Overflow: clip`).
+
+> **Decision:** a stretched item ends with its row, like the cells of a table. The lines of a text leave a gap at the
+> end of each page that is not taken from its height ([Definite height and breaks](#definite-height-and-breaks)), so
+> the split row measures more than unsplit; a sibling stretched to the height of the unsplit row was shorter on the
+> last page, or ran out one page earlier. *Rejected alternative:* distributing across the pages the height of the
+> unsplit row, which was the rule until 0.10.0.
 
 Splitting the row is one more break, which competes with the breaks between rows by the rules of the [choice of the
 break](#choice-of-the-break): its quality is the worst of that of its items, so a row whose items cannot respect their

@@ -210,7 +210,8 @@ class GridFragmentationTest {
     /**
      * The second row (20 lines of 12 in a column of 30) does not fit on any page: with Split rows: false it starts
      * on page 2, where it is split in parallel from the top even though in the whole grid it starts at 30 (mutation
-     * testing). T does not stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and 40.
+     * testing). T does not stretch (8, 8 and 4 lines); B stretches to the row and is split with it: 100, 100 and the
+     * 48 of the last 4 lines of T (aStretchedItemEndsWithItsSplitRow).
      */
     @Test
     void aTallRowAfterTheFirstPageIsSplitFromTheTop() {
@@ -224,7 +225,7 @@ class GridFragmentationTest {
         l.assertAbsent(1, "T");
         assertRect(40, 40, 30, 96, l.rect(2, "T"));
         assertRect(70, 40, 100, 100, l.rect(2, "B"));
-        assertRect(70, 40, 100, 40, l.rect(4, "B"));
+        assertRect(70, 40, 100, 48, l.rect(4, "B"));
     }
 
     /**
@@ -254,6 +255,114 @@ class GridFragmentationTest {
         assertRect(40, 40, 257.5, 30, l.rect(2, "A"));
         assertRect(297.5, 40, 257.5, 60, l.rect(2, "C"));
         assertEquals(5, l.fragment(2, "T").lines().size());
+    }
+
+    /**
+     * T (20 lines of 12 in a column of 30, one word each) is stretched to its row (240) and leaves 4 at the end of
+     * each page: 100, 100 and 48. S, empty and stretched to the same row, measures what the row does on each page,
+     * also on the last one: 48, not the 40 that are left of its 240 after 100 and 100.
+     */
+    @Test
+    void aStretchedItemEndsWithItsSplitRow() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 100 30",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: S",
+                "\t\tArea:", "\t\t\tText: " + text, "\t\t\t\tId: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 100, 100, l.rect(1, "S"));
+        assertRect(40, 40, 100, 100, l.rect(2, "S"));
+        assertRect(140, 40, 30, 48, l.rect(3, "T"));
+        assertRect(40, 40, 100, 48, l.rect(3, "S"));
+    }
+
+    /**
+     * T has 25 lines (300): 8, 8, 7 and 2, so that the last page does not have a single line (widows). S, stretched to
+     * the same 300, used up its height at the end of page 3 (100 + 100 + 100) and was missing from page 4: it goes on
+     * to the end of its row, with the 24 of the last two lines of T.
+     */
+    @Test
+    void aStretchedItemDoesNotEndBeforeItsSplitRow() {
+        String text = String.join(" ", java.util.Collections.nCopies(25, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 100 30",
+                "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: S",
+                "\t\tArea:", "\t\t\tText: " + text, "\t\t\t\tId: T");
+        assertEquals(4, l.pages());
+        assertRect(40, 40, 100, 100, l.rect(3, "S"));
+        assertRect(140, 40, 30, 24, l.rect(4, "T"));
+        assertRect(40, 40, 100, 24, l.rect(4, "S"));
+    }
+
+    /**
+     * L takes up rows 1 (30) and 2 (T, 20 lines: 240), so the two are split together: 5, 8 and 7 lines of T. L, whose
+     * area ends with them, measures on each page what they do: 100, 100 and the 84 of the last 7 lines, not the 70 left
+     * of its 270. K is stretched to row 1 only and ends with it: 30 on page 1, without reaching the end of the page
+     * over T.
+     */
+    @Test
+    void aStretchedItemOfARowBeforeTheLastOfItsGroupEndsWithItsOwnRow() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: 100 30", "		Row sizes: 30 auto",
+                "		Area: 1 1 2 1", "			Block:", "				Id: L",
+                "		Area: 1 2", "			Block:", "				Id: K",
+                "		Area: 2 2", "			Text: " + text, "				Id: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 100, 100, l.rect(1, "L"));
+        assertRect(140, 40, 30, 30, l.rect(1, "K"));
+        assertRect(140, 70, 30, 70, l.rect(1, "T"));
+        l.assertAbsent(2, "K");
+        l.assertAbsent(3, "K");
+        assertRect(140, 40, 30, 84, l.rect(3, "T"));
+        assertRect(40, 40, 100, 84, l.rect(3, "L"));
+    }
+
+    /**
+     * S is stretched to the row of T (240), but its Max height keeps it at 50: it does not end with the row, and it is
+     * not stretched to the end of each page with it.
+     */
+    @Test
+    void aStretchedItemShorterThanItsRowIsNotStretchedWithIt() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: 100 30",
+                "		Area:", "			Block:", "				Id: S", "				Box:", "					Max height: 50",
+                "		Area:", "			Text: " + text, "				Id: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 100, 50, l.rect(1, "S"));
+        l.assertAbsent(2, "S");
+        l.assertAbsent(3, "S");
+    }
+
+    /**
+     * The same item with Overflow: clip, which is not broken, after a block of 20: it stays whole on page 1 (stretching
+     * it to the end of the page left a token of a box that places nothing among those of the row).
+     */
+    @Test
+    void aStretchedItemThatIsNotBrokenStaysWhole() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Block:", "		Box:", "			Height: 20",
+                "	Grid:", "		Column sizes: 100 30",
+                "		Area:", "			Block:", "				Id: S", "				Box:", "					Max height: 50",
+                "					Overflow: clip",
+                "		Area:", "			Text: " + text, "				Id: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 60, 100, 50, l.rect(1, "S"));
+        l.assertAbsent(2, "S");
+        assertRect(140, 40, 30, 72, l.rect(3, "T"));
+    }
+
+    /**
+     * S has a bottom margin of 10: stretched to the row of T (240), it measures 230. On the last page the row ends with
+     * the 48 of the last 4 lines of T, and S, 10 before: 38.
+     */
+    @Test
+    void aStretchedItemEndsWithItsSplitRowWithoutItsBottomMargin() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: 100 30",
+                "		Area:", "			Block:", "				Id: S", "				Box:", "					Margin: 0 0 10 0",
+                "		Area:", "			Text: " + text, "				Id: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 100, 100, l.rect(2, "S"));
+        assertRect(140, 40, 30, 48, l.rect(3, "T"));
+        assertRect(40, 40, 100, 38, l.rect(3, "S"));
     }
 
     /**

@@ -5,6 +5,24 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Changed
+
+- **A stretched item ends with its split row.** An item of a `Grid` or a `Table` (or of a line of a horizontal `Stack`)
+  stretched to its row, without a height of its own, now measures on each page what the row does: it reaches the end
+  of the page while the row goes on and, on the last page, ends where the longest of its siblings ends. Until 0.10.0 it
+  distributed across the pages the height of the unsplit row, and since the lines of a text leave a gap at the end of
+  each page that is not taken from its height, the split row measured more than that: two columns with a background
+  ended at different heights on the last page (a stretched empty cell of 240 next to a text of 240 that leaves 4 at the
+  end of each page measured 100, 100 and 40 against 100, 100 and 48), and with more gaps the stretched item ran out one
+  page before the row and was missing from its last page. Its bottom margin is taken off the end of the row. An item
+  of a row that is split together with the following ones (an item takes up several rows), one that `Max height` keeps
+  shorter than its row and a box that is not broken (`Rotate`, `Overflow: clip`) are not lengthened: they keep the
+  height they had unsplit. "Breaks in `Stack`, `Grid` and `Table`" in the reference.
+  `UnitBreaker.Placed` has a new component, `stretched` (the constructor without it stays), and `ConstraintSpace`, the
+  method `withFixedHeight`.
+
 ## [0.10.0] - 2026-11-04
 
 Hyphenation in five more languages, a resources folder whose files can change while the `Converter` lives, an error for

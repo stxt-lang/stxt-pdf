@@ -125,6 +125,8 @@ public final class StackLayout implements LayoutAlgorithm {
         LayoutResult result;
         /** Space of {@link #result}. */
         ConstraintSpace space;
+        /** In horizontal: its height is that of its line ({@code stretch}, without a height of its own). */
+        boolean stretched;
 
         Item(Box box, Insets margin, Alignment align) {
             this.box = box;
@@ -434,6 +436,7 @@ public final class StackLayout implements LayoutAlgorithm {
                 Fragment f = it.result.fragment();
                 BoxModel m = BoxModel.resolve(it.box, itemSpace(f.width(), OptionalDouble.empty()), context);
                 target = ItemSizing.stretchedHeight(m, lineCross, it.margin);
+                it.stretched = target.isPresent();
             } else {
                 target = ItemSizing.stretchedWidth(it.box.style(), lineCross, it.margin, contentWidth);
             }
@@ -451,7 +454,7 @@ public final class StackLayout implements LayoutAlgorithm {
             double y = (row ? crossPos : mainPos) + it.margin.top();
             FrameOffset offset = FrameOffset.of(it.box.style(), contentWidth, contentHeight);
             return new UnitBreaker.Placed(it.box, it.result, it.space, x + offset.dx(), y + offset.dy(), unit,
-                    offset);
+                    offset, it.stretched);
         }
 
         /**

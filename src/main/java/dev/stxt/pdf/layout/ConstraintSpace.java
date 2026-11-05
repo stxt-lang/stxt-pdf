@@ -139,6 +139,16 @@ public record ConstraintSpace(
     }
 
     /**
+     * The same space with the height imposed by the parent fixed at {@code height}: an item stretched to a row that is
+     * split in parallel, which measures on each page what its row does (reference/common/breaks.md).
+     */
+    public ConstraintSpace withFixedHeight(double height) {
+        return new ConstraintSpace(availableWidth, OptionalDouble.of(height), fixedWidth, true,
+                percentBaseWidth, percentBaseHeight, fragmentainerRemaining, atFragmentainerStart, contentHeight,
+                exclusions);
+    }
+
+    /**
      * The same space with the room the side boxes of the parent take beside the box
      * (reference/components/block.md); an empty list, nothing beside it.
      */

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dev.stxt.pdf.model.Tolerance.fits;
+import static dev.stxt.pdf.model.Tolerance.same;
 
 /**
  * Fragmentation of the containers whose items are grouped in <em>units</em>
@@ -58,9 +59,17 @@ public final class UnitBreaker {
      * @param y           likewise
      * @param unit        unit it belongs to
      * @param frameOffset offset of a {@code Frame} included in {@code x} and {@code y}
+     * @param stretched   its height is that of its row or line ({@code stretch}): broken in parallel, it measures on
+     *                    each page what the row does, if its area ends where its group does
      */
     public record Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
-                         FrameOffset frameOffset) {
+                         FrameOffset frameOffset, boolean stretched) {
+
+        /** An item with its own height. */
+        public Placed(Box box, LayoutResult result, ConstraintSpace space, double x, double y, int unit,
+                      FrameOffset frameOffset) {
+            this(box, result, space, x, y, unit, frameOffset, false);
+        }
     }
 
     /**
@@ -467,8 +476,16 @@ public final class UnitBreaker {
         Split split(int start, int end, List<BreakToken> tokens, double origin, boolean atStart) {
             Placement[] split = new Placement[placed.size()];
             List<BreakToken> next = new ArrayList<>();
+            // Of each item laid out on this page: its layout, its position in the fragment, its token and its slot
+            // in next.
+            LayoutResult[] results = new LayoutResult[placed.size()];
+            double[] ys = new double[placed.size()];
+            BreakToken[] from = new BreakToken[placed.size()];
+            int[] slots = new int[placed.size()];
             int appeal = BreakAppeal.PERFECT_BREAK;
             double bottom = 0;
+            // End of the margin boxes of the items: that of the row, if all of them end on this page.
+            double rowEnd = 0;
             double occupied = 0;
             boolean broken = false;
             int j = 0;
@@ -486,22 +503,92 @@ public final class UnitBreaker {
                 }
                 // The item is broken at its place in the flow, without the offset of a Frame, which is applied
                 // afterwards (reference/components/frame-and-overlays.md).
-                double dy = p.frameOffset().dy();
-                double y = tokens == null ? p.y() - dy - origin : 0;
-                LayoutResult r = context.layout(p.box(), p.space().fragmented(remaining - y, atStart), token);
+                double y = tokens == null ? p.y() - p.frameOffset().dy() - origin : 0;
+                LayoutResult r = context.layout(p.box(), itemSpace(p, token).fragmented(remaining - y, atStart),
+                        token);
                 if (r.breakToken() instanceof BreakToken.Before) {
                     return null;
                 }
-                split[k] = piece(p, r, y + dy + repeat.headHeight());
+                results[k] = r;
+                ys[k] = y;
+                from[k] = token;
+                slots[k] = next.size();
+                split[k] = piece(p, r, y + p.frameOffset().dy() + repeat.headHeight());
                 next.add(r.breakToken());
                 if (!r.isFinished()) {
                     broken = true;
                     appeal = Math.min(appeal, BreakRules.inside(p.box(), r.breakAppeal()));
                 }
                 bottom = Math.max(bottom, y + r.fragment().height());
+                rowEnd = Math.max(rowEnd, y + r.fragment().height() + r.fragment().margin().bottom());
                 occupied = Math.max(occupied, y + r.occupied(token));
             }
+            // A stretched item whose area ends where the group does measures on each page what its row does, and ends
+            // with it (reference/common/breaks.md): the height of the unbroken row would leave it shorter on the last
+            // page than the items whose lines leave a gap at the end of each page, or finished before them.
+            double groupBottom = bottom(start, end);
+            for (int k = 0; k < placed.size(); k++) {
+                Placed p = placed.get(k);
+                if (results[k] == null || !p.stretched() || !endsWithGroup(p, groupBottom)) {
+                    continue;
+                }
+                LayoutResult r = results[k];
+                double y = ys[k];
+                double height;
+                if (broken) {
+                    if (!r.isFinished()) {
+                        continue;
+                    }
+                    // To the end of the page, with something left for the next one.
+                    height = remaining - y + 1;
+                } else {
+                    // To the end of the row, without its bottom margin and without leaving the page.
+                    height = Math.min(rowEnd - r.fragment().margin().bottom(), remaining) - y;
+                    if (fits(height, r.fragment().height())) {
+                        continue;
+                    }
+                }
+                ConstraintSpace s = itemSpace(p, from[k])
+                        .withFixedHeight(BreakToken.consumed(from[k]) + height)
+                        .fragmented(remaining - y, atStart);
+                LayoutResult stretched = context.layout(p.box(), s, from[k]);
+                // It goes on while the row does and ends with it. A box that is not broken (Rotate, Overflow: clip)
+                // cannot do the first, and stays as it was.
+                if (stretched.breakToken() instanceof BreakToken.Before || stretched.isFinished() == broken) {
+                    continue;
+                }
+                split[k] = piece(p, stretched, y + p.frameOffset().dy() + repeat.headHeight());
+                next.set(slots[k], stretched.breakToken());
+                if (!stretched.isFinished()) {
+                    appeal = Math.min(appeal, BreakRules.inside(p.box(), stretched.breakAppeal()));
+                }
+                bottom = Math.max(bottom, y + stretched.fragment().height());
+                occupied = Math.max(occupied, y + stretched.occupied(from[k]));
+            }
             return new Split(split, next, appeal, bottom, occupied, broken);
+        }
+
+        /**
+         * Whether the area of an item ends where its group does, at {@code groupBottom} of the unfragmented layout:
+         * its margin box reaches it. Not an item of a row before the last one of the group, which ends with its own
+         * row, nor one that {@code Max height} keeps shorter than its row.
+         */
+        boolean endsWithGroup(Placed p, double groupBottom) {
+            Fragment f = p.result().fragment();
+            return same(p.y() - p.frameOffset().dy() + f.height() + f.margin().bottom(), groupBottom);
+        }
+
+        /**
+         * The space an item is broken with: its own or, for a stretched item that has already used up the height of
+         * its row on the previous pages, that height and what it went on with ({@link #split}).
+         */
+        ConstraintSpace itemSpace(Placed p, BreakToken token) {
+            ConstraintSpace s = p.space();
+            double consumed = BreakToken.consumed(token);
+            if (p.stretched() && s.availableHeight().isPresent() && s.availableHeight().getAsDouble() < consumed) {
+                return s.withFixedHeight(consumed);
+            }
+            return s;
         }
 
         /**

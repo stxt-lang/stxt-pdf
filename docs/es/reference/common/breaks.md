@@ -133,8 +133,20 @@ En un `Stack` vertical, el corte se hace entre ítems. En uno horizontal y en un
 `Split items` en `Stack`; los dos, `true` por defecto): cada ítem se parte por su cuenta y la fila continúa en la página
 siguiente con los ítems que no han terminado, todos desde arriba, y con la altura del más largo de ellos. Las filas
 siguientes van detrás, con el hueco que las separaba. Las filas que ocupa un mismo ítem se parten juntas, cada ítem desde
-su posición. Un ítem estirado reparte entre las páginas el alto que le impone su línea o su área, así que puede terminar
-antes o después que el texto de sus hermanos.
+su posición. Un ítem estirado (`stretch`, sin alto propio) mide en cada página lo que su fila o su línea: llega al final
+de la página mientras la fila sigue y, en la última, acaba donde acaba la fila, que es donde acaba el más largo de los
+ítems con su margen inferior, aunque el alto que le impone la fila sin partir le dé para menos. El margen inferior del
+ítem estirado se descuenta. Así, dos columnas con fondo acaban a la misma altura en cada página, también en la última.
+
+Tres ítems estirados no se alargan y conservan el alto que tenían sin partir: el de una fila que se
+parte junto con las siguientes, que acaba con su propia fila y no con la última; el que `Max height` deja más corto que
+su fila; y la caja que no se parte (`Rotate`, `Overflow: clip`).
+
+> **Decisión:** un ítem estirado acaba con su fila, como las celdas de una tabla. Las líneas de un texto dejan un hueco al
+> final de cada página que no se le quita a su alto ([Alto definido y cortes](#alto-definido-y-cortes)), así que la fila
+> partida mide más que sin partir; un hermano estirado al alto de la fila sin partir quedaba más corto en la última
+> página, o se acababa una página antes. *Alternativa descartada:* repartir entre las páginas el alto de la fila sin
+> partir, que fue la regla hasta la 0.10.0.
 
 Partir la fila es un corte más, que compite con los cortes entre filas por las reglas de la [elección del
 corte](#elección-del-corte): su calidad es la peor de la de sus ítems, así que una fila cuyos ítems no pueden respetar
