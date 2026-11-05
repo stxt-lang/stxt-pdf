@@ -66,10 +66,11 @@ final class PdfInspector {
     /**
      * The pages of the PDF; {@code name} is its path in the document, for the messages.
      *
+     * @param content the bytes of the file, already read, or {@code null} to read it from {@code path}
      * @throws ImageFormatException if it is encrypted, has no pages or cannot be read
      */
-    static List<PdfPage> inspect(Path path, String name) {
-        try (PDDocument doc = Loader.loadPDF(path.toFile())) {
+    static List<PdfPage> inspect(Path path, byte[] content, String name) {
+        try (PDDocument doc = content != null ? Loader.loadPDF(content) : Loader.loadPDF(path.toFile())) {
             if (doc.isEncrypted()) {
                 throw new ImageFormatException("The PDF " + name + " is encrypted: it has to be saved without protection");
             }

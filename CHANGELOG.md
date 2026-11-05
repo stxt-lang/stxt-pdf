@@ -50,6 +50,14 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   instead of the first conversion. An image it cannot read, or a PDF beyond `Limits.maxPdfBytes`, is left for the
   document that uses it, which reports it with its line. It does not go together with
   `reloadResourcesEachConversion(true)` (`IllegalArgumentException` in `build()`).
+- **The images can be kept in memory.** `new Resources(folder).withImagesInMemory()` (new, and `imagesInMemory()` to
+  ask) keeps the bytes of every image it reads, also of a PNG, a JPEG or a PDF, and paints it with them, without going
+  back to the disk: a document already laid out is painted the same even if its file changes or is removed, and the
+  `Converter` goes on with the image read until `reloaded()` instead of failing with `IMAGE_FORMAT`. With
+  `preloadResources(true)`, the converter keeps the whole folder as it was when it was created or reloaded. It costs
+  keeping every image read in memory. A PNG or a JPEG is still embedded as before (a JPEG as it is, a PNG decoded and
+  compressed again), so the PDF is the same with or without it. `ImageFile.content()` and `ImageFile.inMemory()` are
+  new.
 - **A snapshot that reads an image again no longer changes the one a `Resources` already had.** A `Resources` used
   directly (with `Engine` or `PdfPainter`) shared its images with its snapshots (`Resources.snapshot()`), and a
   snapshot that read again an image whose file had changed replaced it for that `Resources` too, which from then on saw

@@ -50,7 +50,7 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | Todo |
 | `stxt.DocumentReader` | Todo |
-| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()` |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()` |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | Todo |
 | `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | Todo |
 | `tree.InvalidModelException` | `errorCode()` y lo que hereda |
@@ -187,6 +187,8 @@ converter = converter.reloaded();                                        // los 
 
 Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // cada conversión los ve
 Converter eager = Converter.builder().preloadResources(true).build();              // lee la carpeta al crearse
+Converter photo = Converter.builder().resources(new Resources().withImagesInMemory())
+        .preloadResources(true).build();                                         // y guarda todas las imágenes
 ```
 
 Un `Converter` lee cada fuente y cada imagen la primera vez que la usa y se queda con ella, pase lo que pase con su
@@ -233,6 +235,15 @@ una imagen con el tamaño de otra; si el fichero ya no se puede leer (porque se 
 con su ruta. Por defecto el `Converter` sigue maquetando con la imagen vieja, así que sus conversiones con ella fallan
 igual hasta `reloaded()`; en el otro modo, la conversión siguiente lee el fichero nuevo.
 
+Con `new Resources(carpeta).withImagesInMemory()`, también un PNG, un JPEG o un PDF se guarda entero al leerlo y se pinta
+con esos bytes, sin volver al disco: un documento ya maquetado se pinta igual aunque su fichero cambie o se borre, y el
+`Converter` sigue maquetando y pintando con la imagen leída hasta `reloaded()`, sin fallar. `imagesInMemory()` dice si un
+`Resources` lo hace. Cuesta tener en memoria cada imagen leída, tan grande como su fichero: `maxPdfBytes` limita cada
+PDF, no el total. Es del `Resources` y no del `Converter`, porque un `Resources` y sus vistas comparten las imágenes
+leídas y todos tienen que guardarlas igual; el `Resources` que da `withImagesInMemory()` no comparte lo que el original
+ya había leído. Con `preloadResources(true)` da la foto completa de la carpeta al crear el `Converter` y en cada
+`reloaded()`.
+
 Un `Resources` usado con `Engine`, `PdfDocumentWriter` o `PdfPainter` directamente se comporta igual: lee cada fichero
 la primera vez y no vuelve a mirarlo. Para ver los cambios, se les pasa `resources.snapshot()`.
 
@@ -245,15 +256,19 @@ la primera vez y no vuelve a mirarlo. Para ver los cambios, se les pasa `resourc
 > opción para quien quiere ver la carpeta tal como está al recargar y los errores de las fuentes antes de convertir. La
 > precarga se salta las imágenes que no puede leer, porque en `images/` puede haber ficheros que no lo son y su error es
 > más claro con la línea del documento que los usa. Ni con ella es una foto completa: del PNG, el JPEG y el PDF guarda el
-> formato y el tamaño, y su contenido se vuelve a leer al pintar. En los dos modos, el SVG se
-> guarda en memoria, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha, porque pueden ser grandes. No se
+> formato y el tamaño, y su contenido se vuelve a leer al pintar, salvo con `withImagesInMemory()`, que es opcional
+> porque esos ficheros pueden ser grandes y en una carpeta pequeña que se actualiza por debajo (un volumen sincronizado,
+> una carpeta temporal) compensa. Va en `Resources` porque lo que se guarda lo comparte toda la familia de vistas. Sin
+> ella, el SVG se guarda en memoria igualmente, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha. No se
 > detecta un fichero sustituido por otro del mismo tamaño con la fecha del original (como hacen `cp -p`, `rsync -t` o un
 > zip al descomprimirse), ni un cambio entre la comprobación y la lectura. *Alternativas descartadas:* solo la recarga en
 > cada conversión (la 0.10.0), que obligaba a todos a pagar la consulta al disco y a ver carpetas a medio copiar; solo la
 > recarga explícita, que obligaba a una vista previa a llamarla en cada petición; un `reload()` que cambia el
 > `Converter`, que deja de ser inmutable; que `reloaded()` lo lea todo otra vez, que cerraría el hueco de `cp -p` a
 > cambio de indexar todas las fuentes en cada recarga; mirar el disco en cada uso de un fichero, que está en cada medida;
-> leer los bytes una vez al pintar y comprobar sobre ellos el formato y el tamaño medidos.
+> leer los bytes una vez al pintar y comprobar sobre ellos el formato y el tamaño medidos; `keepImagesInMemory(true)` en
+> el `builder`, que obligaba al `Converter` a crear por debajo otro `Resources` que no comparte lo leído con el que
+> recibe.
 
 ## Errores
 

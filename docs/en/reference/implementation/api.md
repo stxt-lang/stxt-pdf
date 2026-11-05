@@ -49,7 +49,7 @@ are always included. Of an exception, what is read from it is promised, not its 
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | All |
 | `stxt.DocumentReader` | All |
-| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()` |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()` |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | All |
 | `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | All |
 | `tree.InvalidModelException` | `errorCode()` and what it inherits |
@@ -191,6 +191,8 @@ converter = converter.reloaded();                                        // the 
 
 Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // each conversion sees them
 Converter eager = Converter.builder().preloadResources(true).build();              // reads the folder when created
+Converter photo = Converter.builder().resources(new Resources().withImagesInMemory())
+        .preloadResources(true).build();                                         // and keeps every image
 ```
 
 A `Converter` reads each font and each image the first time it uses it and keeps it, whatever happens to its file: all
@@ -240,6 +242,16 @@ removed, for example), in `RESOURCE`, with its path. By default the `Converter` 
 so its conversions with it fail the same way until `reloaded()`; in the other mode, the next conversion reads the new
 file.
 
+With `new Resources(folder).withImagesInMemory()`, a PNG, a JPEG or a PDF is also kept whole when it is read and is
+painted with those bytes, without going back to the disk: a document already laid out is painted the same even if its
+file changes or is removed, and the `Converter` goes on laying out and painting with the image read until `reloaded()`,
+without failing. `imagesInMemory()` says whether a `Resources` does it. It costs keeping in memory every image read, as
+large as its file: `maxPdfBytes` limits each PDF, not the total. It belongs to the `Resources` and not to the
+`Converter`, because a `Resources` and its views share the images read and all of them have to keep them the same way;
+the `Resources` that `withImagesInMemory()` gives does not share what the original had already read. With
+`preloadResources(true)` it gives the complete photo of the folder when the `Converter` is created and in each
+`reloaded()`.
+
 A `Resources` used with `Engine`, `PdfDocumentWriter` or `PdfPainter` directly behaves the same: it reads each file the
 first time and does not look at it again. To see the changes, they are given `resources.snapshot()`.
 
@@ -253,15 +265,18 @@ first time and does not look at it again. To see the changes, they are given `re
 > fonts before converting. The preload skips the images it cannot read, because `images/` can hold files that are not
 > images and their error is clearer with the line of the document that uses them. Not even with it is it a complete
 > photo: of the PNG, the JPEG and the PDF it keeps the format and the size, and their content is read again when
-> painting. In both modes, the SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by their size
-> and their date, because they can be large. A file replaced by another of the same size with the date of the original
+> painting, except with `withImagesInMemory()`, which is optional because those files can be large, and in a small
+> folder updated underneath (a synchronized volume, a temporary folder) it pays off. It goes in `Resources` because
+> what is kept is shared by the whole family of views. Without it, the SVG is kept in memory anyway, and the PNG, the
+> JPEG and the PDF are compared by their size and their date. A file replaced by another of the same size with the date of the original
 > (as `cp -p`, `rsync -t` or a zip when it is extracted do) is not detected, nor a change between the check and the
 > reading. *Rejected alternatives:* only reloading in each conversion (0.10.0), which made everyone pay the look at the
 > disk and see folders half copied; only the explicit reload, which made a preview call it in each request; a `reload()`
 > that changes the `Converter`, which stops being immutable; a `reloaded()` that reads everything again, which would close
 > the `cp -p` gap at the cost of indexing all the fonts in each reload; looking at the disk at each use of a file, which
 > is in each measurement; reading the bytes once when painting and checking on them the format and the size that were
-> measured.
+> measured; `keepImagesInMemory(true)` in the `builder`, which made the `Converter` create underneath another
+> `Resources` that does not share what it read with the one it receives.
 
 ## Errors
 

@@ -29,7 +29,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -398,9 +397,9 @@ public final class SvgCanvas implements Canvas {
     }
 
     /**
-     * What goes in the {@code data:} of an image: the bytes of the SVG that were read, the file of a PNG or a JPEG,
-     * and page {@code number} of a PDF drawn into a PNG. The last three are read from the file, as in the PDF
-     * ({@link ImageFile#checkUnchanged()}).
+     * What goes in the {@code data:} of an image: the bytes of the SVG that were read, those of a PNG or a JPEG, and
+     * page {@code number} of a PDF drawn into a PNG. The last three come from the bytes kept in memory or, if they are
+     * not kept, from the file, as in the PDF ({@link ImageFile#checkUnchanged()}).
      *
      * @throws dev.stxt.pdf.resources.ResourceException if the file changed after it was read or cannot be read
      */
@@ -408,9 +407,12 @@ public final class SvgCanvas implements Canvas {
         if (file.format() == ImageFile.Format.SVG) {
             return file.svgContent();
         }
+        if (file.format() != ImageFile.Format.PDF) {
+            return file.content();
+        }
         file.checkUnchanged();
         try {
-            return file.format() == ImageFile.Format.PDF ? pageAsPng(file, number) : Files.readAllBytes(file.path());
+            return pageAsPng(file, number);
         } catch (IOException e) {
             throw file.unreadable(e);
         }
@@ -426,7 +428,7 @@ public final class SvgCanvas implements Canvas {
 
     /** Page {@code number} (from 1) of a PDF, drawn into a PNG. */
     private static byte[] pageAsPng(ImageFile file, int number) throws IOException {
-        try (PDDocument doc = Loader.loadPDF(file.path().toFile())) {
+        try (PDDocument doc = file.inMemory() ? Loader.loadPDF(file.content()) : Loader.loadPDF(file.path().toFile())) {
             ByteArrayOutputStream png = new ByteArrayOutputStream();
             ImageIO.write(new PDFRenderer(doc).renderImageWithDPI(number - 1, 144), "png", png);
             return png.toByteArray();

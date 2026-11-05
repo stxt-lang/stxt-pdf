@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
  * another one in {@link dev.stxt.pdf.convert.Converter#reloaded()}, or one for each conversion if it is
  * {@linkplain dev.stxt.pdf.convert.Converter.Builder#reloadResourcesEachConversion(boolean) built so}. An SVG is
  * painted with the bytes that were read; a PNG, a JPEG or a PDF that changed or was removed between laying out and
- * painting makes the conversion fail ({@link ImageFile#checkUnchanged()}).</p>
+ * painting makes the conversion fail ({@link ImageFile#checkUnchanged()}), unless {@link #withImagesInMemory()} keeps
+ * its bytes too.</p>
  *
  * <p><strong>Threads:</strong> it can be shared among all conversions and all threads, and so can its snapshots. Fonts
  * and images are read the first time they are requested, with double-checked locking, and are then read without a
@@ -57,12 +58,28 @@ public final class Resources {
      * @param root the resources folder, absolute or relative to the working directory
      */
     public Resources(Path root) {
-        this(root.toAbsolutePath().normalize(), new Shared());
+        this(root.toAbsolutePath().normalize(), new Shared(false));
     }
 
     private Resources(Path root, Shared shared) {
         this.root = root;
         this.shared = shared;
+    }
+
+    /**
+     * {@return resources of the same folder that keep in memory the bytes of each image they read, also of a PNG, a
+     * JPEG or a PDF, and paint it with them} An image is then painted as it was read, even if its file changes or is
+     * removed afterwards, without looking at the disk again (reference/implementation/api.md); it costs keeping in
+     * memory every image read, as large as its file. By default only an SVG is kept, and a PNG, a JPEG or a PDF is
+     * read again when painting. The new object and its snapshots do not share what this one already read.
+     */
+    public Resources withImagesInMemory() {
+        return new Resources(root, new Shared(true));
+    }
+
+    /** {@return whether it keeps in memory the bytes of every image it reads ({@link #withImagesInMemory()})} */
+    public boolean imagesInMemory() {
+        return shared.imagesInMemory;
     }
 
     /**
@@ -133,7 +150,13 @@ public final class Resources {
 
         /** The images read, by real path; the one whose file changed is replaced when it is read again. */
         final Map<Path, ImageFile> images = new ConcurrentHashMap<>();
+        /** Whether every image keeps its bytes ({@link Resources#withImagesInMemory()}), the same for the whole family. */
+        final boolean imagesInMemory;
         private volatile FontLibrary fonts;
+
+        Shared(boolean imagesInMemory) {
+            this.imagesInMemory = imagesInMemory;
+        }
 
         /** The fonts of the last scan, scanning them the first time and again when the files are not those it read. */
         FontLibrary fonts(Resources resources) {

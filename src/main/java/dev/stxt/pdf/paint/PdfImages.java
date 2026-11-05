@@ -16,8 +16,12 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -72,7 +76,9 @@ final class PdfImages implements Closeable {
     }
 
     /**
-     * The PNG or the JPEG, embedded the first time, from the file as it is now.
+     * The PNG or the JPEG, embedded the first time, from its bytes ({@link ImageFile#content()}): those kept in memory
+     * or the file as it is now. As {@code PDImageXObject.createFromFileByContent} does it: a JPEG is copied as it is
+     * and a PNG is decoded and compressed again.
      *
      * @throws dev.stxt.pdf.resources.ResourceException if it changed after it was read or cannot be read
      *         ({@link ImageFile#checkUnchanged()})
@@ -81,9 +87,17 @@ final class PdfImages implements Closeable {
         PDImageXObject image = bitmaps.get(file.path());
         if (image == null) {
             cancellation.check();
-            file.checkUnchanged();
+            byte[] content = file.content();
             try {
-                image = PDImageXObject.createFromFileByContent(file.path().toFile(), doc);
+                if (file.format() == ImageFile.Format.JPEG) {
+                    image = JPEGFactory.createFromByteArray(doc, content);
+                } else {
+                    BufferedImage pixels = ImageIO.read(new ByteArrayInputStream(content));
+                    if (pixels == null) {
+                        throw new IOException("no reader can decode it");
+                    }
+                    image = LosslessFactory.createFromImage(doc, pixels);
+                }
             } catch (IOException e) {
                 throw file.unreadable(e);
             }
@@ -123,10 +137,11 @@ final class PdfImages implements Closeable {
                 PDDocument source = sources.get(file.path());
                 if (source == null) {
                     file.checkUnchanged();
-                    source = Loader.loadPDF(file.path().toFile());
+                    source = file.inMemory() ? Loader.loadPDF(file.content()) : Loader.loadPDF(file.path().toFile());
                     sources.put(file.path(), source);
                 }
-                // PDFBox reads the source as it needs it: what it copies is also read from the file.
+                // PDFBox reads the source as it needs it: what it copies is also read from the file, or from the
+                // bytes kept in memory.
                 form = imports.page(source, number, file.path().getFileName().toString());
             } catch (IOException e) {
                 throw file.unreadable(e);

@@ -372,6 +372,66 @@ class ResourceChangesTest {
         assertNotEquals(tall.width(), tall.height());
     }
 
+    /**
+     * With the images in memory, a PNG, a JPEG or a PDF is painted with the bytes that were read: replaced or removed
+     * afterwards, the document is painted the same, and the converter goes on laying it out as it was until it is
+     * reloaded.
+     */
+    @Test
+    void imagesInMemoryArePaintedAsTheyWereRead(@TempDir Path dir) throws IOException {
+        String[][] cases = {{"square.png", "wide.png"}, {"tall.jpg", "square.png"}, {"pages.pdf", "layers.pdf"}};
+        for (String[] replaced : cases) {
+            String name = replaced[0];
+            Path folder = dir.resolve(name);
+            Converter converter = converter(folder(folder, name).withImagesInMemory());
+            LaidOutDocument laidOut = converter.layOut(image(name));
+            assertTrue(laidOut.resources().images().find(name).inMemory(), name);
+            byte[] before = pdf(converter, laidOut);
+            List<String> svgBefore = converter.toSvg(laidOut);
+            replace(folder, name, replaced[1]);
+            assertArrayEquals(before, pdf(converter, laidOut), name);
+            assertEquals(svgBefore, converter.toSvg(laidOut), name);
+            assertArrayEquals(before, pdf(converter, converter.layOut(image(name))), name);
+            Files.delete(folder.resolve("images").resolve(name));
+            assertArrayEquals(before, pdf(converter, laidOut), name);
+            assertEquals(svgBefore, converter.toSvg(laidOut), name);
+        }
+    }
+
+    /** Painting from the bytes in memory gives the same PDF and SVG as painting from the file. */
+    @Test
+    void imagesInMemoryPaintTheSameAsTheFiles(@TempDir Path dir) throws IOException {
+        for (String name : new String[] {"square.png", "tall.jpg", "pages.pdf", "shapes.svg"}) {
+            Resources resources = folder(dir.resolve(name), name);
+            assertFalse(resources.imagesInMemory());
+            Resources inMemory = resources.withImagesInMemory();
+            assertTrue(inMemory.imagesInMemory());
+            assertTrue(inMemory.snapshot().imagesInMemory());
+            Converter fromFile = converter(resources);
+            Converter fromMemory = converter(inMemory);
+            assertArrayEquals(pdf(fromFile, fromFile.layOut(image(name))),
+                    pdf(fromMemory, fromMemory.layOut(image(name))), name);
+            assertEquals(fromFile.toSvg(fromFile.layOut(image(name))),
+                    fromMemory.toSvg(fromMemory.layOut(image(name))), name);
+        }
+    }
+
+    /**
+     * Preloaded and with the images in memory, the converter has the folder as it was when it was created, also the
+     * images no conversion had used: replaced, they are laid out and painted as they were.
+     */
+    @Test
+    void preloadedAndInMemoryTheConverterHasTheWholeFolder(@TempDir Path dir) throws IOException {
+        Resources resources = folder(dir, "tall.jpg").withImagesInMemory();
+        Converter converter = Converter.builder().resources(resources).styles(BASE).preloadResources(true).build();
+        replace(dir, "tall.jpg", "square.png");
+        LaidOutDocument laidOut = converter.layOut(image("tall.jpg"));
+        ImageFile tall = laidOut.resources().images().find("tall.jpg");
+        assertNotEquals(tall.width(), tall.height());
+        assertEquals(ImageFile.Format.JPEG, tall.format());
+        assertTrue(pdf(converter, laidOut).length > 0);
+    }
+
     /** Preloading in each conversion would read the whole folder every time: the two options do not go together. */
     @Test
     void preloadingAndReloadingEachConversionDoNotGoTogether() {
