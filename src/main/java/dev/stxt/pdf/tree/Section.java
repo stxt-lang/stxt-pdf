@@ -3,9 +3,8 @@ package dev.stxt.pdf.tree;
 import dev.stxt.pdf.model.NumberFormat;
 
 /**
- * A section of the document (reference/components/document.md): its box, which is the root of its layout (a
- * {@code Box} without a parent, like the anonymous root of a document with a single section), its medium and what it
- * says about the pages it takes up.
+ * A section of the document (reference/components/document.md): its box, which is a child of the root of the document
+ * and the root of its layout ({@link Box#isLayoutRoot()}), its medium and what it says about the pages it takes up.
  *
  * @param box          the box: the page area of each of its pages; it is {@link Element#SECTION}
  * @param pageSetup        its medium: the one of the document with what the section declares on top

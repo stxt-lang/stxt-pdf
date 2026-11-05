@@ -137,16 +137,18 @@ list, those in flow are computed once, and writing to a closed box or style is a
 
 `BoxTreeBuilder.Result` gives the root of the document and the list of `Section` (`tree/Section`: box, `PageSetup`, `Page numbering`,
 `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` and the
-footnote area, `footnotes()`). The **box of each section is the root of its layout** (`Element.SECTION`, a `Box`
-**without `parent`**) and **hangs from `root.children()` without being a child** (`root.addSection`, not `addChild`): the traversals of the whole tree
-(references, links, tables of contents, fonts, images, `Id`) start from the root and see them, and the layout, the `Page overlay` and going up through
-`parent` stay inside the section. The `Page overlay` children of `Document` are also children of the root (with `parent`) and are not
-laid out in the flow: the `Paginator` places them.
+footnote area, `footnotes()`). The **box of each section is a child of the root of the document** (`Element.SECTION`, added after
+the `Page overlay` elements of the document so that they precede it in preorder traversal) and is the **root of its layout**
+(`Box.isLayoutRoot()`): the traversals of the whole tree (references, links, tables of contents, fonts, images, `Id`, PDF
+structure) start from the root and see a uniform tree where every child has its parent in `parent()`, while the layout, margin
+isolation and the reference container of `Overlay` boxes stop at `isLayoutRoot()`. The `Page overlay` children of `Document` are
+not laid out in the flow either: the `Paginator` places them.
 
-> **Decision:** a section is the root of its layout, without a parent, and hangs from the root of the document without being a child, so the
-> layout, the cache and everything that looked at `parent == null` stay the same, and the traversals of the whole tree see it. What
-> breaks is the invariant "my child's parent is me": it only holds for the sections. *Rejected alternative:* passing the
-> list of sections to the traversals.
+> **Decision:** the sections are children of the root of the document (`section.parent() == root`) and `Box.isLayoutRoot()`
+> identifies the root of each layout, so the invariant "my child's parent is me" holds across the whole tree without the layout
+> or the `Overlay` boxes leaving their section. *Rejected alternative:* hanging the sections from `root.children()` with
+> `parent == null`, which broke the invariant at the first level under `Document` and required special-casing `SECTION` when
+> walking up `parent()`.
 
 ## Text and runs
 

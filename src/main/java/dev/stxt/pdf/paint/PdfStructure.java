@@ -98,9 +98,7 @@ final class PdfStructure {
     /** The element of each footnote, by its {@code Id}, for the {@code IDTree} that PDF/UA-1 asks for a {@code Note}. */
     private final Map<String, PDStructureElement> noteIds = new TreeMap<>();
 
-    /**
-     * The root of the document: it is the "parent" of its sections, which have none (reference/components/document.md).
-     */
+    /** The root of the document. */
     private final Box root;
 
     /** The structure of pages painted on a document that is not the engine's: nothing is tagged. */
@@ -303,7 +301,7 @@ final class PdfStructure {
      * image, the written text if it is painted transformed, and the numbering of a list.
      */
     private void attributes(Box box, PDStructureElement e) {
-        Box outer = box.role() == Role.SECTION ? root : box.parent();
+        Box outer = box.parent();
         if (outer != null && !box.style().typography().locale().equals(outer.style().typography().locale())) {
             // Lang is inherited down the structure tree: only where the language changes from the outer one.
             e.setLanguage(box.style().typography().locale().toLanguageTag());

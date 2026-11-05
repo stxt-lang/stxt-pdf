@@ -33,6 +33,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   takes up several, ended in `BOX_OVERFLOW`. The row now consumes as far as the slowest of the items that go on.
   "Breaks in `Stack`, `Grid` and `Table`" in the reference.
 
+### Java API
+
+- **The box of a `Section` has the root of the document as its parent.** Until 0.10.0 it was among the `children()` of
+  the root and its `parent()` was `null`. Now the parent of every box in `children()` is the box that lists it, and
+  `parent()` is `null` only in the root. `Box.isLayoutRoot()` is new: whether the box is the root of its layout (the
+  box of a `Section`), which is what `parent() == null` said of a section.
+- **The `Page overlay` boxes of the document go before the sections in the `children()` of the root**, also when the
+  document writes them after a `Section`; until 0.10.0 they were in the order of the document. They were already
+  painted before those of the sections, so the pages do not change.
+
 ## [0.10.0] - 2026-11-04
 
 Hyphenation in five more languages, a resources folder whose files can change while the `Converter` lives, an error for

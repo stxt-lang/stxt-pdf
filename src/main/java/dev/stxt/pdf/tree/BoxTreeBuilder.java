@@ -160,12 +160,12 @@ public final class BoxTreeBuilder {
             if (h.getCanonicalName().equals("page-overlay")) {
                 root.addChild(element(ctx, inline(h), root, null, null));
             } else if (h.getCanonicalName().equals("section")) {
-                Section section = section(ctx, inline(h), root, documentPageSetup, sections.isEmpty());
-                sections.add(section);
-                // It hangs from the root without being its child (no parent): each section is the root of its layout.
-                root.addSection(section.box());
+                sections.add(section(ctx, inline(h), root, documentPageSetup, sections.isEmpty()));
             }
         }
+        // After the Page overlays of the document, so that in the root those of the document come before those of the
+        // sections (reference/components/document.md).
+        sections.forEach(s -> root.addChild(s.box()));
         TableOfContentsBuilder.build(ctx, root);
         ctx.footnotes.finish();
         References.validate(root);

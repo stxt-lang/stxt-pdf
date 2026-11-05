@@ -137,16 +137,17 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
 `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` y el área de
-notas, `footnotes()`). La **caja de cada sección es la raíz de su layout** (`Element.SECTION`, una `Box`
-**sin `parent`**) y **cuelga de `root.children()` sin ser hija** (`root.addSection`, no `addChild`): los recorridos de todo el árbol
-(referencias, enlaces, índices, fuentes, imágenes, `Id`) parten de la raíz y las ven, y el layout, los `Page overlay` y subir por
-`parent` se quedan dentro de la sección. Los `Page overlay` hijos de `Document` también son hijos de la raíz (con `parent`) y no se
-maquetan en el flujo: los coloca el `Paginator`.
+notas, `footnotes()`). La **caja de cada sección es hija de la raíz del documento** (`Element.SECTION`, añadida tras los
+`Page overlay` del documento para que estos la precedan en el recorrido en preorden) y es la **raíz de su layout**
+(`Box.isLayoutRoot()`): los recorridos de todo el árbol (referencias, enlaces, índices, fuentes, imágenes, `Id`, estructura PDF)
+parten de la raíz y ven un árbol uniforme donde todo hijo tiene a su padre en `parent()`, mientras que el layout, el aislamiento
+de márgenes y el contenedor de referencia de los `Overlay` se detienen en `isLayoutRoot()`. Los `Page overlay` hijos de
+`Document` tampoco se maquetan en el flujo: los coloca el `Paginator`.
 
-> **Decisión:** una sección es la raíz de su layout, sin padre, y cuelga de la raíz del documento sin ser hija, así que el
-> layout, la caché y todo lo que miraba `parent == null` siguen igual, y los recorridos del árbol entero la ven. Lo que se
-> rompe es la invariante «el padre de mi hijo soy yo»: solo vale para las secciones. *Alternativa descartada:* pasar a los
-> recorridos la lista de secciones.
+> **Decisión:** las secciones son hijas de la raíz del documento (`section.parent() == root`) y `Box.isLayoutRoot()` distingue la
+> raíz de cada layout, de modo que se mantiene en todo el árbol la invariante «el padre de mi hijo soy yo» sin que el layout ni
+> los `Overlay` salgan de su sección. *Alternativa descartada:* colgar las secciones de `root.children()` con `parent == null`,
+> que rompía la invariante en el primer nivel bajo `Document` y obligaba a tratar `SECTION` aparte al subir por `parent()`.
 
 ## Texto y tramos
 

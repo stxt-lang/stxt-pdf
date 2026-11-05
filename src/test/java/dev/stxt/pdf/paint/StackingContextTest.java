@@ -247,6 +247,21 @@ class StackingContextTest {
         assertEquals(List.of("#111", "#222"), order);
     }
 
+    /**
+     * The {@code Page overlay} boxes of the document are painted before those of the section and before its
+     * positioned boxes, also when the document writes them after the {@code Section}: they precede the sections
+     * among the children of the root (reference/implementation/tree.md).
+     */
+    @Test
+    void pageOverlaysOfTheDocumentBeforeTheSectionWrittenBeforeThem() {
+        List<String> order = paint(
+                "\tSection:",
+                "\t\tPage overlay:", "\t\t\tBox:", "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
+                "\t\tFrame:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #333",
+                "\tPage overlay:", "\t\tBox:", "\t\t\tWidth: 10", "\t\t\tHeight: 10", "\t\t\tBackground: #111");
+        assertEquals(List.of("#111", "#222", "#333"), order);
+    }
+
     @Test
     void layerStillWins() {
         List<String> order = paint(

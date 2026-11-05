@@ -43,7 +43,15 @@ class BoxTest {
         assertThrows(IllegalStateException.class, () -> text.prependText("1 "));
         // The marker is not a child and it is closed too.
         assertThrows(IllegalStateException.class, () -> item.marker().setText("2. ", 1, false));
-        assertThrows(IllegalStateException.class, () -> tree.root().addSection(section));
+        assertThrows(IllegalStateException.class, () -> tree.root().addChild(section));
+        assertParentInvariant(tree.root());
+    }
+
+    private static void assertParentInvariant(Box box) {
+        for (Box child : box.children()) {
+            assertSame(box, child.parent());
+            assertParentInvariant(child);
+        }
     }
 
     @Test

@@ -100,18 +100,12 @@ public final class Box {
         return line;
     }
 
-    /**
-     * {@return the children, in document order; the list cannot be changed. In the root of the document, also the
-     * sections, which hang from it without being its children (reference/components/document.md)}
-     */
+    /** {@return the children, in document order; the list cannot be changed} */
     public List<Box> children() {
         return closed ? children : Collections.unmodifiableList(children);
     }
 
-    /**
-     * {@return the parent box; {@code null} in the root and in the box of a section, which is the root of its
-     * layout}
-     */
+    /** {@return the parent box; {@code null} in the root} */
     public Box parent() {
         return parent;
     }
@@ -239,15 +233,6 @@ public final class Box {
         writable();
         child.parent = this;
         children.add(child);
-    }
-
-    /**
-     * Hangs the box of a section from the root of the document without being its child: it sets no parent
-     * (reference/components/document.md).
-     */
-    void addSection(Box section) {
-        writable();
-        children.add(section);
     }
 
     void setText(String text, int line, boolean block) {
@@ -418,12 +403,20 @@ public final class Box {
     }
 
     /**
+     * Whether it is the root of its layout, which represents the page area: the box of a {@code Section}
+     * (reference/components/document.md) or, in a tree without sections, the root.
+     */
+    public boolean isLayoutRoot() {
+        return parent == null || element == Element.SECTION;
+    }
+
+    /**
      * Whether the box isolates margins, that is, whether it stops their merging (reference/components/block.md): the
-     * page area (the root), the {@code Overlay} and {@code Page overlay}, the items of stack and grid, the boxes with
-     * {@code Isolate margins: true} and the rotated ones in flow.
+     * page area (the root of the layout), the {@code Overlay} and {@code Page overlay}, the items of stack and grid,
+     * the boxes with {@code Isolate margins: true} and the rotated ones in flow.
      */
     public boolean isolatesMargins() {
-        if (parent == null || style.isolateMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
+        if (isLayoutRoot() || style.isolateMargins() || style.isOutOfFlow() || style.rotatesInFlow()) {
             return true;
         }
         Layout l = parent.style.layout();
@@ -433,13 +426,13 @@ public final class Box {
     /**
      * Reference container of an out-of-flow box (reference/common/box.md): for an {@code Overlay},
      * the closest {@code Frame}, {@code Overlay} or {@code Page overlay} ancestor; if there is none,
-     * or if the box is a {@code Page overlay}, the root, which represents the page area.
+     * or if the box is a {@code Page overlay}, the root of its layout, which represents the page area.
      */
     public Box referenceContainer() {
         Box b = parent;
         boolean pageOverlay = style.position() == Position.PAGE_OVERLAY;
         // A box rotated in flow is one too, like the positioned ones (reference/common/layers-and-rotation.md).
-        while (b.parent != null && (pageOverlay || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
+        while (!b.isLayoutRoot() && (pageOverlay || !(b.style.isPositioned() || b.style.rotatesInFlow()))) {
             b = b.parent;
         }
         return b;

@@ -304,11 +304,6 @@ public final class StackingContext {
         while (i < pathA.size() && i < pathB.size() && pathA.get(i) == pathB.get(i)) {
             i++;
         }
-        if (i == 0) {
-            // Different roots: a Page overlay of the document and one of a section, which is the root of its layout
-            // (reference/components/document.md). Those of the document go first.
-            return Boolean.compare(pathA.get(0).element() != null, pathB.get(0).element() != null);
-        }
         if (i == pathA.size() || i == pathB.size()) {
             return Integer.compare(pathA.size(), pathB.size());
         }
