@@ -43,6 +43,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `Converter.builder().reloadResourcesEachConversion(true)` (new, and `reloadsResourcesEachConversion()` to ask). In
   the default mode, a PNG, a JPEG or a PDF replaced in `images/` makes the conversions that use it fail with
   `IMAGE_FORMAT` until `reloaded()`, and its message now says so. "Files that change" in `api.md`.
+- **The resources can be read when the `Converter` is created.** With `Converter.builder().preloadResources(true)`
+  (new, and `preloadsResources()` to ask), the converter indexes `fonts/` and reads every image of `images/` it can
+  when it is created and in each `reloaded()`, instead of each file the first time a conversion uses it: it keeps the
+  folder as it was then, and a font that cannot be indexed makes `build()` or `reloaded()` fail with `RESOURCE`
+  instead of the first conversion. An image it cannot read, or a PDF beyond `Limits.maxPdfBytes`, is left for the
+  document that uses it, which reports it with its line. It does not go together with
+  `reloadResourcesEachConversion(true)` (`IllegalArgumentException` in `build()`).
 - **A snapshot that reads an image again no longer changes the one a `Resources` already had.** A `Resources` used
   directly (with `Engine` or `PdfPainter`) shared its images with its snapshots (`Resources.snapshot()`), and a
   snapshot that read again an image whose file had changed replaced it for that `Resources` too, which from then on saw

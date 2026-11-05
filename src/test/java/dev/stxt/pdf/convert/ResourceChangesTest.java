@@ -74,6 +74,21 @@ class ResourceChangesTest {
         return Converter.builder().resources(resources).styles(BASE).reloadResourcesEachConversion(true).build();
     }
 
+    /** A converter that reads the folder when it is created and reloaded. */
+    private static Converter preloaded(Resources resources) {
+        return Converter.builder().resources(resources).styles(BASE).preloadResources(true).build();
+    }
+
+    private static final InlineNode TEXT = Docs.read(HEADER, "\tText: Hola");
+
+    private static void deleteAll(Path folder) throws IOException {
+        try (var walk = Files.walk(folder)) {
+            for (Path path : walk.sorted(java.util.Comparator.reverseOrder()).toList()) {
+                Files.delete(path);
+            }
+        }
+    }
+
     /** The converter that sees the files as they are now: the reloaded one, or the same if it reloads each time. */
     private static Converter next(Converter converter) {
         return converter.reloadsResourcesEachConversion() ? converter : converter.reloaded();
@@ -277,6 +292,91 @@ class ResourceChangesTest {
         Resources next = resources.snapshot();
         assertNotSame(square, next.images().find("square.png"));
         assertTrue(next.fonts().families().contains("IBM Plex Serif"), () -> "families: " + next.fonts().families());
+    }
+
+    /**
+     * A preloaded converter keeps the folder as it was when it was created, also the images no conversion had used; a
+     * converter that is not preloaded reads them when they are first used.
+     */
+    @Test
+    void aPreloadedConverterKeepsTheImagesAsTheyWere(@TempDir Path dir) throws IOException {
+        for (boolean preload : new boolean[] {false, true}) {
+            Path folder = dir.resolve(String.valueOf(preload));
+            Resources resources = folder(folder, "shapes.svg");
+            Converter converter = preload ? preloaded(resources) : converter(resources);
+            assertEquals(preload, converter.preloadsResources());
+            Files.writeString(folder.resolve("images/shapes.svg"), "<svg xmlns=\"http://www.w3.org/2000/svg\" "
+                    + "width=\"30\" height=\"10\"><rect width=\"30\" height=\"10\"/></svg>");
+            double width = converter.layOut(image("shapes.svg")).resources().images().find("shapes.svg").width();
+            if (preload) {
+                assertNotEquals(30 * ImageFile.POINTS_PER_PIXEL, width, 1e-9);
+                Converter reloaded = converter.reloaded();
+                assertTrue(reloaded.preloadsResources());
+                assertEquals(30 * ImageFile.POINTS_PER_PIXEL, reloaded.layOut(image("shapes.svg"))
+                        .resources().images().find("shapes.svg").width(), 1e-9);
+            } else {
+                assertEquals(30 * ImageFile.POINTS_PER_PIXEL, width, 1e-9);
+            }
+        }
+    }
+
+    /** A preloaded converter indexes the fonts when it is created: they are in memory even if the folder goes. */
+    @Test
+    void aPreloadedConverterHasItsFontsInMemory(@TempDir Path dir) throws IOException {
+        Converter converter = preloaded(folder(dir.resolve("preloaded")));
+        Converter lazy = converter(folder(dir.resolve("lazy")));
+        deleteAll(dir.resolve("preloaded/fonts"));
+        deleteAll(dir.resolve("lazy/fonts"));
+        assertTrue(pdf(converter, converter.layOut(TEXT)).length > 0);
+        assertEquals("RESOURCE", assertThrows(StxtPdfException.class, () -> lazy.layOut(TEXT)).code());
+    }
+
+    /**
+     * A font that cannot be indexed makes creating or reloading a preloaded converter fail, and the one that was there
+     * goes on converting; without preloading, the first conversion fails.
+     */
+    @Test
+    void aPreloadedConverterFailsWithAnInvalidFontWhenItIsCreated(@TempDir Path dir) throws IOException {
+        Resources resources = folder(dir);
+        Converter converter = preloaded(resources);
+        Files.writeString(dir.resolve("fonts/broken.ttf"), "Not a font");
+        assertThrows(ResourceException.class, converter::reloaded);
+        assertTrue(pdf(converter, converter.layOut(TEXT)).length > 0);
+        assertThrows(ResourceException.class, () -> preloaded(resources));
+        Converter lazy = converter(resources);
+        assertEquals("RESOURCE", assertThrows(StxtPdfException.class, () -> lazy.layOut(TEXT)).code());
+    }
+
+    /**
+     * The preload reads every image it can, also in subfolders, and leaves the others (not an image, a PDF beyond the
+     * limit) for the document that uses them, which reports them with the line of its {@code Image}.
+     */
+    @Test
+    void aPreloadLeavesTheImagesItCannotReadForTheDocuments(@TempDir Path dir) throws IOException {
+        Resources resources = folder(dir, "pages.pdf");
+        Files.writeString(dir.resolve("images/notes.txt"), "Not an image");
+        Files.createDirectories(dir.resolve("images/sub"));
+        Files.copy(IMAGES.resolve("tall.jpg"), dir.resolve("images/sub/tall.jpg"));
+        long bytes = Files.size(dir.resolve("images/pages.pdf"));
+        Converter converter = Converter.builder().resources(resources).styles(BASE).preloadResources(true)
+                .limits(Limits.DEFAULT.withMaxPdfBytes(bytes - 1)).build();
+        StxtPdfException notes = assertThrows(StxtPdfException.class, () -> converter.layOut(image("notes.txt")));
+        assertEquals("IMAGE_FORMAT", notes.code());
+        assertNotEquals(StxtPdfException.NO_LINE, notes.line());
+        StxtPdfException pdf = assertThrows(StxtPdfException.class, () -> converter.layOut(image("pages.pdf")));
+        assertEquals("PDF_TOO_LARGE", pdf.code());
+        assertNotEquals(StxtPdfException.NO_LINE, pdf.line());
+        // The JPEG of the subfolder was read when the converter was created: replaced, it keeps the old size.
+        replace(dir, "sub/tall.jpg", "square.png");
+        ImageFile tall = converter.layOut(image("sub/tall.jpg")).resources().images().find("sub/tall.jpg");
+        assertNotEquals(tall.width(), tall.height());
+    }
+
+    /** Preloading in each conversion would read the whole folder every time: the two options do not go together. */
+    @Test
+    void preloadingAndReloadingEachConversionDoNotGoTogether() {
+        Converter.Builder builder = Converter.builder().preloadResources(true).reloadResourcesEachConversion(true);
+        assertThrows(IllegalArgumentException.class, builder::build);
     }
 
     /**

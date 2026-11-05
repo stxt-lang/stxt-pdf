@@ -21,6 +21,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Entry point of the engine: STXT document → PDF (or SVG) with the real metrics of the fonts and the images of the
@@ -57,8 +60,9 @@ import java.util.function.Supplier;
  * <p><strong>Changes in the resources folder</strong> (reference/implementation/api.md): a converter reads each font
  * and each image the first time it uses it and keeps it, so the files added, removed or replaced afterwards are seen
  * by the converter {@link #reloaded()} gives, which does not read again what has not changed. Built with
- * {@link Builder#reloadResourcesEachConversion}, each conversion sees the folder as it is when it starts, without
- * calling anything. A {@link LaidOutDocument} keeps the resources it was laid out with, and
+ * {@link Builder#preloadResources}, it reads the whole folder when it is created and reloaded instead of file by file;
+ * built with {@link Builder#reloadResourcesEachConversion}, each conversion sees the folder as it is when it starts,
+ * without calling anything. A {@link LaidOutDocument} keeps the resources it was laid out with, and
  * {@link #toPdf(LaidOutDocument, OutputStream)} and {@link #toSvg(LaidOutDocument)} paint it with them.</p>
  *
  * <p>What belongs to one document and not to the configuration, the files to embed and their XMP
@@ -81,9 +85,11 @@ public final class Converter {
     private final Resources resources;
     /** Whether each conversion takes a snapshot of the resources ({@link Builder#reloadResourcesEachConversion}). */
     private final boolean reloadEachConversion;
+    /** Whether the snapshot is read whole when it is taken ({@link Builder#preloadResources}). */
+    private final boolean preload;
     /**
-     * The snapshot of the resources every conversion works with, taken when it is created; {@code null} if each
-     * conversion takes its own.
+     * The snapshot of the resources every conversion works with, taken when it is created (and read whole if
+     * {@link #preload}); {@code null} if each conversion takes its own.
      */
     private final Resources current;
     private final InlineNode styles;
@@ -97,10 +103,11 @@ public final class Converter {
     private Converter(Builder builder) {
         this.resources = builder.resources;
         this.reloadEachConversion = builder.reloadEachConversion;
-        this.current = reloadEachConversion ? null : resources.snapshot();
+        this.preload = builder.preload;
+        this.limits = builder.limits;
+        this.current = snapshot();
         this.styles = builder.styles;
         this.debug = builder.debug;
-        this.limits = builder.limits;
         this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
         this.pdfUa = builder.pdfUa;
         this.pdfA = builder.pdfA;
@@ -111,10 +118,11 @@ public final class Converter {
     private Converter(Converter other) {
         this.resources = other.resources;
         this.reloadEachConversion = other.reloadEachConversion;
-        this.current = reloadEachConversion ? null : resources.snapshot();
+        this.preload = other.preload;
+        this.limits = other.limits;
+        this.current = snapshot();
         this.styles = other.styles;
         this.debug = other.debug;
-        this.limits = other.limits;
         this.excluded = other.excluded;
         this.pdfUa = other.pdfUa;
         this.pdfA = other.pdfA;
@@ -144,7 +152,11 @@ public final class Converter {
      * images whose files have not changed are not read again (reference/implementation/api.md). This converter does
      * not change: what it converts afterwards still uses the files it had read. It is what has to be called after
      * adding, removing or replacing files of the folder, once they are all in place; with
-     * {@link Builder#reloadResourcesEachConversion} it is not needed, and it gives an equivalent converter.
+     * {@link Builder#reloadResourcesEachConversion} it is not needed, and it gives an equivalent converter. With
+     * {@link Builder#preloadResources} it reads the folder before returning.
+     *
+     * @throws dev.stxt.pdf.resources.ResourceException with {@link Builder#preloadResources}, if the fonts cannot be
+     *         indexed; this converter can still be used
      */
     public Converter reloaded() {
         return new Converter(this);
@@ -153,6 +165,60 @@ public final class Converter {
     /** {@return whether each conversion sees the resources folder as it is when it starts} */
     public boolean reloadsResourcesEachConversion() {
         return reloadEachConversion;
+    }
+
+    /** {@return whether it reads the fonts and the images of the folder when it is created and when it is reloaded} */
+    public boolean preloadsResources() {
+        return preload;
+    }
+
+    /**
+     * The snapshot of the resources the conversions of a new converter work with, read whole if {@link #preload}; or
+     * {@code null} if each conversion takes its own.
+     *
+     * @throws dev.stxt.pdf.resources.ResourceException if it preloads and the fonts cannot be indexed
+     */
+    private Resources snapshot() {
+        if (reloadEachConversion) {
+            return null;
+        }
+        Resources snapshot = resources.snapshot();
+        if (preload) {
+            preload(snapshot);
+        }
+        return snapshot;
+    }
+
+    /**
+     * Reads the fonts of {@code fonts/} and every image of {@code images/} that can be read, so that the snapshot
+     * keeps the files as they are now. A font that cannot be indexed is an error, as in the first conversion. An image
+     * that cannot be read (it is not an image, its format is not supported, it is a PDF beyond
+     * {@link Limits#maxPdfBytes()}, it leaves the folder through a link) is left for when a document uses it, which
+     * reports it with the line of its {@code Image}.
+     */
+    private void preload(Resources snapshot) {
+        snapshot.fonts();
+        Path folder = snapshot.imagesFolder();
+        if (!Files.isDirectory(folder)) {
+            return;
+        }
+        List<Path> files;
+        try (Stream<Path> walk = Files.walk(folder)) {
+            files = walk.filter(Files::isRegularFile).sorted().toList();
+        } catch (IOException | UncheckedIOException e) {
+            // A folder that cannot be walked is reported by the documents that use its images.
+            return;
+        }
+        for (Path file : files) {
+            String path = folder.relativize(file).toString().replace('\\', '/');
+            try {
+                if (snapshot.images().pdfBytes(path) <= limits.maxPdfBytes()) {
+                    snapshot.images().find(path);
+                }
+            } catch (StxtPdfException e) {
+                // Left for the document that uses it.
+            }
+        }
     }
 
     /** The resources a conversion works with from start to end: those of the converter, or a new snapshot. */
@@ -540,6 +606,7 @@ public final class Converter {
 
         private Resources resources = new Resources();
         private boolean reloadEachConversion;
+        private boolean preload;
         private InlineNode styles;
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
@@ -577,6 +644,24 @@ public final class Converter {
          */
         public Builder reloadResourcesEachConversion(boolean reload) {
             this.reloadEachConversion = reload;
+            return this;
+        }
+
+        /**
+         * Whether the converter reads the resources folder when it is created and in {@link Converter#reloaded()},
+         * instead of reading each font and each image the first time a conversion uses it
+         * (reference/implementation/api.md). Off by default. On, it indexes {@code fonts/} and reads every image of
+         * {@code images/} that can be read, so it keeps the folder as it was then, and an invalid font makes
+         * {@link #build} or {@code reloaded()} fail instead of the first conversion. An image that cannot be read, or a
+         * PDF beyond {@link Limits#maxPdfBytes()}, is left for when a document uses it. Of a PNG, a JPEG or a PDF it
+         * keeps the format and the size: its content is still read when painting. It costs reading the whole folder,
+         * also the images that no document uses.
+         *
+         * @param preload {@code true} to read the folder when the converter is created and reloaded
+         * @return this builder
+         */
+        public Builder preloadResources(boolean preload) {
+            this.preload = preload;
             return this;
         }
 
@@ -701,12 +786,19 @@ public final class Converter {
          * {@return the converter with the options given, immutable and independent of this builder}
          *
          * @throws IllegalArgumentException with {@link #pdfUa pdfUa(2)} and a {@link #pdfA}: PDF/UA-2 is a PDF 2.0
-         *         file and PDF/A-2 and PDF/A-3 are PDF 1.7 ones
+         *         file and PDF/A-2 and PDF/A-3 are PDF 1.7 ones; with {@link #preloadResources} and
+         *         {@link #reloadResourcesEachConversion}, which would read the whole folder in each conversion
+         * @throws dev.stxt.pdf.resources.ResourceException with {@link #preloadResources}, if the fonts cannot be
+         *         indexed
          */
         public Converter build() {
             if (pdfUa == 2 && pdfA != null) {
                 throw new IllegalArgumentException("PDF/UA-2 is a PDF 2.0 file and " + pdfA
                         + " a PDF 1.7 one: a PDF cannot comply with both");
+            }
+            if (preload && reloadEachConversion) {
+                throw new IllegalArgumentException("Preloading the resources and reloading them in each conversion "
+                        + "would read the whole folder in each conversion: only one of them can be chosen");
             }
             return new Converter(this);
         }

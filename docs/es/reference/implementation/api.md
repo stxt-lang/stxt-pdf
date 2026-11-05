@@ -186,6 +186,7 @@ Converter converter = Converter.create();
 converter = converter.reloaded();                                        // los ve el nuevo
 
 Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // cada conversión los ve
+Converter eager = Converter.builder().preloadResources(true).build();              // lee la carpeta al crearse
 ```
 
 Un `Converter` lee cada fuente y cada imagen la primera vez que la usa y se queda con ella, pase lo que pase con su
@@ -200,6 +201,16 @@ Cuesta un recorrido de `fonts/` y una consulta al disco por imagen y conversión
 se copian los ficheros puede encontrar unos sí y otros no, o uno a medio escribir. `reloaded()` da en este modo un
 `Converter` equivalente.
 
+Con `preloadResources(true)`, el `Converter` lee la carpeta al crearse y en cada `reloaded()`, en vez de leer cada
+fichero la primera vez que lo usa una conversión. Indexa `fonts/` y lee todas las imágenes de `images/` (también las de
+sus subcarpetas) que se pueden leer, así que se queda con la carpeta como estaba en ese momento. Una fuente que no se
+puede indexar hace fallar `build()` o `reloaded()` con `RESOURCE`, en vez de la primera conversión, y el `Converter` que
+había sigue convirtiendo. Una imagen que no se puede leer (no es una imagen, su formato no se admite, sale de la carpeta
+por un enlace) o un PDF que pasa de `Limits.maxPdfBytes` se deja para cuando la use un documento, que da el error con la
+línea de su `Image`. Cuesta leer la carpeta entera, también las imágenes que no usa ningún documento. No se combina con
+`reloadResourcesEachConversion(true)`, que leería la carpeta entera en cada conversión: `build()` falla con
+`IllegalArgumentException`.
+
 Por debajo, los dos usan `Resources.snapshot()`: otro `Resources` de la misma carpeta, que comparte con el primero y con
 sus demás vistas lo ya leído. Como cualquier `Resources`, mira la carpeta la primera vez que se le piden las fuentes o
 cada imagen y después se queda con lo que encontró:
@@ -212,8 +223,8 @@ cada imagen y después se queda con lo que encontró:
 
 El `Converter` toma una vista al crearse y otra en `reloaded()`, o una por conversión en el otro modo. El
 `LaidOutDocument` guarda la suya (`LaidOutDocument.resources()`), y `toPdf` y `toSvg` lo pintan con las mismas fuentes
-e imágenes con que se maquetó, también con un `Converter` recargado después. Un fichero que todavía no se ha usado se lee
-cuando se usa por primera vez, no al llamar a `reloaded()`.
+e imágenes con que se maquetó, también con un `Converter` recargado después. Sin `preloadResources(true)`, un fichero que
+todavía no se ha usado se lee cuando se usa por primera vez, no al llamar a `reloaded()`.
 
 Las fuentes y los SVG están en memoria, así que un documento ya maquetado se pinta igual aunque su fichero cambie o
 desaparezca. Un PNG, un JPEG o un PDF se vuelve a leer al pintar, y antes `ImageFile.checkUnchanged` compara su tamaño y
@@ -229,7 +240,12 @@ la primera vez y no vuelve a mirarlo. Para ver los cambios, se les pasa `resourc
 > llama quien cambia los ficheros: una conversión no depende de cómo esté el disco en ese momento, no mira el disco en
 > cada conversión y no ve una carpeta a medio actualizar. `reloaded()` da un `Converter` nuevo, y no cambia el que hay,
 > para que el `Converter` siga siendo inmutable. La recarga en cada conversión queda como opción del `builder` para quien
-> no sabe cuándo cambian los ficheros (una vista previa de ficheros que se editan a mano). En los dos modos, el SVG se
+> no sabe cuándo cambian los ficheros (una vista previa de ficheros que se editan a mano). La lectura es perezosa por
+> defecto, porque una carpeta puede tener muchas imágenes que no usa ningún documento, y la precarga queda como otra
+> opción para quien quiere ver la carpeta tal como está al recargar y los errores de las fuentes antes de convertir. La
+> precarga se salta las imágenes que no puede leer, porque en `images/` puede haber ficheros que no lo son y su error es
+> más claro con la línea del documento que los usa. Ni con ella es una foto completa: del PNG, el JPEG y el PDF guarda el
+> formato y el tamaño, y su contenido se vuelve a leer al pintar. En los dos modos, el SVG se
 > guarda en memoria, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha, porque pueden ser grandes. No se
 > detecta un fichero sustituido por otro del mismo tamaño con la fecha del original (como hacen `cp -p`, `rsync -t` o un
 > zip al descomprimirse), ni un cambio entre la comprobación y la lectura. *Alternativas descartadas:* solo la recarga en

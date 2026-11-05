@@ -190,6 +190,7 @@ Converter converter = Converter.create();
 converter = converter.reloaded();                                        // the new one sees them
 
 Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // each conversion sees them
+Converter eager = Converter.builder().preloadResources(true).build();              // reads the folder when created
 ```
 
 A `Converter` reads each font and each image the first time it uses it and keeps it, whatever happens to its file: all
@@ -203,6 +204,16 @@ With `reloadResourcesEachConversion(true)`, each conversion sees the folder as i
 anything. It costs a walk of `fonts/` and one look at the disk per image and conversion, and a conversion that starts
 while the files are being copied can find some of them and not others, or one half written. In this mode `reloaded()`
 gives an equivalent `Converter`.
+
+With `preloadResources(true)`, the `Converter` reads the folder when it is created and in each `reloaded()`, instead of
+reading each file the first time a conversion uses it. It indexes `fonts/` and reads every image of `images/` (also
+those of its subfolders) that can be read, so it keeps the folder as it was at that moment. A font that cannot be
+indexed makes `build()` or `reloaded()` fail with `RESOURCE`, instead of the first conversion, and the `Converter` that
+was there goes on converting. An image that cannot be read (it is not an image, its format is not supported, it leaves
+the folder through a link) or a PDF beyond `Limits.maxPdfBytes` is left for when a document uses it, which gives the
+error with the line of its `Image`. It costs reading the whole folder, also the images that no document uses. It does
+not go together with `reloadResourcesEachConversion(true)`, which would read the whole folder in each conversion:
+`build()` fails with `IllegalArgumentException`.
 
 Underneath, both use `Resources.snapshot()`: another `Resources` of the same folder, which shares with the first one and
 with its other views what was already read. Like any `Resources`, it looks at the folder the first time it is asked for
@@ -218,8 +229,8 @@ the fonts or for each image and then keeps what it found:
 
 The `Converter` takes a view when it is created and another one in `reloaded()`, or one per conversion in the other
 mode. The `LaidOutDocument` keeps its own (`LaidOutDocument.resources()`), and `toPdf` and `toSvg` paint it with the
-same fonts and images it was laid out with, also with a `Converter` reloaded afterwards. A file not used yet is read when
-it is first used, not when `reloaded()` is called.
+same fonts and images it was laid out with, also with a `Converter` reloaded afterwards. Without
+`preloadResources(true)`, a file not used yet is read when it is first used, not when `reloaded()` is called.
 
 The fonts and the SVGs are in memory, so a document already laid out is painted the same even if its file changes or
 disappears. A PNG, a JPEG or a PDF is read again when painting, and before that `ImageFile.checkUnchanged` compares its
@@ -237,7 +248,12 @@ first time and does not look at it again. To see the changes, they are given `re
 > moment, does not look at the disk in each conversion and does not see a folder half updated. `reloaded()` gives a new
 > `Converter`, and does not change the existing one, so that the `Converter` stays immutable. Reloading in each
 > conversion remains as an option of the `builder` for whoever does not know when the files change (a preview of files
-> edited by hand). In both modes, the SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by their size
+> edited by hand). Reading is lazy by default, because a folder can have many images that no document uses, and
+> preloading remains as another option for whoever wants to see the folder as it is when reloading and the errors of the
+> fonts before converting. The preload skips the images it cannot read, because `images/` can hold files that are not
+> images and their error is clearer with the line of the document that uses them. Not even with it is it a complete
+> photo: of the PNG, the JPEG and the PDF it keeps the format and the size, and their content is read again when
+> painting. In both modes, the SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by their size
 > and their date, because they can be large. A file replaced by another of the same size with the date of the original
 > (as `cp -p`, `rsync -t` or a zip when it is extracted do) is not detected, nor a change between the check and the
 > reading. *Rejected alternatives:* only reloading in each conversion (0.10.0), which made everyone pay the look at the
