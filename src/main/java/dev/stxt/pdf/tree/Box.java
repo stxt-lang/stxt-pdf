@@ -403,8 +403,10 @@ public final class Box {
     }
 
     /**
-     * Whether it is the root of its layout, which represents the page area: the box of a {@code Section}
-     * (reference/components/document.md) or, in a tree without sections, the root.
+     * Whether it is the root of a layout, which represents the page area: the box of a {@code Section}
+     * (reference/components/document.md). So is a box without a parent: the root of the document, which is not laid
+     * out and is the reference container of its {@code Page overlay} boxes, and the root of a tree without sections,
+     * which a layout algorithm receives as it is.
      */
     public boolean isLayoutRoot() {
         return parent == null || element == Element.SECTION;
