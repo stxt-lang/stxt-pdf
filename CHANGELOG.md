@@ -5,7 +5,15 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.11.0] - 2026-11-05
+
+Resources that stay as they were when the `Converter` was created and are reloaded when whoever converts asks for it
+(`Converter.reloaded()`), with the options of reading them all when the converter is created or keeping the images in
+memory; stretched items that end with their split row, and split rows that no longer overflow the box that contains
+them. **From 0.10.0**: by default a `Converter` no longer sees the files changed in the resources folder until
+`reloaded()`; `Converter.builder().reloadResourcesEachConversion(true)` keeps the behavior of 0.10.0. The `parent()` of
+the box of a `Section` is now the root of the document. The names of the `dev.stxt.pdf` namespace and the Java API may
+still change before 1.0.
 
 ### Changed
 
