@@ -3,6 +3,8 @@ package dev.stxt.pdf.convert;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Check;
+import dev.stxt.pdf.model.Limits;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.model.StxtPdfException.Kind;
 import dev.stxt.pdf.resources.ImageFile;
@@ -29,9 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Files of the resources folder that change while a {@link Converter} lives (reference/implementation/api.md): each
- * conversion sees the folder as it is when it starts, and a document already laid out is painted with what it was
- * laid out with, or not painted.
+ * Files of the resources folder that change while a {@link Converter} lives (reference/implementation/api.md): a
+ * converter keeps what it read and {@link Converter#reloaded()} sees the changes, or, built with
+ * {@link Converter.Builder#reloadResourcesEachConversion}, each conversion sees the folder as it is when it starts; a
+ * document already laid out is painted with what it was laid out with, or not painted.
  */
 class ResourceChangesTest {
 
@@ -61,8 +64,19 @@ class ResourceChangesTest {
         Files.copy(FONTS.resolve(font), target);
     }
 
+    /** A converter that keeps what it reads until {@link Converter#reloaded()}, the default. */
     private static Converter converter(Resources resources) {
         return Converter.builder().resources(resources).styles(BASE).build();
+    }
+
+    /** A converter whose conversions see the folder as it is when they start. */
+    private static Converter live(Resources resources) {
+        return Converter.builder().resources(resources).styles(BASE).reloadResourcesEachConversion(true).build();
+    }
+
+    /** The converter that sees the files as they are now: the reloaded one, or the same if it reloads each time. */
+    private static Converter next(Converter converter) {
+        return converter.reloadsResourcesEachConversion() ? converter : converter.reloaded();
     }
 
     private static void replace(Path dir, String image, String with) throws IOException {
@@ -97,85 +111,156 @@ class ResourceChangesTest {
         }
     }
 
+    private static void assertChanged(String name, Executable paint) {
+        StxtPdfException e = assertThrows(StxtPdfException.class, paint);
+        assertEquals("IMAGE_FORMAT", e.code(), name + ": " + e);
+        assertEquals(Kind.RESOURCE, e.kind());
+        assertTrue(e.getMessage().startsWith("The image " + name + " changed after it was read"), e.getMessage());
+        assertTrue(e.getMessage().endsWith("(Converter.reloaded())"), e.getMessage());
+    }
+
     /**
      * A PNG, JPEG or PDF replaced between laying out and painting would be laid out with one size and painted with
-     * another: it is an error. The next conversion reads the new file.
+     * another: it is an error. The default converter keeps laying out with the old file, and failing, until it is
+     * reloaded; the reloaded one, or the next conversion of one that reloads each time, reads the new file.
      */
     @Test
-    void anImageReplacedAfterLayingOutIsAnErrorAndTheNextConversionReadsIt(@TempDir Path dir) throws IOException {
+    void anImageReplacedAfterLayingOutIsAnErrorUntilItIsReadAgain(@TempDir Path dir) throws IOException {
         String[][] cases = {{"square.png", "wide.png"}, {"tall.jpg", "square.png"}, {"pages.pdf", "layers.pdf"}};
-        for (String[] replaced : cases) {
-            String name = replaced[0];
-            Converter converter = converter(folder(dir.resolve(name), name));
-            LaidOutDocument laidOut = converter.layOut(image(name));
-            ImageFile before = laidOut.resources().images().find(name);
-            replace(dir.resolve(name), name, replaced[1]);
-            for (Executable paint : paintings(converter, laidOut)) {
-                StxtPdfException e = assertThrows(StxtPdfException.class, paint);
-                assertEquals("IMAGE_FORMAT", e.code(), name + ": " + e);
-                assertEquals(Kind.RESOURCE, e.kind());
-                assertTrue(e.getMessage().startsWith("The image " + name + " changed after it was read"),
-                        e.getMessage());
+        for (boolean eachConversion : new boolean[] {false, true}) {
+            for (String[] replaced : cases) {
+                String name = replaced[0];
+                Path folder = dir.resolve(eachConversion + "-" + name);
+                Resources resources = folder(folder, name);
+                Converter converter = eachConversion ? live(resources) : converter(resources);
+                LaidOutDocument laidOut = converter.layOut(image(name));
+                ImageFile before = laidOut.resources().images().find(name);
+                replace(folder, name, replaced[1]);
+                for (Executable paint : paintings(converter, laidOut)) {
+                    assertChanged(name, paint);
+                }
+                if (!eachConversion) {
+                    LaidOutDocument stale = converter.layOut(image(name));
+                    assertSame(before, stale.resources().images().find(name), name);
+                    assertChanged(name, () -> converter.toPdf(stale, new ByteArrayOutputStream()));
+                }
+                Converter next = next(converter);
+                LaidOutDocument again = next.layOut(image(name));
+                ImageFile after = again.resources().images().find(name);
+                assertNotSame(before, after, name);
+                assertEquals(IMAGES.resolve(replaced[1]).toFile().length(), Files.size(after.path()), name);
+                assertTrue(pdf(next, again).length > 0);
             }
-            LaidOutDocument again = converter.layOut(image(name));
-            ImageFile after = again.resources().images().find(name);
-            assertNotSame(before, after, name);
-            assertEquals(IMAGES.resolve(replaced[1]).toFile().length(), Files.size(after.path()), name);
-            assertTrue(pdf(converter, again).length > 0);
         }
         // The size of the new file is the one the new conversion lays out.
-        Converter converter = converter(new Resources(dir.resolve("square.png")));
+        Converter converter = converter(new Resources(dir.resolve("false-square.png")));
         ImageFile wide = converter.layOut(image("square.png")).resources().images().find("square.png");
         assertNotEquals(wide.width(), wide.height());
     }
 
     /**
      * An SVG is painted with the bytes that were checked and measured when it was read, whatever the file has now; the
-     * next conversion reads the new one.
+     * default converter keeps laying it out as it was read, and the reloaded one reads the new one, as does the next
+     * conversion of one that reloads each time.
      */
     @Test
     void anSvgReplacedAfterLayingOutIsPaintedAsItWasRead(@TempDir Path dir) throws IOException {
-        Converter converter = converter(folder(dir, "shapes.svg"));
-        LaidOutDocument laidOut = converter.layOut(image("shapes.svg"));
-        byte[] before = pdf(converter, laidOut);
-        List<String> svgBefore = converter.toSvg(laidOut);
-        Path file = dir.resolve("images/shapes.svg");
-        Files.writeString(file, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"10\">"
-                + "<rect width=\"30\" height=\"10\" fill=\"#123456\"/></svg>");
-        assertArrayEquals(before, pdf(converter, laidOut));
-        assertEquals(svgBefore, converter.toSvg(laidOut));
-        LaidOutDocument again = converter.layOut(image("shapes.svg"));
-        assertEquals(30 * ImageFile.POINTS_PER_PIXEL, again.resources().images().find("shapes.svg").width(), 1e-9);
-        assertFalse(java.util.Arrays.equals(before, pdf(converter, again)));
-        Files.delete(file);
-        assertArrayEquals(before, pdf(converter, laidOut));
+        for (boolean eachConversion : new boolean[] {false, true}) {
+            Path folder = dir.resolve(String.valueOf(eachConversion));
+            Resources resources = folder(folder, "shapes.svg");
+            Converter converter = eachConversion ? live(resources) : converter(resources);
+            LaidOutDocument laidOut = converter.layOut(image("shapes.svg"));
+            byte[] before = pdf(converter, laidOut);
+            List<String> svgBefore = converter.toSvg(laidOut);
+            Path file = folder.resolve("images/shapes.svg");
+            Files.writeString(file, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"10\">"
+                    + "<rect width=\"30\" height=\"10\" fill=\"#123456\"/></svg>");
+            assertArrayEquals(before, pdf(converter, laidOut));
+            assertEquals(svgBefore, converter.toSvg(laidOut));
+            if (!eachConversion) {
+                assertArrayEquals(before, pdf(converter, converter.layOut(image("shapes.svg"))));
+            }
+            Converter next = next(converter);
+            LaidOutDocument again = next.layOut(image("shapes.svg"));
+            assertEquals(30 * ImageFile.POINTS_PER_PIXEL, again.resources().images().find("shapes.svg").width(),
+                    1e-9);
+            assertFalse(java.util.Arrays.equals(before, pdf(next, again)));
+            Files.delete(file);
+            assertArrayEquals(before, pdf(converter, laidOut));
+        }
     }
 
-    /** A font added to {@code fonts/} is seen by the next conversion, and one removed stops being there. */
+    /**
+     * A font added to {@code fonts/} is seen by the reloaded converter, or by the next conversion of one that reloads
+     * each time, and one removed stops being there; the default converter keeps the fonts it read.
+     */
     @Test
-    void theNextConversionSeesTheFontsAddedAndRemoved(@TempDir Path dir) throws IOException {
-        Converter converter = converter(folder(dir));
+    void theFontsAddedAndRemovedAreSeenWhenTheFolderIsReadAgain(@TempDir Path dir) throws IOException {
         InlineNode serif = Docs.read(HEADER, "\tText: Hola", "\t\tTypography:", "\t\t\tFont: IBM Plex Serif");
-        assertEquals("FONT_UNKNOWN", assertThrows(StxtPdfException.class, () -> converter.layOut(serif)).code());
-        copyFont(dir, SERIF);
-        LaidOutDocument laidOut = converter.layOut(serif);
-        byte[] painted = pdf(converter, laidOut);
-        Files.delete(dir.resolve("fonts").resolve(SERIF));
-        assertEquals("FONT_UNKNOWN", assertThrows(StxtPdfException.class, () -> converter.layOut(serif)).code());
-        // What was laid out keeps the fonts it was measured with, which are in memory.
-        assertArrayEquals(painted, pdf(converter, laidOut));
+        for (boolean eachConversion : new boolean[] {false, true}) {
+            Path folder = dir.resolve(String.valueOf(eachConversion));
+            Resources resources = folder(folder);
+            Converter converter = eachConversion ? live(resources) : converter(resources);
+            assertEquals("FONT_UNKNOWN", assertThrows(StxtPdfException.class, () -> converter.layOut(serif)).code());
+            copyFont(folder, SERIF);
+            if (!eachConversion) {
+                assertEquals("FONT_UNKNOWN",
+                        assertThrows(StxtPdfException.class, () -> converter.layOut(serif)).code());
+            }
+            Converter withSerif = next(converter);
+            LaidOutDocument laidOut = withSerif.layOut(serif);
+            byte[] painted = pdf(withSerif, laidOut);
+            Files.delete(folder.resolve("fonts").resolve(SERIF));
+            if (!eachConversion) {
+                // The fonts are in memory: the converter that read them goes on laying out with them.
+                assertArrayEquals(painted, pdf(withSerif, withSerif.layOut(serif)));
+            }
+            Converter without = next(withSerif);
+            assertEquals("FONT_UNKNOWN", assertThrows(StxtPdfException.class, () -> without.layOut(serif)).code());
+            // What was laid out keeps the fonts it was measured with.
+            assertArrayEquals(painted, pdf(without, laidOut));
+        }
+    }
+
+    /** By default every conversion of a converter works with the same resources. */
+    @Test
+    void theDefaultConverterConvertsWithTheSameResources(@TempDir Path dir) throws IOException {
+        Converter converter = converter(folder(dir, "square.png"));
+        assertFalse(converter.reloadsResourcesEachConversion());
+        assertSame(converter.layOut(image("square.png")).resources(), converter.layOut(image("square.png")).resources());
+        assertTrue(live(converter.resources()).reloadsResourcesEachConversion());
     }
 
     /** What has not changed is not read again: the conversions share the fonts and the images already read. */
     @Test
     void whatHasNotChangedIsNotReadAgain(@TempDir Path dir) throws IOException {
-        Resources resources = folder(dir, "square.png");
-        Converter converter = converter(resources);
-        LaidOutDocument first = converter.layOut(image("square.png"));
-        LaidOutDocument second = converter.layOut(image("square.png"));
-        assertNotSame(first.resources(), second.resources());
-        assertSame(first.resources().fonts(), second.resources().fonts());
-        assertSame(first.resources().images().find("square.png"), second.resources().images().find("square.png"));
+        for (boolean eachConversion : new boolean[] {false, true}) {
+            Resources resources = folder(dir.resolve(String.valueOf(eachConversion)), "square.png");
+            Converter converter = eachConversion ? live(resources) : converter(resources);
+            LaidOutDocument first = converter.layOut(image("square.png"));
+            LaidOutDocument second = next(converter).layOut(image("square.png"));
+            assertNotSame(first.resources(), second.resources());
+            assertSame(first.resources().fonts(), second.resources().fonts());
+            assertSame(first.resources().images().find("square.png"),
+                    second.resources().images().find("square.png"));
+        }
+    }
+
+    /** {@link Converter#reloaded()} gives another converter with the same configuration; the first does not change. */
+    @Test
+    void theReloadedConverterKeepsTheConfiguration() {
+        for (boolean eachConversion : new boolean[] {false, true}) {
+            Converter converter = Converter.builder().resources(new Resources(Path.of("other"))).pdfUa(2)
+                    .limits(Limits.DEFAULT.withMaxPages(3)).exclude(Check.CONTRAST)
+                    .reloadResourcesEachConversion(eachConversion).build();
+            Converter reloaded = converter.reloaded();
+            assertNotSame(converter, reloaded);
+            assertSame(converter.resources(), reloaded.resources());
+            assertEquals(converter.limits(), reloaded.limits());
+            assertEquals(converter.excluded(), reloaded.excluded());
+            assertEquals(2, reloaded.pdfUa());
+            assertEquals(eachConversion, reloaded.reloadsResourcesEachConversion());
+        }
     }
 
     /** A snapshot keeps what it found while it lives, so that a conversion does not mix two versions of a file. */
@@ -192,6 +277,21 @@ class ResourceChangesTest {
         Resources next = resources.snapshot();
         assertNotSame(square, next.images().find("square.png"));
         assertTrue(next.fonts().families().contains("IBM Plex Serif"), () -> "families: " + next.fonts().families());
+    }
+
+    /**
+     * A snapshot that reads a file again does not change what the {@code Resources} it comes from found: each one
+     * keeps its own images.
+     */
+    @Test
+    void aSnapshotDoesNotChangeWhatTheOthersFound(@TempDir Path dir) throws IOException {
+        Resources resources = folder(dir, "square.png");
+        ImageFile square = resources.images().find("square.png");
+        replace(dir, "square.png", "wide.png");
+        ImageFile wide = resources.snapshot().images().find("square.png");
+        assertNotSame(square, wide);
+        // Another spelling, so that it does not come from the shortcut of the spellings already seen.
+        assertSame(square, resources.images().find("./square.png"));
     }
 
     /** A {@code Resources} created with a constructor reads each file once and does not look at the folder again. */

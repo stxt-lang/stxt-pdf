@@ -39,8 +39,9 @@ import java.util.stream.Stream;
  * font, two files with the same family, weight and style, and a link that leaves the
  * resources folder.</p>
  *
- * <p>It keeps the size and the modification time of each file as it read them ({@link #stamps()}), so that
- * {@link Resources#snapshot()} can tell whether the folder changed without reading the fonts again.</p>
+ * <p>It keeps the size and the modification time of each file as it read them ({@link #stamps()}), so that a
+ * {@link Resources} can tell whether the folder changed since another one of the same family scanned it
+ * ({@link Resources#snapshot()}), without reading the fonts again.</p>
  */
 public final class FontLibrary {
 

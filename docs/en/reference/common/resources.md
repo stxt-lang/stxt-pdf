@@ -23,8 +23,8 @@ subfolder: that of an `Image`, to `images/` (`logos/acme.png` is `resources/imag
 > **Decision:** symbolic links that do not leave the resources folder are allowed. *Rejected alternative:* rejecting any
 > link.
 
-The files can change while the engine is running: each conversion sees the fonts and the images as they are when it
-starts ([Using from Java](../implementation/api.md#files-that-change)).
+The files can change while the engine is running: the engine sees them when the application asks it to or, if it is
+configured so, in each conversion ([Using from Java](../implementation/api.md#files-that-change)).
 
 ## Fonts
 

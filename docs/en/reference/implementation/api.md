@@ -184,39 +184,66 @@ with the TrueType one, whatever its extension; `FontFile.cff()` says which ones 
 
 ### Files that change
 
-The files of the folder can change while the `Converter` lives: each conversion sees the folder as it is when it
-starts, without creating another `Converter` or another `Resources`. `Converter` works in each conversion with
-`Resources.snapshot()`, a view of the folder that shares with the `Resources` and with the other views what was already
-read:
+```java
+Converter converter = Converter.create();
+// ... files of resources/ are added, removed or replaced ...
+converter = converter.reloaded();                                        // the new one sees them
 
-- **Fonts.** The first time the view asks for them, it walks `fonts/` looking at the size and the modification time of
-  each file, without reading it. If they are those of the last index, it uses it; if a file was added, removed or
-  replaced, it indexes the folder again.
-- **Images.** The first time the view asks for an image, it looks at the size and the date of its file. If they are
-  those of the image already read, it uses it; if not, it reads it again and the new one replaces the old one for the
-  views that come after. An SVG with text is also read again if the fonts were indexed again, because its text was
-  checked with them.
-- **During the conversion.** The view keeps what it found while it lives, so a conversion does not mix two versions of
-  a file. The `LaidOutDocument` keeps it (`LaidOutDocument.resources()`), and `toPdf` and `toSvg` paint it with the same
-  fonts and images it was laid out with.
+Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // each conversion sees them
+```
+
+A `Converter` reads each font and each image the first time it uses it and keeps it, whatever happens to its file: all
+its conversions work with the same resources. The files added, removed or replaced afterwards are seen by the
+`Converter` that `reloaded()` gives, with the same configuration. The first one does not change, and what it converts
+afterwards still uses what it had read. It is called when the new files are all in place, so no conversion finds part
+of them or one half written. Whoever shares the `Converter` among threads keeps the current one in an
+`AtomicReference`.
+
+With `reloadResourcesEachConversion(true)`, each conversion sees the folder as it is when it starts, without calling
+anything. It costs a walk of `fonts/` and one look at the disk per image and conversion, and a conversion that starts
+while the files are being copied can find some of them and not others, or one half written. In this mode `reloaded()`
+gives an equivalent `Converter`.
+
+Underneath, both use `Resources.snapshot()`: another `Resources` of the same folder, which shares with the first one and
+with its other views what was already read. Like any `Resources`, it looks at the folder the first time it is asked for
+the fonts or for each image and then keeps what it found:
+
+- **Fonts.** It walks `fonts/` looking at the size and the modification time of each file, without reading it. If they
+  are those of the last index of the family, it uses it; if a file was added, removed or replaced, it indexes the folder
+  again.
+- **Images.** It looks at the size and the date of the file. If they are those of the image already read, it uses it;
+  if not, it reads it again and the new one replaces the old one for the `Resources` that ask for it afterwards, without
+  changing the one of those that already had it. An SVG with text is also read again if the fonts were indexed again,
+  because its text was checked with them.
+
+The `Converter` takes a view when it is created and another one in `reloaded()`, or one per conversion in the other
+mode. The `LaidOutDocument` keeps its own (`LaidOutDocument.resources()`), and `toPdf` and `toSvg` paint it with the
+same fonts and images it was laid out with, also with a `Converter` reloaded afterwards. A file not used yet is read when
+it is first used, not when `reloaded()` is called.
 
 The fonts and the SVGs are in memory, so a document already laid out is painted the same even if its file changes or
 disappears. A PNG, a JPEG or a PDF is read again when painting, and before that `ImageFile.checkUnchanged` compares its
 size and its date with those it had when it was read: if they do not match, the conversion ends in `IMAGE_FORMAT`,
 without a line, instead of painting an image with the size of another; if the file can no longer be read (because it was
-removed, for example), in `RESOURCE`, with its path. The next conversion reads the new file.
+removed, for example), in `RESOURCE`, with its path. By default the `Converter` goes on laying out with the old image,
+so its conversions with it fail the same way until `reloaded()`; in the other mode, the next conversion reads the new
+file.
 
-A `Resources` created with its constructor and used without `snapshot()` (with `Engine`, `PdfDocumentWriter` or
-`PdfPainter` directly) reads each file the first time and does not look at the folder again. To see the changes, they
-are given `resources.snapshot()`, one per document.
+A `Resources` used with `Engine`, `PdfDocumentWriter` or `PdfPainter` directly behaves the same: it reads each file the
+first time and does not look at it again. To see the changes, they are given `resources.snapshot()`.
 
-> **Decision:** one view per conversion, which looks at each file the first time it uses it: the changes are seen
-> without creating another `Converter`, it costs a walk of `fonts/` and one look at the disk per image and conversion,
-> and a conversion does not mix versions. The SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by
-> their size and their date, because they can be large. A file replaced by another of the same size with the date of the
-> original (as `cp -p`, `rsync -t` or a zip when it is extracted do) is not detected, nor a change between the check and
-> the reading. *Rejected alternatives:* a folder that cannot change while the `Resources` lives, which needed another one
-> to see a new file; a `reload()` that whoever changes the files calls; looking at the disk at each use of a file, which
+> **Decision:** by default the resources do not change while the `Converter` lives, and they are reloaded with
+> `reloaded()`, which whoever changes the files calls: a conversion does not depend on the state of the disk at that
+> moment, does not look at the disk in each conversion and does not see a folder half updated. `reloaded()` gives a new
+> `Converter`, and does not change the existing one, so that the `Converter` stays immutable. Reloading in each
+> conversion remains as an option of the `builder` for whoever does not know when the files change (a preview of files
+> edited by hand). In both modes, the SVG is kept in memory, and the PNG, the JPEG and the PDF are compared by their size
+> and their date, because they can be large. A file replaced by another of the same size with the date of the original
+> (as `cp -p`, `rsync -t` or a zip when it is extracted do) is not detected, nor a change between the check and the
+> reading. *Rejected alternatives:* only reloading in each conversion (0.10.0), which made everyone pay the look at the
+> disk and see folders half copied; only the explicit reload, which made a preview call it in each request; a `reload()`
+> that changes the `Converter`, which stops being immutable; a `reloaded()` that reads everything again, which would close
+> the `cp -p` gap at the cost of indexing all the fonts in each reload; looking at the disk at each use of a file, which
 > is in each measurement; reading the bytes once when painting and checking on them the format and the size that were
 > measured.
 

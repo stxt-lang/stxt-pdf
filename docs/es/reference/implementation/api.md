@@ -180,38 +180,64 @@ con el de TrueType, sea cual sea su extensión; `FontFile.cff()` dice cuáles so
 
 ### Ficheros que cambian
 
-Los ficheros de la carpeta pueden cambiar mientras vive el `Converter`: cada conversión ve la carpeta como está cuando
-empieza, sin crear otro `Converter` ni otro `Resources`. `Converter` trabaja en cada conversión con
-`Resources.snapshot()`, una vista de la carpeta que comparte con el `Resources` y con las demás vistas lo ya leído:
+```java
+Converter converter = Converter.create();
+// ... se añaden, quitan o sustituyen ficheros de resources/ ...
+converter = converter.reloaded();                                        // los ve el nuevo
 
-- **Fuentes.** La primera vez que la vista las pide, recorre `fonts/` mirando el tamaño y la fecha de modificación de
-  cada fichero, sin leerlo. Si son los del último índice, lo usa; si se ha añadido, quitado o sustituido un fichero,
-  indexa la carpeta otra vez.
-- **Imágenes.** La primera vez que la vista pide una imagen, mira el tamaño y la fecha de su fichero. Si son los de la
-  imagen ya leída, la usa; si no, la lee otra vez y la nueva sustituye a la vieja para las vistas que vengan después. Un
+Converter live = Converter.builder().reloadResourcesEachConversion(true).build();   // cada conversión los ve
+```
+
+Un `Converter` lee cada fuente y cada imagen la primera vez que la usa y se queda con ella, pase lo que pase con su
+fichero: todas sus conversiones trabajan con los mismos recursos. Los ficheros añadidos, quitados o sustituidos después
+los ve el `Converter` que da `reloaded()`, con la misma configuración. El primero no cambia, y lo que convierte después
+sigue usando lo que había leído. Se llama cuando los ficheros nuevos están todos en su sitio, así que ninguna conversión
+encuentra una parte de ellos o uno a medio escribir. Quien comparte el `Converter` entre hilos guarda el actual en un
+`AtomicReference`.
+
+Con `reloadResourcesEachConversion(true)`, cada conversión ve la carpeta como está cuando empieza, sin llamar a nada.
+Cuesta un recorrido de `fonts/` y una consulta al disco por imagen y conversión, y una conversión que empieza mientras
+se copian los ficheros puede encontrar unos sí y otros no, o uno a medio escribir. `reloaded()` da en este modo un
+`Converter` equivalente.
+
+Por debajo, los dos usan `Resources.snapshot()`: otro `Resources` de la misma carpeta, que comparte con el primero y con
+sus demás vistas lo ya leído. Como cualquier `Resources`, mira la carpeta la primera vez que se le piden las fuentes o
+cada imagen y después se queda con lo que encontró:
+
+- **Fuentes.** Recorre `fonts/` mirando el tamaño y la fecha de modificación de cada fichero, sin leerlo. Si son los
+  del último índice de la familia, lo usa; si se ha añadido, quitado o sustituido un fichero, indexa la carpeta otra vez.
+- **Imágenes.** Mira el tamaño y la fecha del fichero. Si son los de la imagen ya leída, la usa; si no, la lee otra vez
+  y la nueva sustituye a la vieja para los `Resources` que la pidan después, sin cambiar la de los que ya la tenían. Un
   SVG con texto se lee también otra vez si las fuentes se han indexado de nuevo, porque su texto se comprobó con ellas.
-- **Durante la conversión.** La vista se queda con lo que encontró mientras vive, así que una conversión no mezcla dos
-  versiones de un fichero. El `LaidOutDocument` la guarda (`LaidOutDocument.resources()`), y `toPdf` y `toSvg` lo pintan
-  con las mismas fuentes e imágenes con que se maquetó.
+
+El `Converter` toma una vista al crearse y otra en `reloaded()`, o una por conversión en el otro modo. El
+`LaidOutDocument` guarda la suya (`LaidOutDocument.resources()`), y `toPdf` y `toSvg` lo pintan con las mismas fuentes
+e imágenes con que se maquetó, también con un `Converter` recargado después. Un fichero que todavía no se ha usado se lee
+cuando se usa por primera vez, no al llamar a `reloaded()`.
 
 Las fuentes y los SVG están en memoria, así que un documento ya maquetado se pinta igual aunque su fichero cambie o
 desaparezca. Un PNG, un JPEG o un PDF se vuelve a leer al pintar, y antes `ImageFile.checkUnchanged` compara su tamaño y
 su fecha con los que tenía al leerlo: si no coinciden, la conversión acaba en `IMAGE_FORMAT`, sin línea, en vez de pintar
 una imagen con el tamaño de otra; si el fichero ya no se puede leer (porque se ha borrado, por ejemplo), en `RESOURCE`,
-con su ruta. La conversión siguiente lee el fichero nuevo.
+con su ruta. Por defecto el `Converter` sigue maquetando con la imagen vieja, así que sus conversiones con ella fallan
+igual hasta `reloaded()`; en el otro modo, la conversión siguiente lee el fichero nuevo.
 
-Un `Resources` creado con su constructor y usado sin `snapshot()` (con `Engine`, `PdfDocumentWriter` o `PdfPainter`
-directamente) lee cada fichero la primera vez y no vuelve a mirar la carpeta. Para ver los cambios, se les pasa
-`resources.snapshot()`, una por documento.
+Un `Resources` usado con `Engine`, `PdfDocumentWriter` o `PdfPainter` directamente se comporta igual: lee cada fichero
+la primera vez y no vuelve a mirarlo. Para ver los cambios, se les pasa `resources.snapshot()`.
 
-> **Decisión:** una vista por conversión, que mira cada fichero la primera vez que lo usa: los cambios se ven sin crear
-> otro `Converter`, cuesta un recorrido de `fonts/` y una consulta al disco por imagen y conversión, y una conversión no
-> mezcla versiones. El SVG se guarda en memoria, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha, porque
-> pueden ser grandes. No se detecta un fichero sustituido por otro del mismo tamaño con la fecha del original (como hacen
-> `cp -p`, `rsync -t` o un zip al descomprimirse), ni un cambio entre la comprobación y la lectura. *Alternativas
-> descartadas:* una carpeta que no puede cambiar mientras vive el `Resources`, que pedía crear otro para ver un fichero
-> nuevo; un `reload()` que llama quien cambia los ficheros; mirar el disco en cada uso de un fichero, que está en cada
-> medida; leer los bytes una vez al pintar y comprobar sobre ellos el formato y el tamaño medidos.
+> **Decisión:** por defecto los recursos no cambian mientras vive el `Converter`, y se recargan con `reloaded()`, que
+> llama quien cambia los ficheros: una conversión no depende de cómo esté el disco en ese momento, no mira el disco en
+> cada conversión y no ve una carpeta a medio actualizar. `reloaded()` da un `Converter` nuevo, y no cambia el que hay,
+> para que el `Converter` siga siendo inmutable. La recarga en cada conversión queda como opción del `builder` para quien
+> no sabe cuándo cambian los ficheros (una vista previa de ficheros que se editan a mano). En los dos modos, el SVG se
+> guarda en memoria, y el PNG, el JPEG y el PDF se comparan por su tamaño y su fecha, porque pueden ser grandes. No se
+> detecta un fichero sustituido por otro del mismo tamaño con la fecha del original (como hacen `cp -p`, `rsync -t` o un
+> zip al descomprimirse), ni un cambio entre la comprobación y la lectura. *Alternativas descartadas:* solo la recarga en
+> cada conversión (la 0.10.0), que obligaba a todos a pagar la consulta al disco y a ver carpetas a medio copiar; solo la
+> recarga explícita, que obligaba a una vista previa a llamarla en cada petición; un `reload()` que cambia el
+> `Converter`, que deja de ser inmutable; que `reloaded()` lo lea todo otra vez, que cerraría el hueco de `cp -p` a
+> cambio de indexar todas las fuentes en cada recarga; mirar el disco en cada uso de un fichero, que está en cada medida;
+> leer los bytes una vez al pintar y comprobar sobre ellos el formato y el tamaño medidos.
 
 ## Errores
 

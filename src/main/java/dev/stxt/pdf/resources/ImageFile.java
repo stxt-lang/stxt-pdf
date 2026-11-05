@@ -33,7 +33,8 @@ import java.util.Locale;
  * <p>What was read is what the layout measures (reference/implementation/api.md). An SVG keeps the bytes it was
  * checked with, and is painted with them. A PNG, a JPEG or a PDF is read again when painting:
  * {@link #checkUnchanged()} compares its size and its modification time with those it had when it was read. With the
- * same comparison a {@link Resources#snapshot()} knows whether it has to read the file again.</p>
+ * same comparison a {@link Resources} knows whether the image another one of the same family read is still that of
+ * the file ({@link Resources#snapshot()}).</p>
  */
 public final class ImageFile {
 
@@ -268,7 +269,7 @@ public final class ImageFile {
         if (now.size() != size || !now.lastModifiedTime().equals(modified)) {
             throw new ImageFormatException("The image " + name + " changed after it was read (its size or its "
                     + "modification time is not the same): the document was laid out with the previous file and "
-                    + "has to be laid out again");
+                    + "has to be laid out again with resources that read the new one (Converter.reloaded())");
         }
     }
 

@@ -16,14 +16,15 @@ import java.util.regex.Pattern;
  * rejects absolute paths, {@code ..} segments and symbolic links that point
  * outside the folder.</p>
  *
- * <p><strong>Changes in the folder</strong> (reference/implementation/api.md): a {@code Resources} created with a
- * constructor reads each font and each image the first time it is requested and does not look at the folder again.
- * {@link #snapshot()} gives a view of the folder as it is now, which shares what was already read: the fonts are
- * indexed again if a file of {@code fonts/} was added, removed or replaced, and each image is read again the first time
- * the view requests it if its file changed. {@link dev.stxt.pdf.convert.Converter} takes a snapshot for each
- * conversion, so a conversion works with one version of each file from start to end and the next one sees the
- * changes. An SVG is painted with the bytes that were read; a PNG, a JPEG or a PDF that changed or was removed between
- * laying out and painting makes the conversion fail ({@link ImageFile#checkUnchanged()}).</p>
+ * <p><strong>Changes in the folder</strong> (reference/implementation/api.md): a {@code Resources} reads the fonts and
+ * each image the first time they are requested and then keeps them while it lives, whatever happens to the files.
+ * {@link #snapshot()} gives another one, which looks at the folder as it is then and shares with this one what was
+ * already read: the fonts are indexed again if a file of {@code fonts/} was added, removed or replaced, and each image
+ * is read again if its file changed. {@link dev.stxt.pdf.convert.Converter} takes a snapshot when it is created and
+ * another one in {@link dev.stxt.pdf.convert.Converter#reloaded()}, or one for each conversion if it is
+ * {@linkplain dev.stxt.pdf.convert.Converter.Builder#reloadResourcesEachConversion(boolean) built so}. An SVG is
+ * painted with the bytes that were read; a PNG, a JPEG or a PDF that changed or was removed between laying out and
+ * painting makes the conversion fail ({@link ImageFile#checkUnchanged()}).</p>
  *
  * <p><strong>Threads:</strong> it can be shared among all conversions and all threads, and so can its snapshots. Fonts
  * and images are read the first time they are requested, with double-checked locking, and are then read without a
@@ -40,8 +41,6 @@ public final class Resources {
     private final Path root;
     /** What this object and its snapshots share. */
     private final Shared shared;
-    /** Whether it is a {@link #snapshot()}, which looks at the folder again, or was created with a constructor. */
-    private final boolean snapshot;
     /** Created the first time they are requested and read without a lock (double-checked locking). */
     private volatile FontLibrary fonts;
     private volatile ImageLibrary images;
@@ -58,23 +57,22 @@ public final class Resources {
      * @param root the resources folder, absolute or relative to the working directory
      */
     public Resources(Path root) {
-        this(root.toAbsolutePath().normalize(), new Shared(), false);
+        this(root.toAbsolutePath().normalize(), new Shared());
     }
 
-    private Resources(Path root, Shared shared, boolean snapshot) {
+    private Resources(Path root, Shared shared) {
         this.root = root;
         this.shared = shared;
-        this.snapshot = snapshot;
     }
 
     /**
-     * {@return a view of the folder as it is now, which shares with this object (and with its other snapshots) the
-     * fonts and the images already read} Those whose files have not changed are not read again. It looks at the folder
-     * only the first time it is asked for its fonts or for each image, and then keeps what it found while it lives, so
-     * that one conversion does not mix two versions of a file. Creating it costs nothing until then.
+     * {@return a view of the same folder, which shares with this object (and with its other snapshots) the fonts and
+     * the images already read} Those whose files have not changed are not read again. Like any {@code Resources}, it
+     * looks at the folder only the first time it is asked for its fonts or for each image, and then keeps what it found
+     * while it lives, so that one conversion does not mix two versions of a file. Creating it costs nothing until then.
      */
     public Resources snapshot() {
-        return new Resources(root, shared, true);
+        return new Resources(root, shared);
     }
 
     /** {@return the resources folder, absolute and normalized} */
@@ -93,8 +91,8 @@ public final class Resources {
     }
 
     /**
-     * Fonts of {@code fonts/}. They are scanned the first time they are requested; in a {@link #snapshot()}, again if
-     * the files of the folder are not those of the last scan.
+     * Fonts of {@code fonts/}, looked for the first time they are requested: the last scan of this object or of its
+     * snapshots if the files of the folder are still those it read, or a new scan.
      *
      * @throws ResourceException if the folder does not exist or some font is not valid
      */
@@ -104,7 +102,7 @@ public final class Resources {
             synchronized (this) {
                 library = fonts;
                 if (library == null) {
-                    library = shared.fonts(this, snapshot);
+                    library = shared.fonts(this);
                     fonts = library;
                 }
             }
@@ -113,8 +111,8 @@ public final class Resources {
     }
 
     /**
-     * Images of {@code images/}, read the first time they are requested; in a {@link #snapshot()}, again if the file
-     * changed since it was read.
+     * Images of {@code images/}, each one looked for the first time it is requested: the one this object or its
+     * snapshots already read if the file has not changed, or the file read again.
      */
     public ImageLibrary images() {
         ImageLibrary library = images;
@@ -122,7 +120,7 @@ public final class Resources {
             synchronized (this) {
                 library = images;
                 if (library == null) {
-                    library = new ImageLibrary(this, shared.images, snapshot);
+                    library = new ImageLibrary(this, shared.images);
                     images = library;
                 }
             }
@@ -133,17 +131,14 @@ public final class Resources {
     /** What a {@code Resources} and its snapshots share: the last scan of the fonts and the images read. */
     private static final class Shared {
 
-        /** The images read, by real path; a snapshot replaces the one whose file changed. */
+        /** The images read, by real path; the one whose file changed is replaced when it is read again. */
         final Map<Path, ImageFile> images = new ConcurrentHashMap<>();
         private volatile FontLibrary fonts;
 
-        /**
-         * The fonts of the last scan, scanning them the first time and, if {@code refresh}, again when the files of
-         * the folder are not those it read.
-         */
-        FontLibrary fonts(Resources resources, boolean refresh) {
+        /** The fonts of the last scan, scanning them the first time and again when the files are not those it read. */
+        FontLibrary fonts(Resources resources) {
             FontLibrary library = fonts;
-            if (library != null && (!refresh || library.stamps().equals(FontLibrary.stamps(resources)))) {
+            if (library != null && library.stamps().equals(FontLibrary.stamps(resources))) {
                 return library;
             }
             synchronized (this) {

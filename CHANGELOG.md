@@ -35,6 +35,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Java API
 
+- **The resources of a `Converter` do not change until it is reloaded.** A `Converter` reads each font and each image
+  the first time it uses it and keeps it, whatever happens to its file; `Converter.reloaded()` (new) gives a converter
+  with the same configuration that sees the files added, removed or replaced, and does not read again what has not
+  changed. It is called once the new files are all in place, so no conversion sees the folder half copied. Until
+  0.10.0 each conversion looked at the folder when it started; that is still available with
+  `Converter.builder().reloadResourcesEachConversion(true)` (new, and `reloadsResourcesEachConversion()` to ask). In
+  the default mode, a PNG, a JPEG or a PDF replaced in `images/` makes the conversions that use it fail with
+  `IMAGE_FORMAT` until `reloaded()`, and its message now says so. "Files that change" in `api.md`.
+- **A snapshot that reads an image again no longer changes the one a `Resources` already had.** A `Resources` used
+  directly (with `Engine` or `PdfPainter`) shared its images with its snapshots (`Resources.snapshot()`), and a
+  snapshot that read again an image whose file had changed replaced it for that `Resources` too, which from then on saw
+  the new file under a spelling of the path it had not used yet (`./logo.png`) and the old one under those it had, even
+  in the same document. Each `Resources` now keeps the images it found;
+  a `Resources` and its snapshots only share them to avoid reading again a file that has not changed. A `Resources`
+  created with a constructor and one given by `snapshot()` now behave the same.
 - **The box of a `Section` has the root of the document as its parent.** Until 0.10.0 it was among the `children()` of
   the root and its `parent()` was `null`. Now the parent of every box in `children()` is the box that lists it, and
   `parent()` is `null` only in the root. `Box.isLayoutRoot()` is new: whether the box is the root of its layout (the

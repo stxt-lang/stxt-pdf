@@ -54,11 +54,12 @@ import java.util.function.Supplier;
  * {@link #layOut(InlineNode)} and the result is painted with {@link #toPdf(LaidOutDocument, OutputStream)} and
  * {@link #toSvg(LaidOutDocument)}. A {@link LaidOutDocument} does not change after it is laid out.</p>
  *
- * <p><strong>Changes in the resources folder:</strong> each conversion works with a {@link Resources#snapshot()} of
- * the folder taken when it starts, so it sees the fonts and the images that were added, removed or replaced since the
- * previous one, without creating another {@code Converter}. A {@link LaidOutDocument} keeps its snapshot, and
- * {@link #toPdf(LaidOutDocument, OutputStream)} and {@link #toSvg(LaidOutDocument)} paint it with the same fonts and
- * images it was laid out with (reference/implementation/api.md).</p>
+ * <p><strong>Changes in the resources folder</strong> (reference/implementation/api.md): a converter reads each font
+ * and each image the first time it uses it and keeps it, so the files added, removed or replaced afterwards are seen
+ * by the converter {@link #reloaded()} gives, which does not read again what has not changed. Built with
+ * {@link Builder#reloadResourcesEachConversion}, each conversion sees the folder as it is when it starts, without
+ * calling anything. A {@link LaidOutDocument} keeps the resources it was laid out with, and
+ * {@link #toPdf(LaidOutDocument, OutputStream)} and {@link #toSvg(LaidOutDocument)} paint it with them.</p>
  *
  * <p>What belongs to one document and not to the configuration, the files to embed and their XMP
  * ({@link Attachments}, for Factur-X), goes with each call: {@link #toPdf(InlineNode, OutputStream, Attachments)}.
@@ -78,6 +79,13 @@ import java.util.function.Supplier;
 public final class Converter {
 
     private final Resources resources;
+    /** Whether each conversion takes a snapshot of the resources ({@link Builder#reloadResourcesEachConversion}). */
+    private final boolean reloadEachConversion;
+    /**
+     * The snapshot of the resources every conversion works with, taken when it is created; {@code null} if each
+     * conversion takes its own.
+     */
+    private final Resources current;
     private final InlineNode styles;
     private final boolean debug;
     private final Limits limits;
@@ -88,6 +96,8 @@ public final class Converter {
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
+        this.reloadEachConversion = builder.reloadEachConversion;
+        this.current = reloadEachConversion ? null : resources.snapshot();
         this.styles = builder.styles;
         this.debug = builder.debug;
         this.limits = builder.limits;
@@ -95,6 +105,20 @@ public final class Converter {
         this.pdfUa = builder.pdfUa;
         this.pdfA = builder.pdfA;
         this.cancellation = builder.cancellation;
+    }
+
+    /** The same configuration as {@code other}, with a new snapshot of its resources ({@link #reloaded()}). */
+    private Converter(Converter other) {
+        this.resources = other.resources;
+        this.reloadEachConversion = other.reloadEachConversion;
+        this.current = reloadEachConversion ? null : resources.snapshot();
+        this.styles = other.styles;
+        this.debug = other.debug;
+        this.limits = other.limits;
+        this.excluded = other.excluded;
+        this.pdfUa = other.pdfUa;
+        this.pdfA = other.pdfA;
+        this.cancellation = other.cancellation;
     }
 
     /**
@@ -113,6 +137,27 @@ public final class Converter {
     /** {@return the resources folder it converts with} */
     public Resources resources() {
         return resources;
+    }
+
+    /**
+     * {@return a converter with the same configuration that sees the resources folder as it is now} The fonts and the
+     * images whose files have not changed are not read again (reference/implementation/api.md). This converter does
+     * not change: what it converts afterwards still uses the files it had read. It is what has to be called after
+     * adding, removing or replacing files of the folder, once they are all in place; with
+     * {@link Builder#reloadResourcesEachConversion} it is not needed, and it gives an equivalent converter.
+     */
+    public Converter reloaded() {
+        return new Converter(this);
+    }
+
+    /** {@return whether each conversion sees the resources folder as it is when it starts} */
+    public boolean reloadsResourcesEachConversion() {
+        return reloadEachConversion;
+    }
+
+    /** The resources a conversion works with from start to end: those of the converter, or a new snapshot. */
+    private Resources forConversion() {
+        return reloadEachConversion ? resources.snapshot() : current;
     }
 
     /** {@return the most it accepts ({@link Limits})} */
@@ -185,8 +230,8 @@ public final class Converter {
         Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         return guarded(() -> {
-            // The folder as it is now, for this whole conversion: the document is painted with it too.
-            Resources current = resources.snapshot();
+            // The same resources for this whole conversion: the document is painted with them too.
+            Resources current = forConversion();
             LaidOutDocument laidOut = new Engine(new PdfMetrics(current), current, limits, excluded, stop,
                     progress).layOutDocument(document, styles);
             if (!excluded.contains(Check.CONTRAST)) {
@@ -449,11 +494,11 @@ public final class Converter {
 
     /**
      * The resources a document is painted with: those it was laid out with ({@link LaidOutDocument#resources()}), so
-     * that it is painted with the fonts and the images it was measured with, or, if they are not known, the folder as
-     * it is now.
+     * that it is painted with the fonts and the images it was measured with, or, if they are not known, those a
+     * conversion would work with.
      */
     private Resources resources(LaidOutDocument document) {
-        return document.resources() != null ? document.resources() : resources.snapshot();
+        return document.resources() != null ? document.resources() : forConversion();
     }
 
     /** A job that writes to a destination. */
@@ -494,6 +539,7 @@ public final class Converter {
     public static final class Builder {
 
         private Resources resources = new Resources();
+        private boolean reloadEachConversion;
         private InlineNode styles;
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
@@ -513,6 +559,24 @@ public final class Converter {
          */
         public Builder resources(Resources resources) {
             this.resources = Objects.requireNonNull(resources, "resources");
+            return this;
+        }
+
+        /**
+         * Whether each conversion sees the resources folder as it is when it starts (reference/implementation/api.md).
+         * Off by default: the converter keeps the fonts and the images it reads, whatever happens to their files, and
+         * sees the changes only in the converter {@link Converter#reloaded()} gives; until then, a PNG, a JPEG or a PDF
+         * that was replaced, which is read again when painting, makes its conversions fail with
+         * {@code IMAGE_FORMAT}. On, each conversion looks at
+         * {@code fonts/} and at each image it uses, and reads again those that changed: the changes are seen without
+         * calling anything, at the cost of a look at the disk per conversion, and a conversion that starts while the
+         * files are being copied can find some of them and not others, or one half written.
+         *
+         * @param reload {@code true} to look at the folder in each conversion
+         * @return this builder
+         */
+        public Builder reloadResourcesEachConversion(boolean reload) {
+            this.reloadEachConversion = reload;
             return this;
         }
 
