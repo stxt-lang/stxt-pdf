@@ -23,6 +23,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `UnitBreaker.Placed` has a new component, `stretched` (the constructor without it stays), and `ConstraintSpace`, the
   method `withFixedHeight`.
 
+### Fixed
+
+- **A split row no longer overflows the box that contains it.** A row of a `Grid` or a `Table` (or a line of a
+  horizontal `Stack`) split inside a box with a definite height (a column stretched to its own row, a box with
+  `Height`) consumed of that height what the item that advanced most took up on each page, and the box ran out of
+  height for an item that advanced less: a text next to a stretched empty item, two texts with lines of different
+  heights, a text next to an item that ends on the page beyond its last line, or rows split together because an item
+  takes up several, ended in `BOX_OVERFLOW`. The row now consumes as far as the slowest of the items that go on.
+  "Breaks in `Stack`, `Grid` and `Table`" in the reference.
+
 ## [0.10.0] - 2026-11-04
 
 Hyphenation in five more languages, a resources folder whose files can change while the `Converter` lives, an error for

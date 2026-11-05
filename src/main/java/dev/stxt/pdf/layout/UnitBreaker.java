@@ -255,7 +255,8 @@ public final class UnitBreaker {
      * @param pieces   index in {@code placed} → item placed on this page
      * @param tokens   token of each item of the group, in order; {@code null} if it has finished
      * @param bottom   end of the longest one, from the content box of the fragment
-     * @param occupied end of what the items take up ({@link LayoutResult#occupied}); at most {@code bottom}
+     * @param occupied end of what the group consumes ({@link LayoutResult#occupied}): if it goes on, as far as the
+     *                 slowest of the items that go on ({@link Run#consumed}); at most {@code bottom}
      * @param broken   some item continues on the next page
      */
     private record Split(Placement[] pieces, List<BreakToken> tokens, int appeal, double bottom, double occupied,
@@ -486,7 +487,6 @@ public final class UnitBreaker {
             double bottom = 0;
             // End of the margin boxes of the items: that of the row, if all of them end on this page.
             double rowEnd = 0;
-            double occupied = 0;
             boolean broken = false;
             int j = 0;
             for (int k = 0; k < placed.size(); k++) {
@@ -521,7 +521,6 @@ public final class UnitBreaker {
                 }
                 bottom = Math.max(bottom, y + r.fragment().height());
                 rowEnd = Math.max(rowEnd, y + r.fragment().height() + r.fragment().margin().bottom());
-                occupied = Math.max(occupied, y + r.occupied(token));
             }
             // A stretched item whose area ends where the group does measures on each page what its row does, and ends
             // with it (reference/common/breaks.md): the height of the unbroken row would leave it shorter on the last
@@ -557,15 +556,52 @@ public final class UnitBreaker {
                 if (stretched.breakToken() instanceof BreakToken.Before || stretched.isFinished() == broken) {
                     continue;
                 }
+                results[k] = stretched;
                 split[k] = piece(p, stretched, y + p.frameOffset().dy() + repeat.headHeight());
                 next.set(slots[k], stretched.breakToken());
                 if (!stretched.isFinished()) {
                     appeal = Math.min(appeal, BreakRules.inside(p.box(), stretched.breakAppeal()));
                 }
                 bottom = Math.max(bottom, y + stretched.fragment().height());
-                occupied = Math.max(occupied, y + stretched.occupied(from[k]));
             }
+            double occupied = broken ? consumed(results, from, groupBottom, tokens == null, origin) : bottom;
             return new Split(split, next, appeal, bottom, occupied, broken);
+        }
+
+        /**
+         * What a group that goes on consumes on this page (reference/common/breaks.md): it is consumed as far as the
+         * slowest of the items that go on, not as far as the one that gets furthest. An item that goes on has consumed
+         * the group up to where it has got in the unfragmented layout, plus the room that layout leaves under it: that
+         * room is not needed for what is left of the item. What the fragments of the other items take beyond that is
+         * not consumed, so that the height left to the boxes that contain the group is enough for the slowest one.
+         *
+         * @param results the layout of each item of the group on this page; {@code null} if it has none
+         * @param from    the token each of them started from
+         * @param starts  the group starts on this page: it is measured from {@code origin}, and if not, from where the
+         *                slowest item had got on the previous pages
+         */
+        double consumed(LayoutResult[] results, BreakToken[] from, double groupBottom, boolean starts, double origin) {
+            double before = Double.POSITIVE_INFINITY;
+            double after = Double.POSITIVE_INFINITY;
+            for (int k = 0; k < results.length; k++) {
+                if (results[k] == null) {
+                    continue;
+                }
+                Placed p = placed.get(k);
+                double reached = p.y() - p.frameOffset().dy() + BreakToken.consumed(from[k])
+                        + Math.max(0, groupBottom - end(p));
+                before = Math.min(before, reached);
+                if (!results[k].isFinished()) {
+                    after = Math.min(after, reached + results[k].occupied(from[k]));
+                }
+            }
+            return after - (starts ? origin : before);
+        }
+
+        /** End of the margin box of an item in the unfragmented layout, without the offset of a {@code Frame}. */
+        double end(Placed p) {
+            Fragment f = p.result().fragment();
+            return p.y() - p.frameOffset().dy() + f.height() + f.margin().bottom();
         }
 
         /**
@@ -574,8 +610,7 @@ public final class UnitBreaker {
          * row, nor one that {@code Max height} keeps shorter than its row.
          */
         boolean endsWithGroup(Placed p, double groupBottom) {
-            Fragment f = p.result().fragment();
-            return same(p.y() - p.frameOffset().dy() + f.height() + f.margin().bottom(), groupBottom);
+            return same(end(p), groupBottom);
         }
 
         /**

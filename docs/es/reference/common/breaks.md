@@ -148,6 +148,18 @@ su fila; y la caja que no se parte (`Rotate`, `Overflow: clip`).
 > página, o se acababa una página antes. *Alternativa descartada:* repartir entre las páginas el alto de la fila sin
 > partir, que fue la regla hasta la 0.10.0.
 
+Mientras la fila sigue, cada ítem avanza a su ritmo: un texto de líneas más altas coloca menos alto en cada página, y un
+ítem estirado vacío llega al final. Para las cajas que contienen la fila, la fila ha consumido de su alto hasta donde ha
+llegado **el más lento de los ítems que siguen**, no hasta donde llega el fragmento del que más avanza
+([Alto definido y cortes](#alto-definido-y-cortes)). El sitio que la fila sin partir deja debajo de un ítem cuenta como
+avanzado por él. Así, una columna con alto definido que contiene la fila tiene sitio en su última página para lo que le
+queda al ítem más lento.
+
+> **Decisión:** la fila partida consume lo que el más lento de sus ítems, para que la caja que la contiene no desborde.
+> *Alternativa descartada:* lo que ocupa el ítem que más avanza, que fue la regla hasta la 0.10.0: junto a un ítem
+> estirado vacío, o a un texto de líneas más bajas, la columna se quedaba sin el alto que el otro ítem aún necesitaba
+> (`BOX_OVERFLOW`).
+
 Partir la fila es un corte más, que compite con los cortes entre filas por las reglas de la [elección del
 corte](#elección-del-corte): su calidad es la peor de la de sus ítems, así que una fila cuyos ítems no pueden respetar
 sus viudas y huérfanas o un `Keep together` (en una `Table`, el de la `Row`, que es el de sus celdas) pasa entera a la

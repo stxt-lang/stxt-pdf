@@ -150,6 +150,18 @@ is split together with the following ones, which ends with its own row and not w
 > last page, or ran out one page earlier. *Rejected alternative:* distributing across the pages the height of the
 > unsplit row, which was the rule until 0.10.0.
 
+While the row goes on, each item advances at its own pace: a text with taller lines places less height on each page, and
+a stretched empty item reaches the end. For the boxes that contain the row, the row has consumed of their height as far
+as **the slowest of the items that go on** has got, not as far as the fragment of the one that advances most reaches
+([Definite height and breaks](#definite-height-and-breaks)). The room the unsplit row leaves under an item counts as
+advanced by it. So a column with a definite height that contains the row has room on its last page for what the slowest
+item has left.
+
+> **Decision:** the split row consumes what the slowest of its items does, so that the box that contains it does not
+> overflow. *Rejected alternative:* what the item that advances most takes up, which was the rule until 0.10.0: next to
+> a stretched empty item, or to a text with shorter lines, the column ran out of the height the other item still needed
+> (`BOX_OVERFLOW`).
+
 Splitting the row is one more break, which competes with the breaks between rows by the rules of the [choice of the
 break](#choice-of-the-break): its quality is the worst of that of its items, so a row whose items cannot respect their
 widows and orphans or a `Keep together` (in a `Table`, that of the `Row`, which is that of its cells) moves whole to the

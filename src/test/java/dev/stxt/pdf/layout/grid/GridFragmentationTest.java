@@ -366,6 +366,93 @@ class GridFragmentationTest {
     }
 
     /**
+     * The column C, stretched to its row (240), holds a grid whose row has S, empty and stretched, and T (20 lines:
+     * 8, 8 and 4). S reaches the end of pages 1 and 2 (100 and 100), but the row is only consumed as far as T, the
+     * slowest item that goes on (96 and 96): C still has 48 for its last 4 lines (it used to be BOX_OVERFLOW, with
+     * 40). A, the other column, ends with them.
+     */
+    @Test
+    void aSplitRowIsConsumedAsFarAsItsSlowestItem() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: * *",
+                "		Area:", "			Block:", "				Id: A",
+                "		Area:", "			Block:", "				Id: C",
+                "				Grid:", "					Column sizes: 100 30",
+                "					Area:", "						Block:", "							Id: S",
+                "					Area:", "						Text: " + text, "							Id: T");
+        assertEquals(3, l.pages());
+        assertRect(297.5, 40, 257.5, 100, l.rect(2, "C"));
+        assertRect(297.5, 40, 100, 100, l.rect(2, "S"));
+        assertRect(297.5, 40, 257.5, 48, l.rect(3, "C"));
+        assertRect(297.5, 40, 100, 48, l.rect(3, "S"));
+        assertEquals(4, l.fragment(3, "T").lines().size());
+        assertRect(40, 40, 257.5, 48, l.rect(3, "A"));
+    }
+
+    /**
+     * Two texts of 240 in the row of a grid inside the column C: T (20 lines of 12) places 8 lines on each page (96)
+     * and U (16 lines of 15), 6 (90). The row is consumed as far as U, so C still has 60 for the last 4 lines of U on
+     * page 3 (it used to be BOX_OVERFLOW, with the 48 of T).
+     */
+    @Test
+    void twoTextsThatAdvanceDifferentlyDoNotOverflowTheirColumn() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        String large = String.join(" ", java.util.Collections.nCopies(16, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: *",
+                "		Area:", "			Block:", "				Id: C",
+                "				Grid:", "					Column sizes: 30 60",
+                "					Area:", "						Text: " + text, "							Id: T",
+                "					Area:", "						Text: " + large, "							Id: U",
+                "							Typography:", "								Size: 12.5");
+        assertEquals(3, l.pages());
+        assertEquals(6, l.fragment(1, "U").lines().size());
+        assertEquals(4, l.fragment(3, "T").lines().size());
+        assertEquals(4, l.fragment(3, "U").lines().size());
+        assertRect(40, 40, 515, 60, l.rect(3, "C"));
+    }
+
+    /**
+     * B (99, at the top of its area) ends on page 1 beyond the 96 of the 8 lines of T, which goes on: the row is
+     * consumed as far as T, not as far as B, and the column C still has 48 for the last 4 lines (it used to be
+     * BOX_OVERFLOW, with 45).
+     */
+    @Test
+    void anItemThatEndsBeyondTheOnesThatGoOnDoesNotConsumeTheirRow() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: *",
+                "		Area:", "			Block:", "				Id: C",
+                "				Grid:", "					Column sizes: 100 30",
+                "					Area:", "						Vertical: start", "						Block:", "							Id: B",
+                "							Box:", "								Height: 99",
+                "					Area:", "						Text: " + text, "							Id: T");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 100, 99, l.rect(1, "B"));
+        assertEquals(4, l.fragment(3, "T").lines().size());
+        assertRect(40, 40, 515, 48, l.rect(3, "C"));
+    }
+
+    /**
+     * Rows 1 (30) and 2 (T, 20 lines) are split together inside the column C (270): L, which takes up both, reaches
+     * the end of page 1 (100), and T, which starts at 30, places 5 lines (90). The rows are consumed as far as T, and
+     * C still has 84 for its last 7 lines on page 3 (it used to be BOX_OVERFLOW, with 70).
+     */
+    @Test
+    void rowsSplitTogetherAreConsumedAsFarAsTheirSlowestItem() {
+        String text = String.join(" ", java.util.Collections.nCopies(20, "aaaaa"));
+        LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: *",
+                "		Area:", "			Block:", "				Id: C",
+                "				Grid:", "					Column sizes: 100 30", "					Row sizes: 30 auto",
+                "					Area: 1 1 2 1", "						Block:", "							Id: L",
+                "					Area: 1 2", "						Block:", "							Id: K",
+                "					Area: 2 2", "						Text: " + text, "							Id: T");
+        assertEquals(3, l.pages());
+        assertEquals(5, l.fragment(1, "T").lines().size());
+        assertEquals(7, l.fragment(3, "T").lines().size());
+        assertRect(40, 40, 100, 84, l.rect(3, "L"));
+        assertRect(40, 40, 515, 84, l.rect(3, "C"));
+    }
+
+    /**
      * A text stretched to a row that is split has the height of the row (240) and its lines leave 4 at the end of each
      * page: that gap is not taken from it, and its last 4 lines fit on page 4 (it used to be BOX_OVERFLOW).
      */
