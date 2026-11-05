@@ -1,11 +1,10 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.Position;
-
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
 
 /**
  * Access to the {@code stxt-core} nodes and builder errors: shared by {@link BoxTreeBuilder} and the classes it

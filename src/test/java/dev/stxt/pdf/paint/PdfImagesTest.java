@@ -57,8 +57,8 @@ class PdfImagesTest {
 
     /** The content of the form in which the SVG {@code images/name} of the resources is drawn. */
     private static byte[] draw(Resources resources, String name) throws IOException {
-        try (PDDocument doc = new PDDocument()) {
-            return new PdfImages(doc, Limits.DEFAULT).drawing(resources.images().find(name))
+        try (PDDocument doc = new PDDocument(); PdfImages pdfImages = new PdfImages(doc, Limits.DEFAULT);) {
+            return pdfImages.drawing(resources.images().find(name))
                     .getContentStream().toByteArray();
         }
     }

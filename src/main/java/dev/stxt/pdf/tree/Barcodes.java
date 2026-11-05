@@ -1,18 +1,6 @@
 package dev.stxt.pdf.tree;
 
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.oned.Code128Writer;
-import com.google.zxing.oned.EAN13Writer;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.qrcode.encoder.ByteMatrix;
-import com.google.zxing.qrcode.encoder.Encoder;
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.BarcodeFormat;
-import dev.stxt.pdf.model.ErrorCorrection;
-import dev.stxt.pdf.model.Modules;
-import dev.stxt.pdf.model.Value;
+import static dev.stxt.pdf.tree.Nodes.error;
 
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
@@ -20,7 +8,19 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import static dev.stxt.pdf.tree.Nodes.error;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.oned.Code128Writer;
+import com.google.zxing.oned.EAN13Writer;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.qrcode.encoder.ByteMatrix;
+import com.google.zxing.qrcode.encoder.Encoder;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.model.ErrorCorrection;
+import dev.stxt.pdf.model.Modules;
+import dev.stxt.pdf.model.Value;
 
 /**
  * The image of a {@code Barcode} (reference/components/barcode.md): ZXing encodes its data in its {@code Format} and
