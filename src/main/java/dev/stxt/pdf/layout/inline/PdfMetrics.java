@@ -119,6 +119,7 @@ public final class PdfMetrics implements TextMeasurer {
     private static void check(Box box, FontLibrary fonts, Map<Integer, List<String>> headings) {
         Style s = box.style();
         boolean hyphens = s.typography().hyphenate() || box.text().indexOf(LineBreaker.SOFT_HYPHEN) >= 0;
+        boolean preformatted = s.typography().preformatted().enabled();
         int start = 0;
         for (TextRun run : box.runs()) {
             if (run.format().image() != null) {
@@ -158,23 +159,36 @@ public final class PdfMetrics implements TextMeasurer {
                         continue;
                     }
                 }
-                // The white-space characters of the document are painted as spaces (reference/common/typography.md),
-                // and the brace of a literal reference, as a brace.
-                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp == Reference.LITERAL_BRACE ? '{' : cp,
-                        start + i);
+                requireGlyph(box, font, painted(cp, preformatted), start + i);
                 i += Character.charCount(cp);
             }
             start += text.length();
         }
     }
 
-    /** Requires every character of {@code text}, painted in the box at {@code index}, in the font. */
+    /**
+     * The character that is painted for one of the text of a box (reference/common/typography.md): a space for the
+     * white space that the line breaking turns into spaces or line ends ({@link Words#isSpace}; in a preformatted
+     * text, {@link PreformattedText#isSpace}), a brace for the brace of a literal reference, and the character itself
+     * for the rest. Any other Unicode space (an em space, an ideographic space) is painted as it is, so the font
+     * needs it.
+     */
+    private static int painted(int cp, boolean preformatted) {
+        if (cp == Reference.LITERAL_BRACE) {
+            return '{';
+        }
+        return (preformatted ? PreformattedText.isSpace(cp) : Words.isSpace(cp)) ? ' ' : cp;
+    }
+
+    /**
+     * Requires every character of {@code text}, the text of a heading painted in the box at {@code index}, in the
+     * font. Its white space is already single spaces ({@link Box#headingText}).
+     */
     private static void requireGlyphs(Box box, FontFile font, String text, int index) {
         for (int i = 0; i < text.length(); ) {
             int cp = text.codePointAt(i);
             if (cp != LineBreaker.SOFT_HYPHEN) {
-                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp == Reference.LITERAL_BRACE ? '{' : cp,
-                        index);
+                requireGlyph(box, font, painted(cp, false), index);
             }
             i += Character.charCount(cp);
         }

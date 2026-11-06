@@ -73,6 +73,22 @@ class PreformattedTextTest {
     }
 
     @Test
+    void aForcedLineBreakEndsTheLine() {
+        // Written as it is (U+2028) in the text, with true and with wrap.
+        for (String mode : List.of("true", "wrap")) {
+            assertEquals(List.of("ab  c", "d"), lines(100, List.of("Preformatted: " + mode),
+                    "ab  c" + TextRun.LINE_SEPARATOR + "d"), mode);
+        }
+    }
+
+    @Test
+    void theLineBreakOfAMarkdownEndsTheLine() {
+        // The text is read as Markdown first: its forced line break (a backslash at the end of the line) reaches the
+        // preformatted text as U+2028.
+        assertEquals(List.of("ab", "cd"), lines(100, List.of("Preformatted: true", "Markup: markdown"), "ab\\", "cd"));
+    }
+
+    @Test
     void aLineWiderThanTheBoxIsNotBrokenWithPre() {
         List<LineBreaker.Line> lines = PreformattedText.lines(TextRun.plain("una línea ancha\nb"), 4, false, 30,
                 new FixedMetrics(), FONT, 10, 0);
@@ -183,6 +199,17 @@ class PreformattedTextTest {
     void carriageReturnsAreIgnored() {
         assertEquals(List.of(List.of(new TextRun("a", TextFormat.PLAIN)), List.of(new TextRun("b", TextFormat.PLAIN))),
                 source(4, new TextRun("a\r\nb", TextFormat.PLAIN)));
+    }
+
+    @Test
+    void aForcedLineBreakIsALineBreakAndIsNotInAnyLine() {
+        String separator = String.valueOf(TextRun.LINE_SEPARATOR);
+        assertEquals(List.of(List.of(new TextRun("a", TextFormat.PLAIN)), List.of(new TextRun("b", BOLD))),
+                source(4, new TextRun("a" + separator, TextFormat.PLAIN), new TextRun("b" + separator, BOLD)));
+        // The natural width is that of the widest line between breaks: "cdef", 20, and not the whole text.
+        IntrinsicSizes sizes = PreformattedText.intrinsics(TextRun.plain("ab" + separator + "cdef"), 4, false,
+                new FixedMetrics(), FONT, 10, 0);
+        assertEquals(20, sizes.natural(), 1e-9);
     }
 
     @Test

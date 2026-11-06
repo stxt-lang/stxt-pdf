@@ -229,6 +229,12 @@ A line break at the end of the text does not add an empty line.
   `right` and `center` align each line separately.
 - `Case`, `Letter spacing`, runs, `{page}` and references work as always. With `Markup: markdown` the
   text is interpreted first, so the lines that are kept are those of the paragraphs.
+- **Forced line break.** The character U+2028, which is also what the `\` at the end of a line leaves with
+  `Markup: markdown`, ends the line like any other line break
+  ([Markdown](../components/markdown.md#forced-line-breaks)).
+- **Other spaces.** Only the space, the tab and the line breaks are treated as such. Any other white-space character,
+  also U+000B and U+000C, stays in its line and the font has to have it (`GLYPH_MISSING`,
+  [Typography](typography.md#spaces-and-paragraphs)).
 
 ### Intrinsic sizes
 

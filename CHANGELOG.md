@@ -59,6 +59,17 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   go before the box, the last child is broken inside with the room of its margin kept free, also in a box with border,
   padding or `Isolate margins` that continues from the page before: until now it overflowed the page. "Margins at
   breaks" in the reference.
+- **A forced line break ends the line in a preformatted text.** With `Preformatted: true` or `wrap`, the character
+  U+2028, written as it is or left by the `\` at the end of a line of a text with `Markup: markdown`, stayed inside its
+  line: the text was not broken there, and the conversion failed with an internal error (`No glyph for U+2028`) if the
+  font did not have that character. It now ends the line like any other line break, as in the rest of the texts.
+  "Preformatted text" in the reference.
+- **A Unicode space the font does not have is `GLYPH_MISSING`.** The check of the characters of a text took every
+  white-space character as a space, but only the space, the tab, the line breaks, U+000B and U+000C are turned into one
+  (in a preformatted text, only the first three). Any other one, like an em space (U+2003) or an ideographic space
+  (U+3000), is painted with its glyph, and with a font that lacks it the conversion failed with an internal error when
+  the PDF was written. It is now `GLYPH_MISSING`, with the line of the character, when the document is laid out. With
+  a font that has the character nothing changes. "Spaces and paragraphs" in the reference.
 
 ## [0.11.0] - 2026-11-05
 

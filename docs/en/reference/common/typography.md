@@ -56,6 +56,10 @@ with the Markdown line break, `\` at the end of the line
 spaces and line breaks are kept, including the blank lines of a `Text`
 ([Text formatting](text-formatting.md#preformatted-text)).
 
+The space, the tab, the line breaks, U+000B and U+000C are white space. Any other Unicode space, like the em space
+(U+2003) or the ideographic space (U+3000), is one more character: it is not collapsed, it does not separate words and
+the font has to have it (`GLYPH_MISSING`).
+
 ## Line breaking
 
 Text is broken into **lines** as wide as the content box:

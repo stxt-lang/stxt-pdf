@@ -188,9 +188,10 @@ final class Words {
 
     /**
      * The white-space characters that separate words: those of {@code \s} ({@code [ \t\n\x0B\f\r]}) and the
-     * {@link TextRun#LINE_SEPARATOR}.
+     * {@link TextRun#LINE_SEPARATOR}. Any other Unicode space (an em space, an ideographic space) is a character of
+     * its word, painted with its glyph.
      */
-    private static boolean isSpace(char c) {
+    static boolean isSpace(int c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\u000B' || c == '\f' || c == '\r' || c == LINE_SEPARATOR;
     }
 

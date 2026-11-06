@@ -288,7 +288,8 @@ like the fonts, that every box with text and `Hyphenate: true` is in a language 
 separates words and marks the word before it (`Word.forced`); the position where the next one starts is a mandatory end
 (`Paragraph.forced`). The greedy breaking closes the line there, and Knuth-Plass lets no line go past it and gives no
 badness to the one that ends at it, like the last one. The `Line` says so with `forced`, and `InlineLayout` does not
-justify it. The natural width of the text is that of its widest line between breaks.
+justify it. The natural width of the text is that of its widest line between breaks. In a preformatted text,
+`PreformattedText.sourceLines` ends the line at it as at a line break, so no line carries it.
 
 > **Decision:** the language is checked when the layout starts and not when the tree is built, like the fonts:
 > `tree` does not depend on `layout`, where the patterns live. *Rejected alternative:* the patterns in `model`.
@@ -311,7 +312,9 @@ and spaces): both line breaking algorithms add up. `PdfMetrics` measures with `F
 kerning)`, which applies `GSUB` and the kerning pairs word by word if they are requested; a pair does not cross a space,
 so the sum is still exact. The part of a split word is measured together with its hyphen, as it is painted: with
 kerning, the last letter and the hyphen are a pair. `Engine.layOutDocument` first calls `validate(root)`, which in `PdfMetrics`
-checks that the fonts exist and have all the characters.
+checks that the fonts exist and have all the characters. Of the white space, only what the line breaking turns into a
+space or a line end is taken as painted as a space (`Words.isSpace`, and in a preformatted text,
+`PreformattedText.isSpace`): any other Unicode space reaches the canvas as it is and is checked as one more character.
 
 **Long text.** Each page lays out the text from a different line, so the `LayoutCache` does not help. `InlineLayout` memoizes
 the line breaking per box and available width in `LineBreakingMemo`, which belongs to the `Engine` like the cache

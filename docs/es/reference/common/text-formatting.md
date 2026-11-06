@@ -232,6 +232,12 @@ Un salto de línea al final del texto no añade una línea vacía.
   `right` y `center` alinean cada línea por separado.
 - `Case`, `Letter spacing`, los tramos, `{page}` y las referencias funcionan como siempre. Con `Markup: markdown` el
   texto se interpreta primero, así que las líneas que se conservan son las de los párrafos.
+- **Salto de línea forzado.** El carácter U+2028, que es también lo que deja la `\` al final de una línea con
+  `Markup: markdown`, acaba la línea como cualquier otro salto
+  ([Markdown](../components/markdown.md#saltos-de-línea-forzados)).
+- **Otros espacios.** Solo el espacio, la tabulación y los saltos de línea se tratan como tales. Cualquier otro carácter
+  de espacio, también U+000B y U+000C, se queda en su línea y la fuente tiene que tenerlo (`GLYPH_MISSING`,
+  [Tipografía](typography.md#espacios-y-párrafos)).
 
 ### Tamaños intrínsecos
 

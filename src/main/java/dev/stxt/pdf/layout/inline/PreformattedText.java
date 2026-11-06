@@ -16,7 +16,9 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * <p>Each line of the text is a line of the box, the empty ones too (a blank line does not
  * separate paragraphs: the whole text is a single one for widows and orphans). A tab moves
  * to the next column that is a multiple of {@code Tab size}, counting the characters from the
- * start of the line; a final line break does not add an empty line. With {@code true} the
+ * start of the line; a final line break does not add an empty line. A forced line break
+ * ({@link TextRun#LINE_SEPARATOR}, which a Markdown line break becomes) ends the line like any other line break
+ * (reference/components/markdown.md). With {@code true} the
  * lines are not broken, so one wider than the box overflows; with {@code wrap} they are broken
  * between words (the spaces at the break are lost: they are not visible) and a word wider than the
  * box overflows.</p>
@@ -80,7 +82,7 @@ final class PreformattedText {
             for (int i = 0; i < text.length(); ) {
                 int cp = text.codePointAt(i);
                 i += Character.charCount(cp);
-                if (cp == '\n') {
+                if (cp == '\n' || cp == TextRun.LINE_SEPARATOR) {
                     add(line, piece, run);
                     lines.add(line.build());
                     line = new TextRun.Joiner();
@@ -101,6 +103,15 @@ final class PreformattedText {
             lines.remove(lines.size() - 1);
         }
         return lines;
+    }
+
+    /**
+     * The characters of a preformatted text that are not painted as they are: the space, the tab (spaces), the line
+     * breaks, with the {@link TextRun#LINE_SEPARATOR}, and the carriage return, which is dropped
+     * ({@link #sourceLines}). Any other white-space character stays in its line and is painted with its glyph.
+     */
+    static boolean isSpace(int cp) {
+        return cp == ' ' || cp == '\t' || cp == '\n' || cp == '\r' || cp == TextRun.LINE_SEPARATOR;
     }
 
     private static void add(TextRun.Joiner line, StringBuilder piece, TextRun run) {

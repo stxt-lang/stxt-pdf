@@ -136,7 +136,8 @@ Administration
 - The two spaces at the end of the line, the other form CommonMark accepts, are not a break: STXT removes the spaces at
   the end of each line of a `>>` block, so they do not reach the Markdown.
 - In the text, the break is the character U+2028 (line separator). Written as is in any text, also without `Markup`, it
-  does the same.
+  does the same. In a preformatted text it is one more line break
+  ([Text formatting](../common/text-formatting.md#preformatted-text)).
 
 > **Decision:** a break without text before it on its line is an error. *Rejected alternative:* painting it as an empty
 > line, which is mistaken for a blank line between paragraphs, which is something else (the text after it is a new

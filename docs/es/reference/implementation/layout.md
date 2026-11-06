@@ -283,7 +283,8 @@ caja con texto y `Hyphenate: true` está en un idioma con patrones.
 separa palabras y marca la palabra de antes (`Word.forced`); la posición donde empieza la siguiente es un final
 obligatorio (`Paragraph.forced`). El reparto voraz cierra ahí la línea, y Knuth-Plass no deja que ninguna línea lo
 cruce y no da maldad a la que acaba en él, como a la última. La `Line` lo dice con `forced`, e `InlineLayout` no la
-justifica. El ancho natural del texto es el de su línea más ancha entre saltos.
+justifica. El ancho natural del texto es el de su línea más ancha entre saltos. En un texto preformateado,
+`PreformattedText.sourceLines` acaba la línea en él como en un salto de línea, así que ninguna línea lo lleva.
 
 > **Decisión:** el idioma se comprueba al empezar el layout y no al construir el árbol, como las fuentes: `tree` no
 > depende de `layout`, donde viven los patrones. *Alternativa descartada:* los patrones en `model`.
@@ -306,7 +307,10 @@ y espacios): los dos repartos en líneas suman. `PdfMetrics` mide con `FontFile.
 que aplica `GSUB` y los pares de kerning palabra a palabra si se piden; un par no cruza un espacio, así que la suma sigue
 siendo exacta. La parte de una palabra partida se mide junto con su guion, como se pinta: con kerning, la última letra y
 el guion son un par. `Engine.layOutDocument` llama antes a `validate(root)`, que en `PdfMetrics`
-comprueba que existen las fuentes y tienen todos los caracteres.
+comprueba que existen las fuentes y tienen todos los caracteres. Del espacio en blanco solo se da por pintado como un
+espacio el que el reparto convierte en espacio o en final de línea (`Words.isSpace`, y en un texto preformateado,
+`PreformattedText.isSpace`): cualquier otro espacio de Unicode llega al lienzo tal cual y se comprueba como un carácter
+más.
 
 **Texto largo.** Cada página maqueta el texto desde otra línea, así que la `LayoutCache` no ayuda. `InlineLayout` memoriza
 el reparto en líneas por caja y ancho disponible en `LineBreakingMemo`, que es del `Engine` como la caché (sin esa

@@ -135,7 +135,8 @@ Administración
 - Los dos espacios al final de la línea, la otra forma que admite CommonMark, no son un salto: STXT quita los espacios
   del final de cada línea de un bloque `>>`, así que no llegan al Markdown.
 - En el texto, el salto es el carácter U+2028 (separador de línea). Escrito tal cual en cualquier texto, también sin
-  `Markup`, hace lo mismo.
+  `Markup`, hace lo mismo. En un texto preformateado es un salto de línea más
+  ([Formato del texto](../common/text-formatting.md#texto-preformateado)).
 
 > **Decisión:** un salto sin texto antes en su línea es un error. *Alternativa descartada:* pintarlo como una línea vacía,
 > que se confunde con una línea en blanco entre párrafos, que es otra cosa (el texto que sigue es un párrafo nuevo, con su

@@ -4,6 +4,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.BoxTreeBuilder;
@@ -111,6 +112,38 @@ class PdfMetricsTest {
         assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
         assertEquals(20, e.line());
         assertEquals("line 20: The font IBM Plex Sans bold has no character '漢' (U+6F22)", e.getMessage());
+    }
+
+    @Test
+    void aUnicodeSpaceIsACharacterTheFontNeeds() {
+        // IBM Plex Sans has the em space (U+2003) and not the ideographic space (U+3000): neither is turned into a
+        // space, so each one is painted with its glyph.
+        String emSpace = String.valueOf((char) 0x2003);
+        String ideographicSpace = String.valueOf((char) 0x3000);
+        assertDoesNotThrow(() -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
+                "\t\tText: Marta" + emSpace + "Vidal"));
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
+                        "\t\tText: Marta" + ideographicSpace + "Vidal"));
+        assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
+        assertEquals("line 15: The font IBM Plex Sans normal has no character '" + ideographicSpace + "' (U+3000)",
+                e.getMessage());
+    }
+
+    @Test
+    void theWhiteSpaceThatBecomesASpaceOrALineEndNeedsNoGlyph() {
+        // IBM Plex Sans has no glyph for the vertical tab (U+000B): in a text it is one more space; in a preformatted
+        // one it stays in its line. The forced line break (U+2028) ends the line in both.
+        String verticalTab = String.valueOf((char) 0x000B);
+        assertDoesNotThrow(() -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
+                "\t\tText: Marta" + verticalTab + "Vidal" + TextRun.LINE_SEPARATOR + "Administración"));
+        assertDoesNotThrow(() -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
+                "\t\t\tPreformatted: true", "\t\tText: Marta\tVidal" + TextRun.LINE_SEPARATOR + "Administración"));
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
+                        "\t\t\tPreformatted: true", "\t\tText: Marta" + verticalTab + "Vidal"));
+        assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
+        assertEquals("line 16: The font IBM Plex Sans normal has no character U+000B", e.getMessage());
     }
 
     @Test

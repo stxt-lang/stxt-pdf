@@ -56,6 +56,10 @@ fuerza con el salto de línea de Markdown, `\` al final de la línea
 conservan los espacios y los saltos de línea, también las líneas en blanco de un `Text`
 ([Formato del texto](text-formatting.md#texto-preformateado)).
 
+Son espacio el espacio, la tabulación, los saltos de línea, U+000B y U+000C. Cualquier otro espacio de Unicode, como el
+de cuadratín (U+2003) o el ideográfico (U+3000), es un carácter más: no se colapsa, no separa palabras y la fuente tiene
+que tenerlo (`GLYPH_MISSING`).
+
 ## El reparto en líneas
 
 El texto se reparte en **líneas** del ancho de la caja de contenido:
