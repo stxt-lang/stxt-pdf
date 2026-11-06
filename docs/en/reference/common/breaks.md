@@ -206,6 +206,11 @@ width of a two-digit number (`00`), or of as many digits as the longest one has 
 many `M` as letters in the longest one). The real number is then put in that space, and the line is realigned without
 changing its breaks.
 
+The width a box takes from its text (the fit to the content, `fit`) counts that space too, and it does not change when
+the real number is put in. If the number is narrower than the space, the line does not fill the box and the leftover
+goes where `Align` says: to the right of the text with `left` and to its left with `right`
+([Overlay](../components/frame-and-overlays.md#overlay)).
+
 `{page of: id}`, on the other hand, is measured with the written page, so it can change the breaking
 ([References](references.md)).
 

@@ -70,6 +70,19 @@ box would have been if it were in flow:
   margin of the box itself, which is added afterwards according to the equation;
 - inside a `Stack` or a `Grid`, the top left corner of its content box.
 
+The fit to the content of a text with `{page}` or `{pages}` counts the space reserved for each number
+([Breaks](../common/breaks.md#page-numbers-page-and-pages)), and the box does not change its width when the real number
+is put in. With a number narrower than the space, the text of a box anchored to the right ends before its edge with
+`Align: left`, and at it with `Align: right`:
+
+```
+Overlay:
+    Offset: 10mm 20mm auto auto
+    Text: Sheet {page} of {pages}
+        Typography:
+            Align: right
+```
+
 An `Overlay` is placed when its reference container already has its size, with the in-flow content placed. It is
 painted at its place in the document among its siblings, even if its reference container is higher up ([Layers and rotation](../common/layers-and-rotation.md#painting-order)). It does not break: it is placed on the page where
 its position falls, and if its reference container is broken, it is resolved against the fragment on that page

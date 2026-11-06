@@ -204,6 +204,11 @@ ancho de un número de dos cifras (`00`), o de tantas como tenga el más largo s
 letras tenga el más largo). El número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus
 saltos.
 
+El ancho que una caja toma de su texto (el ajuste al contenido, `fit`) cuenta también ese hueco, y no cambia cuando se
+pone el número real. Si el número es más estrecho que el hueco, la línea no llena la caja y el sobrante queda donde diga
+`Align`: a la derecha del texto con `left` y a su izquierda con `right`
+([Overlay](../components/frame-and-overlays.md#overlay)).
+
 `{page of: id}`, en cambio, se mide con la página escrita, así que puede cambiar el reparto
 ([Referencias](references.md)).
 

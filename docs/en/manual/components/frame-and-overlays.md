@@ -102,6 +102,8 @@ They also accept `Id`, `Style`, `Link`, `Box` and `Typography`. `Frame` also acc
 - Its texts can write the page number (`{page}`) and the running head (`{heading 2}`: the current section,
   [References and links](../common/references-and-links.md)). With a running head, the `Page overlay` is laid out on
   each page with its own.
+- A box with `{page}` or `{pages}` that takes the width of its text and sits against the right edge carries
+  `Align: right`, so that the text ends at its edge ([Page numbers](../common/pages-and-breaks.md#page-numbers)).
 
 ### `Pages`
 

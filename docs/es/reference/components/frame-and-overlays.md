@@ -70,6 +70,19 @@ caja si estuviera en flujo:
   superior de la propia caja, que se suma después según la ecuación;
 - dentro de un `Stack` o un `Grid`, la esquina superior izquierda de su caja de contenido.
 
+El ajuste al contenido de un texto con `{page}` o `{pages}` cuenta el hueco reservado a cada número
+([Cortes](../common/breaks.md#números-de-página-page-y-pages)), y la caja no cambia de ancho cuando se pone el número
+real. Con un número más estrecho que el hueco, el texto de una caja anclada a la derecha acaba antes de su borde con
+`Align: left`, y en él con `Align: right`:
+
+```
+Overlay:
+    Offset: 10mm 20mm auto auto
+    Text: Hoja {page} de {pages}
+        Typography:
+            Align: right
+```
+
 Un `Overlay` se coloca cuando su contenedor de referencia ya tiene su tamaño, con el contenido en flujo colocado. Se
 pinta en su sitio del documento entre sus hermanos, aunque su contenedor de referencia esté más arriba ([Capas y giro](../common/layers-and-rotation.md#orden-de-pintado)). No se parte: se coloca en la página donde cae
 su posición, y si su contenedor de referencia está partido, se resuelve contra el fragmento de esa página

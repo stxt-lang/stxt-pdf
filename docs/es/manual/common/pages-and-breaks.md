@@ -85,6 +85,10 @@ seguir la cuenta, volver a empezar en 1 o no tener número, como una portada
 ([Document](../components/document.md#numeración-de-las-páginas)). `{pages}` es el último número de la cuenta en curso. Con
 una portada sin número y seis páginas de cuerpo, la primera dice «Página 1 de 6».
 
+El sitio de cada número se reserva con el ancho de dos cifras antes de saber cuál es. Una caja que toma el ancho de su
+texto, como un `Overlay` sin `Width`, queda por eso algo más ancha que el texto cuando el número tiene una cifra. Con
+`Align: right` el texto acaba en el borde derecho de la caja, y con `Align: left` empieza en el izquierdo.
+
 Para escribir la página donde está otra parte del documento («véase la página 12») está `{page of: id}`, y para
 escribir en la cabecera el capítulo o el apartado en curso, `{heading 1}` o `{heading 2}`, el título corrido
 ([Referencias y enlaces](references-and-links.md)).

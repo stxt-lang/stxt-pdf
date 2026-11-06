@@ -86,6 +86,10 @@ section: it can continue the count, start again at 1 or have no number, like a c
 ([Document](../components/document.md#page-numbering)). `{pages}` is the last number of the current count.
 With a cover without a number and six body pages, the first one says "Page 1 of 6".
 
+The room for each number is reserved with the width of two digits before the number is known. A box that takes the
+width of its text, like an `Overlay` without `Width`, is therefore a little wider than the text when the number has one
+digit. With `Align: right` the text ends at the right edge of the box, and with `Align: left` it starts at the left one.
+
 To write the page where another part of the document is ("see page 12") there is `{page of: id}`, and to write the
 current chapter or section in the header, `{heading 1}` or `{heading 2}`, the running head
 ([References and links](references-and-links.md)).

@@ -102,6 +102,8 @@ Admiten además `Id`, `Style`, `Link`, `Box` y `Typography`. `Frame` admite tamb
 - Sus textos pueden escribir el número de página (`{page}`) y el título corrido (`{heading 2}`: el apartado en curso,
   [Referencias y enlaces](../common/references-and-links.md)). Con un título corrido, el `Page overlay` se maqueta en
   cada página con el suyo.
+- Una caja con `{page}` o `{pages}` que toma el ancho de su texto y va pegada a la derecha lleva `Align: right`, para que
+  el texto acabe en su borde ([Números de página](../common/pages-and-breaks.md#números-de-página)).
 
 ### `Pages`
 
