@@ -108,7 +108,7 @@ public final class BoxTreeBuilder {
      * @throws InvalidModelException if it breaks a rule of the model (reference/common/errors.md)
      */
     public Result build(InlineNode document) {
-        return build(document, null);
+        return build(document, List.of());
     }
 
     /**
@@ -122,27 +122,45 @@ public final class BoxTreeBuilder {
      *         error in the rules of the styles document is its own, and the message says so
      */
     public Result build(InlineNode document, InlineNode styles) {
+        return build(document, styles == null ? List.of() : List.of(styles));
+    }
+
+    /**
+     * Like {@link #build(InlineNode)}, with several separate styles documents (each with root {@code Styles},
+     * reference/common/styles.md), in the order they are applied: the rules of each one weigh more than those of the
+     * ones before it, and all of them less than those of the document itself. {@code styles} can be empty.
+     *
+     * @throws dev.stxt.exceptions.ValidationException if any of them does not conform to the schema
+     *         (reference/common/structure.md)
+     * @throws InvalidModelException if it breaks a rule of the model (reference/common/errors.md); the line of an
+     *         error in the rules of a styles document is its own, and the message says so and, if there are several,
+     *         which one it is
+     */
+    public Result build(InlineNode document, List<InlineNode> styles) {
         return build(document, styles, root -> {
         });
     }
 
     /**
-     * Like {@link #build(InlineNode, InlineNode)}, with {@code finish} on the root right before the tree is
+     * Like {@link #build(InlineNode, List)}, with {@code finish} on the root right before the tree is
      * closed: the tests of the package use it to put in it what the document cannot write.
      */
-    Result build(InlineNode document, InlineNode styles, Consumer<Box> finish) {
+    Result build(InlineNode document, List<InlineNode> styles, Consumer<Box> finish) {
         // Without the namespace, the schema would validate nothing.
         if (!is(document, "document") || !DocumentSchema.NAMESPACE.equals(document.getNamespace())) {
             throw error(document, ErrorCode.DOCUMENT_ROOT,
                     "The root node must be Document (" + DocumentSchema.NAMESPACE + "):");
         }
         DocumentSchema.validate(document);
-        if (styles != null) {
-            if (!is(styles, "styles") || !DocumentSchema.NAMESPACE.equals(styles.getNamespace())) {
-                throw error(styles, ErrorCode.DOCUMENT_ROOT, "The root node of the styles document must be Styles ("
-                        + DocumentSchema.NAMESPACE + "):").inStylesDocument();
+        styles = List.copyOf(styles);
+        for (int i = 0; i < styles.size(); i++) {
+            InlineNode s = styles.get(i);
+            SourceLine source = StyleRules.source(i, styles.size());
+            if (!is(s, "styles") || !DocumentSchema.NAMESPACE.equals(s.getNamespace())) {
+                throw error(s, ErrorCode.DOCUMENT_ROOT, "The root node of the styles document must be Styles ("
+                        + DocumentSchema.NAMESPACE + "):").in(source);
             }
-            DocumentSchema.validate(styles, true);
+            DocumentSchema.validate(s, source);
         }
         PageSetupReader.Spec documentPageSetup = PageSetupReader.pageSetup(inline(child(document, "page").orElseThrow()), null);
         PageSetup pageSetup = documentPageSetup.pageSetup();

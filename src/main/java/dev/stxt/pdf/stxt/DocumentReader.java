@@ -5,6 +5,7 @@ import dev.stxt.Node;
 import dev.stxt.Parser;
 import dev.stxt.schema.SchemaValidator;
 import dev.stxt.pdf.model.InternalException;
+import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.resources.ResourceException;
 import dev.stxt.pdf.tree.DocumentSchema;
 import dev.stxt.pdf.tree.DocumentSyntaxException;
@@ -42,6 +43,9 @@ public final class DocumentReader {
     /** Namespace of the box model, the same one the schema defines. */
     public static final String NAMESPACE = DocumentSchema.NAMESPACE;
 
+    /** The main document, for the errors of reading it. */
+    private static final SourceLine DOCUMENT = SourceLine.of(StxtPdfException.NO_LINE);
+
     /**
      * Reads and validates a document; returns its root node.
      *
@@ -49,7 +53,7 @@ public final class DocumentReader {
      * @return the root node {@code Document}, ready for {@code Converter.layOut} or {@code Converter.toPdf}
      */
     public InlineNode read(String content) {
-        return root(parse(() -> parser().parse(content), false));
+        return root(parse(() -> parser().parse(content), DOCUMENT));
     }
 
     /**
@@ -59,7 +63,7 @@ public final class DocumentReader {
      * @return the root node {@code Document}, ready for {@code Converter.layOut} or {@code Converter.toPdf}
      */
     public InlineNode read(Path file) {
-        return root(parse(() -> parser().parseFile(file.toFile()), false));
+        return root(parse(() -> parser().parseFile(file.toFile()), DOCUMENT));
     }
 
     /**
@@ -70,7 +74,7 @@ public final class DocumentReader {
      * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
      */
     public InlineNode readStyles(String content) {
-        return styles(parse(() -> parser().parse(content), true));
+        return readStyles(content, 1);
     }
 
     /**
@@ -80,18 +84,53 @@ public final class DocumentReader {
      * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
      */
     public InlineNode readStyles(Path file) {
-        return styles(parse(() -> parser().parseFile(file.toFile()), true));
+        return readStyles(file, 1);
     }
 
     /**
-     * What the library reads, with the errors of the library turned into those of the engine; {@code inStyles}, if
-     * what is read is a separate styles document.
+     * Like {@link #readStyles(String)}, for the styles document that goes in the place {@code position} among those of
+     * a conversion: an error of reading it says so ({@code StxtPdfException.stylesDocument()}), and from the second
+     * one on, so does its message ({@code line 8 of styles 2}).
+     *
+     * @param content the STXT text of the styles document
+     * @param position the place of the styles document among those of the conversion, from 1
+     * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
      */
-    private static List<Node> parse(Supplier<List<Node>> parsing, boolean inStyles) {
+    public InlineNode readStyles(String content, int position) {
+        SourceLine source = source(position);
+        return styles(parse(() -> parser().parse(content), source), source);
+    }
+
+    /**
+     * Like {@link #readStyles(Path)}, for the styles document that goes in the place {@code position} among those of
+     * a conversion ({@link #readStyles(String, int)}).
+     *
+     * @param file the STXT file of the styles document, in UTF-8
+     * @param position the place of the styles document among those of the conversion, from 1
+     * @return the root node {@code Styles}, for {@code Converter.Builder.styles}
+     */
+    public InlineNode readStyles(Path file, int position) {
+        SourceLine source = source(position);
+        return styles(parse(() -> parser().parseFile(file.toFile()), source), source);
+    }
+
+    /** The styles document in the place {@code position}, for its errors; the first one is not numbered. */
+    private static SourceLine source(int position) {
+        if (position < 1) {
+            throw new IllegalArgumentException("The place of a styles document starts at 1: " + position);
+        }
+        return SourceLine.inStyles(StxtPdfException.NO_LINE, position, position > 1);
+    }
+
+    /**
+     * What the library reads, with the errors of the library turned into those of the engine; {@code source} is the
+     * document that is read: the main one or a separate styles document.
+     */
+    private static List<Node> parse(Supplier<List<Node>> parsing, SourceLine source) {
         try {
             return parsing.get();
         } catch (ParseException e) {
-            throw new DocumentSyntaxException(e, inStyles);
+            throw new DocumentSyntaxException(e, source);
         } catch (STXTIOException e) {
             throw new ResourceException("The document cannot be read: " + e.getMessage(), e);
         } catch (STXTException e) {
@@ -105,16 +144,16 @@ public final class DocumentReader {
         return parser;
     }
 
-    private static InlineNode styles(List<Node> roots) {
+    private static InlineNode styles(List<Node> roots, SourceLine source) {
         if (roots.size() != 1) {
             int line = roots.size() > 1 ? roots.get(1).getLine() : 1;
-            throw new InvalidModelException(SourceLine.inStyles(line), ErrorCode.DOCUMENT_ROOT, "The styles "
+            throw new InvalidModelException(source.at(line), ErrorCode.DOCUMENT_ROOT, "The styles "
                     + "document must have exactly one root node and has " + roots.size());
         }
         Node root = roots.get(0);
         if (!NAMESPACE.equals(root.getNamespace()) || !root.getCanonicalName().equals("styles")
                 || !(root instanceof InlineNode styles)) {
-            throw new InvalidModelException(SourceLine.inStyles(root.getLine()), ErrorCode.DOCUMENT_ROOT,
+            throw new InvalidModelException(source.at(root.getLine()), ErrorCode.DOCUMENT_ROOT,
                     "The root node of the styles document must be Styles (" + NAMESPACE + "):");
         }
         return styles;

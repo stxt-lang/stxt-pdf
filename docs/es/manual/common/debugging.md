@@ -124,7 +124,8 @@ line 35: The modules of Barcode qr (line 35) measure 0.135 mm and the narrowest 
 
 - **`line 35`** es la línea del documento donde está el problema: la de la propiedad que falla o, como aquí, la del
   elemento.
-- **`line N of the styles`**, en lugar de `line N`, es una línea del fichero de estilos aparte.
+- **`line N of the styles`**, en lugar de `line N`, es una línea del fichero de estilos aparte. Con varios ficheros de
+  estilos, `line N of styles 2` es una línea del segundo.
 - **Las cajas se nombran por su `Id`** (`Barcode qr`) o, sin él, por su línea (`Box at line 12`). Por eso conviene
   dar un `Id` a lo que se está ajustando.
 - **El código** (`BARCODE_TOO_SMALL`) lo da `e.code()`, y no cambia aunque cambie el mensaje.

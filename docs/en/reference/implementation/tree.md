@@ -50,10 +50,11 @@ It translates each element into a `Box` (`Style.layout` and `Style.position` com
 `Area` pass to the element they wrap), interprets values, applies inheritance and checks the rules that the schema cannot
 express. The errors are `InvalidModelException` with an `ErrorCode` and the **line of the offending node**: that of the property
 (`Style.line(HEIGHT)`, with the keys of `PropertyKey`) and not that of its box. `PropertyKey.internal` gives the internal name of
-the short names (`Size` → `font-size`), which is the key of `Style.line`. The line is a `SourceLine`: its number and whether it belongs
-to the separate styles document, because a property that comes from one of its rules has the line of that document
-(`StyleRules` marks the `Style` while reading it). It is written in the messages as is (`line 8 of the styles`), and the error
-built with it also states it in `inStyles()`.
+the short names (`Size` → `font-size`), which is the key of `Style.line`. The line is a `SourceLine`: its number and which
+document it belongs to, the main one or one of the separate styles documents (by the place in which it was passed, from
+1), because a property that comes from a rule of one of them has the line of that document (`StyleRules` marks the
+`Style` while reading it). It is written in the messages as is (`line 8 of the styles` or, if there are several,
+`line 8 of styles 2`), and the error built with it also states it in `inStyles()` and in `stylesDocument()`.
 
 `BoxTreeBuilder` is the orchestrator and keeps no state: what belongs to each call goes in a `BuildContext`. `BoxTreeBuilder.element`
 is the order common to all elements (the place, inheritance, the rules, the properties and their checks, the box and

@@ -28,7 +28,7 @@ converter.toPdf(doc, out);
 | Opción | Por defecto |
 |---|---|
 | `resources` | La carpeta `resources/` del directorio de trabajo ([Recursos](resources.md)) |
-| `styles` | Ninguno. El fichero de estilos aparte del documento ([Estilos](styles.md#estilos-en-un-fichero-aparte)) |
+| `styles` | Ninguno. Un fichero de estilos aparte del documento; cada llamada añade uno, y gana el que se añade después ([Estilos](styles.md#estilos-en-un-fichero-aparte)) |
 | `limits` | 2000 páginas, 25 millones de píxeles por imagen, 20 000 elementos y 64 niveles por SVG y 20 MB por PDF |
 | `debug` | `false`. Con `true`, pinta el contorno de cada caja ([Depurar un documento](debugging.md#los-contornos)) |
 | `pdfUa` | `1`: el PDF cumple PDF/UA-1. Con `2`, PDF/UA-2, en PDF 2.0, que algún visor antiguo no abre |
@@ -102,7 +102,8 @@ en la fase que esté, con un error de tipo `CANCELLED` (abajo), y no se escribe 
 ## Errores
 
 Todo error es un `StxtPdfException`, con tres datos: `kind()` (de quién es la culpa), `code()` (el código) y `line()` (la
-línea, 0 si no es de una línea). Si la línea es del fichero de estilos aparte, `inStyles()` es `true`.
+línea, 0 si no es de una línea). Si la línea es de un fichero de estilos aparte, `inStyles()` es `true` y
+`stylesDocument()` dice de cuál: 1 para el primero que se pasó.
 
 ```java
 try {

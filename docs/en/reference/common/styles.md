@@ -2,7 +2,7 @@
 
 `Styles`, an optional child of `Document` (at most one), declares once properties that apply by default to many
 elements, and the [named colors](#named-colors) of the document. The same rules and colors can also be in a [separate
-styles document](#separate-styles-document). There is no cascade: the rules give default values to the elements of a
+styles document](#separate-styles-document), or in [several](#several-styles-documents). There is no cascade: the rules give default values to the elements of a
 type, of a style or with an `Id`, and the element can override them.
 
 ## Rules
@@ -77,7 +77,8 @@ Text: A note on a light background.
   its place, and the messages that cite a color (such as that of `CONTRAST_LOW`) give its hexadecimal value.
 - **The document wins over the separate styles document.** The names of the two sources form a single set; if both
   declare the same name, the color of the document applies, also in the rules of the separate styles document. Within
-  one source, a repeated name is `COLOR_DUPLICATE`.
+  one source, a repeated name is `COLOR_DUPLICATE`. Among several separate styles documents, the one passed later wins
+  ([Several styles documents](#several-styles-documents)).
 - A color with the form of a name that no `Named color` declares is `COLOR_UNKNOWN`, with the line of the property. A
   `Named color` that is not used is not an error.
 
@@ -191,7 +192,8 @@ Styles (dev.stxt.pdf):
 
 - **It is passed at layout time, never looked up.** The document does not say where its styles document is and the engine
   does not look for files or folders: the caller reads it and passes it along with the document
-  ([Using from Java](../implementation/api.md#separate-styles)). It is optional.
+  ([Using from Java](../implementation/api.md#separate-styles)). It is optional, and there can be
+  [several](#several-styles-documents).
 - **It is weaker than the document.** The same rules are allowed as in the `Styles` of the document. At each priority
   level (that of `For id`, that of `For style`, that of `For element`, etc.), the rules of the separate styles document go
   **before** and those of the document **after**, so the document wins, property by property. The priority between levels
@@ -213,6 +215,54 @@ Styles (dev.stxt.pdf):
 
 > **Decision:** the document does not name its styles document: the caller passes it. *Rejected alternative:* a
 > `Styles file` property in `Document`.
+
+### Several styles documents
+
+Several separate styles documents can be passed with a document, in an order. The first one:
+
+```
+Styles (dev.stxt.pdf):
+    Named color: brand #12315A
+    For element: Heading 1
+        Typography:
+            Size: 20
+            Color: brand
+```
+
+And the second one:
+
+```
+Styles (dev.stxt.pdf):
+    Named color: brand #A32D2D
+    For element: Heading 1
+        Typography:
+            Size: 16
+```
+
+A `Heading 1` measures 16 and its color is `#A32D2D`: the size and the color of `brand` are those of the second one, and
+only the first one declares `Color`.
+
+- **The one passed later wins.** At each priority level the rules of the first styles document go first, then those of
+  the second one, and so on up to the last one; those of the document go at the end. If several declare the same
+  property at the same level, that of the last one applies, and the document wins over them all. The priority between
+  levels does not change: a `For style` of the first one still wins over a `For element` of the last one.
+- **The result is that of a single styles document** with the rules of all of them, one after another in that order.
+  So splitting a styles document into two that are passed in the same order does not change the result.
+- **Named colors** follow the same rule: the names of all of them form a single set and, if several declare a name, the
+  color of the last one applies, also in the rules of the earlier ones.
+- **Each one is strict on its own.** A repeated rule or name is an error within one styles document (`STYLE_DUPLICATE`,
+  `COLOR_DUPLICATE`), not between two.
+- **Errors.** With several styles documents, the message says which one the line belongs to, by the place in which it
+  was passed: `line 8 of styles 2: ...` is line 8 of the second one. With a single one, the message is
+  `line 8 of the styles: ...`.
+
+> **Decision:** among the separate styles documents the one passed later wins, the same criterion as among the rules of
+> a `Styles` and as between the separate styles document and the document. *Rejected alternative:* the same rule in two
+> styles documents being an error, which prevents having common styles and changing part of them in another styles
+> document.
+
+> **Decision:** in the errors, a styles document is named by the place in which it was passed. *Rejected alternative:*
+> giving it a name when passing it, more API for what the caller already knows: what was passed and in which order.
 
 ## What is not supported
 

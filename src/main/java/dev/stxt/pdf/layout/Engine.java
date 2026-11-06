@@ -158,6 +158,16 @@ public final class Engine implements LayoutContext {
     }
 
     /**
+     * Like {@link #layOutDocument(InlineNode)}, with several separate styles documents
+     * ({@link dev.stxt.pdf.stxt.DocumentReader#readStyles}), in the order they are applied: the rules of each one
+     * weigh more than those of the ones before it, and all of them less than those of the document itself
+     * (reference/common/styles.md). {@code styles} can be empty.
+     */
+    public LaidOutDocument layOutDocument(InlineNode document, List<InlineNode> styles) {
+        return layOutDocument(new BoxTreeBuilder(cancellation).build(document, styles));
+    }
+
+    /**
      * Like {@link #layOutDocument(InlineNode)}, with the tree already built. It serves to adjust the tree before
      * laying it out (this is how the tests put formatted runs in a text, reference/common/text-formatting.md); the
      * tree cannot be changed afterwards.

@@ -193,7 +193,7 @@ Each error says, besides its code and its line, **who is to blame**, which is wh
 The code is that of the table above, the STXT one for syntax and schema errors (`CHILD_NOT_DECLARED`), `RESOURCE`,
 `IMAGE_FORMAT`, `CANCELLED` or `INTERNAL`. The line is `0` if the error does not belong to a line (a resource, a limit, a
 cancellation or an internal failure). If it belongs to the [separate styles document](styles.md#separate-styles-document), the message says so
-(`line 8 of the styles: ...`). How they are seen from Java is in [Using from Java](../implementation/api.md#errors).
+(`line 8 of the styles: ...`) and, if there are several, says which one (`line 8 of styles 2: ...`). How they are seen from Java is in [Using from Java](../implementation/api.md#errors).
 
 > **Decision:** a failure the engine should have avoided (a page that does not advance, a link without a target) is
 > `INTERNAL`: it is a defect of the engine and not of the document.

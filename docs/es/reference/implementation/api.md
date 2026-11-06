@@ -25,7 +25,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `Converter.builder()` | Qué cambia |
 |---|---|
 | `resources(Resources)` | La carpeta de recursos (por defecto, `resources/` del directorio de trabajo) |
-| `styles(InlineNode)`, `styles(Path)`, `styles(String)` | El documento de estilos aparte |
+| `styles(InlineNode)`, `styles(Path)`, `styles(String)` | Añade un documento de estilos aparte: cada llamada añade uno, y se aplican en el orden de las llamadas ([abajo](#estilos-aparte)) |
 | `limits(Limits)` | Los límites de la conversión |
 | `debug(boolean)` | Pinta los contornos de las cajas |
 | `pdfUa(int)` | La parte de PDF/UA que cumple el PDF: 1 (PDF 1.7, por defecto) o 2 (PDF 2.0) ([El PDF por dentro](pdf.md#pdfua-2)). Otro valor es un `IllegalArgumentException` |
@@ -159,6 +159,23 @@ converter.toPdf(doc, out);
 
 Por debajo, `BoxTreeBuilder.build(documento, estilos)` y `Engine.layOutDocument(documento, estilos)` lo reciben igual. En
 esos dos puede ser `null`. Ver [Styles](../common/styles.md#documento-de-estilos-aparte).
+
+Con varios documentos de estilos, cada llamada a `styles` añade uno:
+
+```java
+Converter converter = Converter.builder()
+        .styles(Path.of("company.stxt"))
+        .styles(Path.of("invoices.stxt"))   // gana a company.stxt
+        .build();
+```
+
+Se aplican en el orden de las llamadas ([Varios documentos de estilos](../common/styles.md#varios-documentos-de-estilos)).
+`BoxTreeBuilder.build` y `Engine.layOutDocument` los reciben también en una lista, que puede estar vacía.
+`DocumentReader.readStyles(texto, lugar)` lee el documento de estilos que va en ese lugar, desde 1, para que un error de
+leerlo diga de cuál es ([Errores](#errores)); `styles(Path)` y `styles(String)` lo leen así.
+
+> **Decisión:** `styles` añade en lugar de sustituir, como `exclude`. *Alternativa descartada:* una lista en una sola
+> llamada, con la que una segunda llamada tendría que sustituir o ser un error.
 
 ## Textos que vienen de datos
 
@@ -349,7 +366,8 @@ la primera vez y no vuelve a mirarlo. Para ver los cambios, se les pasa `resourc
 
 Todo error del motor es un `StxtPdfException` (lo lanzan `DocumentReader` y `Converter`), así que una sola `catch` basta.
 `kind()` dice de quién es la culpa, `code()` qué falla y `line()` dónde (`NO_LINE`, 0, si no es de una línea).
-`inStyles()` dice si esa línea es del [documento de estilos aparte](../common/styles.md#documento-de-estilos-aparte) y no del documento:
+`inStyles()` dice si esa línea es de un [documento de estilos aparte](../common/styles.md#documento-de-estilos-aparte) y no del documento,
+y `stylesDocument()`, de cuál: 1 para el primero que se pasó, 2 para el segundo, y 0 si la línea es del documento:
 
 ```java
 try {
@@ -357,7 +375,7 @@ try {
 } catch (StxtPdfException e) {
     switch (e.kind()) {
         case INVALID_DOCUMENT -> reply(422, e.code() + " en la línea " + e.line()
-                + (e.inStyles() ? " de los estilos" : "") + ": " + e.getMessage());
+                + (e.inStyles() ? " de los estilos " + e.stylesDocument() : "") + ": " + e.getMessage());
         case LIMIT -> reply(413, e.getMessage());
         case CANCELLED -> reply(503, e.getMessage());            // el propio servicio pidió parar
         case RESOURCE, INTERNAL -> reply(500, e.getMessage());   // de la configuración o del motor

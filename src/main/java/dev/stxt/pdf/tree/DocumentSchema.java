@@ -2,6 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.Node;
 import dev.stxt.pdf.model.InternalException;
+import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.exceptions.ValidationException;
 import dev.stxt.schema.SchemaProvider;
 import dev.stxt.schema.SchemaProviderMemory;
@@ -48,14 +49,14 @@ public final class DocumentSchema {
      *         ({@code CHILD_NOT_DECLARED}, {@code TOO_FEW_CHILDREN}...) and its line
      */
     public static void validate(Node root) {
-        validate(root, false);
+        validate(root, SourceLine.of(StxtPdfException.NO_LINE));
     }
 
-    /** Like {@link #validate(Node)}; {@code inStyles}, if it is a separate styles document. */
-    static void validate(Node root, boolean inStyles) {
+    /** Like {@link #validate(Node)}, for the document of {@code source}: the main one or a separate styles document. */
+    static void validate(Node root, SourceLine source) {
         List<ValidationException> errors = new SchemaValidator(PROVIDER, true).validate(root);
         if (!errors.isEmpty()) {
-            throw new DocumentSyntaxException(errors.get(0), inStyles);
+            throw new DocumentSyntaxException(errors.get(0), source);
         }
     }
 

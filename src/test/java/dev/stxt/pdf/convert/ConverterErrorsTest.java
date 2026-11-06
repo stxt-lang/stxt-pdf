@@ -147,10 +147,12 @@ class ConverterErrorsTest {
         InvalidModelException withoutLine = new InvalidModelException(StxtPdfException.NO_LINE, ErrorCode.PAGE_LIMIT, "too many");
         assertEquals("too many", withoutLine.getMessage());
         assertFalse(withoutLine.inStyles());
+        assertEquals(0, withoutLine.stylesDocument());
         InvalidModelException inStyles = new InvalidModelException(8, ErrorCode.VALUE_SYNTAX, "invalid").inStylesDocument();
         assertEquals("line 8 of the styles: invalid", inStyles.getMessage());
         assertEquals(8, inStyles.line());
         assertTrue(inStyles.inStyles());
+        assertEquals(1, inStyles.stylesDocument());
         assertEquals("VALUE_SYNTAX", inStyles.code());
         assertEquals(Kind.INVALID_DOCUMENT, inStyles.kind());
         assertEquals(Kind.LIMIT, ErrorCode.PAGE_LIMIT.kind());

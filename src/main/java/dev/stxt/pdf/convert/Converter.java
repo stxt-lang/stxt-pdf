@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -34,7 +35,7 @@ import java.util.function.Supplier;
 
 /**
  * Entry point of the engine: STXT document → PDF (or SVG) with the real metrics of the fonts and the images of the
- * resources folder. It gathers in one object the resources folder ({@link Resources}), the separate styles document
+ * resources folder. It gathers in one object the resources folder ({@link Resources}), the separate styles documents
  * (reference/common/styles.md) and the debug outlines.
  *
  * <p><strong>It is immutable and thread-safe</strong>: it is created once and shared. Each conversion
@@ -94,7 +95,8 @@ public final class Converter {
     private final Resources current;
     /** The images its conversions have besides those of the resources, by their path ({@link #withImages}). */
     private final Map<String, byte[]> images;
-    private final InlineNode styles;
+    /** The separate styles documents, in the order they are applied ({@link Builder#styles(InlineNode)}). */
+    private final List<InlineNode> styles;
     private final boolean debug;
     private final Limits limits;
     private final Set<Check> excluded;
@@ -109,7 +111,7 @@ public final class Converter {
         this.limits = builder.limits;
         this.images = Map.of();
         this.current = snapshot();
-        this.styles = builder.styles;
+        this.styles = List.copyOf(builder.styles);
         this.debug = builder.debug;
         this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
         this.pdfUa = builder.pdfUa;
@@ -636,7 +638,7 @@ public final class Converter {
         private Resources resources = new Resources();
         private boolean reloadEachConversion;
         private boolean preload;
-        private InlineNode styles;
+        private final List<InlineNode> styles = new ArrayList<>();
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
         private final Set<Check> excluded = EnumSet.noneOf(Check.class);
@@ -695,35 +697,39 @@ public final class Converter {
         }
 
         /**
-         * Separate styles document, already read ({@link DocumentReader#readStyles(String)}), whose rules weigh less
-         * than those of the document (reference/common/styles.md). Without it, the document carries all its styles.
+         * Adds a separate styles document, already read ({@link DocumentReader#readStyles(String)}), whose rules weigh
+         * less than those of the document (reference/common/styles.md). Each call adds one, and they are applied in
+         * the order of the calls: the rules of each one weigh more than those of the ones before it. Without any, the
+         * document carries all its styles.
          *
          * @param styles the styles document as {@link DocumentReader#readStyles(String)} returns it; not {@code null}
          * @return this builder
          */
         public Builder styles(InlineNode styles) {
-            this.styles = Objects.requireNonNull(styles, "styles");
+            this.styles.add(Objects.requireNonNull(styles, "styles"));
             return this;
         }
 
         /**
-         * Like {@link #styles(InlineNode)}, reading it from an STXT text.
+         * Like {@link #styles(InlineNode)}, reading it from an STXT text. An error of reading it says which styles
+         * document it is ({@code StxtPdfException.stylesDocument()}): the place this call gives it.
          *
          * @param content the STXT text of the styles document
          * @return this builder
          */
         public Builder styles(String content) {
-            return styles(new DocumentReader().readStyles(content));
+            return styles(new DocumentReader().readStyles(content, styles.size() + 1));
         }
 
         /**
-         * Like {@link #styles(InlineNode)}, reading it from a UTF-8 file.
+         * Like {@link #styles(InlineNode)}, reading it from a UTF-8 file. An error of reading it says which styles
+         * document it is ({@code StxtPdfException.stylesDocument()}): the place this call gives it.
          *
          * @param file the STXT file of the styles document, in UTF-8
          * @return this builder
          */
         public Builder styles(Path file) {
-            return styles(new DocumentReader().readStyles(file));
+            return styles(new DocumentReader().readStyles(file, styles.size() + 1));
         }
 
         /**

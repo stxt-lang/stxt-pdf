@@ -124,4 +124,9 @@ a un fichero no cambia nada. Lo mismo vale para los colores: si el documento dec
 uno del fichero, gana el suyo, y todas las reglas que usan ese nombre, también las del fichero, toman su color. Un error en el fichero de estilos empieza por `line 8 of the styles:`, también si se ve al
 maquetar, como una fuente que no existe o una caja que no cabe.
 
+Se pueden pasar varios ficheros de estilos, en un orden: los de la empresa y después los de las facturas, por ejemplo.
+Si dos declaran lo mismo, gana el que se pasa después, y el documento gana a todos. Con los colores pasa igual: vale el
+`Named color` del último fichero que declara ese nombre. Con varios ficheros, el error dice de cuál es la línea:
+`line 8 of styles 2:` es la línea 8 del segundo.
+
 Más detalle en la [referencia](../../reference/common/styles.md).

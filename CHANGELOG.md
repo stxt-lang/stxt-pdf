@@ -28,9 +28,20 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   configuration and the same resources, without reading anything again, whose conversions also have those images at
   those paths: the ones a document brings with it. The shared converter does not change. `Resources.withImages(Map)`
   is the same one level below.
+- **Several separate styles documents.** A conversion takes more than one styles document, in an order: at each
+  priority level the rules of the first one go first and those of the document at the end, so the one passed later
+  wins, property by property, and the document wins over them all; the result is that of a single styles document with
+  the rules of all of them. Named colors follow the same rule. A repeated rule or name is still an error within one
+  styles document, not between two. With several, the message of an error says which one its line belongs to
+  (`line 8 of styles 2: ...`; with a single one, `line 8 of the styles: ...`, as before), and
+  `StxtPdfException.stylesDocument()` gives it: 1 for the first one, 0 for a line of the document.
+  `DocumentReader.readStyles(text, place)` reads a styles document for its place, and `BoxTreeBuilder.build` and
+  `Engine.layOutDocument` take a list. "Several styles documents" in the reference.
 
 ### Changed
 
+- **`Converter.Builder.styles` adds a styles document.** Each call adds one, and they are applied in the order of the
+  calls; until now a second call replaced the document of the first one.
 - **An image or a font may have no file.** `ImageFile.path()` and `FontFile.path()` are `null` for one given as bytes:
   `ImageFile.fileName()` and `FontFile.name()` are what the messages call them. `Resources.root()` is `null`, and
   `fontsFolder()` and `imagesFolder()` can be, in resources built with `Resources.builder()`. The message of an image

@@ -41,7 +41,7 @@ public final class TextRuns {
 
     /** Builds the document tree and sets the runs of each text box by its {@code Id}. */
     public static BoxTreeBuilder.Result build(InlineNode document, Map<String, List<TextRun>> runs) {
-        return new BoxTreeBuilder().build(document, null, root -> runs.forEach((id, r) -> set(root, id, r)));
+        return new BoxTreeBuilder().build(document, List.of(), root -> runs.forEach((id, r) -> set(root, id, r)));
     }
 
     /**

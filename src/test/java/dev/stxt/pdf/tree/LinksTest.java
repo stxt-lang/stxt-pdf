@@ -94,7 +94,7 @@ class LinksTest {
     void theRunsOfATextAreCheckedToo() {
         // The runs are set before closing the tree, which does not change afterwards.
         new BoxTreeBuilder().build(document("\tText: Véase el anexo", "\t\tId: t", "\tText: Anexo", "\t\tId: anexo"),
-                null, root -> {
+                List.of(), root -> {
                     TextRuns.set(root, "t", List.of(TextRuns.run("Véase el "),
                             new TextRun("anexo", TextFormat.PLAIN.withLink("#anexo"))));
                     LinkTargets.validate(root);

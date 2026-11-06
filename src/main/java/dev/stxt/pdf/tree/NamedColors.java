@@ -5,6 +5,7 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.inline;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import dev.stxt.InlineNode;
@@ -17,9 +18,10 @@ import dev.stxt.pdf.model.Colors;
  * {@code Background}, also inside {@code linear(...)}, and {@code Separator color}). The name is replaced by its color
  * when the property is read, so the rest of the engine only sees {@code #...} colors.
  *
- * <p>They come from the same two places as the rules: the separate styles document and the {@code Styles} of the
- * document. The names of both form a single set, and if both declare a name, the color of the document wins, also in
- * the rules of the separate styles document. A repeated name is an error within one source, not between the two.</p>
+ * <p>They come from the same places as the rules: the separate styles documents and the {@code Styles} of the
+ * document. The names of all of them form a single set, and if several declare a name, the color of the last one
+ * wins (the styles documents in the order they are given, and the document after them), also in the rules of the
+ * others. A repeated name is an error within one source, not between two.</p>
  */
 final class NamedColors {
 
@@ -34,20 +36,24 @@ final class NamedColors {
     }
 
     /**
-     * Reads the {@code Named color} of the separate styles document ({@code styles}, with root {@code Styles};
-     * {@code null} if there is none) and those of the {@code Styles} of the document, which override them.
+     * Reads the {@code Named color} of the separate styles documents ({@code styles}, each with root {@code Styles},
+     * in the order they were given: each one overrides those before it) and those of the {@code Styles} of the
+     * document, which override them all.
      */
-    static NamedColors read(InlineNode document, InlineNode styles) {
+    static NamedColors read(InlineNode document, List<InlineNode> styles) {
         Map<String, String> colors = new HashMap<>();
-        if (styles != null) {
-            colors.putAll(load(styles, true));
+        for (int i = 0; i < styles.size(); i++) {
+            colors.putAll(load(styles.get(i), StyleRules.source(i, styles.size())));
         }
-        child(document, "styles").map(Nodes::inline).ifPresent(own -> colors.putAll(load(own, false)));
+        child(document, "styles").map(Nodes::inline).ifPresent(own -> colors.putAll(load(own, null)));
         return colors.isEmpty() ? NONE : new NamedColors(Map.copyOf(colors));
     }
 
-    /** The names of one source; a repeated name is an error within it. */
-    private static Map<String, String> load(InlineNode styles, boolean fromFile) {
+    /**
+     * The names of one source; a repeated name is an error within it. {@code source} is the separate styles document
+     * they are in, for the errors; {@code null} if they are of the document.
+     */
+    private static Map<String, String> load(InlineNode styles, SourceLine source) {
         Map<String, String> colors = new HashMap<>();
         Map<String, Node> seen = new HashMap<>();
         for (Node n : styles.getChildren()) {
@@ -63,7 +69,7 @@ final class NamedColors {
                 }
                 colors.put(parts[0], parts[1]);
             } catch (InvalidModelException e) {
-                throw fromFile ? e.inStylesDocument() : e;
+                throw source != null ? e.in(source) : e;
             }
         }
         return colors;

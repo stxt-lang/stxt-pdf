@@ -374,8 +374,11 @@ public final class Style extends StyleGroup {
      * are inherited with their value, to point to where it was declared.
      */
     private final Map<String, SourceLine> lines = new HashMap<>();
-    /** Whether what is being read now is a rule of the separate styles document ({@link #readingStyles}). */
-    private boolean readingStyles;
+    /**
+     * The separate styles document of the rule that is being read now ({@link #readingStyles}); {@code null} if what
+     * is being read is of the document.
+     */
+    private SourceLine readingStyles;
 
     /**
      * Properties that are inherited with their line, to point to it in errors: those of the font (the ones of
@@ -403,17 +406,17 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * The properties declared while {@code reading} is {@code true} come from a rule of the separate styles document,
-     * and their line is of that document.
+     * The properties declared from now on come from a rule of the separate styles document of {@code source} (its line
+     * number does not count), and their line is of that document; with {@code null}, they are of the document again.
      */
-    void readingStyles(boolean reading) {
+    void readingStyles(SourceLine source) {
         writable();
-        readingStyles = reading;
+        readingStyles = source;
     }
 
-    /** Records the line where a property is declared: of the styles document if one of its rules is being read. */
+    /** Records the line where a property is declared: of a styles document if one of its rules is being read. */
     void declared(String property, int line) {
-        declared(property, new SourceLine(line, readingStyles));
+        declared(property, readingStyles != null ? readingStyles.at(line) : SourceLine.of(line));
     }
 
     /** Records the line where a property is declared, with its document. */

@@ -9,8 +9,8 @@ import dev.stxt.exceptions.ParseException;
  * with the code of the library ({@code CHILD_NOT_DECLARED}, {@code INVALID_VALUE}...) and its line. It is the same
  * error of the library without its type: {@link #getCause()} keeps the original. A {@link LimitException} of the
  * library (document nested too deeply or with lines that are too long) is a {@link Kind#LIMIT}; the rest, an invalid
- * document. If it comes from the separate styles document, the message says so and {@link #inStyles()} is
- * {@code true}.
+ * document. If it comes from a separate styles document, the message says so, {@link #inStyles()} is {@code true} and
+ * {@link #stylesDocument()} says which one it is.
  */
 public class DocumentSyntaxException extends StxtPdfException {
 
@@ -20,14 +20,19 @@ public class DocumentSyntaxException extends StxtPdfException {
         this(cause, false);
     }
 
-    /** {@code inStyles}: the error belongs to the separate styles document. */
+    /** {@code inStyles}: the error belongs to the separate styles document, the only one. */
     public DocumentSyntaxException(ParseException cause, boolean inStyles) {
-        super(cause instanceof LimitException ? Kind.LIMIT : Kind.INVALID_DOCUMENT, cause.getLine(), inStyles,
-                cause.getCode(), message(cause, inStyles), cause);
+        this(cause, inStyles ? SourceLine.inStyles(NO_LINE) : SourceLine.of(NO_LINE));
     }
 
-    private static String message(ParseException cause, boolean inStyles) {
+    /** The error belongs to the document of {@code source}, whose line number does not count. */
+    public DocumentSyntaxException(ParseException cause, SourceLine source) {
+        super(cause instanceof LimitException ? Kind.LIMIT : Kind.INVALID_DOCUMENT, cause.getLine(), source.styles(),
+                cause.getCode(), message(cause, source), cause);
+    }
+
+    private static String message(ParseException cause, SourceLine source) {
         String message = cause.getMessage();
-        return cause.getLine() == NO_LINE ? message : new SourceLine(cause.getLine(), inStyles) + ": " + message;
+        return cause.getLine() == NO_LINE ? message : source.at(cause.getLine()) + ": " + message;
     }
 }

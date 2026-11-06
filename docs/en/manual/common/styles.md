@@ -124,4 +124,9 @@ If the document also has its own `Styles`, at each level of the list above the o
 one in the file, its own wins, and all the rules that use that name, also those of the file, take its color. An error in the styles file starts with `line 8 of the styles:`, also if it is
 detected during layout, such as a font that does not exist or a box that does not fit.
 
+Several styles files can be passed, in an order: those of the company and then those of the invoices, for example. If
+two declare the same thing, the one passed later wins, and the document wins over them all. The same goes for colors:
+the `Named color` of the last file that declares that name applies. With several files, the error says which one the
+line belongs to: `line 8 of styles 2:` is line 8 of the second one.
+
 More detail in the [reference](../../reference/common/styles.md).

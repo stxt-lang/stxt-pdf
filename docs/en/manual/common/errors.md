@@ -8,7 +8,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 
 - **The line** is that of the property that fails, not that of its element: the line of the `Margin`, not that of the
   `Block`. If the problem is a combination of two properties, the message names the line of the other one. In a separate
-  styles file it says `line 8 of the styles`.
+  styles file it says `line 8 of the styles` and, if there are several, which one: `line 8 of styles 2`.
 - **The message** says what is wrong and how to fix it.
 - **Each error has a code** (`MARGIN_AUTO_WITHOUT_EFFECT`) that does not change even if the message changes.
 

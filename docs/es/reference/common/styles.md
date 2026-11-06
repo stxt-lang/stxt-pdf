@@ -2,7 +2,8 @@
 
 `Styles`, hijo opcional de `Document` (como mucho uno), declara una vez propiedades que se aplican por defecto a muchos
 elementos, y los [colores con nombre](#colores-con-nombre) del documento. Las mismas reglas y colores pueden estar también
-en un [documento de estilos aparte](#documento-de-estilos-aparte). No hay cascada: las reglas dan valores por defecto a
+en un [documento de estilos aparte](#documento-de-estilos-aparte), o en
+[varios](#varios-documentos-de-estilos). No hay cascada: las reglas dan valores por defecto a
 los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede sobrescribir.
 
 ## Reglas
@@ -77,7 +78,8 @@ Text: Una nota sobre fondo claro.
   lugar, y los mensajes que citan un color (como el de `CONTRAST_LOW`) dan su valor hexadecimal.
 - **El documento gana al documento de estilos aparte.** Los nombres de los dos orígenes forman un solo conjunto; si los
   dos declaran el mismo nombre, vale el color del documento, también en las reglas del documento de estilos aparte.
-  Dentro de un mismo origen, un nombre repetido es `COLOR_DUPLICATE`.
+  Dentro de un mismo origen, un nombre repetido es `COLOR_DUPLICATE`. Entre varios documentos de estilos aparte gana
+  el que se pasa después ([Varios documentos de estilos](#varios-documentos-de-estilos)).
 - Un color con forma de nombre que ningún `Named color` declara es `COLOR_UNKNOWN`, con la línea de la propiedad. Un
   `Named color` que no se usa no es un error.
 
@@ -192,7 +194,8 @@ Styles (dev.stxt.pdf):
 
 - **Se pasa al maquetar, nunca se busca.** El documento no dice dónde está su documento de estilos y el motor no busca
   ficheros ni carpetas: quien convierte lo lee y lo pasa junto al documento
-  ([Uso desde Java](../implementation/api.md#estilos-aparte)). Es opcional.
+  ([Uso desde Java](../implementation/api.md#estilos-aparte)). Es opcional, y puede haber
+  [varios](#varios-documentos-de-estilos).
 - **Vale menos que el documento.** Se admiten las mismas reglas que en el `Styles` del documento. En cada nivel de la
   prioridad (el de `For id`, el de `For style`, el de `For element`, etc.), las reglas del documento de estilos aparte van **antes** y
   las del documento **después**, así que gana el documento, propiedad a propiedad. La prioridad entre niveles no cambia:
@@ -215,6 +218,53 @@ Styles (dev.stxt.pdf):
 
 > **Decisión:** el documento no nombra su documento de estilos: lo pasa quien convierte. *Alternativa descartada:* una
 > propiedad `Styles file` en `Document`.
+
+### Varios documentos de estilos
+
+Con un documento se pueden pasar varios documentos de estilos aparte, en un orden. El primero:
+
+```
+Styles (dev.stxt.pdf):
+    Named color: brand #12315A
+    For element: Heading 1
+        Typography:
+            Size: 20
+            Color: brand
+```
+
+Y el segundo:
+
+```
+Styles (dev.stxt.pdf):
+    Named color: brand #A32D2D
+    For element: Heading 1
+        Typography:
+            Size: 16
+```
+
+Un `Heading 1` mide 16 y es de color `#A32D2D`: el tamaño y el color de `brand` son los del segundo, y `Color` solo lo
+declara el primero.
+
+- **Gana el que se pasa después.** En cada nivel de la prioridad van primero las reglas del primer documento de estilos,
+  después las del segundo, y así hasta el último; las del documento van al final. Si varios declaran la misma propiedad
+  en el mismo nivel, vale la del último, y el documento gana a todos. La prioridad entre niveles no cambia: un
+  `For style` del primero sigue ganando a un `For element` del último.
+- **El resultado es el de un solo documento de estilos** con las reglas de todos, unas detrás de otras en ese orden. Así,
+  partir un documento de estilos en dos que se pasan en el mismo orden no cambia el resultado.
+- **Los colores con nombre** siguen la misma regla: los nombres de todos forman un solo conjunto y, si varios declaran
+  un nombre, vale el color del último, también en las reglas de los anteriores.
+- **Cada uno es estricto por separado.** Una regla o un nombre repetidos son un error dentro de un documento de estilos
+  (`STYLE_DUPLICATE`, `COLOR_DUPLICATE`), no entre dos.
+- **Errores.** Con varios documentos de estilos, el mensaje dice de cuál es la línea, por el lugar en que se pasó:
+  `line 8 of styles 2: ...` es la línea 8 del segundo. Con uno solo, el mensaje es `line 8 of the styles: ...`.
+
+> **Decisión:** entre los documentos de estilos aparte gana el que se pasa después, el mismo criterio que entre las
+> reglas de un `Styles` y que entre el documento de estilos aparte y el documento. *Alternativa descartada:* que la
+> misma regla en dos documentos de estilos sea un error, que impide tener unos estilos comunes y cambiar parte de ellos
+> en otro documento de estilos.
+
+> **Decisión:** en los errores, un documento de estilos se nombra por el lugar en que se pasó. *Alternativa
+> descartada:* darle un nombre al pasarlo, más API para lo que quien convierte ya sabe: qué pasó y en qué orden.
 
 ## Lo que no hay
 

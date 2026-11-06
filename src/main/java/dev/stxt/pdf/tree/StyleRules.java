@@ -2,10 +2,10 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.pdf.model.StxtPdfException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -33,10 +33,11 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
  * position in a table or {@code Document}), {@code For style}, {@code For id} and {@code For column}, read once per
  * call.
  *
- * <p>They can come from two places: from the {@code Styles} of the document itself and from a separate styles document
- * (root {@code Styles}, reference/common/styles.md). At each priority level the rules of the separate document go first
- * and those of the document after, so if both declare the same property the document wins. Each source is read
- * separately: a repeated rule is an error within one source, not between the two.</p>
+ * <p>They can come from several places: from the {@code Styles} of the document itself and from separate styles
+ * documents (root {@code Styles}, reference/common/styles.md). At each priority level the rules of the separate
+ * documents go first, in the order the documents are given, and those of the document after, so if several declare the
+ * same property the last one wins, and the document wins over them all. Each source is read separately: a repeated
+ * rule is an error within one source, not between two.</p>
  */
 final class StyleRules {
 
@@ -44,7 +45,7 @@ final class StyleRules {
     private final Map<Element, List<InlineNode>> elementRules = new EnumMap<>(Element.class);
     /** {@code For element: Document} rules, in the order they are applied. */
     private final List<InlineNode> documentRules = new ArrayList<>();
-    /** {@code For style} rules, in the order they are applied: those of the separate document first. */
+    /** {@code For style} rules, in the order they are applied: those of the separate documents first. */
     private final List<ClassRule> classRules = new ArrayList<>();
     /** The classes that have some rule. */
     private final Set<String> classNames = new HashSet<>();
@@ -57,17 +58,23 @@ final class StyleRules {
     private final List<CellRule> cellRules = new ArrayList<>();
     /** {@code For column} rules, in the order they are applied. */
     private final List<ColumnRule> columnRules = new ArrayList<>();
-    /** The rules that come from the separate styles document: their errors say so. */
-    private final Set<InlineNode> external = Collections.newSetFromMap(new IdentityHashMap<>());
-    /** The {@code Named color} of the two sources, read before the rules, which can use them. */
+    /** The rules that come from a separate styles document, each with its document: their errors say so. */
+    private final Map<InlineNode, SourceLine> external = new IdentityHashMap<>();
+    /** The {@code Named color} of all the sources, read before the rules, which can use them. */
     private final NamedColors namedColors;
+
+    /** The {@link CellRule#source} of a rule of the document, which goes after those of every styles document. */
+    private static final int DOCUMENT = Integer.MAX_VALUE;
 
     /** A {@code For style} rule. */
     private record ClassRule(String name, InlineNode rule) {
     }
 
-    /** A rule of a position in a table; {@code external} places it before those of the document. */
-    private record CellRule(CellSelector selector, InlineNode rule, boolean external) {
+    /**
+     * A rule of a position in a table; {@code source} is the place of its styles document, from 1, or
+     * {@link #DOCUMENT}: within their level the rules are applied in that order.
+     */
+    private record CellRule(CellSelector selector, InlineNode rule, int source) {
     }
 
     /** A {@code For column} rule: columns {@code from} to {@code to}, both included. */
@@ -78,20 +85,32 @@ final class StyleRules {
     }
 
     /**
-     * Reads the rules of {@code Styles} of the document and, if there is one, of the separate styles document
-     * ({@code styles}, with root {@code Styles}; {@code null} if there is none). Their values are checked here, even if
-     * the rule applies to no element; what depends on the element (reference/common/errors.md), when it is applied.
+     * Reads the rules of {@code Styles} of the document and of the separate styles documents ({@code styles}, each
+     * with root {@code Styles}, in the order they were given; empty if there is none). Their values are checked here,
+     * even if the rule applies to no element; what depends on the element (reference/common/errors.md), when it is
+     * applied.
      */
-    StyleRules(InlineNode document, InlineNode styles) {
+    StyleRules(InlineNode document, List<InlineNode> styles) {
         namedColors = NamedColors.read(document, styles);
-        if (styles != null) {
-            load(styles, true);
+        for (int i = 0; i < styles.size(); i++) {
+            load(styles.get(i), source(i, styles.size()));
         }
-        child(document, "styles").map(Nodes::inline).ifPresent(own -> load(own, false));
+        child(document, "styles").map(Nodes::inline).ifPresent(own -> load(own, null));
     }
 
-    /** The rules of one source; a repeated rule is an error within it. */
-    private void load(InlineNode styles, boolean fromFile) {
+    /**
+     * The separate styles document at {@code index}, from 0, of the {@code count} of a conversion, for the lines and
+     * the errors of what comes from it: with several, the messages say which one it is.
+     */
+    static SourceLine source(int index, int count) {
+        return SourceLine.inStyles(StxtPdfException.NO_LINE, index + 1, count > 1);
+    }
+
+    /**
+     * The rules of one source; a repeated rule is an error within it. {@code source} is the separate styles document
+     * they are in; {@code null} if they are of the document.
+     */
+    private void load(InlineNode styles, SourceLine source) {
         Map<String, InlineNode> seen = new HashMap<>();
         for (Node r : styles.getChildren()) {
             if (r.getCanonicalName().equals("named-color")) {
@@ -103,26 +122,26 @@ final class StyleRules {
             if (rule.getCanonicalName().equals("for-element")) {
                 key = "element: " + selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
             } else if (rule.getCanonicalName().equals("for-column")) {
-                key = "for-column: " + columns(rule, fromFile).key();
+                key = "for-column: " + columns(rule, source).key();
             }
             InlineNode previous = seen.putIfAbsent(key, rule);
             if (previous != null) {
                 throw located(error(rule, ErrorCode.STYLE_DUPLICATE, "Repeated rule: " + rule.getName() + ": "
-                        + selector + " (already on line " + previous.getLine() + ")"), fromFile);
+                        + selector + " (already on line " + previous.getLine() + ")"), source);
             }
-            if (fromFile) {
-                external.add(rule);
+            if (source != null) {
+                external.put(rule, source);
             }
             switch (rule.getCanonicalName()) {
-                case "for-element" -> element(rule, selector, fromFile);
-                case "for-column" -> columnRules.add(columns(rule, fromFile));
+                case "for-element" -> element(rule, selector, source);
+                case "for-column" -> columnRules.add(columns(rule, source));
                 case "for-style" -> {
-                    String name = name(rule, "For style", fromFile);
+                    String name = name(rule, "For style", source);
                     classRules.add(new ClassRule(name, rule));
                     classNames.add(name);
                 }
                 case "for-id" -> {
-                    String id = name(rule, "For id", fromFile);
+                    String id = name(rule, "For id", source);
                     idRules.computeIfAbsent(id, k -> new ArrayList<>()).add(rule);
                 }
                 default -> throw unread(rule);
@@ -132,26 +151,26 @@ final class StyleRules {
     }
 
     /** A {@code For element} rule: of an element kind, of a position in a table or {@code Document}. */
-    private void element(InlineNode rule, String selector, boolean fromFile) {
+    private void element(InlineNode rule, String selector, SourceLine source) {
         String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
         if (canonical.equals("document")) {
             for (String group : List.of("box", "break")) {
                 child(rule, group).ifPresent(g -> {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document only allows Typography, "
-                            + "which all boxes inherit: the document has no " + g.getName()), fromFile);
+                            + "which all boxes inherit: the document has no " + g.getName()), source);
                 });
             }
             child(rule, "typography").ifPresent(t -> inline(t).getChildren().stream()
                     .filter(c -> c.getCanonicalName().equals("language")).findFirst().ifPresent(l -> {
                         throw located(error(l, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document does not allow Language: "
-                                + "the language of the document is the Language of Document"), fromFile);
+                                + "the language of the document is the Language of Document"), source);
                     }));
             documentRules.add(rule);
             return;
         }
         Optional<CellSelector> cell = CellSelector.of(canonical);
         if (cell.isPresent()) {
-            cellRules.add(new CellRule(cell.get(), rule, fromFile));
+            cellRules.add(new CellRule(cell.get(), rule, source != null ? source.styles() : DOCUMENT));
             return;
         }
         Element element = Element.of(canonical)
@@ -160,18 +179,18 @@ final class StyleRules {
                         + Stream.concat(Stream.concat(Stream.of("Document"),
                                 Element.selectable().stream().map(Element::label)),
                                 Arrays.stream(CellSelector.values()).map(CellSelector::label))
-                        .collect(Collectors.joining(", ")) + ")"), fromFile));
+                        .collect(Collectors.joining(", ")) + ")"), source));
         elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(rule);
     }
 
-    /** The {@code Named color} of the document and of the separate styles document, for the style of the root. */
+    /** The {@code Named color} of the document and of the separate styles documents, for the style of the root. */
     NamedColors namedColors() {
         return namedColors;
     }
 
-    /** An error of a rule; if it comes from the separate styles document, it says so. */
-    private static InvalidModelException located(InvalidModelException e, boolean fromFile) {
-        return fromFile ? e.inStylesDocument() : e;
+    /** An error of a rule; if it comes from a separate styles document ({@code source}, or {@code null}), it says so. */
+    private static InvalidModelException located(InvalidModelException e, SourceLine source) {
+        return source != null ? e.in(source) : e;
     }
 
     /**
@@ -195,28 +214,28 @@ final class StyleRules {
     }
 
     /** The range of a {@code For column} rule: {@code n} or {@code n m}, positive integers with {@code n <= m}. */
-    private static ColumnRule columns(InlineNode rule, boolean fromFile) {
+    private static ColumnRule columns(InlineNode rule, SourceLine source) {
         String text = rule.getText().trim();
         String[] t = text.split("\\s+");
         if (t.length > 2 || !t[0].matches("[1-9]\\d*") || (t.length == 2 && !t[1].matches("[1-9]\\d*"))) {
             throw located(error(rule, ErrorCode.VALUE_SYNTAX, "For column expects a column or a range 'from to', "
-                    + "positive integers: '" + text + "'"), fromFile);
+                    + "positive integers: '" + text + "'"), source);
         }
         int from = Integer.parseInt(t[0]);
         int to = t.length == 2 ? Integer.parseInt(t[1]) : from;
         if (to < from) {
             throw located(error(rule, ErrorCode.VALUE_NOT_ALLOWED,
-                    "For column: the range goes from lower to higher: '" + text + "'"), fromFile);
+                    "For column: the range goes from lower to higher: '" + text + "'"), source);
         }
         return new ColumnRule(from, to, rule);
     }
 
     /** The name of a class or of an {@code Id} in a rule: a single word. */
-    private static String name(InlineNode rule, String what, boolean fromFile) {
+    private static String name(InlineNode rule, String what, SourceLine source) {
         String name = rule.getText().trim();
         if (name.isEmpty() || name.chars().anyMatch(Character::isWhitespace)) {
             throw located(error(rule, ErrorCode.VALUE_NOT_ALLOWED, what + " needs a single name, without spaces: '"
-                    + name + "'"), fromFile);
+                    + name + "'"), source);
         }
         return name;
     }
@@ -244,7 +263,7 @@ final class StyleRules {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "The rule " + rule.getName() + ": "
                             + rule.getText().trim() + " applies to a Section (line " + n.getLine()
                             + "), which only allows Typography: it is the page area of its pages, not a box"),
-                            external.contains(rule));
+                            external.get(rule));
                 });
             }
             read(rule, s);
@@ -279,9 +298,10 @@ final class StyleRules {
                 s.typography().setTextAlign(position.columnAlign());
                 s.declared(PropertyKey.internal("align"), position.columnAlignLine());
             }
-            // Within this level those of the separate styles document go first, and in each source, by position.
+            // Within this level those of the separate styles documents go first, in the order of the documents, and
+            // in each source, by position.
             cellRules.stream().filter(c -> c.selector().matches(position))
-                    .sorted(Comparator.comparing((CellRule c) -> !c.external())
+                    .sorted(Comparator.comparingInt(CellRule::source)
                             .thenComparing(c -> c.selector().ordinal()))
                     .forEach(c -> rules.add(c.rule()));
             for (ColumnRule column : columnRules) {
@@ -331,19 +351,19 @@ final class StyleRules {
             if (!rule.name().equals(name)) {
                 continue;
             }
-            boolean fromFile = external.contains(rule.rule());
+            SourceLine source = external.get(rule.rule());
             for (Node g : rule.rule().getChildren()) {
                 if (!g.getCanonicalName().equals("typography")) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, "The rule For style: " + name
                             + " gives " + g.getName() + " to the styled run on line " + line + ", which is part of a "
-                            + "line and not a box: a run only takes " + RUN_ALLOWED), fromFile);
+                            + "line and not a box: a run only takes " + RUN_ALLOWED), source);
                 }
                 for (Node p : inline(g).getChildren()) {
                     if (!RUN_PROPERTIES.contains(p.getCanonicalName())) {
                         throw located(error(p, ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, "The rule For style: " + name
                                 + " gives " + p.getName() + " to the styled run on line " + line + ", which keeps the "
                                 + "size, the line height and the rest of the text of its box: a run only takes "
-                                + RUN_ALLOWED), fromFile);
+                                + RUN_ALLOWED), source);
                     }
                 }
             }
@@ -369,7 +389,7 @@ final class StyleRules {
             if (noBreak != null) {
                 child(rule, "break").ifPresent(b -> {
                     throw located(error(b, ErrorCode.STYLE_NOT_ALLOWED, "The rule " + rule.getName() + ": "
-                            + rule.getText().trim() + " applies Break to " + noBreak), external.contains(rule));
+                            + rule.getText().trim() + " applies Break to " + noBreak), external.get(rule));
                 });
             }
             read(rule, s);
@@ -417,12 +437,12 @@ final class StyleRules {
     }
 
     /**
-     * The groups of a rule, read the same way as in an element: each value with its line, which in a rule of the
-     * separate styles document is of that document. An error of a rule of the separate styles document says so.
+     * The groups of a rule, read the same way as in an element: each value with its line, which in a rule of a
+     * separate styles document is of that document. An error of a rule of a separate styles document says so.
      */
     private void read(InlineNode rule, Style s) {
-        boolean fromFile = external.contains(rule);
-        s.readingStyles(fromFile);
+        SourceLine source = external.get(rule);
+        s.readingStyles(source);
         try {
             for (Node g : rule.getChildren()) {
                 switch (g.getCanonicalName()) {
@@ -433,9 +453,9 @@ final class StyleRules {
                 }
             }
         } catch (InvalidModelException e) {
-            throw located(e, fromFile);
+            throw located(e, source);
         } finally {
-            s.readingStyles(false);
+            s.readingStyles(null);
         }
     }
 }

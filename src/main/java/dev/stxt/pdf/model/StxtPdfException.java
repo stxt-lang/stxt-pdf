@@ -47,8 +47,8 @@ public abstract class StxtPdfException extends RuntimeException {
     private final Kind kind;
     /** The line of the offending node, or {@link #NO_LINE}. */
     private final int line;
-    /** Whether {@link #line} belongs to the separate styles document. */
-    private final boolean inStyles;
+    /** The separate styles document {@link #line} belongs to, from 1; 0 if it belongs to the document. */
+    private final int stylesDocument;
     /** The stable code of the error. */
     private final String code;
 
@@ -62,7 +62,7 @@ public abstract class StxtPdfException extends RuntimeException {
      * @param cause the original error, or {@code null}
      */
     protected StxtPdfException(Kind kind, int line, String code, String message, Throwable cause) {
-        this(kind, line, false, code, message, cause);
+        this(kind, line, 0, code, message, cause);
     }
 
     /**
@@ -76,10 +76,28 @@ public abstract class StxtPdfException extends RuntimeException {
      * @param cause the original error, or {@code null}
      */
     protected StxtPdfException(Kind kind, int line, boolean inStyles, String code, String message, Throwable cause) {
+        this(kind, line, inStyles ? 1 : 0, code, message, cause);
+    }
+
+    /**
+     * {@code stylesDocument}: the line belongs to one of the separate styles documents, not to the document.
+     *
+     * @param kind whose fault the error is
+     * @param line the line of the offending node, or {@link #NO_LINE}
+     * @param stylesDocument the separate styles document {@code line} is a line of, by its place among those of the
+     *        conversion, from 1; 0 if it is a line of the document
+     * @param code the stable code of the error, in capitals ({@code BOX_OVERFLOW})
+     * @param message the message, which names the line itself if there is one
+     * @param cause the original error, or {@code null}
+     */
+    protected StxtPdfException(Kind kind, int line, int stylesDocument, String code, String message, Throwable cause) {
         super(message, cause);
+        if (stylesDocument < 0) {
+            throw new IllegalArgumentException("stylesDocument is 0 or the place of a styles document: " + stylesDocument);
+        }
         this.kind = kind;
         this.line = line;
-        this.inStyles = inStyles;
+        this.stylesDocument = stylesDocument;
         this.code = code;
     }
 
@@ -90,15 +108,24 @@ public abstract class StxtPdfException extends RuntimeException {
 
     /**
      * {@return the line of the offending node, or {@link #NO_LINE} if the error does not belong to a line} It is a
-     * line of the document, or of the separate styles document if {@link #inStyles()}.
+     * line of the document, or of a separate styles document if {@link #inStyles()}.
      */
     public int line() {
         return line;
     }
 
-    /** {@return whether {@link #line()} is a line of the separate styles document (reference/common/styles.md)} */
+    /** {@return whether {@link #line()} is a line of a separate styles document (reference/common/styles.md)} */
     public boolean inStyles() {
-        return inStyles;
+        return stylesDocument > 0;
+    }
+
+    /**
+     * {@return which separate styles document {@link #line()} is a line of: 1 for the first one the conversion was
+     * given, 2 for the second...; 0 if it is a line of the document} An error of reading a styles document on its own
+     * ({@code DocumentReader.readStyles}) gives the place it was read for, 1 if none was said.
+     */
+    public int stylesDocument() {
+        return stylesDocument;
     }
 
     /**
