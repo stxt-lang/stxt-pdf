@@ -5,7 +5,16 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.12.0] - 2026-11-06
+
+Resources put together from several places, with images given to a single conversion; several styles documents in one
+conversion; references and page numbers that can be written as text; split rows whose cells end with a bottom margin
+that no longer push what follows out of the page; a forced line break that ends the line in preformatted text; and
+`GLYPH_MISSING` instead of an internal error for a Unicode space the font does not have. **From 0.11.0**: a second call
+to `Converter.Builder.styles` adds a styles document instead of replacing the first one; `{{page}}` writes `{page}`
+instead of the page number between braces, and in Markdown `\{page\}` is text; with PDF/A a JPEG in CMYK is
+`IMAGE_FORMAT`; and `ImageFile.path()`, `FontFile.path()` and `Resources.root()` can be `null`. The names of the
+`dev.stxt.pdf` namespace and the Java API may still change before 1.0.
 
 ### Added
 
