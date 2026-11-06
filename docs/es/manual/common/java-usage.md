@@ -61,7 +61,32 @@ Con `pdfA`, el PDF declara PDF/A y lleva lo que la norma pide: un perfil de colo
 admite además ficheros adjuntos, que es cómo se hace una factura electrónica Factur-X: el XML de la factura va dentro
 del PDF. Los adjuntos se pasan en cada llamada a `toPdf`, con su nombre, sus bytes, su tipo y su relación con el
 documento (`ALTERNATIVE` para el XML de una factura), y `withXmp` añade el fragmento de metadatos que Factur-X pide,
-tal como lo da su especificación. Sin PDF/A-3, un adjunto es un error (`ATTACHMENT_REQUIRES_PDFA3`).
+tal como lo da su especificación. Sin PDF/A-3, un adjunto es un error (`ATTACHMENT_REQUIRES_PDFA3`). Con PDF/A, un JPEG
+en CMYK es un error (`IMAGE_FORMAT`): se convierte antes a RGB.
+
+## Recursos de varios sitios
+
+```java
+Resources resources = Resources.builder()
+        .fonts(Path.of("/datos/fuentes"))
+        .images("img", Path.of("/datos/img"))              // Image: img/logos/acme.png
+        .image("app/logo.svg", bytesDelLogo)               // Image: app/logo.svg
+        .build();
+Converter converter = Converter.builder().resources(resources).build();
+
+Converter own = converter.withImages(Map.of("firma.png", bytesDeLaFirma));
+own.toPdf(doc, out);                                       // Image: firma.png
+```
+
+Los recursos no tienen por qué ser una sola carpeta: `Resources.builder()` los compone de una carpeta de fuentes, de
+carpetas de imágenes, cada una con el prefijo por el que empiezan sus rutas, y de fuentes e imágenes en memoria, para
+lo que la aplicación lleva en su classpath. `withImages` da un `Converter` que añade las imágenes de un documento, las
+que llegan con él, sin tocar el compartido.
+
+Un texto que viene de datos (un nombre, lo que escribe un usuario) se pasa por `Reference.escape` antes de ponerlo en el
+documento, para que un `{page}` que traiga escrito salga tal cual
+([Referencias](references-and-links.md#referencias)). Si el texto va en Markdown, se escapa como Markdown, con una barra
+invertida delante de cada signo de puntuación, y no hace falta más.
 
 ## Cancelar una conversión
 

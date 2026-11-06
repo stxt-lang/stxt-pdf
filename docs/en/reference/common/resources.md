@@ -26,6 +26,29 @@ subfolder: that of an `Image`, to `images/` (`logos/acme.png` is `resources/imag
 The files can change while the engine is running: the engine sees them when the application asks it to or, if it is
 configured so, in each conversion ([Using from Java](../implementation/api.md#files-that-change)).
 
+## Resources from several places
+
+An application can give the resources in another way than with one folder
+([Using from Java](../implementation/api.md#several-places)). For the document little changes: the fonts are requested
+the same, by their family, and the path of an image is still written relative and downward.
+
+- **Several folders of images**, each with a prefix. With the folder `/data/logos` under the prefix `logos`,
+  `Image: logos/acme.png` is `/data/logos/acme.png`. A path goes to the folder with the longest prefix it starts with,
+  and one that starts with none, to the folder without prefix, if there is one; if there is none, the image does not
+  exist (`IMAGE_UNKNOWN`). A path does not leave its folder, not through a link either.
+- **Fonts and images in memory**: the bytes of a `.ttf`, an `.otf`, a PNG, a JPEG, an SVG or a PDF, which are in no
+  folder. An image in memory has the path the application gives it and goes before a file with that same path. A font
+  in memory is indexed with those of the folder, by what its inside declares.
+- **Images of one conversion**: those a document brings with it, which only that conversion sees and which go before
+  all the others.
+
+What is given in memory does not change while the engine is running.
+
+> **Decision:** the resources are put together from fixed pieces (folders and bytes) and not from an interface the
+> application implements: the checks of the paths, what is kept of each file and when it is read again are still the
+> engine's, the same for everyone. *Rejected alternative:* a resource provider, which would serve for any origin but
+> would move the identity and the version of each resource into the contract.
+
 ## Fonts
 
 Only the fonts in `fonts/` are used: the `.ttf` and `.otf` files. There are no system fonts, nor the 14 standard PDF

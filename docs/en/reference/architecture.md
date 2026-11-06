@@ -79,7 +79,7 @@ depend on the `LayoutContext` interface.
   - `ValueReader`, the values, and `PropertyReader`, the properties;
   - `StyleRules`, the `Styles` rules;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` and `TableOfContentsBuilder`, tables, lists, Markdown and
-    tables of contents, and `RunMarks`, the styled runs of the Markdown ([The box tree](implementation/tree.md#text-and-runs));
+    tables of contents, and `RunMarks`, the styled runs and the escaped braces of the Markdown ([The box tree](implementation/tree.md#text-and-runs));
   - `TableBorders`, the merged borders of a table, and `NamedColors`, the named colors of `Styles`;
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
     generated images ([The box tree](implementation/tree.md#generated-images));

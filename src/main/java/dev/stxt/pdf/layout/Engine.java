@@ -13,6 +13,7 @@ import dev.stxt.pdf.layout.image.NaturalSize;
 import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.InlineLayout;
 import dev.stxt.pdf.layout.inline.LineBreakingMemo;
+import dev.stxt.pdf.layout.inline.LiteralBraces;
 import dev.stxt.pdf.layout.inline.PageNumbers;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.layout.inline.TextValues;
@@ -173,6 +174,8 @@ public final class Engine implements LayoutContext {
                 ModuleSizes.check(pages, cancellation);
             }
             progress.laidOut(pages.size());
+            // The braces of the literal references stop being a mark: nothing is replaced in the lines any more.
+            pages = LiteralBraces.shown(tree.root(), pages);
             return new LaidOutDocument(tree.pageSetup(), tree.metadata(), tree.root(), pages, resources);
         } finally {
             release();

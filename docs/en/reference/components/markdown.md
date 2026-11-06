@@ -110,6 +110,10 @@ A single line break inside a paragraph counts as a space, as in a `Text`. The fo
 `Text`, a `Paragraph` or a `Cell` ([Text formatting](../common/text-formatting.md#inline-formatting-markup)), which inside
 a `Markdown` has no effect: its texts come already interpreted.
 
+The markers of the [references](../common/references.md) are replaced in the text of a `Markdown` as in any other, also
+in its code. To write them as text, `\{page\}` or `{{page}}`
+([References as text](../common/references.md#references-as-text)).
+
 ### Forced line breaks
 
 A `\` at the end of a line is a **forced line break**: the line ends there and the text goes on in the next one, within

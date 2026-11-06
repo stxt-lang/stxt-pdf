@@ -230,4 +230,56 @@ class TableFragmentationTest {
         l.assertAbsent(1, "B3");
         assertRect(40, 40, 515, 40, l.rect(2, "B3"));
     }
+
+    /** A body row with one cell, without a height of its own, that holds {@code children}. */
+    private static String[] contentRow(String[]... children) {
+        return concat(new String[]{"\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tId: B"}, concat(children));
+    }
+
+    private static String[] child(String id, int height, String... lines) {
+        return concat(new String[]{"\t\t\t\t\tBlock:", "\t\t\t\t\t\tId: " + id, "\t\t\t\t\t\tBox:",
+                "\t\t\t\t\t\t\tHeight: " + height}, lines);
+    }
+
+    @Test
+    void splitRowWhoseLastMarginDoesNotFitGoesOnToTheNextPage() {
+        // The header (20) and the footer (10) leave 70 for the body. The cell, stretched to its row, holds C (130)
+        // with a bottom margin of 15: 70 on page 1 and, on page 2, the 60 left fit but the margin does not. C is
+        // broken inside with the margin reserved, 55, and the row ends on page 3 with 5 and the margin. The footer
+        // stays inside every page.
+        LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
+                group("Header rows"), row("H", 20),
+                group("Body"), contentRow(child("C", 130, "\t\t\t\t\t\t\tMargin: 0 0 15 0")),
+                group("Footer rows"), row("F", 10)));
+        assertEquals(3, l.pages());
+        assertRect(40, 60, 515, 70, l.rect(1, "C"));
+        assertRect(40, 130, 515, 10, l.rect(1, "F"));
+        assertRect(40, 60, 515, 70, l.rect(2, "B"));
+        assertRect(40, 60, 515, 55, l.rect(2, "C"));
+        assertRect(40, 130, 515, 10, l.rect(2, "F"));
+        assertRect(40, 60, 515, 20, l.rect(3, "B"));
+        assertRect(40, 60, 515, 5, l.rect(3, "C"));
+        assertRect(40, 80, 515, 10, l.rect(3, "F"));
+        assertRect(40, 40, 515, 50, l.rect(3, "T"));
+    }
+
+    @Test
+    void splitRowBreaksBeforeTheLastChildWhoseMarginDoesNotFit() {
+        // A (80) leaves 10 for page 2, where C (50) fits after it but its bottom margin (15) does not: the cell
+        // contains that margin although the row gives it its height, so the break goes before C.
+        LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
+                group("Header rows"), row("H", 20),
+                group("Body"), contentRow(child("A", 80), child("C", 50, "\t\t\t\t\t\t\tMargin: 0 0 15 0",
+                        "\t\t\t\t\t\tBreak:", "\t\t\t\t\t\t\tKeep together: true")),
+                group("Footer rows"), row("F", 10)));
+        assertEquals(3, l.pages());
+        assertRect(40, 60, 515, 70, l.rect(1, "A"));
+        assertRect(40, 60, 515, 10, l.rect(2, "A"));
+        assertRect(40, 60, 515, 70, l.rect(2, "B"));
+        l.assertAbsent(2, "C");
+        assertRect(40, 130, 515, 10, l.rect(2, "F"));
+        assertRect(40, 60, 515, 50, l.rect(3, "C"));
+        assertRect(40, 60, 515, 65, l.rect(3, "B"));
+        assertRect(40, 125, 515, 10, l.rect(3, "F"));
+    }
 }

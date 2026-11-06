@@ -89,9 +89,11 @@ corte forzado, se trunca el margen anterior al corte y se conserva el posterior.
 Una caja que contiene los márgenes de sus hijos (una caja con borde o relleno, con `Isolate margins`, la columna de un
 `Columns`) contiene también en su alto el margen inferior de su último hijo, así que ese margen tiene que caber en la
 página como cabe el hijo: si el hijo cabe y su margen no, el corte va antes del hijo (o antes, si ese corte es mejor), y
-antes de la caja si dentro de ella no puede cortar nada. El área de página es la excepción: su final es el final de la
-página, y el margen inferior de su último hijo se trunca ahí. Una caja con `Height` tiene el alto que tiene, haga lo que
-haga su contenido.
+antes de la caja si dentro de ella no puede cortar nada. Al principio de una página no hay nada antes de la caja: el
+último hijo se parte por dentro, con el sitio de su margen reservado, y acaba con él en la página siguiente. El área de
+página es la excepción: su final es el final de la página, y el margen inferior de su último hijo se trunca ahí. Una caja
+con `Height` tiene el alto que tiene, haga lo que haga su contenido. Un ítem estirado a su fila, como la celda de una
+tabla, no tiene `Height`: la regla vale para él en la página en la que acaba con su contenido.
 
 ## Bordes y relleno en los cortes
 

@@ -3,6 +3,7 @@ package dev.stxt.pdf.convert;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.layout.image.Images;
 import dev.stxt.pdf.layout.inline.PdfMetrics;
 import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Cancellation;
@@ -21,16 +22,15 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Entry point of the engine: STXT document → PDF (or SVG) with the real metrics of the fonts and the images of the
@@ -92,6 +92,8 @@ public final class Converter {
      * {@link #preload}); {@code null} if each conversion takes its own.
      */
     private final Resources current;
+    /** The images its conversions have besides those of the resources, by their path ({@link #withImages}). */
+    private final Map<String, byte[]> images;
     private final InlineNode styles;
     private final boolean debug;
     private final Limits limits;
@@ -105,6 +107,7 @@ public final class Converter {
         this.reloadEachConversion = builder.reloadEachConversion;
         this.preload = builder.preload;
         this.limits = builder.limits;
+        this.images = Map.of();
         this.current = snapshot();
         this.styles = builder.styles;
         this.debug = builder.debug;
@@ -116,11 +119,20 @@ public final class Converter {
 
     /** The same configuration as {@code other}, with a new snapshot of its resources ({@link #reloaded()}). */
     private Converter(Converter other) {
+        this(other, null);
+    }
+
+    /**
+     * The same configuration as {@code other}: with a new snapshot of its resources and its images if {@code images}
+     * is {@code null} ({@link #reloaded()}), or with its snapshot and those images ({@link #withImages}).
+     */
+    private Converter(Converter other, Map<String, byte[]> images) {
         this.resources = other.resources;
         this.reloadEachConversion = other.reloadEachConversion;
         this.preload = other.preload;
         this.limits = other.limits;
-        this.current = snapshot();
+        this.images = images != null ? Collections.unmodifiableMap(images) : other.images;
+        this.current = images != null ? other.current : snapshot();
         this.styles = other.styles;
         this.debug = other.debug;
         this.excluded = other.excluded;
@@ -198,19 +210,8 @@ public final class Converter {
      */
     private void preload(Resources snapshot) {
         snapshot.fonts();
-        Path folder = snapshot.imagesFolder();
-        if (!Files.isDirectory(folder)) {
-            return;
-        }
-        List<Path> files;
-        try (Stream<Path> walk = Files.walk(folder)) {
-            files = walk.filter(Files::isRegularFile).sorted().toList();
-        } catch (IOException | UncheckedIOException e) {
-            // A folder that cannot be walked is reported by the documents that use its images.
-            return;
-        }
-        for (Path file : files) {
-            String path = folder.relativize(file).toString().replace('\\', '/');
+        // A folder that cannot be walked gives no paths: the documents that use its images report it.
+        for (String path : snapshot.imagePaths()) {
             try {
                 if (snapshot.images().pdfBytes(path) <= limits.maxPdfBytes()) {
                     snapshot.images().find(path);
@@ -221,9 +222,34 @@ public final class Converter {
         }
     }
 
-    /** The resources a conversion works with from start to end: those of the converter, or a new snapshot. */
+    /**
+     * The resources a conversion works with from start to end: those of the converter, or a new snapshot, with the
+     * images added for its conversions ({@link #withImages}).
+     */
     private Resources forConversion() {
-        return reloadEachConversion ? resources.snapshot() : current;
+        Resources snapshot = reloadEachConversion ? resources.snapshot() : current;
+        return images.isEmpty() ? snapshot : snapshot.withImages(images);
+    }
+
+    /**
+     * {@return a converter with the same configuration and the same resources, already read or not, whose
+     * conversions also have the images of {@code images}, each at the path a document writes for it} They are the
+     * images one document brings with it, which are in no folder (reference/implementation/api.md): the converter
+     * that is shared stays as it is, and this one is used for that document and thrown away. An image given here goes
+     * before one of the resources with the same path, and before one given to the converter it comes from. Nothing is
+     * read again: creating it costs copying the bytes. Each image is read when a document uses it, and what is wrong
+     * with it is an error of that document, with the line of its {@code Image}.
+     *
+     * @param images the content of each image (a PNG, a JPEG, an SVG or a PDF as it is) by its path, relative and
+     *        without {@code ..}; not {@code null}. The bytes are copied
+     * @throws IllegalArgumentException if a path is blank, absolute or has {@code ..}
+     */
+    public Converter withImages(Map<String, byte[]> images) {
+        Map<String, byte[]> copy = new LinkedHashMap<>(this.images);
+        images.forEach((path, content) -> copy.put(path, content.clone()));
+        // The paths are checked here, not in the first conversion.
+        resources.withImages(copy);
+        return new Converter(this, copy);
     }
 
     /** {@return the most it accepts ({@link Limits})} */
@@ -302,6 +328,9 @@ public final class Converter {
                     progress).layOutDocument(document, styles);
             if (!excluded.contains(Check.CONTRAST)) {
                 ContrastCheck.check(laidOut, stop);
+            }
+            if (pdfA != null) {
+                new Images(current, limits, excluded).validatePdfA(laidOut.root(), pdfA);
             }
             return laidOut;
         });

@@ -314,7 +314,7 @@ final class PdfStructure {
             // Upper case is only a painting matter (reference/common/text-formatting.md): the text of the structure
             // is the written one. If it has page numbers or references, the text changes with the page and cannot be
             // given.
-            e.setActualText(box.text());
+            e.setActualText(Reference.shown(box.text()));
         }
         if (box.role() == Role.LIST) {
             PDListAttributeObject numbering = new PDListAttributeObject();

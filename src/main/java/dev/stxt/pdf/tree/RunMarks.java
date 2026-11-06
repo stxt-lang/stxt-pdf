@@ -1,5 +1,7 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.Reference;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -18,6 +20,10 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * target of a link ({@code (...)}), the brackets of an image ({@code ![...]}) and those that a blank line separates.
  * Anything other than a single word in the braces ({@code [x]{page of: id}}, {@code [x]{a b}}) is not a styled run
  * either, nor are the page numbers ({@code [x]{page}}). A code block, which the marking does not tell apart, gets its text back with {@link #unmark}.</p>
+ *
+ * <p>An escaped opening brace (<code>\{</code>) is marked too, as {@link Reference#LITERAL_BRACE}: the parser would
+ * give back a brace like any other, and <code>\{page}</code> would be the number of the page
+ * (reference/common/references.md).</p>
  */
 final class RunMarks {
 
@@ -52,8 +58,9 @@ final class RunMarks {
                         + "U+%04X, which is not text", (int) text.charAt(i)));
             }
         }
-        List<Span> spans = spans(text);
-        if (spans.isEmpty()) {
+        List<Integer> braces = new ArrayList<>();
+        List<Span> spans = spans(text, braces);
+        if (spans.isEmpty() && braces.isEmpty()) {
             return new Marked(text, List.of());
         }
         spans.sort((a, b) -> Integer.compare(a.open(), b.open()));
@@ -67,8 +74,18 @@ final class RunMarks {
         closes.sort((a, b) -> Integer.compare(a[0], b[0]));
         int nextOpen = 0;
         int nextClose = 0;
+        int nextBrace = 0;
         for (int i = 0; i < text.length(); ) {
-            if (nextOpen < spans.size() && spans.get(nextOpen).open() == i) {
+            while (nextBrace < braces.size() && braces.get(nextBrace) < i) {
+                // Inside the braces of a styled run, already replaced.
+                nextBrace++;
+            }
+            if (nextBrace < braces.size() && braces.get(nextBrace) == i) {
+                // An escaped brace is text: nothing takes it for the start of a reference.
+                out.append(Reference.LITERAL_BRACE);
+                nextBrace++;
+                i += 2;
+            } else if (nextOpen < spans.size() && spans.get(nextOpen).open() == i) {
                 out.append(OPEN).append(number(names.size())).append(END);
                 names.add(spans.get(nextOpen).name());
                 nextOpen++;
@@ -84,9 +101,12 @@ final class RunMarks {
         return new Marked(out.toString(), List.copyOf(names));
     }
 
-    /** The text with its marks written again as {@code [text]{name}}: what a code block shows. */
+    /**
+     * The text with its marks written again as {@code [text]{name}}, and its escaped braces with their backslash: what
+     * a code block shows.
+     */
     static String unmark(String text, List<String> names) {
-        if (names.isEmpty()) {
+        if (names.isEmpty() && text.indexOf(Reference.LITERAL_BRACE) < 0) {
             return text;
         }
         StringBuilder out = new StringBuilder(text.length());
@@ -100,6 +120,8 @@ final class RunMarks {
                 i = end;
             } else if (c == CLOSE) {
                 out.append("]{").append(open.isEmpty() ? "" : open.pop()).append('}');
+            } else if (c == Reference.LITERAL_BRACE) {
+                out.append("\\{");
             } else {
                 out.append(c);
             }
@@ -123,9 +145,10 @@ final class RunMarks {
 
     /**
      * The styled runs of the text: each {@code ]} followed by {@code {name}} closes the {@code [} that opens it,
-     * walking the text as the inline Markdown does.
+     * walking the text as the inline Markdown does. The positions of the backslashes that escape an opening brace are
+     * added to {@code braces}, in order.
      */
-    private static List<Span> spans(String text) {
+    private static List<Span> spans(String text, List<Integer> braces) {
         List<Span> spans = new ArrayList<>();
         // The open brackets: their position, or -1 for that of an image, which does not open a styled run.
         Deque<Integer> brackets = new ArrayDeque<>();
@@ -134,6 +157,9 @@ final class RunMarks {
         while (i < n) {
             char c = text.charAt(i);
             if (c == '\\' && i + 1 < n && isPunctuation(text.charAt(i + 1))) {
+                if (text.charAt(i + 1) == '{') {
+                    braces.add(i);
+                }
                 i += 2;
             } else if (c == '`') {
                 i = afterCode(text, i);

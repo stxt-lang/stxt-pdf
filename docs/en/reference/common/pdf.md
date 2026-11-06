@@ -103,6 +103,16 @@ PDF/A adds to the PDF a 3 KB sRGB color profile and the metadata the standard as
 embedded, the colors are defined, and there is no JavaScript, encryption or forms. The tests validate the eleven
 examples with veraPDF as PDF/A-3a, and the four variants with a test document.
 
+The images from outside are the exception. A JPEG in CMYK is embedded as it is, with a color space PDF/A only admits
+with a CMYK output profile, and the one of the engine is sRGB: with PDF/A it is an error, `IMAGE_FORMAT`, with the line
+of the `Image` (or of the text or the `Marker image` that carries it); without PDF/A it is converted as always. The page
+of a PDF used as an image is copied as it is: the engine checks its fonts and its annotations
+([Image](../components/image.md#pdf)), but not that the rest of its content complies with PDF/A.
+
+> **Decision:** a JPEG in CMYK with PDF/A is an error and is not converted to RGB: the engine embeds the JPEG without
+> encoding it again, and the conversion would change the colors depending on the profile assumed for it. Without PDF/A
+> the PDF is valid and there is no error. *Rejected alternative:* rejecting it always.
+
 PDF/UA-2 writes a PDF 2.0, and PDF/A-2 and PDF/A-3 are PDF 1.7: asking for both is an `IllegalArgumentException`.
 PDF/A-4, on PDF 2.0, is not done.
 
@@ -152,6 +162,8 @@ PDF/A-2 only allows embedding other PDF/A files.
 ## What is not supported
 
 - PDF/A-1 and PDF/A-4 ([above](#pdfa)).
+- A CMYK output profile, or the conversion to RGB of a JPEG in CMYK. Checking that the page of a PDF used as an image
+  complies with PDF/A ([above](#pdfa)).
 - Language per run within a line ([Typography](typography.md#language-language)).
 - Forms, digital signatures and encryption. Attachments outside PDF/A-3.
 - Optional content layers of its own: only those of the page of a PDF used as an image are kept

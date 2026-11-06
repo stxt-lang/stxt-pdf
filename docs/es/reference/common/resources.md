@@ -26,6 +26,29 @@ subcarpeta: la de una `Image`, a `images/` (`logos/acme.png` es `resources/image
 Los ficheros pueden cambiar mientras el motor está en marcha: el motor los ve cuando la aplicación se lo pide o, si se
 configura así, en cada conversión ([Uso desde Java](../implementation/api.md#ficheros-que-cambian)).
 
+## Recursos de varios sitios
+
+Una aplicación puede dar los recursos de otra manera que con una carpeta
+([Uso desde Java](../implementation/api.md#varios-sitios)). Para el documento cambia poco: las fuentes se piden igual, por
+su familia, y la ruta de una imagen se sigue escribiendo relativa y hacia abajo.
+
+- **Varias carpetas de imágenes**, cada una con un prefijo. Con la carpeta `/datos/logos` bajo el prefijo `logos`,
+  `Image: logos/acme.png` es `/datos/logos/acme.png`. Una ruta va a la carpeta con el prefijo más largo por el que
+  empieza, y la que no empieza por ninguno, a la carpeta sin prefijo, si la hay; si no la hay, la imagen no existe
+  (`IMAGE_UNKNOWN`). Una ruta no sale de su carpeta, tampoco por un enlace.
+- **Fuentes e imágenes en memoria**: los bytes de un `.ttf`, un `.otf`, un PNG, un JPEG, un SVG o un PDF, que no están
+  en ninguna carpeta. Una imagen en memoria tiene la ruta que le da la aplicación y va antes que un fichero con esa
+  misma ruta. Una fuente en memoria se indexa con las de la carpeta, por lo que declara su interior.
+- **Imágenes de una conversión**: las que trae un documento consigo, que solo ve esa conversión y van antes que todas
+  las demás.
+
+Lo que se da en memoria no cambia mientras el motor está en marcha.
+
+> **Decisión:** los recursos se componen de piezas fijas (carpetas y bytes) y no de una interfaz que la aplicación
+> implementa: las comprobaciones de las rutas, lo que se guarda de cada fichero y cuándo se vuelve a leer siguen siendo
+> del motor, iguales para todos. *Alternativa descartada:* un proveedor de recursos, que serviría para cualquier origen
+> pero pasaría al contrato la identidad y la versión de cada recurso.
+
 ## Fuentes
 
 Solo se usan las fuentes de `fonts/`: los ficheros `.ttf` y `.otf`. No hay fuentes del sistema, ni las 14 estándar de
@@ -136,7 +159,9 @@ original profile.»* El fichero no se modifica.
 ## Lo que no hay
 
 - Fuentes que no son un fichero `.ttf` u `.otf` (WOFF, colecciones `.ttc`), fuentes del sistema o descargadas: solo se
-  indexan los `.ttf` y los `.otf` de `fonts/` y sus subcarpetas.
+  indexan los `.ttf` y los `.otf` de `fonts/` y sus subcarpetas, y los que la aplicación da en memoria.
+- Varias carpetas de fuentes, o recursos leídos de una URL o del classpath: lo que no está en una carpeta se da en
+  memoria.
 - Síntesis de negrita o cursiva, o el peso más cercano: la variante debe existir como fichero.
 - Subconjuntos de las fuentes CFF: se incrustan enteras.
 - Patrones de partición propios o de otros idiomas que los del jar.

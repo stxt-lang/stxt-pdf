@@ -61,7 +61,8 @@ El valor es la ruta del fichero, relativa a `images/` y siempre hacia abajo ([Re
 formato se reconoce por el contenido y no por la extensión (un SVG es un fichero que empieza por `<`, y un PDF, uno que
 empieza por `%PDF-`). Una `Image` sin ruta, un fichero que no existe o una ruta que sale de `images/` son un error
 (`IMAGE_UNKNOWN`). Un fichero que no es PNG, JPEG, PDF ni un SVG admitido (como un GIF o un WebP), o que no se puede leer,
-es `IMAGE_FORMAT`. Los errores señalan la línea de la `Image`. Si el fichero cambia, la conversión siguiente lo lee otra
+es `IMAGE_FORMAT`, y también un JPEG en CMYK si el PDF se pide como PDF/A ([El PDF](../common/pdf.md#pdfa)). Los errores
+señalan la línea de la `Image`. Si el fichero cambia, la conversión siguiente lo lee otra
 vez, y un documento ya maquetado no se pinta con otra imagen que la que se maquetó
 ([Uso desde Java](../implementation/api.md#ficheros-que-cambian)).
 

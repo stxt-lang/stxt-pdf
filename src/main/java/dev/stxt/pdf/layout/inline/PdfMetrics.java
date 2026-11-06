@@ -66,7 +66,8 @@ public final class PdfMetrics implements TextMeasurer {
 
     @Override
     public double width(String text, FontFace font, double fontSize) {
-        return file(font).width(text, fontSize, font.ligatures(), font.kerning());
+        // A literal brace measures what a brace does (reference/common/references.md).
+        return file(font).width(Reference.shown(text), fontSize, font.ligatures(), font.kerning());
     }
 
     private FontFile file(FontFace font) {
@@ -157,8 +158,10 @@ public final class PdfMetrics implements TextMeasurer {
                         continue;
                     }
                 }
-                // The white-space characters of the document are painted as spaces (reference/common/typography.md).
-                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, start + i);
+                // The white-space characters of the document are painted as spaces (reference/common/typography.md),
+                // and the brace of a literal reference, as a brace.
+                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp == Reference.LITERAL_BRACE ? '{' : cp,
+                        start + i);
                 i += Character.charCount(cp);
             }
             start += text.length();
@@ -170,7 +173,8 @@ public final class PdfMetrics implements TextMeasurer {
         for (int i = 0; i < text.length(); ) {
             int cp = text.codePointAt(i);
             if (cp != LineBreaker.SOFT_HYPHEN) {
-                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp, index);
+                requireGlyph(box, font, Character.isWhitespace(cp) ? ' ' : cp == Reference.LITERAL_BRACE ? '{' : cp,
+                        index);
             }
             i += Character.charCount(cp);
         }

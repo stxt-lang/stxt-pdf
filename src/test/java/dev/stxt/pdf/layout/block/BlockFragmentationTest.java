@@ -252,6 +252,22 @@ class BlockFragmentationTest {
     }
 
     @Test
+    void trailingMarginThatDoesNotFitAtTheStartOfAPageBreaksTheLastChildInside() {
+        // P isolates margins and C (190) is split: 100 on page 1 and, on page 2, the 90 left fit but its bottom margin
+        // (15) does not. At the start of a page nothing can break before C, so C is broken inside with the margin
+        // reserved: 85 on page 2, and 5 with the margin on page 3.
+        LayoutFixture l = layOutPaged(PAGE,
+                "\tBlock:", "\t\tId: P", "\t\tIsolate margins: true",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 190", "\t\t\t\tMargin: 0 0 15 0");
+        assertEquals(3, l.pages());
+        assertRect(40, 40, 515, 100, l.rect(1, "C"));
+        assertRect(40, 40, 515, 85, l.rect(2, "C"));
+        assertRect(40, 40, 515, 85, l.rect(2, "P"));
+        assertRect(40, 40, 515, 5, l.rect(3, "C"));
+        assertRect(40, 40, 515, 20, l.rect(3, "P"));
+    }
+
+    @Test
     void emptyBoxBeforeTheBreakDoesNotOverflow() {
         // E (no height) sits at 90, where B would start, past the 70 of the fragment of P: it is not an overflow.
         LayoutFixture l = layOutPaged(PAGE,

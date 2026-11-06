@@ -5,6 +5,61 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Added
+
+- **References as text.** A reference or a page number inside another pair of braces is text: `{{page}}` writes
+  `{page}`, and so do `{{pages}}`, `{{page of: id}}`, `{{number of: id}}` and `{{heading N}}`, in every text, whatever
+  its `Markup`, also in preformatted text and in the code of a `Markdown`. Only one pair is removed (`{{{page}}}` writes
+  `{{page}}`) and what is not a marker is left as it is (`{{name}}`). Until now a text could not show a marker: it was
+  replaced, or it was an error (`REFERENCE_UNKNOWN`), also with `Markup: none`. `Reference.escape(text)` writes a text
+  that comes from data so that it is shown as it is. The text of a box keeps the brace of such a marker as
+  `Reference.LITERAL_BRACE`, a noncharacter (`Reference.shown` gives the text that is read); the lines of the laid out
+  pages have the brace. "References as text" in the reference.
+- **Resources from several places.** `Resources.builder()` puts the resources together from pieces instead of one
+  folder: a folder of fonts (`fonts(Path)`), a folder of images for the paths without prefix (`images(Path)`) and one
+  for each prefix (`images("img", Path)`: `Image: img/logos/acme.png` is the file `logos/acme.png` of that folder; a
+  path goes to the folder with the longest prefix), and fonts and images given as bytes (`font(name, bytes)`,
+  `image(path, bytes)`), for what an application carries in its classpath or generates. An image in memory goes before
+  a file with the same path. `new Resources(Path)` is as before. `Resources.imagePaths()` lists the paths a document
+  can write. "Several places" in "Using from Java".
+- **The images of one conversion.** `Converter.withImages(Map<String, byte[]>)` gives a converter with the same
+  configuration and the same resources, without reading anything again, whose conversions also have those images at
+  those paths: the ones a document brings with it. The shared converter does not change. `Resources.withImages(Map)`
+  is the same one level below.
+
+### Changed
+
+- **An image or a font may have no file.** `ImageFile.path()` and `FontFile.path()` are `null` for one given as bytes:
+  `ImageFile.fileName()` and `FontFile.name()` are what the messages call them. `Resources.root()` is `null`, and
+  `fontsFolder()` and `imagesFolder()` can be, in resources built with `Resources.builder()`. The message of an image
+  that is a link out of its folder names it from that folder when the resources are not a single folder.
+- **In Markdown, an escaped brace is text.** `\{page\}` and `\{page}`, in a `Markdown` or in a text with
+  `Markup: markdown`, now write `{page}`: until now the backslash was removed and the marker was replaced all the same.
+  In inline code and in a code block the backslash is still text, and a marker is written as text with `{{page}}`.
+- **`{{page}}` no longer writes the number of the page between braces.** A document that wrote a marker inside braces
+  to get `{3}` now gets `{page}`; with a space, `{ {page} }`, it is as before.
+
+### Fixed
+
+- **A JPEG in CMYK no longer goes into a PDF/A.** With `Converter.builder().pdfA(...)`, a JPEG with four color
+  components was embedded as it is, with the device CMYK color space, and the PDF declared a PDF/A it did not comply
+  with (rule 6.2.4.3 of veraPDF: the output profile of the engine is sRGB). It is now `IMAGE_FORMAT`, with the line of
+  the `Image`, of the text that carries it or of its `Marker image`, when the document is laid out. Without PDF/A
+  nothing changes: the PDF is valid and the JPEG is embedded as before. `ImageFile.cmyk()` says whether a JPEG has four
+  components, read from its frame header. "PDF/A" in the reference, which now also says that the content of the page of
+  a PDF used as an image is not checked against PDF/A.
+- **A split row whose cell ends with a bottom margin no longer pushes what follows out of the page.** A cell of a
+  `Table` or an item of a `Grid` (a box stretched to its row) whose last child fitted in what was left of the page, but
+  not with its bottom margin, ended on that page taller than the room it had: the footer of the table, or the row after
+  it, was placed beyond the page area (`PAGE_OVERFLOW`, "extends 12.34 pt beyond the page area"), depending on where the
+  row fell. The rule for a box that contains the bottom margin of its last child now applies to a stretched item on the
+  page where it ends with its content: the break goes before that child. And at the start of a page, where nothing can
+  go before the box, the last child is broken inside with the room of its margin kept free, also in a box with border,
+  padding or `Isolate margins` that continues from the page before: until now it overflowed the page. "Margins at
+  breaks" in the reference.
+
 ## [0.11.0] - 2026-11-05
 
 Resources that stay as they were when the `Converter` was created and are reloaded when whoever converts asks for it

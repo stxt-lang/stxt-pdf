@@ -38,6 +38,10 @@ List:
 El motor escribe el número antes de repartir el texto en líneas, así que «página 9» y «página 10» ocupan lo que tienen que
 ocupar. Si eso mueve el contenido, vuelve a paginar hasta que todos los números son correctos.
 
+Para escribir un marcador como texto, sin que se sustituya, se pone dentro de otro par de llaves: `{{page}}` escribe
+`{page}`, y `{{page of: id}}`, `{page of: id}`. Vale para todos los marcadores y en cualquier texto; en Markdown también
+vale `\{page\}`. El resto de textos entre llaves no cambia (`{{nombre}}` se escribe tal cual).
+
 ## Enlaces
 
 Un enlace hace clicable una zona del PDF. Lleva a una web, a un correo o a otra parte del documento.

@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -48,7 +49,7 @@ final class PdfOutline {
             }
             PDOutlineNode parent = open.isEmpty() ? outline : open.peek();
             PDOutlineItem item = new PDOutlineItem();
-            item.setTitle(h.headingText());
+            item.setTitle(Reference.shown(h.headingText()));
             PDActionGoTo action = goTo.apply(h, destinations.get(h));
             if (action != null) {
                 item.setAction(action);

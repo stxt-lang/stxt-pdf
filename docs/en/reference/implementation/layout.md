@@ -346,6 +346,17 @@ even physical page. Those end with a blank page: `Numbering` counts it as one mo
 reserves its physical number for it and `pages` adds it as a `Page` with `blank`, an empty fragment of the box of the section and
 without `Page overlay`. It is not part of the flow of the section, so the `Pages` of its `Page overlay` does not see it.
 
+**Markers that are text.** A `{{page}}` or a `\{page}` of Markdown
+([References](../common/references.md#references-as-text)) reaches the tree without its pair of braces and with
+`Reference.LITERAL_BRACE` (a noncharacter, U+FDD3) in place of its brace: `ElementReader` puts it in the literal texts
+(`Reference.literal`) and `RunMarks` and `MarkdownBuilder` in those of Markdown, run by run. With that character no
+step takes it for a marker: neither `Reference`, nor `PageNumbers`, nor a running head or a table of contents that copy
+the text of a heading. `PdfMetrics` measures it and checks its glyph as a brace. When `Engine.layOutDocument` finishes
+paginating and nothing is replaced any more, `LiteralBraces.shown` redoes the lines that carry it with the brace,
+without changing measurements, so the laid out pages and what is painted do not have it; the text of the boxes
+(`Box.text()`) does, and whoever reads it to write it (the bookmarks of the PDF, the replacement text, the `Alt` of a
+link) passes it through `Reference.shown`.
+
 **`{page}` and `{pages}`.** `InlineLayout` measures the markers as a trial number (`00` at first, the measurer of
 `TextValues`) and the lines keep them. When pagination finishes, the `Paginator` calls `Engine.number`
 (`PageNumbers.number`, with the real measurer), which redoes only those lines with the values of each page already

@@ -26,8 +26,8 @@ import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
@@ -58,10 +58,11 @@ final class PdfImages implements Closeable {
     private final Limits limits;
     /** Asked before each image is embedded or drawn for the first time, which is where the work is. */
     private final Cancellation cancellation;
-    private final Map<Path, PDImageXObject> bitmaps = new HashMap<>();
-    private final Map<Path, PDFormXObject> drawings = new HashMap<>();
-    private final Map<Path, PDDocument> sources = new HashMap<>();
-    private final Map<Path, Map<Integer, PDFormXObject>> pages = new HashMap<>();
+    // By the image itself, one per file or per image given as bytes in the resources of a conversion.
+    private final Map<ImageFile, PDImageXObject> bitmaps = new IdentityHashMap<>();
+    private final Map<ImageFile, PDFormXObject> drawings = new IdentityHashMap<>();
+    private final Map<ImageFile, PDDocument> sources = new IdentityHashMap<>();
+    private final Map<ImageFile, Map<Integer, PDFormXObject>> pages = new IdentityHashMap<>();
     private final PdfPages imports;
 
     PdfImages(PDDocument doc, Limits limits) {
@@ -84,7 +85,7 @@ final class PdfImages implements Closeable {
      *         ({@link ImageFile#checkUnchanged()})
      */
     PDImageXObject bitmap(ImageFile file) {
-        PDImageXObject image = bitmaps.get(file.path());
+        PDImageXObject image = bitmaps.get(file);
         if (image == null) {
             cancellation.check();
             byte[] content = file.content();
@@ -101,7 +102,7 @@ final class PdfImages implements Closeable {
             } catch (IOException e) {
                 throw file.unreadable(e);
             }
-            bitmaps.put(file.path(), image);
+            bitmaps.put(file, image);
         }
         return image;
     }
@@ -111,11 +112,11 @@ final class PdfImages implements Closeable {
      * the origin at its bottom left corner (like the content of a page).
      */
     PDFormXObject drawing(ImageFile file) throws IOException {
-        PDFormXObject form = drawings.get(file.path());
+        PDFormXObject form = drawings.get(file);
         if (form == null) {
             cancellation.check();
             form = draw(file);
-            drawings.put(file.path(), form);
+            drawings.put(file, form);
         }
         return form;
     }
@@ -129,20 +130,20 @@ final class PdfImages implements Closeable {
      *         ({@link ImageFile#checkUnchanged()})
      */
     PDFormXObject page(ImageFile file, int number) {
-        Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file.path(), p -> new HashMap<>());
+        Map<Integer, PDFormXObject> forms = pages.computeIfAbsent(file, p -> new HashMap<>());
         PDFormXObject form = forms.get(number);
         if (form == null) {
             cancellation.check();
             try {
-                PDDocument source = sources.get(file.path());
+                PDDocument source = sources.get(file);
                 if (source == null) {
                     file.checkUnchanged();
                     source = file.inMemory() ? Loader.loadPDF(file.content()) : Loader.loadPDF(file.path().toFile());
-                    sources.put(file.path(), source);
+                    sources.put(file, source);
                 }
                 // PDFBox reads the source as it needs it: what it copies is also read from the file, or from the
                 // bytes kept in memory.
-                form = imports.page(source, number, file.path().getFileName().toString());
+                form = imports.page(source, number, file.fileName());
             } catch (IOException e) {
                 throw file.unreadable(e);
             }
@@ -182,7 +183,7 @@ final class PdfImages implements Closeable {
         SVGDocument svg = new SVGLoader().load(new ByteArrayInputStream(file.svgContent()), URI.create("about:blank"),
                 context.build());
         if (svg == null) {
-            throw new ImageFormatException("The SVG " + file.path().getFileName()
+            throw new ImageFormatException("The SVG " + file.fileName()
                     + " cannot be drawn: JSVG does not load it (for example, it nests more <use> than its limit of "
                     + DocumentLimits.DEFAULT_MAX_USE_NESTING_DEPTH + " levels)");
         }

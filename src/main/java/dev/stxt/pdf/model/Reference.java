@@ -46,7 +46,75 @@ public record Reference(Kind kind, int start, int end, String id) {
     /** The variant of a heading reference that asks for the first heading of the page. */
     public static final String FIRST = "first";
 
-    private static final Pattern PATTERN = Pattern.compile("\\{(page|number) of:([^{}]*)}|\\{heading ([^{}]*)}");
+    /**
+     * What a reference names: anything but braces, also the literal one ({@link #LITERAL_BRACE}), so that a reference
+     * that is text inside something that looks like another one ({@code {page of: {{page}}}}) does not complete it.
+     */
+    private static final String NAMED = "([^{}" + (char) 0xFDD3 + "]*)";
+    private static final Pattern PATTERN = Pattern.compile("\\{(page|number) of:" + NAMED + "}|\\{heading " + NAMED
+            + "}");
+    /** Everything a text replaces: the references and the page numbers, {@code {page}} and {@code {pages}}. */
+    private static final Pattern REPLACED = Pattern.compile("\\{pages?}|" + PATTERN.pattern());
+    /** One of them inside another pair of braces: it is text ({@link #literal}). */
+    private static final Pattern WRAPPED = Pattern.compile("\\{(" + REPLACED.pattern() + ")}");
+
+    /**
+     * The opening brace of a reference or a page number that is text and not replaced
+     * (reference/common/references.md): {@code {{page}}} in a document, or <code>\{page}</code> in Markdown, is kept
+     * in the text of a box as this character and {@code page}}, which nothing takes for a reference. It is a
+     * noncharacter of Unicode, which a text never has; the measurements count it as a brace and the laid out lines
+     * have the brace ({@link #shown}).
+     */
+    public static final char LITERAL_BRACE = (char) 0xFDD3;
+
+    /**
+     * The text of a document with its literal references kept as text (reference/common/references.md): a reference
+     * or a page number inside another pair of braces, {@code {{page}}} or {@code {{page of: id}}}, loses that pair and
+     * its own opening brace becomes {@link #LITERAL_BRACE}. Only one pair is removed: {@code {{{page}}}} is the text
+     * {@code {{page}}}. Anything else in braces is left as it is.
+     */
+    public static String literal(String text) {
+        if (text == null || !text.contains("{{")) {
+            return text;
+        }
+        Matcher m = WRAPPED.matcher(text);
+        StringBuilder sb = new StringBuilder(text.length());
+        int last = 0;
+        while (m.find()) {
+            sb.append(text, last, m.start()).append(LITERAL_BRACE).append(text, m.start() + 2, m.end() - 1);
+            last = m.end();
+        }
+        return last == 0 ? text : sb.append(text, last, text.length()).toString();
+    }
+
+    /**
+     * A text written so that a document shows it as it is (reference/common/references.md): each reference and each
+     * page number it contains goes inside another pair of braces, {@code {page}} as {@code {{page}}}. It is what a
+     * program that writes documents from data does with a text that is not its own and goes in a literal text; nothing
+     * else is changed. A text that goes in Markdown is escaped as Markdown instead, with a backslash before each
+     * punctuation sign, braces included: both together would double the braces.
+     *
+     * @param text the text to show, not {@code null}
+     * @return the text to write in the document
+     */
+    public static String escape(String text) {
+        if (text.indexOf('{') < 0) {
+            return text;
+        }
+        Matcher m = REPLACED.matcher(text);
+        StringBuilder sb = new StringBuilder(text.length() + 4);
+        int last = 0;
+        while (m.find()) {
+            sb.append(text, last, m.start()).append('{').append(text, m.start(), m.end()).append('}');
+            last = m.end();
+        }
+        return last == 0 ? text : sb.append(text, last, text.length()).toString();
+    }
+
+    /** The text as it is read and painted: each {@link #LITERAL_BRACE} is an opening brace. */
+    public static String shown(String text) {
+        return text == null || text.indexOf(LITERAL_BRACE) < 0 ? text : text.replace(LITERAL_BRACE, '{');
+    }
     /** A valid heading reference: the level, 1 to 6, and the optional variant. */
     private static final Pattern HEADING = Pattern.compile("([1-6])(?:\\s*:\\s*(" + FIRST + "))?");
 

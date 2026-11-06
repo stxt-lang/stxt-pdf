@@ -52,7 +52,8 @@ public final class FontLibrary {
     private static final Comparator<FontFace> BY_VARIANT = Comparator.comparingInt((FontFace f) -> f.weight().value())
             .thenComparing(FontFace::style);
 
-    private final Path folder;
+    /** Where the fonts come from, for the messages: the folder, the memory or both. */
+    private final String origin;
     private final Map<FontFace, FontFile> faces;
     /** All the families found, including those whose files cannot be used, in alphabetical order. */
     private final SortedSet<String> families;
@@ -62,8 +63,8 @@ public final class FontLibrary {
     record Stamp(Path path, long size, FileTime modified) {
     }
 
-    private FontLibrary(Path folder, Map<FontFace, FontFile> faces, Set<String> families, List<Stamp> stamps) {
-        this.folder = folder;
+    private FontLibrary(String origin, Map<FontFace, FontFile> faces, Set<String> families, List<Stamp> stamps) {
+        this.origin = origin;
         this.faces = Map.copyOf(faces);
         this.families = Collections.unmodifiableSortedSet(new TreeSet<>(families));
         this.stamps = List.copyOf(stamps);
@@ -73,11 +74,33 @@ public final class FontLibrary {
         Map<FontFace, FontFile> faces = new HashMap<>();
         Set<String> families = new TreeSet<>();
         List<Stamp> stamps = new ArrayList<>();
-        for (Path file : files(resources)) {
-            resources.checkInside(file);
-            // Before reading it: a change while it is being read gives another modification time.
-            stamps.add(stamp(file));
-            Entry entry = read(file);
+        Path folder = resources.fontsFolder();
+        Map<String, byte[]> memory = resources.fontsInMemory();
+        if (folder == null && memory.isEmpty()) {
+            throw new ResourceException("The resources have no fonts: neither a folder of fonts nor fonts in memory");
+        }
+        List<Entry> entries = new ArrayList<>();
+        if (folder != null) {
+            for (Path file : files(resources)) {
+                resources.checkInside(file);
+                // Before reading it: a change while it is being read gives another modification time.
+                stamps.add(stamp(file));
+                byte[] content;
+                try {
+                    content = Files.readAllBytes(file);
+                } catch (IOException e) {
+                    throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
+                }
+                entries.add(read(file, file.toString(), folder.relativize(file).toString(), content));
+            }
+        }
+        // The fonts given as bytes, in the order of their names: what the index has does not depend on how they
+        // were given.
+        for (String name : new TreeSet<>(memory.keySet())) {
+            entries.add(read(null, name + " (in memory)", name + " (in memory)", memory.get(name)));
+        }
+        Map<FontFace, String> labels = new HashMap<>();
+        for (Entry entry : entries) {
             families.add(entry.family());
             if (entry.font() == null) {
                 continue;
@@ -85,11 +108,12 @@ public final class FontLibrary {
             FontFile previous = faces.putIfAbsent(entry.font().face(), entry.font());
             if (previous != null) {
                 throw new ResourceException("Two files for the font " + entry.font().face() + ": "
-                        + resources.fontsFolder().relativize(previous.path()) + " and "
-                        + resources.fontsFolder().relativize(file));
+                        + labels.get(entry.font().face()) + " and " + entry.label());
             }
+            labels.put(entry.font().face(), entry.label());
         }
-        return new FontLibrary(resources.fontsFolder(), faces, families, stamps);
+        String origin = folder == null ? "memory" : memory.isEmpty() ? folder.toString() : folder + " and memory";
+        return new FontLibrary(origin, faces, families, stamps);
     }
 
     /**
@@ -100,6 +124,10 @@ public final class FontLibrary {
      */
     static List<Stamp> stamps(Resources resources) {
         List<Stamp> stamps = new ArrayList<>();
+        if (resources.fontsFolder() == null) {
+            // Only fonts given as bytes, which do not change.
+            return stamps;
+        }
         for (Path file : files(resources)) {
             stamps.add(stamp(file));
         }
@@ -159,7 +187,7 @@ public final class FontLibrary {
                     .map(f -> " The closest name is '" + f + "'.")
                     .orElse("");
             throw new ResourceException("Unknown font: " + face.family() + "." + similar
-                    + " Families in " + folder + ": " + (families.isEmpty() ? "none" : String.join(", ", families)));
+                    + " Families in " + origin + ": " + (families.isEmpty() ? "none" : String.join(", ", families)));
         }
         String variants = faces.keySet().stream()
                 .filter(f -> f.family().equals(face.family()))
@@ -167,7 +195,7 @@ public final class FontLibrary {
                 .map(FontFace::variant)
                 .collect(Collectors.joining(", "));
         throw new ResourceException("The font " + face.family() + " has no variant " + face.variant()
-                + ". Variants in " + folder + ": " + (variants.isEmpty() ? "none" : variants));
+                + ". Variants in " + origin + ": " + (variants.isEmpty() ? "none" : variants));
     }
 
     /** The file of a font, or {@code null} if it is not there. */
@@ -190,14 +218,22 @@ public final class FontLibrary {
         return new TreeSet<>(families);
     }
 
-    /** Family of a file and the font, or {@code null} if its weight cannot be requested. */
-    private record Entry(String family, FontFile font) {
+    /**
+     * Family of a file and the font, or {@code null} if its weight cannot be requested; {@code label} is how the
+     * message of two files for the same font calls it.
+     */
+    private record Entry(String family, FontFile font, String label) {
     }
 
-    private static Entry read(Path file) {
+    /**
+     * @param path  the file; {@code null} for a font given as bytes
+     * @param file  how the messages call it
+     * @param label how the message of two files for the same font calls it
+     */
+    private static Entry read(Path path, String file, String label, byte[] content) {
         TrueTypeFont ttf;
         try {
-            ttf = FontFile.parse(Files.readAllBytes(file));
+            ttf = FontFile.parse(content);
         } catch (IOException e) {
             throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
         }
@@ -219,9 +255,10 @@ public final class FontLibrary {
             FontStyle style = (ttf.getOS2Windows().getFsSelection() & 1) != 0
                     ? FontStyle.ITALIC : FontStyle.NORMAL;
             if (weightClass < FontWeight.MIN || weightClass > FontWeight.MAX) {
-                return new Entry(family, null);
+                return new Entry(family, null, label);
             }
-            return new Entry(family, new FontFile(file, new FontFace(family, new FontWeight(weightClass), style), ttf));
+            return new Entry(family, new FontFile(path, file, new FontFace(family, new FontWeight(weightClass), style),
+                    ttf), label);
         } catch (IOException e) {
             throw new ResourceException("Cannot read the font " + file + ": " + e.getMessage(), e);
         }

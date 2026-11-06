@@ -52,6 +52,7 @@ import dev.stxt.TextNode;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
@@ -275,8 +276,9 @@ final class MarkdownBuilder {
             if (literal.endsWith("\n")) {
                 literal = literal.substring(0, literal.length() - 1);
             }
-            // The code is literal: what looked like a styled run is written again as it was.
-            literal = RunMarks.unmark(literal, styleNames);
+            // The code is literal: what looked like a styled run or an escaped brace is written again as it was. Its
+            // references are replaced as in any text, and one inside another pair of braces is text.
+            literal = Reference.literal(RunMarks.unmark(literal, styleNames));
             if (literal.isBlank()) {
                 throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown code block needs text");
             }
@@ -319,7 +321,8 @@ final class MarkdownBuilder {
             RunStyle open = style;
             String alt;
             try {
-                alt = TextRun.text(inline(i, line)).replace(TextRun.LINE_SEPARATOR, ' ')
+                // An alternative text replaces nothing: its braces are braces.
+                alt = Reference.shown(TextRun.text(inline(i, line, false))).replace(TextRun.LINE_SEPARATOR, ' ')
                         .replace(TextRun.OBJECT_REPLACEMENT, ' ').strip();
             } finally {
                 style = open;
@@ -505,6 +508,14 @@ final class MarkdownBuilder {
          * after another would leave an empty line, which is a paragraph break and not a line break.
          */
         List<TextRun> inline(org.commonmark.node.Node block, int line) {
+            return inline(block, line, true);
+        }
+
+        /**
+         * Like {@link #inline(org.commonmark.node.Node, int)}; with {@code references}, a reference or a page number
+         * inside another pair of braces is kept as text in each run ({@link Reference#literal}).
+         */
+        private List<TextRun> inline(org.commonmark.node.Node block, int line, boolean references) {
             TextRun.Joiner out = new TextRun.Joiner();
             style = null;
             inline(block, TextFormat.PLAIN, out, line);
@@ -512,6 +523,9 @@ final class MarkdownBuilder {
                 throw unclosed(line);
             }
             List<TextRun> runs = out.build();
+            if (references && runs.stream().anyMatch(r -> r.text().contains("{{"))) {
+                runs = runs.stream().map(r -> new TextRun(Reference.literal(r.text()), r.format())).toList();
+            }
             String text = TextRun.text(runs);
             int from = 0;
             for (int at = text.indexOf(TextRun.LINE_SEPARATOR); at >= 0;

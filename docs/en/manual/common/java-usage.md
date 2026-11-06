@@ -62,7 +62,31 @@ With `pdfA`, the PDF declares PDF/A and carries what the standard asks for: a co
 goes inside the PDF. The attachments are passed with each call to `toPdf`, with their name, their bytes, their type and
 their relationship with the document (`ALTERNATIVE` for the XML of an invoice), and `withXmp` adds the metadata
 fragment Factur-X requires, as its specification gives it. Without PDF/A-3, an attachment is an error
-(`ATTACHMENT_REQUIRES_PDFA3`).
+(`ATTACHMENT_REQUIRES_PDFA3`). With PDF/A, a JPEG in CMYK is an error (`IMAGE_FORMAT`): it is converted to RGB first.
+
+## Resources from several places
+
+```java
+Resources resources = Resources.builder()
+        .fonts(Path.of("/data/fonts"))
+        .images("img", Path.of("/data/img"))               // Image: img/logos/acme.png
+        .image("app/logo.svg", bytesOfTheLogo)             // Image: app/logo.svg
+        .build();
+Converter converter = Converter.builder().resources(resources).build();
+
+Converter own = converter.withImages(Map.of("signature.png", bytesOfTheSignature));
+own.toPdf(doc, out);                                       // Image: signature.png
+```
+
+The resources do not have to be a single folder: `Resources.builder()` puts them together from a folder of fonts, from
+folders of images, each with the prefix its paths start with, and from fonts and images in memory, for what the
+application carries in its classpath. `withImages` gives a `Converter` that adds the images of a document, the ones
+that arrive with it, without touching the shared one.
+
+A text that comes from data (a name, what a user writes) is passed through `Reference.escape` before it is put in the
+document, so that a `{page}` it has written comes out as it is
+([References](references-and-links.md#references)). If the text goes in Markdown, it is escaped as Markdown, with a
+backslash before each punctuation sign, and nothing else is needed.
 
 ## Canceling a conversion
 

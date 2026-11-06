@@ -79,7 +79,7 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   - `ValueReader`, los valores, y `PropertyReader`, las propiedades;
   - `StyleRules`, las reglas de `Styles`;
   - `TableBuilder`, `ListBuilder`, `MarkdownBuilder` y `TableOfContentsBuilder`, las tablas, las listas, el Markdown y
-    los índices, y `RunMarks`, los tramos con estilo del Markdown ([El árbol de cajas](implementation/tree.md#texto-y-tramos));
+    los índices, y `RunMarks`, los tramos con estilo y las llaves escapadas del Markdown ([El árbol de cajas](implementation/tree.md#texto-y-tramos));
   - `TableBorders`, los bordes fusionados de una tabla, y `NamedColors`, los colores con nombre de `Styles`;
   - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
     imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));

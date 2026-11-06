@@ -7,6 +7,7 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Preformatted;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Box;
@@ -309,7 +310,7 @@ final class TextPainter {
             return;
         }
         if (box.hasText()) {
-            out.append(box.text()).append(' ');
+            out.append(Reference.shown(box.text())).append(' ');
         }
         box.children().forEach(child -> collectText(child, out));
     }

@@ -341,6 +341,17 @@ página física par. Esas acaban con una página en blanco: `Numbering` la cuent
 le reserva su número físico y `pages` la añade como una `Page` con `blank`, un fragmento vacío de la caja de la sección y
 sin `Page overlay`. No forma parte del flujo de la sección, así que el `Pages` de sus `Page overlay` no la ve.
 
+**Marcadores que son texto.** Un `{{page}}` o un `\{page}` de Markdown
+([Referencias](../common/references.md#referencias-como-texto)) llega al árbol sin su par de llaves y con
+`Reference.LITERAL_BRACE` (un no-carácter, U+FDD3) en lugar de su llave: lo ponen `ElementReader` en los textos
+literales (`Reference.literal`) y `RunMarks` y `MarkdownBuilder` en los de Markdown, tramo a tramo. Con ese carácter
+ningún paso lo toma por un marcador: ni `Reference`, ni `PageNumbers`, ni un título corrido o un índice que copian el
+texto de un encabezado. `PdfMetrics` lo mide y comprueba su glifo como una llave. Cuando `Engine.layOutDocument` acaba
+de paginar y ya no se sustituye nada, `LiteralBraces.shown` rehace las líneas que lo llevan con la llave, sin cambiar
+medidas, así que las páginas maquetadas y lo que se pinta no lo tienen; el texto de las cajas (`Box.text()`) sí, y
+quien lo lee para escribirlo (los marcadores del PDF, el texto de reemplazo, el `Alt` de un enlace) lo pasa por
+`Reference.shown`.
+
 **`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio, el medidor de
 `TextValues`) y las líneas los conservan. Al terminar de paginar, el `Paginator` llama a `Engine.number`
 (`PageNumbers.number`, con el medidor real), que rehace solo esas líneas con los valores de cada página ya escritos. Si algún número impreso no cabe en el de prueba (`Numbering.probe`:

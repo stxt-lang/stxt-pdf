@@ -39,6 +39,10 @@ List:
 The engine writes the number before breaking the text into lines, so "page 9" and "page 10" take up the space they need.
 If that moves the content, it paginates again until all the numbers are correct.
 
+To write a marker as text, without it being replaced, it goes inside another pair of braces: `{{page}}` writes `{page}`,
+and `{{page of: id}}`, `{page of: id}`. It applies to every marker and in any text; in Markdown `\{page\}` works too.
+The rest of the texts between braces do not change (`{{name}}` is written as it is).
+
 ## Links
 
 A link makes an area of the PDF clickable. It leads to a website, to an email address or to another part of the

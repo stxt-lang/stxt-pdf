@@ -89,9 +89,11 @@ a forced break, the margin before the break is truncated and the one after it is
 A box that contains the margins of its children (a box with border or padding, with `Isolate margins`, the column of a
 `Columns`) also contains the bottom margin of its last child in its height, so that margin has to fit on the page as the
 child does: if the child fits and its margin does not, the break goes before the child (or earlier, if that break is
-better), and before the box if nothing inside it can break. The page area is the exception: its bottom is the end of the
-page, and the bottom margin of its last child is truncated there. A box with `Height` has the height it has, whatever its
-content does.
+better), and before the box if nothing inside it can break. At the start of a page there is nothing before the box: the
+last child is broken inside, with the room of its margin kept free, and ends with it on the next page. The page area is
+the exception: its bottom is the end of the page, and the bottom margin of its last child is truncated there. A box with
+`Height` has the height it has, whatever its content does. An item stretched to its row, like the cell of a table, has no
+`Height`: the rule applies to it on the page where it ends with its content.
 
 ## Borders and padding at breaks
 

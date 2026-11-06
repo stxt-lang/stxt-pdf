@@ -3,6 +3,7 @@ package dev.stxt.pdf.layout.image;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.PdfA;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.ImageFormatException;
@@ -66,6 +67,40 @@ public final class Images {
             validate(box.marker());
         }
         box.children().forEach(this::validate);
+    }
+
+    /**
+     * Checks that every image of the tree, already checked by {@link #validate}, can go in a PDF that complies with
+     * {@code pdfA} (reference/common/pdf.md): a JPEG in CMYK is embedded as it is, with a color space PDF/A only admits
+     * with a CMYK output profile, and the engine writes an sRGB one.
+     *
+     * @throws InvalidModelException {@code IMAGE_FORMAT}, with the line of the first {@code Image} (or
+     *         {@code Marker image}, or text with an image) that fails
+     */
+    public void validatePdfA(Box box, PdfA pdfA) {
+        if (box.image() != null) {
+            checkPdfA(resources.images().find(box.image()), box.line(), box.image(), pdfA);
+        }
+        if (box.hasText()) {
+            for (TextRun run : box.runs()) {
+                InlineImage image = run.format().image();
+                if (image != null) {
+                    checkPdfA(resources.images().find(image.path()), box.textLine(), image.path(), pdfA);
+                }
+            }
+        }
+        if (box.marker() != null) {
+            validatePdfA(box.marker(), pdfA);
+        }
+        box.children().forEach(child -> validatePdfA(child, pdfA));
+    }
+
+    private static void checkPdfA(ImageFile file, int line, String path, PdfA pdfA) {
+        if (file.cmyk()) {
+            throw new InvalidModelException(line, ErrorCode.IMAGE_FORMAT, "The image " + path + " is a JPEG in CMYK, "
+                    + "which " + pdfA + " does not admit in a PDF with an sRGB output profile, the one the engine "
+                    + "writes: it has to be converted to RGB (or the PDF made without PDF/A)");
+        }
     }
 
     /**

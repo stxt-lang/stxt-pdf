@@ -64,6 +64,8 @@ public final class ImageFile {
     private final FontLibrary fonts;
     private final double pixelWidth;
     private final double pixelHeight;
+    /** Color components of a JPEG, as its frame header declares them; 0 for the rest and if it has none. */
+    private final int components;
     private final boolean text;
     private final long svgElements;
     private final int svgDepth;
@@ -73,11 +75,20 @@ public final class ImageFile {
     private ImageFile(Path path, String name, BasicFileAttributes attributes, Format format, double pixelWidth,
             double pixelHeight, byte[] content, FontLibrary fonts, boolean text, long svgElements, int svgDepth,
             List<FontFile> textFonts, List<PdfInspector.PdfPage> pages) {
+        this(path, name, attributes, format, pixelWidth, pixelHeight, 0, content, fonts, text, svgElements, svgDepth,
+                textFonts, pages);
+    }
+
+    private ImageFile(Path path, String name, BasicFileAttributes attributes, Format format, double pixelWidth,
+            double pixelHeight, int components, byte[] content, FontLibrary fonts, boolean text, long svgElements,
+            int svgDepth, List<FontFile> textFonts, List<PdfInspector.PdfPage> pages) {
+        this.components = components;
         this.path = path;
         this.fonts = fonts;
         this.name = name;
-        this.size = attributes.size();
-        this.modified = attributes.lastModifiedTime();
+        // An image given as bytes has no file: nothing to compare it with.
+        this.size = attributes == null ? content.length : attributes.size();
+        this.modified = attributes == null ? null : attributes.lastModifiedTime();
         this.content = content;
         this.format = format;
         this.pixelWidth = pixelWidth;
@@ -117,6 +128,31 @@ public final class ImageFile {
         } catch (IOException e) {
             throw new ImageFormatException("Cannot read the image " + name + ": " + e.getMessage(), e);
         }
+        return parse(path, name, attributes, head, n, content, resources);
+    }
+
+    /**
+     * An image given as bytes ({@link Resources.Builder#image}, {@link Resources#withImages}), which has no file: its
+     * format and its size are taken from {@code content}, which it keeps and is painted with. {@code name} is its
+     * path in the document, for the messages. An SVG is checked in full, including its fonts in {@code resources}.
+     *
+     * @throws ImageFormatException if it is not PNG, JPEG, PDF or an SVG of the subset
+     */
+    static ImageFile inMemory(byte[] content, String name, Resources resources) {
+        int n = Math.min(12, content.length);
+        return parse(null, name, null, Arrays.copyOf(content, 12), n, content, resources);
+    }
+
+    /**
+     * The image of a file or of bytes already read.
+     *
+     * @param path       the file; {@code null} for an image given as bytes
+     * @param attributes those of the file when it was read; {@code null} for an image given as bytes
+     * @param head       the first bytes of the content, {@code n} of them
+     * @param content    the whole content if it is kept; {@code null} to read it from {@code path} when it is needed
+     */
+    private static ImageFile parse(Path path, String name, BasicFileAttributes attributes, byte[] head, int n,
+            byte[] content, Resources resources) {
         Format format = startsWith(head, n, PNG) ? Format.PNG : startsWith(head, n, JPEG) ? Format.JPEG : null;
         if (format == null && looksLikeXml(head, n)) {
             return readSvg(path, name, attributes, content, resources);
@@ -140,8 +176,9 @@ public final class ImageFile {
             if (width <= 0 || height <= 0) {
                 throw new ImageFormatException("The image " + name + " has no pixels");
             }
-            return new ImageFile(path, name, attributes, format, width, height, content, null, false, 0, 0, List.of(),
-                    List.of());
+            int components = format == Format.JPEG ? jpegComponents(path, content) : 0;
+            return new ImageFile(path, name, attributes, format, width, height, components, content, null, false, 0, 0,
+                    List.of(), List.of());
         } catch (IOException | RuntimeException e) {
             if (e instanceof ImageFormatException f) {
                 throw f;
@@ -150,6 +187,53 @@ public final class ImageFile {
                     + " but is damaged: " + e.getMessage(), e);
         } finally {
             reader.dispose();
+        }
+    }
+
+    /**
+     * The color components of a JPEG, from its frame header (the {@code SOFn} segment): 1 for gray, 3 for color and 4
+     * for CMYK or YCCK. It reads the segments before the frame, not the pixels; 0 if no frame header is found, which
+     * embedding the image reports.
+     *
+     * @param content the bytes of the file if they are kept; {@code null} to read them from {@code path}
+     */
+    private static int jpegComponents(Path path, byte[] content) throws IOException {
+        try (InputStream in = content != null ? new ByteArrayInputStream(content)
+                : new java.io.BufferedInputStream(Files.newInputStream(path))) {
+            if (in.read() != 0xFF || in.read() != 0xD8) {
+                return 0;
+            }
+            while (true) {
+                int b = in.read();
+                while (b == 0xFF) {
+                    // The marker, after any fill bytes.
+                    b = in.read();
+                    if (b != 0xFF) {
+                        break;
+                    }
+                }
+                if (b < 0 || b == 0xD9 || b == 0xDA) {
+                    // The end of the file or of the image, or the pixels, without a frame header before them.
+                    return 0;
+                }
+                if (b == 0x01 || (b >= 0xD0 && b <= 0xD7) || b == 0x00) {
+                    // Markers without a segment.
+                    continue;
+                }
+                int length = (in.read() << 8) | in.read();
+                if (length < 2) {
+                    return 0;
+                }
+                boolean frame = b >= 0xC0 && b <= 0xCF && b != 0xC4 && b != 0xC8 && b != 0xCC;
+                if (frame) {
+                    // Precision (1), height (2), width (2) and the number of components.
+                    byte[] header = in.readNBytes(6);
+                    return header.length == 6 ? header[5] & 0xFF : 0;
+                }
+                in.skipNBytes(length - 2);
+            }
+        } catch (java.io.EOFException e) {
+            return 0;
         }
     }
 
@@ -165,6 +249,11 @@ public final class ImageFile {
             n = in.readNBytes(head, 0, head.length);
         }
         return startsWith(head, n, PDF);
+    }
+
+    /** Whether the content is that of a PDF, looking only at its header. */
+    static boolean isPdf(byte[] content) {
+        return startsWith(content, content.length, PDF);
     }
 
     /** Whether it starts like an XML (with or without the UTF-8 byte order mark). */
@@ -247,6 +336,7 @@ public final class ImageFile {
         return "";
     }
 
+    /** {@return its file; {@code null} if it was given as bytes and has none} */
     public Path path() {
         return path;
     }
@@ -254,6 +344,11 @@ public final class ImageFile {
     /** Its path in the document that read it first, for the messages. */
     public String name() {
         return name;
+    }
+
+    /** {@return the name of its file, or of its path in the document if it has no file, for the messages} */
+    public String fileName() {
+        return path != null ? path.getFileName().toString() : name.substring(name.replace('\\', '/').lastIndexOf('/') + 1);
     }
 
     /**
@@ -328,13 +423,15 @@ public final class ImageFile {
      * with text, the fonts of {@code resources} are those its text was checked with.
      */
     boolean isCurrent(Resources resources) {
-        try {
-            BasicFileAttributes now = Files.readAttributes(path, BasicFileAttributes.class);
-            if (now.size() != size || !now.lastModifiedTime().equals(modified)) {
+        if (path != null) {
+            try {
+                BasicFileAttributes now = Files.readAttributes(path, BasicFileAttributes.class);
+                if (now.size() != size || !now.lastModifiedTime().equals(modified)) {
+                    return false;
+                }
+            } catch (IOException e) {
                 return false;
             }
-        } catch (IOException e) {
-            return false;
         }
         return fonts == null || fonts == resources.fonts();
     }
@@ -361,6 +458,15 @@ public final class ImageFile {
     /** Pixels of a PNG or JPEG (width × height, read from the header); 0 for an SVG or a PDF, which have none. */
     public long pixels() {
         return isVector() ? 0 : (long) pixelWidth * (long) pixelHeight;
+    }
+
+    /**
+     * {@return whether it is a JPEG with four color components, CMYK or YCCK} It is embedded as it is, with the device
+     * CMYK color space, which PDF/A only admits with a CMYK output profile, and the engine writes an sRGB one
+     * (reference/common/pdf.md).
+     */
+    public boolean cmyk() {
+        return components == 4;
     }
 
     /** Elements an SVG draws, counting each repetition of a {@code <use>} (saturated); 0 if it is not an SVG. */
@@ -445,6 +551,6 @@ public final class ImageFile {
 
     @Override
     public String toString() {
-        return "ImageFile[" + path.getFileName() + ", " + format + ", " + pixelWidth + "x" + pixelHeight + "]";
+        return "ImageFile[" + fileName() + ", " + format + ", " + pixelWidth + "x" + pixelHeight + "]";
     }
 }

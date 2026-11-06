@@ -129,7 +129,7 @@ final class SvgFonts implements PlatformSupport {
      * @throws ImageFormatException if not
      */
     void check() {
-        String name = file.path().getFileName().toString();
+        String name = file.fileName();
         if (texts != file.textFonts().size()) {
             throw new ImageFormatException("The SVG " + name + " cannot be drawn: JSVG reads " + texts
                     + " <text> and <tspan> elements and the engine " + file.textFonts().size());

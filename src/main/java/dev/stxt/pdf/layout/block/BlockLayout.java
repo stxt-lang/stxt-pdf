@@ -109,7 +109,7 @@ public final class BlockLayout implements LayoutAlgorithm {
     @Override
     public LayoutResult layout(Box box, ConstraintSpace space, BreakToken from) {
         BoxModel model = BoxModel.resolve(box, space, context);
-        return new Run(box, model, space, (BreakToken.Block) from).layOut();
+        return new Run(box, model, space, (BreakToken.Block) from, 0).layOut();
     }
 
     /**
@@ -159,6 +159,7 @@ public final class BlockLayout implements LayoutAlgorithm {
         final Box box;
         final BoxModel model;
         final ConstraintSpace space;
+        final BreakToken.Block from;
         final boolean first;
         final int start;
         final BreakToken resume;
@@ -166,8 +167,15 @@ public final class BlockLayout implements LayoutAlgorithm {
         final boolean fragmenting;
         final ConstraintSpace childSpace;
         final double contentWidth;
-        /** What is left of the page from the start of the content box. */
+        /**
+         * What is left of the page from the start of the content box, for the children: without {@link #reserved}.
+         */
         final double contentRemaining;
+        /**
+         * Room kept free at the end of the page for the bottom margin of the last child, when the box is laid out
+         * again to break that child inside ({@link #finished}); 0 in the first layout.
+         */
+        final double reserved;
 
         final List<Fragment> fragments = new ArrayList<>();
         final List<PendingOverlay> pending = new ArrayList<>();
@@ -184,10 +192,12 @@ public final class BlockLayout implements LayoutAlgorithm {
         /** Last in-flow child placed in this fragment, for the quality of the next break. */
         Box previous;
 
-        Run(Box box, BoxModel model, ConstraintSpace space, BreakToken.Block from) {
+        Run(Box box, BoxModel model, ConstraintSpace space, BreakToken.Block from, double reserved) {
             this.box = box;
             this.model = model;
             this.space = space;
+            this.from = from;
+            this.reserved = reserved;
             this.first = from == null;
             this.start = first ? 0 : from.nextChild();
             this.resume = first ? null : from.childToken();
@@ -196,7 +206,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             this.childSpace = model.childSpace(space, first);
             this.contentWidth = model.contentWidth();
             this.contentRemaining = fragmenting
-                    ? childSpace.fragmentainerRemaining().getAsDouble() : Double.POSITIVE_INFINITY;
+                    ? childSpace.fragmentainerRemaining().getAsDouble() - reserved : Double.POSITIVE_INFINITY;
             // In a fragment that continues the box no margin comes out at the top.
             this.stack = new Stacking(first && !box.isolatesMargins() && model.openAtTop());
             inherit();
@@ -544,8 +554,9 @@ public final class BlockLayout implements LayoutAlgorithm {
             boolean openAtBottom = !box.isolatesMargins() && model.openAtBottom();
             double cursor = stack.cursor();
             MarginStrut strut = stack.strut();
-            if (!openAtBottom && !stack.atTop() && fragmenting && model.height().isEmpty() && !box.isLayoutRoot()
-                    && fits(cursor, contentRemaining) && !fits(cursor + strut.resolve(), contentRemaining)) {
+            if (!openAtBottom && !stack.atTop() && fragmenting && reserved == 0 && !box.isLayoutRoot()
+                    && fits(cursor, contentRemaining) && !fits(cursor + strut.resolve(), contentRemaining)
+                    && endsWithContent(cursor + strut.resolve())) {
                 // The box contains the margin at the end of its content, so the margin has to fit on the page like the
                 // content does (reference/common/breaks.md): the break goes before the last child or, if nothing can
                 // break, before the box. Not the root: its bottom is the end of the page, and the margin is truncated.
@@ -554,6 +565,13 @@ public final class BlockLayout implements LayoutAlgorithm {
                 }
                 if (!space.atFragmentainerStart()) {
                     return LayoutResult.before(box);
+                }
+                // At the start of a page nothing can go before the box: the last child is broken inside, laying the
+                // box out again with the room of the margin kept free for it. If the child cannot be broken either,
+                // the box stays as it is, and whoever checks the overflow reports it.
+                LayoutResult again = new Run(box, model, space, from, strut.resolve()).layOut();
+                if (again.breakToken() != null && !(again.breakToken() instanceof BreakToken.Before)) {
+                    return again;
                 }
             }
             double contentHeight;
@@ -596,6 +614,19 @@ public final class BlockLayout implements LayoutAlgorithm {
             BreakToken token = new BreakToken.Block(box.children().size(), null, slice.consumed());
             return new LayoutResult(fragment, token, BreakAppeal.PERFECT_BREAK, pending,
                     new AdjoiningMargins(out.top(), MarginStrut.EMPTY, false));
+        }
+
+        /**
+         * Whether the box would end on this page with its content, {@code content} high with the margin at its end:
+         * a box with {@code auto} height, always; one whose height its container gives it (an item stretched to its
+         * row, reference/common/breaks.md), if that height does not go on after the content. A box with a
+         * {@code Height} of its own has the height it has, whatever its content does.
+         */
+        boolean endsWithContent(double content) {
+            if (model.height().isEmpty()) {
+                return true;
+            }
+            return space.fixedHeight() && Slice.of(model, first, consumed, content, true, space).finished();
         }
     }
 }

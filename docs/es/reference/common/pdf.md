@@ -103,6 +103,16 @@ PDF/A añade al PDF un perfil de color sRGB de 3 KB y los metadatos que la norma
 incrustadas, los colores son definidos, y no hay JavaScript, cifrado ni formularios. Los tests validan los once
 ejemplos con veraPDF como PDF/A-3a, y las cuatro variantes con un documento de prueba.
 
+Las imágenes de fuera son la excepción. Un JPEG en CMYK se incrusta tal cual, con un espacio de color que PDF/A solo
+admite con un perfil de salida CMYK, y el del motor es sRGB: con PDF/A es un error, `IMAGE_FORMAT`, con la línea de la
+`Image` (o del texto o el `Marker image` que lo lleva); sin PDF/A se convierte como siempre. La página de un PDF usada
+como imagen se copia como está: el motor comprueba sus fuentes y sus anotaciones
+([Image](../components/image.md#pdf)), pero no que el resto de su contenido cumpla PDF/A.
+
+> **Decisión:** un JPEG en CMYK con PDF/A es un error y no se convierte a RGB: el motor incrusta el JPEG sin
+> recodificarlo, y la conversión cambiaría los colores según el perfil que se le supusiera. Sin PDF/A el PDF es válido y
+> no hay error. *Alternativa descartada:* rechazarlo siempre.
+
 PDF/UA-2 escribe un PDF 2.0, y PDF/A-2 y PDF/A-3 son PDF 1.7: pedir los dos es un `IllegalArgumentException`. PDF/A-4,
 sobre PDF 2.0, no está hecho.
 
@@ -151,6 +161,8 @@ PDF/A-2 solo admite adjuntar otros PDF/A.
 ## Lo que no hay
 
 - PDF/A-1 y PDF/A-4 ([arriba](#pdfa)).
+- Un perfil de salida CMYK, ni la conversión a RGB de un JPEG en CMYK. Comprobar que la página de un PDF usada como
+  imagen cumple PDF/A ([arriba](#pdfa)).
 - Idioma por tramo dentro de una línea ([Tipografía](typography.md#idioma-language)).
 - Formularios, firmas digitales y cifrado. Adjuntos fuera de PDF/A-3.
 - Capas opcionales propias: solo se conservan las de la página de un PDF usada como imagen

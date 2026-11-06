@@ -50,7 +50,8 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | Todo |
 | `stxt.DocumentReader` | Todo |
-| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()` |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()`, `builder()`, `withImages(...)`, `imagePaths()` |
+| `resources.Resources.Builder` | Todo |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | Todo |
 | `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | Todo |
 | `tree.InvalidModelException` | `errorCode()` y lo que hereda |
@@ -64,6 +65,7 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 | `tree.Element.Role` | Todo |
 | `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat` | Todo |
 | `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
+| `model.Reference` | `escape(...)`, `shown(...)`, `LITERAL_BRACE` |
 | `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | Todo |
 | `output.StxtDump` | Todo |
 | `paint.PdfPainter` | Todo |
@@ -113,6 +115,10 @@ configuración de quien convierte, no el documento) y sin línea. Un XMP que no 
 nombre, un nombre en blanco o un tipo que no es `tipo/subtipo` son un `IllegalArgumentException` al construirlos, antes
 de convertir. `PdfDocumentWriter.write` recibe lo mismo (`ua`, `pdfA` y `Attachments`) como capa de bajo nivel.
 
+Con `pdfA`, `layOut` comprueba además que ninguna imagen del documento sea un JPEG en CMYK (`IMAGE_FORMAT`, con su
+línea; [El PDF](../common/pdf.md#pdfa)). Lo comprueba el `Converter` que maqueta: un documento se maqueta y se pinta con
+el mismo.
+
 > **Decisión:** los adjuntos y su XMP se pasan en la llamada y no en el `builder`: un `Converter` se comparte entre
 > documentos y el XML de una factura es de una factura. *Alternativa descartada:* `attach(...)` en el `builder`.
 
@@ -154,6 +160,20 @@ converter.toPdf(doc, out);
 Por debajo, `BoxTreeBuilder.build(documento, estilos)` y `Engine.layOutDocument(documento, estilos)` lo reciben igual. En
 esos dos puede ser `null`. Ver [Styles](../common/styles.md#documento-de-estilos-aparte).
 
+## Textos que vienen de datos
+
+```java
+String line = "\tParagraph: A la atención de " + Reference.escape(cliente.nombre());
+```
+
+Un texto del documento sustituye sus marcadores (`{page}`, `{page of: id}`…), y un dato que los lleve escritos se
+sustituiría también, o daría un error. `Reference.escape(texto)` (en `model`) devuelve el texto con cada marcador dentro
+de otro par de llaves, que es como se escribe para que salga tal cual
+([Referencias como texto](../common/references.md#referencias-como-texto)); no toca nada más. Sirve para los
+textos literales (`Markup: none`), preformateados o no. En un texto con `Markup: markdown` o en un `Markdown` el dato se
+escapa como Markdown, con una barra invertida delante de cada signo de puntuación, y con eso basta: una llave con barra
+ya es texto, y pasar además el dato por `Reference.escape` le doblaría las llaves.
+
 ## Recursos
 
 `new Resources(Path.of("otra"))` usa otra carpeta de recursos. Toda ruta pasa por `Resources.resolve`, que nunca va hacia
@@ -177,6 +197,61 @@ con el de TrueType, sea cual sea su extensión; `FontFile.cff()` dice cuáles so
 > **Decisión:** las fuentes solo se comprueban con `PdfMetrics` (`Engine.layOutDocument` llama a `validate`). Con
 > `FixedMetrics` no se mira la carpeta de fuentes: basta con que `Font` esté declarada. *Alternativa descartada:* validar
 > siempre las fuentes al construir el árbol, que obligaría a tener la carpeta también para maquetar sin PDF.
+
+### Varios sitios
+
+```java
+Resources resources = Resources.builder()
+        .fonts(Path.of("/datos/fuentes"))                  // la carpeta de las fuentes
+        .font("Marca-Regular.ttf", bytesDeLaFuente)        // y una fuente que no está en ella
+        .images("img", Path.of("/datos/img"))              // Image: img/logos/acme.png
+        .images("pdf", Path.of("/datos/plantillas"))       // Image: pdf/recibo.pdf
+        .image("app/logo.svg", bytesDelLogo)               // Image: app/logo.svg
+        .build();
+Converter converter = Converter.builder().resources(resources).build();
+```
+
+`Resources.builder()` compone los recursos de piezas ([Recursos](../common/resources.md#recursos-de-varios-sitios)):
+
+- `fonts(Path)`, la carpeta de las fuentes, una sola, que se recorre con sus subcarpetas como `fonts/`;
+- `images(Path)`, la carpeta de las rutas sin prefijo, como `images/`, e `images(prefijo, Path)`, una carpeta para las
+  rutas que empiezan por ese prefijo (uno o más segmentos). Una ruta va a la del prefijo más largo;
+- `font(nombre, bytes)` e `image(ruta, bytes)`, una fuente y una imagen en memoria: lo que la aplicación lleva en su
+  classpath o genera. Los bytes se copian. El nombre de la fuente solo sale en los mensajes; la ruta de la imagen es la
+  que escribe el documento, y va antes que un fichero con la misma ruta;
+- `imagesInMemory(true)`, lo mismo que `withImagesInMemory()`.
+
+No hace falta ninguna en particular: unos recursos solo con fuentes e imágenes en memoria no miran el disco. Dos carpetas
+de fuentes, dos carpetas con el mismo prefijo, dos imágenes con la misma ruta o un prefijo o una ruta absolutos o con
+`..` son un `IllegalArgumentException` al construir. Unos recursos sin ninguna fuente dan `ResourceException` cuando un
+documento pide una. `root()` es `null` en estos recursos, `fontsFolder()` e `imagesFolder()` (la carpeta sin prefijo)
+pueden serlo, y `resolve(...)`, que busca en la carpeta única, falla. `imagePaths()` da las rutas que un documento
+puede escribir ahora, las de las carpetas con su prefijo y las de memoria.
+
+Una imagen en memoria es un `ImageFile` sin fichero (`path()` es `null`, `fileName()` es el final de su ruta) que guarda
+sus bytes, y una fuente en memoria, un `FontFile` sin fichero (`name()` es su nombre y «(in memory)»). La recarga no las
+toca: una vista (`snapshot()`) comparte las que ya se leyeron.
+
+### Imágenes de una conversión
+
+```java
+Converter own = converter.withImages(Map.of("adjuntos/firma.png", bytesDeLaFirma));
+own.toPdf(document, out);                                  // Image: adjuntos/firma.png
+```
+
+`Converter.withImages(Map<String, byte[]>)` da un `Converter` con la misma configuración y los mismos recursos, leídos o
+no, cuyas conversiones tienen además esas imágenes: las que un documento trae consigo (un `data:` de quien lo envía, una
+imagen que la aplicación ya leyó y comprobó). El `Converter` compartido no cambia, y el nuevo se usa para ese documento
+y se tira: crearlo solo cuesta copiar los bytes, y no vuelve a mirar las carpetas (con
+`reloadResourcesEachConversion`, las mira en cada conversión, como el compartido). Una imagen dada así va antes que una
+de los recursos con la misma ruta. Se lee cuando el documento la usa, y lo que tenga mal es un error de ese documento,
+con la línea de su `Image`. Sirve para `layOut`, `toPdf` y `toSvg`: el `LaidOutDocument` guarda los recursos con los que
+se maquetó, con sus imágenes. `Resources.withImages(Map)` es lo mismo un nivel más abajo, sin copiar los bytes.
+
+> **Decisión:** las imágenes de un documento van en un `Converter` derivado y no en la llamada, como los adjuntos:
+> hacen falta al maquetar y al pintar, que pueden ser dos llamadas, y un parámetro más en cada `layOut`, `toPdf` y
+> `toSvg` doblaría sus variantes. *Alternativa descartada:* un `Resources` nuevo por documento, que volvería a indexar
+> las fuentes.
 
 ### Ficheros que cambian
 

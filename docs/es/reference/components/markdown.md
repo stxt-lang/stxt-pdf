@@ -110,6 +110,10 @@ Un salto de línea simple dentro de un párrafo vale un espacio, como en un `Tex
 `Text`, un `Paragraph` o una `Cell` ([Formato del texto](../common/text-formatting.md#formato-en-línea-markup)), que dentro
 de un `Markdown` no actúa: sus textos ya vienen interpretados.
 
+Los marcadores de las [referencias](../common/references.md) se sustituyen en el texto de un `Markdown` como en
+cualquier otro, también en su código. Para escribirlos como texto, `\{page\}` o `{{page}}`
+([Referencias como texto](../common/references.md#referencias-como-texto)).
+
 ### Saltos de línea forzados
 
 Una `\` al final de una línea es un **salto de línea forzado**: la línea acaba ahí y el texto sigue en la siguiente, dentro

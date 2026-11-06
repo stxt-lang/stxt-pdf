@@ -93,6 +93,40 @@ of a book or a manual.
 > **Decision:** `{heading N: first}` with no heading of that level on the page writes the same as `{heading N}`, instead
 > of being empty: a page without a new section is still inside the current one. *Rejected alternative:* empty.
 
+## References as text
+
+A marker inside another pair of braces is text: `{{page}}` writes `{page}`, and not the number of the page.
+
+```
+Text: Page {page} of {pages}. The footer is written {{page}} of {{pages}}.
+```
+
+writes "Page 3 of 12. The footer is written {page} of {pages}.".
+
+- **It applies to the six markers** of the table above, with whatever they carry inside: `{{page of: id}}`,
+  `{{number of: id}}`, `{{heading 2: first}}`. What is left is text: its `Id` is not looked up and it does not have to go
+  in a `Page overlay`.
+- **It applies in every text**: with `Markup: none` and with `Markup: markdown`, in preformatted text, in a `Cell` and in
+  a `Markdown`, also in its code and in its code blocks.
+- **Only one pair is removed.** `{{{page}}}` writes `{{page}}`. The braces on each side have to belong to the same
+  marker: `{{page}` is a brace and the number of the page.
+- **What is not a marker does not change.** `{{name}}`, `{ {page} }` and any other text between braces are written as
+  they are.
+- **In Markdown, an escaped brace is text too**: `\{page\}` and `\{page}` write `{page}`. Not in its code, where the
+  backslash is text and what follows it is replaced: there it is written `{{page}}`.
+- **The text of a heading is copied as it is** to the table of contents, to the bookmarks of the PDF and to the running
+  heads: a `{{page}}` of a heading is `{page}` in all of them.
+
+A program that writes documents with texts that are not its own (a name, an address, what a user types) passes the
+ones that do not go in Markdown through `Reference.escape`, which wraps each marker it finds
+([Using from Java](../implementation/api.md#texts-that-come-from-data)).
+
+> **Decision:** a marker becomes text by wrapping it in another pair of braces, and that applies the same in every text.
+> It changes no text that did not already have a marker. *Rejected alternatives:* the backslash also with
+> `Markup: none`, where the text is literal and a backslash is a backslash (a Windows path followed by a marker could
+> not be written); and a property that turns off the markers of a text, which does not let one that is replaced and one
+> that is not be mixed in the same text.
+
 ## What is not supported
 
 - Counters of the author's own, or number formats other than those of the markers and those of `Number format`.

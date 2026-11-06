@@ -59,6 +59,7 @@ public final class FontFile {
     private static final byte LACKS = 2;
 
     private final Path path;
+    private final String name;
     private final FontFace face;
     private final TrueTypeFont ttf;
     private final boolean cff;
@@ -88,8 +89,18 @@ public final class FontFile {
     /** See {@link #digest()}; {@code null} until requested. */
     private volatile String digest;
 
+    /** A font of the file {@code path}, which the messages call by that path. */
     FontFile(Path path, FontFace face, TrueTypeFont ttf) throws IOException {
+        this(path, path.toString(), face, ttf);
+    }
+
+    /**
+     * @param path its file; {@code null} for a font given as bytes ({@link Resources.Builder#font})
+     * @param name how the messages call it: the path of its file, or the name it was given with
+     */
+    FontFile(Path path, String name, FontFace face, TrueTypeFont ttf) throws IOException {
         this.path = path;
+        this.name = name;
         this.face = face;
         this.ttf = ttf;
         this.cff = ttf.getTableMap().containsKey("CFF ");
@@ -123,8 +134,14 @@ public final class FontFile {
         return otto ? new OTFParser().parse(in) : new TTFParser().parse(in);
     }
 
+    /** {@return its file; {@code null} if it was given as bytes and has none} */
     public Path path() {
         return path;
+    }
+
+    /** {@return how the messages call it: the path of its file, or the name it was given with} */
+    public String name() {
+        return name;
     }
 
     public FontFace face() {
@@ -418,7 +435,7 @@ public final class FontFile {
                     try {
                         kerningPairs = KerningPairs.read(ttf);
                     } catch (IOException e) {
-                        throw new ResourceException("Cannot read the kerning of the font " + path + ": "
+                        throw new ResourceException("Cannot read the kerning of the font " + name + ": "
                                 + e.getMessage(), e);
                     }
                     kerningRead = true;
@@ -481,6 +498,6 @@ public final class FontFile {
      * of the destination. fontbox keeps the file in memory, so this only happens with a damaged file.
      */
     private ResourceException unreadable(String what, IOException e) {
-        return new ResourceException("Cannot read the " + what + " of the font " + path + ": " + e.getMessage(), e);
+        return new ResourceException("Cannot read the " + what + " of the font " + name + ": " + e.getMessage(), e);
     }
 }

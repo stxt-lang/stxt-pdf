@@ -93,6 +93,40 @@ en curso de un libro o un manual.
 > en lugar de quedar vacío: una página sin apartado nuevo sigue dentro del apartado en curso. *Alternativa descartada:*
 > vacío.
 
+## Referencias como texto
+
+Un marcador dentro de otro par de llaves es texto: `{{page}}` escribe `{page}`, y no el número de la página.
+
+```
+Text: Página {page} de {pages}. El pie se escribe {{page}} de {{pages}}.
+```
+
+escribe «Página 3 de 12. El pie se escribe {page} de {pages}.».
+
+- **Vale para los seis marcadores** de la tabla de arriba, con lo que lleven dentro: `{{page of: id}}`,
+  `{{number of: id}}`, `{{heading 2: first}}`. Lo que queda es texto: no se busca su `Id` ni tiene que ir en un
+  `Page overlay`.
+- **Vale en todo texto**: con `Markup: none` y con `Markup: markdown`, en texto preformateado, en una `Cell` y en un
+  `Markdown`, también en su código y en sus bloques de código.
+- **Solo se quita un par.** `{{{page}}}` escribe `{{page}}`. Las llaves de cada lado tienen que ser del mismo marcador:
+  `{{page}` es una llave y el número de la página.
+- **Lo que no es un marcador no cambia.** `{{nombre}}`, `{ {page} }` y cualquier otro texto entre llaves se escriben como
+  están.
+- **En Markdown, además, una llave escapada es texto**: `\{page\}` y `\{page}` escriben `{page}`. No en su código, donde
+  la barra invertida es texto y lo que la sigue se sustituye: ahí se escribe `{{page}}`.
+- **El texto de un encabezado se copia como está** al índice, a los marcadores del PDF y a los títulos corridos: un
+  `{{page}}` de un encabezado es `{page}` en todos ellos.
+
+Un programa que escribe documentos con textos que no son suyos (un nombre, una dirección, lo que teclea un usuario) pasa
+los que no van en Markdown por `Reference.escape`, que envuelve cada marcador que encuentra
+([Uso desde Java](../implementation/api.md#textos-que-vienen-de-datos)).
+
+> **Decisión:** un marcador se hace texto envolviéndolo en otro par de llaves, y eso vale igual en todos los textos. No
+> cambia ningún texto que no tuviera ya un marcador. *Alternativas descartadas:* la barra invertida también con
+> `Markup: none`, donde el texto es literal y una barra es una barra (una ruta de Windows seguida de un marcador no se
+> podría escribir); y una propiedad que apague los marcadores de un texto, que no deja mezclar en el mismo texto uno que
+> se sustituye y otro que no.
+
 ## Lo que no hay
 
 - Contadores propios del autor, ni otros formatos de número que los de los marcadores y los de `Number format`.

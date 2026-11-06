@@ -6,6 +6,7 @@ import dev.stxt.TextNode;
 import dev.stxt.pdf.model.CaptionPosition;
 import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
@@ -378,6 +379,7 @@ enum ElementReader {
     private static void runs(BuildContext ctx, InlineNode n, Box box) {
         box.setRuns(ctx.runs.get(n));
         inlineFormat(ctx, box);
+        literalReferences(ctx, box);
         runStyles(ctx, box);
         codeFont(box);
     }
@@ -398,6 +400,22 @@ enum ElementReader {
         ctx.footnotes.noCalls = null;
         box.setText(TextRun.text(runs), first, false);
         box.setRuns(TextRun.formatted(runs) ? runs : null);
+    }
+
+    /**
+     * A reference or a page number inside another pair of braces, {@code {{page}}}, is text
+     * (reference/common/references.md): the text of the box keeps it without that pair and with
+     * {@link Reference#LITERAL_BRACE} as its brace. The texts that are Markdown come with it already done
+     * ({@link MarkdownBuilder}), run by run.
+     */
+    private static void literalReferences(BuildContext ctx, Box box) {
+        if (box.text() == null || box.style().typography().markup() == Markup.MARKDOWN || ctx.scope().inMarkdown()) {
+            return;
+        }
+        String text = Reference.literal(box.text());
+        if (!text.equals(box.text())) {
+            box.setText(text, box.textLine(), box.textBlock());
+        }
     }
 
     /**

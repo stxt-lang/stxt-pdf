@@ -49,7 +49,8 @@ are always included. Of an exception, what is read from it is promised, not its 
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | All |
 | `stxt.DocumentReader` | All |
-| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()` |
+| `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()`, `builder()`, `withImages(...)`, `imagePaths()` |
+| `resources.Resources.Builder` | All |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | All |
 | `model.StxtPdfException`, `model.StxtPdfException.Kind`, `tree.ErrorCode` | All |
 | `tree.InvalidModelException` | `errorCode()` and what it inherits |
@@ -63,6 +64,7 @@ are always included. Of an exception, what is read from it is promised, not its 
 | `tree.Element.Role` | All |
 | `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat` | All |
 | `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
+| `model.Reference` | `escape(...)`, `shown(...)`, `LITERAL_BRACE` |
 | `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | All |
 | `output.StxtDump` | All |
 | `paint.PdfPainter` | All |
@@ -115,6 +117,10 @@ with the same name, a blank name or a type that is not `type/subtype` are an `Il
 built, before converting. `PdfDocumentWriter.write` receives the same (`ua`, `pdfA` and `Attachments`) as the low-level
 layer.
 
+With `pdfA`, `layOut` also checks that no image of the document is a JPEG in CMYK (`IMAGE_FORMAT`, with its line;
+[The PDF](../common/pdf.md#pdfa)). The `Converter` that lays out checks it: a document is laid out and painted with the
+same one.
+
 > **Decision:** the attachments and their XMP are passed with the call and not in the `builder`: a `Converter` is
 > shared between documents and the XML of an invoice belongs to one invoice. *Rejected alternative:* `attach(...)` in
 > the `builder`.
@@ -157,6 +163,20 @@ converter.toPdf(doc, out);
 Underneath, `BoxTreeBuilder.build(document, styles)` and `Engine.layOutDocument(document, styles)` receive it in the same way. In
 those two it can be `null`. See [Styles](../common/styles.md#separate-styles-document).
 
+## Texts that come from data
+
+```java
+String line = "\tParagraph: For the attention of " + Reference.escape(customer.name());
+```
+
+A text of the document replaces its markers (`{page}`, `{page of: id}`…), and a piece of data that has them written
+would be replaced too, or would give an error. `Reference.escape(text)` (in `model`) returns the text with each marker
+inside another pair of braces, which is how it is written so that it comes out as it is
+([References as text](../common/references.md#references-as-text)); it touches nothing else. It serves for the
+literal texts (`Markup: none`), preformatted or not. In a text with `Markup: markdown` or in a `Markdown` the data is
+escaped as Markdown, with a backslash before each punctuation sign, and that is enough: a brace with a backslash is
+already text, and passing the data through `Reference.escape` as well would double its braces.
+
 ## Resources
 
 `new Resources(Path.of("other"))` uses another resources folder. Every path goes through `Resources.resolve`, which never goes
@@ -181,6 +201,63 @@ with the TrueType one, whatever its extension; `FontFile.cff()` says which ones 
 > **Decision:** the fonts are only checked with `PdfMetrics` (`Engine.layOutDocument` calls `validate`). With
 > `FixedMetrics` the fonts folder is not looked at: it is enough for `Font` to be declared. *Rejected alternative:* always validating
 > the fonts when building the tree, which would require the folder also to lay out without PDF.
+
+### Several places
+
+```java
+Resources resources = Resources.builder()
+        .fonts(Path.of("/data/fonts"))                     // the folder of the fonts
+        .font("Brand-Regular.ttf", bytesOfTheFont)         // and a font that is not in it
+        .images("img", Path.of("/data/img"))               // Image: img/logos/acme.png
+        .images("pdf", Path.of("/data/templates"))         // Image: pdf/receipt.pdf
+        .image("app/logo.svg", bytesOfTheLogo)             // Image: app/logo.svg
+        .build();
+Converter converter = Converter.builder().resources(resources).build();
+```
+
+`Resources.builder()` puts the resources together from pieces
+([Resources](../common/resources.md#resources-from-several-places)):
+
+- `fonts(Path)`, the folder of the fonts, a single one, which is walked with its subfolders like `fonts/`;
+- `images(Path)`, the folder of the paths without prefix, like `images/`, and `images(prefix, Path)`, a folder for the
+  paths that start with that prefix (one or more segments). A path goes to the one with the longest prefix;
+- `font(name, bytes)` and `image(path, bytes)`, a font and an image in memory: what the application carries in its
+  classpath or generates. The bytes are copied. The name of the font only appears in the messages; the path of the
+  image is the one the document writes, and it goes before a file with the same path;
+- `imagesInMemory(true)`, the same as `withImagesInMemory()`.
+
+None in particular is needed: resources with only fonts and images in memory do not look at the disk. Two folders of
+fonts, two folders with the same prefix, two images with the same path or a prefix or a path that is absolute or has
+`..` are an `IllegalArgumentException` when building. Resources without any font give `ResourceException` when a
+document asks for one. `root()` is `null` in these resources, `fontsFolder()` and `imagesFolder()` (the folder without
+prefix) can be, and `resolve(...)`, which looks in the single folder, fails. `imagePaths()` gives the paths a document
+can write now, those of the folders with their prefix and those in memory.
+
+An image in memory is an `ImageFile` without a file (`path()` is `null`, `fileName()` is the end of its path) that keeps
+its bytes, and a font in memory, a `FontFile` without a file (`name()` is its name and "(in memory)"). Reloading does
+not touch them: a view (`snapshot()`) shares the ones already read.
+
+### Images of one conversion
+
+```java
+Converter own = converter.withImages(Map.of("attached/signature.png", bytesOfTheSignature));
+own.toPdf(document, out);                                  // Image: attached/signature.png
+```
+
+`Converter.withImages(Map<String, byte[]>)` gives a `Converter` with the same configuration and the same resources, read
+or not, whose conversions also have those images: the ones a document brings with it (a `data:` from whoever sends it,
+an image the application already read and checked). The shared `Converter` does not change, and the new one is used for
+that document and thrown away: creating it only costs copying the bytes, and it does not look at the folders again
+(with `reloadResourcesEachConversion`, it looks at them in each conversion, like the shared one). An image given this
+way goes before one of the resources with the same path. It is read when the document uses it, and what is wrong with
+it is an error of that document, with the line of its `Image`. It serves for `layOut`, `toPdf` and `toSvg`: the
+`LaidOutDocument` keeps the resources it was laid out with, with their images. `Resources.withImages(Map)` is the same
+one level below, without copying the bytes.
+
+> **Decision:** the images of a document go in a derived `Converter` and not in the call, like the attachments: they
+> are needed when laying out and when painting, which can be two calls, and one more parameter in each `layOut`, `toPdf`
+> and `toSvg` would double their variants. *Rejected alternative:* a new `Resources` per document, which would index
+> the fonts again.
 
 ### Files that change
 
