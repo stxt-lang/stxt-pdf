@@ -252,6 +252,10 @@ final class StyleRules {
             if (GROUPS.contains(name)) {
                 continue;
             }
+            if (!ELEMENT_PROPERTIES.contains(name)) {
+                // The schema allows it in the rule and this class does not know it: the two have to agree.
+                throw unread(p);
+            }
             if (type != null && !declares(type, name)) {
                 throw located(error(p, ErrorCode.STYLE_NOT_ALLOWED, rule.getName() + ": " + rule.getText().trim()
                         + " gives " + p.getName() + (ITEM_PROPERTIES.contains(name)
