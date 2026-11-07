@@ -121,9 +121,14 @@ enum ElementReader {
         }
 
         @Override
-        void wrapper(InlineNode wrapper, Style s, Box parent) {
+        void inherited(InlineNode wrapper, Style s) {
             // The Typography of the row is inherited by its cells: it goes before the rules.
             child(wrapper, "typography").map(Nodes::inline).ifPresent(t -> typography(t, s));
+        }
+
+        @Override
+        void wrapper(InlineNode wrapper, Style s, Box parent) {
+            // The row is not an Item: what it gives its cells is inherited (above) or its Break (check).
         }
 
         @Override
@@ -200,16 +205,17 @@ enum ElementReader {
     /**
      * A {@code Markdown} (reference/components/markdown.md): the elements that {@link MarkdownBuilder} generates,
      * built as if the author had written them; its formatted texts carry their runs. Its markers and its
-     * {@code Table columns} are read by the translation.
+     * {@code Table columns}, its own or those of its rules, are read by the translation.
      */
     MARKDOWN(Set.of(), null, Set.of("bullet-markers", "number-markers", "table-columns")) {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             noCalls(ctx, box);
-            MarkdownBuilder.Translation t = MarkdownBuilder.translate(n, ctx.footnotes);
+            MarkdownBuilder.Translation t = MarkdownBuilder.translate(n, ctx.footnotes, name -> ctx.property(n, name));
             ctx.footnotes.noCalls = null;
             ctx.runs.putAll(t.runs());
             ctx.codeBlocks.addAll(t.codeBlocks());
+            ctx.sources.putAll(t.sources());
             ctx.within(ctx.scope().markdown(), () -> {
                 for (InlineNode e : t.elements()) {
                     box.addChild(builder.element(ctx, e, box, null, null));
@@ -340,8 +346,15 @@ enum ElementReader {
     }
 
     /**
-     * What its wrapper gives it before the rules are applied: to an item, the properties of its {@code Item} or its
-     * {@code Area}; {@code wrapper} is {@code null} if it has none.
+     * What its wrapper gives it as inheritance, before the rules are applied: to a cell, the {@code Typography} of its
+     * {@code Row}. {@code wrapper} is {@code null} if it has none.
+     */
+    void inherited(InlineNode wrapper, Style s) {
+    }
+
+    /**
+     * What its wrapper declares for it, after the rules are applied, so that it wins over them: to an item, the
+     * properties of its {@code Item} or its {@code Area}. {@code wrapper} is {@code null} if it has none.
      */
     void wrapper(InlineNode wrapper, Style s, Box parent) {
         if (wrapper != null) {
@@ -361,6 +374,22 @@ enum ElementReader {
             return true;
         }
         return contentChildren.contains(name);
+    }
+
+    /**
+     * Reads {@code p}, an element property that a rule of {@code Styles} gives the element
+     * (reference/common/styles.md), as if the element declared it: one of its type ({@code Stack}, {@code Grid}...) or
+     * a standalone one. One that its content reads ({@code Column align}, the markers of a {@code Markdown}) is not
+     * read here, and {@link BuildContext#property} gives it to the content: {@code false}.
+     */
+    boolean ruleProperty(Node p, Style s) {
+        if (contentChildren.contains(p.getCanonicalName())) {
+            return false;
+        }
+        if (!property(p, s)) {
+            PropertyReader.single(p, s);
+        }
+        return true;
     }
 
     /** What the family checks of the properties already read, before the box is created. */

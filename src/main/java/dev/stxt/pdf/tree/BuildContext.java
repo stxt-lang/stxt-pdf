@@ -1,5 +1,6 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Position;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static dev.stxt.pdf.tree.Nodes.error;
@@ -61,6 +63,16 @@ final class BuildContext {
     final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
     /** The footnotes: their calls, their boxes and their numbering (reference/components/footnote.md). */
     final Footnotes footnotes = new Footnotes();
+    /**
+     * The properties that the content of an element reads from its node ({@link PropertyNode}) and that the rules of
+     * {@code Styles} give it, by node of the element and canonical name; only those the element does not declare.
+     */
+    final Map<Node, Map<String, PropertyNode>> ruleProperties = new IdentityHashMap<>();
+    /**
+     * The property nodes that {@link MarkdownBuilder} generates from a property of a rule of a separate styles
+     * document (the {@code Marker} of a list, from {@code Bullet markers}): their line is of that document.
+     */
+    final Map<Node, SourceLine> sources = new IdentityHashMap<>();
 
     BuildContext(StyleRules rules, Cancellation cancellation) {
         this.rules = rules;
@@ -136,6 +148,16 @@ final class BuildContext {
             throw error(p, ErrorCode.DUPLICATE_ID, "Duplicate Id: " + id + " (already used on line " + previous + ")");
         }
         return id;
+    }
+
+    /**
+     * A property that the content of {@code n} reads from its node ({@code column-align}, {@code bullet-markers}...):
+     * the one it declares or, if it does not, the one its rules give it (reference/common/styles.md).
+     */
+    Optional<PropertyNode> property(InlineNode n, String name) {
+        Optional<PropertyNode> own = Nodes.child(n, name).map(p -> new PropertyNode(p, null));
+        return own.isPresent() ? own
+                : Optional.ofNullable(ruleProperties.getOrDefault(n, Map.of()).get(name));
     }
 
     /** Whether the height of the content box is definite; the box is already built. */

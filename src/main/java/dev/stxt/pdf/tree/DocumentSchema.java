@@ -4,6 +4,7 @@ import dev.stxt.Node;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.exceptions.ValidationException;
+import dev.stxt.schema.NodeDefinition;
 import dev.stxt.schema.SchemaProvider;
 import dev.stxt.schema.SchemaProviderMemory;
 import dev.stxt.schema.SchemaValidator;
@@ -40,6 +41,17 @@ public final class DocumentSchema {
     /** The schema provider, to validate while reading. */
     public static SchemaProvider provider() {
         return PROVIDER;
+    }
+
+    /**
+     * Whether the node {@code node} of the schema (its name, {@code Stack}) allows the child {@code child} (its
+     * canonical name, {@code gap}): what a rule of {@code Styles} can give an element is what the element can declare
+     * (reference/common/styles.md). {@code false} if the schema has no node with that name.
+     */
+    static boolean allows(String node, String child) {
+        NodeDefinition definition = PROVIDER.getSchema(NAMESPACE).getNodeDefinition(node);
+        return definition != null && definition.getChildren().values().stream()
+                .anyMatch(c -> c.getCanonicalName().equals(child));
     }
 
     /**

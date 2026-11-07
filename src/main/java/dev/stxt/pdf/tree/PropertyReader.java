@@ -399,15 +399,25 @@ final class PropertyReader {
                 s.setLayer(integer(p));
                 continue;
             }
-            s.declared(PropertyKey.item(name), p.getLine());
-            switch (name) {
-                case "grow" -> s.item().setGrow(factor(p));
-                case "shrink" -> s.item().setShrink(factor(p));
-                case "base-size" -> s.item().setBaseSize(value(p, LENGTH_OR_AUTO, false));
-                case "horizontal" -> s.item().setHorizontal(alignment(p));
-                case "vertical" -> s.item().setVertical(alignment(p));
-                default -> throw unread(p);
-            }
+            itemProperty(p, s);
+        }
+    }
+
+    /**
+     * A property of {@code Item} or {@code Area} other than {@code Layer}, also {@code Grow}, {@code Shrink} or
+     * {@code Base size} given by a rule of {@code Styles} to the element an {@code Item} wraps
+     * (reference/common/styles.md).
+     */
+    static void itemProperty(Node p, Style s) {
+        String name = p.getCanonicalName();
+        s.declared(PropertyKey.item(name), p.getLine());
+        switch (name) {
+            case "grow" -> s.item().setGrow(factor(p));
+            case "shrink" -> s.item().setShrink(factor(p));
+            case "base-size" -> s.item().setBaseSize(value(p, LENGTH_OR_AUTO, false));
+            case "horizontal" -> s.item().setHorizontal(alignment(p));
+            case "vertical" -> s.item().setVertical(alignment(p));
+            default -> throw unread(p);
         }
     }
 

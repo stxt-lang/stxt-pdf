@@ -26,12 +26,14 @@ import static dev.stxt.pdf.tree.Nodes.position;
 import static dev.stxt.pdf.tree.Nodes.unread;
 import static dev.stxt.pdf.tree.PropertyReader.box;
 import static dev.stxt.pdf.tree.PropertyReader.fragmentation;
+import static dev.stxt.pdf.tree.PropertyReader.itemProperty;
 import static dev.stxt.pdf.tree.PropertyReader.typography;
 
 /**
  * The reusable rules of {@code Styles} (reference/common/styles.md): {@code For element} (of an element kind, of a
  * position in a table or {@code Document}), {@code For style}, {@code For id} and {@code For column}, read once per
- * call.
+ * call. Besides the groups ({@code Box}, {@code Typography} and {@code Break}) they give element properties
+ * ({@link #ELEMENT_PROPERTIES}), which are read as if the element declared them.
  *
  * <p>They can come from several places: from the {@code Styles} of the document itself and from separate styles
  * documents (root {@code Styles}, reference/common/styles.md). At each priority level the rules of the separate
@@ -85,6 +87,53 @@ final class StyleRules {
     }
 
     /**
+     * The element a rule is applied to, for its element properties: its node, its type and what wraps it
+     * ({@code Item}, {@code Area} or the {@code Row} of a cell; {@code null} if nothing does).
+     */
+    private record Target(InlineNode node, Element kind, InlineNode wrapper) {
+        boolean inItem() {
+            return wrapper != null && wrapper.getCanonicalName().equals("item");
+        }
+
+        /** For the messages: {@code the Text (line 12)}. */
+        String what() {
+            return "the " + node.getName() + " (line " + node.getLine() + ")";
+        }
+    }
+
+    /** The groups of a rule, which it can give any box. */
+    private static final Set<String> GROUPS = Set.of("box", "typography", "break");
+
+    /**
+     * The element properties a rule allows besides the groups (reference/common/styles.md), by canonical name: those of
+     * how an element looks and distributes its content. Not those of its identity, content, structure or position
+     * ({@code Id}, {@code Link}, {@code Alt}, {@code Span}, {@code Start}, {@code Offset}, {@code Rotate}...). A rule
+     * gives one to an element only if the element could declare it ({@link #declares}). {@code Horizontal} and
+     * {@code Vertical} are those of a {@code Stack} or a {@code Grid}, never those of the {@code Item} or the
+     * {@code Area} that wraps the element.
+     */
+    static final Set<String> ELEMENT_PROPERTIES = Set.of(
+            "direction", "wrap", "gap", "horizontal", "vertical", "line-distribution", "split-items",
+            "column-sizes", "row-sizes", "areas", "flow", "split-rows", "column-align",
+            "count", "min-column-width", "separator", "separator-color", "balance",
+            "marker", "marker-image", "fit", "format", "error-correction", "quiet-zone",
+            "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
+            "drop-cap", "side", "clear", "isolate-margins",
+            "bullet-markers", "number-markers", "table-columns",
+            "grow", "shrink", "base-size");
+
+    /**
+     * Of {@link #ELEMENT_PROPERTIES}, those of the {@code Item} that wraps an element in a {@code Stack}: a rule gives
+     * them to the element it wraps.
+     */
+    private static final Set<String> ITEM_PROPERTIES = Set.of("grow", "shrink", "base-size");
+
+    /** The types of element that can declare each of {@link #ELEMENT_PROPERTIES}, in the order of {@link Element}. */
+    private static final Map<String, List<Element>> DECLARED_BY = ELEMENT_PROPERTIES.stream()
+            .collect(Collectors.toMap(p -> p, p -> Arrays.stream(Element.values())
+                    .filter(k -> k.label() != null && declares(k.label(), p)).toList()));
+
+    /**
      * Reads the rules of {@code Styles} of the document and of the separate styles documents ({@code styles}, each
      * with root {@code Styles}, in the order they were given; empty if there is none). Their values are checked here,
      * even if the rule applies to no element; what depends on the element (reference/common/errors.md), when it is
@@ -132,8 +181,9 @@ final class StyleRules {
             if (source != null) {
                 external.put(rule, source);
             }
+            String type = null;
             switch (rule.getCanonicalName()) {
-                case "for-element" -> element(rule, selector, source);
+                case "for-element" -> type = element(rule, selector, source);
                 case "for-column" -> columnRules.add(columns(rule, source));
                 case "for-style" -> {
                     String name = name(rule, "For style", source);
@@ -146,19 +196,24 @@ final class StyleRules {
                 }
                 default -> throw unread(rule);
             }
-            read(rule, new Style(namedColors));
+            read(rule, new Style(namedColors), null, null);
+            checkElementProperties(rule, type, source);
         }
     }
 
-    /** A {@code For element} rule: of an element kind, of a position in a table or {@code Document}. */
-    private void element(InlineNode rule, String selector, SourceLine source) {
+    /**
+     * A {@code For element} rule: of an element kind, of a position in a table or {@code Document}. Returns the name in
+     * the schema of what it applies to, for its element properties: that of the element, {@code Cell} for a position
+     * in a table.
+     */
+    private String element(InlineNode rule, String selector, SourceLine source) {
         String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
         if (canonical.equals("document")) {
-            for (String group : List.of("box", "break")) {
-                child(rule, group).ifPresent(g -> {
+            for (Node g : rule.getChildren()) {
+                if (!g.getCanonicalName().equals("typography")) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document only allows Typography, "
                             + "which all boxes inherit: the document has no " + g.getName()), source);
-                });
+                }
             }
             child(rule, "typography").ifPresent(t -> inline(t).getChildren().stream()
                     .filter(c -> c.getCanonicalName().equals("language")).findFirst().ifPresent(l -> {
@@ -166,12 +221,12 @@ final class StyleRules {
                                 + "the language of the document is the Language of Document"), source);
                     }));
             documentRules.add(rule);
-            return;
+            return "Document";
         }
         Optional<CellSelector> cell = CellSelector.of(canonical);
         if (cell.isPresent()) {
             cellRules.add(new CellRule(cell.get(), rule, source != null ? source.styles() : DOCUMENT));
-            return;
+            return Element.CELL.label();
         }
         Element element = Element.of(canonical)
                 .orElseThrow(() -> located(error(rule, ErrorCode.STYLE_UNKNOWN_ELEMENT, "For element: '" + selector
@@ -181,6 +236,86 @@ final class StyleRules {
                                 Arrays.stream(CellSelector.values()).map(CellSelector::label))
                         .collect(Collectors.joining(", ")) + ")"), source));
         elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(rule);
+        return element.label();
+    }
+
+    /**
+     * Checks the element properties of a rule when it is read, even if it applies to no element
+     * (reference/common/styles.md). In a {@code For element}, {@code type} is the name in the schema of what it applies
+     * to: a property that an element of that type cannot declare is an error, and the value is read as that type reads
+     * it. In {@code For style} and {@code For id} ({@code type} is {@code null}) the element is not known until the rule
+     * is applied: the value has to be valid in one of the types that can declare the property.
+     */
+    private void checkElementProperties(InlineNode rule, String type, SourceLine source) {
+        for (Node p : rule.getChildren()) {
+            String name = p.getCanonicalName();
+            if (GROUPS.contains(name)) {
+                continue;
+            }
+            if (type != null && !declares(type, name)) {
+                throw located(error(p, ErrorCode.STYLE_NOT_ALLOWED, rule.getName() + ": " + rule.getText().trim()
+                        + " gives " + p.getName() + (ITEM_PROPERTIES.contains(name)
+                        ? ", which is of the Item that wraps an element in a Stack, and a " + type + " is never in one"
+                        : ", which a " + type + " does not have")), source);
+            }
+            List<Element> kinds = type != null ? List.of(Element.of(canonical(type)).orElseThrow())
+                    : DECLARED_BY.get(name);
+            InvalidModelException first = null;
+            for (Element kind : kinds) {
+                try {
+                    Style scratch = new Style(namedColors);
+                    if (ITEM_PROPERTIES.contains(name)) {
+                        itemProperty(p, scratch);
+                    } else if (!ElementReader.of(kind).ruleProperty(p, scratch)) {
+                        contentValue(p);
+                    }
+                    first = null;
+                    break;
+                } catch (InvalidModelException e) {
+                    if (first == null) {
+                        first = e;
+                    }
+                }
+            }
+            if (first != null) {
+                throw located(first, source);
+            }
+        }
+    }
+
+    /**
+     * Checks the value of a property that the content of an element reads ({@link ElementReader#ruleProperty}): what
+     * does not depend on the element. That the {@code Column align} has an alignment per column is checked in the
+     * table.
+     */
+    private static void contentValue(Node p) {
+        switch (p.getCanonicalName()) {
+            case "column-align" -> TableBuilder.alignments(p);
+            case "bullet-markers" -> MarkdownBuilder.markers(p, false);
+            case "number-markers" -> MarkdownBuilder.markers(p, true);
+            case "table-columns" -> {
+                // An ENUM: the schema checks its values.
+            }
+            default -> throw unread(p);
+        }
+    }
+
+    /**
+     * Whether an element of type {@code type} (its name in the schema, {@code Stack}) can declare the element property
+     * {@code name}: what a rule gives an element is what the element could declare itself. Those of
+     * {@link #ITEM_PROPERTIES}, whether an element of that type can be in an {@code Item}.
+     */
+    private static boolean declares(String type, String name) {
+        if (!ELEMENT_PROPERTIES.contains(name)) {
+            return false;
+        }
+        return ITEM_PROPERTIES.contains(name) ? DocumentSchema.allows("Item", canonical(type))
+                : DocumentSchema.allows(type, name);
+    }
+
+    /** The canonical name of the name of an element in the schema: {@code Heading 1} is {@code heading-1}. */
+    private static String canonical(String type) {
+        return type.toLowerCase(Locale.ROOT).replace(' ', '-');
     }
 
     /** The {@code Named color} of the document and of the separate styles documents, for the style of the root. */
@@ -198,7 +333,7 @@ final class StyleRules {
      */
     void applyDocument(Style root) {
         for (InlineNode rule : documentRules) {
-            read(rule, root);
+            read(rule, root, null, null);
         }
     }
 
@@ -209,7 +344,7 @@ final class StyleRules {
      */
     void apply(Element kind, Style s) {
         for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {
-            read(rule, s);
+            read(rule, s, null, null);
         }
     }
 
@@ -243,8 +378,8 @@ final class StyleRules {
     /**
      * Applies to a {@code Section} (reference/components/document.md) the rules that reach it:
      * {@code For element: Section}, those of its classes and that of its {@code Id}. They can only give
-     * {@code Typography}, which all its content inherits; with {@code Box} or {@code Break} they are an error (a
-     * section is the page area of its pages, not a box).
+     * {@code Typography}, which all its content inherits; with {@code Box}, {@code Break} or an element property they
+     * are an error (a section is the page area of its pages, not a box).
      */
     void applySection(InlineNode n, Style s) {
         List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(Element.SECTION, List.of()));
@@ -258,25 +393,16 @@ final class StyleRules {
         });
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
         for (InlineNode rule : rules) {
-            for (String group : List.of("box", "break")) {
-                child(rule, group).ifPresent(g -> {
+            for (Node g : rule.getChildren()) {
+                if (!g.getCanonicalName().equals("typography")) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "The rule " + rule.getName() + ": "
                             + rule.getText().trim() + " applies to a Section (line " + n.getLine()
                             + "), which only allows Typography: it is the page area of its pages, not a box"),
                             external.get(rule));
-                });
+                }
             }
-            read(rule, s);
+            read(rule, s, null, null);
         }
-    }
-
-    /**
-     * Applies the rules that correspond to an element that is not a table cell.
-     *
-     * @see #apply(InlineNode, Element, Style, Box, CellPosition)
-     */
-    void apply(InlineNode n, Element kind, Style s, Box parent) {
-        apply(n, kind, s, parent, null);
     }
 
     /**
@@ -285,12 +411,20 @@ final class StyleRules {
      * {@code Body cell} or {@code Footer cell}, and {@code Odd row cell} or {@code Even row cell}), those of its column
      * ({@code For column}, in the order of {@code Styles}), those of its classes (in the order of {@code Styles}) and
      * that of its {@code Id}. They go after inheritance and before what the element itself declares, and they are
-     * merged property by property. {@code position} is that of a {@code Cell}; {@code null} for the others.
+     * merged property by property. {@code wrapper} is the {@code Item}, the {@code Area} or the {@code Row} that wraps
+     * the element, or {@code null}; {@code position} is that of a {@code Cell}, {@code null} for the others.
+     *
+     * <p>The element properties of the rules (reference/common/styles.md) are read as if the element declared them; an
+     * element property that the element could not declare is an error, with its line. Returns those that its content
+     * reads from its node ({@link BuildContext#property}), by canonical name: the one of higher priority.</p>
      */
-    void apply(InlineNode n, Element kind, Style s, Box parent, CellPosition position) {
+    Map<String, PropertyNode> apply(InlineNode n, Element kind, Style s, Box parent, InlineNode wrapper,
+                                    CellPosition position) {
         String noBreak = noBreak(n, kind, s, parent);
+        Target target = new Target(n, kind, wrapper);
+        Map<String, PropertyNode> content = new HashMap<>();
         List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(kind, List.of()));
-        applyAll(rules, noBreak, s);
+        applyAll(rules, noBreak, s, target, content);
         rules.clear();
         if (position != null) {
             if (position.columnAlign() != null) {
@@ -320,7 +454,8 @@ final class StyleRules {
             Optional.ofNullable(idRules.get(position.rowId().getText().trim())).ifPresent(rules::addAll);
         }
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
-        applyAll(rules, noBreak, s);
+        applyAll(rules, noBreak, s, target, content);
+        return content;
     }
 
     /**
@@ -367,7 +502,7 @@ final class StyleRules {
                     }
                 }
             }
-            read(rule.rule(), s);
+            read(rule.rule(), s, null, null);
         }
         return s;
     }
@@ -384,7 +519,8 @@ final class StyleRules {
         return rules;
     }
 
-    private void applyAll(List<InlineNode> rules, String noBreak, Style s) {
+    private void applyAll(List<InlineNode> rules, String noBreak, Style s, Target target,
+                          Map<String, PropertyNode> content) {
         for (InlineNode rule : rules) {
             if (noBreak != null) {
                 child(rule, "break").ifPresent(b -> {
@@ -392,7 +528,7 @@ final class StyleRules {
                             + rule.getText().trim() + " applies Break to " + noBreak), external.get(rule));
                 });
             }
-            read(rule, s);
+            read(rule, s, target, content);
         }
     }
 
@@ -437,10 +573,13 @@ final class StyleRules {
     }
 
     /**
-     * The groups of a rule, read the same way as in an element: each value with its line, which in a rule of a
-     * separate styles document is of that document. An error of a rule of a separate styles document says so.
+     * A rule, read the same way as in an element: each value with its line, which in a rule of a separate styles
+     * document is of that document. An error of a rule of a separate styles document says so. The element properties
+     * are given to the element of {@code target} ({@link #elementProperty}); with {@code target} {@code null}, only the
+     * groups are read, and the element properties were already checked when the rule was read
+     * ({@link #checkElementProperties}) or rejected where they cannot go (a {@code Section}, a styled run).
      */
-    private void read(InlineNode rule, Style s) {
+    private void read(InlineNode rule, Style s, Target target, Map<String, PropertyNode> content) {
         SourceLine source = external.get(rule);
         s.readingStyles(source);
         try {
@@ -449,13 +588,40 @@ final class StyleRules {
                     case "box" -> box(inline(g), s);
                     case "typography" -> typography(inline(g), s);
                     case "break" -> fragmentation(inline(g), s);
-                    default -> throw unread(g);
+                    default -> {
+                        if (target != null) {
+                            elementProperty(rule, g, s, target, content);
+                        }
+                    }
                 }
             }
         } catch (InvalidModelException e) {
             throw located(e, source);
         } finally {
             s.readingStyles(null);
+        }
+    }
+
+    /**
+     * Gives the element property {@code p} of {@code rule} to the element of {@code target}, as if it declared it, and
+     * puts in {@code content} one that its content reads from its node. One that the element could not declare is
+     * {@code STYLE_NOT_ALLOWED}, with the line of the property: also {@code Grow}, {@code Shrink} or {@code Base size}
+     * to an element that is not in an {@code Item}.
+     */
+    private void elementProperty(InlineNode rule, Node p, Style s, Target target, Map<String, PropertyNode> content) {
+        String name = p.getCanonicalName();
+        String gives = "The rule " + rule.getName() + ": " + rule.getText().trim() + " gives " + p.getName() + " to "
+                + target.what();
+        if (ITEM_PROPERTIES.contains(name)) {
+            if (!target.inItem()) {
+                throw error(p, ErrorCode.STYLE_NOT_ALLOWED, gives + ", which is not in an Item: Grow, Shrink and Base "
+                        + "size are of the Item that wraps an element in a Stack");
+            }
+            itemProperty(p, s);
+        } else if (!declares(target.kind().label(), name)) {
+            throw error(p, ErrorCode.STYLE_NOT_ALLOWED, gives + ", which does not have it");
+        } else if (!ElementReader.of(target.kind()).ruleProperty(p, s)) {
+            content.put(name, new PropertyNode(p, external.get(rule)));
         }
     }
 }
