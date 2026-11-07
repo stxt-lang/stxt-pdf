@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 
 | Property | Where | What it does |
 |---|---|---|
-| `Marker` | `List` | **Required.** `bullet` (•), `dash` (–), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Required**, in the list or in a rule of `Styles` ([Styles](../common/styles.md#element-properties)). `bullet` (•), `dash` (–), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Marker image` | `List`, `List item` | The image of the marker with `Marker: image`, from `images/`. That of the list serves all its items; that of an item replaces it. It accepts `Alt` and `Height` |
 | `Start` | `List` | The number of the first item (1 by default). Only in numbered lists |
 | `Number` | `List item` | The number of this item. The following ones continue from it |

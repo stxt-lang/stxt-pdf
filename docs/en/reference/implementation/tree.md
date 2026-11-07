@@ -57,17 +57,30 @@ document it belongs to, the main one or one of the separate styles documents (by
 `line 8 of styles 2`), and the error built with it also states it in `inStyles()` and in `stylesDocument()`.
 
 `BoxTreeBuilder` is the orchestrator and keeps no state: what belongs to each call goes in a `BuildContext`. `BoxTreeBuilder.element`
-is the order common to all elements (the place, inheritance, the rules, the properties and their checks, the box and
-the content), and what is specific to each one is done by its family, `ElementReader` (an enum: `TEXT`, `CODE_BLOCK`, `IMAGE`,
+is the order common to all elements (the place, inheritance, the rules, what its wrapper declares, the properties and
+their checks, the box and the content), and what is specific to each one is done by its family, `ElementReader` (an enum: `TEXT`, `CODE_BLOCK`, `IMAGE`,
 `BARCODE`, `CELL`, `TABLE`, `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS`, `FOOTNOTE`, `FIGURE` and `CONTAINER`,
 chosen with `ElementReader.of`): the layout of the
-box, what its wrapper gives it, the properties of its type, what it checks before creating the box, and its content. A
+box, what its wrapper gives it (the `Typography` of the `Row` of a cell before the rules, as inheritance, with
+`inherited`; the properties of the `Item` or the `Area` after them, so that they win over the rules, with `wrapper`), the
+properties of its type, what it checks before creating the box, and its content. A
 new element with nothing of its own is a `CONTAINER`, and one with something of its own, a new family, without touching `element`. The
 `FIGURE` family builds the element and the `Caption` of a `Figure`, orders them by `Caption position`, numbers it
 (`Figures`) and keeps it from being split. Each family claims the children that are its own (`ElementReader.property`): the
 properties of its type, which it reads, and those its content reads, such as the row groups and `Column align` of a
 `Table`, the `Span` of a `Cell` or the markers and `Table columns` of a `Markdown`. The orchestrator only sets aside those
 of any element (`Item`, `Area`, `Content` and `Style`).
+
+The element properties of a rule ([Styles](../common/styles.md#element-properties)) are read with the same code as those
+of the element: `StyleRules` gives them to the family of the element (`ElementReader.ruleProperty`, which reads those of
+its type and the standalone ones with `PropertyReader.single`), and `Grow`, `Shrink` and `Base size`, to
+`PropertyReader.itemProperty`. If the element cannot declare one, it is `STYLE_NOT_ALLOWED`: what it can declare is said
+by the schema (`DocumentSchema.allows`), so there is no second table of what each element allows, only the closed list of
+those that go in rules (`StyleRules.ELEMENT_PROPERTIES`). Those that the content of the element reads from its node
+(`Column align`, the markers and `Table columns` of a `Markdown`) are not read there: `StyleRules.apply` returns them,
+with their document (`PropertyNode`), and `BuildContext.property` gives the one of the element or, if it does not declare
+it, the one of its rule. What a `Markdown` generates from one of a separate styles document (the `Marker` of a list, the
+`Column sizes` of a table) carries the line of that document (`Translation.sources`, in `BuildContext.sources`).
 
 Inside which boxes each content is built (a `Page overlay`, a heading, a `Columns`, a `Markdown`, a `Footnote` or a box
 that is not split) is said by `BuildContext.Scope`, a `record` that only changes while the content of a box is built
@@ -84,7 +97,7 @@ The pieces:
 | `SectionReader` | The properties of a `Section` (`Id`, `Page`, the page and footnote numbering, `Inherit page overlays`, `Begin on`) and their rules; the box, the footnote area and `SECTION_EMPTY` stay in `BoxTreeBuilder.section` |
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
-| `StyleRules` | The rules of `Styles` from the two origins and their priority |
+| `StyleRules` | The rules of `Styles` from the two origins, their priority and their element properties |
 | `NamedColors` | The named colors (`Named color`) of the two origins, read before the rules and replaced by their color when each property is read (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
 | `TableBorders` | The merged borders of a table with `Merge borders`: it keeps the border each cell declares (`Box.mergedBorder()`, with `model.Stroke`) and changes its `Border` into the room it leaves for the lines |

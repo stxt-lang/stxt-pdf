@@ -72,6 +72,9 @@ Document (dev.stxt.pdf):
 | `Number markers` | The same for numbered lists: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Required if there are numbered lists |
 | `Table columns` | The columns of the tables: `equal` (all the same) or `auto` (according to their content). Required if there are tables |
 
+`Bullet markers`, `Number markers` and `Table columns` can also go once for the whole document, in a
+`For element: Markdown` rule ([Styles](../common/styles.md#element-properties)).
+
 It also accepts `Id`, `Style`, `Box`, `Typography` (which everything inside inherits) and `Break`. The code font is the
 `Code font` of `Typography` ([Text formatting](../common/text-formatting.md#code)): it is declared in the `Typography`
 of the `Markdown` or, once for the whole document, in `For element: Document`, and it is required if there is code.

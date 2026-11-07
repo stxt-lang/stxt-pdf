@@ -42,7 +42,9 @@ Table:
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
 
-They do not go in the rules of `Styles`, which only accept the groups. `Merge borders` (`true` or `false`, by default
+`Column sizes`, `Column align`, `Gap` and `Split rows` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Span` and
+`Row header` cannot. Without `Column sizes`, its own or from a rule, it is an error (`TABLE_COLUMN_SIZES_MISSING`).
+`Merge borders` (`true` or `false`, by default
 `false`) goes in the `Box` of the `Table`, so it is also valid in a rule: the border between two cells is drawn once,
 the wider of the two ([Merged borders](#merged-borders)).
 

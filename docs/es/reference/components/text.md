@@ -67,6 +67,8 @@ preformateado (`DROP_CAP_NOT_ALLOWED`) ni fuera de 2 a 5 (`VALUE_NOT_ALLOWED`). 
 |---|---|---|---|
 | `Drop cap` | entero de 2 a 5 | sin valor | Líneas que ocupa la letra capitular. Solo en `Paragraph`. |
 
+`Drop cap` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
+
 > **Decisión:** la capitular se dimensiona por la altura de mayúsculas, con su cima a la altura de las mayúsculas de la
 > primera línea y su base en la línea base de la última que ocupa, como en los procesadores de texto; es la primera
 > letra, en la fuente del párrafo, separada del texto un espacio. *Alternativa descartada:* una fuente, un color o varias

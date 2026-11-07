@@ -88,6 +88,10 @@ What several examples have in common and how it is solved:
   (also in Markdown tables), `Even row cell` the zebra stripes (example 05) and `Column align` or `For column` the
   numeric columns. What belongs to a single row, such as the totals of the invoice (examples 01, 04 and 07), goes in a
   style on the `Row` (`Style: total`), which applies its rules to all its cells.
+- **What repeats in an element** goes in a rule too: the `Gap` of the dishes of the menu (06) is in its
+  `For style: dish`, the `Fit: fill` of the photos of the catalog (09) in `For element: Image`, the distribution of the
+  rows of its cards in `For style: spread`, the legend of the timetable (11) in `For style: legend` and the bullets of the
+  lists of the CV (03) in `For element: List`.
 - **Links** are a property of the whole box (`Link`) or a Markdown span (`[text](target)`). A `Text` with a phone
   number and a website (examples 02 and 09) has a `Link` and is clickable as a whole, phone number included. With
   `Markup: markdown` only part of it can be linked (`[web](https://...)`).

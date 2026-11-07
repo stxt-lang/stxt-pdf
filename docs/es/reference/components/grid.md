@@ -26,6 +26,8 @@ Grid:
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
 | `Split rows` | booleano | `true` | Una fila que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). |
 
+Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
+
 Pistas válidas: número, %, `auto`, `narrowest`, `natural`, fracción, `between(a, b)` y `repeat(n, patrón)`.
 `fit` no es una pista (`FIT_TRACK`), porque `auto` ya se ajusta al contenido.
 

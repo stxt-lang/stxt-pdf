@@ -68,6 +68,8 @@ side box ([Block](block.md#side-boxes-side)), the drop cap goes after what the b
 |---|---|---|---|
 | `Drop cap` | integer from 2 to 5 | none | Lines the drop cap takes up. Only in `Paragraph`. |
 
+`Drop cap` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
+
 > **Decision:** the drop cap is sized by the cap height, with its top at the height of the capitals of the first line and
 > its base on the baseline of the last line it takes up, as word processors do; it is the first letter, in the font of
 > the paragraph, a space away from the text. *Rejected alternative:* a font, a color or several letters of the drop cap's

@@ -58,7 +58,8 @@ Document (dev.stxt.pdf):
 | `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | sin valor | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
 | `Table columns` | `equal`, `auto` | sin valor | Las `Column sizes` de las tablas: `equal` es `repeat(n, *)`, y `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
-No van en las reglas de `Styles`, que solo admiten los grupos.
+Las tres también pueden venir de una regla de `Styles`, como `For element: Markdown`, que las da a todos los `Markdown`
+del documento ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)). Obligatorio quiere decir que el `Markdown` la declara o la toma de una regla.
 
 > **Decisión:** las propiedades que no se usan no son un error (un `Bullet markers` sin listas), aunque en general lo que no tiene
 > efecto lo es: el contenido de un Markdown cambia a menudo y obligaría a quitar y poner las propiedades. Su valor sí se

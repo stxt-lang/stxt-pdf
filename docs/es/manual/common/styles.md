@@ -35,8 +35,66 @@ Styles:
 | `For element: Code block` | A los bloques de código de un `Markdown` |
 | `For element: TOC 1` a `TOC 6` | A las entradas de un índice, por nivel ([Table of contents](../components/table-of-contents.md)) |
 
-Cada regla admite los grupos `Box`, `Typography` y `Break`. Las propiedades propias de un elemento (las columnas de una
-tabla, el marcador de una lista, un enlace) no van en reglas: se escriben en el elemento.
+Cada regla admite los grupos `Box`, `Typography` y `Break`, y las [propiedades propias de un elemento](#propiedades-de-un-elemento)
+que dicen cómo se ve o cómo reparte su contenido.
+
+## Propiedades de un elemento
+
+Una regla también da las propiedades propias de un elemento que dicen cómo se ve o cómo reparte su contenido: el `Gap` de
+un `Stack`, las `Column sizes` de un `Grid` o de una `Table`, el `Fit` de una `Image`, el `Marker` de una `List`... En
+esta carta, cada plato es un `Stack` con `Style: dish`, y su `Gap` va una sola vez, en la regla:
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Carta
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For style: dish
+            Gap: 12
+            Box:
+                Margin: 0 0 6 0
+        For style: name
+            Grow: 1
+        For style: price
+            Typography:
+                Bold: true
+    Section:
+        Stack:
+            Style: dish
+            Item:
+                Text: Croquetas de gamba roja
+                    Style: name
+            Item:
+                Text: 9,50 €
+                    Style: price
+        Stack:
+            Style: dish
+            Item:
+                Text: Alcachofas confitadas con jamón
+                    Style: name
+            Item:
+                Text: 12,00 €
+                    Style: price
+```
+
+- **Solo lo que el elemento admite.** Una regla que da a un elemento una propiedad que no tiene, como un `Gap` a un
+  `Text`, es un error (`STYLE_NOT_ALLOWED`) con la línea de la regla.
+- **`Grow`, `Shrink` y `Base size` son del `Item`.** Los da la regla del elemento que va dentro del `Item` (aquí,
+  `For style: name`). Si el `Item` también los declara, gana el `Item`.
+- **`Horizontal` y `Vertical`, en una regla, son las del `Stack` o el `Grid`.** La alineación de un ítem se escribe en
+  su `Item`.
+- **Lo que identifica a un elemento o es su contenido no va en reglas:** `Id`, `Link`, `Alt`, `Offset`, `Rotate`, los
+  números de una lista (`Start`, `Number`), `Span`, `Row header` y el texto. La lista completa, por elemento, está en la
+  [referencia](../../reference/common/styles.md#propiedades-de-elemento).
+- El `Marker` de una `List` y las `Column sizes` de una `Table` son obligatorios, y pueden venir de una regla:
+  `For element: List` con `Marker: bullet` da viñetas a todas las listas del documento.
 
 ## Quién gana
 

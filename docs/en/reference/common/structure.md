@@ -192,15 +192,16 @@ once, and the elements, as many times as needed.
 | `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
-| `For element`, `For style`, `For id`, `For column` | `Box`, `Typography`, `Break` |
+| `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` and the element properties of appearance and distribution ([Styles](styles.md#element-properties)), at most one of each |
+| `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`, `Side`, `Clear`; elements |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, besides, `Drop cap` |
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (at least one) |
-| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required), `Marker image` (with `Alt` and `Height`), `Start`; `List item` (at least one) |
+| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker image` (with `Alt` and `Height`), `Start`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`); elements except headings (at least one) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (required), `Footer rows` |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (required), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elements except headings |

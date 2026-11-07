@@ -19,7 +19,8 @@ Table of contents:
 | `Levels` | two integers from 1 to 6: the first and the last level | `1 3` | The headings it lists: `Levels: 1 2` lists the `Heading 1` and `Heading 2` elements. Without any heading at those levels it is an error. Only with `Of: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | What fills the gap between the title and the page of each entry: dots, a line or nothing. |
 
-They do not go in the `Styles` rules, which only accept the groups.
+`Levels` and `Leader` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Of` cannot: it says what the table of contents
+is.
 
 ## What it lists (`Of`)
 

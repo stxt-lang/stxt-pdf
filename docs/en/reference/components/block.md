@@ -61,6 +61,8 @@ of `Stack` and `Grid` (also the cells of a `Table`), the columns of a `Columns`,
 |---|---|---|---|
 | `Isolate margins` | boolean | `false` | Isolates the margins of the box: stops margin merging with the children. Only in `Block` and `Frame`, and not in an item of `Stack` or `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
+`Isolate margins` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), like `Side` and `Clear`.
+
 > **Decision:** `Isolate margins` exists only where it can have an effect: `Overlay`, `Page overlay` and the items already isolate, and `Stack`, `Grid`
 > and `Text` have no children in block flow. In a `Block` or a `Frame` that is an item, `Isolate margins: true` is an error.
 

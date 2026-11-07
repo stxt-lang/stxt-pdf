@@ -17,8 +17,9 @@ type, of a style or with an `Id`, and the element can override them.
 | `For id` | an `Id`, without spaces | the element with that `Id` |
 | `For column` | a column (`3`) or a range of columns (`2 4`, both included) | the cells of a `Table` that **start** in those columns |
 
-Each rule allows the `Box`, `Typography` and `Break` groups, at most one of each. It does not allow the properties of an
-element itself (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link` or `Rotate`).
+Each rule allows the `Box`, `Typography` and `Break` groups, at most one of each, and the
+[element properties](#element-properties) that say how an element looks or how it distributes its content (`Gap`,
+`Column sizes`, `Fit`, `Marker`...), at most one of each.
 
 ```
 Styles:
@@ -41,8 +42,92 @@ Text: A side note.
     Style: note
 ```
 
-> **Decision:** rules only allow the groups: the properties of an element itself could not be validated when the
-> document is written, because the element type goes in the value of `For element`.
+## Element properties
+
+A rule also gives properties of an element itself, as if the element declared them:
+
+```
+Styles:
+    For style: dish
+        Gap: 12
+    For element: Image
+        Fit: fill
+Stack:
+    Style: dish
+    Item:
+        Grow: 1
+        Text: Red prawn croquettes
+    Item:
+        Text: €9.50
+Image: photos/room.jpg
+```
+
+They are those of appearance and distribution. The rule that applies to an element of that type allows them:
+
+| Element | Properties in a rule |
+|---|---|
+| `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
+| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
+| `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
+| `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
+| `List` | `Marker`, `Marker image` |
+| `List item` | `Marker image` |
+| `Image` | `Fit`, `Side`, `Clear` |
+| `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
+| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
+| `Heading 1` to `Heading 6` | `In table of contents`, `Clear` |
+| `Paragraph` | `Drop cap`, `Clear` |
+| `Text` | `Clear` |
+| `Block` | `Isolate margins`, `Side`, `Clear` |
+| `Frame` | `Isolate margins` |
+| `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
+| `Table of contents` | `Levels`, `Leader` |
+| the element of an `Item` | `Grow`, `Shrink`, `Base size` |
+
+- **They apply like the groups**: with the same [priority](#priority), property by property, and without inheritance.
+  What the element declares wins over all its rules.
+- **Only what the element can declare.** A rule that gives an element a property it does not have (a `Gap` to a `Text`)
+  is `STYLE_NOT_ALLOWED`, with the line of the property in the rule. In `For element` the error comes when the rule is
+  read, even if it applies to no element; in `For style` and `For id`, when it is applied, because the same name can go
+  on elements of different types. The position rules of a cell, `For column`, `For element: Document` and the generated
+  elements (`Code block`, `TOC 1` to `TOC 6`, `Footnotes`) allow none, and neither does a rule that reaches a `Section`.
+- **The value is checked when the rule is read.** In `For style` and `For id` it has to be valid in one of the elements
+  that have the property: `Gap: 1 2 3` is `VALUE_NOT_ALLOWED` in any case, and `Horizontal: justify`, which is valid in a
+  `Stack`, is an error when it is applied to a `Grid`. What depends on the element is checked when the rule is applied:
+  the `Column align` of a rule has one alignment per column of each table it reaches (`TABLE_COLUMN_ALIGN`).
+- **`Horizontal` and `Vertical`** are those of the `Stack` or the `Grid`, never those of the `Item` or the `Area` that
+  wraps the element: the alignment of an item is written in its `Item` or its `Area`.
+- **`Grow`, `Shrink` and `Base size`** are of the `Item` ([Stack](../components/stack.md#item)), which is not a box: the
+  rule of the element the `Item` wraps gives them, and what the `Item` declares wins over the rule. To an element that is
+  not in an `Item` (also that of an `Area`) they are `STYLE_NOT_ALLOWED`.
+- **`Marker` and `Column sizes`** are required in a `List` and in a `Table`, and they can come from a rule. Without
+  either, the error is `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
+- **Not in a rule** are the properties of identity, content, structure and position: `Id`, `Style`, `Link`, `Alt`,
+  `Span`, `Row header`, `Start`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
+  those of `Section` and `Page`, and the value or the `Content` of an element. The schema does not allow them.
+
+> **Decision:** rules allow the element properties of appearance and distribution, and the engine checks that the
+> element can declare them, because the schema cannot: the type goes in the value of `For element`, and in `For style`
+> and `For id` it is not known until the rule is applied. *Rejected alternative:* rules that only allowed the groups,
+> which made each element repeat the same `Gap` or the same `Fit`.
+
+> **Decision:** a property that the element cannot declare is an error, also in `For style`. *Rejected alternative:*
+> ignoring it, which would allow using the same style on elements of different types at the cost of not reporting a
+> typo.
+
+> **Decision:** `Grow`, `Shrink` and `Base size` come through the rule of the element the `Item` wraps, and in a rule
+> `Horizontal` and `Vertical` are those of the `Stack` or the `Grid`. *Rejected alternative:* allowing `Style` in `Item`
+> and `Area`, which are not boxes, and which would make `Horizontal` and `Vertical` ambiguous in a `Stack` that is also an
+> item of another one.
+
+> **Decision:** identity, content, structure and position stay out, like the decision on `Offset` and `Rotate`
+> ([Layers and rotation](layers-and-rotation.md)). `Row header` too: a `For column` reaches the cells of `Header rows`,
+> where it is an error (`ROW_HEADER_IN_HEADER_ROWS`). *Rejected alternative:* all the properties of the element except
+> `Id` and `Style`.
+
+> **Decision:** `Marker` in `List` and `Column sizes` in `Table` are no longer required by the schema and the engine
+> requires them, so that they can come from a rule. *Rejected alternative:* keeping them required in the element, so
+> the rule would never have an effect.
 
 ## Named colors
 
@@ -111,6 +196,8 @@ Each property takes, from strongest to weakest:
 10. the default value.
 
 The rules of points 4 to 7 only apply to the cells of a `Table` ([Table](../components/table.md#cell-style)).
+The [element properties](#element-properties) follow the same order, without point 9: they are not inherited. For
+`Grow`, `Shrink` and `Base size`, what the `Item` declares is point 1.
 
 A rule wins over inheritance: with `For element: Text` and `Size: 10`, a `Text` measures 10 even if its parent declares
 `Size: 20`. Rules are merged **property by property** and not by group: if the rule declares `Size` and the element
@@ -137,9 +224,14 @@ These are errors:
 - a rule that gives `Break` to an element that does not allow it: `Overlay`, `Page overlay`, a heading, a `Text` of a
   heading or a cell, also with a position rule, a column rule or a rule of the style of its `Row` (`STYLE_NOT_ALLOWED`);
 - a rule that gives a `Section` something that is not `Typography` (`STYLE_NOT_ALLOWED`);
+- an element property that the element cannot declare: in `For element`, when the rule is read; in `For style` and
+  `For id`, when it is applied; also `Grow`, `Shrink` or `Base size` to an element that is not in an `Item`
+  (`STYLE_NOT_ALLOWED`);
+- an element property with a value that is not valid in any element that has it (`VALUE_SYNTAX`,
+  `VALUE_NOT_ALLOWED`);
 - a `Style` name or the name of a styled run without its `For style` rule (`STYLE_WITHOUT_RULE`);
-- the rule of a styled run that declares something a run does not accept, such as `Size` or a `Box`
-  (`STYLE_NOT_ALLOWED_IN_RUN`);
+- the rule of a styled run that declares something a run does not accept, such as `Size`, a `Box` or an element
+  property (`STYLE_NOT_ALLOWED_IN_RUN`);
 - two `Named color` with the same name in the same source (`COLOR_DUPLICATE`);
 - a color with the form of a name that no `Named color` declares (`COLOR_UNKNOWN`);
 - a `Named color` without a name and a color separated by a space, with a misspelled name or with a color that is not
@@ -268,4 +360,5 @@ only the first one declares `Color`.
 
 - Compound selectors (an element inside another, several styles at once), combinators or priorities declared by the
   author.
+- Properties of identity, content, structure or position in a rule ([Element properties](#element-properties)).
 - Style of a table row with `Box` or of a whole column: it is given to the cells ([Table](../components/table.md#what-is-not-supported)).

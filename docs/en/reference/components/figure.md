@@ -38,6 +38,9 @@ Paragraph: The wires are connected as figure {number of: wiring} shows.
 | `Alt` | non-empty text | none; required with a `Block` | The alternative text of the whole figure, only with a `Block` inside: with an image, the `Alt` goes in the image ([accessibility](#accessibility)). |
 | `In table of contents` | `true`, `false` | `true` | Whether the figure has an entry in the tables of contents of figures or tables. With `false` it is still numbered. |
 
+`Caption position`, `Figure counter` and `In table of contents` can also come from a rule of `Styles`
+([Element properties](../common/styles.md#element-properties)); `Alt` cannot.
+
 `Numbered`, `Number format` and `Number label` belong to `Typography` and apply to figures too ([numbering](#numbering)).
 
 ## The caption (`Caption`)

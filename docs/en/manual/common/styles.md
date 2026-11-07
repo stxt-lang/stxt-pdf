@@ -35,8 +35,66 @@ Styles:
 | `For element: Code block` | The code blocks of a `Markdown` |
 | `For element: TOC 1` to `TOC 6` | The entries of a table of contents, by level ([Table of contents](../components/table-of-contents.md)) |
 
-Each rule accepts the `Box`, `Typography` and `Break` groups. The properties specific to an element (the columns of a
-table, the marker of a list, a link) do not go in rules: they are written in the element.
+Each rule accepts the `Box`, `Typography` and `Break` groups, and the [properties specific to an element](#element-properties)
+that say how it looks or how it distributes its content.
+
+## Element properties
+
+A rule also gives the properties specific to an element that say how it looks or how it distributes its content: the
+`Gap` of a `Stack`, the `Column sizes` of a `Grid` or a `Table`, the `Fit` of an `Image`, the `Marker` of a `List`... In
+this menu, each dish is a `Stack` with `Style: dish`, and its `Gap` goes only once, in the rule:
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Menu
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For style: dish
+            Gap: 12
+            Box:
+                Margin: 0 0 6 0
+        For style: name
+            Grow: 1
+        For style: price
+            Typography:
+                Bold: true
+    Section:
+        Stack:
+            Style: dish
+            Item:
+                Text: Red prawn croquettes
+                    Style: name
+            Item:
+                Text: €9.50
+                    Style: price
+        Stack:
+            Style: dish
+            Item:
+                Text: Confit artichokes with ham
+                    Style: name
+            Item:
+                Text: €12.00
+                    Style: price
+```
+
+- **Only what the element allows.** A rule that gives an element a property it does not have, such as a `Gap` to a
+  `Text`, is an error (`STYLE_NOT_ALLOWED`) with the line of the rule.
+- **`Grow`, `Shrink` and `Base size` are of the `Item`.** The rule of the element inside the `Item` gives them (here,
+  `For style: name`). If the `Item` declares them too, the `Item` wins.
+- **`Horizontal` and `Vertical`, in a rule, are those of the `Stack` or the `Grid`.** The alignment of an item is written
+  in its `Item`.
+- **What identifies an element or is its content does not go in rules:** `Id`, `Link`, `Alt`, `Offset`, `Rotate`, the
+  numbers of a list (`Start`, `Number`), `Span`, `Row header` and the text. The full list, by element, is in the
+  [reference](../../reference/common/styles.md#element-properties).
+- The `Marker` of a `List` and the `Column sizes` of a `Table` are required, and they can come from a rule:
+  `For element: List` with `Marker: bullet` gives bullets to every list of the document.
 
 ## Which one wins
 

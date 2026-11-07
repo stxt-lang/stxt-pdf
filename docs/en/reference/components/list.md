@@ -31,10 +31,12 @@ List:
 | `Start` | integer | `1` | `List` | Number of the first item. Only in the numberings. |
 | `Number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
 
-They do not go in the `Styles` rules, which only accept the groups. The indent of the items is the left `Padding` of the
-`List`.
+`Marker` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Start` and `Number` cannot. Without
+`Marker`, its own or from a rule, it is an error (`LIST_MARKER_MISSING`). The indent of the items is the left `Padding` of
+the `List`.
 
-> **Decision:** a single `List` element with a required `Marker`, which is not inherited: each nested list declares its own.
+> **Decision:** a single `List` element with a required `Marker`, which is not inherited: each nested list declares its own
+> or takes it from a rule.
 > *Rejected alternative:* two elements (bulleted and numbered), or `Marker` in `Typography`.
 
 ## Markers

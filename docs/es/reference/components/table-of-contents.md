@@ -19,7 +19,7 @@ Table of contents:
 | `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. Solo con `Of: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, una línea o nada. |
 
-No van en las reglas de `Styles`, que solo admiten los grupos.
+`Levels` y `Leader` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Of`, no: dice qué es el índice.
 
 ## Qué lista (`Of`)
 

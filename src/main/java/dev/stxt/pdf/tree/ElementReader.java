@@ -158,6 +158,15 @@ enum ElementReader {
      */
     TABLE(PropertyReader.GRID, PropertyReader::grid, Set.of("header-rows", "body", "footer-rows", "column-align")) {
         @Override
+        void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
+            if (!s.isDeclared(PropertyKey.grid("column-sizes"))) {
+                throw error(n, ErrorCode.TABLE_COLUMN_SIZES_MISSING, "The Table needs Column sizes, its own or from a "
+                        + "rule of Styles (For element: Table, For style...): the width of each column, as in "
+                        + "Column sizes: * 80");
+            }
+        }
+
+        @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             table(ctx, n, box, (cell, row, at) -> builder.element(ctx, cell, box, row, at));
         }
@@ -175,6 +184,10 @@ enum ElementReader {
     LIST {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
+            if (!s.isDeclared("marker")) {
+                throw error(n, ErrorCode.LIST_MARKER_MISSING, "The List needs Marker, its own or from a rule of "
+                        + "Styles (For element: List, For style...), as in Marker: bullet");
+            }
             validateList(s);
         }
     },

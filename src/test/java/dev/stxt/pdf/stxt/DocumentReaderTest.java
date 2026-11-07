@@ -127,9 +127,9 @@ class DocumentReaderTest {
         }
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
 
-        // Columns and Body are required; the rows go in their group and Span only in Cell.
-        assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
+        // Body is required; the rows go in their group and Span only in Cell. Column sizes can come from a rule of
+        // Styles, so the schema does not require it: the engine does (TABLE_COLUMN_SIZES_MISSING).
+        reader.read(doc("\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"));
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         DocumentSyntaxException row = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(

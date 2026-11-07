@@ -61,6 +61,8 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 |---|---|---|---|
 | `Isolate margins` | booleano | `false` | Aísla los márgenes de la caja: corta la fusión de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Stack` o `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
+`Isolate margins` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)), como `Side` y `Clear`.
+
 > **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
 

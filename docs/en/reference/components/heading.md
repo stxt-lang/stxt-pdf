@@ -61,7 +61,8 @@ is repeated on each page and is not part of the content, nor inside a `List item
 
 `In table of contents: false` leaves a heading out of the tables of contents (`Table of contents`) without it ceasing to be a heading: it still has a
 bookmark, counts in the hierarchy and is a target of `#id`. It is the usual thing for the title of the cover or that of the table of contents
-itself. It is a property of the element, `true` by default, which is not inherited and does not go in `Styles`.
+itself. It is a property of the element, `true` by default, which is not inherited; it can also come from a rule of `Styles`
+([Element properties](../common/styles.md#element-properties)).
 
 > **Decision:** it is chosen on each heading. *Rejected alternative:* the table of contents choosing by level (`Levels`) the ones it
 > does not list, which does not work when the cover and the chapters are of the same level.

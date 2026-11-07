@@ -57,17 +57,30 @@ la lee). Se escribe en los mensajes tal cual (`line 8 of the styles` o, si hay v
 que se construye con ella lo dice también en `inStyles()` y en `stylesDocument()`.
 
 `BoxTreeBuilder` es el orquestador y no guarda estado: lo de cada llamada va en un `BuildContext`. `BoxTreeBuilder.element`
-es el orden común a todos los elementos (el sitio, la herencia, las reglas, las propiedades y sus comprobaciones, la caja y
-el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `CODE_BLOCK`, `IMAGE`, `BARCODE`,
+es el orden común a todos los elementos (el sitio, la herencia, las reglas, lo que declara su envoltorio, las propiedades y
+sus comprobaciones, la caja y el contenido) y lo propio de cada uno lo hace su familia, `ElementReader` (un enum: `TEXT`, `CODE_BLOCK`, `IMAGE`, `BARCODE`,
 `CELL`, `TABLE`, `GRID`, `STACK`, `LIST`, `COLUMNS`, `MARKDOWN`, `TABLE_OF_CONTENTS`, `FOOTNOTE`, `FIGURE` y `CONTAINER`, elegida
 con `ElementReader.of`): el layout de la
-caja, lo que le da su envoltorio, las propiedades de su tipo, lo que comprueba antes de crear la caja y su contenido. Un
+caja, lo que le da su envoltorio (la `Typography` de la `Row` de una celda antes de las reglas, como herencia, con
+`inherited`; las propiedades del `Item` o el `Area` después, para que ganen a las reglas, con `wrapper`), las propiedades de
+su tipo, lo que comprueba antes de crear la caja y su contenido. Un
 elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una familia nueva, sin tocar `element`. La familia
 `FIGURE` construye el elemento y el `Caption` de una `Figure`, los ordena según `Caption position`, la numera
 (`Figures`) y la deja sin partir. Cada familia reclama los hijos que son suyos (`ElementReader.property`): las propiedades
 de su tipo, que lee, y los que lee su contenido, como los grupos de filas y `Column align` de una `Table`, `Span` de una
 `Cell` o los marcadores y `Table columns` de un `Markdown`. El orquestador solo aparta los de cualquier elemento (`Item`,
 `Area`, `Content` y `Style`).
+
+Las propiedades de elemento de una regla ([Styles](../common/styles.md#propiedades-de-elemento)) se leen con el mismo código
+que las del elemento: `StyleRules` las da a la familia del elemento (`ElementReader.ruleProperty`, que lee las de su tipo y
+las sueltas con `PropertyReader.single`), y `Grow`, `Shrink` y `Base size`, a `PropertyReader.itemProperty`. Si el elemento
+no puede declarar una, es `STYLE_NOT_ALLOWED`: lo que puede declarar lo dice el schema (`DocumentSchema.allows`), así que
+no hay una segunda tabla de qué admite cada elemento, solo la lista cerrada de las que van en reglas
+(`StyleRules.ELEMENT_PROPERTIES`). Las que lee el contenido del elemento desde su nodo (`Column align`, los marcadores y
+`Table columns` de un `Markdown`) no se leen ahí: `StyleRules.apply` las devuelve, con su documento (`PropertyNode`), y
+`BuildContext.property` da la del elemento o, si no la declara, la de su regla. Lo que un `Markdown` genera a partir de una
+de un documento de estilos aparte (el `Marker` de una lista, las `Column sizes` de una tabla) lleva la línea de ese
+documento (`Translation.sources`, en `BuildContext.sources`).
 
 Dentro de qué cajas se construye cada contenido (un `Page overlay`, un encabezado, un `Columns`, un `Markdown`, una
 `Footnote` o una caja que no se parte) lo dice `BuildContext.Scope`, un `record` que solo cambia mientras se construye el
@@ -84,7 +97,7 @@ Las piezas:
 | `SectionReader` | Las propiedades de una `Section` (`Id`, `Page`, la numeración de páginas y de notas, `Inherit page overlays`, `Begin on`) y sus reglas; la caja, el área de notas y `SECTION_EMPTY` quedan en `BoxTreeBuilder.section` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
-| `StyleRules` | Las reglas de `Styles` de los dos orígenes y su prioridad |
+| `StyleRules` | Las reglas de `Styles` de los dos orígenes, su prioridad y sus propiedades de elemento |
 | `NamedColors` | Los colores con nombre (`Named color`) de los dos orígenes, leídos antes que las reglas y sustituidos por su color al leer cada propiedad (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `TableBorders` | Los bordes fusionados de una tabla con `Merge borders`: guarda el borde que declara cada celda (`Box.mergedBorder()`, con `model.Stroke`) y cambia su `Border` por el sitio que deja para las líneas |

@@ -36,6 +36,8 @@ Stack:
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
+Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
+
 > **Decisión:** los ejes se nombran por su dirección en la página, `Horizontal` y `Vertical`, como en `Grid`, y no por su
 > papel. Qué hace cada uno lo dice `Direction`: el del eje principal reparte el sobrante y el del cruzado alinea los ítems,
 > y un valor que no es de su papel es un error (`VALUE_NOT_ALLOWED`): `stretch` en el principal, y `justify`, `around` o
@@ -62,6 +64,11 @@ demás propiedades van en ese elemento. El `Item` solo añade cómo participa en
 | `Base size` | número, %, `auto` | `auto` | Tamaño de partida en el eje principal. |
 | `Horizontal`, `Vertical` | `start`, `end`, `center`, `stretch` | el del contenedor | La alineación del ítem en el eje cruzado, que sobrescribe la del contenedor: `Vertical` en un `Stack` horizontal, `Horizontal` en uno vertical. La del eje principal es un error (`ITEM_MAIN_AXIS`): ahí reparte el `Stack`, y el ítem crece o encoge con `Grow` y `Shrink`. |
 | `Layer` | entero | `auto` | Orden de apilamiento del ítem ([Capas y giro](../common/layers-and-rotation.md)). |
+
+`Grow`, `Shrink` y `Base size` también pueden venir de una regla de `Styles` del elemento que el `Item` envuelve, y lo
+que declara el `Item` gana a la regla ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)). La
+alineación del ítem (`Horizontal`, `Vertical`) y `Layer`, no: en una regla, `Horizontal` y `Vertical` son las del
+`Stack`.
 
 ## Algoritmo
 

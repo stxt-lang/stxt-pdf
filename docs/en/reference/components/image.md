@@ -52,7 +52,7 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 | `Side` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
 | `Clear` | boolean | `false` | Moves the image below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-They do not go in the rules of `Styles`, which only accept the groups.
+`Fit`, `Side` and `Clear` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `Pdf page` and `Rotate` cannot.
 
 ## File
 

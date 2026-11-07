@@ -31,10 +31,11 @@ List:
 | `Start` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
 | `Number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
 
-No van en las reglas de `Styles`, que solo admiten los grupos. La sangría de los ítems es el `Padding` izquierdo de la
-`List`.
+`Marker` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Start` y `Number`, no. Sin `Marker`, propio
+o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems es el `Padding` izquierdo de la `List`.
 
-> **Decisión:** un único elemento `List` con `Marker` obligatorio, que no se hereda: cada lista anidada declara el suyo.
+> **Decisión:** un único elemento `List` con `Marker` obligatorio, que no se hereda: cada lista anidada declara el suyo o
+> lo toma de una regla.
 > *Alternativa descartada:* dos elementos (con viñetas y numerada), o `Marker` en `Typography`.
 
 ## Marcadores

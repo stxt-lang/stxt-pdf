@@ -26,6 +26,8 @@ Grid:
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
 | `Split rows` | boolean | `true` | A row that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). |
 
+All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
+
 Valid tracks: number, %, `auto`, `narrowest`, `natural`, fraction, `between(a, b)` and `repeat(n, pattern)`.
 `fit` is not a track (`FIT_TRACK`), because `auto` already fits the content.
 

@@ -52,7 +52,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | `Side` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
-No van en las reglas de `Styles`, que solo admiten los grupos.
+`Fit`, `Side` y `Clear` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `Pdf page` y `Rotate`, no.
 
 ## Fichero
 

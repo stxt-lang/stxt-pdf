@@ -28,8 +28,8 @@ Columns:
 | `Separator color` | color | the text `Color` | Only with `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). It does not affect the layout. |
 | `Balance` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |
 
-`Count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`). They do not go in the `Styles` rules, which only
-accept the groups.
+`Count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`), their own or from a rule. All of them can come
+from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
 
 ## Columns
 

@@ -93,6 +93,10 @@ Lo que se repite en varios ejemplos y cómo se resuelve:
   `Column align` o `For column` las columnas numéricas. Lo que es de una sola fila, como los
   totales de la factura (ejemplos 01, 04 y 07), va en un estilo en la `Row` (`Style: total`), que
   aplica sus reglas a todas sus celdas.
+- **Lo que se repite de un elemento** también va en una regla: el `Gap` de los platos del menú (06) está en su
+  `For style: dish`, el `Fit: fill` de las fotos del catálogo (09) en `For element: Image`, el reparto de las filas de
+  sus fichas en `For style: spread`, la leyenda del horario (11) en `For style: legend` y las viñetas de las listas del
+  currículum (03) en `For element: List`.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) lleva `Link` y es
   clicable entero, también el teléfono. Con `Markup: markdown` se puede enlazar solo una parte

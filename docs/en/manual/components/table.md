@@ -67,7 +67,7 @@ Document (dev.stxt.pdf):
 
 - `Header rows` (optional), `Body` (required) and `Footer rows` (optional), in that order. Each one has one or more `Row`
   elements, and each row, its `Cell` elements from left to right.
-- **`Column sizes`** (required) are the columns, with the same measurements as a `Grid`: points, millimeters,
+- **`Column sizes`** (required, in the table or in a rule of `Styles` ([Styles](../common/styles.md#element-properties))) are the columns, with the same measurements as a `Grid`: points, millimeters,
   percentages, `auto` (what its content asks for) and fractions (`*`: a share of what is left over) ([Grid](grid.md)).
   What is left over in a table without fractions is shared among the `auto` columns by how much their content measures:
   with `auto auto`, the column of the long texts takes more than the one of the labels. A fixed width

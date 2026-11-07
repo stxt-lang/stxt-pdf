@@ -72,6 +72,8 @@ public enum ErrorCode {
     LIST_IMAGE_NOT_ALLOWED,
     /** An item of a list with {@code Marker: image} that has no {@code Marker image}, its own or the list's. */
     LIST_IMAGE_MISSING,
+    /** A {@code List} without {@code Marker}, its own or from a rule of {@code Styles}. */
+    LIST_MARKER_MISSING,
 
     // --- Tables -----------------------------------------------------------------------------------
     /** {@code Header rows}, {@code Body} and {@code Footer rows} out of that order. */
@@ -84,6 +86,8 @@ public enum ErrorCode {
     CELL_CONTENT,
     /** {@code Break} in a row of {@code Header rows} or {@code Footer rows}, which are repeated on each page. */
     TABLE_ROW_BREAK,
+    /** A {@code Table} without {@code Column sizes}, its own or from a rule of {@code Styles}. */
+    TABLE_COLUMN_SIZES_MISSING,
     /** A {@code Column align} with a number of alignments different from the number of columns of the table. */
     TABLE_COLUMN_ALIGN,
     /** {@code Row header} in a cell of {@code Header rows}, whose cells are already column headers. */

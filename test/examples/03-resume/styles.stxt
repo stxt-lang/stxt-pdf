@@ -34,6 +34,7 @@ Styles (dev.stxt.pdf):
 		Typography:
 			Markup: markdown
 	For element: List
+		Marker: bullet
 		Box:
 			Padding: 0 0 0 11
 	For style: side

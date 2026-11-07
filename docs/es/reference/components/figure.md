@@ -38,6 +38,9 @@ Paragraph: Los cables se conectan como muestra la figura {number of: wiring}.
 | `Alt` | texto no vacío | sin valor; obligatorio con un `Block` | El texto alternativo de la figura entera, solo con un `Block` dentro: con una imagen, el `Alt` va en la imagen ([accesibilidad](#accesibilidad)). |
 | `In table of contents` | `true`, `false` | `true` | Si la figura tiene entrada en los índices de figuras o de tablas. Con `false` sigue numerada. |
 
+`Caption position`, `Figure counter` e `In table of contents` también pueden venir de una regla de `Styles`
+([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, no.
+
 `Numbered`, `Number format` y `Number label` son de `Typography` y valen también para las figuras ([numeración](#numeración)).
 
 ## El pie (`Caption`)

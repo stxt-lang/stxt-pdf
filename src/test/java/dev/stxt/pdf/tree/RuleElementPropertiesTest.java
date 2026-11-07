@@ -232,6 +232,24 @@ class RuleElementPropertiesTest {
     }
 
     @Test
+    void theMarkerOfAListAndTheColumnSizesOfATableCanComeOnlyFromARule() {
+        Box root = root(
+                "For element: List", "\tMarker: dash",
+                "For style: two", "\tColumn sizes: * 80",
+                "---",
+                "List:", "\tList item:", "\t\tParagraph: Uno",
+                "Table:", "\tStyle: two", "\tBody:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b");
+        assertEquals(Marker.DASH, root.children().get(0).style().list().marker());
+        assertEquals(List.of(new Value.Fraction(1), pt(80)), root.children().get(1).style().grid().columnSizes());
+        // Without them, the engine says so: the schema no longer requires them.
+        assertEquals(ErrorCode.LIST_MARKER_MISSING, error("---", "List:", "\tList item:", "\t\tParagraph: Uno")
+                .errorCode());
+        InvalidModelException table = error("---", "Table:", "\tBody:", "\t\tRow:", "\t\t\tCell: a");
+        assertEquals(ErrorCode.TABLE_COLUMN_SIZES_MISSING, table.errorCode());
+        assertEquals(13, table.line());
+    }
+
+    @Test
     void aMarkerImageComesFromTheRuleOfAnItem() {
         Box list = root(
                 "For style: yes", "\tMarker image: test/check.svg", "\t\tAlt: Sí",

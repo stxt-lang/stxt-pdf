@@ -62,7 +62,8 @@ dark brown modules inside a frame.)
 | `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
 | `Clear` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-They do not go in the rules of `Styles`, which only accept the groups.
+`Format`, `Error correction`, `Quiet zone`, `Side` and `Clear` can also come from a rule of `Styles`
+([Element properties](../common/styles.md#element-properties)); the data, `Alt` and `Rotate` cannot.
 
 ## Formats
 

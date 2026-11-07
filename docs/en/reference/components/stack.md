@@ -36,6 +36,8 @@ Stack:
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
+All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
+
 > **Decision:** the axes are named by their direction on the page, `Horizontal` and `Vertical`, as in `Grid`, and not by their
 > role. What each one does is set by `Direction`: the one on the main axis distributes the leftover space and the one on the cross axis aligns the items,
 > and a value that does not belong to its role is an error (`VALUE_NOT_ALLOWED`): `stretch` on the main axis, and `justify`, `around` or
@@ -62,6 +64,10 @@ other properties go on that element. The `Item` only adds how it takes part in t
 | `Base size` | number, %, `auto` | `auto` | Starting size on the main axis. |
 | `Horizontal`, `Vertical` | `start`, `end`, `center`, `stretch` | that of the container | The alignment of the item on the cross axis, which overrides that of the container: `Vertical` in a horizontal `Stack`, `Horizontal` in a vertical one. The one on the main axis is an error (`ITEM_MAIN_AXIS`): there the `Stack` distributes, and the item grows or shrinks with `Grow` and `Shrink`. |
 | `Layer` | integer | `auto` | Stacking order of the item ([Layers and rotation](../common/layers-and-rotation.md)). |
+
+`Grow`, `Shrink` and `Base size` can also come from a rule of `Styles` of the element the `Item` wraps, and what the
+`Item` declares wins over the rule ([Element properties](../common/styles.md#element-properties)). The alignment of the
+item (`Horizontal`, `Vertical`) and `Layer` cannot: in a rule, `Horizontal` and `Vertical` are those of the `Stack`.
 
 ## Algorithm
 

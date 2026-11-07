@@ -18,8 +18,9 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
 | `For column` | una columna (`3`) o un rango de columnas (`2 4`, ambas incluidas) | las celdas de una `Table` que **empiezan** en esas columnas |
 
-Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada. No admite las propiedades propias de un
-elemento (`Gap`, `Column sizes`, `Offset`, `Marker`, `Link` o `Rotate`).
+Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada, y las
+[propiedades de elemento](#propiedades-de-elemento) que dicen cómo se ve un elemento o cómo reparte su contenido (`Gap`,
+`Column sizes`, `Fit`, `Marker`...), como mucho una de cada.
 
 ```
 Styles:
@@ -42,8 +43,92 @@ Text: Una nota al margen.
     Style: note
 ```
 
-> **Decisión:** las reglas solo admiten los grupos: las propiedades propias de un elemento no se podrían validar al
-> escribir el documento, porque el tipo de elemento va en el valor de `For element`.
+## Propiedades de elemento
+
+Una regla da también propiedades propias de un elemento, como si el elemento las declarara:
+
+```
+Styles:
+    For style: dish
+        Gap: 12
+    For element: Image
+        Fit: fill
+Stack:
+    Style: dish
+    Item:
+        Grow: 1
+        Text: Croquetas de gamba roja
+    Item:
+        Text: 9,50 €
+Image: fotos/sala.jpg
+```
+
+Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento de ese tipo:
+
+| Elemento | Propiedades en una regla |
+|---|---|
+| `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
+| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
+| `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
+| `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
+| `List` | `Marker`, `Marker image` |
+| `List item` | `Marker image` |
+| `Image` | `Fit`, `Side`, `Clear` |
+| `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
+| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
+| `Heading 1` a `Heading 6` | `In table of contents`, `Clear` |
+| `Paragraph` | `Drop cap`, `Clear` |
+| `Text` | `Clear` |
+| `Block` | `Isolate margins`, `Side`, `Clear` |
+| `Frame` | `Isolate margins` |
+| `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
+| `Table of contents` | `Levels`, `Leader` |
+| el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |
+
+- **Se aplican como los grupos**: con la misma [prioridad](#prioridad), propiedad a propiedad, y sin herencia. Lo que
+  declara el elemento gana a todas sus reglas.
+- **Solo lo que el elemento puede declarar.** Una regla que da a un elemento una propiedad que no tiene (un `Gap` a un
+  `Text`) es `STYLE_NOT_ALLOWED`, con la línea de la propiedad en la regla. En `For element` el error sale al leer la
+  regla, aunque no se aplique a ningún elemento; en `For style` y `For id`, al aplicarla, porque el mismo nombre puede
+  ir en elementos de tipos distintos. Las reglas de posición de una celda, `For column`, `For element: Document` y los
+  elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnotes`) no admiten ninguna, y una regla que llega a una
+  `Section` tampoco.
+- **El valor se comprueba al leer la regla.** En `For style` y `For id` tiene que valer en alguno de los elementos que
+  tienen la propiedad: `Gap: 1 2 3` es `VALUE_NOT_ALLOWED` en cualquier caso, y `Horizontal: justify`, que vale en un
+  `Stack`, es un error al aplicarlo a un `Grid`. Lo que depende del elemento se comprueba al aplicarla: el
+  `Column align` de una regla tiene una alineación por columna de cada tabla a la que llega (`TABLE_COLUMN_ALIGN`).
+- **`Horizontal` y `Vertical`** son las del `Stack` o el `Grid`, nunca las del `Item` o el `Area` que envuelve el
+  elemento: la alineación de un ítem se escribe en su `Item` o su `Area`.
+- **`Grow`, `Shrink` y `Base size`** son del `Item` ([Stack](../components/stack.md#item)), que no es una caja: los da la
+  regla del elemento que el `Item` envuelve, y lo que declara el `Item` gana a la regla. A un elemento que no está en un
+  `Item` (también al de un `Area`) son `STYLE_NOT_ALLOWED`.
+- **`Marker` y `Column sizes`** son obligatorios en una `List` y en una `Table`, y pueden venir de una regla. Sin ninguno
+  de los dos, el error es `LIST_MARKER_MISSING` o `TABLE_COLUMN_SIZES_MISSING`, con la línea del elemento.
+- **No van en una regla** las propiedades de identidad, de contenido, de estructura y de posición: `Id`, `Style`,
+  `Link`, `Alt`, `Span`, `Row header`, `Start`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` y
+  `Rotate origin`, las de `Section` y `Page`, y el valor o el `Content` de un elemento. El schema no las admite.
+
+> **Decisión:** las reglas admiten las propiedades de elemento de aspecto y de reparto, y el motor comprueba que el
+> elemento las puede declarar, porque el schema no puede: el tipo va en el valor de `For element`, y en `For style` y
+> `For id` no se conoce hasta aplicar la regla. *Alternativa descartada:* que las reglas solo admitieran los grupos, que
+> obligaba a repetir en cada elemento el mismo `Gap` o el mismo `Fit`.
+
+> **Decisión:** una propiedad que el elemento no puede declarar es un error, también en `For style`. *Alternativa
+> descartada:* ignorarla, que permitiría usar el mismo estilo en elementos de tipos distintos a costa de no avisar de una
+> errata.
+
+> **Decisión:** `Grow`, `Shrink` y `Base size` llegan por la regla del elemento que envuelve el `Item`, y en una regla
+> `Horizontal` y `Vertical` son las del `Stack` o el `Grid`. *Alternativa descartada:* admitir `Style` en `Item` y
+> `Area`, que no son cajas, y que haría ambiguas `Horizontal` y `Vertical` en un `Stack` que es a la vez ítem de otro.
+
+> **Decisión:** quedan fuera la identidad, el contenido, la estructura y la posición, como la decisión de `Offset` y
+> `Rotate` ([Capas y giro](layers-and-rotation.md)). `Row header`, también: un `For column` llega a las celdas de
+> `Header rows`, donde es un error (`ROW_HEADER_IN_HEADER_ROWS`). *Alternativa descartada:* todas las del elemento salvo
+> `Id` y `Style`.
+
+> **Decisión:** `Marker` en `List` y `Column sizes` en `Table` dejan de ser obligatorios en el schema y los exige el
+> motor, para que puedan venir de una regla. *Alternativa descartada:* seguir obligatorios en el elemento, con lo que la
+> regla nunca tendría efecto.
 
 ## Colores con nombre
 
@@ -112,6 +197,8 @@ Cada propiedad toma, de más a menos fuerte:
 10. el valor por defecto.
 
 Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table` ([Table](../components/table.md#estilo-de-las-celdas)).
+Las [propiedades de elemento](#propiedades-de-elemento) siguen el mismo orden, sin el punto 9: no se heredan. Para
+`Grow`, `Shrink` y `Base size`, lo que declara el `Item` es el punto 1.
 
 Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare
 `Size: 20`. Las reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento
@@ -138,9 +225,14 @@ Son errores:
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
   una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
+- una propiedad de elemento que el elemento no puede declarar: en `For element`, al leer la regla; en `For style` y
+  `For id`, al aplicarla; también `Grow`, `Shrink` o `Base size` a un elemento que no está en un `Item`
+  (`STYLE_NOT_ALLOWED`);
+- una propiedad de elemento con un valor que no vale en ningún elemento que la tenga (`VALUE_SYNTAX`,
+  `VALUE_NOT_ALLOWED`);
 - un nombre de `Style` o de un tramo con estilo sin su regla `For style` (`STYLE_WITHOUT_RULE`);
-- la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size` o un `Box`
-  (`STYLE_NOT_ALLOWED_IN_RUN`);
+- la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size`, un `Box` o una propiedad de
+  elemento (`STYLE_NOT_ALLOWED_IN_RUN`);
 - dos `Named color` con el mismo nombre en el mismo origen (`COLOR_DUPLICATE`);
 - un color con forma de nombre que ningún `Named color` declara (`COLOR_UNKNOWN`);
 - un `Named color` sin nombre y color separados por un espacio, con un nombre mal escrito o con un color que no es
@@ -270,4 +362,6 @@ declara el primero.
 
 - Selectores compuestos (un elemento dentro de otro, varios estilos a la vez), combinadores ni prioridades declaradas por el
   autor.
+- Propiedades de identidad, de contenido, de estructura o de posición en una regla
+  ([Propiedades de elemento](#propiedades-de-elemento)).
 - Estilo de una fila de tabla con `Box` o de una columna entera: se da a las celdas ([Table](../components/table.md#lo-que-no-hay)).

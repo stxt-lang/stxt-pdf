@@ -62,7 +62,8 @@ marrón oscuro dentro de un marco.)
 | `Side` | `left`, `right` | sin valor | Lo hace una caja lateral, como una `Image`: el texto que lo sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | Lo baja por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
-No van en las reglas de `Styles`, que solo admiten los grupos.
+`Format`, `Error correction`, `Quiet zone`, `Side` y `Clear` también pueden venir de una regla de `Styles`
+([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); los datos, `Alt` y `Rotate`, no.
 
 ## Formatos
 

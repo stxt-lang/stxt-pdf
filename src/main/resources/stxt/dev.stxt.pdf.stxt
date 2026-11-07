@@ -374,7 +374,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Min: 1
 	Node: List
 		Type: GROUP
-		Description: List: its items (List item) stacked vertically, each with a marker hung in the indent (the left Padding of the list).
+		Description: List: its items (List item) stacked vertically, each with a marker hung in the indent (the left Padding of the list). Its Marker, its own or from a rule of Styles, is required.
 		Children:
 			Child: Id
 				Max: 1
@@ -389,7 +389,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Marker
-				Min: 1
 				Max: 1
 			Child: Marker image
 				Max: 1
@@ -744,7 +743,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table
 		Type: GROUP
-		Description: Table: its rows (Row) in Header rows, Body and Footer rows, in that order, over the columns of Column sizes. When it breaks, Header rows and Footer rows are repeated on each page.
+		Description: Table: its rows (Row) in Header rows, Body and Footer rows, in that order, over the columns of Column sizes, its own or from a rule of Styles, which is required. When it breaks, Header rows and Footer rows are repeated on each page.
 		Children:
 			Child: Id
 				Max: 1
@@ -759,7 +758,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Column sizes
-				Min: 1
 				Max: 1
 			Child: Column align
 				Max: 1

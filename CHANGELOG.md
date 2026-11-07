@@ -5,6 +5,41 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Added
+
+- **Element properties in the rules of `Styles`.** Besides `Box`, `Typography` and `Break`, `For element`, `For style`
+  and `For id` give the properties of an element that say how it looks or how it distributes its content: those of
+  `Stack`, `Grid`, `Table` (also `Column align`) and `Columns`, `Marker` and `Marker image`, `Fit`, the ones of
+  `Barcode`, `Drop cap`, `Side`, `Clear`, `Isolate margins`, `Caption position`, `Figure counter`,
+  `In table of contents`, `Levels`, `Leader` and the markers and `Table columns` of a `Markdown`; and, to the element an
+  `Item` wraps, `Grow`, `Shrink` and `Base size`. They apply with the priority of the groups and are not inherited:
+  what the element declares wins, and what its `Item` declares wins over a `Grow` from a rule. In a rule, `Horizontal`
+  and `Vertical` are those of the `Stack` or the `Grid`. Identity, content, structure and position stay out (`Id`,
+  `Link`, `Alt`, `Span`, `Row header`, `Start`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate`).
+  "Element properties" in the reference of `Styles`.
+- `STYLE_NOT_ALLOWED` also for an element property that the element cannot declare (a `Gap` to a `Text`), when a
+  `For element` rule is read and when a `For style` or `For id` rule is applied, and for `Grow`, `Shrink` or
+  `Base size` to an element that is not in an `Item`. The value of an element property is checked when the rule is
+  read, against the elements that have it. `STYLE_NOT_ALLOWED_IN_RUN` for an element property in the rule of a styled
+  run.
+- `LIST_MARKER_MISSING` and `TABLE_COLUMN_SIZES_MISSING`: a `List` without `Marker`, or a `Table` without
+  `Column sizes`, its own or from a rule.
+
+### Changed
+
+- **`Marker` in `List` and `Column sizes` in `Table` are no longer required by the schema**, so that they can come
+  from a rule; the engine requires them. A list or a table without them was `TOO_FEW_CHILDREN`, from `stxt-core`, and
+  is now `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
+- `MARKDOWN_PROPERTY_MISSING` says that the property can also come from a rule of `Styles`.
+
+### Examples
+
+- The menu (06), the CV (03), the catalog (09) and the timetable (11) take from their `styles.stxt` what they repeated:
+  the `Gap` of the dishes, the `Marker` of the lists, the `Fit` of the photos and the alignment of the rows of the
+  product cards, and the `Gap` and `Vertical` of the legend. Their PDFs are byte for byte the same.
+
 ## [0.12.0] - 2026-11-06
 
 Resources put together from several places, with images given to a single conversion; several styles documents in one
