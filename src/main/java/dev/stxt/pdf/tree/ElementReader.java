@@ -13,6 +13,7 @@ import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -168,8 +169,11 @@ enum ElementReader {
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            // The Row is an ancestor of its cells, with its Style and its Id, for the nested rules.
-            table(ctx, n, box, (cell, row, at) -> ctx.inside(StyleRules.ancestor(row, Element.ROW),
+            // The Row is an ancestor of its cells, with its Style and its Id, for the nested rules: read once per row,
+            // not once per cell (reading it goes through the cells of the row).
+            Map<InlineNode, Ancestor> rows = new IdentityHashMap<>();
+            table(ctx, n, box, (cell, row, at) -> ctx.inside(
+                    rows.computeIfAbsent(row, r -> StyleRules.ancestor(r, Element.ROW)),
                     () -> builder.element(ctx, cell, box, row, at)));
         }
     },

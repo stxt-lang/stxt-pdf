@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -168,10 +169,18 @@ final class StyleRules {
      */
     private static final Set<String> ITEM_PROPERTIES = Set.of("grow", "shrink", "base-size");
 
-    /** The types of element that can declare each of {@link #ELEMENT_PROPERTIES}, in the order of {@link Element}. */
-    private static final Map<String, List<Element>> DECLARED_BY = ELEMENT_PROPERTIES.stream()
-            .collect(Collectors.toMap(p -> p, p -> Arrays.stream(Element.values())
-                    .filter(k -> k.label() != null && declares(k.label(), p)).toList()));
+    /**
+     * The children the schema allows in each type of element, by its name in the schema ({@code Stack}), read from the
+     * schema once per type: {@link #declares} looks them up for every element property a rule gives an element.
+     */
+    private static final Map<String, Set<String>> CHILDREN = new ConcurrentHashMap<>();
+
+    /**
+     * The types of element that can declare each of {@link #ELEMENT_PROPERTIES}, in the order of {@link Element},
+     * found when a {@code For style} or a {@code For id} first gives that property ({@link #declaredBy}): not at the
+     * start, so that loading this class costs nothing to a document without them.
+     */
+    private static final Map<String, List<Element>> DECLARED_BY = new ConcurrentHashMap<>();
 
     /**
      * Reads the rules of {@code Styles} of the document and of the separate styles documents ({@code styles}, each
@@ -406,7 +415,7 @@ final class StyleRules {
                         : ", which a " + type + " does not have")), source);
             }
             List<Element> kinds = type != null ? List.of(Element.of(canonical(type)).orElseThrow())
-                    : DECLARED_BY.get(name);
+                    : declaredBy(name);
             InvalidModelException first = null;
             for (Element kind : kinds) {
                 try {
@@ -456,8 +465,19 @@ final class StyleRules {
         if (!ELEMENT_PROPERTIES.contains(name)) {
             return false;
         }
-        return ITEM_PROPERTIES.contains(name) ? DocumentSchema.allows("Item", canonical(type))
-                : DocumentSchema.allows(type, name);
+        return ITEM_PROPERTIES.contains(name) ? children("Item").contains(canonical(type))
+                : children(type).contains(name);
+    }
+
+    /** The types of element that can declare the element property {@code name} ({@link #DECLARED_BY}). */
+    private static List<Element> declaredBy(String name) {
+        return DECLARED_BY.computeIfAbsent(name, p -> Arrays.stream(Element.values())
+                .filter(k -> k.label() != null && declares(k.label(), p)).toList());
+    }
+
+    /** The children the schema allows in the type {@code type} ({@link #CHILDREN}). */
+    private static Set<String> children(String type) {
+        return CHILDREN.computeIfAbsent(type, DocumentSchema::children);
     }
 
     /** The canonical name of the name of an element in the schema: {@code Heading 1} is {@code heading-1}. */

@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The schema of the box model ({@code src/main/resources/stxt/dev.stxt.pdf.stxt},
@@ -44,14 +46,14 @@ public final class DocumentSchema {
     }
 
     /**
-     * Whether the node {@code node} of the schema (its name, {@code Stack}) allows the child {@code child} (its
-     * canonical name, {@code gap}): what a rule of {@code Styles} can give an element is what the element can declare
-     * (reference/common/styles.md). {@code false} if the schema has no node with that name.
+     * The children the node {@code node} of the schema (its name, {@code Stack}) allows, by canonical name
+     * ({@code gap}): what a rule of {@code Styles} can give an element is what the element can declare
+     * (reference/common/styles.md). Empty if the schema has no node with that name.
      */
-    static boolean allows(String node, String child) {
+    static Set<String> children(String node) {
         NodeDefinition definition = PROVIDER.getSchema(NAMESPACE).getNodeDefinition(node);
-        return definition != null && definition.getChildren().values().stream()
-                .anyMatch(c -> c.getCanonicalName().equals(child));
+        return definition == null ? Set.of() : definition.getChildren().values().stream()
+                .map(c -> c.getCanonicalName()).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
