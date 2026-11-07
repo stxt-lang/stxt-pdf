@@ -1,0 +1,20 @@
+# Case: The rule of a styled run declares Clear, an element property, and a run is part of a line
+# Code: STYLE_NOT_ALLOWED_IN_RUN
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: tag
+			Clear: true
+	Section:
+		Text: Una [etiqueta]{tag} en la frase
+			Typography:
+				Markup: markdown

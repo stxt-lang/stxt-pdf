@@ -27,6 +27,7 @@ import static dev.stxt.pdf.tree.ValueReader.angle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -53,8 +54,9 @@ import dev.stxt.pdf.model.Value;
  *
  * <p>Priority of each property, from lowest to highest: the default value, the inherited value, the
  * {@code For element} rule of the type, the {@code For style} rules of its classes, the {@code For id} rule
- * and what the element itself declares. What a rule contributes is validated as if the element declared
- * it, and its errors point to the line of the rule.</p>
+ * and what the element itself declares (for {@code Grow}, {@code Shrink} and {@code Base size}, what its
+ * {@code Item} declares). What a rule contributes, its groups and its element properties, is validated as if
+ * the element declared it, and its errors point to the line of the rule.</p>
  *
  * <p>Errors point to the line of the offending node: that of the property, not that of its box.
  * Combinations that would have no effect or contradict each other are errors too: the model rejects
@@ -266,8 +268,8 @@ public final class BoxTreeBuilder {
     /**
      * A box element; {@code wrapper} is its {@code Item} or its {@code Area}, if it is an item, or
      * the {@code Row} of a {@code Cell}, and {@code position} is then the place of the cell in its table.
-     * The order is the same for all: the place, inheritance, the rules, the properties and their
-     * checks, the box and the content; what is specific to each element is done by its {@link ElementReader}.
+     * The order is the same for all: the place, inheritance, the rules, what its wrapper declares, the properties and
+     * their checks, the box and the content; what is specific to each element is done by its {@link ElementReader}.
      */
     Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
         ctx.cancellation.check();
@@ -277,8 +279,12 @@ public final class BoxTreeBuilder {
         Style s = Style.inheriting(parent.style());
         s.setLayout(reader.layout(n, kind));
         s.setPosition(kind.position());
+        reader.inherited(wrapper, s);
+        Map<String, PropertyNode> fromRules = ctx.rules.apply(n, kind, s, parent, wrapper, position);
+        if (!fromRules.isEmpty()) {
+            ctx.ruleProperties.put(n, fromRules);
+        }
         reader.wrapper(wrapper, s, parent);
-        ctx.rules.apply(n, kind, s, parent, position);
         String id = properties(ctx, n, reader, s, parent);
         reader.check(n, wrapper, s, position);
         validateRotation(s);
@@ -387,7 +393,22 @@ public final class BoxTreeBuilder {
         Value[] rotateOrigin = {Rotation.CENTER, Rotation.CENTER};
         for (Node p : n.getChildren()) {
             String name = p.getCanonicalName();
-            if (isElement(p) || NOT_PROPERTIES.contains(name) || reader.property(p, s)) {
+            if (isElement(p) || NOT_PROPERTIES.contains(name)) {
+                continue;
+            }
+            // What a Markdown generates from a property of a rule of a separate styles document (the Marker of a
+            // list, from Bullet markers) has the line of that document.
+            SourceLine source = ctx.sources.get(p);
+            if (source != null) {
+                s.readingStyles(source);
+                try {
+                    reader.ruleProperty(p, s);
+                } finally {
+                    s.readingStyles(null);
+                }
+                continue;
+            }
+            if (reader.property(p, s)) {
                 continue;
             }
             switch (name) {

@@ -160,8 +160,7 @@ Document (dev.stxt.pdf):
 				Border color: #CAD3CD
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot math
@@ -172,8 +171,7 @@ Document (dev.stxt.pdf):
 						Text: Matemáticas
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot lang
@@ -184,8 +182,7 @@ Document (dev.stxt.pdf):
 						Text: Lengua
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot eng
@@ -196,8 +193,7 @@ Document (dev.stxt.pdf):
 						Text: Inglés
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot sci
@@ -208,8 +204,7 @@ Document (dev.stxt.pdf):
 						Text: Ciencias
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot music
@@ -220,8 +215,7 @@ Document (dev.stxt.pdf):
 						Text: Música
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot art
@@ -232,8 +226,7 @@ Document (dev.stxt.pdf):
 						Text: Plástica
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot pe
@@ -244,8 +237,7 @@ Document (dev.stxt.pdf):
 						Text: Educación física
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot lab
@@ -256,8 +248,7 @@ Document (dev.stxt.pdf):
 						Text: Taller
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot tutor
@@ -268,8 +259,7 @@ Document (dev.stxt.pdf):
 						Text: Tutoría
 			Item:
 				Stack:
-					Gap: 5
-					Vertical: center
+					Style: legend
 					Item:
 						Block:
 							Style: slot proj

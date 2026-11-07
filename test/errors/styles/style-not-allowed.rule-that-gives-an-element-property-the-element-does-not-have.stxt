@@ -1,0 +1,23 @@
+# Case: A For style rule gives Gap, of a Stack, to a Text
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: dish
+			Gap: 12
+	Section:
+		Stack:
+			Style: dish
+			Item:
+				Text: Croquetas
+		Text: Precios con IVA
+			Style: dish

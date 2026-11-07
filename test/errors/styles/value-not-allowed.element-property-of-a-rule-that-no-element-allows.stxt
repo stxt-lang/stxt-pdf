@@ -1,0 +1,18 @@
+# Case: A For style rule with Gap: 1 2 3, which no element allows, even if no element uses it
+# Code: VALUE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: wide
+			Gap: 1 2 3
+	Section:
+		Block:

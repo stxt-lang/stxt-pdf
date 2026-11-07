@@ -283,7 +283,9 @@ class SchemaCoverageTest {
             assertNotNull(template, () -> "SchemaCoverageTest needs a template for " + pair.parent());
             String sample = SAMPLES.get(pair.child());
             assertNotNull(sample, () -> "SchemaCoverageTest needs a sample value for " + pair.child());
-            String document = document(template, pair.child(), sample);
+            String document = RULES.contains(pair.parent()) && !GROUPS.contains(pair.child())
+                    ? ruleDocument(pair.parent(), pair.child(), sample)
+                    : document(template, pair.child(), sample);
             assertDoesNotThrow(() -> new BoxTreeBuilder().build(reader.read(Docs.sectioned(document))),
                     () -> pair.parent() + " > " + pair.child() + " in:\n" + document);
         }));
@@ -301,6 +303,52 @@ class SchemaCoverageTest {
                 .filter(kid -> GROUPS.contains(kid) || children.getOrDefault(kid, List.of()).isEmpty())
                 .forEach(kid -> pairs.add(new Pair(parent, kid))));
         return pairs;
+    }
+
+    /** The rules that give element properties besides the groups (reference/common/styles.md). */
+    private static final Set<String> RULES = Set.of("For element", "For style", "For id");
+
+    /** The element properties of a rule that are of the {@code Item} that wraps the element. */
+    private static final Set<String> ITEM_PROPERTIES = Set.of("Grow", "Shrink", "Base size");
+
+    /**
+     * A document with the element property {@code child} in a rule {@code rule} that applies to the first element of
+     * {@link #TEMPLATES} that can declare it: the rule goes in the {@code Styles} of the header and, on the line
+     * {@code {}}, the element says which rule applies to it ({@code Style: d}, {@code Id: r}, nothing for
+     * {@code For element}). {@code Grow}, {@code Shrink} and {@code Base size} go to the {@code Block} of an
+     * {@code Item}.
+     */
+    private static String ruleDocument(String rule, String child, String sample) {
+        Map<String, List<String>> children = SchemaNodes.children();
+        String element = "Block";
+        String body = "\tStack:\n\t\tItem:\n\t\t\tBlock:\n\t\t\t\t{}";
+        if (!ITEM_PROPERTIES.contains(child)) {
+            element = TEMPLATES.keySet().stream()
+                    .filter(e -> !e.contains(" > ") && !e.equals("Item") && !e.equals("Area"))
+                    .filter(e -> children.getOrDefault(e, List.of()).contains(child))
+                    .findFirst().orElseThrow(() -> new AssertionError("No element template declares " + child));
+            body = TEMPLATES.getOrDefault(element + " > " + child, TEMPLATES.get(element)).document()
+                    .substring(HEADER.length());
+        }
+        String mark = switch (rule) {
+            case "For element" -> null;
+            case "For style" -> "Style: d";
+            default -> "Id: r";
+        };
+        StringBuilder document = new StringBuilder(HEADER).append("\t\t").append(rule).append(": ")
+                .append(mark == null ? element : mark.substring(mark.indexOf(' ') + 1)).append('\n');
+        for (String s : sample.split("\n")) {
+            document.append("\t\t\t").append(s).append('\n');
+        }
+        for (String line : body.split("\n")) {
+            int marker = line.indexOf("{}");
+            if (marker < 0) {
+                document.append(line).append('\n');
+            } else if (mark != null) {
+                document.append(line, 0, marker).append(mark).append('\n');
+            }
+        }
+        return document.toString();
     }
 
     /** The template with the property on the line {@code {}}, with its indent; without it if it already declares it. */

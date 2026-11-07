@@ -64,8 +64,9 @@ final class TableBuilder {
      */
     static void table(BuildContext ctx, InlineNode n, Box table, Cells cells) {
         int count = table.style().grid().columnSizes().size();
-        Columns columns = new Columns(count, columnAlign(n, count),
-                child(n, "column-align").map(Node::getLine).orElse(0));
+        Optional<PropertyNode> align = ctx.property(n, "column-align");
+        Columns columns = new Columns(count, align.map(a -> columnAlign(a, count)).orElse(List.of()),
+                align.map(PropertyNode::line).orElse(null));
         int last = -1;
         int firstRow = 0;
         for (Node g : n.getChildren()) {
@@ -94,9 +95,9 @@ final class TableBuilder {
 
     /**
      * The columns of the table: how many there are ({@code Column sizes}) and their {@code Column align}, with its line
-     * (0 without one).
+     * ({@code null} without one).
      */
-    private record Columns(int count, List<TextAlign> aligns, int alignLine) {
+    private record Columns(int count, List<TextAlign> aligns, SourceLine alignLine) {
     }
 
     /**
@@ -214,27 +215,36 @@ final class TableBuilder {
     }
 
     /**
-     * The {@code Column align} of a {@code Table}: one alignment per column, in the order of {@code Column sizes}.
-     * Empty if it does not declare it.
+     * The {@code Column align} of a {@code Table}, its own or that of a rule of {@code Styles}: one alignment per
+     * column, in the order of {@code Column sizes}.
      */
-    private static List<TextAlign> columnAlign(InlineNode table, int columns) {
-        Optional<Node> node = child(table, "column-align");
-        if (node.isEmpty()) {
-            return List.of();
+    private static List<TextAlign> columnAlign(PropertyNode property, int columns) {
+        Node node = property.node();
+        try {
+            List<TextAlign> aligns = alignments(node);
+            if (aligns.size() != columns) {
+                throw error(node, ErrorCode.TABLE_COLUMN_ALIGN, "Column align gives " + aligns.size()
+                        + " alignments and the table has " + columns + " columns (Columns): one goes per column");
+            }
+            return aligns;
+        } catch (InvalidModelException e) {
+            throw property.located(e);
         }
-        String[] t = node.get().getText().trim().split("\\s+");
+    }
+
+    /**
+     * The alignments of a {@code Column align}, whatever the table: also those of a rule, which are checked when it is
+     * read (reference/common/styles.md).
+     */
+    static List<TextAlign> alignments(Node node) {
         List<TextAlign> aligns = new ArrayList<>();
-        for (String word : t) {
+        for (String word : node.getText().trim().split("\\s+")) {
             try {
                 aligns.add(TextAlign.valueOf(word.toUpperCase(Locale.ROOT)));
             } catch (IllegalArgumentException ex) {
-                throw error(node.get(), ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in Column align: " + word
+                throw error(node, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in Column align: " + word
                         + " (left, center, right or justify)");
             }
-        }
-        if (aligns.size() != columns) {
-            throw error(node.get(), ErrorCode.TABLE_COLUMN_ALIGN, "Column align gives " + aligns.size()
-                    + " alignments and the table has " + columns + " columns (Columns): one goes per column");
         }
         return aligns;
     }

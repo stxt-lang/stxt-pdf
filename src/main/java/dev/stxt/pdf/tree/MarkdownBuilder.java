@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,32 +116,47 @@ final class MarkdownBuilder {
 
     /**
      * The generated elements, in order, and the runs of the formatted texts, by node ({@code Text}, {@code Paragraph}
-     * or {@code Cell}).
+     * or {@code Cell}). {@code sources} are the generated property nodes whose line is in a separate styles document:
+     * they come from a property of one of its rules ({@code Bullet markers}, {@code Table columns}).
      */
-    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks) {
+    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks,
+                       Map<Node, SourceLine> sources) {
     }
 
     private MarkdownBuilder() {
     }
 
     static Translation translate(InlineNode markdown) {
-        return translate(markdown, new Footnotes());
+        return translate(markdown, new Footnotes(), name -> child(markdown, name).map(p -> new PropertyNode(p, null)));
     }
 
-    /** Like {@link #translate(InlineNode)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}. */
-    static Translation translate(InlineNode markdown, Footnotes footnotes) {
+    /**
+     * Like {@link #translate(InlineNode)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}.
+     * {@code properties} gives the {@code Bullet markers}, {@code Number markers} and {@code Table columns} of the
+     * {@code Markdown}, by canonical name: its own or those of its rules ({@link BuildContext#property}).
+     */
+    static Translation translate(InlineNode markdown, Footnotes footnotes,
+                                 Function<String, Optional<PropertyNode>> properties) {
         Node content = child(markdown, "content").orElseThrow();
         // The Content >> block begins on the line after its own.
         RunMarks.Marked marked = RunMarks.mark(content.getText(), content.getLine() + 1);
-        Translator t = new Translator(markdown, content.getLine() + 1, false, content.getText().split("\n", -1),
-                footnotes, marked.names());
+        Translator t = new Translator(markdown, properties, content.getLine() + 1, false,
+                content.getText().split("\n", -1), footnotes, marked.names());
         List<InlineNode> elements = t.blocks(PARSER.parse(marked.text()), false);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown needs content in Content");
         }
         // Safety net: what is generated conforms to the schema, like what the author writes.
         elements.forEach(DocumentSchema::validate);
-        return new Translation(List.copyOf(elements), t.runs, t.codeBlocks);
+        return new Translation(List.copyOf(elements), t.runs, t.codeBlocks, t.sources);
+    }
+
+    /**
+     * The markers of a {@code Bullet markers} (unnumbered) or a {@code Number markers} (numbered), one per level; also
+     * those of a rule of {@code Styles}, which are checked when it is read.
+     */
+    static List<String> markers(Node n, boolean numbered) {
+        return Translator.markers(n, numbered);
     }
 
     /**
@@ -157,7 +173,8 @@ final class MarkdownBuilder {
     /** Like {@link #inline(String, int)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}. */
     static List<TextRun> inline(String text, int firstLine, Footnotes footnotes) {
         RunMarks.Marked marked = RunMarks.mark(text, firstLine);
-        Translator t = new Translator(null, firstLine, true, new String[0], footnotes, marked.names());
+        Translator t = new Translator(null, name -> Optional.empty(), firstLine, true, new String[0], footnotes,
+                marked.names());
         TextRun.Joiner out = new TextRun.Joiner();
         boolean first = true;
         for (org.commonmark.node.Node b = INLINE_PARSER.parse(marked.text()).getFirstChild(); b != null;
@@ -180,14 +197,16 @@ final class MarkdownBuilder {
     private static final class Translator {
         private final InlineNode markdown;
         private final int firstLine;
-        private final Optional<Node> bullet;
-        private final Optional<Node> numbering;
-        private final Optional<Node> tableColumns;
+        private final Optional<PropertyNode> bullet;
+        private final Optional<PropertyNode> numbering;
+        private final Optional<PropertyNode> tableColumns;
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
         /** The {@code Text} nodes that are code blocks: the builder gives them the {@code Code block} element. */
         private final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
+        /** The generated property nodes whose line is in a separate styles document ({@link Translation}). */
+        private final Map<Node, SourceLine> sources = new IdentityHashMap<>();
         /** Bulleted and numbered lists that contain the block being translated. */
         private int bulletDepth;
         private int numberingDepth;
@@ -202,19 +221,19 @@ final class MarkdownBuilder {
         /** The styled run the text being translated is in; {@code null} outside one. */
         private RunStyle style;
 
-        Translator(InlineNode markdown, int firstLine, boolean inlineOnly, String[] source, Footnotes footnotes,
-                   List<String> styleNames) {
+        Translator(InlineNode markdown, Function<String, Optional<PropertyNode>> properties, int firstLine,
+                   boolean inlineOnly, String[] source, Footnotes footnotes, List<String> styleNames) {
             this.markdown = markdown;
             this.source = source;
             this.footnotes = footnotes;
             this.styleNames = styleNames;
             this.firstLine = firstLine;
             this.inlineOnly = inlineOnly;
-            this.bullet = markdown == null ? Optional.empty() : child(markdown, "bullet-markers");
-            this.numbering = markdown == null ? Optional.empty() : child(markdown, "number-markers");
-            this.tableColumns = markdown == null ? Optional.empty() : child(markdown, "table-columns");
-            this.bullets = bullet.map(n -> markers(n, false)).orElse(List.of());
-            this.numberings = numbering.map(n -> markers(n, true)).orElse(List.of());
+            this.bullet = properties.apply("bullet-markers");
+            this.numbering = properties.apply("number-markers");
+            this.tableColumns = properties.apply("table-columns");
+            this.bullets = bullet.map(p -> markers(p, false)).orElse(List.of());
+            this.numberings = numbering.map(p -> markers(p, true)).orElse(List.of());
         }
 
         /** The child blocks of {@code parent}; {@code inItem} if they are inside a list item. */
@@ -341,17 +360,18 @@ final class MarkdownBuilder {
 
         private InlineNode list(ListBlock l, int line) {
             boolean numbered = l instanceof OrderedList;
-            Optional<Node> property = numbered ? numbering : bullet;
+            Optional<PropertyNode> property = numbered ? numbering : bullet;
             if (property.isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, (numbered ? "The numbered list" : "The list")
                         + " needs " + (numbered ? "Number markers" : "Bullet markers") + " in its Markdown (line "
-                        + markdown.getLine() + "): the marker of each level, as in "
+                        + markdown.getLine() + ") or in a rule of Styles: the marker of each level, as in "
                         + (numbered ? "Number markers: decimal lower-alpha" : "Bullet markers: bullet dash"));
             }
             List<String> markers = numbered ? numberings : bullets;
             int depth = numbered ? numberingDepth++ : bulletDepth++;
             InlineNode list = node("List", "", line);
-            list.addChild(node("Marker", markers.get(Math.min(depth, markers.size() - 1)), property.get().getLine()));
+            list.addChild(generated(node("Marker", markers.get(Math.min(depth, markers.size() - 1)),
+                    property.get().node().getLine()), property.get()));
             if (l instanceof OrderedList o && o.getMarkerStartNumber() != 1) {
                 list.addChild(node("Start", Integer.toString(o.getMarkerStartNumber()), line));
             }
@@ -372,7 +392,7 @@ final class MarkdownBuilder {
         private InlineNode table(TableBlock t, int line) {
             if (tableColumns.isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "The table needs Table columns in its "
-                        + "Markdown (line " + markdown.getLine() + "): equal or auto");
+                        + "Markdown (line " + markdown.getLine() + ") or in a rule of Styles: equal or auto");
             }
             TableHead head = null;
             TableBody body = null;
@@ -391,10 +411,11 @@ final class MarkdownBuilder {
             for (org.commonmark.node.Node c = head.getFirstChild().getFirstChild(); c != null; c = c.getNext()) {
                 columns++;
             }
-            Node mode = tableColumns.get();
+            Node mode = tableColumns.get().node();
             String track = mode.getText().trim().equals("equal") ? "*" : "auto";
             InlineNode table = node("Table", "", line);
-            table.addChild(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()));
+            table.addChild(generated(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()),
+                    tableColumns.get()));
             table.addChild(rows("Header rows", head));
             table.addChild(rows("Body", body));
             for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {
@@ -653,6 +674,26 @@ final class MarkdownBuilder {
                 throw error(line, ErrorCode.LINK_SCHEME, "Markdown link: " + problem);
             });
             return f.withMarks(f.bold(), f.italic(), true, f.strike()).withLink(destination);
+        }
+
+        /**
+         * A property node generated from {@code property}, on its line: if that line is in a separate styles document,
+         * the builder reads it as such ({@link Translation#sources}).
+         */
+        private InlineNode generated(InlineNode node, PropertyNode property) {
+            if (property.source() != null) {
+                sources.put(node, property.source());
+            }
+            return node;
+        }
+
+        /** {@link #markers(Node, boolean)} of a property that can come from a rule: its errors say where it is. */
+        private static List<String> markers(PropertyNode property, boolean numbered) {
+            try {
+                return markers(property.node(), numbered);
+            } catch (InvalidModelException e) {
+                throw property.located(e);
+            }
         }
 
         /**

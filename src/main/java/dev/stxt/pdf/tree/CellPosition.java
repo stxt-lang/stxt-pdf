@@ -11,13 +11,14 @@ import dev.stxt.pdf.model.TextAlign;
  * @param row             row within its group, from 1; that of a cell spanning several is the first
  * @param column          column where it starts, from 1
  * @param columnAlign     {@code Column align} of its column; {@code null} if the table does not declare it
- * @param columnAlignLine line of that {@code Column align}
+ * @param columnAlignLine line of that {@code Column align}, which can be that of a rule in a separate styles
+ *                        document; {@code null} if the table does not declare it
  * @param rowClass        the {@code Style} of its {@code Row}, whose {@code For style} rules apply to the cell;
  *                        {@code null} if the row does not declare it
  * @param rowId           the {@code Id} of its {@code Row}, whose {@code For id} rule applies to the cell; {@code null}
  *                        if the row does not declare it
  */
-record CellPosition(int group, int row, int column, TextAlign columnAlign, int columnAlignLine,
+record CellPosition(int group, int row, int column, TextAlign columnAlign, SourceLine columnAlignLine,
                     Node rowClass, Node rowId) {
 
     static final int HEADER = 0;

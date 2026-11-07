@@ -49,5 +49,6 @@ Styles (dev.stxt.pdf):
 			Color: #14365C
 			Align: right
 	For style: dish
+		Gap: 12
 		Box:
 			Margin: 0 0 7 0

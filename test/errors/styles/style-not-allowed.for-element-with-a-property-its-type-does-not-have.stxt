@@ -1,0 +1,18 @@
+# Case: For element: Text with Gap, which a Text does not have, even if no Text uses it
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Text
+			Gap: 12
+	Section:
+		Block:

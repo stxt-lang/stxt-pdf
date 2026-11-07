@@ -1,0 +1,20 @@
+# Case: A rule gives Grow to a Block that is not in an Item of a Stack
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: main
+			Grow: 1
+	Section:
+		Block:
+			Style: main
+			Text: Hola

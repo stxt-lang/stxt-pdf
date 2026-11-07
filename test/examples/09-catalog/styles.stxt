@@ -35,6 +35,8 @@ Styles (dev.stxt.pdf):
 	For element: Paragraph
 		Box:
 			Margin: 0 0 6 0
+	For element: Image
+		Fit: fill
 	For element: Cell
 		Box:
 			Padding: 6 8
@@ -81,6 +83,9 @@ Styles (dev.stxt.pdf):
 	For style: body
 		Box:
 			Padding: 10 12 12 12
+	For style: spread
+		Horizontal: justify
+		Vertical: end
 	For style: product
 		Typography:
 			Size: 13
