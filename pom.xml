@@ -55,18 +55,6 @@
         <excludedGroups>perf</excludedGroups>
     </properties>
 
-    <!-- de.rototor.pdfbox:graphics2d 3.0.5 depends on PDFBox 3.0.5: the engine's version is the one for both, which
-         is what the enforcer's dependencyConvergence asks for. -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.pdfbox</groupId>
-                <artifactId>pdfbox</artifactId>
-                <version>${pdfbox.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- Official STXT parser and validator. Used by stxt.DocumentReader, and the engine works with its nodes.
              Latest version at https://central.sonatype.com/artifact/dev.stxt/stxt-core
@@ -109,7 +97,10 @@
         </dependency>
 
         <!-- SVG images (resources.ImageFile, paint.PdfCanvas): JSVG reads and draws the SVG on a Graphics2D and
-             pdfbox-graphics2d turns what is drawn into PDF paths, fills and text (reference/components/image.md). -->
+             pdfbox-graphics2d turns what is drawn into PDF paths, fills and text (reference/components/image.md).
+             graphics2d 3.0.5 depends on PDFBox 3.0.5: it is excluded, so that it runs on the engine's PDFBox and the
+             consumers see a single version in the tree (a dependencyManagement here would not reach them, and their
+             enforcer's dependencyConvergence would fail). -->
         <dependency>
             <groupId>com.github.weisj</groupId>
             <artifactId>jsvg</artifactId>
@@ -119,6 +110,12 @@
             <groupId>de.rototor.pdfbox</groupId>
             <artifactId>graphics2d</artifactId>
             <version>3.0.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.pdfbox</groupId>
+                    <artifactId>pdfbox</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Barcode element (tree.Barcodes): ZXing encodes the QR codes, Code 128 and EAN-13 as a matrix of modules,

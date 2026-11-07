@@ -44,6 +44,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   is now `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
 - `MARKDOWN_PROPERTY_MISSING` says that the property can also come from a rule of `Styles`.
 
+### Fixed
+
+- **A single PDFBox in the tree of a consumer.** `de.rototor.pdfbox:graphics2d` 3.0.5, used for SVG images, brought
+  PDFBox 3.0.5 next to the engine's 3.0.8; the `dependencyManagement` that chose 3.0.8 only applied to the build of
+  `stxt-pdf`, so a Maven project with the enforcer's `dependencyConvergence` failed and had to fix the version itself.
+  PDFBox is now excluded from `graphics2d`, which runs on the engine's version, as it already did.
+
 ### Examples
 
 - The menu (06), the CV (03), the catalog (09) and the timetable (11) take from their `styles.stxt` what they repeated:
