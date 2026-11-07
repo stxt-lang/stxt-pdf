@@ -276,6 +276,28 @@ one level below, without copying the bytes.
 > and `toSvg` would double their variants. *Rejected alternative:* a new `Resources` per document, which would index
 > the fonts again.
 
+### Options of one request
+
+```java
+Converter request = converter.toBuilder().styles(stylesOfTheRequest).debug(true).build();
+List<String> preview = request.toSvg(request.layOut(document));
+```
+
+`Converter.toBuilder()` gives a `Builder` with the configuration of the `Converter`, to build another one that differs
+in some options: the separate styles of a request, its `debug`, its part of PDF/UA, its PDF/A, its `Check`s or its
+`Limits`. What is built shares the resources of the `Converter` as it has read them (its view), without looking at the
+folders again, as long as `resources`, `reloadResourcesEachConversion` and `preloadResources` do not change: if they do,
+it takes a view of its own, like `Converter.builder()`. The styles of the `Converter` are in the `Builder`, and `styles`
+adds after them, so what is added weighs more and is numbered after them (`stylesDocument()`); so are its images
+(`withImages`). The shared `Converter` does not change. It is what a service does with a shared `Converter` and the
+options of each request: it builds one on it for that request and throws it away.
+
+> **Decision:** the options of a request are given with a `Builder` that comes from the `Converter`, and not with a
+> `withStyles`, a `withDebug` and one per option, nor with an options parameter in each call: a single method, the
+> checks of the `Builder` (`pdfUa(2)` with `pdfA`, the reading and the numbering of the styles) and no more variants of
+> `layOut`, `toPdf` and `toSvg`. *Rejected alternative:* `Converter.builder().resources(converter.resources())`, which
+> takes a view again and, with `preloadResources`, reads the whole folder again.
+
 ### Files that change
 
 ```java

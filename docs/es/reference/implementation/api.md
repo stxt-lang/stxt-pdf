@@ -270,6 +270,28 @@ se maquetó, con sus imágenes. `Resources.withImages(Map)` es lo mismo un nivel
 > `toSvg` doblaría sus variantes. *Alternativa descartada:* un `Resources` nuevo por documento, que volvería a indexar
 > las fuentes.
 
+### Opciones de una petición
+
+```java
+Converter request = converter.toBuilder().styles(stylesDeLaPeticion).debug(true).build();
+List<String> preview = request.toSvg(request.layOut(document));
+```
+
+`Converter.toBuilder()` da un `Builder` con la configuración del `Converter`, para construir otro que cambie en algunas
+opciones: los estilos aparte de una petición, su `debug`, su parte de PDF/UA, su PDF/A, sus `Check` o sus `Limits`. Lo
+que se construye comparte los recursos del `Converter` tal como los ha leído (su vista), sin volver a mirar las
+carpetas, mientras no cambien `resources`, `reloadResourcesEachConversion` ni `preloadResources`: si cambian, toma una
+vista propia, como `Converter.builder()`. Los estilos del `Converter` están en el `Builder`, y `styles` añade detrás, con
+lo que lo añadido pesa más y se numera a continuación (`stylesDocument()`); sus imágenes (`withImages`) también. El
+`Converter` compartido no cambia. Es lo que hace un servicio con un `Converter` compartido y las opciones de cada
+petición: construye uno sobre él para esa petición y lo tira.
+
+> **Decisión:** las opciones de una petición se dan con un `Builder` que sale del `Converter`, y no con un `withStyles`,
+> un `withDebug` y uno por opción, ni con un parámetro de opciones en cada llamada: un solo método, las comprobaciones
+> del `Builder` (`pdfUa(2)` con `pdfA`, la lectura y la numeración de los estilos) y ninguna variante más de `layOut`,
+> `toPdf` y `toSvg`. *Alternativa descartada:* `Converter.builder().resources(converter.resources())`, que vuelve a
+> tomar una vista y, con `preloadResources`, a leer la carpeta entera.
+
 ### Ficheros que cambian
 
 ```java

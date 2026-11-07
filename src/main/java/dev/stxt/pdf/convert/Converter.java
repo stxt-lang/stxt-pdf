@@ -109,8 +109,9 @@ public final class Converter {
         this.reloadEachConversion = builder.reloadEachConversion;
         this.preload = builder.preload;
         this.limits = builder.limits;
-        this.images = Map.of();
-        this.current = snapshot();
+        this.images = builder.images;
+        // Built on another converter ({@link #toBuilder}) with the same resources options, it shares its snapshot.
+        this.current = builder.keepsTheSnapshot() ? builder.base.current : snapshot();
         this.styles = List.copyOf(builder.styles);
         this.debug = builder.debug;
         this.excluded = Collections.unmodifiableSet(EnumSet.copyOf(builder.excluded));
@@ -154,6 +155,33 @@ public final class Converter {
     /** {@return a new builder with every option at its default, to configure a converter} */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * {@return a builder with the configuration of this converter, to build one that differs in some options: the
+     * styles of one request, its {@code debug}, its part of PDF/UA} What it builds shares the resources of this
+     * converter as it has read them (its snapshot), without looking at the folders again, unless
+     * {@link Builder#resources}, {@link Builder#reloadResourcesEachConversion} or {@link Builder#preloadResources}
+     * change: then it takes a snapshot of its own, as {@link #builder()} would. The styles of this converter are in
+     * the builder, and {@link Builder#styles} adds after them, so what is added weighs more; so are its images
+     * ({@link #withImages}). This converter does not change. It is what a service does with a shared converter and the
+     * options of each request (reference/implementation/api.md): build one on it for that request and throw it away.
+     */
+    public Builder toBuilder() {
+        Builder b = new Builder();
+        b.base = this;
+        b.resources = resources;
+        b.reloadEachConversion = reloadEachConversion;
+        b.preload = preload;
+        b.images = images;
+        b.styles.addAll(styles);
+        b.debug = debug;
+        b.limits = limits;
+        b.excluded.addAll(excluded);
+        b.pdfUa = pdfUa;
+        b.pdfA = pdfA;
+        b.cancellation = cancellation;
+        return b;
     }
 
     /** {@return the resources folder it converts with} */
@@ -635,9 +663,13 @@ public final class Converter {
     /** Configures a {@link Converter}; every option is optional. */
     public static final class Builder {
 
+        /** The converter this builder comes from ({@link Converter#toBuilder()}); {@code null} if from scratch. */
+        private Converter base;
         private Resources resources = new Resources();
         private boolean reloadEachConversion;
         private boolean preload;
+        /** The images of the conversions of {@link #base} ({@link Converter#withImages}); none from scratch. */
+        private Map<String, byte[]> images = Map.of();
         private final List<InlineNode> styles = new ArrayList<>();
         private boolean debug;
         private Limits limits = Limits.DEFAULT;
@@ -647,6 +679,15 @@ public final class Converter {
         private Cancellation cancellation = Cancellation.NONE;
 
         private Builder() {
+        }
+
+        /**
+         * Whether what it builds can share the snapshot of {@link #base}: it comes from a converter and the options
+         * of the resources (the folder, reloading each conversion, preloading) are those of that converter.
+         */
+        private boolean keepsTheSnapshot() {
+            return base != null && base.resources == resources && base.reloadEachConversion == reloadEachConversion
+                    && base.preload == preload;
         }
 
         /**

@@ -81,7 +81,10 @@ own.toPdf(doc, out);                                       // Image: signature.p
 The resources do not have to be a single folder: `Resources.builder()` puts them together from a folder of fonts, from
 folders of images, each with the prefix its paths start with, and from fonts and images in memory, for what the
 application carries in its classpath. `withImages` gives a `Converter` that adds the images of a document, the ones
-that arrive with it, without touching the shared one.
+that arrive with it, without touching the shared one. For what else changes from one request to another (its separate
+styles, `debug`, the part of PDF/UA), `converter.toBuilder().styles(styles).debug(true).build()` gives another
+`Converter` with the same configuration and the same resources already read, which is used for that request and thrown
+away.
 
 A text that comes from data (a name, what a user writes) is passed through `Reference.escape` before it is put in the
 document, so that a `{page}` it has written comes out as it is

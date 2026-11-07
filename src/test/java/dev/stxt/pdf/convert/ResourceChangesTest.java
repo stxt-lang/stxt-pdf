@@ -485,4 +485,25 @@ class ResourceChangesTest {
         assertNotSame(label, next.images().find("label.svg"));
         assertSame(plain, next.images().find("plain.svg"));
     }
+    /**
+     * A converter built from another ({@link Converter#toBuilder()}) with the same resources options shares its
+     * snapshot: nothing is read again, and what was replaced in the folder since is not seen; with other resources
+     * options it takes a snapshot of its own.
+     */
+    @Test
+    void aConverterBuiltFromAnotherSharesItsSnapshot(@TempDir Path dir) throws IOException {
+        Resources resources = folder(dir, "square.png");
+        Converter shared = converter(resources);
+        LaidOutDocument first = shared.layOut(image("square.png"));
+        replace(dir, "square.png", "wide.png");
+        LaidOutDocument request = shared.toBuilder().debug(true).build().layOut(image("square.png"));
+        assertSame(first.resources(), request.resources());
+        assertSame(first.resources().images().find("square.png"), request.resources().images().find("square.png"));
+        LaidOutDocument live = shared.toBuilder().reloadResourcesEachConversion(true).build()
+                .layOut(image("square.png"));
+        assertNotSame(first.resources(), live.resources());
+        assertNotSame(first.resources().images().find("square.png"), live.resources().images().find("square.png"));
+        LaidOutDocument other = shared.toBuilder().resources(resources.snapshot()).build().layOut(image("square.png"));
+        assertNotSame(first.resources(), other.resources());
+    }
 }

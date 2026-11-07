@@ -81,7 +81,9 @@ own.toPdf(doc, out);                                       // Image: firma.png
 Los recursos no tienen por qué ser una sola carpeta: `Resources.builder()` los compone de una carpeta de fuentes, de
 carpetas de imágenes, cada una con el prefijo por el que empiezan sus rutas, y de fuentes e imágenes en memoria, para
 lo que la aplicación lleva en su classpath. `withImages` da un `Converter` que añade las imágenes de un documento, las
-que llegan con él, sin tocar el compartido.
+que llegan con él, sin tocar el compartido. Para lo demás que cambia de una petición a otra (sus estilos aparte, `debug`,
+la parte de PDF/UA), `converter.toBuilder().styles(estilos).debug(true).build()` da otro `Converter` con la misma
+configuración y los mismos recursos ya leídos, que se usa para esa petición y se tira.
 
 Un texto que viene de datos (un nombre, lo que escribe un usuario) se pasa por `Reference.escape` antes de ponerlo en el
 documento, para que un `{page}` que traiga escrito salga tal cual

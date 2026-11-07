@@ -37,6 +37,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - `LIST_MARKER_MISSING` and `TABLE_COLUMN_SIZES_MISSING`: a `List` without `Marker`, or a `Table` without
   `Column sizes`, its own or from a rule.
 
+- **The options of one request.** `Converter.toBuilder()` gives a builder with the configuration of a converter, to
+  build one that differs in some options (the separate styles of a request, `debug`, the part of PDF/UA, PDF/A, the
+  checks, the limits). What it builds shares the resources of the converter as it has read them, without looking at
+  the folders again, unless the resources options change; the styles added go after those of the converter. The shared
+  converter does not change. "Options of one request" in "API".
+
 ### Changed
 
 - **`Marker` in `List` and `Column sizes` in `Table` are no longer required by the schema**, so that they can come

@@ -4,6 +4,8 @@ import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Check;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.StxtPdfException;
 import dev.stxt.pdf.resources.ResourceException;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -25,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -205,5 +209,36 @@ class ConverterTest {
             assertEquals(List.of(), pdf.getPage(0).getAnnotations());
             assertEquals(null, pdf.getDocumentCatalog().getAcroForm());
         }
+    }
+    /**
+     * {@link Converter#toBuilder()} starts from the configuration of a converter, for the options of one request; the
+     * converter does not change.
+     */
+    @Test
+    void aBuilderFromAConverterKeepsItsConfigurationAndTakesTheOptionsOfARequest() throws IOException {
+        Converter shared = Converter.builder().styles(BASE).pdfUa(2).limits(Limits.DEFAULT.withMaxPages(3))
+                .exclude(Check.CONTRAST).build();
+        Converter request = shared.toBuilder().debug(true).build();
+        assertNotSame(shared, request);
+        assertSame(shared.resources(), request.resources());
+        assertEquals(shared.limits(), request.limits());
+        assertEquals(shared.excluded(), request.excluded());
+        assertEquals(2, request.pdfUa());
+        assertArrayEquals(pdf(Converter.builder().styles(BASE).pdfUa(2).debug(true).build(), document()),
+                pdf(request, document()));
+        assertArrayEquals(pdf(Converter.builder().styles(BASE).pdfUa(2).build(), document()), pdf(shared, document()));
+    }
+
+    /** The styles added to a builder from a converter go after those of the converter, and are numbered after them. */
+    @Test
+    void theStylesOfARequestGoAfterThoseOfTheConverter() throws IOException {
+        String bigger = "Styles (dev.stxt.pdf):\n\tFor element: Document\n\t\tTypography:\n\t\t\tSize: 20\n";
+        Converter shared = Converter.builder().styles(BASE).build();
+        byte[] request = pdf(shared.toBuilder().styles(bigger).build(), document());
+        assertArrayEquals(pdf(Converter.builder().styles(BASE).styles(bigger).build(), document()), request);
+        assertFalse(java.util.Arrays.equals(pdf(shared, document()), request));
+        StxtPdfException e = assertThrows(StxtPdfException.class,
+                () -> shared.toBuilder().styles(bigger.replace("Size:", "Sizee:")));
+        assertEquals(2, e.stylesDocument());
     }
 }
