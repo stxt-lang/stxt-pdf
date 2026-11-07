@@ -117,6 +117,8 @@ one:
   style and `Id` rules override it, and so does what the cell itself declares.
 - **By row.** The `Style` of a `Row` gives each of its cells the `For style` rules of those styles (the totals footer
   of an invoice: `Style: total` in the `Row` and not in each cell), and the `For id` rule of its `Id`, its own.
+- **By table.** A cell rule written inside the rule of a `Table` (`For style: pricing` → `For element: Header cell`)
+  styles only the cells of that table ([Styles](../common/styles.md#nested-rules)).
 
 The priority of all of them is in [Styles](../common/styles.md#priority). The cells of the tables of a `Markdown`
 receive these same rules. Their `Align` comes from the delimiter row of the table (`:--`, `--:`), which each cell declares

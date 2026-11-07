@@ -82,6 +82,14 @@ no hay una segunda tabla de qué admite cada elemento, solo la lista cerrada de 
 de un documento de estilos aparte (el `Marker` de una lista, las `Column sizes` de una tabla) lleva la línea de ese
 documento (`Translation.sources`, en `BuildContext.sources`).
 
+Las reglas anidadas ([Styles](../common/styles.md#reglas-anidadas)) necesitan los ancestros del elemento en el documento:
+`BuildContext` lleva la pila (`Ancestor`: el tipo, los nombres del `Style` y el `Id`; `BuildContext.inside` la apila mientras
+se construye el contenido de un elemento, de una `Section` o de las celdas de una `Row`, y `ancestors()` la da, el más
+cercano primero). `StyleRules.load` lee las reglas de dentro de cada regla con la de fuera (`Placed.outer()`, y `Outer`, a
+qué se aplica la de fuera), y `select` las ordena en cada nivel: las sueltas, y después las anidadas cuya regla de fuera se
+aplica a un ancestro, la del más lejano primero (`depth`). `checkStyle` da el `STYLE_WITHOUT_RULE` de un nombre solo
+anidado fuera de su contexto, también para los tramos (`runStyle` recibe los ancestros).
+
 Dentro de qué cajas se construye cada contenido (un `Page overlay`, un encabezado, un `Columns`, un `Markdown`, una
 `Footnote` o una caja que no se parte) lo dice `BuildContext.Scope`, un `record` que solo cambia mientras se construye el
 contenido de una caja (`BuildContext.within`) y que se recupera después. Por qué una caja no se parte entre páginas lo dice
@@ -97,7 +105,7 @@ Las piezas:
 | `SectionReader` | Las propiedades de una `Section` (`Id`, `Page`, la numeración de páginas y de notas, `Inherit page overlays`, `Begin on`) y sus reglas; la caja, el área de notas y `SECTION_EMPTY` quedan en `BoxTreeBuilder.section` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |
-| `StyleRules` | Las reglas de `Styles` de los dos orígenes, su prioridad y sus propiedades de elemento |
+| `StyleRules` | Las reglas de `Styles` de los dos orígenes, su prioridad, sus propiedades de elemento y las reglas anidadas |
 | `NamedColors` | Los colores con nombre (`Named color`) de los dos orígenes, leídos antes que las reglas y sustituidos por su color al leer cada propiedad (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Las tablas: la colocación de las celdas, su posición para las reglas y la caja de cada `Row` con `Id` o `Box` (`Element.ROW`, en `Box.rows()` de la tabla: la tiene de padre, pero no es su hija) |
 | `TableBorders` | Los bordes fusionados de una tabla con `Merge borders`: guarda el borde que declara cada celda (`Box.mergedBorder()`, con `model.Stroke`) y cambia su `Border` por el sitio que deja para las líneas |

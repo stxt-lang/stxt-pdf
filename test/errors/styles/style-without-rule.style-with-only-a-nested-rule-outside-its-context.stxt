@@ -1,0 +1,23 @@
+# Case: A style whose only rule is nested, on an element outside an element the outer rule applies to
+# Code: STYLE_WITHOUT_RULE
+# Line: 23
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: card
+			For style: body
+				Box:
+					Padding: 4
+	Section:
+		Block:
+			Style: card
+		Block:
+			Style: body

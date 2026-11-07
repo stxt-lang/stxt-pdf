@@ -168,7 +168,9 @@ enum ElementReader {
 
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
-            table(ctx, n, box, (cell, row, at) -> builder.element(ctx, cell, box, row, at));
+            // The Row is an ancestor of its cells, with its Style and its Id, for the nested rules.
+            table(ctx, n, box, (cell, row, at) -> ctx.inside(StyleRules.ancestor(row, Element.ROW),
+                    () -> builder.element(ctx, cell, box, row, at)));
         }
     },
 
@@ -492,7 +494,7 @@ enum ElementReader {
             if (named != null) {
                 String name = named.name();
                 if (!styles.containsKey(name)) {
-                    Style s = ctx.rules.runStyle(name, box.textLineAt(index));
+                    Style s = ctx.rules.runStyle(name, box.textLineAt(index), ctx.ancestors());
                     styles.put(name, s);
                     values.put(name, runStyle(name, s));
                 }

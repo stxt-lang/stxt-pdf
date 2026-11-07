@@ -145,8 +145,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 1 termostato Aire+ T2
 						Typography:
 							Bold: true
@@ -154,8 +152,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 2 tornillos y 2 tacos
 						Typography:
 							Bold: true
@@ -163,8 +159,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 1 guía rápida
 						Typography:
 							Bold: true
@@ -411,8 +405,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Teléfono
 							Style: label
 							Typography:
@@ -427,8 +419,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Correo
 							Style: label
 							Typography:
@@ -444,8 +434,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Web
 							Style: label
 							Typography:

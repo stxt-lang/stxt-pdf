@@ -145,8 +145,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 1 Aire+ T2 thermostat
 						Typography:
 							Bold: true
@@ -154,8 +152,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 2 screws and 2 wall plugs
 						Typography:
 							Bold: true
@@ -163,8 +159,6 @@ Document (dev.stxt.pdf):
 			Area:
 				Block:
 					Style: tip
-					Box:
-						Margin: 0
 					Text: 1 quick guide
 						Typography:
 							Bold: true
@@ -411,8 +405,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Phone
 							Style: label
 							Typography:
@@ -427,8 +419,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Email
 							Style: label
 							Typography:
@@ -444,8 +434,6 @@ Document (dev.stxt.pdf):
 				Area:
 					Block:
 						Style: tip
-						Box:
-							Margin: 0
 						Text: Web
 							Style: label
 							Typography:

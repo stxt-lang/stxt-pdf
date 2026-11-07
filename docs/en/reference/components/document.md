@@ -137,7 +137,8 @@ room where it is written.
 - **A section without content is `SECTION_EMPTY`**: without elements, or with only `Page overlay` elements, which take up no space, it would have
   no page. An `Overlay` does count: a cover made only of positioned boxes is valid.
 - **Typography per section.** The rules that reach a section can only give `Typography` (`Language` included: an
-  annex in English), which all of its content inherits.
+  annex in English), which all of its content inherits. The rules nested in them apply to what is inside the section
+  ([Styles](../common/styles.md#nested-rules)).
 - **A single document.** The heading hierarchy, the tables of contents (`Table of contents`, which list the headings of all the
   sections, in order), `Styles`, the `Id` values (unique in the whole document) and the convergence of the references belong to the
   document and not to the section.

@@ -214,7 +214,7 @@ public final class BoxTreeBuilder {
         // The footnote area of the section (reference/components/footnote.md): its notes hang from it, not from the
         // boxes that hold them.
         Box footnotes = ctx.footnotes.beginSection(ctx, n, box, p.footnoteNumbering(), p.footnoteNumberFormat());
-        buildContent(ctx, n, box);
+        ctx.inside(StyleRules.ancestor(n, Element.SECTION), () -> buildContent(ctx, n, box));
         // After the content, so that the children of the section are its elements in order, and then the area.
         box.addChild(footnotes);
         if (box.children().stream().allMatch(c -> c.style().position() == Position.PAGE_OVERLAY
@@ -280,7 +280,7 @@ public final class BoxTreeBuilder {
         s.setLayout(reader.layout(n, kind));
         s.setPosition(kind.position());
         reader.inherited(wrapper, s);
-        Map<String, PropertyNode> fromRules = ctx.rules.apply(n, kind, s, parent, wrapper, position);
+        Map<String, PropertyNode> fromRules = ctx.rules.apply(n, kind, s, parent, wrapper, position, ctx.ancestors());
         if (!fromRules.isEmpty()) {
             ctx.ruleProperties.put(n, fromRules);
         }
@@ -307,7 +307,9 @@ public final class BoxTreeBuilder {
         if (number != null) {
             listItem(ctx, n, box, parent, number);
         }
-        ctx.within(ctx.scope().element(s, kind.headingLevel() > 0), () -> reader.content(this, ctx, n, box));
+        // Its content is inside it: for the nested rules, it is the closest ancestor.
+        ctx.inside(StyleRules.ancestor(n, kind), () -> ctx.within(ctx.scope().element(s, kind.headingLevel() > 0),
+                () -> reader.content(this, ctx, n, box)));
         validateShrink(n, box);
         validateMergeBorders(n, box);
         if (kind.headingLevel() > 0) {

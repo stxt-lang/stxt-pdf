@@ -1,0 +1,26 @@
+# card: the loose For style gives Padding 10 (a For style beats a For element, nested or not). Inside it, a takes the
+# Padding 20 of the For element: Block nested in card, which beats the loose For element: Block (5): a is
+# 20 + 10 + 20 = 50 high and a1 starts 20 in. b takes the Height 30 of the For style: inner nested in card. d is a Block
+# inside card (Padding 20), and d1 and d2 are inside d, with Style notice, and inside card: the For element: Block nested
+# in notice is of the closest ancestor and wins (Padding 2): d1 is 2 + 10 + 2 = 14 high and d is 20 + 14 + 20 = 54.
+# card is 10 + 50 + 30 + 54 + 10 = 154 high. Outside it, c has the loose Padding 5: 5 + 10 + 5 = 20 high.
+Result:
+	Page: 1
+		Fragment: card
+			Rect: 40 40 515 154
+			Fragment: a
+				Rect: 50 50 495 50
+				Fragment: a1
+					Rect: 70 70 455 10
+			Fragment: b
+				Rect: 50 100 495 30
+			Fragment: d
+				Rect: 50 130 495 54
+				Fragment: d1
+					Rect: 70 150 455 14
+					Fragment: d2
+						Rect: 72 152 451 10
+		Fragment: c
+			Rect: 40 194 515 20
+			Fragment: c1
+				Rect: 45 199 505 10

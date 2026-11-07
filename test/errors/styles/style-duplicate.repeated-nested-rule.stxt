@@ -1,0 +1,23 @@
+# Case: The same selector twice inside a rule
+# Code: STYLE_DUPLICATE
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: card
+			For element: Text
+				Typography:
+					Bold: true
+			For element: text
+				Typography:
+					Italic: true
+	Section:
+		Block:

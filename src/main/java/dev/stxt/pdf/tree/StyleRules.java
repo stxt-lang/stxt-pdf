@@ -35,6 +35,10 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
  * call. Besides the groups ({@code Box}, {@code Typography} and {@code Break}) they give element properties
  * ({@link #ELEMENT_PROPERTIES}), which are read as if the element declared them.
  *
+ * <p>A rule written inside another is nested: it applies to the elements it names that are inside an element the outer
+ * one applies to ({@link Ancestor}). Within each priority level the nested rules go after the loose ones, and among
+ * them the one of the closest ancestor goes last, so it wins. Rules nest one level.</p>
+ *
  * <p>They can come from several places: from the {@code Styles} of the document itself and from separate styles
  * documents (root {@code Styles}, reference/common/styles.md). At each priority level the rules of the separate
  * documents go first, in the order the documents are given, and those of the document after, so if several declare the
@@ -44,13 +48,15 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
 final class StyleRules {
 
     /** {@code For element} rules, by element and in the order they are applied. */
-    private final Map<Element, List<InlineNode>> elementRules = new EnumMap<>(Element.class);
+    private final Map<Element, List<ElementRule>> elementRules = new EnumMap<>(Element.class);
     /** {@code For element: Document} rules, in the order they are applied. */
     private final List<InlineNode> documentRules = new ArrayList<>();
     /** {@code For style} rules, in the order they are applied: those of the separate documents first. */
     private final List<ClassRule> classRules = new ArrayList<>();
-    /** The classes that have some rule. */
+    /** The classes that have some loose rule; one with only nested rules has a rule inside their outer rules. */
     private final Set<String> classNames = new HashSet<>();
+    /** What each rule that contains nested rules applies to, by rule. */
+    private final Map<InlineNode, Outer> outers = new IdentityHashMap<>();
     /**
      * {@code For id} rules, by {@code Id}, in the order they are applied. That no element has that {@code Id} is not an
      * error: the element can come later, from a template.
@@ -68,23 +74,57 @@ final class StyleRules {
     /** The {@link CellRule#source} of a rule of the document, which goes after those of every styles document. */
     private static final int DOCUMENT = Integer.MAX_VALUE;
 
+    /** A rule and, if it is nested, the rule it is written inside ({@code outer}); {@code null} if it is loose. */
+    private interface Placed {
+        InlineNode rule();
+
+        InlineNode outer();
+    }
+
+    /** A {@code For element} rule of an element kind. */
+    private record ElementRule(InlineNode rule, InlineNode outer) implements Placed {
+    }
+
     /** A {@code For style} rule. */
-    private record ClassRule(String name, InlineNode rule) {
+    private record ClassRule(String name, InlineNode rule, InlineNode outer) implements Placed {
     }
 
     /**
      * A rule of a position in a table; {@code source} is the place of its styles document, from 1, or
      * {@link #DOCUMENT}: within their level the rules are applied in that order.
      */
-    private record CellRule(CellSelector selector, InlineNode rule, int source) {
+    private record CellRule(CellSelector selector, InlineNode rule, int source, InlineNode outer) implements Placed {
     }
 
     /** A {@code For column} rule: columns {@code from} to {@code to}, both included. */
-    private record ColumnRule(int from, int to, InlineNode rule) {
+    private record ColumnRule(int from, int to, InlineNode rule, InlineNode outer) implements Placed {
         String key() {
             return from + " " + to;
         }
     }
+
+    /**
+     * What a rule that contains nested rules applies to: the elements of a kind ({@code For element}, also
+     * {@code Section}), those with a style ({@code For style}) or the one with an {@code Id} ({@code For id}). The
+     * nested rules apply within the ancestors it matches.
+     */
+    private record Outer(Element kind, String className, String id) {
+        boolean matches(Ancestor a) {
+            return kind != null ? a.kind() == kind
+                    : className != null ? a.classes().contains(className)
+                    : id.equals(a.id());
+        }
+
+        /** For the messages: what an element has to be inside of. */
+        String within() {
+            return kind != null ? "a " + kind.label()
+                    : className != null ? "an element with Style: " + className
+                    : "the element with Id: " + id;
+        }
+    }
+
+    /** The rules that can be written inside another rule. */
+    private static final Set<String> NESTED = Set.of("for-element", "for-style", "for-column");
 
     /**
      * The element a rule is applied to, for its element properties: its node, its type and what wraps it
@@ -165,51 +205,149 @@ final class StyleRules {
             if (r.getCanonicalName().equals("named-color")) {
                 continue; // already read by NamedColors
             }
-            InlineNode rule = inline(r);
-            String selector = rule.getText().trim();
-            String key = rule.getCanonicalName() + ": " + selector;
-            if (rule.getCanonicalName().equals("for-element")) {
-                key = "element: " + selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
-            } else if (rule.getCanonicalName().equals("for-column")) {
-                key = "for-column: " + columns(rule, source).key();
-            }
-            InlineNode previous = seen.putIfAbsent(key, rule);
-            if (previous != null) {
-                throw located(error(rule, ErrorCode.STYLE_DUPLICATE, "Repeated rule: " + rule.getName() + ": "
-                        + selector + " (already on line " + previous.getLine() + ")"), source);
-            }
-            if (source != null) {
-                external.put(rule, source);
-            }
-            String type = null;
-            switch (rule.getCanonicalName()) {
-                case "for-element" -> type = element(rule, selector, source);
-                case "for-column" -> columnRules.add(columns(rule, source));
-                case "for-style" -> {
-                    String name = name(rule, "For style", source);
-                    classRules.add(new ClassRule(name, rule));
+            load(inline(r), null, seen, source);
+        }
+    }
+
+    /**
+     * One rule, loose ({@code outer} is {@code null}) or nested in {@code outer}; {@code seen} are the selectors already
+     * read at its level, in its source: a repeated one is an error.
+     */
+    private void load(InlineNode rule, InlineNode outer, Map<String, InlineNode> seen, SourceLine source) {
+        String selector = rule.getText().trim();
+        String key = rule.getCanonicalName() + ": " + selector;
+        if (rule.getCanonicalName().equals("for-element")) {
+            key = "element: " + selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+        } else if (rule.getCanonicalName().equals("for-column")) {
+            key = "for-column: " + columns(rule, outer, source).key();
+        }
+        InlineNode previous = seen.putIfAbsent(key, rule);
+        if (previous != null) {
+            throw located(error(rule, ErrorCode.STYLE_DUPLICATE, "Repeated rule: " + rule.getName() + ": "
+                    + selector + (outer != null ? " inside " + selector(outer) : "") + " (already on line "
+                    + previous.getLine() + ")"), source);
+        }
+        if (source != null) {
+            external.put(rule, source);
+        }
+        String type = null;
+        switch (rule.getCanonicalName()) {
+            case "for-element" -> type = element(rule, selector, outer, source);
+            case "for-column" -> columnRules.add(columns(rule, outer, source));
+            case "for-style" -> {
+                String name = name(rule, "For style", source);
+                classRules.add(new ClassRule(name, rule, outer));
+                if (outer == null) {
                     classNames.add(name);
                 }
-                case "for-id" -> {
-                    String id = name(rule, "For id", source);
-                    idRules.computeIfAbsent(id, k -> new ArrayList<>()).add(rule);
-                }
-                default -> throw unread(rule);
             }
-            read(rule, new Style(namedColors), null, null);
-            checkElementProperties(rule, type, source);
+            case "for-id" -> {
+                if (outer != null) {
+                    throw unread(rule); // the schema does not allow it inside a rule
+                }
+                String id = name(rule, "For id", source);
+                idRules.computeIfAbsent(id, k -> new ArrayList<>()).add(rule);
+            }
+            default -> throw unread(rule);
         }
+        read(rule, new Style(namedColors), null, null);
+        checkElementProperties(rule, type, source);
+        nested(rule, outer, source);
+    }
+
+    /**
+     * The rules written inside {@code rule} (reference/common/styles.md), which apply within the elements it applies
+     * to: only a rule of an element written in the document, of a style or of an {@code Id} contains them, and only one
+     * level deep. {@code outer} is the rule {@code rule} is inside, or {@code null}.
+     */
+    private void nested(InlineNode rule, InlineNode outer, SourceLine source) {
+        List<InlineNode> inner = rule.getChildren().stream()
+                .filter(c -> NESTED.contains(c.getCanonicalName())).map(Nodes::inline).toList();
+        if (inner.isEmpty()) {
+            return;
+        }
+        if (outer != null) {
+            throw located(error(inner.get(0), ErrorCode.STYLE_NESTED_TOO_DEEP, "The rule " + selector(rule)
+                    + " is inside " + selector(outer) + " and cannot contain " + selector(inner.get(0))
+                    + ": rules nest one level"), source);
+        }
+        outers.put(rule, container(rule, inner.get(0), source));
+        Map<String, InlineNode> seen = new HashMap<>();
+        for (InlineNode r : inner) {
+            load(r, rule, seen, source);
+        }
+    }
+
+    /**
+     * What {@code rule} applies to, if it can contain rules ({@link Outer}): a {@code For style}, a {@code For id} or
+     * the {@code For element} of an element written in the document, {@code Section} included. Not a position in a
+     * table, a column, {@code Document} or an element the engine generates. {@code inner} is its first nested rule, for
+     * the error.
+     */
+    private static Outer container(InlineNode rule, InlineNode inner, SourceLine source) {
+        String what = switch (rule.getCanonicalName()) {
+            case "for-style" -> null;
+            case "for-id" -> null;
+            case "for-element" -> {
+                String canonical = rule.getText().trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
+                if (canonical.equals("document")) {
+                    yield "the document is not an element";
+                }
+                if (CellSelector.of(canonical).isPresent()) {
+                    yield "a position in a table is not an element";
+                }
+                yield Element.of(canonical).filter(Element::isWritten).isPresent() ? null
+                        : "it is generated by the engine, not written in the document";
+            }
+            default -> "a column is not an element";
+        };
+        if (what != null) {
+            throw located(error(inner, ErrorCode.STYLE_NOT_ALLOWED, "The rule " + selector(rule) + " cannot contain "
+                    + selector(inner) + ": " + what + ". A rule inside another applies within the elements the outer "
+                    + "one applies to: For style, For id or the For element of an element of the document"), source);
+        }
+        return switch (rule.getCanonicalName()) {
+            case "for-style" -> new Outer(null, rule.getText().trim(), null);
+            case "for-id" -> new Outer(null, null, rule.getText().trim());
+            default -> new Outer(Element.of(canonical(rule.getText().trim())).orElseThrow(), null, null);
+        };
+    }
+
+    /** A rule, for the messages: {@code For style: card}. */
+    private static String selector(InlineNode rule) {
+        return rule.getName() + ": " + rule.getText().trim();
+    }
+
+    /**
+     * {@code n} as an ancestor of what is inside it ({@link Ancestor}): its kind, the names of its {@code Style} and
+     * its {@code Id}. The names are checked when its own rules are applied, not here.
+     */
+    static Ancestor ancestor(InlineNode n, Element kind) {
+        Set<String> classes = child(n, "style")
+                .map(c -> new HashSet<>(Arrays.asList(c.getText().trim().split("\\s+")))).orElseGet(HashSet::new);
+        return new Ancestor(kind, classes, child(n, "id").map(i -> i.getText().trim()).orElse(null));
     }
 
     /**
      * A {@code For element} rule: of an element kind, of a position in a table or {@code Document}. Returns the name in
      * the schema of what it applies to, for its element properties: that of the element, {@code Cell} for a position
-     * in a table.
+     * in a table. {@code outer} is the rule it is nested in, or {@code null}: nested, it cannot name {@code Document},
+     * {@code Section} or an element the engine builds apart (the entries of a table of contents, the footnote area),
+     * which are never inside an element.
      */
-    private String element(InlineNode rule, String selector, SourceLine source) {
+    private String element(InlineNode rule, String selector, InlineNode outer, SourceLine source) {
         String canonical = selector.toLowerCase(Locale.ROOT).replaceAll("\\s+", "-");
         if (canonical.equals("document")) {
+            if (outer != null) {
+                throw located(error(rule, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document cannot be inside "
+                        + selector(outer) + ": the document is inside nothing"), source);
+            }
             for (Node g : rule.getChildren()) {
+                if (NESTED.contains(g.getCanonicalName())) {
+                    throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document cannot contain rules: "
+                            + "the document is not an element. A rule inside another applies within the elements the "
+                            + "outer one applies to"), source);
+                }
                 if (!g.getCanonicalName().equals("typography")) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "For element: Document only allows Typography, "
                             + "which all boxes inherit: the document has no " + g.getName()), source);
@@ -225,7 +363,7 @@ final class StyleRules {
         }
         Optional<CellSelector> cell = CellSelector.of(canonical);
         if (cell.isPresent()) {
-            cellRules.add(new CellRule(cell.get(), rule, source != null ? source.styles() : DOCUMENT));
+            cellRules.add(new CellRule(cell.get(), rule, source != null ? source.styles() : DOCUMENT, outer));
             return Element.CELL.label();
         }
         Element element = Element.of(canonical)
@@ -235,7 +373,12 @@ final class StyleRules {
                                 Element.selectable().stream().map(Element::label)),
                                 Arrays.stream(CellSelector.values()).map(CellSelector::label))
                         .collect(Collectors.joining(", ")) + ")"), source));
-        elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(rule);
+        if (outer != null && (element == Element.SECTION || !(element.isWritten() || element == Element.CODE_BLOCK))) {
+            throw located(error(rule, ErrorCode.STYLE_NOT_ALLOWED, selector(rule) + " cannot be inside "
+                    + selector(outer) + ": " + (element == Element.SECTION ? "a Section is inside nothing"
+                    : "the engine builds " + element.label() + " apart, inside no element")), source);
+        }
+        elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(new ElementRule(rule, outer));
         return element.label();
     }
 
@@ -249,7 +392,7 @@ final class StyleRules {
     private void checkElementProperties(InlineNode rule, String type, SourceLine source) {
         for (Node p : rule.getChildren()) {
             String name = p.getCanonicalName();
-            if (GROUPS.contains(name)) {
+            if (GROUPS.contains(name) || NESTED.contains(name)) {
                 continue;
             }
             if (!ELEMENT_PROPERTIES.contains(name)) {
@@ -347,13 +490,15 @@ final class StyleRules {
      * {@code Id} to look at.
      */
     void apply(Element kind, Style s) {
-        for (InlineNode rule : elementRules.getOrDefault(kind, List.of())) {
-            read(rule, s, null, null);
+        for (ElementRule rule : elementRules.getOrDefault(kind, List.of())) {
+            if (rule.outer() == null) {
+                read(rule.rule(), s, null, null);
+            }
         }
     }
 
     /** The range of a {@code For column} rule: {@code n} or {@code n m}, positive integers with {@code n <= m}. */
-    private static ColumnRule columns(InlineNode rule, SourceLine source) {
+    private static ColumnRule columns(InlineNode rule, InlineNode outer, SourceLine source) {
         String text = rule.getText().trim();
         String[] t = text.split("\\s+");
         if (t.length > 2 || !t[0].matches("[1-9]\\d*") || (t.length == 2 && !t[1].matches("[1-9]\\d*"))) {
@@ -366,7 +511,7 @@ final class StyleRules {
             throw located(error(rule, ErrorCode.VALUE_NOT_ALLOWED,
                     "For column: the range goes from lower to higher: '" + text + "'"), source);
         }
-        return new ColumnRule(from, to, rule);
+        return new ColumnRule(from, to, rule, outer);
     }
 
     /** The name of a class or of an {@code Id} in a rule: a single word. */
@@ -386,19 +531,14 @@ final class StyleRules {
      * are an error (a section is the page area of its pages, not a box).
      */
     void applySection(InlineNode n, Style s) {
-        List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(Element.SECTION, List.of()));
-        child(n, "style").ifPresent(c -> {
-            Set<String> classes = classes(c);
-            for (ClassRule rule : classRules) {
-                if (classes.contains(rule.name())) {
-                    rules.add(rule.rule());
-                }
-            }
-        });
+        // A section is inside nothing: only the loose rules reach it. Those nested in its rules apply to its content.
+        List<InlineNode> rules = new ArrayList<>();
+        select(elementRules.getOrDefault(Element.SECTION, List.of()), List.of(), rules);
+        child(n, "style").ifPresent(c -> rules.addAll(classRules(c, List.of())));
         child(n, "id").map(id -> idRules.get(id.getText().trim())).ifPresent(rules::addAll);
         for (InlineNode rule : rules) {
             for (Node g : rule.getChildren()) {
-                if (!g.getCanonicalName().equals("typography")) {
+                if (!g.getCanonicalName().equals("typography") && !NESTED.contains(g.getCanonicalName())) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED, "The rule " + rule.getName() + ": "
                             + rule.getText().trim() + " applies to a Section (line " + n.getLine()
                             + "), which only allows Typography: it is the page area of its pages, not a box"),
@@ -416,18 +556,21 @@ final class StyleRules {
      * ({@code For column}, in the order of {@code Styles}), those of its classes (in the order of {@code Styles}) and
      * that of its {@code Id}. They go after inheritance and before what the element itself declares, and they are
      * merged property by property. {@code wrapper} is the {@code Item}, the {@code Area} or the {@code Row} that wraps
-     * the element, or {@code null}; {@code position} is that of a {@code Cell}, {@code null} for the others.
+     * the element, or {@code null}; {@code position} is that of a {@code Cell}, {@code null} for the others;
+     * {@code ancestors} are those of the element in the document, the closest first, for the nested rules
+     * ({@link #select}).
      *
      * <p>The element properties of the rules (reference/common/styles.md) are read as if the element declared them; an
      * element property that the element could not declare is an error, with its line. Returns those that its content
      * reads from its node ({@link BuildContext#property}), by canonical name: the one of higher priority.</p>
      */
     Map<String, PropertyNode> apply(InlineNode n, Element kind, Style s, Box parent, InlineNode wrapper,
-                                    CellPosition position) {
+                                    CellPosition position, List<Ancestor> ancestors) {
         String noBreak = noBreak(n, kind, s, parent);
         Target target = new Target(n, kind, wrapper);
         Map<String, PropertyNode> content = new HashMap<>();
-        List<InlineNode> rules = new ArrayList<>(elementRules.getOrDefault(kind, List.of()));
+        List<InlineNode> rules = new ArrayList<>();
+        select(elementRules.getOrDefault(kind, List.of()), ancestors, rules);
         applyAll(rules, noBreak, s, target, content);
         rules.clear();
         if (position != null) {
@@ -437,22 +580,24 @@ final class StyleRules {
                 s.declared(PropertyKey.internal("align"), position.columnAlignLine());
             }
             // Within this level those of the separate styles documents go first, in the order of the documents, and
-            // in each source, by position.
-            cellRules.stream().filter(c -> c.selector().matches(position))
-                    .sorted(Comparator.comparingInt(CellRule::source)
-                            .thenComparing(c -> c.selector().ordinal()))
+            // in each source, by position; the nested ones after, those of the closest ancestor last.
+            List<CellRule> cells = cellRules.stream().filter(c -> c.selector().matches(position)).toList();
+            Comparator<CellRule> order = Comparator.comparingInt(CellRule::source)
+                    .thenComparing(c -> c.selector().ordinal());
+            cells.stream().filter(c -> c.outer() == null).sorted(order).forEach(c -> rules.add(c.rule()));
+            cells.stream().filter(c -> c.outer() != null && depth(c.outer(), ancestors) >= 0)
+                    .sorted(Comparator.comparingInt((CellRule c) -> depth(c.outer(), ancestors)).reversed()
+                            .thenComparing(order))
                     .forEach(c -> rules.add(c.rule()));
-            for (ColumnRule column : columnRules) {
-                if (position.column() >= column.from() && position.column() <= column.to()) {
-                    rules.add(column.rule());
-                }
-            }
+            select(columnRules.stream()
+                    .filter(c -> position.column() >= c.from() && position.column() <= c.to()).toList(),
+                    ancestors, rules);
         }
         // The classes of the row of a cell weigh less than those of the cell itself.
         if (position != null && position.rowClass() != null) {
-            rules.addAll(classRules(position.rowClass()));
+            rules.addAll(classRules(position.rowClass(), ancestors));
         }
-        child(n, "style").ifPresent(c -> rules.addAll(classRules(c)));
+        child(n, "style").ifPresent(c -> rules.addAll(classRules(c, ancestors)));
         // The For id of the row weighs more than the classes and less than the For id of the cell itself.
         if (position != null && position.rowId() != null) {
             Optional.ofNullable(idRules.get(position.rowId().getText().trim())).ifPresent(rules::addAll);
@@ -478,20 +623,21 @@ final class StyleRules {
      * what is declared in it is what the rules declare, each property with its line. A rule with a {@code Box}, a
      * {@code Break} or a property that a run does not allow is an error, with the line of what it declares.
      *
-     * @param line line of the document where the run is, for the messages
+     * @param line      line of the document where the run is, for the messages
+     * @param ancestors the ancestors of the run in the document, the closest first (its {@code Text} is the first), for
+     *                  the nested rules
      */
-    Style runStyle(String name, int line) {
-        if (!classNames.contains(name)) {
-            throw error(line, ErrorCode.STYLE_WITHOUT_RULE, "The style " + name + " of the styled run [...]{" + name
-                    + "} has no rule: 'For style: " + name + "' is missing in Styles");
-        }
+    Style runStyle(String name, int line, List<Ancestor> ancestors) {
+        checkStyle(name, line, ancestors, "The style " + name + " of the styled run [...]{" + name + "}");
         Style s = new Style(namedColors);
-        for (ClassRule rule : classRules) {
-            if (!rule.name().equals(name)) {
-                continue;
-            }
-            SourceLine source = external.get(rule.rule());
-            for (Node g : rule.rule().getChildren()) {
+        List<InlineNode> rules = new ArrayList<>();
+        select(classRules.stream().filter(r -> r.name().equals(name)).toList(), ancestors, rules);
+        for (InlineNode rule : rules) {
+            SourceLine source = external.get(rule);
+            for (Node g : rule.getChildren()) {
+                if (NESTED.contains(g.getCanonicalName())) {
+                    continue; // it applies within the elements with the style, not to the run
+                }
                 if (!g.getCanonicalName().equals("typography")) {
                     throw located(error(g, ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, "The rule For style: " + name
                             + " gives " + g.getName() + " to the styled run on line " + line + ", which is part of a "
@@ -506,21 +652,74 @@ final class StyleRules {
                     }
                 }
             }
-            read(rule.rule(), s, null, null);
+            read(rule, s, null, null);
         }
         return s;
     }
 
-    /** The {@code For style} rules of a {@code Style}, in the order of {@code Styles}. */
-    private List<InlineNode> classRules(Node classNode) {
-        Set<String> classes = classes(classNode);
+    /**
+     * The {@code For style} rules of a {@code Style} that apply to an element with {@code ancestors}, in the order of
+     * {@code Styles}, the nested ones after ({@link #select}).
+     */
+    private List<InlineNode> classRules(Node classNode, List<Ancestor> ancestors) {
+        Set<String> classes = classes(classNode, ancestors);
         List<InlineNode> rules = new ArrayList<>();
-        for (ClassRule rule : classRules) {
-            if (classes.contains(rule.name())) {
-                rules.add(rule.rule());
+        select(classRules.stream().filter(r -> classes.contains(r.name())).toList(), ancestors, rules);
+        return rules;
+    }
+
+    /**
+     * Of the rules of one priority level, those that apply to an element with {@code ancestors}, added to {@code out}
+     * in the order they are applied: the loose ones as given, then the nested ones whose outer rule applies to an
+     * ancestor, those of the farthest ancestor first, so that the one of the closest ancestor wins; with the same
+     * ancestor, as given.
+     */
+    private void select(List<? extends Placed> candidates, List<Ancestor> ancestors, List<InlineNode> out) {
+        List<Placed> nested = new ArrayList<>();
+        for (Placed c : candidates) {
+            if (c.outer() == null) {
+                out.add(c.rule());
+            } else if (depth(c.outer(), ancestors) >= 0) {
+                nested.add(c);
             }
         }
-        return rules;
+        nested.sort(Comparator.comparingInt((Placed c) -> depth(c.outer(), ancestors)).reversed());
+        nested.forEach(c -> out.add(c.rule()));
+    }
+
+    /**
+     * How far up is the closest of {@code ancestors} that the rule {@code outer} applies to: 0 is the parent; -1 if
+     * none.
+     */
+    private int depth(InlineNode outer, List<Ancestor> ancestors) {
+        Outer o = outers.get(outer);
+        for (int i = 0; i < ancestors.size(); i++) {
+            if (o.matches(ancestors.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * That the style {@code name} has a rule where an element with {@code ancestors} is: a loose {@code For style} or
+     * a nested one whose outer rule applies to an ancestor. {@code what} starts the message: {@code The style x}.
+     */
+    private void checkStyle(String name, int line, List<Ancestor> ancestors, String what) {
+        if (classNames.contains(name)) {
+            return;
+        }
+        List<ClassRule> nested = classRules.stream().filter(r -> r.name().equals(name)).toList();
+        if (nested.isEmpty()) {
+            throw error(line, ErrorCode.STYLE_WITHOUT_RULE, what + " has no rule: 'For style: " + name
+                    + "' is missing in Styles");
+        }
+        if (nested.stream().noneMatch(r -> depth(r.outer(), ancestors) >= 0)) {
+            InlineNode outer = nested.get(0).outer();
+            throw error(line, ErrorCode.STYLE_WITHOUT_RULE, what + " has no rule here: its rule For style: " + name
+                    + " is inside " + selector(outer) + " (line " + outer.getLine() + ") and applies within "
+                    + outers.get(outer).within() + ", which this is not inside of");
+        }
     }
 
     private void applyAll(List<InlineNode> rules, String noBreak, Style s, Target target,
@@ -557,8 +756,11 @@ final class StyleRules {
         return null;
     }
 
-    /** The classes of a {@code Style}: each one with its {@code For style} rule and without repetition. */
-    private Set<String> classes(Node n) {
+    /**
+     * The classes of a {@code Style}: each one with its {@code For style} rule, loose or nested in a rule of one of
+     * {@code ancestors} ({@link #checkStyle}), and without repetition.
+     */
+    private Set<String> classes(Node n, List<Ancestor> ancestors) {
         String[] names = n.getText().trim().split("\\s+");
         if (names[0].isEmpty()) {
             throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Style needs at least one style");
@@ -568,10 +770,7 @@ final class StyleRules {
             if (!classes.add(name)) {
                 throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Repeated style in Style: " + name);
             }
-            if (!classNames.contains(name)) {
-                throw error(n, ErrorCode.STYLE_WITHOUT_RULE, "The style " + name + " has no rule: "
-                        + "'For style: " + name + "' is missing in Styles");
-            }
+            checkStyle(name, n.getLine(), ancestors, "The style " + name);
         }
         return classes;
     }
@@ -581,7 +780,8 @@ final class StyleRules {
      * document is of that document. An error of a rule of a separate styles document says so. The element properties
      * are given to the element of {@code target} ({@link #elementProperty}); with {@code target} {@code null}, only the
      * groups are read, and the element properties were already checked when the rule was read
-     * ({@link #checkElementProperties}) or rejected where they cannot go (a {@code Section}, a styled run).
+     * ({@link #checkElementProperties}) or rejected where they cannot go (a {@code Section}, a styled run). The rules
+     * nested in it are not read here: they apply within the element.
      */
     private void read(InlineNode rule, Style s, Target target, Map<String, PropertyNode> content) {
         SourceLine source = external.get(rule);
@@ -593,7 +793,7 @@ final class StyleRules {
                     case "typography" -> typography(inline(g), s);
                     case "break" -> fragmentation(inline(g), s);
                     default -> {
-                        if (target != null) {
+                        if (target != null && !NESTED.contains(g.getCanonicalName())) {
                             elementProperty(rule, g, s, target, content);
                         }
                     }

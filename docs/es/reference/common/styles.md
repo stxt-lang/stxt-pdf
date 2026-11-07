@@ -20,7 +20,8 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada, y las
 [propiedades de elemento](#propiedades-de-elemento) que dicen cómo se ve un elemento o cómo reparte su contenido (`Gap`,
-`Column sizes`, `Fit`, `Marker`...), como mucho una de cada.
+`Column sizes`, `Fit`, `Marker`...), como mucho una de cada. Una regla escrita dentro de otra es una
+[regla anidada](#reglas-anidadas): se aplica a los elementos que están dentro de un elemento al que se aplica la de fuera.
 
 ```
 Styles:
@@ -130,6 +131,79 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 > motor, para que puedan venir de una regla. *Alternativa descartada:* seguir obligatorios en el elemento, con lo que la
 > regla nunca tendría efecto.
 
+## Reglas anidadas
+
+Una regla escrita dentro de otra se aplica a los elementos que nombra que están **dentro de** un elemento al que se aplica
+la de fuera, a cualquier profundidad:
+
+```
+Styles:
+    For style: card
+        Box:
+            Background: #FBF8F3
+        For element: Image
+            Box:
+                Width: 100%
+                Height: 205
+        For style: body
+            Box:
+                Padding: 10
+Block:
+    Style: card
+    Frame:
+        Image: fotos/silla.jpg
+    Block:
+        Style: body
+Image: fotos/sala.jpg
+```
+
+La foto de la ficha mide 205 de alto y el bloque `body` lleva su relleno; la foto de fuera no cambia.
+
+- **Qué contiene y qué va dentro.** Contienen reglas `For style`, `For id` y el `For element` de un elemento escrito en
+  el documento, `Section` incluida. Dentro van `For element` (también las posiciones de celda, `Header cell`,
+  `Body cell`...), `For style` y `For column`. Un nivel: una regla dentro de otra, no dentro de una anidada
+  (`STYLE_NESTED_TOO_DEEP`). No contienen reglas `For element: Document`, las de posición de celda, `For column` ni las de
+  los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnotes`), y dentro no van `For element: Document`,
+  `Section`, `TOC 1` a `TOC 6` ni `Footnotes`, que nunca están dentro de un elemento (`STYLE_NOT_ALLOWED`);
+  `Code block` sí, que está dentro de su `Markdown`.
+- **Qué es «dentro».** Los ancestros del elemento tal como está escrito: la `Section`, los elementos y la `Row` de una
+  celda, con su `Style` y su `Id`. `Item` y `Area` no cuentan ni estorban. Lo que genera un `Markdown` está dentro del
+  `Markdown`; una `Footnote` está donde se escribe, aunque herede del área de notas; las entradas de un
+  `Table of contents` y el área `Footnotes` las construye el motor aparte y solo toman reglas sueltas.
+- **Prioridad.** Los niveles no cambian: una regla anidada es del nivel de su propio selector (un `For element` dentro de
+  un `For style` sigue siendo un `For element`) y, **dentro de cada nivel, va después de la suelta**, así que gana. Entre
+  dos anidadas del mismo nivel que llegan al mismo elemento gana la del **ancestro más cercano**; con el mismo ancestro,
+  la que va después en `Styles`, con los orígenes como siempre (el documento después de los documentos de estilos). Un
+  `For style` suelto sigue ganando a un `For element` anidado.
+- **Las reglas de celda** anidadas en la regla de una `Table` (`For style: pricing` → `For element: Header cell`) dan
+  estilo a las celdas de esa tabla; las sueltas, a las de todas ([Table](../components/table.md#estilo-de-las-celdas)).
+- **Las propiedades de elemento** las da una regla anidada igual que una suelta: `For style: dish` →
+  `For element: Block` → `Grow: 1` da el `Grow` al `Block` que envuelve cada `Item` de los platos.
+- **Un nombre de `Style` cuya única regla está anidada** solo vale dentro de su contexto: fuera es `STYLE_WITHOUT_RULE`,
+  con la línea del `Style`, para que una errata de colocación no pase sin verse. Con una regla suelta del mismo nombre
+  vale en cualquier sitio, y dentro del contexto se aplican las dos.
+- **Los tramos con estilo** `[texto]{nombre}` toman también las reglas anidadas de su contexto, con el mismo orden; la
+  regla anidada en la del tramo no se aplica al tramo.
+- **Repetición.** El mismo selector dos veces dentro de la misma regla y el mismo origen es `STYLE_DUPLICATE`; el mismo
+  selector en dos reglas distintas, o suelto y anidado, no.
+- Los errores de una regla anidada señalan su línea, y los de un documento de estilos aparte lo dicen.
+
+> **Decisión:** alcance y no selectores: el anidado dice «dentro de» con los mismos nodos, sin combinadores ni sintaxis
+> nueva, y la prioridad sigue fija. *Alternativa descartada:* selectores compuestos con especificidad calculada.
+
+> **Decisión:** entre dos reglas anidadas gana la del ancestro más cercano, como en la herencia tipográfica, y el orden
+> de `Styles` solo desempata: el resultado no depende de dónde esté cada regla en el fichero. *Alternativa descartada:* el
+> orden de `Styles`.
+
+> **Decisión:** un nivel de anidado. *Alternativa descartada:* cualquier profundidad; abrirlo es fácil y cerrarlo no.
+
+> **Decisión:** «dentro» son los ancestros del documento, con los casos generados dichos uno a uno. *Alternativa
+> descartada:* el árbol de cajas, en el que `Section`, `Row`, `Item` y `Area` no existen y los generados cuelgan de otro
+> sitio.
+
+> **Decisión:** un estilo con solo reglas anidadas es un error fuera de su contexto. *Alternativa descartada:* valer en
+> cualquier sitio, como una regla que no se aplica a nada.
+
 ## Colores con nombre
 
 `Named color`, hijo de `Styles` y repetible, da nombre a un color: el nombre y el color van separados por un espacio. Desde
@@ -198,7 +272,8 @@ Cada propiedad toma, de más a menos fuerte:
 
 Las reglas de los puntos 4 a 7 solo se aplican a las celdas de una `Table` ([Table](../components/table.md#estilo-de-las-celdas)).
 Las [propiedades de elemento](#propiedades-de-elemento) siguen el mismo orden, sin el punto 9: no se heredan. Para
-`Grow`, `Shrink` y `Base size`, lo que declara el `Item` es el punto 1.
+`Grow`, `Shrink` y `Base size`, lo que declara el `Item` es el punto 1. Las [reglas anidadas](#reglas-anidadas) son
+del nivel de su selector y, dentro de él, van después de las sueltas; entre varias, gana la del ancestro más cercano.
 
 Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mide 10 aunque su padre declare
 `Size: 20`. Las reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento
@@ -209,8 +284,9 @@ hubiera declarado él. `Item` y `Area` no son cajas: las reglas se aplican al el
 de posición). `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../components/document.md#section)).
 
-> **Decisión:** prioridad fija en lugar de especificidad calculada. *Alternativa descartada:* especificidad calculada y
-> selectores compuestos, más potentes pero menos predecibles.
+> **Decisión:** prioridad fija en lugar de especificidad calculada, también con las reglas anidadas, que añaden un paso
+> dentro de cada nivel y no una especificidad. *Alternativa descartada:* especificidad calculada y selectores compuestos,
+> más potentes pero menos predecibles.
 
 ## Validación
 
@@ -221,7 +297,12 @@ Son errores:
 - un `For element` que no nombra un elemento de caja, un elemento generado ni una posición en una tabla
   (`STYLE_UNKNOWN_ELEMENT`);
 - un `For column` que no es un número (`VALUE_SYNTAX`) o un rango que no va de menor a mayor (`VALUE_NOT_ALLOWED`);
-- dos reglas con el mismo selector en el mismo origen, también dos `For column` con el mismo rango (`STYLE_DUPLICATE`);
+- dos reglas con el mismo selector en el mismo origen y al mismo nivel (sueltas, o dentro de la misma regla), también
+  dos `For column` con el mismo rango (`STYLE_DUPLICATE`);
+- una regla dentro de una regla anidada (`STYLE_NESTED_TOO_DEEP`);
+- una regla anidada en una que no puede contenerlas (`For element: Document`, una posición de celda, `For column`, un
+  elemento generado) o que nombra lo que nunca está dentro de un elemento (`Document`, `Section`, `TOC 1` a `TOC 6`,
+  `Footnotes`) (`STYLE_NOT_ALLOWED`);
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
   una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
@@ -230,7 +311,8 @@ Son errores:
   (`STYLE_NOT_ALLOWED`);
 - una propiedad de elemento con un valor que no vale en ningún elemento que la tenga (`VALUE_SYNTAX`,
   `VALUE_NOT_ALLOWED`);
-- un nombre de `Style` o de un tramo con estilo sin su regla `For style` (`STYLE_WITHOUT_RULE`);
+- un nombre de `Style` o de un tramo con estilo sin su regla `For style`, o solo con una anidada fuera de su contexto
+  (`STYLE_WITHOUT_RULE`);
 - la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size`, un `Box` o una propiedad de
   elemento (`STYLE_NOT_ALLOWED_IN_RUN`);
 - dos `Named color` con el mismo nombre en el mismo origen (`COLOR_DUPLICATE`);
@@ -360,8 +442,8 @@ declara el primero.
 
 ## Lo que no hay
 
-- Selectores compuestos (un elemento dentro de otro, varios estilos a la vez), combinadores ni prioridades declaradas por el
-  autor.
+- Selectores compuestos (varios estilos a la vez, el hermano, el hijo directo), combinadores ni prioridades declaradas
+  por el autor. «Dentro de» se escribe [anidando reglas](#reglas-anidadas).
 - Propiedades de identidad, de contenido, de estructura o de posición en una regla
   ([Propiedades de elemento](#propiedades-de-elemento)).
 - Estilo de una fila de tabla con `Box` o de una columna entera: se da a las celdas ([Table](../components/table.md#lo-que-no-hay)).

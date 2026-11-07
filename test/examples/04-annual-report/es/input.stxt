@@ -222,8 +222,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: de producción renovable, un 11 % más que en 2024
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 				Area:
 					Block:
 						Style: tile
@@ -231,8 +229,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: clientes abastecidos entre hogares, comercios, industria y administración
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 				Area:
 					Block:
 						Style: tile
@@ -240,8 +236,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: de CO₂ evitadas desde 2019, el año de la primera instalación
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 				Area:
 					Block:
 						Style: tile
@@ -249,8 +243,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: socias y socios, ochenta y siete más que el año anterior
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 				Area:
 					Block:
 						Style: tile
@@ -258,8 +250,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: personas en la plantilla, con un 48 % de mujeres
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 				Area:
 					Block:
 						Style: tile
@@ -267,8 +257,6 @@ Document (dev.stxt.pdf):
 							Style: figure
 						Text: invertidos en nueva generación y almacenamiento
 							Style: caption
-							Box:
-								Margin: 2 0 0 0
 			Heading 2:
 				Text: Producción mensual
 			Image: examples/report/es/chart-production.svg

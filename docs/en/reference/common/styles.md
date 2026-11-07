@@ -19,7 +19,8 @@ type, of a style or with an `Id`, and the element can override them.
 
 Each rule allows the `Box`, `Typography` and `Break` groups, at most one of each, and the
 [element properties](#element-properties) that say how an element looks or how it distributes its content (`Gap`,
-`Column sizes`, `Fit`, `Marker`...), at most one of each.
+`Column sizes`, `Fit`, `Marker`...), at most one of each. A rule written inside another is a
+[nested rule](#nested-rules): it applies to the elements that are inside an element the outer one applies to.
 
 ```
 Styles:
@@ -129,6 +130,79 @@ They are those of appearance and distribution. The rule that applies to an eleme
 > requires them, so that they can come from a rule. *Rejected alternative:* keeping them required in the element, so
 > the rule would never have an effect.
 
+## Nested rules
+
+A rule written inside another applies to the elements it names that are **inside** an element the outer one applies
+to, at any depth:
+
+```
+Styles:
+    For style: card
+        Box:
+            Background: #FBF8F3
+        For element: Image
+            Box:
+                Width: 100%
+                Height: 205
+        For style: body
+            Box:
+                Padding: 10
+Block:
+    Style: card
+    Frame:
+        Image: photos/chair.jpg
+    Block:
+        Style: body
+Image: photos/room.jpg
+```
+
+The photo of the card is 205 high and the `body` block has its padding; the photo outside does not change.
+
+- **What contains and what goes inside.** `For style`, `For id` and the `For element` of an element written in the
+  document, `Section` included, contain rules. Inside go `For element` (also the cell positions, `Header cell`,
+  `Body cell`...), `For style` and `For column`. One level: a rule inside another, not inside a nested one
+  (`STYLE_NESTED_TOO_DEEP`). `For element: Document`, the cell position rules, `For column` and the rules of the generated
+  elements (`Code block`, `TOC 1` to `TOC 6`, `Footnotes`) contain no rules, and `For element: Document`, `Section`,
+  `TOC 1` to `TOC 6` and `Footnotes`, which are never inside an element, do not go inside one (`STYLE_NOT_ALLOWED`);
+  `Code block` does, since it is inside its `Markdown`.
+- **What "inside" is.** The ancestors of the element as written: the `Section`, the elements and the `Row` of a cell,
+  with their `Style` and their `Id`. `Item` and `Area` neither count nor get in the way. What a `Markdown` generates is
+  inside the `Markdown`; a `Footnote` is where it is written, even though it inherits from the footnote area; the
+  entries of a `Table of contents` and the `Footnotes` area are built apart by the engine and take only loose rules.
+- **Priority.** The levels do not change: a nested rule is of the level of its own selector (a `For element` inside a
+  `For style` is still a `For element`) and, **within each level, it goes after the loose one**, so it wins. Between two
+  nested rules of the same level that reach the same element, the one of the **closest ancestor** wins; with the same
+  ancestor, the one later in `Styles`, with the sources as always (the document after the styles documents). A loose
+  `For style` still wins over a nested `For element`.
+- **The cell rules** nested in the rule of a `Table` (`For style: pricing` → `For element: Header cell`) style the cells
+  of that table; the loose ones, those of every table ([Table](../components/table.md#cell-style)).
+- **The element properties** are given by a nested rule as by a loose one: `For style: dish` → `For element: Block` →
+  `Grow: 1` gives the `Grow` to the `Block` that each `Item` of the dishes wraps.
+- **A `Style` name whose only rule is nested** is valid only inside its context: outside it is `STYLE_WITHOUT_RULE`, with
+  the line of the `Style`, so that a misplacement does not go unnoticed. With a loose rule of the same name it is valid
+  anywhere, and inside the context both apply.
+- **Styled runs** `[text]{name}` take the nested rules of their context too, in the same order; a rule nested in the
+  rule of the run does not apply to the run.
+- **Repetition.** The same selector twice inside the same rule and the same source is `STYLE_DUPLICATE`; the same
+  selector in two different rules, or loose and nested, is not.
+- The errors of a nested rule point to its line, and those of a separate styles document say so.
+
+> **Decision:** scope, not selectors: nesting says "inside" with the same nodes, without combinators or new syntax, and
+> the priority stays fixed. *Rejected alternative:* compound selectors with computed specificity.
+
+> **Decision:** between two nested rules the one of the closest ancestor wins, as in typographic inheritance, and the
+> order of `Styles` only breaks ties: the result does not depend on where each rule is in the file. *Rejected
+> alternative:* the order of `Styles`.
+
+> **Decision:** one level of nesting. *Rejected alternative:* any depth; opening it is easy and closing it is not.
+
+> **Decision:** "inside" means the ancestors of the document, with the generated cases stated one by one. *Rejected
+> alternative:* the box tree, in which `Section`, `Row`, `Item` and `Area` do not exist and the generated elements hang
+> elsewhere.
+
+> **Decision:** a style with only nested rules is an error outside its context. *Rejected alternative:* valid anywhere,
+> like a rule that applies to nothing.
+
 ## Named colors
 
 `Named color`, a repeatable child of `Styles`, gives a name to a color: the name and the color go separated by a space.
@@ -197,7 +271,8 @@ Each property takes, from strongest to weakest:
 
 The rules of points 4 to 7 only apply to the cells of a `Table` ([Table](../components/table.md#cell-style)).
 The [element properties](#element-properties) follow the same order, without point 9: they are not inherited. For
-`Grow`, `Shrink` and `Base size`, what the `Item` declares is point 1.
+`Grow`, `Shrink` and `Base size`, what the `Item` declares is point 1. The [nested rules](#nested-rules) are of the
+level of their selector and, within it, go after the loose ones; among several, the one of the closest ancestor wins.
 
 A rule wins over inheritance: with `For element: Text` and `Size: 10`, a `Text` measures 10 even if its parent declares
 `Size: 20`. Rules are merged **property by property** and not by group: if the rule declares `Size` and the element
@@ -207,8 +282,9 @@ declared it. `Item` and `Area` are not boxes: the rules apply to the element the
 `Row` cannot be named in `For element` (the position rules are there to style the cells of each group). `Table` and
 `Cell` can. Only `Typography` reaches a `Section` ([Document](../components/document.md#section)).
 
-> **Decision:** fixed priority instead of computed specificity. *Rejected alternative:* computed specificity and compound
-> selectors, more powerful but less predictable.
+> **Decision:** fixed priority instead of computed specificity, also with the nested rules, which add a step within each
+> level and not a specificity. *Rejected alternative:* computed specificity and compound selectors, more powerful but
+> less predictable.
 
 ## Validation
 
@@ -220,7 +296,12 @@ These are errors:
   (`STYLE_UNKNOWN_ELEMENT`);
 - a `For column` that is not a number (`VALUE_SYNTAX`) or a range that does not go from lowest to highest
   (`VALUE_NOT_ALLOWED`);
-- two rules with the same selector in the same source, also two `For column` with the same range (`STYLE_DUPLICATE`);
+- two rules with the same selector in the same source and at the same level (loose, or inside the same rule), also
+  two `For column` with the same range (`STYLE_DUPLICATE`);
+- a rule inside a nested rule (`STYLE_NESTED_TOO_DEEP`);
+- a rule nested in one that cannot contain rules (`For element: Document`, a cell position, `For column`, a generated
+  element) or that names what is never inside an element (`Document`, `Section`, `TOC 1` to `TOC 6`, `Footnotes`)
+  (`STYLE_NOT_ALLOWED`);
 - a rule that gives `Break` to an element that does not allow it: `Overlay`, `Page overlay`, a heading, a `Text` of a
   heading or a cell, also with a position rule, a column rule or a rule of the style of its `Row` (`STYLE_NOT_ALLOWED`);
 - a rule that gives a `Section` something that is not `Typography` (`STYLE_NOT_ALLOWED`);
@@ -229,7 +310,8 @@ These are errors:
   (`STYLE_NOT_ALLOWED`);
 - an element property with a value that is not valid in any element that has it (`VALUE_SYNTAX`,
   `VALUE_NOT_ALLOWED`);
-- a `Style` name or the name of a styled run without its `For style` rule (`STYLE_WITHOUT_RULE`);
+- a `Style` name or the name of a styled run without its `For style` rule, or with only a nested one outside its
+  context (`STYLE_WITHOUT_RULE`);
 - the rule of a styled run that declares something a run does not accept, such as `Size`, a `Box` or an element
   property (`STYLE_NOT_ALLOWED_IN_RUN`);
 - two `Named color` with the same name in the same source (`COLOR_DUPLICATE`);
@@ -358,7 +440,7 @@ only the first one declares `Color`.
 
 ## What is not supported
 
-- Compound selectors (an element inside another, several styles at once), combinators or priorities declared by the
-  author.
+- Compound selectors (several styles at once, the sibling, the direct child), combinators or priorities declared by
+  the author. "Inside" is written by [nesting rules](#nested-rules).
 - Properties of identity, content, structure or position in a rule ([Element properties](#element-properties)).
 - Style of a table row with `Box` or of a whole column: it is given to the cells ([Table](../components/table.md#what-is-not-supported)).

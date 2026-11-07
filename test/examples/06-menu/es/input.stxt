@@ -69,7 +69,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Pan de cristal con tomate de colgar
 							Style: name
@@ -81,7 +80,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Ensaladilla rusa de la casa
 							Style: name
@@ -93,7 +91,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Croquetas de gamba roja
 							Style: name
@@ -105,7 +102,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Alcachofas confitadas
 							Style: name
@@ -119,7 +115,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Arroz caldoso de cigalas y calamar
 							Style: name
@@ -131,7 +126,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Suquet de pescado de roca
 							Style: name
@@ -143,7 +137,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Lubina salvaje al horno
 							Style: name
@@ -155,7 +148,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Pulpo a la brasa
 							Style: name
@@ -169,7 +161,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Presa ibérica a la brasa
 							Style: name
@@ -181,7 +172,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Canelones de la abuela
 							Style: name
@@ -201,7 +191,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Crema catalana
 							Style: name
@@ -213,7 +202,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Tarta de queso cremosa
 							Style: name
@@ -225,7 +213,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Helado artesano de leche de oveja
 							Style: name
@@ -237,7 +224,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Pera al vino tinto
 							Style: name
@@ -255,7 +241,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Blanc de la casa
 							Style: name
@@ -267,7 +252,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Cava brut nature reserva
 							Style: name
@@ -279,7 +263,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Tinto joven
 							Style: name
@@ -291,7 +274,6 @@ Document (dev.stxt.pdf):
 			Stack:
 				Style: dish
 				Item:
-					Grow: 1
 					Block:
 						Text: Vermut de la casa
 							Style: name

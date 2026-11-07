@@ -36,7 +36,7 @@ Styles:
 | `For element: TOC 1` a `TOC 6` | A las entradas de un índice, por nivel ([Table of contents](../components/table-of-contents.md)) |
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, y las [propiedades propias de un elemento](#propiedades-de-un-elemento)
-que dicen cómo se ve o cómo reparte su contenido.
+que dicen cómo se ve o cómo reparte su contenido. Una regla puede ir dentro de otra: [reglas dentro de reglas](#reglas-dentro-de-reglas).
 
 ## Propiedades de un elemento
 
@@ -96,6 +96,56 @@ Document (dev.stxt.pdf):
 - El `Marker` de una `List` y las `Column sizes` de una `Table` son obligatorios, y pueden venir de una regla:
   `For element: List` con `Marker: bullet` da viñetas a todas las listas del documento.
 
+## Reglas dentro de reglas
+
+Una regla escrita dentro de otra se aplica solo dentro de los elementos a los que se aplica la de fuera. En esta ficha, los
+párrafos pierden su margen y el bloque `body` lleva su relleno, pero solo dentro de un `Block` con `Style: card`:
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Ficha
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Paragraph
+            Box:
+                Margin: 0 0 8 0
+        For style: card
+            Box:
+                Background: #FBF8F3
+                Padding: 12
+            For element: Paragraph
+                Box:
+                    Margin: 0
+            For style: body
+                Box:
+                    Padding: 8
+    Section:
+        Paragraph: Este párrafo lleva el margen de siempre.
+        Block:
+            Style: card
+            Paragraph: Este, dentro de la ficha, no lleva margen.
+            Block:
+                Style: body
+                Paragraph: Y este bloque lleva relleno, porque está en una ficha.
+```
+
+- La regla de dentro se aplica a cualquier profundidad: a un párrafo dentro de un `Stack` dentro de la ficha también.
+- Dentro de otra regla van `For element`, `For style` y las reglas de celda (`Header cell`, `For column`...); así una
+  tabla con `Style: precios` puede tener sus propias cabeceras. Solo un nivel: una regla dentro de otra.
+- Una regla de dentro gana a la suelta de su misma clase (aquí, a `For element: Paragraph`), pero no a lo que declara el
+  elemento ni a un `For style` o un `For id` sueltos. Si dos reglas de dentro llegan al mismo elemento, gana la del
+  elemento de fuera más cercano.
+- Un estilo que solo tiene regla dentro de otra (`body`) solo vale ahí: fuera de una ficha es un error, para que una
+  errata no pase sin verse.
+- `[texto]{nombre}` dentro de una ficha toma también las reglas de dentro de `card`.
+
 ## Quién gana
 
 Si varias cosas dan la misma propiedad, gana, de más a menos fuerte:
@@ -110,6 +160,8 @@ Si varias cosas dan la misma propiedad, gana, de más a menos fuerte:
 
 Las reglas se mezclan propiedad a propiedad: si una regla da `Size` y el elemento declara `Bold`, se aplican las dos. Y
 una regla gana a la herencia: con `For element: Text` y `Size: 10`, un texto mide 10 aunque su padre diga `Size: 20`.
+Una regla escrita [dentro de otra](#reglas-dentro-de-reglas) cuenta en el mismo punto que una suelta de su clase y, a
+igualdad, gana a la suelta; entre dos de dentro, gana la del elemento de fuera más cercano.
 
 Un nombre de `Style` que no tiene su regla `For style` es un error, para que una errata no pase sin verse. Una regla que
 no se aplica a nada no es un error, para poder reutilizar el mismo `Styles` en muchos documentos.

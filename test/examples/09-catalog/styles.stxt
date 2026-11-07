@@ -80,6 +80,14 @@ Styles (dev.stxt.pdf):
 			Background: #FBF8F3
 			Border: 0.5
 			Border color: #E6DAC6
+		For element: Frame
+			Box:
+				Height: 205
+		For element: Image
+			Box:
+				Width: 100%
+				Height: 205
+				Corner radius: 5.5 5.5 0 0
 	For style: body
 		Box:
 			Padding: 10 12 12 12

@@ -115,6 +115,8 @@ una:
   de estilo y de `Id`, y lo que declara la propia celda.
 - **Por fila.** El `Style` de una `Row` da a cada una de sus celdas las reglas `For style` de esos estilos (el pie de
   totales de una factura: `Style: total` en la `Row` y no en cada celda), y la regla `For id` de su `Id`, la suya.
+- **Por tabla.** Una regla de celda escrita dentro de la regla de una `Table` (`For style: pricing` →
+  `For element: Header cell`) solo da estilo a las celdas de esa tabla ([Styles](../common/styles.md#reglas-anidadas)).
 
 La prioridad de todas ellas está en [Styles](../common/styles.md#prioridad). Las celdas de las tablas de un `Markdown`
 reciben estas mismas reglas. Su `Align` sale de la fila de separación de la tabla (`:--`, `--:`), que lo declara cada celda

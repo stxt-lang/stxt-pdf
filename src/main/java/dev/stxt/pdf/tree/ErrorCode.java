@@ -257,6 +257,8 @@ public enum ErrorCode {
     STYLE_UNKNOWN_ELEMENT,
     /** Two rules with the same selector. */
     STYLE_DUPLICATE,
+    /** A rule inside a rule that is itself inside another: rules nest one level (reference/common/styles.md). */
+    STYLE_NESTED_TOO_DEEP,
     /**
      * A rule applies a group that the element does not accept: {@code Break} in {@code Overlay},
      * {@code Page overlay}, a heading, a {@code Text} of a heading or a {@code Cell}.

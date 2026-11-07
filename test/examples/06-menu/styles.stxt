@@ -50,5 +50,7 @@ Styles (dev.stxt.pdf):
 			Align: right
 	For style: dish
 		Gap: 12
+		For element: Block
+			Grow: 1
 		Box:
 			Margin: 0 0 7 0

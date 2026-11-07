@@ -6,6 +6,7 @@ import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.TextRun;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static dev.stxt.pdf.tree.Nodes.error;
 
@@ -73,6 +75,11 @@ final class BuildContext {
      * document (the {@code Marker} of a list, from {@code Bullet markers}): their line is of that document.
      */
     final Map<Node, SourceLine> sources = new IdentityHashMap<>();
+    /**
+     * The ancestors in the document of the content being built, the closest first, for the nested rules of
+     * {@code Styles} ({@link Ancestor}); it changes only with {@link #inside}.
+     */
+    private final ArrayDeque<Ancestor> ancestors = new ArrayDeque<>();
 
     BuildContext(StyleRules rules, Cancellation cancellation) {
         this.rules = rules;
@@ -137,6 +144,29 @@ final class BuildContext {
             content.run();
         } finally {
             scope = outer;
+        }
+    }
+
+    /** The ancestors of the content being built, the closest first; empty in the content of a section. */
+    List<Ancestor> ancestors() {
+        return List.copyOf(ancestors);
+    }
+
+    /** Builds {@code content} with {@code ancestor} as its closest ancestor, and goes back to the ancestors it had. */
+    void inside(Ancestor ancestor, Runnable content) {
+        inside(ancestor, () -> {
+            content.run();
+            return null;
+        });
+    }
+
+    /** Like {@link #inside(Ancestor, Runnable)}, with what {@code content} gives. */
+    <T> T inside(Ancestor ancestor, Supplier<T> content) {
+        ancestors.push(ancestor);
+        try {
+            return content.get();
+        } finally {
+            ancestors.pop();
         }
     }
 

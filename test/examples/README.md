@@ -92,6 +92,11 @@ What several examples have in common and how it is solved:
   `For style: dish`, the `Fit: fill` of the photos of the catalog (09) in `For element: Image`, the distribution of the
   rows of its cards in `For style: spread`, the legend of the timetable (11) in `For style: legend` and the bullets of the
   lists of the CV (03) in `For element: List`.
+- **What repeats inside a container** goes in a nested rule: the `Grow` of the block of each dish of the menu (06) is
+  in `For style: dish` → `For element: Block`, the `Box` of the photos and the frames of the cards of the catalog (09), in
+  `For style: card`, the `Margin: 0` of the tips of the two grids of the manual (08), in `For id: contents` and
+  `For id: contact` → `For style: tip`, and that of the captions of the tiles of the annual report (04), in
+  `For style: tile` → `For style: caption`.
 - **Links** are a property of the whole box (`Link`) or a Markdown span (`[text](target)`). A `Text` with a phone
   number and a website (examples 02 and 09) has a `Link` and is clickable as a whole, phone number included. With
   `Markup: markdown` only part of it can be linked (`[web](https://...)`).

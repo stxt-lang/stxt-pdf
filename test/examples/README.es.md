@@ -97,6 +97,11 @@ Lo que se repite en varios ejemplos y cómo se resuelve:
   `For style: dish`, el `Fit: fill` de las fotos del catálogo (09) en `For element: Image`, el reparto de las filas de
   sus fichas en `For style: spread`, la leyenda del horario (11) en `For style: legend` y las viñetas de las listas del
   currículum (03) en `For element: List`.
+- **Lo que se repite dentro de un contenedor** va en una regla anidada: el `Grow` del bloque de cada plato del menú (06)
+  está en `For style: dish` → `For element: Block`, el `Box` de las fotos y de los marcos de las fichas del catálogo (09), en
+  `For style: card`, el `Margin: 0` de los consejos de las dos rejillas del manual (08), en `For id: contents` y
+  `For id: contact` → `For style: tip`, y el de los pies de las baldosas de la memoria (04), en `For style: tile` →
+  `For style: caption`.
 - **Los enlaces** son una propiedad de la caja entera (`Link`) o un tramo de Markdown
   (`[texto](destino)`). Un `Text` con un teléfono y una web (ejemplos 02 y 09) lleva `Link` y es
   clicable entero, también el teléfono. Con `Markup: markdown` se puede enlazar solo una parte

@@ -82,6 +82,14 @@ with their document (`PropertyNode`), and `BuildContext.property` gives the one 
 it, the one of its rule. What a `Markdown` generates from one of a separate styles document (the `Marker` of a list, the
 `Column sizes` of a table) carries the line of that document (`Translation.sources`, in `BuildContext.sources`).
 
+The nested rules ([Styles](../common/styles.md#nested-rules)) need the ancestors of the element in the document:
+`BuildContext` keeps the stack (`Ancestor`: the kind, the names of the `Style` and the `Id`; `BuildContext.inside` pushes
+one while the content of an element, of a `Section` or of the cells of a `Row` is built, and `ancestors()` gives it, the
+closest first). `StyleRules.load` reads the rules inside each rule with the outer one (`Placed.outer()`, and `Outer`, what
+the outer one applies to), and `select` orders them at each level: the loose ones, then the nested ones whose outer rule
+applies to an ancestor, that of the farthest first (`depth`). `checkStyle` gives the `STYLE_WITHOUT_RULE` of a name that is
+only nested outside its context, also for the runs (`runStyle` receives the ancestors).
+
 Inside which boxes each content is built (a `Page overlay`, a heading, a `Columns`, a `Markdown`, a `Footnote` or a box
 that is not split) is said by `BuildContext.Scope`, a `record` that only changes while the content of a box is built
 (`BuildContext.within`) and is restored afterwards. Why a box is not split across pages is said by a single
@@ -97,7 +105,7 @@ The pieces:
 | `SectionReader` | The properties of a `Section` (`Id`, `Page`, the page and footnote numbering, `Inherit page overlays`, `Begin on`) and their rules; the box, the footnote area and `SECTION_EMPTY` stay in `BoxTreeBuilder.section` |
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |
-| `StyleRules` | The rules of `Styles` from the two origins, their priority and their element properties |
+| `StyleRules` | The rules of `Styles` from the two origins, their priority, their element properties and the nested rules |
 | `NamedColors` | The named colors (`Named color`) of the two origins, read before the rules and replaced by their color when each property is read (`COLOR_UNKNOWN`, `COLOR_DUPLICATE`) |
 | `TableBuilder`, `CellPosition`, `CellSelector` | Tables: the placement of the cells, their position for the rules and the box of each `Row` with `Id` or `Box` (`Element.ROW`, in `Box.rows()` of the table: it has the table as parent, but is not its child) |
 | `TableBorders` | The merged borders of a table with `Merge borders`: it keeps the border each cell declares (`Box.mergedBorder()`, with `model.Stroke`) and changes its `Border` into the room it leaves for the lines |

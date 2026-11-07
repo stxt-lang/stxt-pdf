@@ -36,7 +36,7 @@ Styles:
 | `For element: TOC 1` to `TOC 6` | The entries of a table of contents, by level ([Table of contents](../components/table-of-contents.md)) |
 
 Each rule accepts the `Box`, `Typography` and `Break` groups, and the [properties specific to an element](#element-properties)
-that say how it looks or how it distributes its content.
+that say how it looks or how it distributes its content. A rule can go inside another: [rules inside rules](#rules-inside-rules).
 
 ## Element properties
 
@@ -96,6 +96,56 @@ Document (dev.stxt.pdf):
 - The `Marker` of a `List` and the `Column sizes` of a `Table` are required, and they can come from a rule:
   `For element: List` with `Marker: bullet` gives bullets to every list of the document.
 
+## Rules inside rules
+
+A rule written inside another applies only inside the elements the outer one applies to. In this card, the paragraphs
+lose their margin and the `body` block has its padding, but only inside a `Block` with `Style: card`:
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Card
+    Page:
+        Paper: A5
+        Margin: 40
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: Paragraph
+            Box:
+                Margin: 0 0 8 0
+        For style: card
+            Box:
+                Background: #FBF8F3
+                Padding: 12
+            For element: Paragraph
+                Box:
+                    Margin: 0
+            For style: body
+                Box:
+                    Padding: 8
+    Section:
+        Paragraph: This paragraph has the usual margin.
+        Block:
+            Style: card
+            Paragraph: This one, inside the card, has no margin.
+            Block:
+                Style: body
+                Paragraph: And this block has padding, because it is in a card.
+```
+
+- The inner rule applies at any depth: to a paragraph inside a `Stack` inside the card too.
+- Inside another rule go `For element`, `For style` and the cell rules (`Header cell`, `For column`...); this way a table
+  with `Style: prices` can have its own headers. Only one level: a rule inside another.
+- An inner rule beats the loose one of its own kind (here, `For element: Paragraph`), but not what the element declares
+  nor a loose `For style` or `For id`. If two inner rules reach the same element, the one of the closest outer element
+  wins.
+- A style that only has a rule inside another (`body`) is valid only there: outside a card it is an error, so that a typo
+  does not go unnoticed.
+- `[text]{name}` inside a card takes the rules inside `card` too.
+
 ## Which one wins
 
 If several things give the same property, the winner is, from strongest to weakest:
@@ -110,6 +160,8 @@ If several things give the same property, the winner is, from strongest to weake
 
 Rules are combined property by property: if a rule gives `Size` and the element declares `Bold`, both apply. And a rule
 wins over inheritance: with `For element: Text` and `Size: 10`, a text measures 10 even if its parent says `Size: 20`.
+A rule written [inside another](#rules-inside-rules) counts at the same point as a loose one of its kind and, at a tie,
+beats the loose one; between two inner rules, the one of the closest outer element wins.
 
 A `Style` name without its `For style` rule is an error, so that a typo does not go unnoticed. A rule that applies to
 nothing is not an error, so that the same `Styles` can be reused in many documents.

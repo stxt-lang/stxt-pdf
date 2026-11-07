@@ -138,14 +138,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/silla.jpg
 								Alt: Silla Olot
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -172,14 +166,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/mesa.jpg
 								Alt: Mesa Besalú
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -206,14 +194,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/lampara.jpg
 								Alt: Lámpara Sol
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40
@@ -247,14 +229,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/taburete.jpg
 								Alt: Taburete Cal
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -293,14 +269,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/estanteria.jpg
 								Alt: Estantería Fageda
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -327,14 +297,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/banco.jpg
 								Alt: Banco Mirador
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -361,14 +325,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/espejo.jpg
 								Alt: Espejo Lluna
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 						Block:
 							Style: body
 							Stack:
@@ -395,14 +353,8 @@ Document (dev.stxt.pdf):
 					Block:
 						Style: card
 						Frame:
-							Box:
-								Height: 205
 							Image: examples/catalog/escritorio.jpg
 								Alt: Escritorio Torre
-								Box:
-									Width: 100%
-									Height: 205
-									Corner radius: 5.5 5.5 0 0
 							Overlay:
 								Offset: 18 -12 auto auto
 								Rotate: 40

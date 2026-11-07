@@ -1,0 +1,54 @@
+# Nested rules of Styles (reference/common/styles.md#nested-rules): a rule inside another applies within the elements
+# the outer one applies to, after the loose rules of its level, and the one of the closest ancestor wins.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+		Margin: 40
+	Styles:
+		For element: Block
+			Box:
+				Padding: 5
+		For style: card
+			Box:
+				Padding: 10
+			For element: Block
+				Box:
+					Padding: 20
+			For style: inner
+				Box:
+					Height: 30
+		For style: notice
+			For element: Block
+				Box:
+					Padding: 2
+	Section:
+		Block:
+			Id: card
+			Style: card
+			Block:
+				Id: a
+				Block:
+					Id: a1
+					Box:
+						Height: 10
+			Block:
+				Id: b
+				Style: inner
+			Block:
+				Id: d
+				Style: notice
+				Block:
+					Id: d1
+					Block:
+						Id: d2
+						Box:
+							Height: 10
+		Block:
+			Id: c
+			Block:
+				Id: c1
+				Box:
+					Height: 10

@@ -106,6 +106,14 @@ Styles (dev.stxt.pdf):
 			Border: 0 0 0 3
 			Border color: #1F7A7A
 			Background: #E7F3F2
+	For id: contents
+		For style: tip
+			Box:
+				Margin: 0
+	For id: contact
+		For style: tip
+			Box:
+				Margin: 0
 	For style: label
 		Typography:
 			Size: 7.5

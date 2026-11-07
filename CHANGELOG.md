@@ -9,6 +9,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **Nested rules in `Styles`.** A `For element`, `For style` or `For column` written inside a `For style`, a `For id` or
+  the `For element` of an element of the document applies to the elements it names that are inside an element the
+  outer rule applies to, at any depth and one level deep. The priority levels do not change: within each level the
+  nested rule goes after the loose one, and between nested rules the one of the closest ancestor wins. "Inside" is the
+  document as written (`Section`, the elements and the `Row` of a cell count; `Item` and `Area` do not); the cell rules
+  nested in the rule of a table style only its cells, styled runs take the nested rules of their context, and a style
+  whose only rule is nested is `STYLE_WITHOUT_RULE` outside it. "Nested rules" in the reference of `Styles`.
+- `STYLE_NESTED_TOO_DEEP`: a rule inside a nested rule. `STYLE_NOT_ALLOWED` also for a rule nested in one that cannot
+  contain rules (`For element: Document`, a cell position, a generated element) or that names what is never inside an
+  element (`Document`, `Section`, `TOC 1` to `TOC 6`, `Footnotes`); `STYLE_DUPLICATE` also inside a rule.
 - **Element properties in the rules of `Styles`.** Besides `Box`, `Typography` and `Break`, `For element`, `For style`
   and `For id` give the properties of an element that say how it looks or how it distributes its content: those of
   `Stack`, `Grid`, `Table` (also `Column align`) and `Columns`, `Marker` and `Marker image`, `Fit`, the ones of
@@ -39,6 +49,9 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - The menu (06), the CV (03), the catalog (09) and the timetable (11) take from their `styles.stxt` what they repeated:
   the `Gap` of the dishes, the `Marker` of the lists, the `Fit` of the photos and the alignment of the rows of the
   product cards, and the `Gap` and `Vertical` of the legend. Their PDFs are byte for byte the same.
+- The menu (06), the annual report (04), the manual (08) and the catalog (09) take to nested rules what they repeated
+  inside a container: the `Grow` of the block of each dish, the margin of the captions of the tiles, the `Margin: 0` of
+  the tips of the grids and the `Box` of the photos and frames of the cards. Their PDFs are byte for byte the same.
 
 ## [0.12.0] - 2026-11-06
 

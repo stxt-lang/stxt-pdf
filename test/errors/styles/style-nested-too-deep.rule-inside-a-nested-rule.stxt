@@ -1,0 +1,21 @@
+# Case: A rule inside a rule that is itself inside another
+# Code: STYLE_NESTED_TOO_DEEP
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: card
+			For element: Block
+				For element: Text
+					Typography:
+						Bold: true
+	Section:
+		Block:

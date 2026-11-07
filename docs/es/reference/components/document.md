@@ -137,7 +137,8 @@ sitio donde se escribe.
 - **Una sección sin contenido es `SECTION_EMPTY`**: sin elementos, o solo con `Page overlay`, que no ocupan sitio, no tendría
   ninguna página. Un `Overlay` sí cuenta: una portada hecha solo de cajas posicionadas es válida.
 - **Tipografía por sección.** Las reglas que llegan a una sección solo pueden dar `Typography` (`Language` incluido: un
-  anexo en inglés), que hereda todo su contenido.
+  anexo en inglés), que hereda todo su contenido. Las reglas anidadas en ellas se aplican a lo que hay dentro de la sección
+  ([Styles](../common/styles.md#reglas-anidadas)).
 - **Un solo documento.** La jerarquía de encabezados, los índices (`Table of contents`, que listan los encabezados de todas las
   secciones, en orden), `Styles`, los `Id` (únicos en todo el documento) y la convergencia de las referencias son del
   documento y no de la sección.
