@@ -50,6 +50,7 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | Todo |
 | `stxt.DocumentReader` | Todo |
+| `tree.DocumentSchema` | `NAMESPACE`, `text()` |
 | `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()`, `builder()`, `withImages(...)`, `imagePaths()` |
 | `resources.Resources.Builder` | Todo |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | Todo |
@@ -77,7 +78,7 @@ componentes: lo que un componente dice hoy lo dirá siempre.
 
 Lo demás que el jar expone como público lo es porque otro package del motor lo usa, no para quien convierte: `Engine`,
 `PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` y los grupos de `Style`, `Resources.fonts()` e `images()` con sus
-índices, los algoritmos de `layout`, los lienzos de `paint`. Se puede usar, con la versión fijada, y no se promete.
+índices (`FontLibrary.all()` lista las fuentes, para un servicio que las enseña), los algoritmos de `layout`, los lienzos de `paint`. Se puede usar, con la versión fijada, y no se promete.
 
 `PublicApiTest` lee esta tabla y comprueba que cada tipo y cada miembro existe y es público, que ninguna firma
 prometida (parámetros, lo que devuelve, componentes, supertipos) expone un tipo del motor que no esté en la tabla ni uno
@@ -652,3 +653,17 @@ otras carpetas. JSVG lo dibuja con AWT, así que en un servidor sin pantalla se 
 La extensión de STXT para VS Code carga los schemas de la carpeta `.stxt/` del espacio de trabajo. Copiando allí el schema
 ([`dev.stxt.pdf.stxt`](../../../../src/main/resources/stxt/dev.stxt.pdf.stxt)) se tiene validación y ayuda contextual
 mientras se escriben documentos.
+
+`DocumentSchema.text()` da el texto de ese schema tal como lo lleva el jar, el mismo con el que valida el motor: lo usa
+quien lo publica o se lo da a un editor (`GET /schema` de `stxt-press`), sin depender de dónde lo guarda el jar.
+
+## La versión del motor
+
+`Converter.version()` da la versión del motor que se está usando (`0.13.0`): un servicio puede decir con qué versión se
+hizo un PDF. La escribe Maven al construir el jar en un recurso del motor, `dev/stxt/pdf/version.properties`.
+
+> **Decisión:** la versión sale de un recurso propio y no del manifest. Un jar que junta el motor con sus dependencias
+> (el de `stxt-press`) guarda un solo manifest, el suyo, y `Converter.class.getPackage().getImplementationVersion()` da
+> allí la versión de ese jar. El manifest lleva igualmente `Implementation-Title` e `Implementation-Version`.
+> *Alternativa descartada:* leer `META-INF/maven/dev.stxt/stxt-pdf/pom.properties`, que es un detalle de Maven y no
+> existe al construir con otra herramienta.

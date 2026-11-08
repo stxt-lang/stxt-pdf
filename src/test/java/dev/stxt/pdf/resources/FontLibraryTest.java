@@ -194,6 +194,22 @@ class FontLibraryTest {
                 () -> r.fonts().find(plex(FontWeight.NORMAL, FontStyle.NORMAL)));
         assertEquals("The font IBM Plex Sans has no variant normal. Variants in "
                 + r.fontsFolder() + ": weight 450", e.getMessage());
+        // The list of the index has the file of 450, and not the one outside 1 to 1000.
+        assertEquals(List.of(new FontWeight(450)), r.fonts().all().stream().map(f -> f.face().weight()).toList());
+    }
+
+    /** The list of the index: every file, by family and then from the lightest to the heaviest, upright first. */
+    @Test
+    void allTheFontsInOrder() throws IOException {
+        Resources r = copy("plex", "Bold", "Italic", "SemiBold", "Regular", "Light");
+        assertEquals(List.of("Light", "Regular", "Italic", "SemiBold", "Bold"), r.fonts().all().stream()
+                .map(f -> f.path().getFileName().toString().replace(".ttf", "")).toList());
+        // The fonts of the repository: the files of the folder, each once.
+        FontLibrary fonts = new Resources().fonts();
+        List<FontFile> all = fonts.all();
+        assertEquals(fonts.families(), Set.copyOf(all.stream().map(f -> f.face().family()).toList()));
+        assertEquals(all.size(), Set.copyOf(all.stream().map(FontFile::digest).toList()).size());
+        assertTrue(all.contains(fonts.find(plex(FontWeight.BOLD, FontStyle.ITALIC))));
     }
 
     @Test

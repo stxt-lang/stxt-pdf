@@ -35,9 +35,21 @@ public final class DocumentSchema {
 
     private static final String RESOURCE = "/stxt/dev.stxt.pdf.stxt";
 
+    /** The text of the schema, as the resource has it. */
+    private static final String TEXT = read();
+
     private static final SchemaProviderMemory PROVIDER = load();
 
     private DocumentSchema() {
+    }
+
+    /**
+     * {@return the text of the schema, the STXT document {@code dev.stxt.pdf} as the engine has it} It is the schema
+     * the engine validates with, for those who publish it or give it to an editor, so that they do not depend on where
+     * the jar keeps it.
+     */
+    public static String text() {
+        return TEXT;
     }
 
     /** The schema provider, to validate while reading. */
@@ -74,16 +86,20 @@ public final class DocumentSchema {
         }
     }
 
-    private static SchemaProviderMemory load() {
+    private static String read() {
         try (InputStream in = DocumentSchema.class.getResourceAsStream(RESOURCE)) {
             if (in == null) {
                 throw new InternalException("Schema " + RESOURCE + " not found in the classpath");
             }
-            SchemaProviderMemory provider = new SchemaProviderMemory();
-            provider.addSchema(new String(in.readAllBytes(), StandardCharsets.UTF_8));
-            return provider;
+            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new InternalException("Schema " + RESOURCE + " cannot be read", e);
         }
+    }
+
+    private static SchemaProviderMemory load() {
+        SchemaProviderMemory provider = new SchemaProviderMemory();
+        provider.addSchema(TEXT);
+        return provider;
     }
 }

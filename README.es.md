@@ -68,12 +68,12 @@ Java 17 o superior.
 <dependency>
     <groupId>dev.stxt</groupId>
     <artifactId>stxt-pdf</artifactId>
-    <version>0.12.0</version>
+    <version>0.13.0</version>
 </dependency>
 ```
 
 ```groovy
-implementation 'dev.stxt:stxt-pdf:0.12.0'
+implementation 'dev.stxt:stxt-pdf:0.13.0'
 ```
 
 ```java

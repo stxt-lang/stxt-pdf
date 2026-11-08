@@ -204,8 +204,12 @@ public final class FontLibrary {
         return faces.get(requested.base());
     }
 
-    /** All the fonts that can be used, in order of family and variant. */
-    List<FontFile> all() {
+    /**
+     * {@return every font of the index, one file per family, weight and style, in order of family and variant} It is
+     * what {@link #find(FontFace)} can give, plus a file whose weight a document cannot ask for (450), which is indexed
+     * but not used: those who list the fonts of a server use it instead of asking for each weight.
+     */
+    public List<FontFile> all() {
         return faces.values().stream()
                 .sorted(Comparator.comparing(FontFile::face,
                         Comparator.comparing(FontFace::family).thenComparing(BY_VARIANT)))

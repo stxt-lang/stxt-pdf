@@ -5,7 +5,14 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.13.0] - 2026-11-08
+
+Rules of `Styles` that give the properties of an element (`Gap`, `Fit`, `Marker`, `Column sizes`...) and rules nested
+in other rules, for what is repeated inside a container; a builder from a converter, for the options of one request;
+the text of the schema, the fonts of the index and the version of the engine, for a service; and a single PDFBox in
+the tree of a consumer. **From 0.12.0**: a `List` without `Marker` or a `Table` without `Column sizes` is
+`LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING` instead of `TOO_FEW_CHILDREN`. The names of the `dev.stxt.pdf`
+namespace and the Java API may still change before 1.0.
 
 ### Added
 
@@ -36,12 +43,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   run.
 - `LIST_MARKER_MISSING` and `TABLE_COLUMN_SIZES_MISSING`: a `List` without `Marker`, or a `Table` without
   `Column sizes`, its own or from a rule.
-
 - **The options of one request.** `Converter.toBuilder()` gives a builder with the configuration of a converter, to
   build one that differs in some options (the separate styles of a request, `debug`, the part of PDF/UA, PDF/A, the
   checks, the limits). What it builds shares the resources of the converter as it has read them, without looking at
   the folders again, unless the resources options change; the styles added go after those of the converter. The shared
   converter does not change. "Options of one request" in "API".
+- `DocumentSchema.text()`, promised: the text of the schema `dev.stxt.pdf` as the engine has it, for those who publish it
+  or give it to an editor without depending on where the jar keeps it. "Validation in the editor" in "API".
+- `FontLibrary.all()` is public: every font of the index, in order of family and variant, for those who list the fonts
+  of a server instead of asking for each weight. Like the rest of the indexes of `Resources`, it is not promised.
+- `Converter.version()`: the version of the engine, from a resource that Maven writes when it builds the jar, so that
+  it is right also in a jar that joins the engine with its dependencies. The manifest of the jar has
+  `Implementation-Title` and `Implementation-Version` too. "The version of the engine" in "API".
 
 ### Changed
 

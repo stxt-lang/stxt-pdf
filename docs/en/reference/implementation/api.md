@@ -49,6 +49,7 @@ are always included. Of an exception, what is read from it is promised, not its 
 |---|---|
 | `convert.Converter`, `convert.Converter.Builder` | All |
 | `stxt.DocumentReader` | All |
+| `tree.DocumentSchema` | `NAMESPACE`, `text()` |
 | `resources.Resources` | `Resources()`, `Resources(Path)`, `DEFAULT_ROOT`, `root()`, `fontsFolder()`, `imagesFolder()`, `resolve(...)`, `snapshot()`, `withImagesInMemory()`, `imagesInMemory()`, `builder()`, `withImages(...)`, `imagePaths()` |
 | `resources.Resources.Builder` | All |
 | `model.Limits`, `model.Check`, `model.PdfA`, `model.Cancellation`, `model.Progress`, `model.Attachment`, `model.Attachment.Relationship`, `model.Attachments` | All |
@@ -76,7 +77,7 @@ that only gain components: what a component says today it will always say.
 
 Everything else the jar exposes as public is so because another package of the engine uses it, not for the caller:
 `Engine`, `PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` and the groups of `Style`, `Resources.fonts()` and
-`images()` with their indexes, the `layout` algorithms, the `paint` canvases. It can be used, with the version pinned,
+`images()` with their indexes (`FontLibrary.all()` lists the fonts, for a service that shows them), the `layout` algorithms, the `paint` canvases. It can be used, with the version pinned,
 and it is not promised.
 
 `PublicApiTest` reads this table and checks that every type and every member exists and is public, that no promised
@@ -664,3 +665,19 @@ other folders. JSVG draws it with AWT, so on a server without a display the JVM 
 The STXT extension for VS Code loads the schemas of the `.stxt/` folder of the workspace. By copying the schema there
 ([`dev.stxt.pdf.stxt`](../../../../src/main/resources/stxt/dev.stxt.pdf.stxt)), documents get validation and contextual help
 while they are written.
+
+`DocumentSchema.text()` gives the text of that schema as the jar has it, the same one the engine validates with: it is
+for those who publish it or give it to an editor (`GET /schema` of `stxt-press`), without depending on where the jar
+keeps it.
+
+## The version of the engine
+
+`Converter.version()` gives the version of the engine in use (`0.13.0`): a service can say which version made a PDF.
+Maven writes it when it builds the jar, in a resource of the engine, `dev/stxt/pdf/version.properties`.
+
+> **Decision:** the version comes from a resource of its own and not from the manifest. A jar that joins the engine with
+> its dependencies (the one of `stxt-press`) keeps a single manifest, its own, and
+> `Converter.class.getPackage().getImplementationVersion()` gives there the version of that jar. The manifest has
+> `Implementation-Title` and `Implementation-Version` anyway. *Rejected alternative:* reading
+> `META-INF/maven/dev.stxt/stxt-pdf/pom.properties`, which is a detail of Maven and does not exist when another tool
+> builds the jar.

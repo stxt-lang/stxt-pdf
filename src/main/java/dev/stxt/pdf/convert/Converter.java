@@ -21,6 +21,7 @@ import dev.stxt.pdf.stxt.DocumentReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -82,6 +84,11 @@ import java.util.function.Supplier;
  * {@link dev.stxt.pdf.paint.PdfPainter}.</p>
  */
 public final class Converter {
+
+    /** The resource with the version of the engine, written by Maven ({@code src/main/resources-filtered}). */
+    private static final String VERSION_RESOURCE = "/dev/stxt/pdf/version.properties";
+
+    private static final String VERSION = readVersion();
 
     private final Resources resources;
     /** Whether each conversion takes a snapshot of the resources ({@link Builder#reloadResourcesEachConversion}). */
@@ -142,6 +149,15 @@ public final class Converter {
         this.pdfUa = other.pdfUa;
         this.pdfA = other.pdfA;
         this.cancellation = other.cancellation;
+    }
+
+    /**
+     * {@return the version of the engine, the one of its jar ({@code 0.13.0})} It is read from a resource that Maven
+     * writes when it builds the jar, not from the manifest: a jar that joins the engine with other dependencies keeps a
+     * single manifest, that of the jar that joins them.
+     */
+    public static String version() {
+        return VERSION;
     }
 
     /**
@@ -661,6 +677,19 @@ public final class Converter {
     }
 
     /** Configures a {@link Converter}; every option is optional. */
+    private static String readVersion() {
+        try (InputStream in = Converter.class.getResourceAsStream(VERSION_RESOURCE)) {
+            if (in == null) {
+                throw new InternalException("Resource " + VERSION_RESOURCE + " not found in the classpath");
+            }
+            Properties properties = new Properties();
+            properties.load(in);
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            throw new InternalException("Resource " + VERSION_RESOURCE + " cannot be read", e);
+        }
+    }
+
     public static final class Builder {
 
         /** The converter this builder comes from ({@link Converter#toBuilder()}); {@code null} if from scratch. */

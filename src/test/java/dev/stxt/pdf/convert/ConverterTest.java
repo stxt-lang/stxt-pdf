@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +44,15 @@ class ConverterTest {
     /** A document with a single box of text, which needs the typography of {@link #BASE}. */
     private static InlineNode document() {
         return Docs.read(HEADER, "\tText: Hola");
+    }
+
+    /** The version is that of the {@code pom.xml}, written by Maven in a resource of the engine. */
+    @Test
+    void versionOfThePom() throws IOException {
+        Matcher m = Pattern.compile("<artifactId>stxt-pdf</artifactId>\\s*<version>([^<]+)</version>")
+                .matcher(Files.readString(Path.of("pom.xml")));
+        assertTrue(m.find());
+        assertEquals(m.group(1), Converter.version());
     }
 
     private static byte[] pdf(Converter converter, InlineNode document) throws IOException {
