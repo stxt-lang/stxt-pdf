@@ -21,10 +21,10 @@ In the schema:
 - the container elements and the groups are `GROUP` (no value);
 - `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, `Caption`, `Marker image` and the rules of `Styles`, `INLINE` with
   children;
-- `Content`, `BLOCK`, and `Areas`, `TEXT`;
+- `Content`, `BLOCK`, and `Area map`, `TEXT`;
 - the switches (such as `Isolate margins`, `Wrap`, `Row header`, `In table of contents`, `Merge borders` or `Hyphenate`),
   `BOOLEAN`;
-- the integers (such as `Layer`, `Widows`, `Orphans`, `Start`, `Number`, `Count`, `Weight`, `Drop cap` or `Quiet zone`),
+- the integers (such as `Layer`, `Widows`, `Orphans`, `First number`, `Number`, `Column count`, `Weight`, `Drop cap` or `Quiet zone`),
   `INTEGER`, and `Rotate`, `NUMBER`;
 - those with closed values (such as `Fit`, `Leader`, `Pages` or `Paper`), `ENUM`;
 - the rest, `INLINE` without children, whose form `ValueReader` checks.
@@ -158,7 +158,7 @@ list, those in flow are computed once, and writing to a closed box or style is a
 ## The sections and the root
 
 `BoxTreeBuilder.Result` gives the root of the document and the list of `Section` (`tree/Section`: box, `PageSetup`, `Page numbering`,
-`Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` and the
+`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` and the
 footnote area, `footnotes()`). The **box of each section is a child of the root of the document** (`Element.SECTION`, added after
 the `Page overlay` elements of the document so that they precede it in preorder traversal) and is the **root of its layout**
 (`Box.isLayoutRoot()`): the traversals of the whole tree (references, links, tables of contents, fonts, images, `Id`, PDF

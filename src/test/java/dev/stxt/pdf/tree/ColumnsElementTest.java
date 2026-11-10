@@ -26,7 +26,7 @@ class ColumnsElementTest {
 
     @Test
     void contentGoesInTheColumnFlow() {
-        Box columnsBox = root("\tColumns:", "\t\tId: m", "\t\tCount: 3", "\t\tGap: 12", "\t\tSeparator: 0.5",
+        Box columnsBox = root("\tColumns:", "\t\tId: m", "\t\tColumn count: 3", "\t\tGap: 12", "\t\tSeparator: 0.5",
                 "\t\tSeparator color: #999999", "\t\tBalance: false", "\t\tTypography:", "\t\t\tSize: 9",
                 "\t\tParagraph: Uno", "\t\tBlock:", "\t\t\tId: b").children().get(0);
         assertEquals(Element.COLUMNS, columnsBox.element());
@@ -62,7 +62,7 @@ class ColumnsElementTest {
 
     @Test
     void columnBreaksInsideAColumns() {
-        Box flow = root("\tColumns:", "\t\tCount: 2", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tAfter: column",
+        Box flow = root("\tColumns:", "\t\tColumn count: 2", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tAfter: column",
                 "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: column").children().get(0).children().get(0);
         assertEquals(Break.COLUMN, flow.children().get(0).style().breaks().after());
         assertEquals(Break.COLUMN, flow.children().get(1).style().breaks().before());
@@ -73,7 +73,7 @@ class ColumnsElementTest {
     void columnBreakFromARuleOutsideAColumns() {
         InvalidModelException ex = assertThrows(InvalidModelException.class, () -> root(
                 "\tStyles:", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tBefore: column",
-                "\tColumns:", "\t\tCount: 2", "\t\tParagraph: Dentro",
+                "\tColumns:", "\t\tColumn count: 2", "\t\tParagraph: Dentro",
                 "\tParagraph: Fuera"));
         assertEquals(ErrorCode.COLUMN_BREAK_OUTSIDE_COLUMNS, ex.errorCode());
         assertEquals(14, ex.line());

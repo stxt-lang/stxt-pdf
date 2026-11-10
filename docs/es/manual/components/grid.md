@@ -23,7 +23,7 @@ Document (dev.stxt.pdf):
         Grid:
             Column sizes: 150 *
             Gap: 20
-            Areas >>
+            Area map >>
                 head head
                 side main
             Area: head
@@ -48,7 +48,7 @@ Cada hijo de un `Grid` va dentro de un `Area`, que envuelve **exactamente un ele
 | Valor | Dónde va |
 |---|---|
 | *(nada)* | En el siguiente hueco libre, recorriendo la rejilla por filas |
-| `side` | En el área con ese nombre de `Areas` |
+| `side` | En el área con ese nombre de `Area map` |
 | `2 3` | En la fila 2, columna 3 (se cuenta desde 1) |
 | `1 1 1 2` | En la fila 1, desde la columna 1, ocupando 1 fila y 2 columnas |
 | `auto auto 1 2` | En el siguiente hueco donde quepan 2 columnas |
@@ -63,11 +63,11 @@ El `Area` admite además `Horizontal` y `Vertical` (la alineación del ítem en 
 | `Column sizes` | una columna | El ancho de cada columna |
 | `Row sizes` | lo que mida cada fila | El alto de cada fila |
 | `Gap` | `0` | El hueco entre celdas (con dos valores: entre filas y entre columnas) |
-| `Areas` | sin valor | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
+| `Area map` | sin valor | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
 | `Flow` | `horizontal` | Si los ítems sin sitio fijo se colocan por filas (`horizontal`) o por columnas (`vertical`) |
 | `Horizontal`, `Vertical` | `stretch` | La alineación de los ítems en su celda: `start`, `end`, `center` o `stretch` (ocupar toda la celda) |
 
-Cada nombre de `Areas` tiene que formar un rectángulo. Si un ítem cae fuera de las filas declaradas, se añaden filas nuevas.
+Cada nombre de `Area map` tiene que formar un rectángulo. Si un ítem cae fuera de las filas declaradas, se añaden filas nuevas.
 
 ## Las medidas de las columnas y las filas
 

@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 |---|---|---|
 | `Marker` | `List` | **Obligatorio**, en la lista o en una regla de `Styles` ([Estilos](../common/styles.md#propiedades-de-un-elemento)). `bullet` (•), `dash` (–), `none`, `image` (una imagen), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Marker image` | `List`, `List item` | La imagen del marcador con `Marker: image`, de `images/`. La de la lista vale para todos sus ítems; la de un ítem la sustituye. Admite `Alt` y `Height` |
-| `Start` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
+| `First number` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios

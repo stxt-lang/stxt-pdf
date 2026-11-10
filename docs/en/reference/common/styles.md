@@ -52,7 +52,7 @@ Styles:
     For style: dish
         Gap: 12
     For element: Image
-        Fit: fill
+        Fit: crop
 Stack:
     Style: dish
     Item:
@@ -68,13 +68,13 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | Element | Properties in a rule |
 |---|---|
 | `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
-| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
+| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
-| `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
+| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
 | `List` | `Marker`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Clear` |
-| `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
 | `Heading 1` to `Heading 6` | `In table of contents`, `Clear` |
 | `Paragraph` | `Drop cap`, `Clear` |
@@ -105,7 +105,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 - **`Marker` and `Column sizes`** are required in a `List` and in a `Table`, and they can come from a rule. Without
   either, the error is `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
 - **Not in a rule** are the properties of identity, content, structure and position: `Id`, `Style`, `Link`, `Alt`,
-  `Span`, `Row header`, `Start`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
+  `Span`, `Row header`, `First number`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
   those of `Section` and `Page`, and the value or the `Content` of an element. The schema does not allow them.
 
 > **Decision:** rules allow the element properties of appearance and distribution, and the engine checks that the

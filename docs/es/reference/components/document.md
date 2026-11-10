@@ -136,7 +136,7 @@ contenido está en alguna.
 | `Page` | como el del documento | el del documento | Ver [abajo](#el-page-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
-| `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
+| `First number` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Descarta el margen de arriba de su primer elemento (`top`), el de abajo del último (`bottom`) o los dos: con `both` o `top`, el contenido empieza arriba del área útil ([Block](block.md#recortar-los-márgenes-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
@@ -208,7 +208,7 @@ deja en blanco. Los marcadores, los enlaces y `Pages` siguen la página física.
 estar en un índice (`In table of contents: false`).
 
 Como el contador no avanza en una sección `none`, una sección `continue` detrás de una portada empieza en 1. Con
-`Page numbering: restart`, `Start` da el número de la primera página de la sección (`Start: 5`: un documento repartido
+`Page numbering: restart`, `First number` da el número de la primera página de la sección (`First number: 5`: un documento repartido
 en varios ficheros). El visor muestra también el número impreso ([El PDF](../common/pdf.md#páginas)).
 
 **Cómo se escribe.** `Page number format` escribe los números de las páginas de la sección en cifras (`decimal`), en romanos en
@@ -226,7 +226,7 @@ Section:
     Paragraph: El cuerpo empieza en la página 1.
 ```
 
-Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. Un `Start` sin `restart`,
+Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. Un `First number` sin `restart`,
 que no tendría efecto porque la sección sigue la cuenta de la anterior, es `START_WITHOUT_RESTART`.
 
 > **Decisión:** el estilo es de la sección y no del contador: una sección `continue` en romanos sigue la cuenta de la

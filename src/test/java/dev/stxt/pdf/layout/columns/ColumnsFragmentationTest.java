@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Blocks in columns on pages of 180 pt with margins of 40: page area of 515 × 100 from
- * (40, 40). With {@code Count: 2} and {@code Gap: 15}, the second column starts at x = 305.
+ * (40, 40). With {@code Column count: 2} and {@code Gap: 15}, the second column starts at x = 305.
  */
 class ColumnsFragmentationTest {
 
     private static final double PAGE = 180;
-    private static final List<String> TWO = List.of("Count: 2", "Gap: 15");
+    private static final List<String> TWO = List.of("Column count: 2", "Gap: 15");
 
     /** Blocks of 25 with {@code Id} A, B, C...: four fit in a column. */
     private static List<String>[] blocks(int n) {
@@ -53,7 +53,7 @@ class ColumnsFragmentationTest {
 
     @Test
     void fillAutoDoesNotBalanceTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false"), blocks(10)));
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), blocks(10)));
         assertRect(40, 40, 515, 50, l.rect(2, "M"));
         assertRect(40, 65, 250, 25, l.rect(2, "J"));
     }
@@ -86,7 +86,7 @@ class ColumnsFragmentationTest {
     @Test
     void columnsThatCannotStartMoveToTheNextPage() {
         LayoutFixture l = layOutPaged(PAGE, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 90",
-                "\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tText: Hola");
+                "\tColumns:", "\t\tId: M", "\t\tColumn count: 2", "\t\tText: Hola");
         l.assertAbsent(1, "M");
         assertRect(40, 40, 515, 12, l.rect(2, "M"));
     }
@@ -104,7 +104,7 @@ class ColumnsFragmentationTest {
     /** A {@code Height} of 150 is the total: 100 on page 1 and 50 on page 2, which are filled in order. */
     @Test
     void heightAcrossPages() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 150"), blocks(10)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "M"));
@@ -115,7 +115,7 @@ class ColumnsFragmentationTest {
 
     @Test
     void closedEdgesRepeatBorderAndPadding() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 5",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Box:", "\tPadding: 5",
                 "Break:", "\tEdges: closed"), blocks(8, true)));
         // Columns of 90 between the 5 at the top and at the bottom, and 245 wide: three whole blocks
         // per column on page 1.
@@ -137,7 +137,7 @@ class ColumnsFragmentationTest {
      */
     @Test
     void cloneWithHeightLeavesTheRestToTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 160", "\tPadding: 5", "Break:", "\tEdges: closed"), blocks(10, true)));
         assertEquals(2, l.pages());
         assertRect(305, 95, 245, 25, l.rect(1, "F"));
@@ -149,7 +149,7 @@ class ColumnsFragmentationTest {
     /** The content fits on page 1, but Height: 150 continues: page 2 has the rest of the box, empty. */
     @Test
     void theHeightGoesOnAfterTheContent() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 150"),
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Box:", "\tHeight: 150"),
                 blocks(2)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "M"));
@@ -159,7 +159,7 @@ class ColumnsFragmentationTest {
     /** Height: 150 with twelve blocks: on page 2, 50 remain, two blocks per column (K starts the second). */
     @Test
     void theRestOfTheHeightLimitsTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 150"), blocks(12, true)));
         assertEquals(2, l.pages());
         assertRect(40, 65, 250, 25, l.rect(2, "J"));
@@ -177,7 +177,7 @@ class ColumnsFragmentationTest {
     @Test
     void aChildWithADefiniteHeightThatLeavesAGapDoesNotOverflowTheColumns() {
         String text = String.join(" ", Collections.nCopies(16, "aaaaa"));
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Count: 1", "Box:", "\tHeight: 200"),
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 1", "Box:", "\tHeight: 200"),
                 List.of("\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 200", "\t\t\t\tWidth: 30",
                         "\t\t\tText: " + text, "\t\t\t\tId: T")));
         assertEquals(3, l.pages());
@@ -199,7 +199,7 @@ class ColumnsFragmentationTest {
         String text = String.join(" ", Collections.nCopies(16, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tId: G", "\t\tColumn sizes: * *",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 200",
-                "\t\tArea:", "\t\t\tColumns:", "\t\t\t\tId: M", "\t\t\t\tCount: 1",
+                "\t\tArea:", "\t\t\tColumns:", "\t\t\t\tId: M", "\t\t\t\tColumn count: 1",
                 "\t\t\t\tBlock:", "\t\t\t\t\tId: B", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 200", "\t\t\t\t\t\tWidth: 30",
                 "\t\t\t\t\tText: " + text, "\t\t\t\t\t\tId: T");
         assertEquals(3, l.pages());

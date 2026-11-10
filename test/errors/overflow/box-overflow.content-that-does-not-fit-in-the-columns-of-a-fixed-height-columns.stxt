@@ -16,7 +16,7 @@ Document (dev.stxt.pdf):
 		Columns:
 			Box:
 				Height: 50
-			Count: 2
+			Column count: 2
 			Block:
 				Box:
 					Height: 40

@@ -43,7 +43,7 @@ class NamedColorsTest {
                 "\tBlock:", "\t\tBox:", "\t\t\tBackground: light", "\t\t\tBorder: 1", "\t\t\tBorder color: brand #000 brand",
                 "\t\tTypography:", "\t\t\tColor: brand",
                 "\tBlock:", "\t\tBox:", "\t\t\tBackground: linear(180, light, #FFF, brand)",
-                "\tColumns:", "\t\tCount: 2", "\t\tGap: 10", "\t\tSeparator: 1", "\t\tSeparator color: brand", "\t\tText: hola");
+                "\tColumns:", "\t\tColumn count: 2", "\t\tGap: 10", "\t\tSeparator: 1", "\t\tSeparator color: brand", "\t\tText: hola");
         Box block = root.children().get(0);
         assertEquals(new Paint.Solid("#EEF3F8"), block.style().box().background());
         assertEquals(Sides.shorthand(List.of("#12315A", "#000", "#12315A")), block.style().box().borderColor());

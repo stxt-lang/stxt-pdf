@@ -50,7 +50,7 @@ List:
 ## `{number of: id}`
 
 Lo tienen los `List item` de una lista numerada, y es lo que escribe su marcador sin el sufijo: `3`, `c`, `IV` (`decimal`,
-`lower-alpha`, `upper-roman`), con el `Start` y el `Number` que haya. Cada ítem da solo su propio número: para escribir
+`lower-alpha`, `upper-roman`), con el `First number` y el `Number` que haya. Cada ítem da solo su propio número: para escribir
 «4.2» de una lista anidada, se escriben los dos, `{number of: clausula}.{number of: apartado}`. También lo tienen los
 encabezados con `Numbered: true`, y su número es el completo (`4.2`: sus niveles unidos por puntos,
 [Encabezados](../components/heading.md#numeración-numbered)), y las `Figure` numeradas, cuyo número es el de su contador

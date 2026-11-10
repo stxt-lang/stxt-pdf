@@ -10,5 +10,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Barcode: AL-2025-0388
 			Alt: Código de barras del albarán
-			Format: code-128
+			Barcode format: code-128
 			Quiet zone: 60

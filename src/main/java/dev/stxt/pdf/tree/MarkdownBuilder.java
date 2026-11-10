@@ -373,7 +373,7 @@ final class MarkdownBuilder {
             list.addChild(generated(node("Marker", markers.get(Math.min(depth, markers.size() - 1)),
                     property.get().node().getLine()), property.get()));
             if (l instanceof OrderedList o && o.getMarkerStartNumber() != 1) {
-                list.addChild(node("Start", Integer.toString(o.getMarkerStartNumber()), line));
+                list.addChild(node("First number", Integer.toString(o.getMarkerStartNumber()), line));
             }
             for (org.commonmark.node.Node i = l.getFirstChild(); i != null; i = i.getNext()) {
                 ListItem source = (ListItem) i;

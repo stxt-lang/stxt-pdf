@@ -5,6 +5,22 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Changed
+
+- **Five names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
+  alone in a rule of `Styles`, and so that no two names are nearly the same. A document written for 0.14.0 that uses
+  them has to be updated; the old names are not accepted.
+  - `Start` is **`First number`**, in a `List` and in a `Section` (where it read like `Begin on`).
+  - `Count` is **`Column count`**, in a `Columns`, beside `Min column width`.
+  - `Areas` is **`Area map`**, in a `Grid`, one letter away from its item `Area`.
+  - `Format` is **`Barcode format`**, in a `Barcode`, like `Page number format` and `Footnote number format`.
+  - `Fit: fill` is **`Fit: crop`**, in an `Image`: in web layout `fill` is the value that stretches the image, the
+    opposite of what it did here. In Java, `Fit.FILL` is `Fit.CROP`.
+- The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `START_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
+  `SINGLE_COLUMN` and of the errors of `Area map` name the properties with their new names. The codes do not change.
+
 ## [0.14.0] - 2026-11-10
 
 A box that drops the margins of its children at its edges, where each box ended up on the paper, the author and the

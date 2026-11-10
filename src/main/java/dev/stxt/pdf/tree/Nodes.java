@@ -68,7 +68,7 @@ final class Nodes {
         }
     }
 
-    /** Parses {@code Areas} or {@code Area}: its errors are placement errors and carry the line of the node. */
+    /** Parses {@code Area map} or {@code Area}: its errors are placement errors and carry the line of the node. */
     static <T> T placement(Node n, Supplier<T> parser) {
         try {
             return parser.get();

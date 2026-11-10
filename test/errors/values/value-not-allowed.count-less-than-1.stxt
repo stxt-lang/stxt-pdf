@@ -1,4 +1,4 @@
-# Case: Count less than 1
+# Case: Column count less than 1
 # Code: VALUE_NOT_ALLOWED
 # Line: 17
 Document (dev.stxt.pdf):
@@ -14,5 +14,5 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Columns:
-			Count: 0
+			Column count: 0
 			Text: Hola

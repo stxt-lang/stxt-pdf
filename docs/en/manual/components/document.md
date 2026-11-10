@@ -110,7 +110,7 @@ A section is a part of the document that **always starts on a new page**. All th
 | `Page` | Another paper, another orientation or other margins for this section. It inherits from the `Page` of the document what it does not declare: with only `Orientation: landscape`, it is the same paper in landscape, and with only `Margin`, the same paper with other margins (`Mirror margins` goes with `Margin`: they are inherited or declared together) |
 | `Page numbering` | `continue` (the default) continues the page count, `restart` starts again at 1 and with `none` its pages have no number and do not count |
 | `Page number format` | How its page numbers are written: `decimal` (the default), `lower-roman` (`i`, `ii`, `iii`) or `upper-roman` (`I`, `II`, `III`) |
-| `Start` | With `Page numbering: restart`, the number of its first page (`Start: 5`) |
+| `First number` | With `Page numbering: restart`, the number of its first page (`First number: 5`) |
 | `Inherit page overlays` | `true` (the default) carries the headers and footers of the document, and `false`, only its own |
 | `Begin on` | `any` (the default) starts on the next page, and `odd`, on an odd page, the right-hand one when printing double-sided |
 | `Id`, `Style` | To link to it (`#id`, its first page) and to give it typography with a rule (`Typography` and nothing else: an appendix in another language) |
@@ -126,7 +126,7 @@ section with `Page numbering: restart`. A page of a `none` section has no number
 
 Tables of contents and references (`{page of: id}`) give the same number as the footer of the page: the printed one, also
 in roman numerals if its section has `Page number format: lower-roman`. For a preface in roman numerals, its section
-declares `Page number format` and the section of the body, `Page numbering: restart`. With `Start`, the numbering starts
+declares `Page number format` and the section of the body, `Page numbering: restart`. With `First number`, the numbering starts
 at another number.
 
 ## Double-sided

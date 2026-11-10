@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
             Item:
                 Grow: 1
                 Image: test/wide.png
-                    Fit: fill
+                    Fit: crop
                     Box:
                         Height: 60
 ```
@@ -46,7 +46,7 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 |---|---|---|---|
 | *(valor)* | ruta relativa a `images/` | obligatorio | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | sin valor | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)). Sin él, es decorativa. |
-| `Fit` | `inside`, `fill`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Fit` | `inside`, `crop`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
 | `Side` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
@@ -111,11 +111,12 @@ Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción,
 Si la caja de contenido y la imagen tienen proporciones distintas:
 
 - `inside` (por defecto) dibuja la imagen entera, lo más grande que cabe y centrada, y deja ver el fondo a los lados.
-- `fill` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra.
+- `crop` la dibuja lo más pequeña que cubre la caja, centrada, y recorta lo que sobra.
 - `stretch` la estira a la caja y la deforma.
 
-> **Decisión:** los valores dicen qué pasa con la imagen: cabe dentro (`inside`), llena la caja (`fill`) o se estira
-> (`stretch`). *Alternativa descartada:* `contain` y `cover`, que no se entienden sin conocerlos de antes.
+> **Decisión:** los valores dicen qué pasa con la imagen: cabe dentro (`inside`), se recorta hasta cubrir la caja (`crop`) o se estira
+> (`stretch`). *Alternativas descartadas:* `contain` y `cover`, que no se entienden sin conocerlos de antes; y `fill` para
+> la recortada, que en la maquetación web es el valor que deforma la imagen.
 
 Con la misma proporción, las tres dan lo mismo. Una imagen se recorta además con las esquinas redondeadas de su caja de contenido ([La caja](../common/box.md#esquinas)).
 

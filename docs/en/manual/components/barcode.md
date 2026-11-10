@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
                     Text: Stalls, row 7, seat 12
                     Barcode: TV-2025-1187
                         Alt: Barcode of ticket TV-2025-1187
-                        Format: code-128
+                        Barcode format: code-128
                         Box:
                             Width: 180
                             Height: 36
@@ -50,7 +50,7 @@ Document (dev.stxt.pdf):
 | Property | What it does |
 |---|---|
 | *(value)* | The data: an address, a reference, a number. If it has several lines, it goes in a `Content >>` block |
-| `Format` | `qr` (by default), a QR code; `code-128`, a barcode of letters, digits and signs; `ean-13`, the barcode of products |
+| `Barcode format` | `qr` (by default), a QR code; `code-128`, a barcode of letters, digits and signs; `ean-13`, the barcode of products |
 | `Error correction` | Only in a QR code: how much of it can be damaged and still be read. `low`, `medium` (by default), `quartile` or `high`. The higher it is, the more modules for the same data |
 | `Quiet zone` | The blank modules on each side of the code, from 0 to 40. By default, those of the standard of each format ([The size](#the-size)) |
 | `Alt` | What it is and where it leads, for whoever cannot see it. Required |

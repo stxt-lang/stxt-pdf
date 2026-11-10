@@ -30,7 +30,7 @@ class ModuleSizesTest {
         lines[i++] = "\t\tId: B";
         lines[i++] = "\t\tAlt: Código";
         if (format != null) {
-            lines[i++] = "\t\tFormat: " + format;
+            lines[i++] = "\t\tBarcode format: " + format;
         }
         lines[i++] = "\t\tBox:";
         for (String b : box) {

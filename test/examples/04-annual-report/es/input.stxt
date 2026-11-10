@@ -276,7 +276,7 @@ Document (dev.stxt.pdf):
 				Style: lead
 			Columns:
 				Id: community
-				Count: 2
+				Column count: 2
 				Gap: 26
 				Separator: 0.5
 				Separator color: rule

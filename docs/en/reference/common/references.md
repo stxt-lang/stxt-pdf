@@ -51,7 +51,7 @@ List:
 ## `{number of: id}`
 
 The `List item` elements of a numbered list have it, and it is what their marker writes without the suffix: `3`, `c`, `IV`
-(`decimal`, `lower-alpha`, `upper-roman`), with whatever `Start` and `Number` there are. Each item gives only its own
+(`decimal`, `lower-alpha`, `upper-roman`), with whatever `First number` and `Number` there are. Each item gives only its own
 number: to write "4.2" from a nested list, both are written, `{number of: clausula}.{number of: apartado}`. Headings with
 `Numbered: true` also have it, and their number is the complete one (`4.2`: their levels joined by dots,
 [Headings](../components/heading.md#numbering-numbered)), and so do the numbered `Figure` elements, whose number is that

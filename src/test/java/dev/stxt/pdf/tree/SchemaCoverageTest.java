@@ -135,16 +135,16 @@ class SchemaCoverageTest {
             // Grid and Area
             Map.entry("Column sizes", "Column sizes: 100"),
             Map.entry("Row sizes", "Row sizes: 20"),
-            Map.entry("Areas", "Areas >>\n\ta"),
+            Map.entry("Area map", "Area map >>\n\ta"),
             Map.entry("Flow", "Flow: vertical"),
             Map.entry("Horizontal", "Horizontal: center"),
             Map.entry("Vertical", "Vertical: center"),
             // Lists
             Map.entry("Marker", "Marker: decimal"),
-            Map.entry("Start", "Start: 3"),
+            Map.entry("First number", "First number: 3"),
             Map.entry("Number", "Number: 5"),
             // Columns
-            Map.entry("Count", "Count: 3"),
+            Map.entry("Column count", "Column count: 3"),
             Map.entry("Min column width", "Min column width: 100"),
             Map.entry("Separator", "Separator: 1"),
             Map.entry("Separator color", "Separator color: #999999"),
@@ -163,10 +163,10 @@ class SchemaCoverageTest {
             Map.entry("Leader", "Leader: line"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
-            Map.entry("Fit", "Fit: fill"),
+            Map.entry("Fit", "Fit: crop"),
             Map.entry("Pdf page", "Pdf page: 2"),
             // Barcode
-            Map.entry("Format", "Format: qr"),
+            Map.entry("Barcode format", "Barcode format: qr"),
             Map.entry("Error correction", "Error correction: high"),
             Map.entry("Quiet zone", "Quiet zone: 5"),
             // Styles
@@ -193,7 +193,7 @@ class SchemaCoverageTest {
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
         t.put("Document", new Template(HEADER + "\t{}\n\tSection:\n\t\tBlock:", Set.of("Title", "Language")));
-        // A section: what it allows besides its content. Start needs restart.
+        // A section: what it allows besides its content. First number needs restart.
         t.put("Section", new Template(HEADER + "\tSection:\n\t\tPage numbering: restart\n\t\t{}\n\t\tBlock:",
                 Set.of("Page numbering")));
         // Paper excludes Width and Height, which all the documents read (the header).
@@ -224,8 +224,8 @@ class SchemaCoverageTest {
         t.put("Marker image", new Template(HEADER + "\tList:\n\t\tMarker: image\n\t\tMarker image: test/square.png\n"
                 + "\t\t\t{}\n\t\tList item:\n\t\t\tParagraph: Uno"));
         // Separator needs a Gap that contains it, and Separator color, a Separator.
-        t.put("Columns", new Template(HEADER + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 1\n"
-                + "\t\t{}\n\t\tText: Hola", Set.of("Count", "Gap", "Separator")));
+        t.put("Columns", new Template(HEADER + "\tColumns:\n\t\tColumn count: 2\n\t\tGap: 10\n\t\tSeparator: 1\n"
+                + "\t\t{}\n\t\tText: Hola", Set.of("Column count", "Gap", "Separator")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",
                 Set.of("Content")));
         // A footnote needs its call, and its Id is the name of the call.

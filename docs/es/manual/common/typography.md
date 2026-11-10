@@ -129,7 +129,7 @@ Document (dev.stxt.pdf):
                 Hyphenate: true
     Section:
         Columns:
-            Count: 3
+            Column count: 3
             Gap: 12
             Paragraph: Los patrones de partición dividen las palabras largas por sus sílabas, y así las columnas estrechas quedan sin huecos entre las palabras.
 ```

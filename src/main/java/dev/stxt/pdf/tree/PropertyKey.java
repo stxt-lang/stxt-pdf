@@ -46,7 +46,7 @@ public final class PropertyKey {
     public static final String LAYER = "layer";
     public static final String ROTATE = "rotate";
     public static final String ROTATE_ORIGIN = "rotate-origin";
-    public static final String START = "start";
+    public static final String FIRST_NUMBER = "first-number";
     public static final String NUMBER = "number";
     public static final String MARKER_IMAGE = "marker-image";
     public static final String PDF_PAGE = "pdf-page";
@@ -58,7 +58,7 @@ public final class PropertyKey {
     public static final String LEVELS = "levels";
 
     // Columns
-    public static final String COUNT = "count";
+    public static final String COLUMN_COUNT = "column-count";
     public static final String COLUMN_GAP = "gap";
     public static final String SEPARATOR = "separator";
     public static final String SEPARATOR_COLOR = "separator-color";

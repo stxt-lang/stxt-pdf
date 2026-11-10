@@ -200,7 +200,7 @@ class PdfStructureTest {
     @Test
     void columnsIsADivWithoutOneElementPerColumn() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
-                + "\tColumns:\n\t\tCount: 2\n\t\tGap: 10\n\t\tSeparator: 0.5\n"
+                + "\tColumns:\n\t\tColumn count: 2\n\t\tGap: 10\n\t\tSeparator: 0.5\n"
                 + "\t\tParagraph: Uno\n\t\tParagraph: Dos\n"))) {
             PDStructureElement columnsBox = (PDStructureElement) section(pdf).getKids().get(0);
             assertEquals("Div", columnsBox.getStructureType());

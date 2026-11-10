@@ -44,7 +44,7 @@ class ListsTest {
 
     @Test
     void numberingStartsAtStartAndFollowsNumber() {
-        Box list = root("\tList:", "\t\tMarker: decimal", "\t\tStart: 3",
+        Box list = root("\tList:", "\t\tMarker: decimal", "\t\tFirst number: 3",
                 "\t\tList item:", "\t\t\tText: a",
                 "\t\tList item:", "\t\t\tText: b",
                 "\t\tList item:", "\t\t\tNumber: 10", "\t\t\tText: c",
@@ -54,7 +54,7 @@ class ListsTest {
 
     @Test
     void markersWithAHyphen() {
-        Box list = root("\tList:", "\t\tMarker: upper-roman", "\t\tStart: 4",
+        Box list = root("\tList:", "\t\tMarker: upper-roman", "\t\tFirst number: 4",
                 "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b").children().get(0);
         assertEquals(Marker.UPPER_ROMAN, list.style().list().marker());
         assertEquals(List.of("IV. ", "V. "), markers(list));
@@ -185,7 +185,7 @@ class ListsTest {
 
     @Test
     void anImageListDoesNotNumber() {
-        assertEquals(ErrorCode.LIST_NUMBER_NOT_ALLOWED, error("\tList:", "\t\tMarker: image", "\t\tStart: 2",
+        assertEquals(ErrorCode.LIST_NUMBER_NOT_ALLOWED, error("\tList:", "\t\tMarker: image", "\t\tFirst number: 2",
                 "\t\tMarker image: test/check.svg", "\t\tList item:", "\t\t\tText: a").errorCode());
     }
 }

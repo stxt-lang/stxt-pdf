@@ -20,7 +20,7 @@ Grid:
 | `Column sizes` | list of tracks | one `auto` column | Described in [track sizing](#track-sizing). |
 | `Row sizes` | list of tracks | implicit `auto` rows | |
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`. |
-| `Areas` | text block | none | One row per line, with the names separated by spaces and `.` for an empty cell. |
+| `Area map` | text block | none | One row per line, with the names separated by spaces and `.` for an empty cell. |
 | `Flow` | `horizontal`, `vertical` | `horizontal` | Direction of automatic placement: `horizontal` fills the rows one by one, and `vertical`, the columns. |
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Horizontal alignment of the items in their area. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
@@ -49,7 +49,7 @@ automatically occupying two columns. `Area:` without a value is equivalent to `A
 
 ## Placement
 
-1. The explicit grid is built with `Column sizes`, `Row sizes` and `Areas`. Each name in `Areas` must form a rectangle and
+1. The explicit grid is built with `Column sizes`, `Row sizes` and `Area map`. Each name in `Area map` must form a rectangle and
    all the rows must have the same number of cells.
 2. The items whose `Area` has a row and a column, or an area name, are placed.
 3. The rest are placed in tree order with a **cursor** that goes through the grid by rows (or by columns, with
@@ -60,7 +60,7 @@ An item with **only the row fixed** (`Area: 2 auto`) goes to the first column of
 none is left, it is an error (`GRID_PLACEMENT`): the row does not create implicit columns. One with **only the column fixed**
 (`Area: auto 2`) goes to the first free row from the cursor, to the next one if the column is behind it, and moves the
 cursor behind itself. With `Flow: vertical` rows and columns are swapped. These items are placed in step 3, in tree
-order with the automatic ones. An area name that does not exist or `Areas` that do not form rectangles are also
+order with the automatic ones. An area name that does not exist or `Area map` that do not form rectangles are also
 `GRID_PLACEMENT`.
 
 > **Decision:** an item with the row fixed and no room in it is an error, with the line of the `Area`. The grid does not create

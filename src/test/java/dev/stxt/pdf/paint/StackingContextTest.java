@@ -278,7 +278,7 @@ class StackingContextTest {
      */
     @Test
     void separatorBetweenColumnsWithContent() {
-        Recorder r = record("\tColumns:", "\t\tCount: 3", "\t\tGap: 10", "\t\tSeparator: 2",
+        Recorder r = record("\tColumns:", "\t\tColumn count: 3", "\t\tGap: 10", "\t\tSeparator: 2",
                 "\t\tSeparator color: #F00", "\t\tBox:", "\t\t\tBackground: #000",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #111", "\t\t\tBreak:",
                 "\t\t\t\tKeep together: true",
@@ -290,7 +290,7 @@ class StackingContextTest {
 
     @Test
     void ruleColorIsTheTextColorByDefault() {
-        Recorder r = record("\tColumns:", "\t\tCount: 2", "\t\tGap: 10", "\t\tSeparator: 1",
+        Recorder r = record("\tColumns:", "\t\tColumn count: 2", "\t\tGap: 10", "\t\tSeparator: 1",
                 "\t\tTypography:", "\t\t\tColor: #00F",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tKeep together: true",
                 "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\tBreak:", "\t\t\t\tKeep together: true");

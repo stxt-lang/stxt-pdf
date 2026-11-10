@@ -1,4 +1,4 @@
-# Case: Start without Page numbering: restart
+# Case: First number without Page numbering: restart
 # Code: START_WITHOUT_RESTART
 # Line: 16
 Document (dev.stxt.pdf):
@@ -13,5 +13,5 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		Start: 5
+		First number: 5
 		Paragraph: Uno

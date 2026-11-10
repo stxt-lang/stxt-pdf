@@ -20,7 +20,7 @@ Grid:
 | `Column sizes` | lista de pistas | una columna `auto` | Ver [dimensionado de pistas](#dimensionado-de-pistas). |
 | `Row sizes` | lista de pistas | filas implícitas `auto` | |
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`. |
-| `Areas` | bloque de texto | sin valor | Una fila por línea, con los nombres separados por espacios y `.` para una celda vacía. |
+| `Area map` | bloque de texto | sin valor | Una fila por línea, con los nombres separados por espacios y `.` para una celda vacía. |
 | `Flow` | `horizontal`, `vertical` | `horizontal` | Dirección de la colocación automática: `horizontal` llena las filas una a una, y `vertical`, las columnas. |
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
@@ -49,7 +49,7 @@ automáticamente ocupando dos columnas. `Area:` sin valor equivale a `Area: auto
 
 ## Colocación
 
-1. Se construye la rejilla explícita con `Column sizes`, `Row sizes` y `Areas`. Cada nombre de `Areas` debe formar un rectángulo y
+1. Se construye la rejilla explícita con `Column sizes`, `Row sizes` y `Area map`. Cada nombre de `Area map` debe formar un rectángulo y
    todas las filas deben tener el mismo número de celdas.
 2. Se colocan los ítems cuyo `Area` tiene fila y columna, o nombre de área.
 3. Se colocan los demás en orden del árbol con un **cursor** que recorre la rejilla por filas (o por columnas, con
@@ -60,7 +60,7 @@ Un ítem con **solo la fila fija** (`Area: 2 auto`) va a la primera columna de e
 no queda ninguna, es un error (`GRID_PLACEMENT`): la fila no crea columnas implícitas. Uno con **solo la columna fija**
 (`Area: auto 2`) va a la primera fila libre desde el cursor, en la siguiente si la columna queda detrás de él, y mueve el
 cursor detrás de sí. Con `Flow: vertical` se intercambian filas y columnas. Estos ítems se colocan en el paso 3, en orden del
-árbol con los automáticos. Un nombre de área que no existe o unas `Areas` que no forman rectángulos también son
+árbol con los automáticos. Un nombre de área que no existe o unas `Area map` que no forman rectángulos también son
 `GRID_PLACEMENT`.
 
 > **Decisión:** un ítem con la fila fija y sin hueco en ella es un error, con la línea del `Area`. La rejilla no crea

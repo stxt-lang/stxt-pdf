@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * The printed number of each physical page, the last one of its page sequence and how they are written
  * (reference/components/document.md): the page sequence is the pages since the last {@code Page numbering: restart},
- * which starts at its {@code Start}; {@code none} neither numbers nor advances the counter. Each page is written with
+ * which starts at its {@code First number}; {@code none} neither numbers nor advances the counter. Each page is written with
  * the {@code Page style} of its section. The blank page with which a section ends ({@code Begin on: odd}) is one more
  * page of it.
  */

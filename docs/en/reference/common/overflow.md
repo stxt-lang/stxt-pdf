@@ -36,7 +36,7 @@ situations:
   [Table](../components/table.md#breaks)), at the line of the `Table`;
 - **the content of a `Columns` that does not fit in its columns** and cannot continue on another page (`BOX_OVERFLOW`,
   [Columns](../components/columns.md#what-does-not-fit)): at the line of its `Height` (or `Max height`, or `Aspect ratio`) if
-  it is its height that runs out, or at that of its `Count` if, with no page or height to fill, it has more column breaks
+  it is its height that runs out, or at that of its `Column count` if, with no page or height to fill, it has more column breaks
   than columns.
 
 The error points to the **innermost** culprit: if a box goes outside because something inside it goes outside, what is

@@ -188,7 +188,7 @@ class SectionsTest {
                 join(new String[] {"\tSection:", "\t\tPage number format: lower-roman", "\t\tText: El cuerpo empieza en la "
                         + "{page of: b1} y el prefacio en la {page of: p1}.", "\t\t\tId: ref"}, fullPage("p1"),
                         fullPage("p2")),
-                join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tStart: 5"}, fullPage("b1"),
+                join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tFirst number: 5"}, fullPage("b1"),
                         fullPage("b2")));
         assertEquals(List.of(1, 2, 3, 5, 6), d.pages().stream().map(Page::printed).toList());
         assertEquals(List.of(NumberFormat.LOWER_ROMAN, NumberFormat.LOWER_ROMAN, NumberFormat.LOWER_ROMAN,

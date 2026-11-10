@@ -53,7 +53,7 @@ Styles:
     For style: dish
         Gap: 12
     For element: Image
-        Fit: fill
+        Fit: crop
 Stack:
     Style: dish
     Item:
@@ -69,13 +69,13 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | Elemento | Propiedades en una regla |
 |---|---|
 | `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
-| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
+| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
-| `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
+| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
 | `List` | `Marker`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Clear` |
-| `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
 | `Heading 1` a `Heading 6` | `In table of contents`, `Clear` |
 | `Paragraph` | `Drop cap`, `Clear` |
@@ -107,7 +107,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 - **`Marker` y `Column sizes`** son obligatorios en una `List` y en una `Table`, y pueden venir de una regla. Sin ninguno
   de los dos, el error es `LIST_MARKER_MISSING` o `TABLE_COLUMN_SIZES_MISSING`, con la línea del elemento.
 - **No van en una regla** las propiedades de identidad, de contenido, de estructura y de posición: `Id`, `Style`,
-  `Link`, `Alt`, `Span`, `Row header`, `Start`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` y
+  `Link`, `Alt`, `Span`, `Row header`, `First number`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` y
   `Rotate origin`, las de `Section` y `Page`, y el valor o el `Content` de un elemento. El schema no las admite.
 
 > **Decisión:** las reglas admiten las propiedades de elemento de aspecto y de reparto, y el motor comprueba que el

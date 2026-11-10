@@ -1,5 +1,5 @@
 # Two-page monthly newsletter of a few villages, with a newspaper look: front-page masthead,
-# main story with a cropped photo (Fit: fill), three-column articles with a rule and
+# main story with a cropped photo (Fit: crop), three-column articles with a rule and
 # balanced breaks, text with a photo beside it, a calendar in a table and classified ads in
 # a grid. The body is Markdown inside Columns. The front-page masthead is a block of the
 # first page; the following ones carry a running head in a Page overlay (Pages: not-first). The labels are written in
@@ -82,7 +82,7 @@ Document (dev.stxt.pdf):
 			Image: examples/newsletter/market.jpg
 				Id: lead-photo
 				Alt: Market stalls with colorful awnings
-				Fit: fill
+				Fit: crop
 				Box:
 					Width: 100%
 					Height: 214
@@ -90,7 +90,7 @@ Document (dev.stxt.pdf):
 				Style: caption
 			Columns:
 				Id: lead-text
-				Count: 3
+				Column count: 3
 				Gap: 16
 				Separator: 0.5
 				Separator color: rule
@@ -146,7 +146,7 @@ Document (dev.stxt.pdf):
 						Remember to carry water, stay on the marked trails and take back with you any waste you produce.
 			Columns:
 				Id: briefs
-				Count: 2
+				Column count: 2
 				Gap: 22
 				Separator: 0.5
 				Separator color: rule

@@ -98,7 +98,7 @@ class PdfDocumentWriterTest {
     }
 
     /**
-     * With {@code Page number format} and {@code Start}, the label carries the style and the number of each page
+     * With {@code Page number format} and {@code First number}, the label carries the style and the number of each page
      * sequence (i, ii, 5, VI). The PDF entries are checked and not the text that PDFBox generates, which uppercases
      * with the language of the JVM: in Turkish, "vi" would be "Vİ".
      */
@@ -106,7 +106,7 @@ class PdfDocumentWriterTest {
     void pageLabelsKeepThePageStyleAndTheStart() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(SECTIONS_HEAD
                 + "\tSection:\n\t\tPage number format: lower-roman\n\t\tText: Prefacio\n\t\tText: Más\n\t\t\tBreak:\n\t\t\t\tBefore: page\n"
-                + "\tSection:\n\t\tPage numbering: restart\n\t\tStart: 5\n\t\tText: Cuerpo\n"
+                + "\tSection:\n\t\tPage numbering: restart\n\t\tFirst number: 5\n\t\tText: Cuerpo\n"
                 + "\tSection:\n\t\tPage number format: upper-roman\n\t\tText: Anexo\n"))) {
             PDPageLabels labels = pdf.getDocumentCatalog().getPageLabels();
             List<String> ranges = new ArrayList<>();

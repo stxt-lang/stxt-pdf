@@ -4,7 +4,7 @@ import dev.stxt.pdf.model.Marker;
 
 /**
  * The properties of lists (reference/components/list.md): the {@code Marker}, the {@code Marker image} and the
- * {@code Start} of a {@code List} and the {@code Number} and the {@code Marker image} of a {@code List item}. They are
+ * {@code First number} of a {@code List} and the {@code Number} and the {@code Marker image} of a {@code List item}. They are
  * not inherited.
  */
 public final class ListStyle extends StyleGroup {

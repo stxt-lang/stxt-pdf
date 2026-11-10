@@ -319,7 +319,7 @@ class ImageLayoutTest {
         LayoutFixture f = layOut(
                 "\tColumns:",
                 "\t\tId: M",
-                "\t\tCount: 2",
+                "\t\tColumn count: 2",
                 "\t\tBalance: false",
                 "\t\tBox:",
                 "\t\t\tHeight: 100",

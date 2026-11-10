@@ -29,7 +29,7 @@ Document (dev.stxt.pdf):
                             Bold: true
                     Barcode: AL-2025-0388
                         Alt: Barcode of delivery note AL-2025-0388
-                        Format: code-128
+                        Barcode format: code-128
                         Box:
                             Width: 150
                             Height: 30
@@ -54,7 +54,7 @@ dark brown modules inside a frame.)
 |---|---|---|---|
 | *(value)* | the data | required (or `Content`) | What it encodes: `Barcode: https://example.com/verify/1234`. |
 | `Content` | `>>` block | none | The data of several lines, with the lines as they are. Either the value or `Content`, one of the two. |
-| `Format` | `qr`, `code-128`, `ean-13` | `qr` | The kind of code ([Formats](#formats)). |
+| `Barcode format` | `qr`, `code-128`, `ean-13` | `qr` | The kind of code ([Formats](#formats)). |
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Only in a QR code: the part of the modules that can be damaged while the code can still be read, 7 %, 15 %, 25 % and 30 %. In another format it is an error. |
 | `Quiet zone` | integer from 0 to 40 | that of the format | The light modules on each side of the code ([The modules](#the-modules)). |
 | `Alt` | non-empty text | required | What it is and where it leads, for whoever cannot see it ([Accessibility](#accessibility)). |
@@ -62,12 +62,12 @@ dark brown modules inside a frame.)
 | `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
 | `Clear` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-`Format`, `Error correction`, `Quiet zone`, `Side` and `Clear` can also come from a rule of `Styles`
+`Barcode format`, `Error correction`, `Quiet zone`, `Side` and `Clear` can also come from a rule of `Styles`
 ([Element properties](../common/styles.md#element-properties)); the data, `Alt` and `Rotate` cannot.
 
 ## Formats
 
-| `Format` | What it is | Data |
+| `Barcode format` | What it is | Data |
 |---|---|---|
 | `qr` | QR code (ISO/IEC 18004): a square matrix of modules | Any text. If it is all ASCII it goes as is; if not, in UTF-8, with the ECI designator that tells the reader so. 2331 bytes fit with `Error correction: medium`, 2953 with `low` and 1273 with `high` (more if they are only digits or capital letters). |
 | `code-128` | Code 128 (ISO/IEC 15417): a row of bars | The printable ASCII characters, from the space to `~`, from 1 to 80. |
@@ -94,7 +94,7 @@ code for payment by transfer (EPC) or a contact card.
 The drawing of a `Barcode` is a matrix of modules, each one dark or light, which includes the **quiet zone**: the light
 margin that the reader needs around the code. It is part of the content box.
 
-| `Format` | Quiet zone | Natural module |
+| `Barcode format` | Quiet zone | Natural module |
 |---|---|---|
 | `qr` | 4 modules on each side | 0.5 × 0.5 mm |
 | `code-128` | 10 modules on each side | 0.33 mm wide; the bars, 22.85 mm high |
@@ -161,7 +161,7 @@ A `Barcode` does not accept `Fit`.
 
 A code shrunk until it cannot be read is an error. Each format has a minimum module:
 
-| `Format` | Minimum module | Where it comes from |
+| `Barcode format` | Minimum module | Where it comes from |
 |---|---|---|
 | `qr` | 0.25 mm | About three dots of a 300 dpi printer. ISO/IEC 18004 does not set one |
 | `code-128` | 0.25 mm | The same criterion. ISO/IEC 15417 does not set one |

@@ -18,7 +18,7 @@ class ImageFitTest {
 
     @Test
     void fillCoversTheBoxCentered() {
-        assertEquals(new Rect(-40, 20, 200, 100), ImageFit.place(Fit.FILL, BOX, 150, 75));
+        assertEquals(new Rect(-40, 20, 200, 100), ImageFit.place(Fit.CROP, BOX, 150, 75));
     }
 
     @Test

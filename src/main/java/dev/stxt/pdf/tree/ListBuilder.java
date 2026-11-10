@@ -11,11 +11,11 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_IMAGE;
 import static dev.stxt.pdf.tree.PropertyKey.NUMBER;
-import static dev.stxt.pdf.tree.PropertyKey.START;
+import static dev.stxt.pdf.tree.PropertyKey.FIRST_NUMBER;
 
 /**
  * Lists (reference/components/list.md): numbering of the {@code List item}, the generated box of their
- * marker (text, or the image of {@code Marker image}) and the rules of {@code Start}, {@code Number} and
+ * marker (text, or the image of {@code Marker image}) and the rules of {@code First number}, {@code Number} and
  * {@code Marker image}.
  */
 final class ListBuilder {
@@ -25,7 +25,7 @@ final class ListBuilder {
 
     /**
      * Number of a {@code List item} (reference/components/list.md): that of its {@code Number} or the one after that of
-     * the previous item, starting with the {@code Start} of the list. In a list without numbering, 0.
+     * the previous item, starting with the {@code First number} of the list. In a list without numbering, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
         Marker marker = list.style().list().marker();
@@ -125,7 +125,7 @@ final class ListBuilder {
     }
 
     /**
-     * {@code Marker image} only with {@code Marker: image}; {@code Start} only numbers, and within the range of the
+     * {@code Marker image} only with {@code Marker: image}; {@code First number} only numbers, and within the range of the
      * numbering.
      */
     static void validateList(Style s) {
@@ -133,15 +133,15 @@ final class ListBuilder {
             throw error(s.line(MARKER_IMAGE), ErrorCode.LIST_IMAGE_NOT_ALLOWED, "Marker image has no effect with "
                     + "Marker: " + markerName(s.list().marker()) + ": only Marker: image draws an image");
         }
-        if (!s.isDeclared(START)) {
+        if (!s.isDeclared(FIRST_NUMBER)) {
             return;
         }
         if (!s.list().marker().numbered()) {
-            throw error(s.line(START), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Start has no effect with Marker: "
+            throw error(s.line(FIRST_NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "First number has no effect with Marker: "
                     + markerName(s.list().marker()) + ", which does not number the items");
         }
         if (!ListMarkers.inRange(s.list().marker(), s.list().start())) {
-            throw error(s.line(START), ErrorCode.LIST_NUMBER_RANGE, "Start: " + s.list().start() + " cannot be "
+            throw error(s.line(FIRST_NUMBER), ErrorCode.LIST_NUMBER_RANGE, "First number: " + s.list().start() + " cannot be "
                     + "written with Marker: " + markerName(s.list().marker()) + ", which numbers "
                     + ListMarkers.range(s.list().marker()));
         }

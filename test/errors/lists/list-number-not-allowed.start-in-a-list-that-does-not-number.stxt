@@ -1,4 +1,4 @@
-# Case: Start in a list that does not number
+# Case: First number in a list that does not number
 # Code: LIST_NUMBER_NOT_ALLOWED
 # Line: 18
 Document (dev.stxt.pdf):
@@ -15,6 +15,6 @@ Document (dev.stxt.pdf):
 	Section:
 		List:
 			Marker: bullet
-			Start: 2
+			First number: 2
 			List item:
 				Text: Uno

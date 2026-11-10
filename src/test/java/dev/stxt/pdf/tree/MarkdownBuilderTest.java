@@ -152,7 +152,7 @@ class MarkdownBuilderTest {
                 "          Marker: dash @14",
                 "          List item @19",
                 "            Paragraph: c @19"), outline(t.elements().get(0)));
-        assertEquals(List.of("List @21", "  Marker: lower-roman @15", "  Start: 3 @21", "  List item @21",
+        assertEquals(List.of("List @21", "  Marker: lower-roman @15", "  First number: 3 @21", "  List item @21",
                 "    Paragraph: x @21"), outline(t.elements().get(1)));
     }
 

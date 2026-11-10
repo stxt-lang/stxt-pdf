@@ -21,10 +21,10 @@ En el schema:
 - los elementos contenedores y los grupos son `GROUP` (sin valor);
 - `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, `Caption`, `Marker image` y las reglas de `Styles`, `INLINE` con
   hijos;
-- `Content`, `BLOCK`, y `Areas`, `TEXT`;
+- `Content`, `BLOCK`, y `Area map`, `TEXT`;
 - los interruptores (como `Isolate margins`, `Wrap`, `Row header`, `In table of contents`, `Merge borders` o `Hyphenate`),
   `BOOLEAN`;
-- los enteros (como `Layer`, `Widows`, `Orphans`, `Start`, `Number`, `Count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
+- los enteros (como `Layer`, `Widows`, `Orphans`, `First number`, `Number`, `Column count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
   y `Rotate`, `NUMBER`;
 - las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
@@ -158,7 +158,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
-`Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` y el área de
+`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` y el área de
 notas, `footnotes()`). La **caja de cada sección es hija de la raíz del documento** (`Element.SECTION`, añadida tras los
 `Page overlay` del documento para que estos la precedan en el recorrido en preorden) y es la **raíz de su layout**
 (`Box.isLayoutRoot()`): los recorridos de todo el árbol (referencias, enlaces, índices, fuentes, imágenes, `Id`, estructura PDF)

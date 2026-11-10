@@ -75,7 +75,7 @@ class MarkdownTest {
                 "\t\t\t\tContent >>", "\t\t\t\t\tUno **dos**"));
         assertDoesNotThrow(() -> build("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell:",
                 "\t\t\t\t\tMarkdown:", "\t\t\t\t\t\tContent >>", "\t\t\t\t\t\t\tUno"));
-        assertDoesNotThrow(() -> build("\tColumns:", "\t\tCount: 2", "\t\tMarkdown:", "\t\t\tContent >>",
+        assertDoesNotThrow(() -> build("\tColumns:", "\t\tColumn count: 2", "\t\tMarkdown:", "\t\t\tContent >>",
                 "\t\t\t\t# Uno", "", "\t\t\t\tTexto"));
         assertDoesNotThrow(() -> build("\tStack:", "\t\tItem:", "\t\t\tMarkdown:", "\t\t\t\tContent >>",
                 "\t\t\t\t\tUno"));

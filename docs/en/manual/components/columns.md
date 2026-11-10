@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
                 Margin: 0 0 8 0
     Section:
         Columns:
-            Count: 2
+            Column count: 2
             Gap: 20
             Separator: 0.5
             Separator color: #999999
@@ -42,14 +42,14 @@ Document (dev.stxt.pdf):
 
 | Property | Default | What it does |
 |---|---|---|
-| `Count` | none | The number of columns |
-| `Min column width` | none | The minimum width of a column: as many fit as the width allows. With `Count`, at most `Count` |
-| `Gap` | `0` | The gap between columns, a single value. With `Count: 1` it is an error, because there are no columns to separate |
-| `Separator` | no line | The thickness of a line between columns, in the middle of the gap. It cannot be wider than the gap, and with `Count: 1` it is an error |
+| `Column count` | none | The number of columns |
+| `Min column width` | none | The minimum width of a column: as many fit as the width allows. With `Column count`, at most `Column count` |
+| `Gap` | `0` | The gap between columns, a single value. With `Column count: 1` it is an error, because there are no columns to separate |
+| `Separator` | no line | The thickness of a line between columns, in the middle of the gap. It cannot be wider than the gap, and with `Column count: 1` it is an error |
 | `Separator color` | the text color | The color of that line. Only with `Separator` |
 | `Balance` | `true` | With `true`, on the last page the columns are equally tall. With `false`, they are filled in order |
 
-`Count`, `Min column width` or both are required. It also accepts `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`.
+`Column count`, `Min column width` or both are required. It also accepts `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`.
 
 ## How it behaves
 

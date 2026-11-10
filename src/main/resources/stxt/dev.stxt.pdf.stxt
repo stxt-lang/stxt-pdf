@@ -60,7 +60,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Page number format
 				Max: 1
-			Child: Start
+			Child: First number
 				Max: 1
 			Child: Inherit page overlays
 				Max: 1
@@ -199,7 +199,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Gap
 				Max: 1
-			Child: Areas
+			Child: Area map
 				Max: 1
 			Child: Flow
 				Max: 1
@@ -398,7 +398,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Marker image
 				Max: 1
-			Child: Start
+			Child: First number
 				Max: 1
 			Child: List item
 				Min: 1
@@ -443,7 +443,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Footnote
 	Node: Columns
 		Type: GROUP
-		Description: Block in columns: its content fills the first column, continues in the next one and, at the end of the page, continues in the first column of the next page. Count, Min column width or both set the columns.
+		Description: Block in columns: its content fills the first column, continues in the next one and, at the end of the page, continues in the first column of the next page. Column count, Min column width or both set the columns.
 		Children:
 			Child: Id
 				Max: 1
@@ -457,7 +457,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Count
+			Child: Column count
 				Max: 1
 			Child: Min column width
 				Max: 1
@@ -974,7 +974,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Barcode
 		Type: INLINE
-		Description: QR code or barcode that the engine generates from its data, in the Format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone (Quiet zone) included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
+		Description: QR code or barcode that the engine generates from its data, in the Barcode format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone (Quiet zone) included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
 		Children:
 			Child: Id
 				Max: 1
@@ -990,7 +990,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Alt
 				Max: 1
-			Child: Format
+			Child: Barcode format
 				Max: 1
 			Child: Error correction
 				Max: 1
@@ -1047,7 +1047,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Row sizes
 				Max: 1
-			Child: Areas
+			Child: Area map
 				Max: 1
 			Child: Flow
 				Max: 1
@@ -1055,7 +1055,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Column align
 				Max: 1
-			Child: Count
+			Child: Column count
 				Max: 1
 			Child: Min column width
 				Max: 1
@@ -1071,7 +1071,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
-			Child: Format
+			Child: Barcode format
 				Max: 1
 			Child: Error correction
 				Max: 1
@@ -1140,7 +1140,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Row sizes
 				Max: 1
-			Child: Areas
+			Child: Area map
 				Max: 1
 			Child: Flow
 				Max: 1
@@ -1148,7 +1148,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Column align
 				Max: 1
-			Child: Count
+			Child: Column count
 				Max: 1
 			Child: Min column width
 				Max: 1
@@ -1164,7 +1164,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
-			Child: Format
+			Child: Barcode format
 				Max: 1
 			Child: Error correction
 				Max: 1
@@ -1233,7 +1233,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Row sizes
 				Max: 1
-			Child: Areas
+			Child: Area map
 				Max: 1
 			Child: Flow
 				Max: 1
@@ -1241,7 +1241,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Column align
 				Max: 1
-			Child: Count
+			Child: Column count
 				Max: 1
 			Child: Min column width
 				Max: 1
@@ -1257,7 +1257,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
-			Child: Format
+			Child: Barcode format
 				Max: 1
 			Child: Error correction
 				Max: 1
@@ -1749,7 +1749,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Size of each column: one track per column.
 	Node: Row sizes
 		Description: Size of each row: one track per row.
-	Node: Areas
+	Node: Area map
 		Type: TEXT
 		Description: One row of the grid per line; names separated by spaces and . for empty cells.
 	Node: Flow
@@ -1810,7 +1810,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Height
 				Max: 1
-	Node: Start
+	Node: First number
 		Type: INTEGER
 		Description: Number a numbering starts with: that of the first item of a numbered list or, in a Section with Page numbering: restart, that of its first page. By default, 1.
 	Node: Number
@@ -1827,11 +1827,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	# Columns
 
-	Node: Count
+	Node: Column count
 		Type: INTEGER
 		Description: Number of columns of a Columns (at least 1); with Min column width, the maximum.
 	Node: Min column width
-		Description: Minimum width of the columns: as many fit as the width allows, up to Count if it is declared.
+		Description: Minimum width of the columns: as many fit as the width allows, up to Column count if it is declared.
 	Node: Separator
 		Description: Width of the line between the columns of a Columns, centered in Gap, which must be at least as wide.
 	Node: Separator color
@@ -1846,10 +1846,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Alternative text of an Image or a Barcode: with it, the image is a figure (Figure) of the tagged PDF; without it, an Image is decorative. A Barcode requires it, and so does the image of a Figure. In a Figure with a Block, the alternative text of the whole figure, required.
 	Node: Fit
 		Type: ENUM
-		Description: How an Image fills its box if they have different proportions: inside (by default) fits whole and centered; fill fills the box, centered and clipped; stretch stretches it to the box and distorts it.
+		Description: How an Image fills its box if they have different proportions: inside (by default) fits whole and centered; crop fills the box, centered, and crops what is left over; stretch stretches it to the box and distorts it.
 		Values:
 			Value: inside
-			Value: fill
+			Value: crop
 			Value: stretch
 	Node: Pdf page
 		Type: INTEGER
@@ -1857,7 +1857,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	# Barcode
 
-	Node: Format
+	Node: Barcode format
 		Type: ENUM
 		Description: Symbology of a Barcode: qr (by default), a QR code; code-128, printable ASCII characters, up to 80; ean-13, 12 digits (the check digit is added) or 13 (it is checked).
 		Values:
@@ -1866,7 +1866,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: ean-13
 	Node: Error correction
 		Type: ENUM
-		Description: Error correction of a QR code, the part of its modules that can be damaged and it can still be read: low (7 %), medium (15 %, by default), quartile (25 %) or high (30 %). In another Format, it is an error.
+		Description: Error correction of a QR code, the part of its modules that can be damaged and it can still be read: low (7 %), medium (15 %, by default), quartile (25 %) or high (30 %). In another Barcode format, it is an error.
 		Values:
 			Value: low
 			Value: medium

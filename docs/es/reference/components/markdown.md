@@ -75,7 +75,7 @@ así:
 | `#` a `######` (y los subrayados con `===` y `---`) | `Heading 1` a `Heading 6`, con un `Text`, y con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
-| `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `Start`, el primer número si no es 1 |
+| `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `First number`, el primer número si no es 1 |
 | Tabla | `Table` con las `Column sizes` de `Table columns`, con la fila de cabecera en `Header rows` y el resto en `Body` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../common/text-formatting.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |

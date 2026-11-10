@@ -61,7 +61,7 @@ class RuleElementPropertiesTest {
     void aRuleGivesAnElementPropertyAsIfTheElementDeclaredIt() {
         Box root = root(
                 "For style: dish", "\tGap: 12",
-                "For element: Image", "\tFit: fill",
+                "For element: Image", "\tFit: crop",
                 "---",
                 "Stack:", "\tStyle: dish", "\tItem:", "\t\tText: a",
                 "Image: test/wide.png");
@@ -70,7 +70,7 @@ class RuleElementPropertiesTest {
         assertEquals(pt(12), stack.style().stack().rowGap());
         // Its line is that of the rule: errors point to it.
         assertEquals(13, stack.style().line(PropertyKey.stack("gap")).number());
-        assertEquals(Fit.FILL, root.children().get(1).style().image().fit());
+        assertEquals(Fit.CROP, root.children().get(1).style().image().fit());
     }
 
     @Test

@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 		List:
 			Id: num
 			Marker: decimal
-			Start: 9
+			First number: 9
 			List item:
 				Id: n9
 				Text: Nueve

@@ -29,7 +29,7 @@ Document (dev.stxt.pdf):
                             Bold: true
                     Barcode: AL-2025-0388
                         Alt: Código de barras del albarán AL-2025-0388
-                        Format: code-128
+                        Barcode format: code-128
                         Box:
                             Width: 150
                             Height: 30
@@ -54,7 +54,7 @@ marrón oscuro dentro de un marco.)
 |---|---|---|---|
 | *(valor)* | los datos | obligatorio (o `Content`) | Lo que codifica: `Barcode: https://example.com/verify/1234`. |
 | `Content` | bloque `>>` | sin valor | Los datos de varias líneas, con las líneas tal cual. O el valor o `Content`, uno de los dos. |
-| `Format` | `qr`, `code-128`, `ean-13` | `qr` | El tipo de código ([Formatos](#formatos)). |
+| `Barcode format` | `qr`, `code-128`, `ean-13` | `qr` | El tipo de código ([Formatos](#formatos)). |
 | `Error correction` | `low`, `medium`, `quartile`, `high` | `medium` | Solo en un QR: la parte de los módulos que puede estropearse y el código sigue leyéndose, un 7 %, 15 %, 25 % y 30 %. En otro formato es un error. |
 | `Quiet zone` | entero de 0 a 40 | la del formato | Los módulos claros a cada lado del código ([Los módulos](#los-módulos)). |
 | `Alt` | texto no vacío | obligatorio | Qué es y adónde lleva, para quien no lo ve ([Accesibilidad](#accesibilidad)). |
@@ -62,12 +62,12 @@ marrón oscuro dentro de un marco.)
 | `Side` | `left`, `right` | sin valor | Lo hace una caja lateral, como una `Image`: el texto que lo sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | Lo baja por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
-`Format`, `Error correction`, `Quiet zone`, `Side` y `Clear` también pueden venir de una regla de `Styles`
+`Barcode format`, `Error correction`, `Quiet zone`, `Side` y `Clear` también pueden venir de una regla de `Styles`
 ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); los datos, `Alt` y `Rotate`, no.
 
 ## Formatos
 
-| `Format` | Qué es | Datos |
+| `Barcode format` | Qué es | Datos |
 |---|---|---|
 | `qr` | Código QR (ISO/IEC 18004): una matriz cuadrada de módulos | Cualquier texto. Si es todo ASCII va tal cual; si no, en UTF-8, con el indicador ECI que se lo dice al lector. Caben 2331 bytes con `Error correction: medium`, 2953 con `low` y 1273 con `high` (más si son solo cifras o mayúsculas). |
 | `code-128` | Code 128 (ISO/IEC 15417): una fila de barras | Los caracteres ASCII imprimibles, del espacio a `~`, de 1 a 80. |
@@ -93,7 +93,7 @@ como el código QR de pago por transferencia (EPC) o una tarjeta de contacto.
 El dibujo de un `Barcode` es una matriz de módulos, cada uno oscuro o claro, que incluye la **zona de silencio**: el margen
 claro que el lector necesita alrededor del código. Es parte de la caja de contenido.
 
-| `Format` | Zona de silencio | Módulo natural |
+| `Barcode format` | Zona de silencio | Módulo natural |
 |---|---|---|
 | `qr` | 4 módulos a cada lado | 0,5 × 0,5 mm |
 | `code-128` | 10 módulos a cada lado | 0,33 mm de ancho; las barras, 22,85 mm de alto |
@@ -159,7 +159,7 @@ Un `Barcode` no admite `Fit`.
 
 Un código encogido hasta que no se puede leer es un error. Cada formato tiene un módulo mínimo:
 
-| `Format` | Módulo mínimo | De dónde sale |
+| `Barcode format` | Módulo mínimo | De dónde sale |
 |---|---|---|
 | `qr` | 0,25 mm | Unos tres puntos de una impresora de 300 ppp. ISO/IEC 18004 no fija ninguno |
 | `code-128` | 0,25 mm | El mismo criterio. ISO/IEC 15417 no fija ninguno |

@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Columns:
-			Count: 2
+			Column count: 2
 			Block:
 				Page overlay:
 					Text: Nota

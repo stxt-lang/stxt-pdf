@@ -8,7 +8,7 @@ import static dev.stxt.pdf.model.Tolerance.EPSILON;
  */
 public final class ColumnsStyle extends StyleGroup {
 
-    /** {@code Count}; {@code null} = not declared ({@code Min column width} then sets the columns). */
+    /** {@code Column count}; {@code null} = not declared ({@code Min column width} then sets the columns). */
     private Integer count;
     /** {@code Min column width}, in points; {@code null} = not declared. */
     private Double minColumnWidth;
@@ -99,12 +99,12 @@ public final class ColumnsStyle extends StyleGroup {
     }
 
     /**
-     * The number of columns (reference/components/columns.md): with only {@code Count}, that number; with only
+     * The number of columns (reference/components/columns.md): with only {@code Column count}, that number; with only
      * {@code Min column width}, as many columns of at least that width as fit, and at least one; with both, as many
-     * as fit without exceeding {@code Count}. The only place that computes it: the layout and whoever asks where the
+     * as fit without exceeding {@code Column count}. The only place that computes it: the layout and whoever asks where the
      * columns ended up ({@code PageFragment.columns()}) read it here.
      *
-     * @param count     {@code Count}; {@code null} if it is not declared
+     * @param count     {@code Column count}; {@code null} if it is not declared
      * @param minWidth  {@code Min column width}, in points; {@code null} if it is not declared
      * @param gap       {@code Gap}, in points
      * @param available width of the content box of the {@code Columns}, in points

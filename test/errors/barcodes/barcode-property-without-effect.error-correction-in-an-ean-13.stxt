@@ -10,5 +10,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Barcode: 8412345678905
 			Alt: Código de producto
-			Format: ean-13
+			Barcode format: ean-13
 			Error correction: high

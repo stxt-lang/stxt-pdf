@@ -137,7 +137,7 @@ content is in one of them.
 | `Page` | like the document's | the document's | See [below](#the-page-of-a-section). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | How it numbers its pages ([numbering](#page-numbering)). |
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | How its page numbers are written: `1`, `i`, `I`. With `none` it is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
-| `Start` | integer ≥ 1 | `1` | With `restart`, the number of its first page. Without `restart` it is `START_WITHOUT_RESTART`. |
+| `First number` | integer ≥ 1 | `1` | With `restart`, the number of its first page. Without `restart` it is `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | boolean | `true` | Whether it carries the `Page overlay` elements of the document. With `false`, only its own appear. |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Drops the top margin of its first element (`top`), the bottom margin of its last one (`bottom`) or both: with `both` or `top`, the content starts at the top of the page area ([Block](block.md#trimming-the-margins-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | On which physical page it begins ([double-sided](#beginning-on-an-odd-page)). In the first section, `odd` is `BEGIN_ON_FIRST_SECTION`. |
@@ -209,7 +209,7 @@ left blank. The bookmarks, the links and `Pages` follow the physical page. A hea
 be in a table of contents (`In table of contents: false`).
 
 Since the counter does not advance in a `none` section, a `continue` section after a cover starts at 1. With
-`Page numbering: restart`, `Start` gives the number of the first page of the section (`Start: 5`: a document split
+`Page numbering: restart`, `First number` gives the number of the first page of the section (`First number: 5`: a document split
 across several files). The viewer also shows the printed number ([The PDF](../common/pdf.md#pages)).
 
 **How it is written.** `Page number format` writes the page numbers of the section in digits (`decimal`), in lowercase Roman
@@ -227,7 +227,7 @@ Section:
     Paragraph: The body starts on page 1.
 ```
 
-A `Page number format` in a `none` section, which has no numbers, is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. A `Start` without `restart`,
+A `Page number format` in a `none` section, which has no numbers, is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. A `First number` without `restart`,
 which would have no effect because the section continues the count of the previous one, is `START_WITHOUT_RESTART`.
 
 > **Decision:** the style belongs to the section and not to the counter: a `continue` section in Roman numerals continues the count of the

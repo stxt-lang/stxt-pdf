@@ -7,7 +7,7 @@ in-flow element goes, also inside another `Columns`.
 
 ```
 Columns:
-    Count: 2
+    Column count: 2
     Gap: 20
     Separator: 0.5
     Separator color: #999999
@@ -21,24 +21,24 @@ Columns:
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
-| `Count` | integer ≥ 1 | none | Number of columns. With `Min column width`, the maximum. |
+| `Column count` | integer ≥ 1 | none | Number of columns. With `Min column width`, the maximum. |
 | `Min column width` | number > 0 | none | Minimum width of the columns: as many fit as the width allows. Measurements only, without percentages. |
-| `Gap` | number ≥ 0 | `0` | Space between columns: a single measurement (two values are `VALUE_NOT_ALLOWED`). With `Count: 1` it is an error (`SINGLE_COLUMN`). |
-| `Separator` | number > 0 | no line | Thickness of the line between columns, centered in the gap. It does not exceed `Gap` (`SEPARATOR_WIDTH`). With `Count: 1` it is an error (`SINGLE_COLUMN`). |
+| `Gap` | number ≥ 0 | `0` | Space between columns: a single measurement (two values are `VALUE_NOT_ALLOWED`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
+| `Separator` | number > 0 | no line | Thickness of the line between columns, centered in the gap. It does not exceed `Gap` (`SEPARATOR_WIDTH`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator color` | color | the text `Color` | Only with `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). It does not affect the layout. |
 | `Balance` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |
 
-`Count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`), their own or from a rule. All of them can come
+`Column count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`), their own or from a rule. All of them can come
 from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
 
 ## Columns
 
-The number and the width come from `Count` and `Min column width`, over the width of the content box (`W`) and with `Gap`
+The number and the width come from `Column count` and `Min column width`, over the width of the content box (`W`) and with `Gap`
 (`g`) between each two:
 
-- only `Count: n`: `n` columns;
+- only `Column count: n`: `n` columns;
 - only `Min column width: w`: as many as fit, `⌊(W + g) / (w + g)⌋`, and at least one;
-- both: those that fit, without exceeding `Count`.
+- both: those that fit, without exceeding `Column count`.
 
 The columns share the width left by the gaps: they measure `(W − (n − 1) · g) / n`.
 
@@ -87,7 +87,7 @@ inside ends the columns of the page.
 ## What does not fit
 
 If the own height of the `Columns` (`Height`, `Max height`) ends on a page and its content does not fit in the columns of
-that page, it is an error (`BOX_OVERFLOW`), on the line of that property. It is also an error, on the line of `Count`, when, with no page or height to
+that page, it is an error (`BOX_OVERFLOW`), on the line of that property. It is also an error, on the line of `Column count`, when, with no page or height to
 fill, its column breaks need more columns than it has ([Overflow](../common/overflow.md)).
 
 > **Decision:** content that does not fit in the columns is an error. *Rejected alternative:* overflow columns
@@ -103,9 +103,9 @@ the content box and with the height of the tallest column on that page. Its colo
 
 ## Intrinsic sizes
 
-With `Count` and without `Min column width`, the narrowest width is `Count` columns of the narrowest width of the content plus the gaps. With
-`Min column width`, it is one column, because the number of columns adapts to the width. The natural width is `Count` columns (or one, without
-`Count`) of the natural width of the content, or of `Min column width` if it is larger, plus the gaps.
+With `Column count` and without `Min column width`, the narrowest width is `Column count` columns of the narrowest width of the content plus the gaps. With
+`Min column width`, it is one column, because the number of columns adapts to the width. The natural width is `Column count` columns (or one, without
+`Column count`) of the natural width of the content, or of `Min column width` if it is larger, plus the gaps.
 
 > **Decision:** with `Min column width`, the narrowest width is that of a single column. *Rejected alternative:* the smaller of
 > `Min column width` and the narrowest width of the content.

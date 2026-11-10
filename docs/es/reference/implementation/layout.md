@@ -332,7 +332,7 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 ## Paginación
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
-`Numbering` el número impreso de cada página (el contador, `restart` con su `Start` y `none`), el último de su tanda
+`Numbering` el número impreso de cada página (el contador, `restart` con su `First number` y `none`), el último de su tanda
 (`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`). `Page` lleva su `PageSetup`, su
 sección, su `printed` (0 = sin número) y su estilo. El `PageSetup` de una página es el de su sección pasado por
 `forPage(número)`: con `Mirror margins`, en las páginas físicas pares lleva el margen izquierdo y el derecho

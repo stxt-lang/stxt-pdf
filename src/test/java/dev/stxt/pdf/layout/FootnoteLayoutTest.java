@@ -116,7 +116,7 @@ class FootnoteLayoutTest {
     @Test
     void inColumnsTheNotesGoAtTheFootOfThePage() {
         LayoutFixture f = LayoutFixture.layOutPaged(200, join(new String[] {MARKDOWN,
-                "\tColumns:", "\t\tId: cols", "\t\tCount: 2", "\t\tGap: 15",
+                "\tColumns:", "\t\tId: cols", "\t\tColumn count: 2", "\t\tGap: 15",
                 "\t\tParagraph: Uno[^a].", "\t\t\tId: c1", "\t\tParagraph: Dos[^b].", "\t\t\tId: c2"},
                 note("a", 1), note("b", 1)));
         assertEquals(1, f.pages());

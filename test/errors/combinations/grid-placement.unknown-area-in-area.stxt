@@ -9,7 +9,7 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Grid:
-			Areas: a b
+			Area map: a b
 			Area: c
 				Block:
 					Box:

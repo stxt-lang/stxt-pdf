@@ -9,7 +9,7 @@
 # (280 − 261 = 19) and moves whole to page 2.
 # Page 2: label at 20, of 120 × 36, with its margin of 8. row starts at 64: mini has Height: 30,
 # so its width is 30 × 2 = 60; banner, with Grow, takes up what remains (260 − 60 − 10 = 190) and
-# with both axes declared the image covers the box (Fit: fill). md turns the lone image in
+# with both axes declared the image covers the box (Fit: crop). md turns the lone image in
 # its paragraph into an Image of its natural size (150 × 75) and the paragraph goes below: md measures 75 + 12.
 # logo: a Page overlay in the top right corner, of 12 × 6, on both pages.
 Document (dev.stxt.pdf):
@@ -65,7 +65,7 @@ Document (dev.stxt.pdf):
 				Grow: 1
 				Image: test/label.svg
 					Id: banner
-					Fit: fill
+					Fit: crop
 					Box:
 						Height: 30
 		Markdown:

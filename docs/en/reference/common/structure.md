@@ -190,30 +190,30 @@ once, and the elements, as many times as needed.
 | Node | Children |
 |---|---|
 | `Document` | `Page`, `Title` and `Language` (exactly one of each), `Subject`, `Author`, `Styles`; `Page overlay`, `Section` (at least one) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elements |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` and the element properties of appearance and distribution ([Styles](styles.md#element-properties)), at most one of each |
 | `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Clear`; elements |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
-| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
+| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, besides, `Drop cap` |
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (at least one) |
-| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker image` (with `Alt` and `Height`), `Start`; `List item` (at least one) |
+| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (required), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`; elements except headings |
-| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
+| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Clear`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Of`, `Levels`, `Leader` |
 | `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate`, `Side`, `Clear` |
-| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Barcode format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |
@@ -229,7 +229,7 @@ once, and the elements, as many times as needed.
 `Caption` only goes in a `Figure`.
 
 Only the properties (not the groups), `Text`, `Paragraph`, `Caption`, `Cell`, `Image`, `Barcode`, `Area`, the `Styles` rules and `Named color` carry a value on their line.
-`Block: something` is an error. `Content` always goes in a `>>` block, and `Areas`, inline or in a block. What the schema cannot
+`Block: something` is an error. `Content` always goes in a `>>` block, and `Area map`, inline or in a block. What the schema cannot
 express (that `Page` declares its size in a single way, that an `Item` or a `Figure` has exactly one element, the order
 of the parts of a table) is checked by the engine, with the codes of [Errors](errors.md).
 

@@ -34,7 +34,7 @@ resultado ya paginado y da un error con la primera de estas situaciones:
   [Table](../components/table.md#cortes)), en la línea de la `Table`;
 - **el contenido de un `Columns` que no cabe en sus columnas** y no puede seguir en otra página (`BOX_OVERFLOW`,
   [Columns](../components/columns.md#lo-que-no-cabe)): en la línea de su `Height` (o `Max height`, o `Aspect ratio`) si
-  es su alto el que se acaba, o en la de su `Count` si, sin página ni alto que llenar, tiene más cortes de columna que
+  es su alto el que se acaba, o en la de su `Column count` si, sin página ni alto que llenar, tiene más cortes de columna que
   columnas.
 
 El error señala al culpable **más interior**: si una caja se sale porque se sale algo de dentro, se nombra lo de dentro.

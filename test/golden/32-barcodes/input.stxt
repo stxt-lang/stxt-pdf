@@ -37,14 +37,14 @@ Document (dev.stxt.pdf):
 		Barcode: STXT-2026-0042
 			Id: code
 			Alt: Referencia STXT-2026-0042
-			Format: code-128
+			Barcode format: code-128
 			Box:
 				Width: 160
 				Height: 30
 		Barcode: 8412345678905
 			Id: ean
 			Alt: Código de producto 8412345678905
-			Format: ean-13
+			Barcode format: ean-13
 			Box:
 				Width: 100
 		Barcode: https://stxt.dev

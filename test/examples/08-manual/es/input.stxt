@@ -383,7 +383,7 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Garantía y soporte
 			Columns:
-				Count: 2
+				Column count: 2
 				Gap: 26
 				Separator: 0.5
 				Separator color: #BFD9D7

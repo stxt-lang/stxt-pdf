@@ -10,7 +10,7 @@ import dev.stxt.pdf.model.NumberFormat;
  * @param pageSetup        its medium: the one of the document with what the section declares on top
  * @param numbering    how it numbers its pages
  * @param pageNumberFormat    how its page numbers are written ({@code Page number format})
- * @param start        the number of its first page with {@code Page numbering: restart} ({@code Start}); 1 if it does
+ * @param start        the number of its first page with {@code Page numbering: restart} ({@code First number}); 1 if it does
  *                     not declare it
  * @param inheritPageOverlays whether it carries the {@code Page overlay} elements of the document
  * @param beginOn      on which physical page it begins ({@code Begin on})

@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
                     Text: Platea, fila 7, butaca 12
                     Barcode: TV-2025-1187
                         Alt: Código de barras de la entrada TV-2025-1187
-                        Format: code-128
+                        Barcode format: code-128
                         Box:
                             Width: 180
                             Height: 36
@@ -50,7 +50,7 @@ Document (dev.stxt.pdf):
 | Propiedad | Qué hace |
 |---|---|
 | *(valor)* | Los datos: una dirección, una referencia, un número. Si tienen varias líneas, van en un bloque `Content >>` |
-| `Format` | `qr` (por defecto), un código QR; `code-128`, un código de barras de letras, cifras y signos; `ean-13`, el código de barras de los productos |
+| `Barcode format` | `qr` (por defecto), un código QR; `code-128`, un código de barras de letras, cifras y signos; `ean-13`, el código de barras de los productos |
 | `Error correction` | Solo en un QR: cuánto puede estropearse y seguir leyéndose. `low`, `medium` (por defecto), `quartile` o `high`. Cuanto más alto, más módulos para los mismos datos |
 | `Quiet zone` | Los módulos en blanco a cada lado del código, de 0 a 40. Por defecto, los de la norma de cada formato ([El tamaño](#el-tamaño)) |
 | `Alt` | Lo que es y adónde lleva, para quien no lo ve. Obligatorio |

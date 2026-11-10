@@ -59,7 +59,7 @@ public enum ErrorCode {
     // --- Lists -----------------------------------------------------------------------------------
     /** A {@code List item} without any element. */
     LIST_ITEM_EMPTY,
-    /** {@code Start} or {@code Number} in a list that does not number ({@code bullet}, {@code dash}, {@code none}). */
+    /** {@code First number} or {@code Number} in a list that does not number ({@code bullet}, {@code dash}, {@code none}). */
     LIST_NUMBER_NOT_ALLOWED,
     /**
      * A number that the numbering cannot write: negative, 0 in letters or Roman numerals, or over 3999 in Roman
@@ -104,7 +104,7 @@ public enum ErrorCode {
     MERGE_BORDERS_WITHOUT_EFFECT,
 
     // --- Columns -------------------------------------------------------------------------------
-    /** A {@code Columns} without {@code Count} or {@code Min column width}. */
+    /** A {@code Columns} without {@code Column count} or {@code Min column width}. */
     COLUMNS_WITHOUT_COUNT,
     /** {@code Separator} wider than {@code Gap}: the line would be painted over the columns. */
     SEPARATOR_WIDTH,
@@ -177,7 +177,7 @@ public enum ErrorCode {
 
     // --- Barcodes -------------------------------------------------------------------------------
     /**
-     * A {@code Barcode} without data, or with data that its {@code Format} cannot encode: characters it does not have,
+     * A {@code Barcode} without data, or with data that its {@code Barcode format} cannot encode: characters it does not have,
      * too many of them, or digits with a wrong check digit (line of the {@code Barcode}).
      */
     BARCODE_DATA,
@@ -286,7 +286,7 @@ public enum ErrorCode {
     OVERCONSTRAINED,
     /** An {@code auto} margin where it neither centers nor absorbs anything. */
     MARGIN_AUTO_WITHOUT_EFFECT,
-    /** {@code Start} in a {@code Section} without {@code Page numbering: restart}. */
+    /** {@code First number} in a {@code Section} without {@code Page numbering: restart}. */
     START_WITHOUT_RESTART,
     /**
      * Something that is not the appearance ({@code Background}, {@code Border}, {@code Border color},
@@ -323,11 +323,11 @@ public enum ErrorCode {
     BREAK_IN_CLIPPED,
     /** A vertical percentage whose base is not a definite height. */
     INDEFINITE_PERCENTAGE,
-    /** Non-rectangular {@code Areas} or an invalid {@code Area} value. */
+    /** Non-rectangular {@code Area map} or an invalid {@code Area} value. */
     GRID_PLACEMENT,
     /** {@code Rotate origin} without {@code Rotate}. */
     ROTATE_ORIGIN_WITHOUT_ROTATE,
-    /** {@code Gap} or {@code Separator} in a {@code Columns} with {@code Count: 1}. */
+    /** {@code Gap} or {@code Separator} in a {@code Columns} with {@code Column count: 1}. */
     SINGLE_COLUMN,
     /** {@code Separator color} without {@code Separator}. */
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,

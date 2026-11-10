@@ -80,9 +80,9 @@ class BarcodePaintTest {
     @Test
     void code128AndEan13AreReadFromThePage() throws Exception {
         assertEquals("STXT-2026-0042", read(pdf("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia",
-                "\t\tFormat: code-128", "\t\tBox:", "\t\t\tWidth: 240", "\t\t\tHeight: 50"), BarcodeFormat.CODE_128).getText());
+                "\t\tBarcode format: code-128", "\t\tBox:", "\t\t\tWidth: 240", "\t\t\tHeight: 50"), BarcodeFormat.CODE_128).getText());
         assertEquals("8412345678905", read(pdf("\tBarcode: 841234567890", "\t\tAlt: Producto",
-                "\t\tFormat: ean-13", "\t\tBox:", "\t\t\tWidth: 160"), BarcodeFormat.EAN_13).getText());
+                "\t\tBarcode format: ean-13", "\t\tBox:", "\t\t\tWidth: 160"), BarcodeFormat.EAN_13).getText());
     }
 
     @Test

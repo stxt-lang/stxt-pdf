@@ -104,7 +104,7 @@ class BarcodesTest {
         Modules qr = modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace");
         assertEquals(33 * 0.5 * Value.POINTS_PER_MM, qr.naturalWidth(), 1e-9);
         assertEquals(qr.naturalWidth(), qr.naturalHeight(), 1e-9);
-        Modules ean = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13");
+        Modules ean = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tBarcode format: ean-13");
         assertEquals(37.29 * Value.POINTS_PER_MM, ean.naturalWidth(), 1e-9);
         assertEquals(22.85 * Value.POINTS_PER_MM, ean.naturalHeight(), 1e-9);
     }
@@ -115,9 +115,9 @@ class BarcodesTest {
         assertEquals(0.25 * Value.POINTS_PER_MM, modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace").minModule(),
                 1e-9);
         assertEquals(0.25 * Value.POINTS_PER_MM,
-                modules("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tFormat: code-128").minModule(), 1e-9);
+                modules("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tBarcode format: code-128").minModule(), 1e-9);
         assertEquals(0.264 * Value.POINTS_PER_MM,
-                modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13").minModule(), 1e-9);
+                modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tBarcode format: ean-13").minModule(), 1e-9);
     }
 
     @Test
@@ -155,7 +155,7 @@ class BarcodesTest {
 
     @Test
     void code128IsReadBack() throws Exception {
-        Modules m = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tFormat: code-128");
+        Modules m = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tBarcode format: code-128");
         assertEquals(1, m.rows());
         for (int q = 0; q < 10; q++) {
             assertFalse(m.isDark(q, 0));
@@ -167,8 +167,8 @@ class BarcodesTest {
 
     @Test
     void ean13AddsOrChecksTheCheckDigit() throws Exception {
-        Modules twelve = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13");
-        Modules thirteen = modules("\tBarcode: 8412345678905", "\t\tAlt: Producto", "\t\tFormat: ean-13");
+        Modules twelve = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tBarcode format: ean-13");
+        Modules thirteen = modules("\tBarcode: 8412345678905", "\t\tAlt: Producto", "\t\tBarcode format: ean-13");
         assertEquals(twelve, thirteen);
         // 11 modules of quiet zone on the left, 95 of code and 7 on the right.
         assertEquals(113, twelve.columns());
@@ -185,8 +185,8 @@ class BarcodesTest {
 
     @Test
     void quietZoneReplacesThatOfTheFormat() throws Exception {
-        Modules standard = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tFormat: code-128");
-        Modules narrow = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tFormat: code-128",
+        Modules standard = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tBarcode format: code-128");
+        Modules narrow = modules("\tBarcode: STXT-2026-0042", "\t\tAlt: Referencia", "\t\tBarcode format: code-128",
                 "\t\tQuiet zone: 5");
         assertEquals(standard.columns() - 10, narrow.columns());
         for (int q = 0; q < 5; q++) {
@@ -198,7 +198,7 @@ class BarcodesTest {
         assertEquals(narrow.columns() * Barcodes.LINEAR_MODULE, narrow.naturalWidth(), 1e-9);
 
         // In an EAN-13 the same number goes on both sides.
-        Modules ean = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tFormat: ean-13",
+        Modules ean = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tBarcode format: ean-13",
                 "\t\tQuiet zone: 5");
         assertEquals(105, ean.columns());
         assertTrue(ean.isDark(5, 0));
@@ -217,7 +217,7 @@ class BarcodesTest {
 
     @Test
     void quietZoneOutOfRange() {
-        InvalidModelException wide = error("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tFormat: code-128",
+        InvalidModelException wide = error("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tBarcode format: code-128",
                 "\t\tQuiet zone: 41");
         assertEquals(ErrorCode.VALUE_NOT_ALLOWED, wide.errorCode());
         assertTrue(wide.getMessage().contains("Quiet zone allows from 0 to 40 modules: 41"), wide.getMessage());
@@ -237,23 +237,23 @@ class BarcodesTest {
     /** The limits of a Code 128: the space and ~ are the first and the last characters it encodes, and 80 of them fit. */
     @Test
     void code128EncodesThePrintableAsciiUpToEightyCharacters() {
-        assertNotNull(modules("\tBarcode: ~ !", "\t\tAlt: Referencia", "\t\tFormat: code-128"));
-        assertNotNull(modules("\tBarcode: " + "A".repeat(80), "\t\tAlt: Referencia", "\t\tFormat: code-128"));
+        assertNotNull(modules("\tBarcode: ~ !", "\t\tAlt: Referencia", "\t\tBarcode format: code-128"));
+        assertNotNull(modules("\tBarcode: " + "A".repeat(80), "\t\tAlt: Referencia", "\t\tBarcode format: code-128"));
     }
 
     @Test
     void dataThatCannotBeEncoded() {
         InvalidModelException empty = error("\tBarcode:", "\t\tAlt: Código");
         assertEquals(ErrorCode.BARCODE_DATA, empty.errorCode());
-        InvalidModelException digit = error("\tBarcode: 8412345678901", "\t\tAlt: Producto", "\t\tFormat: ean-13");
+        InvalidModelException digit = error("\tBarcode: 8412345678901", "\t\tAlt: Producto", "\t\tBarcode format: ean-13");
         assertTrue(digit.getMessage().contains("The check digit of the EAN-13 8412345678901 is 5, not 1"),
                 digit.getMessage());
-        InvalidModelException letters = error("\tBarcode: 84123A", "\t\tAlt: Producto", "\t\tFormat: ean-13");
+        InvalidModelException letters = error("\tBarcode: 84123A", "\t\tAlt: Producto", "\t\tBarcode format: ean-13");
         assertTrue(letters.getMessage().contains("12 digits"), letters.getMessage());
-        InvalidModelException ascii = error("\tBarcode: Peña", "\t\tAlt: Referencia", "\t\tFormat: code-128");
+        InvalidModelException ascii = error("\tBarcode: Peña", "\t\tAlt: Referencia", "\t\tBarcode format: code-128");
         assertTrue(ascii.getMessage().contains("'ñ' (U+00F1)"), ascii.getMessage());
         InvalidModelException longCode = error("\tBarcode: " + "A".repeat(81), "\t\tAlt: Referencia",
-                "\t\tFormat: code-128");
+                "\t\tBarcode format: code-128");
         assertTrue(longCode.getMessage().contains("81 characters"), longCode.getMessage());
         InvalidModelException qr = error("\tBarcode: " + "x".repeat(3000), "\t\tAlt: Datos");
         assertTrue(qr.getMessage().contains("3000 bytes") && qr.getMessage().contains("or Error correction lower"),
@@ -267,7 +267,7 @@ class BarcodesTest {
     void propertiesWithoutEffect() {
         assertEquals(ErrorCode.BARCODE_WITHOUT_ALT, error("\tBarcode: https://stxt.dev").errorCode());
         assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, error("\tBarcode: STXT", "\t\tAlt: Referencia",
-                "\t\tFormat: code-128", "\t\tError correction: low").errorCode());
+                "\t\tBarcode format: code-128", "\t\tError correction: low").errorCode());
         assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, error("\tBarcode: STXT", "\t\tAlt: Referencia",
                 "\t\tTypography:", "\t\t\tSize: 12").errorCode());
     }

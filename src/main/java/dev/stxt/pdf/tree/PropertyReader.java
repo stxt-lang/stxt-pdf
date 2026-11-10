@@ -88,10 +88,10 @@ final class PropertyReader {
     static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution",
             "split-items");
     /** Properties of the {@code Grid} and {@code Table} elements. */
-    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "areas", "flow", "horizontal", "vertical",
+    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "area-map", "flow", "horizontal", "vertical",
             "split-rows");
     /** Properties of the {@code Columns} element. */
-    static final Set<String> COLUMNS = Set.of("count", "min-column-width", "gap", "separator", "separator-color", "balance");
+    static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
     /** Reads a property into the style; its line is already recorded. */
     @FunctionalInterface
@@ -135,7 +135,7 @@ final class PropertyReader {
             entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("marker-image", PropertyReader::markerImage),
-            entry("start", (p, s) -> s.list().setStart(integer(p))),
+            entry("first-number", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
             entry("trim-margins", (p, s) -> s.setTrimMargins(enumValue(TrimMargins.class, p))),
@@ -148,7 +148,7 @@ final class PropertyReader {
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
-            entry("format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
+            entry("barcode-format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
             entry("quiet-zone", (p, s) -> s.image().setQuietZone(quietZone(p))),
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
@@ -354,7 +354,7 @@ final class PropertyReader {
                 List<Value> gap = gap(p);
                 s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
             }
-            case "areas" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
+            case "area-map" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
             case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
@@ -371,7 +371,7 @@ final class PropertyReader {
     static void columns(Node p, Style s) {
         s.declared(p.getCanonicalName(), p.getLine());
         switch (p.getCanonicalName()) {
-            case "count" -> s.columns().setCount(positiveInteger(p));
+            case "column-count" -> s.columns().setCount(positiveInteger(p));
             case "min-column-width" -> s.columns().setMinColumnWidth(positive(p));
             case "gap" -> s.columns().setColumnGap(columnGap(p));
             case "separator" -> s.columns().setSeparator(positive(p));

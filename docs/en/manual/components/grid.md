@@ -23,7 +23,7 @@ Document (dev.stxt.pdf):
         Grid:
             Column sizes: 150 *
             Gap: 20
-            Areas >>
+            Area map >>
                 head head
                 side main
             Area: head
@@ -49,7 +49,7 @@ goes:
 | Value | Where it goes |
 |---|---|
 | *(nothing)* | In the next free slot, going through the grid by rows |
-| `side` | In the area with that name in `Areas` |
+| `side` | In the area with that name in `Area map` |
 | `2 3` | In row 2, column 3 (counting from 1) |
 | `1 1 1 2` | In row 1, from column 1, spanning 1 row and 2 columns |
 | `auto auto 1 2` | In the next slot where 2 columns fit |
@@ -64,11 +64,11 @@ margins and the `Id` go on the element inside.
 | `Column sizes` | one column | The width of each column |
 | `Row sizes` | whatever each row measures | The height of each row |
 | `Gap` | `0` | The gap between cells (with two values: between rows and between columns) |
-| `Areas` | none | A drawing of the grid with names: one line per row, one name per cell, `.` for an empty cell |
+| `Area map` | none | A drawing of the grid with names: one line per row, one name per cell, `.` for an empty cell |
 | `Flow` | `horizontal` | Whether the items without a fixed position are placed by rows (`horizontal`) or by columns (`vertical`) |
 | `Horizontal`, `Vertical` | `stretch` | The alignment of the items in their cell: `start`, `end`, `center` or `stretch` (taking up the whole cell) |
 
-Each name in `Areas` must form a rectangle. If an item falls outside the declared rows, new rows are added.
+Each name in `Area map` must form a rectangle. If an item falls outside the declared rows, new rows are added.
 
 ## The sizes of the columns and rows
 

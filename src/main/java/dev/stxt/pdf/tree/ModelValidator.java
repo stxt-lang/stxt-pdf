@@ -111,20 +111,20 @@ final class ModelValidator {
     }
 
     /**
-     * A {@code Columns} sets its columns with {@code Count}, {@code Min column width} or both; with a single column
+     * A {@code Columns} sets its columns with {@code Column count}, {@code Min column width} or both; with a single column
      * there is no gap or rule between columns, {@code Separator color} needs {@code Separator} and the rule fits in the
      * gap (reference/components/columns.md).
      */
     static void validateColumns(Style s, int line) {
         if (s.columns().count() == null && s.columns().minColumnWidth() == null) {
-            throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "A Columns needs Count, Min column width or both: "
-                    + "Count sets the number of columns and Min column width their minimum width");
+            throw error(line, ErrorCode.COLUMNS_WITHOUT_COUNT, "A Columns needs Column count, Min column width or both: "
+                    + "Column count sets the number of columns and Min column width their minimum width");
         }
         if (s.columns().count() != null && s.columns().count() == 1) {
             for (String p : List.of(COLUMN_GAP, SEPARATOR)) {
                 if (s.isDeclared(p)) {
                     throw error(s.line(p), ErrorCode.SINGLE_COLUMN, (p.equals(SEPARATOR) ? "Separator" : "Gap")
-                            + " has no effect with Count: 1, because there are not two columns to separate: it is not needed");
+                            + " has no effect with Column count: 1, because there are not two columns to separate: it is not needed");
                 }
             }
         }

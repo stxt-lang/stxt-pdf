@@ -16,7 +16,7 @@ Document (dev.stxt.pdf):
 		Stack:
 			Item:
 				Columns:
-					Count: 2
+					Column count: 2
 					Text: A
 					Text: B
 						Break:

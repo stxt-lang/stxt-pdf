@@ -28,14 +28,14 @@ Document (dev.stxt.pdf):
             Area:
                 Image: examples/catalog/silla.jpg
                     Alt: Walnut chair with a wool seat
-                    Fit: fill
+                    Fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
             Area:
                 Image: examples/catalog/mesa.jpg
                     Alt: Walnut dining table
-                    Fit: fill
+                    Fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | *(value)* | The path of the file inside `images/`: `Image: logos/acme.png`. Required |
 | `Alt` | The alternative text, for those who cannot see the image. Without `Alt`, the image is decorative and the screen reader skips it |
-| `Fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `fill` (fills the box and crops what is left over) or `stretch` (it is distorted) |
+| `Fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `crop` (fills the box and crops what is left over) or `stretch` (it is distorted) |
 | `Pdf page` | The page of a PDF that is drawn, from 1. Without `Pdf page`, the first one. Only in a PDF |
 | `Rotate` | Rotating the image around its center. It takes up the rectangle that encloses it rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
 | `Side` | `left` or `right`: the image is placed at that side and the text that follows it runs beside it ([Block](block.md#a-box-at-one-side-with-the-text-around-it-side)) |

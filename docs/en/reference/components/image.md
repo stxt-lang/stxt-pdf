@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
             Item:
                 Grow: 1
                 Image: test/wide.png
-                    Fit: fill
+                    Fit: crop
                     Box:
                         Height: 60
 ```
@@ -46,7 +46,7 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 |---|---|---|---|
 | *(value)* | path relative to `images/` | required | The PNG, JPEG, SVG or PDF file: `Image: logos/acme.png`. |
 | `Alt` | non-empty text | none | Alternative text: with it, the image is a figure that is read ([accessibility](#accessibility)). Without it, it is decorative. |
-| `Fit` | `inside`, `fill`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
+| `Fit` | `inside`, `crop`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
 | `Pdf page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates the image around its center (a seal) and takes up the rectangle that encloses it rotated. |
 | `Side` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
@@ -111,11 +111,12 @@ If the minimums and the maximums cannot be met at the same time with the proport
 If the content box and the image have different proportions:
 
 - `inside` (default) draws the whole image, as large as fits and centered, and lets the background show at the sides.
-- `fill` draws it as small as covers the box, centered, and crops what is left over.
+- `crop` draws it as small as covers the box, centered, and crops what is left over.
 - `stretch` stretches it to the box and distorts it.
 
-> **Decision:** the values say what happens to the image: it fits inside (`inside`), it fills the box (`fill`) or it is stretched
-> (`stretch`). *Rejected alternative:* `contain` and `cover`, which cannot be understood without knowing them beforehand.
+> **Decision:** the values say what happens to the image: it fits inside (`inside`), it is cropped to cover the box (`crop`) or it is stretched
+> (`stretch`). *Rejected alternatives:* `contain` and `cover`, which cannot be understood without knowing them beforehand;
+> and `fill` for the cropped one, which in web layout is the value that stretches the image.
 
 With the same proportion, the three give the same result. An image is also clipped by the rounded corners of its content box ([The box](../common/box.md#corners)).
 

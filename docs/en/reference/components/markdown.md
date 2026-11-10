@@ -75,7 +75,7 @@ as follows:
 | `#` to `######` (and the ones underlined with `===` and `---`) | `Heading 1` to `Heading 6`, with a `Text`, and with `{#id}` at the end of the text (`## Sales {#sales}`), its `Id` |
 | Paragraph | `Paragraph` |
 | `-`, `*`, `+` | `List` with the `Marker` of `Bullet markers` for its level, with one `List item` per item |
-| `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level and `Start`, the first number if it is not 1 |
+| `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level and `First number`, the first number if it is not 1 |
 | Table | `Table` with the `Column sizes` of `Table columns`, with the header row in `Header rows` and the rest in `Body` |
 | `**x**`, `__x__` | bold run ([Text formatting](../common/text-formatting.md#runs)) |
 | `*x*`, `_x_` | italic run |

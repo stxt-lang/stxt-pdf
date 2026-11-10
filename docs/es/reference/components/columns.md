@@ -7,7 +7,7 @@ elemento en flujo, también dentro de otro `Columns`.
 
 ```
 Columns:
-    Count: 2
+    Column count: 2
     Gap: 20
     Separator: 0.5
     Separator color: #999999
@@ -21,24 +21,24 @@ Columns:
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Count` | entero ≥ 1 | sin valor | Número de columnas. Con `Min column width`, el máximo. |
+| `Column count` | entero ≥ 1 | sin valor | Número de columnas. Con `Min column width`, el máximo. |
 | `Min column width` | número > 0 | sin valor | Ancho mínimo de las columnas: caben tantas como permita el ancho. Solo medidas, sin porcentajes. |
-| `Gap` | número ≥ 0 | `0` | Separación entre columnas: una sola medida (dos valores son `VALUE_NOT_ALLOWED`). Con `Count: 1` es un error (`SINGLE_COLUMN`). |
-| `Separator` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Gap` (`SEPARATOR_WIDTH`). Con `Count: 1` es un error (`SINGLE_COLUMN`). |
+| `Gap` | número ≥ 0 | `0` | Separación entre columnas: una sola medida (dos valores son `VALUE_NOT_ALLOWED`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
+| `Separator` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Gap` (`SEPARATOR_WIDTH`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator color` | color | el `Color` del texto | Solo con `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). No afecta al layout. |
 | `Balance` | `true`, `false` | `true` | `true` iguala las columnas de la última página, y `false` las llena en orden. |
 
-`Count`, `Min column width` o los dos son obligatorios (`COLUMNS_WITHOUT_COUNT`), propios o de una regla. Todas pueden venir
+`Column count`, `Min column width` o los dos son obligatorios (`COLUMNS_WITHOUT_COUNT`), propios o de una regla. Todas pueden venir
 de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
 
 ## Columnas
 
-El número y el ancho salen de `Count` y `Min column width`, sobre el ancho de la caja de contenido (`W`) y con `Gap`
+El número y el ancho salen de `Column count` y `Min column width`, sobre el ancho de la caja de contenido (`W`) y con `Gap`
 (`g`) entre cada dos:
 
-- solo `Count: n`: `n` columnas;
+- solo `Column count: n`: `n` columnas;
 - solo `Min column width: w`: tantas como quepan, `⌊(W + g) / (w + g)⌋`, y al menos una;
-- los dos: las que quepan, sin pasar de `Count`.
+- los dos: las que quepan, sin pasar de `Column count`.
 
 Las columnas se reparten el ancho que dejan los huecos: miden `(W − (n − 1) · g) / n`.
 
@@ -87,7 +87,7 @@ de dentro termina las columnas de la página.
 ## Lo que no cabe
 
 Si el alto propio del `Columns` (`Height`, `Max height`) termina en una página y su contenido no cabe en las columnas de
-esa página, es un error (`BOX_OVERFLOW`), en la línea de esa propiedad. También lo es, en la línea de `Count`, que sin página ni alto que
+esa página, es un error (`BOX_OVERFLOW`), en la línea de esa propiedad. También lo es, en la línea de `Column count`, que sin página ni alto que
 llenar sus cortes de columna necesiten más columnas de las que tiene ([Desbordamiento](../common/overflow.md)).
 
 > **Decisión:** el contenido que no cabe en las columnas es un error. *Alternativa descartada:* columnas de desbordamiento
@@ -103,9 +103,9 @@ texto. Se pinta con el fondo del `Columns`, debajo del contenido, y no puede ser
 
 ## Tamaños intrínsecos
 
-Con `Count` y sin `Min column width`, el ancho más estrecho es `Count` columnas del ancho más estrecho del contenido más los huecos. Con
-`Min column width`, es una columna, porque el número de columnas se adapta al ancho. El ancho natural es `Count` columnas (o una, sin
-`Count`) del ancho natural del contenido, o de `Min column width` si es mayor, más los huecos.
+Con `Column count` y sin `Min column width`, el ancho más estrecho es `Column count` columnas del ancho más estrecho del contenido más los huecos. Con
+`Min column width`, es una columna, porque el número de columnas se adapta al ancho. El ancho natural es `Column count` columnas (o una, sin
+`Column count`) del ancho natural del contenido, o de `Min column width` si es mayor, más los huecos.
 
 > **Decisión:** con `Min column width`, el ancho más estrecho es el de una sola columna. *Alternativa descartada:* el menor entre
 > `Min column width` y el ancho más estrecho del contenido.

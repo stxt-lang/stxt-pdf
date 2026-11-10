@@ -154,7 +154,7 @@ class BoxTreeBuilderTest {
         assertEquals(ErrorCode.TEXT_CONTENT, twice.errorCode());
         assertEquals(10, twice.line());
         assertThrows(InvalidModelException.class, () -> build(document(
-                "\tGrid:", "\t\tAreas >>", "\t\t\ta a", "\t\t\ta b", "\t\t\tb b")));
+                "\tGrid:", "\t\tArea map >>", "\t\t\ta a", "\t\t\ta b", "\t\t\tb b")));
         assertThrows(InvalidModelException.class, () -> build(document(
                 "\tBlock:", "\t\tTypography:", "\t\t\tWidows: 0")));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
@@ -377,7 +377,7 @@ class BoxTreeBuilderTest {
                 "\t\t\t\tSize: 10", "\t\tFor element: Paragraph", "\t\t\tBreak:", "\t\t\t\tKeep with next: true",
                 "\tStack:", "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tIsolate margins: false",
                 "\tOverlay:", "\t\tParagraph: Sello",
-                "\t\tColumns:", "\t\t\tCount: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
+                "\t\tColumns:", "\t\t\tColumn count: 2", "\t\t\tBlock:", "\t\t\t\tBreak:", "\t\t\t\t\tAfter: column",
                 "\t\t\tBlock:"));
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(document(
                 "\tPage overlay:", "\t\tBlock:", "\t\t\tBreak:", "\t\t\t\tBefore: page", "\tBlock:")));

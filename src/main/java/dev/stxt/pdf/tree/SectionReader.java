@@ -60,7 +60,7 @@ final class SectionReader {
                     pageNumberFormat = enumValue(NumberFormat.class, p);
                     pageNumberFormatNode = p;
                 }
-                case "start" -> {
+                case "first-number" -> {
                     start = positiveInteger(p);
                     startNode = p;
                 }
@@ -80,8 +80,8 @@ final class SectionReader {
         }
         // What would have no effect (reference/components/document.md#page-numbering).
         if (startNode != null && numbering != Section.PageNumbering.RESTART) {
-            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "Start only has an effect with Page numbering: "
-                    + "restart, which is when the numbering starts again: restart is missing or Start is not needed");
+            throw error(startNode, ErrorCode.START_WITHOUT_RESTART, "First number only has an effect with Page numbering: "
+                    + "restart, which is when the numbering starts again: restart is missing or First number is not needed");
         }
         if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
             throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format has no "

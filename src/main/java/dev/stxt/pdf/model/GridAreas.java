@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The parsed {@code Areas} block of a grid (reference/components/grid.md): one row of the
+ * The parsed {@code Area map} block of a grid (reference/components/grid.md): one row of the
  * grid per line, names separated by spaces and {@code .} for an empty cell. Each name
  * must form a rectangle.
  *
@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public record GridAreas(Map<String, Area> named, int rows, int columns) {
 
-    /** A grid without {@code Areas}. */
+    /** A grid without {@code Area map}. */
     public static final GridAreas NONE = new GridAreas(Map.of(), 0, 0);
 
     public GridAreas {
@@ -29,12 +29,12 @@ public record GridAreas(Map<String, Area> named, int rows, int columns) {
                 .map(l -> l.trim().split("\\s+"))
                 .toList();
         if (rows.isEmpty()) {
-            throw new IllegalArgumentException("Areas is empty");
+            throw new IllegalArgumentException("Area map is empty");
         }
         int columns = rows.get(0).length;
         for (int r = 0; r < rows.size(); r++) {
             if (rows.get(r).length != columns) {
-                throw new IllegalArgumentException("Row " + (r + 1) + " of Areas has "
+                throw new IllegalArgumentException("Row " + (r + 1) + " of Area map has "
                         + rows.get(r).length + " cells and the first one has " + columns);
             }
         }

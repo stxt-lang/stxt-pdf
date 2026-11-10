@@ -110,7 +110,7 @@ Una sección es una parte del documento que **empieza siempre en una página nue
 | `Page` | Otro papel, otra orientación u otros márgenes para esta sección. Hereda del `Page` del documento lo que no declara: con solo `Orientation: landscape`, es el mismo papel apaisado, y con solo `Margin`, el mismo papel con otros márgenes (`Mirror margins` va con `Margin`: se heredan o se declaran juntos) |
 | `Page numbering` | `continue` (por defecto) sigue la cuenta de páginas, `restart` vuelve a empezar en 1 y con `none` sus páginas no tienen número ni cuentan |
 | `Page number format` | Cómo se escriben sus números de página: `decimal` (por defecto), `lower-roman` (`i`, `ii`, `iii`) o `upper-roman` (`I`, `II`, `III`) |
-| `Start` | Con `Page numbering: restart`, el número de su primera página (`Start: 5`) |
+| `First number` | Con `Page numbering: restart`, el número de su primera página (`First number: 5`) |
 | `Inherit page overlays` | `true` (por defecto) lleva las cabeceras y los pies del documento, y `false`, solo los suyos |
 | `Begin on` | `any` (por defecto) empieza en la página siguiente, y `odd`, en una impar, la de la derecha al imprimir a doble cara |
 | `Id`, `Style` | Para enlazarla (`#id`, su primera página) y darle tipografía con una regla (`Typography` y nada más: un anexo en otro idioma) |
@@ -126,7 +126,7 @@ sección con `Page numbering: restart`. Una página de una sección `none` no ti
 
 Los índices y las referencias (`{page of: id}`) dan el mismo número que el pie de la página: el impreso, también en
 romanos si su sección tiene `Page number format: lower-roman`. Para un prefacio en romanos, su sección declara `Page number format` y la
-del cuerpo, `Page numbering: restart`. Con `Start`, la numeración empieza en otro número.
+del cuerpo, `Page numbering: restart`. Con `First number`, la numeración empieza en otro número.
 
 ## Doble cara
 

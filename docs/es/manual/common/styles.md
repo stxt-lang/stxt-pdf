@@ -91,7 +91,7 @@ Document (dev.stxt.pdf):
 - **`Horizontal` y `Vertical`, en una regla, son las del `Stack` o el `Grid`.** La alineación de un ítem se escribe en
   su `Item`.
 - **Lo que identifica a un elemento o es su contenido no va en reglas:** `Id`, `Link`, `Alt`, `Offset`, `Rotate`, los
-  números de una lista (`Start`, `Number`), `Span`, `Row header` y el texto. La lista completa, por elemento, está en la
+  números de una lista (`First number`, `Number`), `Span`, `Row header` y el texto. La lista completa, por elemento, está en la
   [referencia](../../reference/common/styles.md#propiedades-de-elemento).
 - El `Marker` de una `List` y las `Column sizes` de una `Table` son obligatorios, y pueden venir de una regla:
   `For element: List` con `Marker: bullet` da viñetas a todas las listas del documento.

@@ -20,7 +20,7 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
         return row != null && column != null;
     }
 
-    /** Parses the value of {@code Area}; names are looked up in the {@code Areas} of the grid. */
+    /** Parses the value of {@code Area}; names are looked up in the {@code Area map} of the grid. */
     public static Cell parse(String text, GridAreas areas) {
         if (text == null || text.isBlank()) {
             return AUTO;

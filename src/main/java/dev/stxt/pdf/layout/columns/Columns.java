@@ -6,10 +6,10 @@ import dev.stxt.pdf.tree.ColumnsStyle;
  * Number and width of the columns of a {@code Columns} (reference/components/columns.md):
  *
  * <ul>
- *   <li>only {@code Count}: that number of columns, which share the width;</li>
+ *   <li>only {@code Column count}: that number of columns, which share the width;</li>
  *   <li>only {@code Min column width}: as many columns of at least that width as fit, and at
  *       least one;</li>
- *   <li>both: as many as fit, without exceeding {@code Count}.</li>
+ *   <li>both: as many as fit, without exceeding {@code Column count}.</li>
  * </ul>
  *
  * <p>The columns widen to fill the content width between the gaps. If the
@@ -22,7 +22,7 @@ import dev.stxt.pdf.tree.ColumnsStyle;
 record Columns(int count, double width, double gap) {
 
     /**
-     * @param count     {@code Count}; {@code null} if it is not declared
+     * @param count     {@code Column count}; {@code null} if it is not declared
      * @param width     {@code Min column width}; {@code null} if it is not declared
      * @param gap       {@code Gap}
      * @param available width of the content box of the {@code Columns}

@@ -148,16 +148,16 @@ final class StyleRules {
     /**
      * The element properties a rule allows besides the groups (reference/common/styles.md), by canonical name: those of
      * how an element looks and distributes its content. Not those of its identity, content, structure or position
-     * ({@code Id}, {@code Link}, {@code Alt}, {@code Span}, {@code Start}, {@code Offset}, {@code Rotate}...). A rule
+     * ({@code Id}, {@code Link}, {@code Alt}, {@code Span}, {@code First number}, {@code Offset}, {@code Rotate}...). A rule
      * gives one to an element only if the element could declare it ({@link #declares}). {@code Horizontal} and
      * {@code Vertical} are those of a {@code Stack} or a {@code Grid}, never those of the {@code Item} or the
      * {@code Area} that wraps the element.
      */
     static final Set<String> ELEMENT_PROPERTIES = Set.of(
             "direction", "wrap", "gap", "horizontal", "vertical", "line-distribution", "split-items",
-            "column-sizes", "row-sizes", "areas", "flow", "split-rows", "column-align",
-            "count", "min-column-width", "separator", "separator-color", "balance",
-            "marker", "marker-image", "fit", "format", "error-correction", "quiet-zone",
+            "column-sizes", "row-sizes", "area-map", "flow", "split-rows", "column-align",
+            "column-count", "min-column-width", "separator", "separator-color", "balance",
+            "marker", "marker-image", "fit", "barcode-format", "error-correction", "quiet-zone",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
             "drop-cap", "side", "clear", "isolate-margins", "trim-margins",
             "bullet-markers", "number-markers", "table-columns",

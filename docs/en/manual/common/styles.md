@@ -91,7 +91,7 @@ Document (dev.stxt.pdf):
 - **`Horizontal` and `Vertical`, in a rule, are those of the `Stack` or the `Grid`.** The alignment of an item is written
   in its `Item`.
 - **What identifies an element or is its content does not go in rules:** `Id`, `Link`, `Alt`, `Offset`, `Rotate`, the
-  numbers of a list (`Start`, `Number`), `Span`, `Row header` and the text. The full list, by element, is in the
+  numbers of a list (`First number`, `Number`), `Span`, `Row header` and the text. The full list, by element, is in the
   [reference](../../reference/common/styles.md#element-properties).
 - The `Marker` of a `List` and the `Column sizes` of a `Table` are required, and they can come from a rule:
   `For element: List` with `Marker: bullet` gives bullets to every list of the document.

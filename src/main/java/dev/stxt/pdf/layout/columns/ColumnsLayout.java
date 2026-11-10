@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import static dev.stxt.pdf.layout.Messages.pt;
 import static dev.stxt.pdf.model.Tolerance.fits;
 import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
-import static dev.stxt.pdf.tree.PropertyKey.COUNT;
+import static dev.stxt.pdf.tree.PropertyKey.COLUMN_COUNT;
 import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
 import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
 
@@ -76,7 +76,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
     }
 
     /**
-     * With {@code Count}, that number of columns of the narrowest or the natural width of the content,
+     * With {@code Column count}, that number of columns of the narrowest or the natural width of the content,
      * plus the gaps; with {@code Min column width} the minimum is one column, because the number of
      * columns adapts to the width, and the maximum, columns of at least that width.
      */
@@ -303,7 +303,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
         /** Without a page or a height to fill, the column breaks need more columns than there are. */
         InvalidModelException tooManyColumnBreaks() {
             Style s = box.style();
-            return new InvalidModelException(s.isDeclared(COUNT) ? s.line(COUNT) : SourceLine.of(box.line()),
+            return new InvalidModelException(s.isDeclared(COLUMN_COUNT) ? s.line(COLUMN_COUNT) : SourceLine.of(box.line()),
                     ErrorCode.BOX_OVERFLOW,
                     "Columns " + box.describe() + " has " + columns.count() + (columns.count() == 1 ? " column" : " columns")
                             + " and its column breaks need more: without a page or a height to fill, what does not "

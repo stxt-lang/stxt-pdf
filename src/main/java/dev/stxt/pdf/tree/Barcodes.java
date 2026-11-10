@@ -23,7 +23,7 @@ import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Value;
 
 /**
- * The image of a {@code Barcode} (reference/components/barcode.md): ZXing encodes its data in its {@code Format} and
+ * The image of a {@code Barcode} (reference/components/barcode.md): ZXing encodes its data in its {@code Barcode format} and
  * this class adds the quiet zone and the natural size of a module. The data is checked here, so that each error says
  * what fails with the line of the {@code Barcode} ({@code BARCODE_DATA}): ZXing would accept some data it cannot encode
  * as such (in Code 128, {@code ñ} is a function character) and its messages are not those of the engine.

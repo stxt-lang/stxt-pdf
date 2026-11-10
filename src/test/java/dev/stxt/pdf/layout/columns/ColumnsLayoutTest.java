@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Blocks in columns on an A4 page (page area of 515 × 762 from (40, 40)),
- * reference/components/columns.md. With {@code Count: 2} and {@code Gap: 15}, the columns measure 250 and the
+ * reference/components/columns.md. With {@code Column count: 2} and {@code Gap: 15}, the columns measure 250 and the
  * second starts at x = 305.
  */
 class ColumnsLayoutTest {
@@ -66,7 +66,7 @@ class ColumnsLayoutTest {
         return lines.toArray(String[]::new);
     }
 
-    private static final List<String> TWO = List.of("Count: 2", "Gap: 15");
+    private static final List<String> TWO = List.of("Column count: 2", "Gap: 15");
 
     @Test
     void balancedByDefault() {
@@ -81,7 +81,7 @@ class ColumnsLayoutTest {
 
     @Test
     void fillAutoFillsInOrder() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
                 block("B", 30, false), block("C", 30, false), block("D", 30, false)));
         assertRect(40, 40, 515, 120, l.rect("M"));
         assertRect(40, 130, 250, 30, l.rect("D"));
@@ -129,7 +129,7 @@ class ColumnsLayoutTest {
     void trailingMarginThatDoesNotFitTheColumnOpensTheNextOne() {
         List<String> lines = new ArrayList<>(List.of("	Block:", "		Id: S", "		Box:", "			Height: 447", "		Break:",
                 "			Keep together: true"));
-        lines.addAll(List.of(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false"), block("A", 100, true),
+        lines.addAll(List.of(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), block("A", 100, true),
                 block("B", 100, true), sized("C", true, "Height: 100", "Margin: 0 0 20 0"))));
         LayoutFixture l = layOut(lines.toArray(String[]::new));
         assertEquals(1, l.pages());
@@ -150,7 +150,7 @@ class ColumnsLayoutTest {
 
     @Test
     void columnBreak() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
                 block("B", 30, false, "\t\t\tBreak:", "\t\t\t\tBefore: column"), block("C", 30, false)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -160,7 +160,7 @@ class ColumnsLayoutTest {
 
     @Test
     void paragraphsAreBalancedBetweenColumns() {
-        LayoutFixture l = layOut("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15", "\t\tParagraph: Uno",
+        LayoutFixture l = layOut("\tColumns:", "\t\tId: M", "\t\tColumn count: 2", "\t\tGap: 15", "\t\tParagraph: Uno",
                 "\t\tParagraph: Dos", "\t\tParagraph: Tres", "\t\t\tId: T", "\t\tParagraph: Cuatro");
         assertRect(40, 40, 515, 24, l.rect("M"));
         // The third paragraph opens the second column.
@@ -169,7 +169,7 @@ class ColumnsLayoutTest {
 
     @Test
     void heightIsFilledInOrderWithFillAuto() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
                 block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
@@ -179,7 +179,7 @@ class ColumnsLayoutTest {
 
     @Test
     void heightIsBalanced() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tHeight: 100"),
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Box:", "\tHeight: 100"),
                 block("A", 30, true), block("B", 30, true), block("C", 30, true), block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
         assertRect(305, 40, 250, 30, l.rect("C"));
@@ -187,7 +187,7 @@ class ColumnsLayoutTest {
 
     @Test
     void borderAndPaddingSurroundTheColumns() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Box:", "\tPadding: 10",
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Box:", "\tPadding: 10",
                 "\tBorder: 1"), block("A", 30, true), block("B", 30, true)));
         // Content 493 wide: columns of 239.
         assertRect(40, 40, 515, 52, l.rect("M"));
@@ -206,7 +206,7 @@ class ColumnsLayoutTest {
     @Test
     void stackItemIsBalancedAndSizedByItsColumns() {
         List<String> lines = new ArrayList<>(List.of("\tStack:", "\t\tVertical: start", "\t\tItem:"));
-        for (String line : columnsElement(List.of("Count: 2", "Gap: 10", "Balance: false"),
+        for (String line : columnsElement(List.of("Column count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {
             lines.add("\t\t" + line);
@@ -219,7 +219,7 @@ class ColumnsLayoutTest {
 
     /** Three words of 40 characters (200 pt): one per line in a column of 250. */
     private static String[] threeLines(String... typography) {
-        List<String> lines = new ArrayList<>(List.of("\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15",
+        List<String> lines = new ArrayList<>(List.of("\tColumns:", "\t\tId: M", "\t\tColumn count: 2", "\t\tGap: 15",
                 "\t\tText: " + "a".repeat(40) + " " + "b".repeat(40) + " " + "c".repeat(40), "\t\t\tId: T"));
         if (typography.length > 0) {
             lines.add("\t\t\tTypography:");
@@ -248,19 +248,19 @@ class ColumnsLayoutTest {
     // Cases that were missing according to mutation testing.
 
     /**
-     * The text measures 20 (narrowest width, "aaaa") and 35 (natural width). With Count: 3 and gaps of 10, three
+     * The text measures 20 (narrowest width, "aaaa") and 35 (natural width). With Column count: 3 and gaps of 10, three
      * columns of each; with Min column width the minimum is one column and the maximum, columns of at least that width.
      */
     @Test
     void intrinsicWidthsWithThreeColumns() {
         LayoutFixture l = layOut(
-                "\tColumns:", "\t\tId: min", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: narrowest",
+                "\tColumns:", "\t\tId: min", "\t\tColumn count: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaaa bb",
-                "\tColumns:", "\t\tId: max", "\t\tCount: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: natural",
+                "\tColumns:", "\t\tId: max", "\t\tColumn count: 3", "\t\tGap: 10", "\t\tBox:", "\t\t\tWidth: natural",
                 "\t\tText: aaaa bb",
-                "\tColumns:", "\t\tId: wmin", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
+                "\tColumns:", "\t\tId: wmin", "\t\tColumn count: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
                 "\t\t\tWidth: narrowest", "\t\tText: aaaa bb",
-                "\tColumns:", "\t\tId: wmax", "\t\tCount: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
+                "\tColumns:", "\t\tId: wmax", "\t\tColumn count: 3", "\t\tMin column width: 50", "\t\tGap: 10", "\t\tBox:",
                 "\t\t\tWidth: natural", "\t\tText: aaaa bb");
         assertEquals(80, l.rect("min").width(), 1e-9);
         assertEquals(125, l.rect("max").width(), 1e-9);
@@ -274,7 +274,7 @@ class ColumnsLayoutTest {
      */
     @Test
     void heightWithBorderAndPaddingLeavesTheColumnsTheRest() {
-        LayoutFixture l = layOut(columnsElement(List.of("Count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
                         "\tBorder: 5", "\tPadding: 5"), block("A", 12, true), block("B", 12, true), block("C", 12, true),
                 block("D", 12, true), block("E", 12, true)));
         assertRect(50, 74, 240, 12, l.rect("C"));
@@ -285,15 +285,15 @@ class ColumnsLayoutTest {
     @Test
     void theMessageCountsTheColumns() {
         // Whole blocks of 40 in columns of 30: they do not fit.
-        String one = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 1", "Box:",
+        String one = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Column count: 1", "Box:",
                 "\tHeight: 30"), block("A", 40, true)))).getMessage();
         assertTrue(one.contains("which leaves 1 column of 30 pt:"), one);
-        String two = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Count: 2", "Box:",
+        String two = assertThrows(InvalidModelException.class, () -> layOut(columnsElement(List.of("Column count: 2", "Box:",
                 "\tHeight: 30"), block("A", 40, true), block("B", 40, true), block("C", 40, true)))).getMessage();
         assertTrue(two.contains("which leaves 2 columns of 30 pt:"), two);
         // Without a page (a stack item is not split) or a height, the column breaks need more columns than there are.
         String breaks = assertThrows(InvalidModelException.class, () -> layOut("\tStack:", "\t\tItem:",
-                "\t\t\tColumns:", "\t\t\t\tCount: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
+                "\t\t\tColumns:", "\t\t\t\tColumn count: 1", "\t\t\t\tText: A", "\t\t\t\tText: B", "\t\t\t\t\tBreak:",
                 "\t\t\t\t\t\tBefore: column")).getMessage();
         assertTrue(breaks.contains("has 1 column and its column breaks"), breaks);
     }

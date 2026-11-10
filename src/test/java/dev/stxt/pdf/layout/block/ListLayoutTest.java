@@ -47,7 +47,7 @@ class ListLayoutTest {
 
     @Test
     void markersOfDifferentWidthAlignRight() {
-        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal", "\t\tStart: 9",
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal", "\t\tFirst number: 9",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Nueve",
                 "\t\tList item:", "\t\t\tId: B", "\t\t\tText: Diez"));
         assertRect(f.marker("A"), 45, 40, 15, 12);

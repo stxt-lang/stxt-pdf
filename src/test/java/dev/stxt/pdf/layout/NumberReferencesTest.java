@@ -17,13 +17,13 @@ class NumberReferencesTest {
         LayoutFixture l = layOut(
                 "\tText: Véase la cláusula {number of: c} ({number of: d}), el apartado {number of: r}.",
                 "\t\tId: ref",
-                "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: decimal", "\t\tStart: 3",
+                "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: decimal", "\t\tFirst number: 3",
                 "\t\tList item:", "\t\t\tText: Tres", "\t\t\t\tId: t3",
                 "\t\tList item:", "\t\t\tId: c", "\t\t\tText: Cuatro",
                 "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: lower-alpha",
                 "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b",
                 "\t\tList item:", "\t\t\tId: d", "\t\t\tText: c",
-                "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: upper-roman", "\t\tStart: 4",
+                "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: upper-roman", "\t\tFirst number: 4",
                 "\t\tList item:", "\t\t\tId: r", "\t\t\tText: Cuatro romano");
         assertEquals("Véase la cláusula 4 (c), el apartado IV.", text(l, "ref"));
     }

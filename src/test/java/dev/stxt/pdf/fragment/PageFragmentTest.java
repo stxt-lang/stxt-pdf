@@ -140,7 +140,7 @@ class PageFragmentTest {
     @Test
     void theColumnsAreAllThereAlsoTheEmptyOnes() {
         LaidOutDocument document = LayoutFixture.layOut(
-                "\tColumns:", "\t\tId: M", "\t\tCount: 3", "\t\tGap: 15", "\t\tBalance: false",
+                "\tColumns:", "\t\tId: M", "\t\tColumn count: 3", "\t\tGap: 15", "\t\tBalance: false",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #cccccc",
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 20").document();
         PageFragment columns = only(document, "M");
@@ -161,7 +161,7 @@ class PageFragmentTest {
     @Test
     void theColumnsAreInsideTheContentBox() {
         LaidOutDocument document = LayoutFixture.layOut(
-                "\tColumns:", "\t\tId: M", "\t\tCount: 2", "\t\tGap: 15",
+                "\tColumns:", "\t\tId: M", "\t\tColumn count: 2", "\t\tGap: 15",
                 "\t\tBox:", "\t\t\tBorder: 5", "\t\t\tPadding: 10",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", WHOLE[0], WHOLE[1],
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 30", WHOLE[0], WHOLE[1]).document();

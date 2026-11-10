@@ -130,7 +130,7 @@ Document (dev.stxt.pdf):
                 Hyphenate: true
     Section:
         Columns:
-            Count: 3
+            Column count: 3
             Gap: 12
             Paragraph: The hyphenation patterns divide the long words by their syllables, and so the narrow columns are left without gaps between the words.
 ```

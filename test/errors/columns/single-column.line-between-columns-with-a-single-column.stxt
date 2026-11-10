@@ -1,4 +1,4 @@
-# Case: Separator with Count: 1, without columns to paint the line between
+# Case: Separator with Column count: 1, without columns to paint the line between
 # Code: SINGLE_COLUMN
 # Line: 18
 Document (dev.stxt.pdf):
@@ -14,6 +14,6 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Columns:
-			Count: 1
+			Column count: 1
 			Separator: 0.5
 			Text: Hola

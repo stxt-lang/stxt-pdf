@@ -15,7 +15,7 @@ public final class GridStyle extends StyleGroup {
 
     private List<Value> columnSizes = List.of();
     private List<Value> rowSizes = List.of();
-    /** {@code Areas} already interpreted; {@link GridAreas#NONE} if it is not declared. */
+    /** {@code Area map} already interpreted; {@link GridAreas#NONE} if it is not declared. */
     private GridAreas areas = GridAreas.NONE;
     private Direction flow = Direction.HORIZONTAL;
     private Alignment horizontal = Alignment.STRETCH;

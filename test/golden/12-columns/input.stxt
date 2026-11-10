@@ -27,7 +27,7 @@ Document (dev.stxt.pdf):
 				Margin: 0 0 8 0
 		Columns:
 			Id: m
-			Count: 2
+			Column count: 2
 			Gap: 20
 			Separator: 0.5
 			Separator color: #999999
