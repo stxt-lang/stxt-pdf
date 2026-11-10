@@ -18,4 +18,4 @@ Document (dev.stxt.pdf):
 			Image: test/wide.png
 				Alt: Uno
 		Table of contents:
-			Of: tables
+			Entries: tables

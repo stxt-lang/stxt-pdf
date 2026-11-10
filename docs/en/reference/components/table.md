@@ -1,7 +1,7 @@
 # `Table`
 
 A `Table` places its cells in rows and columns: its rows (`Row`) go in a header (`Header rows`, optional), a
-body (`Body`, required) and a footer (`Footer rows`, optional), **in that order** (`TABLE_ORDER`), and each row has its
+body (`Body rows`, required) and a footer (`Footer rows`, optional), **in that order** (`TABLE_ORDER`), and each row has its
 cells (`Cell`) from left to right. The `Table` accepts `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`, and goes
 wherever an in-flow element goes, also inside a cell.
 
@@ -20,7 +20,7 @@ Table:
             Cell: Item
             Cell: Q1
             Cell: Q2
-    Body:
+    Body rows:
         Row:
             Cell: Sales
             Cell: 100
@@ -60,7 +60,7 @@ are stretched to their row. Each cell is a grid item placed explicitly: it goes 
 and takes up the rows and columns of its `Span` (`Span: 1 3` takes up three columns). A column is taken if it is taken by a
 cell of a row above with a `Span` of several rows. Each row fills **exactly** all the columns
 (`TABLE_ROW_CELLS`): an empty cell is written `Cell:`. A `Span` does not go outside the table, does not pass from one group to another
-(from `Header rows` to `Body`, from `Body` to `Footer rows`) and does not overlap another cell (`TABLE_SPAN`).
+(from `Header rows` to `Body rows`, from `Body rows` to `Footer rows`) and does not overlap another cell (`TABLE_SPAN`).
 
 An explicit `Span: 1 1` is accepted: it is the default value written out and not a contradiction.
 
@@ -107,7 +107,7 @@ one:
 
 - **By position.** `For element: Header cell`, `Body cell` and `Footer cell` are the cells of each group, and
   `Odd row cell` and `Even row cell`, those of the odd and even rows of the **body**, counting from the first row of
-  `Body` as 1 (the zebra striping, which the header and the footer do not take part in). The row of a cell that takes up several is the
+  `Body rows` as 1 (the zebra striping, which the header and the footer do not take part in). The row of a cell that takes up several is the
   **first** of those it takes up. A cell matches at the same time that of its group and that of its row, and the usual rule
   `For element: Cell`.
 - **By column.** `For column: 3` (or `For column: 2 4`, from 2 to 4) applies to the cells that **begin** in those
@@ -134,7 +134,7 @@ If two `For column` overlap, they are applied in the order of `Styles`, like the
 
 ## Rows
 
-A `Row` is not a box of the layout: it takes up no space of its own and is not named in `For element`, like `Header rows`, `Body` and
+A `Row` is not a box of the layout: it takes up no space of its own and is not named in `For element`, like `Header rows`, `Body rows` and
 `Footer rows`. The rows of the table have no size property and measure what their tallest cell measures. What the
 row declares is for its cells or for its **band**:
 
@@ -207,7 +207,7 @@ Table:
             Cell: Rate
             Cell: Month
             Cell: Year
-    Body:
+    Body rows:
         Row:
             Cell: Basic
             Cell: 9.00

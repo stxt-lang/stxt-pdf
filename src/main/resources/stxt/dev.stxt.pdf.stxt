@@ -753,7 +753,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table
 		Type: GROUP
-		Description: Table: its rows (Row) in Header rows, Body and Footer rows, in that order, over the columns of Column sizes, its own or from a rule of Styles, which is required. When it breaks, Header rows and Footer rows are repeated on each page.
+		Description: Table: its rows (Row) in Header rows, Body rows and Footer rows, in that order, over the columns of Column sizes, its own or from a rule of Styles, which is required. When it breaks, Header rows and Footer rows are repeated on each page.
 		Children:
 			Child: Id
 				Max: 1
@@ -777,7 +777,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Header rows
 				Max: 1
-			Child: Body
+			Child: Body rows
 				Min: 1
 				Max: 1
 			Child: Footer rows
@@ -788,7 +788,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Children:
 			Child: Row
 				Min: 1
-	Node: Body
+	Node: Body rows
 		Type: GROUP
 		Description: Body rows of a Table.
 		Children:
@@ -872,7 +872,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Number markers
 				Max: 1
-			Child: Table columns
+			Child: Table column sizes
 				Max: 1
 			Child: Clear
 				Max: 1
@@ -881,7 +881,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Table of contents
 		Type: GROUP
-		Description: Automatic table of contents: one entry per heading of the levels in Levels or, with Of, per figure or per table (the Figure elements of that counter), in document order, with its title, a leader and the page. A block; the entries are styled with the For element rules 'TOC 1' to 'TOC 6' (those of figures and tables, 'TOC 1').
+		Description: Automatic table of contents: one entry per heading of the levels in Levels or, with Entries, per figure or per table (the Figure elements of that counter), in document order, with its title, a leader and the page. A block; the entries are styled with the For element rules 'TOC 1' to 'TOC 6' (those of figures and tables, 'TOC 1').
 		Children:
 			Child: Id
 				Max: 1
@@ -893,7 +893,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Of
+			Child: Entries
 				Max: 1
 			Child: Levels
 				Max: 1
@@ -901,7 +901,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Figure
 		Type: GROUP
-		Description: A figure with a caption: exactly one element (an Image, a Barcode, a Table or a Block) and its Caption, below it (above a Table) or where Caption position says. A block that is not split across pages (a Table inside is, with the caption on its first or last part). It is numbered with the counter of the figures or, with a Table inside, of the tables (Figure counter changes it): the number, or its Number label, goes before the caption, {number of: id} gives it and a Table of contents with Of: figures or tables lists it. Numbered: false in its Typography, or in a rule that reaches it, leaves it without a number. The image inside carries its Alt; with a Block, the Figure carries its own.
+		Description: A figure with a caption: exactly one element (an Image, a Barcode, a Table or a Block) and its Caption, below it (above a Table) or where Caption position says. A block that is not split across pages (a Table inside is, with the caption on its first or last part). It is numbered with the counter of the figures or, with a Table inside, of the tables (Figure counter changes it): the number, or its Number label, goes before the caption, {number of: id} gives it and a Table of contents with Entries: figures or tables lists it. Numbered: false in its Typography, or in a rule that reaches it, leaves it without a number. The image inside carries its Alt; with a Block, the Figure carries its own.
 		Children:
 			Child: Id
 				Max: 1
@@ -964,7 +964,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
-			Child: Pdf page
+			Child: PDF page
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -1101,7 +1101,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Number markers
 				Max: 1
-			Child: Table columns
+			Child: Table column sizes
 				Max: 1
 			Child: Grow
 				Max: 1
@@ -1194,7 +1194,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Number markers
 				Max: 1
-			Child: Table columns
+			Child: Table column sizes
 				Max: 1
 			Child: Grow
 				Max: 1
@@ -1287,7 +1287,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Number markers
 				Max: 1
-			Child: Table columns
+			Child: Table column sizes
 				Max: 1
 			Child: Grow
 				Max: 1
@@ -1452,10 +1452,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: top
 			Value: bottom
 	Node: Offset
-		Description: Offset: top, right, bottom, left (1 to 4 values).
+		Description: Top, right, bottom, left (1 to 4 values). In a Frame, how far the box is shifted from its place in the flow. In an Overlay or a Page overlay, the distance from each edge of its reference container to the box; auto leaves that side free.
 	Node: Layer
 		Type: INTEGER
-		Description: Stacking order within its context. Not declared = auto.
+		Description: Stacking order within its context: the lower ones are painted first, the negative ones beneath the content in flow. Without it, the box is painted in document order, like Layer: 0.
 	Node: Pages
 		Type: ENUM
 		Description: Pages on which a Page overlay appears, counting from 1 within its scope (those of the document if it is a Page overlay of Document, those of the section if it is of a Section): all, every page; first, only the first; not-first, all but the first; odd, the odd ones; even, the even ones; last, only the last.
@@ -1615,10 +1615,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Color of the text.
 	Node: Line breaking
 		Type: ENUM
-		Description: Line breaking of the text: simple (greedy, by default: each line is filled as much as it can) or balanced (Knuth-Plass, which balances the lines of the paragraph).
+		Description: Line breaking of the text: simple (greedy, by default: each line is filled as much as it can) or optimal (Knuth-Plass, which chooses the breaks of the whole paragraph at once).
 		Values:
 			Value: simple
-			Value: balanced
+			Value: optimal
 	Node: Hyphenate
 		Type: BOOLEAN
 		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split.
@@ -1720,7 +1720,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: vertical
 	Node: Wrap
 		Type: BOOLEAN
-		Description: Allows the items to be distributed over several lines.
+		Description: Whether the items that do not fit in a line go to the next one, so that they are distributed over several lines. By default, false.
 	Node: Split items
 		Type: BOOLEAN
 		Description: With true (by default), a line of a Stack (in vertical, an item) that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
@@ -1824,6 +1824,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Row header
 		Type: BOOLEAN
 		Description: The cell is the header of its row (the item of an invoice, the time of a timetable): in the tagged PDF it is a TH with Scope Row, and a screen reader announces it with each cell of the row. By default, false. Not valid in Header rows, whose cells are already column headers.
+	Node: Column align
+		Description: Alignment of each column of a Table (left, center, right or justify), one per column: it is the default value of its cells, which the Styles rules and what the cell declares override.
 
 	# Columns
 
@@ -1851,7 +1853,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: inside
 			Value: crop
 			Value: stretch
-	Node: Pdf page
+	Node: PDF page
 		Type: INTEGER
 		Description: Page drawn by an Image of a PDF, from 1 (by default, the first). In an image that is not a PDF, or a page the PDF does not have, it is an error.
 
@@ -1882,9 +1884,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none.
 	Node: Number markers
 		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman.
-	Node: Column align
-		Description: Alignment of each column of a Table (left, center, right or justify), one per column: it is the default value of its cells, which the Styles rules and what the cell declares override.
-	Node: Table columns
+	Node: Table column sizes
 		Type: ENUM
 		Description: Columns of the tables of a Markdown: equal, all of the same width (repeat(n, *)); auto, each according to its content (repeat(n, auto)).
 		Values:
@@ -1908,7 +1908,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	# Table of contents
 
-	Node: Of
+	Node: Entries
 		Type: ENUM
 		Description: What a Table of contents lists: headings (by default), the headings of its Levels; figures or tables, the Figure elements numbered with that counter, with the text of their caption. With figures or tables, Levels has no effect and is an error.
 		Values:
@@ -1916,7 +1916,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: figures
 			Value: tables
 	Node: Levels
-		Description: Heading levels listed by a Table of contents with Of: headings: the first and the last, from 1 to 6 (by default, 1 3).
+		Description: Heading levels listed by a Table of contents with Entries: headings: the first and the last, from 1 to 6 (by default, 1 3).
 	Node: Leader
 		Type: ENUM
 		Description: Leader between the title and the page of the entries of a Table of contents: dots (by default), line (a line) or none.

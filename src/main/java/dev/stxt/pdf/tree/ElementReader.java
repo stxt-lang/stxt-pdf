@@ -157,7 +157,7 @@ enum ElementReader {
      * A {@code Table} (reference/components/table.md): a grid whose cells {@link TableBuilder} places, with its row
      * groups and its {@code Column align}.
      */
-    TABLE(PropertyReader.GRID, PropertyReader::grid, Set.of("header-rows", "body", "footer-rows", "column-align")) {
+    TABLE(PropertyReader.GRID, PropertyReader::grid, Set.of("header-rows", "body-rows", "footer-rows", "column-align")) {
         @Override
         void check(InlineNode n, InlineNode wrapper, Style s, CellPosition position) {
             if (!s.isDeclared(PropertyKey.grid("column-sizes"))) {
@@ -224,9 +224,9 @@ enum ElementReader {
     /**
      * A {@code Markdown} (reference/components/markdown.md): the elements that {@link MarkdownBuilder} generates,
      * built as if the author had written them; its formatted texts carry their runs. Its markers and its
-     * {@code Table columns}, its own or those of its rules, are read by the translation.
+     * {@code Table column sizes}, its own or those of its rules, are read by the translation.
      */
-    MARKDOWN(Set.of(), null, Set.of("bullet-markers", "number-markers", "table-columns")) {
+    MARKDOWN(Set.of(), null, Set.of("bullet-markers", "number-markers", "table-column-sizes")) {
         @Override
         void content(BoxTreeBuilder builder, BuildContext ctx, InlineNode n, Box box) {
             noCalls(ctx, box);

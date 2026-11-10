@@ -48,7 +48,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: tab
 			Column sizes: 80 80
-			Body:
+			Body rows:
 				Row:
 					Cell: **aaaa** **bbbb**
 					Cell: [web](https://a.example)

@@ -16,7 +16,7 @@ import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * Breaks a text into lines (reference/common/typography.md). With {@code Line breaking: simple},
- * with the greedy algorithm (<em>first-fit</em>) of browsers; with {@code balanced}, with
+ * with the greedy algorithm (<em>first-fit</em>) of browsers; with {@code optimal}, with
  * Knuth-Plass ({@link #optimal}).
  *
  * <p>The line breaking goes in three steps, each one in its class: {@link Words} splits the text into words (the
@@ -103,7 +103,7 @@ public final class LineBreaker {
      * overflowing.
      */
     static List<Line> breakLines(Paragraph p, int from, LineWidths widths, LineBreaking wrap) {
-        return wrap == LineBreaking.BALANCED ? optimal(p, from, widths) : greedy(p, from, widths);
+        return wrap == LineBreaking.OPTIMAL ? optimal(p, from, widths) : greedy(p, from, widths);
     }
 
     /**

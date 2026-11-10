@@ -133,7 +133,7 @@ an *artifact*, and the `LI` has no `Lbl`. veraPDF accepts it this way in PDF/UA-
 
 ### Tables
 
-A cell of `Header rows` is `TH` with `Scope: Column`, one of `Body` or `Footer rows` with `Row header: true` is `TH` with
+A cell of `Header rows` is `TH` with `Scope: Column`, one of `Body rows` or `Footer rows` with `Row header: true` is `TH` with
 `Scope: Row`, and the rest, `TD`. A cell that spans several rows or columns carries `RowSpan` and `ColSpan`. The header and
 the footer are content on the first page on which each cell appears. Where they repeat, they are *artifacts*, so the tree
 has a single `THead` and a single `TFoot`.

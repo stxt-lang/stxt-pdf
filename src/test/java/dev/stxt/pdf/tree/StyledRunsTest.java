@@ -155,7 +155,7 @@ class StyledRunsTest {
     @Test
     void aStyledRunThatCrossesTwoCellsIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> build(PRICE, "Markdown:",
-                "\tTable columns: auto", "\tContent >>", "\t\t| A | B |", "\t\t|---|---|", "\t\t| [a | b]{price} |"));
+                "\tTable column sizes: auto", "\tContent >>", "\t\t| A | B |", "\t\t|---|---|", "\t\t| [a | b]{price} |"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.errorCode());
         // The line of the row.
         assertEquals(23, e.line());

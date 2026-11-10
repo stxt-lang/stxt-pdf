@@ -117,7 +117,7 @@ class DocumentReaderTest {
                 "\tTable:", "\t\tId: t", "\t\tColumn sizes: 120 * *", "\t\tGap: 2",
                 "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tTypography:", "\t\t\t\t\tBold: true",
                 "\t\t\t\tCell: Concepto", "\t\t\t\tCell: T1", "\t\t\t\tCell: T2",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page",
                 "\t\t\t\tCell: Ventas", "\t\t\t\tCell:", "\t\t\t\t\tParagraph: 100", "\t\t\t\tCell:",
                 "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tCell: Total", "\t\t\t\t\tSpan: 1 3",
                 "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 4"));
@@ -127,13 +127,13 @@ class DocumentReaderTest {
         }
         assertEquals("1 3", assertInstanceOf(InlineNode.class, cell).getChild("Span").getText());
 
-        // Body is required; the rows go in their group and Span only in Cell. Column sizes can come from a rule of
+        // Body rows is required; the rows go in their group and Span only in Cell. Column sizes can come from a rule of
         // Styles, so the schema does not require it: the engine does (TABLE_COLUMN_SIZES_MISSING).
-        reader.read(doc("\tTable:", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a"));
+        reader.read(doc("\tTable:", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a"));
         assertEquals("TOO_FEW_CHILDREN", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
                 "\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a"))).code());
         DocumentSyntaxException row = assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(
-                "\tTable:", "\t\tColumn sizes: *", "\t\tRow:", "\t\t\tCell: a", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a")));
+                "\tTable:", "\t\tColumn sizes: *", "\t\tRow:", "\t\t\tCell: a", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a")));
         assertEquals("CHILD_NOT_DECLARED", row.code());
         assertEquals(10, row.line());
         assertEquals("CHILD_NOT_DECLARED", assertThrows(DocumentSyntaxException.class, () -> reader.read(doc(

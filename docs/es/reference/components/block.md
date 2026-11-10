@@ -152,7 +152,7 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
   `Barcode` lo baja por debajo de las cajas laterales que hay antes que él, en lugar de rodearlas. Sin una caja lateral
   antes es un error (`CLEAR_WITHOUT_SIDE`).
 - **Una palabra que no cabe** al lado de la caja deja esa línea vacía y pasa a la siguiente, hasta la primera línea con el
-  ancho entero; solo es un desbordamiento si tampoco cabe ahí (`TEXT_OVERFLOW`). Con `Line breaking: balanced`, el reparto
+  ancho entero; solo es un desbordamiento si tampoco cabe ahí (`TEXT_OVERFLOW`). Con `Line breaking: optimal`, el reparto
   tiene en cuenta el ancho de cada línea.
 - **Varias cajas laterales.** Una segunda caja lateral del mismo lado que solapa con la anterior va debajo de ella; una
   del otro lado va a su altura, y el texto corre entre las dos.

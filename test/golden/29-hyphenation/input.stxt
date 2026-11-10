@@ -5,7 +5,7 @@
 #             of programación that fits with its hyphen is "programa-": "la programa-" (12). The rest, "ción", starts
 #             the next line, where "extraordinaria" (14) does not fit after it; its longest fitting part is "extraor-":
 #             "ción extraor-" (13). Then "dinaria" (7). Three lines: 36. y = 20.
-#   balanced: the same text with Line breaking: balanced. The text has 30 characters with its spaces: two lines of 14
+#   optimal: the same text with Line breaking: optimal. The text has 30 characters with its spaces: two lines of 14
 #             cannot hold it (at most 29 with the space between them), so it has three lines whatever the breaks: 36.
 #             y = 56.
 #   soft:     "ultra<SHY>moderno ultra<SHY>modernos", where <SHY> is a soft hyphen (U+00AD, invisible in this file),
@@ -34,12 +34,12 @@ Document (dev.stxt.pdf):
 			Typography:
 				Hyphenate: true
 		Text: la programación extraordinaria
-			Id: balanced
+			Id: optimal
 			Box:
 				Width: 70
 			Typography:
 				Hyphenate: true
-				Line breaking: balanced
+				Line breaking: optimal
 		Text:
 			Id: soft
 			Box:

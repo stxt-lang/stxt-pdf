@@ -9,7 +9,7 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
-- **Five names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
+- **Nine names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
   alone in a rule of `Styles`, and so that no two names are nearly the same. A document written for 0.14.0 that uses
   them has to be updated; the old names are not accepted.
   - `Start` is **`First number`**, in a `List` and in a `Section` (where it read like `Begin on`).
@@ -18,8 +18,17 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   - `Format` is **`Barcode format`**, in a `Barcode`, like `Page number format` and `Footnote number format`.
   - `Fit: fill` is **`Fit: crop`**, in an `Image`: in web layout `fill` is the value that stretches the image, the
     opposite of what it did here. In Java, `Fit.FILL` is `Fit.CROP`.
+  - `Body` is **`Body rows`**, in a `Table`, like `Header rows` and `Footer rows`. `Body cell`, in a rule, does not
+    change.
+  - `Of` is **`Entries`**, in a `Table of contents` (`Entries: figures`).
+  - `Line breaking: balanced` is **`Line breaking: optimal`**: it is the Knuth-Plass algorithm, and in web layout
+    "balance" evens out the length of the lines. In Java, `LineBreaking.BALANCED` is `LineBreaking.OPTIMAL`.
+  - `Table columns` is **`Table column sizes`**, in a `Markdown`: its values become the `Column sizes` of the tables.
+- `Pdf page` is written **`PDF page`** in the schema and in the documentation. Both spellings are the same node.
+- The descriptions of `Offset`, `Layer` and `Wrap` in the schema say what each one does in each element and its
+  default.
 - The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `START_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
-  `SINGLE_COLUMN` and of the errors of `Area map` name the properties with their new names. The codes do not change.
+  `SINGLE_COLUMN`, `TABLE_ORDER`, `MARKDOWN_PROPERTY_MISSING` and of the errors of `Area map` and of `Entries` name the properties with their new names. The codes do not change.
 
 ## [0.14.0] - 2026-11-10
 

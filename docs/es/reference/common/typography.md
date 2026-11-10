@@ -21,7 +21,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Line height` | número o % | `120%` | **Un número es una medida** (`15` = 15 pt). Para un valor relativo al `Size`, porcentaje (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La última línea de un párrafo justificado se alinea a la izquierda. |
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |
-| `Line breaking` | `simple`, `balanced` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`balanced`). |
+| `Line breaking` | `simple`, `optimal` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Partir palabras con guion al final de la línea, con los patrones del idioma ([Guiones](#guiones-hyphenate)). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
@@ -65,7 +65,7 @@ que tenerlo (`GLYPH_MISSING`).
 El texto se reparte en **líneas** del ancho de la caja de contenido:
 
 - **`Line breaking: simple`**, algoritmo voraz: las palabras se añaden a la línea mientras quepan.
-- **`Line breaking: balanced`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
+- **`Line breaking: optimal`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
   líneas, de modo que las líneas quedan más parejas. Los espacios se estiran hasta la mitad de su ancho y no se encogen,
   y la última línea no cuenta.
 
@@ -134,7 +134,7 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
   se pinta con la fuente y el formato de la letra que lo precede (en negrita si ella lo está; nunca en versalitas).
   Cuenta en el ancho de la línea.
 - **En el reparto**, con `simple`, cuando una palabra no cabe entera se añade la parte más larga que cabe con su guion
-  y el resto empieza la línea siguiente; con `balanced`, cada punto de corte es un salto posible con la penalización de
+  y el resto empieza la línea siguiente; con `optimal`, cada punto de corte es un salto posible con la penalización de
   TeX (50, al cuadrado, en los deméritos de la línea, y 10 000 más si dos líneas seguidas acaban en guion). Una palabra
   más ancha que la línea se parte en tantas partes como haga falta.
 - **Tamaños intrínsecos**: el ancho más estrecho es la parte más ancha que no se puede partir más, con su guion.

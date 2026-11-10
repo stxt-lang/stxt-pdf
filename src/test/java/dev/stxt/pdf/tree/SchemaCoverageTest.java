@@ -98,7 +98,7 @@ class SchemaCoverageTest {
             Map.entry("Line height", "Line height: 14"),
             Map.entry("Align", "Align: center"),
             Map.entry("Color", "Color: #333333"),
-            Map.entry("Line breaking", "Line breaking: balanced"),
+            Map.entry("Line breaking", "Line breaking: optimal"),
             Map.entry("Hyphenate", "Hyphenate: true"),
             Map.entry("Markup", "Markup: markdown"),
             Map.entry("Case", "Case: uppercase"),
@@ -152,19 +152,19 @@ class SchemaCoverageTest {
             // Markdown
             Map.entry("Bullet markers", "Bullet markers: bullet dash"),
             Map.entry("Number markers", "Number markers: decimal lower-alpha"),
-            Map.entry("Table columns", "Table columns: auto"),
+            Map.entry("Table column sizes", "Table column sizes: auto"),
             Map.entry("Column align", "Column align: right"),
             // Figure
             Map.entry("Caption position", "Caption position: top"),
             Map.entry("Figure counter", "Figure counter: tables"),
             // Table of contents
-            Map.entry("Of", "Of: figures"),
+            Map.entry("Entries", "Entries: figures"),
             Map.entry("Levels", "Levels: 1 2"),
             Map.entry("Leader", "Leader: line"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
             Map.entry("Fit", "Fit: crop"),
-            Map.entry("Pdf page", "Pdf page: 2"),
+            Map.entry("PDF page", "PDF page: 2"),
             // Barcode
             Map.entry("Barcode format", "Barcode format: qr"),
             Map.entry("Error correction", "Error correction: high"),
@@ -231,7 +231,7 @@ class SchemaCoverageTest {
         // A footnote needs its call, and its Id is the name of the call.
         t.put("Footnote", new Template(HEADER + "\tParagraph: Hola[^n]\n\t\tTypography:\n\t\t\tMarkup: markdown\n"
                 + "\tFootnote:\n\t\tId: n\n\t\t{}\n\t\tParagraph: Nota", Set.of("Id")));
-        // A table of contents needs some heading to list, or some figure with Of: figures.
+        // A table of contents needs some heading to list, or some figure with Entries: figures.
         t.put("Table of contents", new Template(HEADER + "\tHeading 1:\n\t\tText: A\n\tFigure:\n\t\tCaption: C\n"
                 + "\t\tImage: test/wide.png\n\t\t\tAlt: A\n\tTable of contents:\n\t\t{}"));
         // A figure with a Block carries its own Alt; with an image, the Alt would have no effect.
@@ -250,9 +250,9 @@ class SchemaCoverageTest {
                 + "\t\t\tBlock:"));
         t.put("Area", new Template(HEADER + "\tGrid:\n\t\tArea:\n\t\t\t{}\n\t\t\tBlock:"));
         String table = HEADER + "\tTable:\n\t\tColumn sizes: 100\n";
-        t.put("Table", new Template(table + "\t\t{}\n\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Column sizes")));
-        t.put("Row", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
-        t.put("Cell", new Template(table + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
+        t.put("Table", new Template(table + "\t\t{}\n\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: Hola", Set.of("Column sizes")));
+        t.put("Row", new Template(table + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\t{}\n\t\t\t\tCell: Hola"));
+        t.put("Cell", new Template(table + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell:\n\t\t\t\t\t{}"));
         // The rules and the named colors go inside the Styles of the header.
         t.put("Styles", new Template(HEADER + "\t\t{}\n\tBlock:"));
         t.put("For element", new Template(HEADER + "\t\tFor element: Block\n\t\t\t{}\n\tBlock:"));
@@ -262,7 +262,7 @@ class SchemaCoverageTest {
         t.put("Box", new Template(HEADER + "\tBlock:\n\t\tBox:\n\t\t\t{}"));
         // Merge borders written in the Box of an element only has an effect on a Table.
         t.put("Box > Merge borders", new Template(HEADER + "\tTable:\n\t\tColumn sizes: *\n\t\tBox:\n\t\t\t{}\n"
-                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: a"));
+                + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: a"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
         // Clear needs a side box before the element: the template of each element, with one in front.

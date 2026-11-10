@@ -403,7 +403,7 @@ Document (dev.stxt.pdf):
 						Cell: Character
 						Cell: Origin
 						Cell: Finishes
-				Body:
+				Body rows:
 					Row:
 						Cell: Walnut
 							Row header: true

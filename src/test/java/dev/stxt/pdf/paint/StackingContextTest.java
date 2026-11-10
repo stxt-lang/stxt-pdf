@@ -525,7 +525,7 @@ class StackingContextTest {
      */
     @Test
     void theBandOfARowIsPaintedUnderItsCells() {
-        Recorder r = record("\tTable:", "\t\tColumn sizes: 100 100", "\t\tBody:",
+        Recorder r = record("\tTable:", "\t\tColumn sizes: 100 100", "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEE", "\t\t\t\tCell:",
                 "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10", "\t\t\t\t\t\tBackground: #111", "\t\t\t\tCell:",
                 "\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 10",

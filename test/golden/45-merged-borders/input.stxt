@@ -53,7 +53,7 @@ Document (dev.stxt.pdf):
 					Cell:
 						Id: h2
 						Block:
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Id: b1
@@ -70,7 +70,7 @@ Document (dev.stxt.pdf):
 			Id: t2
 			Column sizes: 100 100
 			Split rows: false
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Id: t2r1
@@ -98,7 +98,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t3
 			Column sizes: 60 60 60
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Id: t3a

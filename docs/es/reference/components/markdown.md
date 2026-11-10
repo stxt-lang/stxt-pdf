@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
                 Code font: IBM Plex Mono
             Bullet markers: bullet dash
             Number markers: decimal
-            Table columns: equal
+            Table column sizes: equal
             Content >>
                 # Resultados
 
@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 | `Content` | bloque `>>` | sin valor | El Markdown. Obligatorio. |
 | `Bullet markers` | lista de `bullet`, `dash`, `none` | sin valor | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento. El último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
 | `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | sin valor | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
-| `Table columns` | `equal`, `auto` | sin valor | Las `Column sizes` de las tablas: `equal` es `repeat(n, *)`, y `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
+| `Table column sizes` | `equal`, `auto` | sin valor | Las `Column sizes` de las tablas: `equal` es `repeat(n, *)`, y `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
 Las tres también pueden venir de una regla de `Styles`, como `For element: Markdown`, que las da a todos los `Markdown`
 del documento ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)). Obligatorio quiere decir que el `Markdown` la declara o la toma de una regla.
@@ -76,7 +76,7 @@ así:
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
 | `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `First number`, el primer número si no es 1 |
-| Tabla | `Table` con las `Column sizes` de `Table columns`, con la fila de cabecera en `Header rows` y el resto en `Body` |
+| Tabla | `Table` con las `Column sizes` de `Table column sizes`, con la fila de cabecera en `Header rows` y el resto en `Body rows` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../common/text-formatting.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
 | `++x++` | tramo subrayado |
@@ -126,7 +126,7 @@ Marta Vidal\
 Administración
 ```
 
-- En los dos repartos en líneas (`Line breaking: simple` y `balanced`) el salto es un final de línea obligatorio, y
+- En los dos repartos en líneas (`Line breaking: simple` y `optimal`) el salto es un final de línea obligatorio, y
   ninguna línea lo cruza.
 - La línea que acaba en un salto forzado **no se justifica**, como la última del párrafo.
 - Vale en párrafos, encabezados e ítems de lista, y con `Markup: markdown` en un `Text`, un `Paragraph` o una `Cell`.
@@ -230,7 +230,7 @@ como elemento de un `Item` o un `Area`.
 
 Los errores de lo generado señalan la línea del documento donde empieza su bloque de Markdown (la del ítem, la de la fila de
 la tabla). Los del marcador de una lista señalan la de `Bullet markers` o `Number markers`, y los de las columnas de una tabla, la de
-`Table columns`. Una lista o una tabla sin su propiedad es un error con la línea de la lista o la tabla
+`Table column sizes`. Una lista o una tabla sin su propiedad es un error con la línea de la lista o la tabla
 (`MARKDOWN_PROPERTY_MISSING`). Una propiedad que no se usa no lo es. El código sin `Code font` es `CODE_WITHOUT_FONT`
 ([Código](#código)).
 

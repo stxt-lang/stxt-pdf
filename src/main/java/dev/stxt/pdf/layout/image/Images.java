@@ -25,8 +25,8 @@ import java.util.Set;
  * {@code IMAGE_FORMAT} if it is not PNG, JPEG, PDF or a supported SVG. An image that exceeds the {@link Limits} is
  * {@code IMAGE_TOO_LARGE} (the pixels of a PNG or JPEG) or {@code SVG_TOO_COMPLEX} (the elements and the
  * levels of an SVG), also with the line of the {@code Image}; a PDF with more bytes than the {@link Limits} is
- * {@code PDF_TOO_LARGE}, before opening it. The page of a PDF has to exist, and {@code Pdf page} in another format is
- * an error ({@code IMAGE_PAGE}, with the line of {@code Pdf page}); a page that would not be drawn the same as in its
+ * {@code PDF_TOO_LARGE}, before opening it. The page of a PDF has to exist, and {@code PDF page} in another format is
+ * an error ({@code IMAGE_PAGE}, with the line of {@code PDF page}); a page that would not be drawn the same as in its
  * PDF is {@code IMAGE_FORMAT}, unless its check is removed ({@link Check#PDF_IMAGE_FONTS},
  * {@link Check#PDF_IMAGE_ANNOTATIONS}).
  */
@@ -152,14 +152,14 @@ public final class Images {
     }
 
     /**
-     * That {@code Pdf page} belongs to a PDF and the page exists, and that it can be drawn with the checks that are
+     * That {@code PDF page} belongs to a PDF and the page exists, and that it can be drawn with the checks that are
      * made.
      */
     private void checkPage(ImageFile file, Box box) {
         int page = box.style().image().pdfPage();
         if (box.style().isDeclared(PropertyKey.PDF_PAGE)) {
             if (file.format() != ImageFile.Format.PDF) {
-                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "Pdf page only "
+                throw new InvalidModelException(box.style().line(PropertyKey.PDF_PAGE), ErrorCode.IMAGE_PAGE, "PDF page only "
                         + "has an effect on a PDF, and the image " + box.image() + " is " + file.format()
                         + ": it is not needed");
             }

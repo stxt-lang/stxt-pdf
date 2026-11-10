@@ -15,7 +15,7 @@ enum CellSelector {
     HEADER_CELL("Header cell", p -> p.group() == CellPosition.HEADER),
     BODY_CELL("Body cell", p -> p.group() == CellPosition.BODY),
     FOOTER_CELL("Footer cell", p -> p.group() == CellPosition.FOOTER),
-    /** Odd rows of the body: the first row of {@code Body} is row 1. */
+    /** Odd rows of the body: the first row of {@code Body rows} is row 1. */
     ODD_ROW_CELL("Odd row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 1),
     EVEN_ROW_CELL("Even row cell", p -> p.group() == CellPosition.BODY && p.row() % 2 == 0);
 

@@ -32,7 +32,7 @@ Styles:
 | `Line height` | número o % | `120%` | La altura de cada línea: `15` son 15 puntos y `140%`, 1,4 veces el tamaño |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | La alineación de las líneas |
 | `Color` | color | `#000000` | El color del texto |
-| `Line breaking` | `simple`, `balanced` | `simple` | Cómo se reparte el texto en líneas |
+| `Line breaking` | `simple`, `optimal` | `simple` | Cómo se reparte el texto en líneas |
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
 | `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
@@ -99,7 +99,7 @@ salvo la última de cada párrafo, las de una sola palabra y las líneas preform
 ## Reparto en líneas
 
 El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `Line breaking: simple`, cada línea se llena todo lo
-que puede. Con `Line breaking: balanced`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
+que puede. Con `Line breaking: optimal`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
 se nota sobre todo en texto justificado. Por defecto no se parten palabras: una palabra más ancha que la línea es un error.
 
 Los espacios seguidos y los saltos de línea simples son un solo espacio. Una línea en blanco es un error: cada texto es

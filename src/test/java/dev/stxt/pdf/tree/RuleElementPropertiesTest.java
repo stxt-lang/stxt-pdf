@@ -198,13 +198,13 @@ class RuleElementPropertiesTest {
         Box table = root(
                 "For element: Table", "\tColumn align: left right",
                 "---",
-                "Table:", "\tColumn sizes: * *", "\tBody:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b").children().get(0);
+                "Table:", "\tColumn sizes: * *", "\tBody rows:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b").children().get(0);
         assertEquals(TextAlign.RIGHT, table.children().get(1).style().typography().textAlign());
         assertEquals(13, table.children().get(1).style().line(PropertyKey.internal("align")).number());
         InvalidModelException e = error(
                 "For element: Table", "\tColumn align: left right",
                 "---",
-                "Table:", "\tColumn sizes: *", "\tBody:", "\t\tRow:", "\t\t\tCell: a");
+                "Table:", "\tColumn sizes: *", "\tBody rows:", "\t\tRow:", "\t\t\tCell: a");
         assertEquals(ErrorCode.TABLE_COLUMN_ALIGN, e.errorCode());
         assertEquals(13, e.line());
     }
@@ -212,7 +212,7 @@ class RuleElementPropertiesTest {
     @Test
     void theMarkersAndTheTableColumnsOfAMarkdownComeFromARule() {
         Box markdown = root(
-                "For element: Markdown", "\tBullet markers: dash", "\tTable columns: equal",
+                "For element: Markdown", "\tBullet markers: dash", "\tTable column sizes: equal",
                 "---",
                 "Markdown:", "\tContent >>", "\t\t- uno", "\t\t", "\t\t| a | b |", "\t\t|---|---|", "\t\t| 1 | 2 |")
                 .children().get(0);
@@ -238,13 +238,13 @@ class RuleElementPropertiesTest {
                 "For style: two", "\tColumn sizes: * 80",
                 "---",
                 "List:", "\tList item:", "\t\tParagraph: Uno",
-                "Table:", "\tStyle: two", "\tBody:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b");
+                "Table:", "\tStyle: two", "\tBody rows:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b");
         assertEquals(Marker.DASH, root.children().get(0).style().list().marker());
         assertEquals(List.of(new Value.Fraction(1), pt(80)), root.children().get(1).style().grid().columnSizes());
         // Without them, the engine says so: the schema no longer requires them.
         assertEquals(ErrorCode.LIST_MARKER_MISSING, error("---", "List:", "\tList item:", "\t\tParagraph: Uno")
                 .errorCode());
-        InvalidModelException table = error("---", "Table:", "\tBody:", "\t\tRow:", "\t\t\tCell: a");
+        InvalidModelException table = error("---", "Table:", "\tBody rows:", "\t\tRow:", "\t\t\tCell: a");
         assertEquals(ErrorCode.TABLE_COLUMN_SIZES_MISSING, table.errorCode());
         assertEquals(13, table.line());
     }

@@ -45,7 +45,7 @@ class HyphenationLayoutTest {
         assertEquals(List.of(true, true, false), l.stream().map(TextLine::hyphenated).toList());
         assertEquals(60, l.get(0).width(), 1e-9);
         assertEquals(List.of("la programa-", "ción extraor-", "dinaria"),
-                texts(lines(TEXT, 70, "Hyphenate: true", "Line breaking: balanced")));
+                texts(lines(TEXT, 70, "Hyphenate: true", "Line breaking: optimal")));
     }
 
     @Test

@@ -93,7 +93,7 @@ class LongTextTest {
         TextMeasurer[] metrics = {new FixedMetrics(), new PdfMetrics()};
         String[] names = {"FixedMetrics", "PdfMetrics"};
         for (int m = 0; m < metrics.length; m++) {
-            for (String wrap : List.of("simple", "balanced")) {
+            for (String wrap : List.of("simple", "optimal")) {
                 run(metrics[m], 50, wrap); // JVM warm-up
                 for (int paragraphs : new int[]{260, 520, 1040}) {
                     Run r = run(metrics[m], paragraphs, wrap);

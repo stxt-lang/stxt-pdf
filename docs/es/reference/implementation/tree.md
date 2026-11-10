@@ -32,7 +32,7 @@ En el schema:
 Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que
 `Item`, `Area` y `Figure` tengan exactamente un elemento y un `List item` al menos uno (el schema cuenta por tipo), que un `Text`
 tenga su texto en un sitio y solo uno, que la raíz sea `Document`, que el `Text` de un encabezado no tenga `Break`, la
-jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Header rows`, `Body`, `Footer rows`, que una `Cell`
+jerarquía y el sitio de los encabezados y, en una `Table`, el orden `Header rows`, `Body rows`, `Footer rows`, que una `Cell`
 no tenga a la vez valor y elementos y que cada fila llene sus columnas. Lo que genera un `Markdown` pasa por el schema
 como lo que escribe el autor.
 
@@ -68,7 +68,7 @@ elemento nuevo sin nada propio es un `CONTAINER`, y uno con algo propio, una fam
 `FIGURE` construye el elemento y el `Caption` de una `Figure`, los ordena según `Caption position`, la numera
 (`Figures`) y la deja sin partir. Cada familia reclama los hijos que son suyos (`ElementReader.property`): las propiedades
 de su tipo, que lee, y los que lee su contenido, como los grupos de filas y `Column align` de una `Table`, `Span` de una
-`Cell` o los marcadores y `Table columns` de un `Markdown`. El orquestador solo aparta los de cualquier elemento (`Item`,
+`Cell` o los marcadores y `Table column sizes` de un `Markdown`. El orquestador solo aparta los de cualquier elemento (`Item`,
 `Area`, `Content` y `Style`).
 
 Las propiedades de elemento de una regla ([Styles](../common/styles.md#propiedades-de-elemento)) se leen con el mismo código
@@ -77,7 +77,7 @@ las sueltas con `PropertyReader.single`), y `Grow`, `Shrink` y `Base size`, a `P
 no puede declarar una, es `STYLE_NOT_ALLOWED`: lo que puede declarar lo dice el schema (`DocumentSchema.allows`), así que
 no hay una segunda tabla de qué admite cada elemento, solo la lista cerrada de las que van en reglas
 (`StyleRules.ELEMENT_PROPERTIES`). Las que lee el contenido del elemento desde su nodo (`Column align`, los marcadores y
-`Table columns` de un `Markdown`) no se leen ahí: `StyleRules.apply` las devuelve, con su documento (`PropertyNode`), y
+`Table column sizes` de un `Markdown`) no se leen ahí: `StyleRules.apply` las devuelve, con su documento (`PropertyNode`), y
 `BuildContext.property` da la del elemento o, si no la declara, la de su regla. Lo que un `Markdown` genera a partir de una
 de un documento de estilos aparte (el `Marker` de una lista, las `Column sizes` de una tabla) lleva la línea de ese
 documento (`Translation.sources`, en `BuildContext.sources`).
@@ -203,7 +203,7 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
   una imagen (`LIST_IMAGE_MISSING`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
 - **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
-  o, con `Of: figures` o `tables`, por `Figure` de ese contador (`Element.TOC_1`), con el título o el pie, la guía y el
+  o, con `Entries: figures` o `tables`, por `Figure` de ese contador (`Element.TOC_1`), con el título o el pie, la guía y el
   número. Un encabezado o una figura sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el `Id` o ese
   nombre.
 - **Área de notas:** `Footnotes.beginSection` crea en cada sección la caja `Footnotes` (`Element.FOOTNOTES`,

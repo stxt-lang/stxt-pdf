@@ -96,7 +96,7 @@ class PdfStructureLinksTest {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
                 + "\tTable:\n\t\tColumn sizes: * 60\n"
                 + "\t\tHeader rows:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\t\tLink: https://c.example\n\t\t\t\tCell: Valor\n"
-                + "\t\tBody:\n" + body))) {
+                + "\t\tBody rows:\n" + body))) {
             assertEquals(2, pdf.getNumberOfPages());
             assertEquals(List.of("https://c.example"), links(pdf, 0).stream().map(PdfStructureLinksTest::uri).toList());
             assertEquals(List.of("https://c.example"), links(pdf, 1).stream().map(PdfStructureLinksTest::uri).toList());

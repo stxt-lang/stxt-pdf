@@ -76,7 +76,7 @@ import dev.stxt.pdf.model.TextRun;
  *
  * <p>Only a closed subset is allowed; the rest is an error ({@link ErrorCode#MARKDOWN_UNSUPPORTED}). Each generated
  * node carries the line of the document where its Markdown block begins; the marker of a list, that of
- * {@code Bullet markers} or {@code Number markers}, and the columns of a table, that of {@code Table columns}.</p>
+ * {@code Bullet markers} or {@code Number markers}, and the columns of a table, that of {@code Table column sizes}.</p>
  */
 final class MarkdownBuilder {
 
@@ -117,7 +117,7 @@ final class MarkdownBuilder {
     /**
      * The generated elements, in order, and the runs of the formatted texts, by node ({@code Text}, {@code Paragraph}
      * or {@code Cell}). {@code sources} are the generated property nodes whose line is in a separate styles document:
-     * they come from a property of one of its rules ({@code Bullet markers}, {@code Table columns}).
+     * they come from a property of one of its rules ({@code Bullet markers}, {@code Table column sizes}).
      */
     record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks,
                        Map<Node, SourceLine> sources) {
@@ -132,7 +132,7 @@ final class MarkdownBuilder {
 
     /**
      * Like {@link #translate(InlineNode)}, numbering the footnote calls ({@code [^id]}) with {@code footnotes}.
-     * {@code properties} gives the {@code Bullet markers}, {@code Number markers} and {@code Table columns} of the
+     * {@code properties} gives the {@code Bullet markers}, {@code Number markers} and {@code Table column sizes} of the
      * {@code Markdown}, by canonical name: its own or those of its rules ({@link BuildContext#property}).
      */
     static Translation translate(InlineNode markdown, Footnotes footnotes,
@@ -231,7 +231,7 @@ final class MarkdownBuilder {
             this.inlineOnly = inlineOnly;
             this.bullet = properties.apply("bullet-markers");
             this.numbering = properties.apply("number-markers");
-            this.tableColumns = properties.apply("table-columns");
+            this.tableColumns = properties.apply("table-column-sizes");
             this.bullets = bullet.map(p -> markers(p, false)).orElse(List.of());
             this.numberings = numbering.map(p -> markers(p, true)).orElse(List.of());
         }
@@ -391,7 +391,7 @@ final class MarkdownBuilder {
 
         private InlineNode table(TableBlock t, int line) {
             if (tableColumns.isEmpty()) {
-                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "The table needs Table columns in its "
+                throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "The table needs Table column sizes in its "
                         + "Markdown (line " + markdown.getLine() + ") or in a rule of Styles: equal or auto");
             }
             TableHead head = null;
@@ -417,7 +417,7 @@ final class MarkdownBuilder {
             table.addChild(generated(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()),
                     tableColumns.get()));
             table.addChild(rows("Header rows", head));
-            table.addChild(rows("Body", body));
+            table.addChild(rows("Body rows", body));
             for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {
                 extraCells(r, columns);
             }
@@ -448,7 +448,7 @@ final class MarkdownBuilder {
             }
         }
 
-        /** {@code Header rows} or {@code Body} with its rows; cells have no line of their own: that of their row. */
+        /** {@code Header rows} or {@code Body rows} with its rows; cells have no line of their own: that of their row. */
         private InlineNode rows(String name, org.commonmark.node.Node group) {
             InlineNode out = node(name, "", line(group));
             for (org.commonmark.node.Node r = group.getFirstChild(); r != null; r = r.getNext()) {

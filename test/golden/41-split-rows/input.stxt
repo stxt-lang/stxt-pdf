@@ -88,7 +88,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t
 			Column sizes: * *
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Block:

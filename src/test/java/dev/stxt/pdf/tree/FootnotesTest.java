@@ -146,7 +146,7 @@ class FootnotesTest {
                 "\t\tFootnote:", "\t\t\tId: a", "\t\t\tParagraph: A.", "\t\t\tBlock:", "\t\t\t\tFootnote:",
                 "\t\t\t\t\tId: b", "\t\t\t\t\tParagraph: B."));
         assertEquals(ErrorCode.FOOTNOTE_CONTENT, error("\tSection:", "\t\tParagraph: Uno[^a].",
-                "\t\tFootnote:", "\t\t\tId: a", "\t\t\tTable:", "\t\t\t\tColumn sizes: *", "\t\t\t\tBody:",
+                "\t\tFootnote:", "\t\t\tId: a", "\t\t\tTable:", "\t\t\t\tColumn sizes: *", "\t\t\t\tBody rows:",
                 "\t\t\t\t\tRow:", "\t\t\t\t\t\tCell: A."));
     }
 

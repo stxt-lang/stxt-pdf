@@ -4,7 +4,7 @@ import dev.stxt.Node;
 
 /**
  * A property that the content of an element reads from its node ({@code Column align} of a {@code Table}, the markers
- * and {@code Table columns} of a {@code Markdown}): the one the element declares or, if it does not, the one a rule
+ * and {@code Table column sizes} of a {@code Markdown}): the one the element declares or, if it does not, the one a rule
  * of {@code Styles} gives it (reference/common/styles.md), with the document its line is in.
  *
  * @param node   the node of the property

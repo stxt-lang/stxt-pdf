@@ -24,7 +24,7 @@ class FiguresTest {
     private static final String HEADER = Docs.header(595, 842) + Docs.TYPOGRAPHY;
 
     private static final String IMAGE = "\t\tImage: test/wide.png\n\t\t\tAlt: Paisaje";
-    private static final String TABLE = "\t\tTable:\n\t\t\tColumn sizes: *\n\t\t\tBody:\n\t\t\t\tRow:\n\t\t\t\t\tCell: a";
+    private static final String TABLE = "\t\tTable:\n\t\t\tColumn sizes: *\n\t\t\tBody rows:\n\t\t\t\tRow:\n\t\t\t\t\tCell: a";
 
     private static BoxTreeBuilder.Result build(String... lines) {
         return new BoxTreeBuilder().build(Docs.read(HEADER, lines));
@@ -135,8 +135,8 @@ class FiguresTest {
     @Test
     void tablesOfContentsListTheFiguresOrTheTables() {
         BoxTreeBuilder.Result tree = build("\tSection:",
-                "\t\tTable of contents:", "\t\t\tId: figures", "\t\t\tOf: figures",
-                "\t\tTable of contents:", "\t\t\tId: tables", "\t\t\tOf: tables",
+                "\t\tTable of contents:", "\t\t\tId: figures", "\t\t\tEntries: figures",
+                "\t\tTable of contents:", "\t\t\tId: tables", "\t\t\tEntries: tables",
                 "\t\tFigure:", "\t\t\tCaption: Esquema", "\t" + IMAGE.replace("\n", "\n\t"),
                 "\t\tFigure:", "\t\t\tId: t", "\t\t\tCaption: Bornes", "\t" + TABLE.replace("\n", "\n\t"),
                 "\t\tFigure:", "\t\t\tIn table of contents: false", "\t\t\tCaption: Oculta", "\t" + IMAGE.replace("\n", "\n\t"),
@@ -190,11 +190,11 @@ class FiguresTest {
     @Test
     void aTableOfContentsOfFiguresHasNoLevelsAndNeedsSomeFigure() {
         InvalidModelException levels = error("\tSection:", "\t\tFigure:", "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"),
-                "\t\tTable of contents:", "\t\t\tOf: figures", "\t\t\tLevels: 1 2");
+                "\t\tTable of contents:", "\t\t\tEntries: figures", "\t\t\tLevels: 1 2");
         assertEquals(ErrorCode.LEVELS_WITHOUT_HEADINGS, levels.errorCode());
         assertEquals(19, levels.line());
         InvalidModelException empty = error("\tSection:", "\t\tFigure:", "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"),
-                "\t\tTable of contents:", "\t\t\tOf: tables");
+                "\t\tTable of contents:", "\t\t\tEntries: tables");
         assertEquals(ErrorCode.TABLE_OF_CONTENTS_EMPTY, empty.errorCode());
         assertEquals(17, empty.line());
     }

@@ -165,7 +165,7 @@ class MarkdownBuilderTest {
 
     @Test
     void tablesWithHeadAlignmentAndEmptyCells() {
-        MarkdownBuilder.Translation t = translate(List.of("Table columns: equal"),
+        MarkdownBuilder.Translation t = translate(List.of("Table column sizes: equal"),
                 "| Mes | Total |", "|-----|------:|", "| Ene | **120** |", "| Feb |");
         assertEquals(List.of("Table @16",
                 "  Column sizes: repeat(2, *) @14",
@@ -175,7 +175,7 @@ class MarkdownBuilderTest {
                 "      Cell: Total @16",
                 "        Typography @16",
                 "          Align: right @16",
-                "  Body @18",
+                "  Body rows @18",
                 "    Row @18",
                 "      Cell: Ene @18",
                 "      Cell: 120 @18",
@@ -185,7 +185,7 @@ class MarkdownBuilderTest {
                 "      Cell: Feb @19",
                 // GFM completes the row with an empty cell.
                 "      Cell @19"), outline(t.elements().get(0)));
-        InlineNode body = (InlineNode) t.elements().get(0).getChild("body");
+        InlineNode body = (InlineNode) t.elements().get(0).getChild("body-rows");
         Node cell = ((InlineNode) body.getChildren().get(0)).getChildren().get(1);
         assertEquals(List.of(run("120", "b")), t.runs().get(cell));
     }
@@ -196,23 +196,23 @@ class MarkdownBuilderTest {
      */
     @Test
     void rowsWithMoreCellsThanTheHeadAreAnError() {
-        translate(List.of("Table columns: auto"), "A | B", "--|--", "1 \\| 2 | 3", "| x | y |");
+        translate(List.of("Table column sizes: auto"), "A | B", "--|--", "1 \\| 2 | 3", "| x | y |");
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> translate(
-                List.of("Table columns: auto"), "| A | B |", "|---|---|", "| 1 | 2 |", "3 | 4 | 5"));
+                List.of("Table column sizes: auto"), "| A | B |", "|---|---|", "| 1 | 2 |", "3 | 4 | 5"));
         assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, e.errorCode());
         assertEquals(19, e.line());
     }
 
     @Test
     void autoColumns() {
-        MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "| A |", "|---|", "| 1 |");
+        MarkdownBuilder.Translation t = translate(List.of("Table column sizes: auto"), "| A |", "|---|", "| 1 |");
         assertEquals("repeat(1, auto)", t.elements().get(0).getChild("column-sizes").getText());
     }
 
     @Test
     void unusedPropertiesAreAllowed() {
-        // Bullet markers, Number markers and Table columns are only required if there are lists or tables (K6).
-        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table columns: auto"), "Hola.");
+        // Bullet markers, Number markers and Table column sizes are only required if there are lists or tables (K6).
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table column sizes: auto"), "Hola.");
         assertEquals(1, t.elements().size());
         assertNull(t.runs().get(t.elements().get(0)));
     }
@@ -238,11 +238,11 @@ class MarkdownBuilderTest {
 
     @Test
     void linksToABoxAndLinksInTablesAndHeadings() {
-        MarkdownBuilder.Translation t = translate(List.of("Table columns: auto"), "# Ver [anexo](#anexo)", "",
+        MarkdownBuilder.Translation t = translate(List.of("Table column sizes: auto"), "# Ver [anexo](#anexo)", "",
                 "| A | B |", "|---|---|", "| [uno](https://a.example) | dos |");
         assertEquals(List.of(run("Ver "), link("anexo", "u", "#anexo")),
                 t.runs().get(t.elements().get(0).getChildren().get(0)));
-        // Table: Columns, Header rows, Body; the first cell of the first row of the body.
+        // Table: Columns, Header rows, Body rows; the first cell of the first row of the body.
         Node body = t.elements().get(1).getChildren().get(2);
         Node cell = ((InlineNode) ((InlineNode) body).getChildren().get(0)).getChildren().get(0);
         assertEquals(List.of(link("uno", "u", "https://a.example")), t.runs().get(cell));
@@ -405,9 +405,9 @@ class MarkdownBuilderTest {
 
     @Test
     void codeInATableCellAndInAListItem() {
-        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table columns: auto"),
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet", "Table column sizes: auto"),
                 "| A |", "|---|", "| `x` |", "", "- uno", "", "  ```", "  y", "  ```");
-        InlineNode cell = (InlineNode) ((InlineNode) ((InlineNode) t.elements().get(0).getChild("body")).getChildren()
+        InlineNode cell = (InlineNode) ((InlineNode) ((InlineNode) t.elements().get(0).getChild("body-rows")).getChildren()
                 .get(0)).getChildren().get(0);
         assertTrue(t.runs().get(cell).get(0).format().code());
         InlineNode item = (InlineNode) t.elements().get(1).getChild("list-item");

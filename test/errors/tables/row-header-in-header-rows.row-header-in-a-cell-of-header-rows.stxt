@@ -20,7 +20,7 @@ Document (dev.stxt.pdf):
 					Cell: Concepto
 						Row header: true
 					Cell: Importe
-			Body:
+			Body rows:
 				Row:
 					Cell: Mesa
 					Cell: 120

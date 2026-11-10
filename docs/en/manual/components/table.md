@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
                     Cell: Qty
                     Cell: Price
                     Cell: Amount
-            Body:
+            Body rows:
                 Row:
                     Cell: Walnut chair
                         Row header: true
@@ -65,7 +65,7 @@ Document (dev.stxt.pdf):
 
 ## The structure
 
-- `Header rows` (optional), `Body` (required) and `Footer rows` (optional), in that order. Each one has one or more `Row`
+- `Header rows` (optional), `Body rows` (required) and `Footer rows` (optional), in that order. Each one has one or more `Row`
   elements, and each row, its `Cell` elements from left to right.
 - **`Column sizes`** (required, in the table or in a rule of `Styles` ([Styles](../common/styles.md#element-properties))) are the columns, with the same measurements as a `Grid`: points, millimeters,
   percentages, `auto` (what its content asks for) and fractions (`*`: a share of what is left over) ([Grid](grid.md)).
@@ -142,7 +142,7 @@ Document (dev.stxt.pdf):
                         Bold: true
                     Cell: Item
                     Cell: Amount
-            Body:
+            Body rows:
                 Row:
                     Cell: Design
                     Cell: 1,200.00
@@ -203,7 +203,7 @@ Document (dev.stxt.pdf):
                     Cell: Rate
                     Cell: Month
                     Cell: Year
-            Body:
+            Body rows:
                 Row:
                     Cell: Basic
                     Cell: 9.00

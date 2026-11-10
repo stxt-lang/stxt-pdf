@@ -128,7 +128,7 @@ Un marcador con imagen ([List](../components/list.md#marcadores-con-imagen)) con
 
 ### Tablas
 
-Una celda de `Header rows` es `TH` con `Scope: Column`, una de `Body` o `Footer rows` con `Row header: true` es `TH` con
+Una celda de `Header rows` es `TH` con `Scope: Column`, una de `Body rows` o `Footer rows` con `Row header: true` es `TH` con
 `Scope: Row`, y el resto, `TD`. Una celda que ocupa varias filas o columnas lleva `RowSpan` y `ColSpan`. La cabecera y
 el pie son contenido en la primera página en que sale cada celda. Donde se repiten, son *artifacts*, así que el árbol
 tiene una sola `THead` y una sola `TFoot`.

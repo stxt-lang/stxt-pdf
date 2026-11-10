@@ -28,7 +28,7 @@ class MarkdownTest {
 
     @Test
     void aBlockWithTheGeneratedElements() {
-        Box root = build("\tMarkdown:", "\t\tId: M", "\t\tBullet markers: bullet", "\t\tTable columns: auto", "\t\tContent >>",
+        Box root = build("\tMarkdown:", "\t\tId: M", "\t\tBullet markers: bullet", "\t\tTable column sizes: auto", "\t\tContent >>",
                 "\t\t\t# Título", "", "\t\t\tUn **párrafo**.", "", "\t\t\t- ítem", "", "\t\t\t| A |", "\t\t\t|---|",
                 "\t\t\t| *1* |");
         Box md = root.children().get(0);
@@ -73,7 +73,7 @@ class MarkdownTest {
         // In a list item, a cell, a Columns and a Stack Item (K1).
         assertDoesNotThrow(() -> build("\tList:", "\t\tMarker: bullet", "\t\tList item:", "\t\t\tMarkdown:",
                 "\t\t\t\tContent >>", "\t\t\t\t\tUno **dos**"));
-        assertDoesNotThrow(() -> build("\tTable:", "\t\tColumn sizes: 100", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell:",
+        assertDoesNotThrow(() -> build("\tTable:", "\t\tColumn sizes: 100", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell:",
                 "\t\t\t\t\tMarkdown:", "\t\t\t\t\t\tContent >>", "\t\t\t\t\t\t\tUno"));
         assertDoesNotThrow(() -> build("\tColumns:", "\t\tColumn count: 2", "\t\tMarkdown:", "\t\t\tContent >>",
                 "\t\t\t\t# Uno", "", "\t\t\t\tTexto"));

@@ -245,7 +245,7 @@ class StylesFileTest {
         String styles = BASE + "\tFor element: Odd row cell\n\t\tBox:\n\t\t\tPadding: 7\n";
         Box table = root(styles, "\tStyles:", "\t\tFor element: Header cell", "\t\t\tBox:", "\t\t\t\tPadding: 3",
                 "\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: b").children().get(0);
         assertEquals(Sides.all(Value.pt(3)), table.children().get(0).style().box().padding());
         assertEquals(Sides.all(Value.pt(7)), table.children().get(1).style().box().padding());
     }

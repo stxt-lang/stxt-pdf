@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
                     Cell: Uds.
                     Cell: Precio
                     Cell: Importe
-            Body:
+            Body rows:
                 Row:
                     Cell: Silla de nogal
                         Row header: true
@@ -65,7 +65,7 @@ Document (dev.stxt.pdf):
 
 ## La estructura
 
-- `Header rows` (opcional), `Body` (obligatorio) y `Footer rows` (opcional), en ese orden. Cada uno tiene una o varias
+- `Header rows` (opcional), `Body rows` (obligatorio) y `Footer rows` (opcional), en ese orden. Cada uno tiene una o varias
   `Row`, y cada fila, sus `Cell` de izquierda a derecha.
 - **`Column sizes`** (obligatorio, en la tabla o en una regla de `Styles` ([Estilos](../common/styles.md#propiedades-de-un-elemento))) son las columnas, con las mismas medidas que un `Grid`: puntos, milímetros,
   porcentajes, `auto` (lo que pida su contenido) y fracciones (`*`: una parte de lo que sobra) ([Grid](grid.md)). Lo
@@ -143,7 +143,7 @@ Document (dev.stxt.pdf):
                         Bold: true
                     Cell: Concepto
                     Cell: Importe
-            Body:
+            Body rows:
                 Row:
                     Cell: Diseño
                     Cell: 1200,00
@@ -204,7 +204,7 @@ Document (dev.stxt.pdf):
                     Cell: Tarifa
                     Cell: Mes
                     Cell: Año
-            Body:
+            Body rows:
                 Row:
                     Cell: Básica
                     Cell: 9,00

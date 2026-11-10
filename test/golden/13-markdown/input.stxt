@@ -59,7 +59,7 @@ Document (dev.stxt.pdf):
 				2. Aprobar
 		Markdown:
 			Id: table
-			Table columns: equal
+			Table column sizes: equal
 			Content >>
 				| Región | Ventas |
 				|--------|-------:|

@@ -29,7 +29,7 @@ class TableStylesTest {
     private static final String[] TABLE = {
             "\tTable:", "\t\tColumn sizes: * *",
             "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
-            "\t\tBody:",
+            "\t\tBody rows:",
             "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
             "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2",
             "\t\t\tRow:", "\t\t\t\tCell: c1", "\t\t\t\tCell: c2",
@@ -84,7 +84,7 @@ class TableStylesTest {
     @Test
     void aCellWithRowSpanBelongsToItsFirstRow() {
         Box table = root("\tStyles:", "\t\tFor element: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #222222",
-                "\tTable:", "\t\tColumn sizes: * *", "\t\tBody:",
+                "\tTable:", "\t\tColumn sizes: * *", "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tSpan: 2 1", "\t\t\t\tCell: b",
                 "\t\t\tRow:", "\t\t\t\tCell: c",
                 "\t\t\tRow:", "\t\t\t\tCell: d", "\t\t\t\tCell: e").children().get(0);
@@ -117,7 +117,7 @@ class TableStylesTest {
                 "\t\tFor style: left", "\t\t\tTypography:", "\t\t\t\tAlign: left",
                 "\tTable:", "\t\tColumn sizes: * *",
                 "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\t\tStyle: left",
                 "\t\t\tRow:", "\t\t\t\tCell: c1", "\t\t\t\tCell: c2", "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center")
                 .children().get(0);
@@ -134,7 +134,7 @@ class TableStylesTest {
         Box table = root("\tStyles:",
                 "\t\tFor column: 2 3", "\t\t\tBox:", "\t\t\t\tBackground: #333333",
                 "\tTable:", "\t\tColumn sizes: * * * *",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tSpan: 1 3",
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\t\tSpan: 1 3",
                 "\t\t\tRow:", "\t\t\t\tCell: c", "\t\t\t\tCell: d", "\t\t\t\tCell: e", "\t\t\t\tCell: f").children().get(0);
         assertEquals(List.of("-", "#333333", "-", "#333333", "#333333", "-"),
                 background(table).stream().map(b -> b.equals("-") ? b : b.toLowerCase()).toList());
@@ -147,7 +147,7 @@ class TableStylesTest {
                 "\t\tFor column: 3", "\t\t\tTypography:", "\t\t\t\tAlign: left",
                 "\tTable:", "\t\tColumn sizes: * * *", "\t\tColumn align: left right right",
                 "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: h1", "\t\t\t\tCell: h2", "\t\t\t\tCell: h3",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2", "\t\t\t\tCell: a3",
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a1", "\t\t\t\tCell: a2", "\t\t\t\tCell: a3",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2", "\t\t\t\tCell: b3",
                 "\t\t\t\t\tTypography:", "\t\t\t\t\t\tAlign: center").children().get(0);
         assertEquals(TextAlign.LEFT, cell(table, "a1").style().typography().textAlign());
@@ -162,9 +162,9 @@ class TableStylesTest {
 
     @Test
     void columnAlignIsNotInheritedByTheContentsOfAnotherTable() {
-        Box root = root("\tTable:", "\t\tColumn sizes: *", "\t\tColumn align: right", "\t\tBody:",
+        Box root = root("\tTable:", "\t\tColumn sizes: *", "\t\tColumn align: right", "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tCell: a",
-                "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b");
+                "\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: b");
         assertEquals(TextAlign.RIGHT, cell(root.children().get(0), "a").style().typography().textAlign());
         assertEquals(TextAlign.LEFT, cell(root.children().get(1), "b").style().typography().textAlign());
     }
@@ -175,7 +175,7 @@ class TableStylesTest {
                 "\t\tFor element: Header cell", "\t\t\tTypography:", "\t\t\t\tBold: true",
                 "\t\tFor column: 1", "\t\t\tTypography:", "\t\t\t\tAlign: right",
                 "\t\tFor element: Even row cell", "\t\t\tBox:", "\t\t\t\tBackground: #444444",
-                "\tMarkdown:", "\t\tTable columns: equal",
+                "\tMarkdown:", "\t\tTable column sizes: equal",
                 "\t\tContent >>",
                 "\t\t\t| A | B |", "\t\t\t|:--|--:|", "\t\t\t| 1 | 2 |", "\t\t\t| 3 | 4 |").children().get(0);
         Box table = markdown.children().get(0);
@@ -199,7 +199,7 @@ class TableStylesTest {
                 "\t\tFor style: total", "\t\t\tTypography:", "\t\t\t\tBold: true",
                 "\t\t\tBox:", "\t\t\t\tBackground: #EFE4D2",
                 "\tTable:", "\t\tColumn sizes: * * *",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\tCell: b", "\t\t\t\tCell: c",
                 "\t\tFooter rows:", "\t\t\tRow:", "\t\t\t\tStyle: total", "\t\t\t\tCell: t1", "\t\t\t\t\tSpan: 1 2",
                 "\t\t\t\tCell: t2").children().get(0);
         for (String total : List.of("t1", "t2")) {
@@ -223,7 +223,7 @@ class TableStylesTest {
                 "\t\tFor style: row", "\t\t\tBox:", "\t\t\t\tBackground: #444444",
                 "\t\tFor style: own", "\t\t\tBox:", "\t\t\t\tBackground: #555555",
                 "\tTable:", "\t\tColumn sizes: * *",
-                "\t\tBody:",
+                "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tStyle: row", "\t\t\t\tCell: a1", "\t\t\t\t\tStyle: own", "\t\t\t\tCell: a2",
                 "\t\t\tRow:", "\t\t\t\tCell: b1", "\t\t\t\tCell: b2").children().get(0);
         // a1: its class; a2: that of its row, which beats the odd ones and the column; b1 (even row): nothing; b2: the
@@ -239,7 +239,7 @@ class TableStylesTest {
     @Test
     void aRowClassWithoutARuleIsAnError() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
-                () -> root("\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tStyle: nope",
+                () -> root("\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tStyle: nope",
                         "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.STYLE_WITHOUT_RULE, e.errorCode());
         assertEquals(17, e.line());
@@ -250,7 +250,7 @@ class TableStylesTest {
     void aRowClassCannotGiveBreaksToTheCells() {
         InvalidModelException e = org.junit.jupiter.api.Assertions.assertThrows(InvalidModelException.class,
                 () -> root("\tStyles:", "\t\tFor style: keep", "\t\t\tBreak:", "\t\t\t\tKeep together: true",
-                        "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tStyle: keep",
+                        "\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tStyle: keep",
                         "\t\t\t\tCell: a"));
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode());
     }

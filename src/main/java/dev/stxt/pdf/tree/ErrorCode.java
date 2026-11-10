@@ -76,7 +76,7 @@ public enum ErrorCode {
     LIST_MARKER_MISSING,
 
     // --- Tables -----------------------------------------------------------------------------------
-    /** {@code Header rows}, {@code Body} and {@code Footer rows} out of that order. */
+    /** {@code Header rows}, {@code Body rows} and {@code Footer rows} out of that order. */
     TABLE_ORDER,
     /** A row that does not fill exactly the columns of the table. */
     TABLE_ROW_CELLS,
@@ -124,7 +124,7 @@ public enum ErrorCode {
     MARKDOWN_UNSUPPORTED,
     /**
      * A list or a table of a {@code Markdown} without its {@code Bullet markers}, {@code Number markers} or
-     * {@code Table columns}.
+     * {@code Table column sizes}.
      */
     MARKDOWN_PROPERTY_MISSING,
     /** Code, inline or in a block, without {@code Code font} in {@code Typography}, its own or inherited. */
@@ -139,7 +139,7 @@ public enum ErrorCode {
      */
     IMAGE_FORMAT,
     /**
-     * {@code Pdf page} in an {@code Image} that is not a PDF, or a page that the PDF does not have (line of {@code Pdf
+     * {@code PDF page} in an {@code Image} that is not a PDF, or a page that the PDF does not have (line of {@code Pdf
      * page}).
      */
     IMAGE_PAGE,
@@ -245,11 +245,11 @@ public enum ErrorCode {
 
     // --- Table of contents --------------------------------------------------------------------
     /**
-     * A {@code Table of contents} without any heading in the levels of {@code Levels} or, with {@code Of: figures} or
+     * A {@code Table of contents} without any heading in the levels of {@code Levels} or, with {@code Entries: figures} or
      * {@code tables}, without any figure or table to list.
      */
     TABLE_OF_CONTENTS_EMPTY,
-    /** {@code Levels} in a {@code Table of contents} with {@code Of: figures} or {@code tables}, which lists no headings. */
+    /** {@code Levels} in a {@code Table of contents} with {@code Entries: figures} or {@code tables}, which lists no headings. */
     LEVELS_WITHOUT_HEADINGS,
 
     // --- Reusable rules (Styles) ---------------------------------------------------------------

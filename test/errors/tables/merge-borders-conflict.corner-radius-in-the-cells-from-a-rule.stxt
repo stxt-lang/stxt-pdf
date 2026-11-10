@@ -22,7 +22,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table:
 			Column sizes: * *
-			Body:
+			Body rows:
 				Row:
 					Cell: a
 					Cell: b

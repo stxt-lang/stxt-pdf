@@ -32,7 +32,7 @@ In the schema:
 What the schema cannot express is checked by `BoxTreeBuilder`: that `Page` declares its size in a single way, that
 `Item`, `Area` and `Figure` have exactly one element and a `List item` at least one (the schema counts by type), that a `Text`
 has its text in one place and only one, that the root is `Document`, that the `Text` of a heading has no `Break`, the
-hierarchy and the place of the headings and, in a `Table`, the order `Header rows`, `Body`, `Footer rows`, that a `Cell`
+hierarchy and the place of the headings and, in a `Table`, the order `Header rows`, `Body rows`, `Footer rows`, that a `Cell`
 does not have both a value and elements and that each row fills its columns. What a `Markdown` generates goes through the schema
 like what the author writes.
 
@@ -68,7 +68,7 @@ new element with nothing of its own is a `CONTAINER`, and one with something of 
 `FIGURE` family builds the element and the `Caption` of a `Figure`, orders them by `Caption position`, numbers it
 (`Figures`) and keeps it from being split. Each family claims the children that are its own (`ElementReader.property`): the
 properties of its type, which it reads, and those its content reads, such as the row groups and `Column align` of a
-`Table`, the `Span` of a `Cell` or the markers and `Table columns` of a `Markdown`. The orchestrator only sets aside those
+`Table`, the `Span` of a `Cell` or the markers and `Table column sizes` of a `Markdown`. The orchestrator only sets aside those
 of any element (`Item`, `Area`, `Content` and `Style`).
 
 The element properties of a rule ([Styles](../common/styles.md#element-properties)) are read with the same code as those
@@ -77,7 +77,7 @@ its type and the standalone ones with `PropertyReader.single`), and `Grow`, `Shr
 `PropertyReader.itemProperty`. If the element cannot declare one, it is `STYLE_NOT_ALLOWED`: what it can declare is said
 by the schema (`DocumentSchema.allows`), so there is no second table of what each element allows, only the closed list of
 those that go in rules (`StyleRules.ELEMENT_PROPERTIES`). Those that the content of the element reads from its node
-(`Column align`, the markers and `Table columns` of a `Markdown`) are not read there: `StyleRules.apply` returns them,
+(`Column align`, the markers and `Table column sizes` of a `Markdown`) are not read there: `StyleRules.apply` returns them,
 with their document (`PropertyNode`), and `BuildContext.property` gives the one of the element or, if it does not declare
 it, the one of its rule. What a `Markdown` generates from one of a separate styles document (the `Marker` of a list, the
 `Column sizes` of a table) carries the line of that document (`Translation.sources`, in `BuildContext.sources`).
@@ -205,7 +205,7 @@ box that is passed to them.
   `Marker: image` there is an image (`LIST_IMAGE_MISSING`).
 - **Column flow:** the content of a `Columns` goes in a generated block box (`Element.COLUMN_FLOW`), its only child.
 - **Table of contents entries:** `TableOfContentsBuilder` generates at the end one `Stack` box per heading (`Element.TOC_1` to `Element.TOC_6`)
-  or, with `Of: figures` or `tables`, per `Figure` of that counter (`Element.TOC_1`), with the title or the caption, the
+  or, with `Entries: figures` or `tables`, per `Figure` of that counter (`Element.TOC_1`), with the title or the caption, the
   leader and the number. A heading or a figure without `Id` receives a generated name (`Box.anchor`), and `Box.key()`
   gives the `Id` or that name.
 - **Footnote area:** `Footnotes.beginSection` creates in each section the `Footnotes` box (`Element.FOOTNOTES`,

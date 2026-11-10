@@ -106,7 +106,7 @@ class SeveralStylesTest {
     @Test
     void tablePositionRulesGoInTheOrderOfTheStylesDocuments() {
         String[] table = {"\tTable:", "\t\tColumn sizes: *", "\t\tHeader rows:", "\t\t\tRow:", "\t\t\t\tCell: a",
-                "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: b"};
+                "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: b"};
         String body = rule("For element: Body cell", "Padding: 3");
         String odd = rule("For element: Odd row cell", "Padding: 7");
         // In one source Odd row cell goes after Body cell; between two, the order of the documents goes first.

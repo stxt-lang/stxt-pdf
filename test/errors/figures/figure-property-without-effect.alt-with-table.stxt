@@ -18,6 +18,6 @@ Document (dev.stxt.pdf):
 			Caption: Pie
 			Table:
 				Column sizes: *
-				Body:
+				Body rows:
 					Row:
 						Cell: a

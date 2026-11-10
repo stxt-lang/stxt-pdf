@@ -36,7 +36,7 @@
 | **Small caps** | Lowercase letters painted as smaller capitals (`Small caps`). |
 | **Stacking context** | Group of boxes that is painted as a unit and orders its children by `Layer` ([Layers and rotation](layers-and-rotation.md)). |
 | **Static position** | Where a positioned box would have been if it were in flow ([positioned elements](../components/frame-and-overlays.md#overlay)). |
-| **Table of contents** | `Table of contents` element: one entry per heading (or, with `Of`, per figure or per table) with its title, a leader and its page ([Table of contents](../components/table-of-contents.md)). |
+| **Table of contents** | `Table of contents` element: one entry per heading (or, with `Entries`, per figure or per table) with its title, a leader and its page ([Table of contents](../components/table-of-contents.md)). |
 | **Track** | Column or row of a `Grid` or a `Table`. |
 | **Widow** (`Widows`) | Line of a paragraph that goes alone to the next page. |
 | **Wrapper** | `Item` or `Area`. It is not a box: it adds to the element it contains how that element takes part in its `Stack` or its `Grid`. |

@@ -22,7 +22,7 @@ Document (dev.stxt.pdf):
                 Margin: 0 0 10 0
             Typography:
                 Align: justify
-                Line breaking: balanced
+                Line breaking: optimal
                 Markup: markdown
     Section:
         Text: Madrid, March 3

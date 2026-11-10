@@ -63,7 +63,7 @@ Document (dev.stxt.pdf):
 			Column sizes: 100 *
 			Box:
 				Margin: 8 0 0 0
-			Body:
+			Body rows:
 				Row:
 					Cell: Celda[^i]
 					Cell: x

@@ -73,7 +73,7 @@ class LineWidthsTest {
     @Test
     void knuthPlassUsesTheWidthOfEachLine() {
         LineWidths w = LineWidths.of(100, 12, List.of(new Exclusion(0, 24, 60, 0)));
-        List<LineBreaker.Line> lines = LineBreaker.breakLines(paragraph(6), 0, w, LineBreaking.BALANCED);
+        List<LineBreaker.Line> lines = LineBreaker.breakLines(paragraph(6), 0, w, LineBreaking.OPTIMAL);
         assertEquals(List.of("aaaa", "aaaa", "aaaa aaaa aaaa aaaa"), texts(lines));
     }
 

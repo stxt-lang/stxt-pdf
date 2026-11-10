@@ -155,7 +155,7 @@ class SideBoxLayoutTest {
     void aHeadingAndAMarkdownRunBesideTheSideBox() {
         LayoutFixture l = layOut(join(LEFT, new String[]{"\tHeading 1:", "\t\tId: H", "\t\tText: " + words(5),
                 "\t\t\tId: T",
-                "\tMarkdown:", "\t\tId: M", "\t\tTable columns: equal", "\t\tContent >>",
+                "\tMarkdown:", "\t\tId: M", "\t\tTable column sizes: equal", "\t\tContent >>",
                 "\t\t\t" + words(5), "", "\t\t\t| a | b |", "\t\t\t|---|---|", "\t\t\t| c | d |"}));
         assertEquals(70, l.fragment("T").lines().get(0).left(), 1e-9);
         Fragment markdown = l.fragment("M");

@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
 						Keep with next: true
 					Cell: a
 					Cell: b
-			Body:
+			Body rows:
 				Row:
 					Cell: c
 					Cell: d

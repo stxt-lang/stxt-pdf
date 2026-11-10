@@ -32,7 +32,7 @@ Styles:
 | `Line height` | number or % | `120%` | The height of each line: `15` is 15 points and `140%`, 1.4 times the size |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The alignment of the lines |
 | `Color` | color | `#000000` | The color of the text |
-| `Line breaking` | `simple`, `balanced` | `simple` | How the text is broken into lines |
+| `Line breaking` | `simple`, `optimal` | `simple` | How the text is broken into lines |
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
 | `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
@@ -99,7 +99,7 @@ except the last one of each paragraph, those with a single word and preformatted
 ## Line breaking
 
 The text is broken into lines of the width of its box, always between words. With `Line breaking: simple`, each line is
-filled as much as it can be. With `Line breaking: balanced`, the engine looks at the whole paragraph and chooses the
+filled as much as it can be. With `Line breaking: optimal`, the engine looks at the whole paragraph and chooses the
 breaks that leave the most even lines, which shows above all in justified text. By default words are not split: a word
 wider than the line is an error.
 

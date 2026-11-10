@@ -51,7 +51,7 @@ class LiteralReferencesTest {
         LayoutFixture l = layOut(
                 "\tText:", "\t\tId: P", "\t\tTypography:", "\t\t\tPreformatted: true",
                 "\t\tContent >>", "\t\t\tuno {{page}}", "\t\t\t  dos {page}",
-                "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:", "\t\t\t\tCell: {{pages}} y {pages}",
+                "\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: {{pages}} y {pages}",
                 "\t\t\t\t\tId: C");
         assertEquals("uno {page}|  dos 1", text(l, "P"));
         assertEquals("{pages} y 1", text(l, "C"));

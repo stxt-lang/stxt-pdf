@@ -124,7 +124,7 @@ Document (dev.stxt.pdf):
 					Cell: Qty
 					Cell: Price
 					Cell: Amount
-			Body:
+			Body rows:
 				Row:
 					Cell: MN-014
 					Cell: Solid walnut dining table, 180 × 90 cm

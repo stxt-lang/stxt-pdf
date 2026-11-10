@@ -20,7 +20,7 @@ Document (dev.stxt.pdf):
 					Cell:
 						Box:
 							Height: 600
-			Body:
+			Body rows:
 				Row:
 					Cell: a
 			Footer rows:

@@ -18,7 +18,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Merge borders: true
 			Gap: 4
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Box:

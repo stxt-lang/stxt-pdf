@@ -7,7 +7,7 @@ import dev.stxt.pdf.model.TextAlign;
  * Where a {@code Cell} is in its table (reference/components/table.md), for the {@code Styles} rules that name it
  * by its position.
  *
- * @param group           group of rows: 0 {@code Header rows}, 1 {@code Body}, 2 {@code Footer rows}
+ * @param group           group of rows: 0 {@code Header rows}, 1 {@code Body rows}, 2 {@code Footer rows}
  * @param row             row within its group, from 1; that of a cell spanning several is the first
  * @param column          column where it starts, from 1
  * @param columnAlign     {@code Column align} of its column; {@code null} if the table does not declare it

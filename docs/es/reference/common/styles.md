@@ -83,7 +83,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Block` | `Isolate margins`, `Trim margins`, `Side`, `Clear` |
 | `Frame` | `Isolate margins`, `Trim margins` |
 | `Cell` | `Trim margins` |
-| `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
+| `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Clear` |
 | `Table of contents` | `Levels`, `Leader` |
 | el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |
 
@@ -107,7 +107,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 - **`Marker` y `Column sizes`** son obligatorios en una `List` y en una `Table`, y pueden venir de una regla. Sin ninguno
   de los dos, el error es `LIST_MARKER_MISSING` o `TABLE_COLUMN_SIZES_MISSING`, con la línea del elemento.
 - **No van en una regla** las propiedades de identidad, de contenido, de estructura y de posición: `Id`, `Style`,
-  `Link`, `Alt`, `Span`, `Row header`, `First number`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` y
+  `Link`, `Alt`, `Span`, `Row header`, `First number`, `Number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` y
   `Rotate origin`, las de `Section` y `Page`, y el valor o el `Content` de un elemento. El schema no las admite.
 
 > **Decisión:** las reglas admiten las propiedades de elemento de aspecto y de reparto, y el motor comprueba que el
@@ -280,7 +280,7 @@ Una regla gana a la herencia: con `For element: Text` y `Size: 10`, un `Text` mi
 `Size: 20`. Las reglas se mezclan **propiedad a propiedad** y no por grupo: si la regla declara `Size` y el elemento
 `Bold`, se aplican las dos. Lo que una regla da a un elemento en `Typography` lo heredan sus descendientes, como si lo
 hubiera declarado él. `Item` y `Area` no son cajas: las reglas se aplican al elemento que envuelven. El `Style` y el
-`Id` de una `Row` aplican sus reglas a cada una de sus celdas y no a la franja de la fila. `Header rows`, `Body`,
+`Id` de una `Row` aplican sus reglas a cada una de sus celdas y no a la franja de la fila. `Header rows`, `Body rows`,
 `Footer rows` y `Row` no se pueden nombrar en `For element` (para dar estilo a las celdas de cada grupo están las reglas
 de posición). `Table` y `Cell`, sí. A una `Section` solo le llega `Typography`
 ([Document](../components/document.md#section)).

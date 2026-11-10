@@ -18,5 +18,5 @@ Document (dev.stxt.pdf):
 			Image: test/wide.png
 				Alt: Uno
 		Table of contents:
-			Of: figures
+			Entries: figures
 			Levels: 1 2

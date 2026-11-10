@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 						Style: rule
 					Cell: Valor
 						Style: rule
-			Body:
+			Body rows:
 				Row:
 					Cell: Fila 1
 						Id: b1

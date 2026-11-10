@@ -44,15 +44,15 @@ class LineBreakerTest {
         assertEquals(List.of("a bbb c", "ddddd e", "fff"),
                 Lines.breakLines(text, 10, measurer, F, 1, LineBreaking.SIMPLE));
         assertEquals(List.of("a bbb", "c ddddd e", "fff"),
-                Lines.breakLines(text, 10, measurer, F, 1, LineBreaking.BALANCED));
+                Lines.breakLines(text, 10, measurer, F, 1, LineBreaking.OPTIMAL));
     }
 
     @Test
     void prettyKeepsOverflowingWords() {
         assertEquals(List.of("a", "larguísima", "b"),
-                Lines.breakLines("a larguísima b", 4, measurer, F, 1, LineBreaking.BALANCED));
+                Lines.breakLines("a larguísima b", 4, measurer, F, 1, LineBreaking.OPTIMAL));
         assertEquals(List.of("uno dos tres"),
-                Lines.breakLines("uno dos tres", 100, measurer, F, 1, LineBreaking.BALANCED));
+                Lines.breakLines("uno dos tres", 100, measurer, F, 1, LineBreaking.OPTIMAL));
     }
 
     @Test
@@ -149,8 +149,8 @@ class LineBreakerTest {
         // "a bb c": with bb in bold, the word measures 4 and does not fit with the others in 6.
         List<TextRun> runs = List.of(run("a "), run("bb", "b"), run(" c"));
         assertEquals(List.of("a bb c"),
-                texts(Lines.breakLines(runs, 6, measurer, F, 1, LineBreaking.BALANCED)));
-        assertEquals(2, Lines.breakLines(runs, 6, boldIsWider, F, 1, LineBreaking.BALANCED).size());
+                texts(Lines.breakLines(runs, 6, measurer, F, 1, LineBreaking.OPTIMAL)));
+        assertEquals(2, Lines.breakLines(runs, 6, boldIsWider, F, 1, LineBreaking.OPTIMAL).size());
     }
 
     @Test
@@ -195,7 +195,7 @@ class LineBreakerTest {
     void letterSpacingWorksWithKnuthPlass() {
         // With letter spacing 1 and width 9, two words of two letters fit (2+1 + 1+1 + 2... = 8) and not three.
         List<LineBreaker.Line> l = Lines.breakLines(List.of(run("ab cd ef gh")), 9, measurer, F, 1, 1,
-                LineBreaking.BALANCED);
+                LineBreaking.OPTIMAL);
         assertEquals(List.of("ab cd", "ef gh"), texts(l));
     }
 
@@ -218,9 +218,9 @@ class LineBreakerTest {
                 measurer, F, 1, 0, LineBreaking.SIMPLE)));
         // Width 9: "ab cd ef" measures 8 without spacing, and 16 with the 2 of "cd ef", whose space carries it too.
         assertEquals(List.of("ab cd ef"), texts(Lines.breakLines(List.of(run("ab "), spaced("cd ef", 0)), 9,
-                measurer, F, 1, 0, LineBreaking.BALANCED)));
+                measurer, F, 1, 0, LineBreaking.OPTIMAL)));
         assertEquals(List.of("ab cd", "ef"), texts(Lines.breakLines(List.of(run("ab "), spaced("cd ef", 2)), 9,
-                measurer, F, 1, 0, LineBreaking.BALANCED)));
+                measurer, F, 1, 0, LineBreaking.OPTIMAL)));
     }
 
     // --- Hyphenation (reference/common/typography.md) ---------------------------------------------------------------
@@ -262,11 +262,11 @@ class LineBreakerTest {
         // stretches a single space beyond its half ("la progra-" leaves 4, "ción extra-" leaves 3: maximum too), so
         // the hyphen penalties do not change the breaks of the greedy algorithm here.
         assertEquals(List.of("la programa-", "ción extraor-", "dinaria"),
-                Lines.breakLines(TEXT, 14, measurer, F, 1, LineBreaking.BALANCED, HYPHENATOR));
+                Lines.breakLines(TEXT, 14, measurer, F, 1, LineBreaking.OPTIMAL, HYPHENATOR));
         // Width 9: "aaaa bbbb" fills the line exactly, and "aaaa bb-" would leave 1 to stretch and pay the hyphen.
         Hyphenator h = new Hyphenator(List.of(), List.of("bb-bb"), 2, 2);
         assertEquals(List.of("aaaa bbbb", "cccc"),
-                Lines.breakLines("aaaa bbbb cccc", 9, measurer, F, 1, LineBreaking.BALANCED, h));
+                Lines.breakLines("aaaa bbbb cccc", 9, measurer, F, 1, LineBreaking.OPTIMAL, h));
     }
 
     @Test

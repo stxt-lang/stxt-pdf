@@ -6,7 +6,7 @@
 # inline code and tables of specifications and of faults. The figures and the tables are Figure
 # elements with a Caption, numbered apart ("Figura 1.", "Tabla 1.": the labels are the Number label
 # of the rules in the Styles of the document, because they depend on the language), and the last
-# section lists them with two Table of contents (Of: figures and Of: tables). The heading
+# section lists them with two Table of contents (Entries: figures and Entries: tables). The heading
 # structure gives the PDF outline (bookmarks), and the fault table refers to the diagram with
 # {number of: wiring} and {page of: wiring}, its number and the page where it is (also inside
 # Markdown). The header writes the section in effect on each page with {heading 2}, a running head.
@@ -234,7 +234,7 @@ Document (dev.stxt.pdf):
 							Cell: Borne
 							Cell: Función
 							Cell: Cable habitual
-					Body:
+					Body rows:
 						Row:
 							Cell: L
 								Row header: true
@@ -310,7 +310,7 @@ Document (dev.stxt.pdf):
 							Cell: Franja
 							Cell: De lunes a viernes
 							Cell: Fin de semana
-					Body:
+					Body rows:
 						Row:
 							Cell: Mañana · 06:30–08:30
 								Row header: true
@@ -334,7 +334,7 @@ Document (dev.stxt.pdf):
 			Heading 2:
 				Text: Solución de problemas
 			Markdown:
-				Table columns: auto
+				Table column sizes: auto
 				Content >>
 					| Síntoma | Causa probable | Qué hacer |
 					|---------|----------------|-----------|
@@ -352,7 +352,7 @@ Document (dev.stxt.pdf):
 				Table:
 					Id: specs
 					Column sizes: 150 *
-					Body:
+					Body rows:
 						Row:
 							Cell: Alimentación
 								Row header: true
@@ -454,9 +454,9 @@ Document (dev.stxt.pdf):
 				Style: list-label
 			Table of contents:
 				Id: figures
-				Of: figures
+				Entries: figures
 			Text: Tablas
 				Style: list-label
 			Table of contents:
 				Id: tables
-				Of: tables
+				Entries: tables

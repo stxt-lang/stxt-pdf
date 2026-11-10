@@ -160,7 +160,7 @@ final class StyleRules {
             "marker", "marker-image", "fit", "barcode-format", "error-correction", "quiet-zone",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
             "drop-cap", "side", "clear", "isolate-margins", "trim-margins",
-            "bullet-markers", "number-markers", "table-columns",
+            "bullet-markers", "number-markers", "table-column-sizes",
             "grow", "shrink", "base-size");
 
     /**
@@ -449,7 +449,7 @@ final class StyleRules {
             case "column-align" -> TableBuilder.alignments(p);
             case "bullet-markers" -> MarkdownBuilder.markers(p, false);
             case "number-markers" -> MarkdownBuilder.markers(p, true);
-            case "table-columns" -> {
+            case "table-column-sizes" -> {
                 // An ENUM: the schema checks its values.
             }
             default -> throw unread(p);

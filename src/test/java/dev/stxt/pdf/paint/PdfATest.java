@@ -91,7 +91,7 @@ class PdfATest {
             "\t\tImage: test/label.svg",
             "\t\t\tAlt: Una etiqueta",
             "\t\tImage: test/pages.pdf",
-            "\t\t\tPdf page: 1",
+            "\t\t\tPDF page: 1",
             "\t\t\tAlt: La página 1",
             "\t\t\tBox:",
             "\t\t\t\tHeight: 80",

@@ -37,8 +37,8 @@ rules can also come from a separate styles document ([Styles](styles.md#separate
 | `Heading 1` to `Heading 6` | Heading of level 1 to 6 ([Headings](../components/heading.md)) | One or more `Text` |
 | `List` | List with markers or numbered ([List](../components/list.md)) | One or more `List item` |
 | `List item` | Item of a `List`: a block with its marker | Elements, except headings |
-| `Table` | Table with a header and a footer that repeat on each page ([Table](../components/table.md)) | `Header rows`, `Body` and `Footer rows`, in that order |
-| `Header rows`, `Body`, `Footer rows` | Header, body and footer of a `Table` | One or more `Row` |
+| `Table` | Table with a header and a footer that repeat on each page ([Table](../components/table.md)) | `Header rows`, `Body rows` and `Footer rows`, in that order |
+| `Header rows`, `Body rows`, `Footer rows` | Header, body and footer of a `Table` | One or more `Row` |
 | `Row` | Row of a table | One or more `Cell` |
 | `Cell` | Cell: a text or a block | Its text in the value, or elements except headings |
 | `Columns` | Block whose content flows through several columns ([Columns](../components/columns.md)) | In-flow elements |
@@ -55,13 +55,13 @@ rules can also come from a separate styles document ([Styles](styles.md#separate
 | `Item` | Item of a `Stack`: how it grows, shrinks and is aligned | Exactly one in-flow element |
 | `Area` | Item of a `Grid`: the area it takes up and how it is aligned | Exactly one in-flow element |
 
-**Elements** are all except `Section`, `Item`, `Area`, `Header rows`, `Body`, `Footer rows` and `Row`, and each one is a
+**Elements** are all except `Section`, `Item`, `Area`, `Header rows`, `Body rows`, `Footer rows` and `Row`, and each one is a
 box of the [tree](#the-box-tree). **In-flow elements** are those that can be an item: all except `Overlay` and
 `Page overlay`, which leave the flow, and `List item`, `Cell` and `Caption`, which only go in a `List`, in a `Row` and in
 a `Figure`.
 
 `Item` and `Area` are not boxes: they are **wrappers** that add to the element what only makes sense inside its
-container. Neither are `Header rows`, `Body`, `Footer rows` and `Row`: they group the cells, which are boxes. A `Row` with `Id`
+container. Neither are `Header rows`, `Body rows`, `Footer rows` and `Row`: they group the cells, which are boxes. A `Row` with `Id`
 or `Box` also has a band that is painted under its cells ([Table](../components/table.md#rows)), but it does not
 take up space.
 
@@ -202,17 +202,17 @@ once, and the elements, as many times as needed.
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (at least one) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
-| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (required), `Footer rows` |
-| `Header rows`, `Body`, `Footer rows` | `Row` (at least one) |
+| `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (required), `Footer rows` |
+| `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`; elements except headings |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
-| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Clear`, `Content` (required) |
+| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Clear`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
-| `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Of`, `Levels`, `Leader` |
+| `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
 | `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate`, `Side`, `Clear` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `PDF page`, `Rotate`, `Side`, `Clear` |
 | `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`), `Break`, `Alt` (required), `Barcode format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |

@@ -29,7 +29,7 @@ class ArrangementCacheTest {
         for (int c = 1; c <= 3; c++) {
             sb.append("\t\t\t\t\tCell: Columna ").append(c).append('\n');
         }
-        sb.append("\t\t\tBody:\n");
+        sb.append("\t\t\tBody rows:\n");
         for (int i = 0; i < rows; i++) {
             sb.append("\t\t\t\tRow:\n");
             for (int c = 1; c <= 3; c++) {

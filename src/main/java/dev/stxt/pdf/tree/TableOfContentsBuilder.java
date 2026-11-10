@@ -19,7 +19,7 @@ import static dev.stxt.pdf.tree.PropertyKey.LEVELS;
 /**
  * The automatic table of contents (reference/components/table-of-contents.md): reads {@code Levels} and {@code Leader}
  * of a {@code Table of contents} and, when the tree is built and all the headings and figures are known, generates
- * its entries: one per heading of its levels or, with {@code Of: figures} or {@code tables}, one per {@code Figure}
+ * its entries: one per heading of its levels or, with {@code Entries: figures} or {@code tables}, one per {@code Figure}
  * numbered with that counter (reference/components/figure.md).
  *
  * <p>Each entry is a generated {@code Stack} box ({@link Element#TOC_1} ... by the level of the heading; {@link
@@ -116,14 +116,14 @@ final class TableOfContentsBuilder {
             String what = of.name().toLowerCase(Locale.ROOT);
             if (s.isDeclared(LEVELS)) {
                 throw error(s.line(LEVELS), ErrorCode.LEVELS_WITHOUT_HEADINGS, "Levels has no effect in a table of contents "
-                        + "with Of: " + what + ", which lists the " + what + " and not the headings: it is not needed");
+                        + "with Entries: " + what + ", which lists the " + what + " and not the headings: it is not needed");
             }
             FigureCounter counter = of == Listing.FIGURES ? FigureCounter.FIGURES : FigureCounter.TABLES;
             listed = ctx.figures.stream()
                     .filter(f -> f.style().figure().counter() == counter && f.style().inTableOfContents()).toList();
             if (listed.isEmpty()) {
                 throw error(contents.line(), ErrorCode.TABLE_OF_CONTENTS_EMPTY, "The table of contents has no "
-                        + (of == Listing.FIGURES ? "figure" : "table") + " to list (Of: " + what + "): it would have no "
+                        + (of == Listing.FIGURES ? "figure" : "table") + " to list (Entries: " + what + "): it would have no "
                         + "entries. A Figure with a Caption counts as one, with the counter of its content or its Figure counter");
             }
         }

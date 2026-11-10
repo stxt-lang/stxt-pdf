@@ -107,7 +107,7 @@ Document (dev.stxt.pdf):
 			Id: clauses
 			Number markers: decimal lower-alpha lower-roman
 			Typography:
-				Line breaking: balanced
+				Line breaking: optimal
 			Content >>
 				1. **Objeto.** El Estudio se compromete a diseñar y entregar a la Cliente una nueva identidad visual y un sitio web corporativo, con arreglo a la propuesta técnica de 20 de octubre de 2025, que forma parte de este contrato como Anexo {number of: annex-title}.
 
@@ -170,7 +170,7 @@ Document (dev.stxt.pdf):
 						Cell: Hito y entregable
 						Cell: Fecha prevista
 						Cell: Importe
-				Body:
+				Body rows:
 					Row:
 						Cell: 1
 						Cell: Firma del contrato y arranque (40 %)

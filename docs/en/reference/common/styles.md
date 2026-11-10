@@ -82,7 +82,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Block` | `Isolate margins`, `Trim margins`, `Side`, `Clear` |
 | `Frame` | `Isolate margins`, `Trim margins` |
 | `Cell` | `Trim margins` |
-| `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
+| `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Clear` |
 | `Table of contents` | `Levels`, `Leader` |
 | the element of an `Item` | `Grow`, `Shrink`, `Base size` |
 
@@ -105,7 +105,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 - **`Marker` and `Column sizes`** are required in a `List` and in a `Table`, and they can come from a rule. Without
   either, the error is `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
 - **Not in a rule** are the properties of identity, content, structure and position: `Id`, `Style`, `Link`, `Alt`,
-  `Span`, `Row header`, `First number`, `Number`, `Pdf page`, `Of`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
+  `Span`, `Row header`, `First number`, `Number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
   those of `Section` and `Page`, and the value or the `Content` of an element. The schema does not allow them.
 
 > **Decision:** rules allow the element properties of appearance and distribution, and the engine checks that the
@@ -279,7 +279,7 @@ A rule wins over inheritance: with `For element: Text` and `Size: 10`, a `Text` 
 `Size: 20`. Rules are merged **property by property** and not by group: if the rule declares `Size` and the element
 `Bold`, both apply. What a rule gives an element in `Typography` is inherited by its descendants, as if the element had
 declared it. `Item` and `Area` are not boxes: the rules apply to the element they wrap. The `Style` and the `Id` of a
-`Row` apply their rules to each of its cells and not to the strip of the row. `Header rows`, `Body`, `Footer rows` and
+`Row` apply their rules to each of its cells and not to the strip of the row. `Header rows`, `Body rows`, `Footer rows` and
 `Row` cannot be named in `For element` (the position rules are there to style the cells of each group). `Table` and
 `Cell` can. Only `Typography` reaches a `Section` ([Document](../components/document.md#section)).
 

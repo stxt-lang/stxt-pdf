@@ -3,7 +3,7 @@
 Una `Figure` es una **figura con pie**: un bloque con exactamente un elemento (`Image`, `Barcode`, `Table` o `Block`) y
 un `Caption`, el pie, que va debajo del contenido o, en una tabla, encima. El motor la numera con un contador propio,
 escribe el número delante del pie («1 Esquema de conexión», o «Figura 1. Esquema de conexión» con `Number label`), lo da
-con `{number of: id}` y la lista en un `Table of contents` con `Of: figures` o `Of: tables`
+con `{number of: id}` y la lista en un `Table of contents` con `Entries: figures` o `Entries: tables`
 ([Table of contents](table-of-contents.md#qué-lista-of)). Admite `Id`, `Style`, `Box`, `Typography`, `Break`,
 `In table of contents`, `Side` y `Clear`, y las propiedades de abajo. No admite `Link`: el enlace va en el elemento de
 dentro.
@@ -95,7 +95,7 @@ Figure:
     Caption: Referencia de los bornes     # «Tabla 1. Referencia de los bornes», encima de la tabla
     Table:
         Column sizes: 56 *
-        Body:
+        Body rows:
             Row:
                 Cell: L
                 Cell: Fase
@@ -145,7 +145,7 @@ corre al lado de una caja lateral: va debajo de ella, como una tabla.
 
 ## Índices
 
-Un `Table of contents` con `Of: figures` lista las figuras que cuentan entre las figuras, y con `Of: tables`, las que
+Un `Table of contents` con `Entries: figures` lista las figuras que cuentan entre las figuras, y con `Entries: tables`, las que
 cuentan entre las tablas, en orden del documento y con el texto de su pie (número o etiqueta incluidos), una guía y la
 página, en entradas `TOC 1` clicables ([Table of contents](table-of-contents.md#qué-lista-of)). `In table of contents:
 false` deja una figura fuera sin quitarle el número.

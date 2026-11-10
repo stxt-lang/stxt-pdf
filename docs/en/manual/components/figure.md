@@ -58,7 +58,7 @@ Document (dev.stxt.pdf):
                         Cell: Piece
                         Cell: Width
                         Cell: Height
-                Body:
+                Body rows:
                     Row:
                         Cell: Chair
                         Cell: 45 cm
@@ -69,7 +69,7 @@ Document (dev.stxt.pdf):
                         Cell: 75 cm
         Paragraph: List of figures
         Table of contents:
-            Of: figures
+            Entries: figures
 ```
 
 ## Properties
@@ -96,7 +96,7 @@ a rule) leaves it without a number; `Number label` and `Number format` write the
 - `{number of: id}` writes the number of a figure with `Id`, without the label: "figure 2".
 - The figure **is not split** between pages: if it does not fit, it goes whole to the next one. A table inside is split,
   and the caption stays with its first part (or with the last, if it goes below).
-- A `Table of contents` with `Of: figures` lists the figures, and with `Of: tables`, the tables, with the text of their
+- A `Table of contents` with `Entries: figures` lists the figures, and with `Entries: tables`, the tables, with the text of their
   caption and their page. It is styled with `For element: TOC 1`.
 - The image or the code of a figure needs `Alt`: a figure with a caption is content and a screen reader reads it with
   its caption.

@@ -21,7 +21,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Line height` | number or % | `120%` | **A number is a measurement** (`15` = 15 pt). For a value relative to `Size`, a percentage (`120%`). |
 | `Align` | `left`, `right`, `center`, `justify` | `left` | The last line of a justified paragraph is aligned to the left. |
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |
-| `Line breaking` | `simple`, `balanced` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`balanced`). |
+| `Line breaking` | `simple`, `optimal` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Split words with a hyphen at the end of the line, with the patterns of the language ([Hyphenation](#hyphenation-hyphenate)). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
@@ -65,7 +65,7 @@ the font has to have it (`GLYPH_MISSING`).
 Text is broken into **lines** as wide as the content box:
 
 - **`Line breaking: simple`**, greedy algorithm: words are added to the line while they fit.
-- **`Line breaking: balanced`**, **Knuth-Plass**: the breaks of the paragraph that minimize the sum of the demerits of its
+- **`Line breaking: optimal`**, **Knuth-Plass**: the breaks of the paragraph that minimize the sum of the demerits of its
   lines are chosen, so that the lines are more even. Spaces stretch up to half their width and do not shrink,
   and the last line does not count.
 
@@ -137,7 +137,7 @@ by default.
   measures in it and is painted with the font and the format of the letter before it (bold if that letter is bold;
   never in small caps). It counts in the width of the line.
 - **In the line breaking**, with `simple`, when a word does not fit whole the longest part of it that fits with its
-  hyphen is added and the rest starts the next line; with `balanced`, each break point is a possible break with TeX's
+  hyphen is added and the rest starts the next line; with `optimal`, each break point is a possible break with TeX's
   penalty (50, squared, in the demerits of the line, and 10,000 more if two consecutive lines end with a hyphen). A
   word wider than the line is split in as many parts as needed.
 - **Intrinsic sizes**: the narrowest width is the widest part that cannot be split further, with its hyphen.

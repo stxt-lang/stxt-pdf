@@ -1,7 +1,7 @@
 # `Table`
 
 Una `Table` coloca sus celdas en filas y columnas: sus filas (`Row`) van en una cabecera (`Header rows`, opcional), un
-cuerpo (`Body`, obligatorio) y un pie (`Footer rows`, opcional), **en ese orden** (`TABLE_ORDER`), y cada fila tiene sus
+cuerpo (`Body rows`, obligatorio) y un pie (`Footer rows`, opcional), **en ese orden** (`TABLE_ORDER`), y cada fila tiene sus
 celdas (`Cell`) de izquierda a derecha. La `Table` admite `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`, y va
 donde va un elemento en flujo, también dentro de una celda.
 
@@ -20,7 +20,7 @@ Table:
             Cell: Concepto
             Cell: T1
             Cell: T2
-    Body:
+    Body rows:
         Row:
             Cell: Ventas
             Cell: 100
@@ -59,7 +59,7 @@ se estiran a su fila. Cada celda es un ítem del grid colocado explícitamente: 
 y ocupa las filas y columnas de su `Span` (`Span: 1 3` ocupa tres columnas). Una columna está ocupada si la ocupa una
 celda de una fila de arriba con un `Span` de varias filas. Cada fila llena **exactamente** todas las columnas
 (`TABLE_ROW_CELLS`): una celda vacía se escribe `Cell:`. Un `Span` no se sale de la tabla, no pasa de un grupo a otro
-(de `Header rows` a `Body`, de `Body` a `Footer rows`) ni se solapa con otra celda (`TABLE_SPAN`).
+(de `Header rows` a `Body rows`, de `Body rows` a `Footer rows`) ni se solapa con otra celda (`TABLE_SPAN`).
 
 `Span: 1 1` explícito se admite: es el valor por defecto escrito y no una contradicción.
 
@@ -105,7 +105,7 @@ una:
 
 - **Por posición.** `For element: Header cell`, `Body cell` y `Footer cell` son las celdas de cada grupo, y
   `Odd row cell` y `Even row cell`, las de las filas impares y pares del **cuerpo**, contando desde la primera fila de
-  `Body` como la 1 (la cebra, en la que no entran la cabecera ni el pie). La fila de una celda que ocupa varias es la
+  `Body rows` como la 1 (la cebra, en la que no entran la cabecera ni el pie). La fila de una celda que ocupa varias es la
   **primera** de las que ocupa. Una celda cumple a la vez la de su grupo y la de su fila, y la regla
   `For element: Cell` de siempre.
 - **Por columna.** `For column: 3` (o `For column: 2 4`, de la 2 a la 4) se aplica a las celdas que **empiezan** en esas
@@ -132,7 +132,7 @@ Si dos `For column` se solapan, se aplican en el orden de `Styles`, como los est
 
 ## Filas
 
-Una `Row` no es una caja del layout: no ocupa sitio propio ni se nombra en `For element`, como `Header rows`, `Body` y
+Una `Row` no es una caja del layout: no ocupa sitio propio ni se nombra en `For element`, como `Header rows`, `Body rows` y
 `Footer rows`. Las filas de la tabla no tienen propiedad de tamaño y miden lo que su celda más alta. Lo que declara la
 fila es para sus celdas o para su **franja**:
 
@@ -205,7 +205,7 @@ Table:
             Cell: Tarifa
             Cell: Mes
             Cell: Año
-    Body:
+    Body rows:
         Row:
             Cell: Básica
             Cell: 9,00

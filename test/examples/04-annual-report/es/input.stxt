@@ -326,7 +326,7 @@ Document (dev.stxt.pdf):
 						Cell: 2025
 						Cell: 2024
 						Cell: Variación
-				Body:
+				Body rows:
 					Row:
 						Cell: Venta de energía
 							Row header: true
@@ -369,7 +369,7 @@ Document (dev.stxt.pdf):
 				Text: Dónde ha ido la inversión
 			Markdown:
 				Number markers: decimal
-				Table columns: auto
+				Table column sizes: auto
 				Content >>
 					| Proyecto | Inversión (k€) | Potencia |
 					|----------|---------------:|---------:|
@@ -420,7 +420,7 @@ Document (dev.stxt.pdf):
 						Cell: 2023
 						Cell: 2024
 						Cell: 2025
-				Body:
+				Body rows:
 					Row:
 						Cell: Producción renovable (MWh)
 							Row header: true
@@ -463,7 +463,7 @@ Document (dev.stxt.pdf):
 						Cell: Nombre
 						Cell: Cargo
 						Cell: En el cargo desde
-				Body:
+				Body rows:
 					Row:
 						Cell: Carme Vidal i Roca
 							Row header: true
@@ -517,7 +517,7 @@ Document (dev.stxt.pdf):
 						Cell: 2.º trim.
 						Cell: 3.er trim.
 						Cell: 4.º trim.
-				Body:
+				Body rows:
 					Row:
 						Cell: Oficina de atención en Olot
 							Row header: true

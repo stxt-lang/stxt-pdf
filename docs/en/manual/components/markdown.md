@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
                 Code font: IBM Plex Mono
             Bullet markers: bullet dash
             Number markers: decimal
-            Table columns: auto
+            Table column sizes: auto
             Content >>
                 # Payment terms
 
@@ -70,9 +70,9 @@ Document (dev.stxt.pdf):
 | `Content` | The Markdown, in a `>>` block. Required |
 | `Bullet markers` | The marker of bulleted lists, one per level: `bullet dash` uses `•` on the first level and `–` on the following ones. Required if there are bulleted lists |
 | `Number markers` | The same for numbered lists: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Required if there are numbered lists |
-| `Table columns` | The columns of the tables: `equal` (all the same) or `auto` (according to their content). Required if there are tables |
+| `Table column sizes` | The columns of the tables: `equal` (all the same) or `auto` (according to their content). Required if there are tables |
 
-`Bullet markers`, `Number markers` and `Table columns` can also go once for the whole document, in a
+`Bullet markers`, `Number markers` and `Table column sizes` can also go once for the whole document, in a
 `For element: Markdown` rule ([Styles](../common/styles.md#element-properties)).
 
 It also accepts `Id`, `Style`, `Box`, `Typography` (which everything inside inherits) and `Break`. The code font is the

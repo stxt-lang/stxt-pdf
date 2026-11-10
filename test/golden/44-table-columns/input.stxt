@@ -26,7 +26,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t1
 			Column sizes: auto auto
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Id: t1a
@@ -55,7 +55,7 @@ Document (dev.stxt.pdf):
 			Id: t2
 			Column sizes: 40 auto auto
 			Gap: 10
-			Body:
+			Body rows:
 				Row:
 					Cell:
 						Id: t2a

@@ -135,7 +135,7 @@ class PdfStructureTest {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
                 + "\tTable:\n\t\tColumn sizes: * 60\n"
                 + "\t\tHeader rows:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Valor\n"
-                + "\t\tBody:\n" + rows()
+                + "\t\tBody rows:\n" + rows()
                 + "\t\tFooter rows:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tSpan: 1 2\n"))) {
             assertEquals(2, pdf.getNumberOfPages());
             PDStructureElement table = (PDStructureElement) section(pdf).getKids().get(0);
@@ -176,7 +176,7 @@ class PdfStructureTest {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
                 + "\tTable:\n\t\tColumn sizes: 100 100\n"
                 + "\t\tHeader rows:\n\t\t\tRow:\n\t\t\t\tCell: Concepto\n\t\t\t\tCell: Importe\n"
-                + "\t\tBody:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tRow header: true\n\t\t\t\tCell: 120\n"
+                + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: Mesa\n\t\t\t\t\tRow header: true\n\t\t\t\tCell: 120\n"
                 + "\t\tFooter rows:\n\t\t\tRow:\n\t\t\t\tCell: Total\n\t\t\t\t\tRow header: true\n\t\t\t\tCell: 120\n"))) {
             PDStructureElement table = (PDStructureElement) section(pdf).getKids().get(0);
             PDStructureElement bodyRow = (PDStructureElement) ((PDStructureElement) table.getKids().get(1)).getKids().get(0);
@@ -218,7 +218,7 @@ class PdfStructureTest {
     void markdownIsTaggedAndItsHeadingsAreBookmarks() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(Docs.header(300, 300, 40) + Docs.TYPOGRAPHY
                 + "\t\tFor element: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 15\n"
-                + "\tMarkdown:\n\t\tBullet markers: bullet\n\t\tTable columns: equal\n\t\tContent >>\n"
+                + "\tMarkdown:\n\t\tBullet markers: bullet\n\t\tTable column sizes: equal\n\t\tContent >>\n"
                 + "\t\t\t# Informe\n\n\t\t\tCon **negrita** y ++subrayado++.\n\n\t\t\t## Datos\n\n"
                 + "\t\t\t- uno\n\t\t\t- dos\n\n\t\t\t| A | B |\n\t\t\t|---|---|\n\t\t\t| 1 | 2 |\n"))) {
             PDStructureElement document = section(pdf);
@@ -290,9 +290,9 @@ class PdfStructureTest {
     // and its Caption; with a table, the Table carries the Caption.
 
     private static final String FIGURES = Docs.header(300, 300, 20) + Docs.TYPOGRAPHY
-            + "\tTable of contents:\n\t\tOf: tables\n"
+            + "\tTable of contents:\n\t\tEntries: tables\n"
             + "\tFigure:\n\t\tCaption: Esquema\n\t\tImage: test/wide.png\n\t\t\tAlt: Paisaje\n\t\t\tBox:\n\t\t\t\tWidth: 100\n"
-            + "\tFigure:\n\t\tCaption: Bornes\n\t\tTable:\n\t\t\tColumn sizes: *\n\t\t\tBody:\n\t\t\t\tRow:\n\t\t\t\t\tCell: a\n"
+            + "\tFigure:\n\t\tCaption: Bornes\n\t\tTable:\n\t\t\tColumn sizes: *\n\t\t\tBody rows:\n\t\t\t\tRow:\n\t\t\t\t\tCell: a\n"
             + "\tFigure:\n\t\tAlt: Dos fotos\n\t\tCaption: Fotos\n\t\tBlock:\n\t\t\tText: Hola\n";
 
     @Test

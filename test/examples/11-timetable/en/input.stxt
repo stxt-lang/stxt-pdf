@@ -64,7 +64,7 @@ Document (dev.stxt.pdf):
 					Cell: Wednesday
 					Cell: Thursday
 					Cell: Friday
-			Body:
+			Body rows:
 				Row:
 					Cell: 9:00 – 10:00
 						Row header: true

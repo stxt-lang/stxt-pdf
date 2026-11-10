@@ -47,12 +47,12 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | *(valor)* | ruta relativa a `images/` | obligatorio | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | sin valor | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)). Sin él, es decorativa. |
 | `Fit` | `inside`, `crop`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
-| `Pdf page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
+| `PDF page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
 | `Side` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
-`Fit`, `Side` y `Clear` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `Pdf page` y `Rotate`, no.
+`Fit`, `Side` y `Clear` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `PDF page` y `Rotate`, no.
 
 ## Fichero
 
@@ -167,7 +167,7 @@ ve como cualquier texto del documento, pero no se puede seleccionar ni copiar.
 
 ## PDF
 
-Una `Image` de un PDF dibuja **una de sus páginas**, la de `Pdf page` (la primera, si no se declara), como una imagen más: se
+Una `Image` de un PDF dibuja **una de sus páginas**, la de `PDF page` (la primera, si no se declara), como una imagen más: se
 dimensiona, se coloca, se recorta y se gira como cualquier otra. Sirve para poner en el documento un plano, un gráfico o
 una ilustración que vienen en PDF, o un dibujo que el subconjunto de [SVG](#svg) no admite, convertido a PDF. También sirve
 como **fondo de página**: un papel con membrete o un formulario preimpreso, en un `Page overlay` detrás del contenido.
@@ -189,8 +189,8 @@ apagada, y el visor las enseña en su lista de capas. Una configuración de las 
 (`planos.pdf`), que PDF/UA pide, y ninguna conserva sus estados automáticos (`AS`, que encienden o apagan una capa al
 ampliar, imprimir o exportar), que PDF/UA no admite: cada capa queda en el estado que le da la configuración.
 
-`Pdf page` es la página física, desde 1, y no el número que lleva impreso. Una página que el PDF no tiene es un error
-(`IMAGE_PAGE`, con la línea de `Pdf page`), y `Pdf page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
+`PDF page` es la página física, desde 1, y no el número que lleva impreso. Una página que el PDF no tiene es un error
+(`IMAGE_PAGE`, con la línea de `PDF page`), y `PDF page` en un PNG, un JPEG o un SVG, que no tiene páginas, también. Es un error
 (`IMAGE_FORMAT`, con la línea de la `Image`) un PDF cifrado, aunque se abra sin contraseña, y una página con una fuente
 que no cumple PDF/UA:
 
@@ -242,7 +242,7 @@ Document (dev.stxt.pdf):
             Offset: -140 -72 -80 -72
             Layer: -1
             Image: examples/letterhead/letterhead.pdf
-                Pdf page: 2
+                PDF page: 2
                 Style: letterhead
         Paragraph: Olot, 20 de octubre de 2025
         Paragraph: Le enviamos la propuesta de renovación del mobiliario del comedor.

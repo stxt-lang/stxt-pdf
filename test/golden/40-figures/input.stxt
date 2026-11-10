@@ -21,10 +21,10 @@ Document (dev.stxt.pdf):
 	Section:
 		Table of contents:
 			Id: toc
-			Of: figures
+			Entries: figures
 		Table of contents:
 			Id: toc2
-			Of: tables
+			Entries: tables
 		Figure:
 			Id: f1
 			Caption: Esquema
@@ -42,7 +42,7 @@ Document (dev.stxt.pdf):
 			Table:
 				Id: tb
 				Column sizes: * *
-				Body:
+				Body rows:
 					Row:
 						Cell: L
 						Cell: Fase

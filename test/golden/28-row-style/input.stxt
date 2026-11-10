@@ -2,7 +2,7 @@
 # with margins of 20: page area of 160 × 260 from (20, 20). Lines of 12 (Size 10) and two columns of 80.
 #   The total style gives Padding 6 (top and bottom) to each cell of the rows that declare it in their Row: a one-line
 #   cell measures 12 + 12 = 24. The rows without the style measure 12.
-#   Body: row 1, no style: 12 (y = 20); row 2, with the style: 24 (y = 32); row 3, no style: 12 (y = 56).
+#   Body rows: row 1, no style: 12 (y = 20); row 2, with the style: 24 (y = 32); row 3, no style: 12 (y = 56).
 #   Footer rows: one row with the style, 24 (y = 68). The table measures 12 + 24 + 12 + 24 = 72.
 Document (dev.stxt.pdf):
 	Language: es
@@ -23,7 +23,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: t
 			Column sizes: * *
-			Body:
+			Body rows:
 				Row:
 					Cell: a
 					Cell: b

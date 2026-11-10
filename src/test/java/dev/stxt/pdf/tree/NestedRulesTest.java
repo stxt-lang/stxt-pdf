@@ -139,9 +139,9 @@ class NestedRulesTest {
                 "---",
                 "Table:", "\tStyle: pricing", "\tColumn sizes: * *",
                 "\tHeader rows:", "\t\tRow:", "\t\t\tCell: a", "\t\t\tCell: b",
-                "\tBody:", "\t\tRow:", "\t\t\tCell: c", "\t\t\tCell: d",
+                "\tBody rows:", "\t\tRow:", "\t\t\tCell: c", "\t\t\tCell: d",
                 "Table:", "\tColumn sizes: * *", "\tHeader rows:", "\t\tRow:", "\t\t\tCell: e", "\t\t\tCell: f",
-                "\tBody:", "\t\tRow:", "\t\t\tCell: g", "\t\t\tCell: h");
+                "\tBody rows:", "\t\tRow:", "\t\t\tCell: g", "\t\t\tCell: h");
         Box pricing = root.children().get(0);
         assertEquals(FontWeight.BOLD, pricing.children().get(0).style().typography().fontWeight());
         assertEquals(all(4), padding(pricing.children().get(1)));
@@ -156,7 +156,7 @@ class NestedRulesTest {
         Box table = root(
                 "For style: total", "\tFor element: Text", "\t\tTypography:", "\t\t\tBold: true",
                 "---",
-                "Table:", "\tColumn sizes: *", "\tBody:", "\t\tRow:", "\t\t\tStyle: total", "\t\t\tCell:", "\t\t\t\tText: a",
+                "Table:", "\tColumn sizes: *", "\tBody rows:", "\t\tRow:", "\t\t\tStyle: total", "\t\t\tCell:", "\t\t\t\tText: a",
                 "\t\tRow:", "\t\t\tCell:", "\t\t\t\tText: b").children().get(0);
         assertEquals(FontWeight.BOLD, table.children().get(0).children().get(0).style().typography().fontWeight());
         assertEquals(FontWeight.NORMAL, table.children().get(1).children().get(0).style().typography().fontWeight());

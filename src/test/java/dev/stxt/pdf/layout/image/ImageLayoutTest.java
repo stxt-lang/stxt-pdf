@@ -66,7 +66,7 @@ class ImageLayoutTest {
     }
 
     /**
-     * A PDF measures what its page does, already in points: that of {@code Pdf page}, cropped and rotated
+     * A PDF measures what its page does, already in points: that of {@code PDF page}, cropped and rotated
      * ({@code pages.pdf}: 200 × 100, 150 × 50 and 100 × 200), or the first one.
      */
     @Test
@@ -76,10 +76,10 @@ class ImageLayoutTest {
                 "\t\tId: A",
                 "\tImage: test/pages.pdf",
                 "\t\tId: B",
-                "\t\tPdf page: 2",
+                "\t\tPDF page: 2",
                 "\tImage: test/pages.pdf",
                 "\t\tId: C",
-                "\t\tPdf page: 3",
+                "\t\tPDF page: 3",
                 "\t\tBox:",
                 "\t\t\tWidth: 50");
         assertRect(40, 40, 200, 100, f.rect("A"));
@@ -302,7 +302,7 @@ class ImageLayoutTest {
         LayoutFixture f = layOut(
                 "\tTable:",
                 "\t\tColumn sizes: 100 *",
-                "\t\tBody:",
+                "\t\tBody rows:",
                 "\t\t\tRow:",
                 "\t\t\t\tCell:",
                 "\t\t\t\t\tId: C",

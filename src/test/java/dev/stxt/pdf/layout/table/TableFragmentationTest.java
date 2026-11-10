@@ -57,7 +57,7 @@ class TableFragmentationTest {
         // after the last row placed.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Header rows"), row("H", 20),
-                group("Body"), row("B1", 30), row("B2", 30), row("B3", 30), row("B4", 30),
+                group("Body rows"), row("B1", 30), row("B2", 30), row("B3", 30), row("B4", 30),
                 group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 90, l.rect(1, "T"));
@@ -79,7 +79,7 @@ class TableFragmentationTest {
     @Test
     void theBandOfARowSpansItsColumnsAndItsHeight() {
         LayoutFixture l = LayoutFixture.layOut("\tTable:", "\t\tId: T", "\t\tColumn sizes: 100 100", "\t\tGap: 10",
-                "\t\tBody:",
+                "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tId: R1", "\t\t\t\tCell:", "\t\t\t\t\tBox:", "\t\t\t\t\t\tHeight: 20",
                 "\t\t\t\tCell:",
                 "\t\t\tRow:", "\t\t\t\tBox:", "\t\t\t\t\tBackground: #EEEEEE", "\t\t\t\tId: R2",
@@ -103,7 +103,7 @@ class TableFragmentationTest {
     void bandsOfHeaderAndFooterRowsRepeat() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Header rows"), row("H", 20, "\t\t\t\tId: HR"),
-                group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tId: R2"), row("B3", 30, "\t\t\t\tId: R3"),
+                group("Body rows"), row("B1", 30), row("B2", 30, "\t\t\t\tId: R2"), row("B3", 30, "\t\t\t\tId: R3"),
                 row("B4", 30),
                 group("Footer rows"), row("F", 10, "\t\t\t\tId: FR")));
         assertEquals(2, l.pages());
@@ -123,7 +123,7 @@ class TableFragmentationTest {
      */
     @Test
     void theBandOfASplitRowIsSplitToo() {
-        LayoutFixture l = layOutPaged(PAGE, concat(table(null), group("Body"),
+        LayoutFixture l = layOutPaged(PAGE, concat(table(null), group("Body rows"),
                 new String[]{"\t\t\tRow:", "\t\t\t\tId: R", "\t\t\t\tBox:", "\t\t\t\t\tBorder: 1",
                         "\t\t\t\tCell:", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 60",
                         "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 60"}));
@@ -143,7 +143,7 @@ class TableFragmentationTest {
         // at 65) do not fit together.
         LayoutFixture l = layOutPaged(PAGE, concat(table("5"),
                 group("Header rows"), row("H", 20),
-                group("Body"), row("B1", 30), row("B2", 30),
+                group("Body rows"), row("B1", 30), row("B2", 30),
                 group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 65, 515, 30, l.rect(1, "B1"));
@@ -159,7 +159,7 @@ class TableFragmentationTest {
         // to page 2, without leaving the header alone.
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tId: X", "\t\tBox:", "\t\t\tHeight: 50"}, table(null),
-                group("Header rows"), row("H", 20), group("Body"), row("B1", 30), group("Footer rows"), row("F", 10)));
+                group("Header rows"), row("H", 20), group("Body rows"), row("B1", 30), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         l.assertAbsent(1, "T");
         assertRect(40, 40, 515, 20, l.rect(2, "H"));
@@ -171,7 +171,7 @@ class TableFragmentationTest {
         // B1 (100) does not fit in the 70 left by the header and the footer: it is split, 70 + 30, and the
         // header and the footer repeat around each part.
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Header rows"), row("H", 20), group("Body"), row("B1", 100), group("Footer rows"), row("F", 10)));
+                group("Header rows"), row("H", 20), group("Body rows"), row("B1", 100), group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 60, 515, 70, l.rect(1, "B1"));
         assertRect(40, 130, 515, 10, l.rect(1, "F"));
@@ -184,7 +184,7 @@ class TableFragmentationTest {
     void rowBreakForcesAPageWithTheHeadRepeated() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
                 group("Header rows"), row("H", 20),
-                group("Body"), row("B1", 30), row("B2", 30, "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page")));
+                group("Body rows"), row("B1", 30), row("B2", 30, "\t\t\t\tBreak:", "\t\t\t\t\tBefore: page")));
         assertEquals(2, l.pages());
         l.assertAbsent(1, "B2");
         assertRect(40, 40, 515, 50, l.rect(1, "T"));
@@ -195,7 +195,7 @@ class TableFragmentationTest {
     @Test
     void withoutHeaderAndFooterRowsItBreaksLikeAGrid() {
         LayoutFixture l = layOutPaged(PAGE, concat(table(null),
-                group("Body"), row("B1", 40), row("B2", 40), row("B3", 40)));
+                group("Body rows"), row("B1", 40), row("B2", 40), row("B3", 40)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "T"));
         assertRect(40, 40, 515, 40, l.rect(2, "B3"));
@@ -207,7 +207,7 @@ class TableFragmentationTest {
         // footer goes after each part.
         LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
                 group("Header rows"), row("H", 20),
-                group("Body"), row("B1", 30), row("B2", 30), row("B3", 30),
+                group("Body rows"), row("B1", 30), row("B2", 30), row("B3", 30),
                 group("Footer rows"), row("F", 10)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "T"));
@@ -223,7 +223,7 @@ class TableFragmentationTest {
     void keepTogetherOnARowMovesItWhole() {
         // The Break of a Row is that of its cells: B3 cannot be split, and the break before it is better.
         LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
-                group("Body"), row("B1", 40), row("B2", 40),
+                group("Body rows"), row("B1", 40), row("B2", 40),
                 row("B3", 40, "\t\t\t\tBreak:", "\t\t\t\t\tKeep together: true")));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 80, l.rect(1, "T"));
@@ -249,7 +249,7 @@ class TableFragmentationTest {
         // stays inside every page.
         LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
                 group("Header rows"), row("H", 20),
-                group("Body"), contentRow(child("C", 130, "\t\t\t\t\t\t\tMargin: 0 0 15 0")),
+                group("Body rows"), contentRow(child("C", 130, "\t\t\t\t\t\t\tMargin: 0 0 15 0")),
                 group("Footer rows"), row("F", 10)));
         assertEquals(3, l.pages());
         assertRect(40, 60, 515, 70, l.rect(1, "C"));
@@ -269,7 +269,7 @@ class TableFragmentationTest {
         // contains that margin although the row gives it its height, so the break goes before C.
         LayoutFixture l = layOutPaged(PAGE, concat(splitTable(null),
                 group("Header rows"), row("H", 20),
-                group("Body"), contentRow(child("A", 80), child("C", 50, "\t\t\t\t\t\t\tMargin: 0 0 15 0",
+                group("Body rows"), contentRow(child("A", 80), child("C", 50, "\t\t\t\t\t\t\tMargin: 0 0 15 0",
                         "\t\t\t\t\t\tBreak:", "\t\t\t\t\t\t\tKeep together: true")),
                 group("Footer rows"), row("F", 10)));
         assertEquals(3, l.pages());

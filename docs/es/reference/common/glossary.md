@@ -26,7 +26,7 @@
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve, y posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](layers-and-rotation.md#giro-rotate)). |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../components/image.md)). |
-| **Índice** | Elemento `Table of contents`: una entrada por encabezado (o, con `Of`, por figura o por tabla) con su título, una guía y su página ([Table of contents](../components/table-of-contents.md)). |
+| **Índice** | Elemento `Table of contents`: una entrada por encabezado (o, con `Entries`, por figura o por tabla) con su título, una guía y su página ([Table of contents](../components/table-of-contents.md)). |
 | **Letra capitular** (`Drop cap`) | Primera letra de un `Paragraph` compuesta en grande, ocupando sus primeras líneas, que empiezan a su derecha ([Text](../components/text.md#letra-capitular-drop-cap)). |
 | **Markdown** | Elemento cuyo contenido se escribe en un subconjunto de Markdown y se traduce a encabezados, párrafos, listas, tablas, bloques de código e imágenes ([Markdown](../components/markdown.md)). |
 | **Papel** (`Paper`) | Tamaño de página con nombre (`A4` o `Letter`), en vertical o, con `Orientation: landscape`, apaisado. |

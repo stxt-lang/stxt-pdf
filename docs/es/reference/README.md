@@ -45,7 +45,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [`Text`](components/text.md) | `Text` y `Paragraph`, con la letra capitular (`Drop cap`) |
 | [Encabezados](components/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](components/list.md) | `List` y `List item` |
-| [`Table`](components/table.md) | `Table`, `Header rows`, `Body`, `Footer rows`, `Row` y `Cell` |
+| [`Table`](components/table.md) | `Table`, `Header rows`, `Body rows`, `Footer rows`, `Row` y `Cell` |
 | [`Stack`](components/stack.md) | `Stack` e `Item` |
 | [`Grid`](components/grid.md) | `Grid` y `Area` |
 | [`Columns`](components/columns.md) | `Columns` |

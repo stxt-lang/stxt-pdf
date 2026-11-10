@@ -45,7 +45,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [`Text`](components/text.md) | `Text` and `Paragraph`, with the drop cap (`Drop cap`) |
 | [Headings](components/heading.md) | `Heading 1` to `Heading 6` and their numbering |
 | [`List`](components/list.md) | `List` and `List item` |
-| [`Table`](components/table.md) | `Table`, `Header rows`, `Body`, `Footer rows`, `Row` and `Cell` |
+| [`Table`](components/table.md) | `Table`, `Header rows`, `Body rows`, `Footer rows`, `Row` and `Cell` |
 | [`Stack`](components/stack.md) | `Stack` and `Item` |
 | [`Grid`](components/grid.md) | `Grid` and `Area` |
 | [`Columns`](components/columns.md) | `Columns` |

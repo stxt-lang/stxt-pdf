@@ -133,7 +133,7 @@ class BlockLayoutTest {
     void trimMarginsInACellDropsTheMarginsOfItsFirstAndItsLastElement() {
         // The cell is as high as its block: without Trim margins it would be 70 high, with both margins inside.
         LayoutFixture l = layOut(
-                "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:",
+                "\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:",
                 "\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tTrim margins: both",
                 "\t\t\t\t\tBlock:", "\t\t\t\t\t\tId: C", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30",
                 "\t\t\t\t\t\t\tMargin: 20 0 20 0");

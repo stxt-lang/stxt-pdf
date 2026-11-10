@@ -39,7 +39,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Id: table
 			Column sizes: 50 110
-			Body:
+			Body rows:
 				Row:
 					Cell: Cliente
 						Id: c1

@@ -403,7 +403,7 @@ Document (dev.stxt.pdf):
 						Cell: Carácter
 						Cell: Origen
 						Cell: Acabados
-				Body:
+				Body rows:
 					Row:
 						Cell: Nogal
 							Row header: true

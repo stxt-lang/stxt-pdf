@@ -58,7 +58,7 @@ Document (dev.stxt.pdf):
                         Cell: Pieza
                         Cell: Ancho
                         Cell: Alto
-                Body:
+                Body rows:
                     Row:
                         Cell: Silla
                         Cell: 45 cm
@@ -69,7 +69,7 @@ Document (dev.stxt.pdf):
                         Cell: 75 cm
         Paragraph: Índice de figuras
         Table of contents:
-            Of: figures
+            Entries: figures
 ```
 
 ## Propiedades
@@ -97,7 +97,7 @@ regla) la deja sin número; `Number label` y `Number format` escriben el número
 - `{number of: id}` escribe el número de una figura con `Id`, sin la etiqueta: «la figura 2».
 - La figura **no se parte** entre páginas: si no cabe, pasa entera a la siguiente. Una tabla dentro sí se parte, y el pie
   se queda con su primera parte (o con la última, si va debajo).
-- Un `Table of contents` con `Of: figures` lista las figuras, y con `Of: tables`, las tablas, con el texto de su pie y su
+- Un `Table of contents` con `Entries: figures` lista las figuras, y con `Entries: tables`, las tablas, con el texto de su pie y su
   página. Se estila con `For element: TOC 1`.
 - La imagen o el código de una figura necesitan `Alt`: una figura con pie es contenido y un lector de pantalla la lee con
   su pie.

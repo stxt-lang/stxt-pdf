@@ -92,7 +92,7 @@ public class ScaleProbe {
         for (int c = 1; c <= 4; c++) {
             sb.append("\t\t\t\t\tCell: Columna ").append(c).append('\n');
         }
-        sb.append("\t\t\tBody:\n");
+        sb.append("\t\t\tBody rows:\n");
         for (int i = 0; i < rows; i++) {
             sb.append("\t\t\t\tRow:\n");
             for (int c = 1; c <= 4; c++) {
@@ -134,7 +134,7 @@ public class ScaleProbe {
         StringBuilder sb = new StringBuilder(tableHead().replace("\t\t\t\tBorder: 1\n",
                 "\t\t\t\tBorder: 1\n\t\t\t\tBackground: #F4F2EC\n\t\t\tTypography:\n\t\t\t\tSize: 6\n"
                 + "\t\t\t\tMarkup: markdown\n").replaceAll("\tPage overlay:\n(\t\t.*\n)*", ""));
-        sb.append("\t\tTable:\n\t\t\tColumn sizes: * * * * * *\n\t\t\tBody:\n");
+        sb.append("\t\tTable:\n\t\t\tColumn sizes: * * * * * *\n\t\t\tBody rows:\n");
         for (int i = 0; i < rows; i++) {
             sb.append("\t\t\t\tRow:\n");
             for (int c = 1; c <= 6; c++) {

@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 			Column sizes: * *
 			Box:
 				Merge borders: true
-			Body:
+			Body rows:
 				Row:
 					Cell: a
 					Cell: b

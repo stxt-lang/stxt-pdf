@@ -16,7 +16,7 @@ Document (dev.stxt.pdf):
 		Table:
 			Column sizes: * * *
 			Column align: left right
-			Body:
+			Body rows:
 				Row:
 					Cell: a
 					Cell: b

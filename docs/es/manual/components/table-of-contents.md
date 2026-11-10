@@ -62,8 +62,8 @@ Document (dev.stxt.pdf):
 
 | Propiedad | Por defecto | Qué hace |
 |---|---|---|
-| `Of` | `headings` | Qué lista: `headings`, los encabezados; `figures` o `tables`, las figuras o las tablas con pie ([Figure](figure.md)), con el texto de su pie |
-| `Levels` | `1 3` | Los niveles de encabezado que lista, del primero al último: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Solo con `Of: headings` |
+| `Entries` | `headings` | Qué lista: `headings`, los encabezados; `figures` o `tables`, las figuras o las tablas con pie ([Figure](figure.md)), con el texto de su pie |
+| `Levels` | `1 3` | Los niveles de encabezado que lista, del primero al último: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Solo con `Entries: headings` |
 | `Leader` | `dots` | Lo que llena el hueco entre el título y la página: `dots` (puntos), `line` (una línea) o `none` |
 
 Admite además `Id`, `Style`, `Box`, `Typography` y `Break`. No tiene hijos: las entradas las genera el motor.
@@ -78,7 +78,7 @@ Admite además `Id`, `Style`, `Box`, `Typography` y `Break`. No tiene hijos: las
   `Padding` izquierdo, y la separación entre entradas, su `Margin`.
 - Si un título no cabe en una línea, se parte, y el número queda en la primera línea.
 - Un índice sin ningún encabezado en sus niveles es un error.
-- Con `Of: figures` o `Of: tables`, las entradas son las figuras o las tablas, con el texto de su pie («Figura 1. ...») y
+- Con `Entries: figures` o `Entries: tables`, las entradas son las figuras o las tablas, con el texto de su pie («Figura 1. ...») y
   su página, todas con la regla `For element: TOC 1`. Un índice de figuras y otro de tablas son dos `Table of contents`.
 
 Más detalle en la [referencia](../../reference/components/table-of-contents.md).

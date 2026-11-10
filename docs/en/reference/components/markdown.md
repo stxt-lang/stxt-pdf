@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
                 Code font: IBM Plex Mono
             Bullet markers: bullet dash
             Number markers: decimal
-            Table columns: equal
+            Table column sizes: equal
             Content >>
                 # Results
 
@@ -56,7 +56,7 @@ Document (dev.stxt.pdf):
 | `Content` | `>>` block | none | The Markdown. Required. |
 | `Bullet markers` | list of `bullet`, `dash`, `none` | none | The `Marker` of the bulleted lists (`-`, `*`, `+`), one per nesting level. The last one serves for the deeper levels. Required if there are bulleted lists. |
 | `Number markers` | list of `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | none | The same, for the numbered lists (`1.`, `1)`). Required if there are any. |
-| `Table columns` | `equal`, `auto` | none | The `Column sizes` of the tables: `equal` is `repeat(n, *)`, and `auto`, `repeat(n, auto)`. Required if there are tables. |
+| `Table column sizes` | `equal`, `auto` | none | The `Column sizes` of the tables: `equal` is `repeat(n, *)`, and `auto`, `repeat(n, auto)`. Required if there are tables. |
 
 The three can also come from a rule of `Styles`, such as `For element: Markdown`, which gives them to every `Markdown`
 of the document ([Element properties](../common/styles.md#element-properties)). Required means that the `Markdown` declares it or takes it from a rule.
@@ -76,7 +76,7 @@ as follows:
 | Paragraph | `Paragraph` |
 | `-`, `*`, `+` | `List` with the `Marker` of `Bullet markers` for its level, with one `List item` per item |
 | `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level and `First number`, the first number if it is not 1 |
-| Table | `Table` with the `Column sizes` of `Table columns`, with the header row in `Header rows` and the rest in `Body` |
+| Table | `Table` with the `Column sizes` of `Table column sizes`, with the header row in `Header rows` and the rest in `Body rows` |
 | `**x**`, `__x__` | bold run ([Text formatting](../common/text-formatting.md#runs)) |
 | `*x*`, `_x_` | italic run |
 | `++x++` | underlined run |
@@ -126,7 +126,7 @@ Marta Vidal\
 Administration
 ```
 
-- In both line breakings (`Line breaking: simple` and `balanced`) the break is a mandatory end of line, and no line goes
+- In both line breakings (`Line breaking: simple` and `optimal`) the break is a mandatory end of line, and no line goes
   past it.
 - The line a forced line break ends is **not justified**, like the last one of the paragraph.
 - It works in paragraphs, headings and list items, and with `Markup: markdown` in a `Text`, a `Paragraph` or a `Cell`.
@@ -231,7 +231,7 @@ as the element of an `Item` or an `Area`.
 
 The errors of what is generated point to the line of the document where its Markdown block starts (that of the item, that of the row of
 the table). Those of the marker of a list point to that of `Bullet markers` or `Number markers`, and those of the columns of a table, to that of
-`Table columns`. A list or a table without its property is an error with the line of the list or the table
+`Table column sizes`. A list or a table without its property is an error with the line of the list or the table
 (`MARKDOWN_PROPERTY_MISSING`). A property that is not used is not. Code without `Code font` is `CODE_WITHOUT_FONT`
 ([Code](#code)).
 

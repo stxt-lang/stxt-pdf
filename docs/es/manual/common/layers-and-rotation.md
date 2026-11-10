@@ -77,7 +77,7 @@ Document (dev.stxt.pdf):
                     Cell:
                         Text: Noche
                             Rotate: -90
-            Body:
+            Body rows:
                 Row:
                     Cell: Ana Ruiz
                     Cell: sí

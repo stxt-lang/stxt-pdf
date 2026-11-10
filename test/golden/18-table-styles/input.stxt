@@ -55,7 +55,7 @@ Document (dev.stxt.pdf):
 					Cell: Detalle
 					Cell: Total
 						Id: h3
-			Body:
+			Body rows:
 				Row:
 					Cell: Uno
 						Id: b1

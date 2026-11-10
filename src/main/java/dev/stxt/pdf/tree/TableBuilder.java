@@ -31,7 +31,7 @@ import static dev.stxt.pdf.tree.PropertyReader.typography;
 final class TableBuilder {
 
     /** Row groups of a {@code Table}, in the order they go in. */
-    private static final List<String> TABLE_GROUPS = List.of("header-rows", "body", "footer-rows");
+    private static final List<String> TABLE_GROUPS = List.of("header-rows", "body-rows", "footer-rows");
 
     /** What the {@code Box} of a {@code Row} allows: its look (reference/components/table.md#rows). */
     private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
@@ -55,7 +55,7 @@ final class TableBuilder {
     /**
      * The rows of a {@code Table} (reference/components/table.md) as items of a grid with explicit placement: each
      * {@code Cell} goes in the first free column of its row, counting the ones taken up by the {@code Span} of the rows
-     * above. The groups go in the order {@code Header rows}, {@code Body}, {@code Footer rows}; each row fills exactly
+     * above. The groups go in the order {@code Header rows}, {@code Body rows}, {@code Footer rows}; each row fills exactly
      * the columns of {@code Column sizes}, and a {@code Span} does not go outside the table or its group. The rows of
      * {@code Header rows} and {@code Footer rows} are repeated on each page and do not allow {@code Break}.
      * {@code cells} builds the box of each cell, with the table as parent. Each cell carries its position
@@ -77,7 +77,7 @@ final class TableBuilder {
             if (group < last) {
                 throw error(g, ErrorCode.TABLE_ORDER, g.getName() + " goes after "
                         + label(TABLE_GROUPS.get(last))
-                        + ": the groups of a Table go in the order Header rows, Body, Footer rows");
+                        + ": the groups of a Table go in the order Header rows, Body rows, Footer rows");
             }
             last = group;
             int rows = rows(ctx, g, group, firstRow, columns, table, cells);

@@ -17,7 +17,7 @@ Document (dev.stxt.pdf):
 		Page overlay:
 			Table:
 				Column sizes: *
-				Body:
+				Body rows:
 					Row:
 						Break:
 							Keep together: true

@@ -10,7 +10,7 @@ import dev.stxt.pdf.model.Listing;
  */
 public final class TableOfContentsStyle extends StyleGroup {
 
-    /** {@code Of}: the headings (by default), the figures or the tables. */
+    /** {@code Entries}: the headings (by default), the figures or the tables. */
     private Listing of = Listing.HEADINGS;
     /** First and last heading level listed by a {@code Table of contents} ({@code Levels}). */
     private int from = 1;

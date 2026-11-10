@@ -47,12 +47,12 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 | *(value)* | path relative to `images/` | required | The PNG, JPEG, SVG or PDF file: `Image: logos/acme.png`. |
 | `Alt` | non-empty text | none | Alternative text: with it, the image is a figure that is read ([accessibility](#accessibility)). Without it, it is decorative. |
 | `Fit` | `inside`, `crop`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
-| `Pdf page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
+| `PDF page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates the image around its center (a seal) and takes up the rectangle that encloses it rotated. |
 | `Side` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
 | `Clear` | boolean | `false` | Moves the image below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-`Fit`, `Side` and `Clear` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `Pdf page` and `Rotate` cannot.
+`Fit`, `Side` and `Clear` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `PDF page` and `Rotate` cannot.
 
 ## File
 
@@ -167,7 +167,7 @@ looks like any text of the document, but it cannot be selected or copied.
 
 ## PDF
 
-An `Image` of a PDF draws **one of its pages**, that of `Pdf page` (the first one, if it is not declared), as one more image: it is
+An `Image` of a PDF draws **one of its pages**, that of `PDF page` (the first one, if it is not declared), as one more image: it is
 sized, placed, cropped and rotated like any other. It serves to put in the document a plan, a chart or
 an illustration that come as PDF, or a drawing that the [SVG](#svg) subset does not accept, converted to PDF. It also serves
 as a **page background**: a letterhead paper or a preprinted form, in a `Page overlay` behind the content.
@@ -189,8 +189,8 @@ off, and the viewer shows them in its list of layers. A layer configuration with
 (`planos.pdf`), which PDF/UA requires, and none keeps its automatic states (`AS`, which turn a layer on or off when
 zooming, printing or exporting), which PDF/UA does not allow: each layer stays in the state the configuration gives it.
 
-`Pdf page` is the physical page, from 1, and not the number printed on it. A page that the PDF does not have is an error
-(`IMAGE_PAGE`, with the line of `Pdf page`), and so is `Pdf page` in a PNG, a JPEG or an SVG, which has no pages. An
+`PDF page` is the physical page, from 1, and not the number printed on it. A page that the PDF does not have is an error
+(`IMAGE_PAGE`, with the line of `PDF page`), and so is `PDF page` in a PNG, a JPEG or an SVG, which has no pages. An
 encrypted PDF, even if it opens without a password, is an error (`IMAGE_FORMAT`, with the line of the `Image`), and so is a
 page with a font that does not comply with PDF/UA:
 
@@ -243,7 +243,7 @@ Document (dev.stxt.pdf):
             Offset: -140 -72 -80 -72
             Layer: -1
             Image: examples/letterhead/letterhead.pdf
-                Pdf page: 2
+                PDF page: 2
                 Style: letterhead
         Paragraph: Olot, October 20, 2025
         Paragraph: We are sending you the proposal for renewing the dining room furniture.

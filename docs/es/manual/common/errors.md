@@ -31,7 +31,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `HEADING_LEVEL` | Un salto de nivel (`Heading 3` después de `Heading 1`) | Usar el nivel siguiente |
 | `TABLE_ROW_CELLS` | Una fila con celdas de más o de menos | Añadir `Cell:` vacías o usar `Span` |
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG, PDF ni un SVG admitido | Revisar la ruta o convertir el fichero |
-| `IMAGE_PAGE` | `Pdf page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quitar `Pdf page` o corregir el número |
+| `IMAGE_PAGE` | `PDF page` en una imagen que no es un PDF, o una página que el PDF no tiene | Quitar `PDF page` o corregir el número |
 | `REFERENCE_UNKNOWN`, `LINK_UNKNOWN` | Un `{page of: id}` o un `#id` a un `Id` que no existe | Revisar el `Id` |
 | `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY` | Un `{heading 1}` en un texto que no es de una cabecera o un pie (`Page overlay`) | Escribirlo en el `Page overlay` |
 | `DUPLICATE_ID` | Dos cajas con el mismo `Id` | Cambiar uno |

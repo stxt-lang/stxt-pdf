@@ -31,7 +31,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `HEADING_LEVEL` | A skipped level (`Heading 3` after `Heading 1`) | Using the next level |
 | `TABLE_ROW_CELLS` | A row with too many or too few cells | Adding empty `Cell:` entries or using `Span` |
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | The image does not exist or is not a PNG, a JPEG, a PDF or a supported SVG | Checking the path or converting the file |
-| `IMAGE_PAGE` | `Pdf page` in an image that is not a PDF, or a page that the PDF does not have | Removing `Pdf page` or correcting the number |
+| `IMAGE_PAGE` | `PDF page` in an image that is not a PDF, or a page that the PDF does not have | Removing `PDF page` or correcting the number |
 | `REFERENCE_UNKNOWN`, `LINK_UNKNOWN` | A `{page of: id}` or an `#id` to an `Id` that does not exist | Checking the `Id` |
 | `HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY` | A `{heading 1}` in a text that is not in a header or a footer (`Page overlay`) | Writing it in the `Page overlay` |
 | `DUPLICATE_ID` | Two boxes with the same `Id` | Changing one of them |

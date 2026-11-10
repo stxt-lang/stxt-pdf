@@ -124,7 +124,7 @@ Document (dev.stxt.pdf):
 					Cell: Uds.
 					Cell: Precio
 					Cell: Importe
-			Body:
+			Body rows:
 				Row:
 					Cell: MN-014
 					Cell: Mesa de comedor en nogal macizo, 180 × 90 cm

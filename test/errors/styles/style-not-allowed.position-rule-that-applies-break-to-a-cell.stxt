@@ -21,6 +21,6 @@ Document (dev.stxt.pdf):
 			Header rows:
 				Row:
 					Cell: a
-			Body:
+			Body rows:
 				Row:
 					Cell: b

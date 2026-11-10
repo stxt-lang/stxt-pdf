@@ -107,7 +107,7 @@ Document (dev.stxt.pdf):
 			Id: clauses
 			Number markers: decimal lower-alpha lower-roman
 			Typography:
-				Line breaking: balanced
+				Line breaking: optimal
 			Content >>
 				1. **Purpose.** The Studio undertakes to design and deliver to the Client a new visual identity and a corporate website, in accordance with the technical proposal of October 20, 2025, which forms part of this contract as Appendix {number of: annex-title}.
 
@@ -170,7 +170,7 @@ Document (dev.stxt.pdf):
 						Cell: Milestone and deliverable
 						Cell: Expected date
 						Cell: Amount
-				Body:
+				Body rows:
 					Row:
 						Cell: 1
 						Cell: Contract signature and kickoff (40%)

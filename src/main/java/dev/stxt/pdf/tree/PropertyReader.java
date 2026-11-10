@@ -153,7 +153,7 @@ final class PropertyReader {
             entry("quiet-zone", (p, s) -> s.image().setQuietZone(quietZone(p))),
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
             entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
-            entry("of", (p, s) -> s.tableOfContents().setOf(enumValue(Listing.class, p))),
+            entry("entries", (p, s) -> s.tableOfContents().setOf(enumValue(Listing.class, p))),
             entry("levels", TableOfContentsBuilder::levels),
             entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 

@@ -74,7 +74,7 @@ class MergedBordersTest {
                 new String[]{"\t\tHeader rows:"},
                 concat(new String[]{"\t\t\tRow:", "\t\t\t\tCell:", "\t\t\t\t\tId: H", "\t\t\t\t\tBox:",
                         "\t\t\t\t\t\tBorder: 1 1 2 1", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 20"}),
-                new String[]{"\t\tBody:"}, row("B1", 30), row("B2", 30), row("B3", 30)));
+                new String[]{"\t\tBody rows:"}, row("B1", 30), row("B2", 30), row("B3", 30)));
         assertEquals(2, l.pages());
         assertEquals(84.5, l.rect(1, "T").height(), 1e-9);
         assertEquals(List.of("0 1", "53 1", "83.5 1", "21 2"), horizontal(l, 1));
@@ -91,14 +91,14 @@ class MergedBordersTest {
      */
     @Test
     void aSplitRowHasALineAtTheCutOnlyWithClosedEdges() {
-        LayoutFixture open = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody:"},
+        LayoutFixture open = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody rows:"},
                 row("C", new String[0], 30, 30, 30, 30, 30)));
         assertEquals(2, open.pages());
         assertEquals(List.of("0 1"), horizontal(open, 1));
         double end = open.rect(2, "T").height();
         assertEquals(List.of(format(end - 1) + " 1"), horizontal(open, 2));
 
-        LayoutFixture closed = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody:"},
+        LayoutFixture closed = layOutPaged(PAGE, concat(BORDER, table(), new String[]{"\t\tBody rows:"},
                 row("C", new String[]{"\t\t\t\tBreak:", "\t\t\t\t\tEdges: closed"}, 30, 30, 30, 30, 30)));
         assertEquals(2, closed.pages());
         assertEquals(List.of("0 1", format(closed.rect(1, "T").height() - 1) + " 1"), horizontal(closed, 1));
@@ -115,7 +115,7 @@ class MergedBordersTest {
      */
     @Test
     void aTableCutBetweenRowsDrawsTheLineOnBothPages() {
-        LayoutFixture l = layOutPaged(PAGE, concat(BORDER, table("Split rows: false"), new String[]{"\t\tBody:"},
+        LayoutFixture l = layOutPaged(PAGE, concat(BORDER, table("Split rows: false"), new String[]{"\t\tBody rows:"},
                 row("R1", 30), row("R2", 30), row("R3", 30), row("R4", 30)));
         assertEquals(2, l.pages());
         assertEquals(93.5, l.rect(1, "T").height(), 1e-9);
@@ -127,7 +127,7 @@ class MergedBordersTest {
     /** Numbering the pages ({@code {page}} in a cell) rebuilds the fragments of the table and keeps its lines. */
     @Test
     void theLinesSurviveThePageNumbering() {
-        LayoutFixture l = layOut(concat(BORDER, table(), new String[]{"\t\tBody:", "\t\t\tRow:",
+        LayoutFixture l = layOut(concat(BORDER, table(), new String[]{"\t\tBody rows:", "\t\t\tRow:",
                 "\t\t\t\tCell: p. {page}"}));
         // One cell: its four sides, each a rule.
         assertEquals(4, l.fragment("T").rules().size());
@@ -138,7 +138,7 @@ class MergedBordersTest {
     void theHorizontalPiecesOfTheColumnsAreJoined() {
         String[] cell = {"\t\t\t\tCell:", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30"};
         LayoutFixture l = layOut(concat(BORDER, new String[]{"\tTable:", "\t\tId: T", "\t\tColumn sizes: * *",
-                        "\t\tBox:", "\t\t\tMerge borders: true", "\t\tBody:"},
+                        "\t\tBox:", "\t\t\tMerge borders: true", "\t\tBody rows:"},
                 new String[]{"\t\t\tRow:"}, cell, cell, new String[]{"\t\t\tRow:"}, cell, cell));
         List<Rule> horizontal = l.fragment("T").rules().stream().filter(r -> r.width() > r.height()).toList();
         assertEquals(List.of(new Rule(0, 0, 515, 1, "#000000"), new Rule(0, 31, 515, 1, "#000000"),

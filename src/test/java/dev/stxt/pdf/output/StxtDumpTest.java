@@ -75,7 +75,7 @@ class StxtDumpTest {
         List<Page> pages = layOut(DOCUMENT
                 + "\t\tFor element: Cell\n\t\t\tBox:\n\t\t\t\tPadding: 0\n\t\t\t\tBorder: 1\n\t\t\t\tBorder color: #333333\n"
                 + "\t\tFor element: Table\n\t\t\tBox:\n\t\t\t\tMerge borders: true\n"
-                + "\tTable:\n\t\tId: t\n\t\tColumn sizes: 100 100\n\t\tBody:\n\t\t\tRow:\n"
+                + "\tTable:\n\t\tId: t\n\t\tColumn sizes: 100 100\n\t\tBody rows:\n\t\t\tRow:\n"
                 + "\t\t\t\tCell:\n\t\t\t\t\tId: a\n\t\t\t\t\tBlock:\n\t\t\t\t\t\tBox:\n\t\t\t\t\t\t\tHeight: 20\n"
                 + "\t\t\t\tCell:\n\t\t\t\t\tBlock:\n\t\t\t\t\t\tBox:\n\t\t\t\t\t\t\tHeight: 20\n");
         // The table takes the width of the page area and its columns, 200, start at its left; the row measures 20 plus

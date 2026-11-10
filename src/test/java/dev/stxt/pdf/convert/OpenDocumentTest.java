@@ -43,7 +43,7 @@ class OpenDocumentTest {
         return Docs.read(HEADER, "\tHeading 1:", "\t\tId: uno", "\t\tText: Uno",
                 "\tParagraph: Un texto con un [enlace](#dos) y un [cuadrado](https://stxt.dev).",
                 "\tImage: test/square.png", "\t\tAlt: Un cuadrado", "\t\tBox:", "\t\t\tWidth: 40",
-                "\tImage: test/pages.pdf", "\t\tPdf page: 1", "\t\tAlt: La página 1", "\t\tBox:", "\t\t\tHeight: 80",
+                "\tImage: test/pages.pdf", "\t\tPDF page: 1", "\t\tAlt: La página 1", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tBlock:", "\t\tBox:", "\t\t\tHeight: 200",
                 "\tHeading 1:", "\t\tId: dos", "\t\tText: Dos");
     }

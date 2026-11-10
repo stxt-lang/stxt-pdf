@@ -154,7 +154,7 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
   error (`CLEAR_WITHOUT_SIDE`).
 - **A word that does not fit** beside the box leaves that line empty and goes to the next one, up to the first line
   with the whole width; it is an overflow only if it does not fit there either (`TEXT_OVERFLOW`). With
-  `Line breaking: balanced`, the line breaking takes the width of each line into account.
+  `Line breaking: optimal`, the line breaking takes the width of each line into account.
 - **Several side boxes.** A second side box on the same side that overlaps the previous one goes below it; one on the
   other side goes at its height, and the text runs between the two.
 - **The height of the container** reaches the bottom of its side boxes if the text ends before, and then the bottom

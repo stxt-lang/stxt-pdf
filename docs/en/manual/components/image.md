@@ -48,7 +48,7 @@ Document (dev.stxt.pdf):
 | *(value)* | The path of the file inside `images/`: `Image: logos/acme.png`. Required |
 | `Alt` | The alternative text, for those who cannot see the image. Without `Alt`, the image is decorative and the screen reader skips it |
 | `Fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `crop` (fills the box and crops what is left over) or `stretch` (it is distorted) |
-| `Pdf page` | The page of a PDF that is drawn, from 1. Without `Pdf page`, the first one. Only in a PDF |
+| `PDF page` | The page of a PDF that is drawn, from 1. Without `PDF page`, the first one. Only in a PDF |
 | `Rotate` | Rotating the image around its center. It takes up the rectangle that encloses it rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
 | `Side` | `left` or `right`: the image is placed at that side and the text that follows it runs beside it ([Block](block.md#a-box-at-one-side-with-the-text-around-it-side)) |
 | `Clear` | `true` moves the image below the side boxes before it |
@@ -84,13 +84,13 @@ selected.
 
 ## A page of a PDF
 
-An `Image` of a PDF draws one of its pages, the one in `Pdf page`, like any other image: a plan, a chart or a drawing that
+An `Image` of a PDF draws one of its pages, the one in `PDF page`, like any other image: a plan, a chart or a drawing that
 comes as a PDF, or an SVG that the engine does not accept, converted to PDF with another program. It goes in as a vector
 drawing, sharp at any size, and its text can be selected.
 
 ```
 Image: planos/sala.pdf
-    Pdf page: 2
+    PDF page: 2
     Alt: Plan of the meeting room
     Box:
         Width: 100%
@@ -126,7 +126,7 @@ Document (dev.stxt.pdf):
         Paragraph: We are sending you the proposal for renewing the dining room furniture, with the details of each piece and its delivery time.
 ```
 
-With two `Page overlay` elements, one with `Pages: first` and another with `Pages: not-first` and `Pdf page: 2`, the first
+With two `Page overlay` elements, one with `Pages: first` and another with `Pages: not-first` and `PDF page: 2`, the first
 sheet has one letterhead and the following ones, another.
 
 Whatever is not the drawing of the page is not copied: its links, its bookmarks and its tagging. Its layers are. A PDF with

@@ -3,7 +3,7 @@
 A `Figure` is a **figure with a caption**: a block with exactly one element (`Image`, `Barcode`, `Table` or `Block`) and
 a `Caption`, which goes below the content or, in a table, above it. The engine numbers it with a counter of its own,
 writes the number before the caption ("1 Wiring diagram", or "Figure 1. Wiring diagram" with `Number label`), gives it
-with `{number of: id}` and lists it in a `Table of contents` with `Of: figures` or `Of: tables`
+with `{number of: id}` and lists it in a `Table of contents` with `Entries: figures` or `Entries: tables`
 ([Table of contents](table-of-contents.md#what-it-lists-of)). It accepts `Id`, `Style`, `Box`, `Typography`, `Break`,
 `In table of contents`, `Side` and `Clear`, and the properties below. It does not accept `Link`: the link goes in the
 element inside.
@@ -97,7 +97,7 @@ Figure:
     Caption: Terminal reference           # "Table 1. Terminal reference", above the table
     Table:
         Column sizes: 56 *
-        Body:
+        Body rows:
             Row:
                 Cell: L
                 Cell: Live
@@ -149,7 +149,7 @@ side box: it goes below it, like a table.
 
 ## Tables of contents
 
-A `Table of contents` with `Of: figures` lists the figures that count among the figures, and with `Of: tables`, those
+A `Table of contents` with `Entries: figures` lists the figures that count among the figures, and with `Entries: tables`, those
 that count among the tables, in document order and with the text of their caption (number or label included), a leader
 and the page, in clickable `TOC 1` entries ([Table of contents](table-of-contents.md#what-it-lists-of)).
 `In table of contents: false` leaves a figure out without removing its number.
