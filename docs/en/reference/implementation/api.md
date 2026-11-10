@@ -115,8 +115,9 @@ that goes with them (one or more `rdf:Description`, with their namespaces declar
 `withModified` give the description and the modification date. All of it is in `model`. The two `toPdf` without
 attachments are the same as `Attachments.NONE`.
 
-An attachment without `pdfA(A3B)` or `pdfA(A3A)` is `ATTACHMENT_REQUIRES_PDFA3`, a `StxtPdfException` of kind `RESOURCE`
-(it is the configuration of the caller, not the document) and without a line. An XMP that is not XML, two attachments
+An attachment goes with `pdfA(A3B)` or `pdfA(A3A)`, and also without `pdfA`; with `pdfA(A2B)` or `pdfA(A2A)` it is
+`ATTACHMENT_REQUIRES_PDFA3`, a `StxtPdfException` of kind `RESOURCE` (it is the configuration of the caller, not the
+document) and without a line. An XMP that is not XML, two attachments
 with the same name, a blank name or a type that is not `type/subtype` are an `IllegalArgumentException` when they are
 built, before converting. `PdfDocumentWriter.write` receives the same (`ua`, `pdfA` and `Attachments`) as the low-level
 layer.

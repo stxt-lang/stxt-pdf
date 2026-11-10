@@ -32,6 +32,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   where the content of a page or of a column ends, to draw over a laid out box or to fill the blank below it without
   adding up borders and paddings outside the engine. It is in the promised API. "Where each box ended up" in "Using from Java".
 
+### Changed
+
+- **Attachments without PDF/A.** An `Attachment` is embedded also in a PDF that is not PDF/A, with what a PDF/A-3
+  carries (the file specification, the `EmbeddedFiles` tree and the `AF` array): any PDF admits files, and a PDF that
+  is going to be encrypted cannot be PDF/A. Until now it was `ATTACHMENT_REQUIRES_PDFA3`, which stays only for
+  PDF/A-2, where the standard forbids it; its message changes. "Embedded files (Factur-X)" in "The PDF".
+
 ## [0.13.0] - 2026-11-08
 
 Rules of `Styles` that give the properties of an element (`Gap`, `Fit`, `Marker`, `Column sizes`...) and rules nested

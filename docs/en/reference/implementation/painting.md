@@ -82,7 +82,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `PdfOutline` | The bookmarks of the headings |
 | `PdfMetadata` | The title, the language, the XMP packet (PDF/UA, PDF/A and the XMP of the attachments) and the output intent of PDF/A |
 | `XmpFragment` | The XMP fragment of the attachments, split into its extension schemas and the rest of its descriptions |
-| `PdfAttachments` | The embedded files of PDF/A-3: the file specifications, the `EmbeddedFiles` tree and the `AF` array |
+| `PdfAttachments` | The embedded files (PDF/A-3 or no PDF/A): the file specifications, the `EmbeddedFiles` tree and the `AF` array |
 | `PdfId` | The identifier of the trailer (`/ID`), computed from the content when saving |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
 | `ImageFit`, `Leaders`, `Shapes` | Where an image is drawn according to `Fit`, the leader of a table of contents and the paths of the boxes |

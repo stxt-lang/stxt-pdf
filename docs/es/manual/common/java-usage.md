@@ -61,7 +61,7 @@ Con `pdfA`, el PDF declara PDF/A y lleva lo que la norma pide: un perfil de colo
 admite además ficheros adjuntos, que es cómo se hace una factura electrónica Factur-X: el XML de la factura va dentro
 del PDF. Los adjuntos se pasan en cada llamada a `toPdf`, con su nombre, sus bytes, su tipo y su relación con el
 documento (`ALTERNATIVE` para el XML de una factura), y `withXmp` añade el fragmento de metadatos que Factur-X pide,
-tal como lo da su especificación. Sin PDF/A-3, un adjunto es un error (`ATTACHMENT_REQUIRES_PDFA3`). Con PDF/A, un JPEG
+tal como lo da su especificación. Sin PDF/A, un adjunto va igual; con PDF/A-2 es un error (`ATTACHMENT_REQUIRES_PDFA3`). Con PDF/A, un JPEG
 en CMYK es un error (`IMAGE_FORMAT`): se convierte antes a RGB.
 
 ## Recursos de varios sitios

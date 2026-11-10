@@ -31,7 +31,10 @@ final class PdfAttachments {
     private PdfAttachments() {
     }
 
-    /** Embeds the files of {@code attachments}, if there are any; whoever calls checked that the PDF is PDF/A-3. */
+    /**
+     * Embeds the files of {@code attachments}, if there are any; whoever calls checked that the PDF admits them
+     * (PDF/A-3, or no PDF/A).
+     */
     static void write(PDDocument doc, Attachments attachments) throws IOException {
         if (attachments.files().isEmpty()) {
             return;

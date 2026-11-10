@@ -61,7 +61,7 @@ With `pdfA`, the PDF declares PDF/A and carries what the standard asks for: a co
 (`A3B`, `A3A`) also allows embedded files, which is how a Factur-X electronic invoice is made: the XML of the invoice
 goes inside the PDF. The attachments are passed with each call to `toPdf`, with their name, their bytes, their type and
 their relationship with the document (`ALTERNATIVE` for the XML of an invoice), and `withXmp` adds the metadata
-fragment Factur-X requires, as its specification gives it. Without PDF/A-3, an attachment is an error
+fragment Factur-X requires, as its specification gives it. Without PDF/A, an attachment goes the same; with PDF/A-2 it is an error
 (`ATTACHMENT_REQUIRES_PDFA3`). With PDF/A, a JPEG in CMYK is an error (`IMAGE_FORMAT`): it is converted to RGB first.
 
 ## Resources from several places

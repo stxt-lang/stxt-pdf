@@ -81,7 +81,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `PdfOutline` | Los marcadores de los encabezados |
 | `PdfMetadata` | El título, el idioma, el paquete XMP (PDF/UA, PDF/A y el XMP de los adjuntos) y el perfil de salida de PDF/A |
 | `XmpFragment` | El fragmento XMP de los adjuntos, separado en sus esquemas de extensión y el resto de sus descripciones |
-| `PdfAttachments` | Los ficheros adjuntos de PDF/A-3: las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
+| `PdfAttachments` | Los ficheros adjuntos (PDF/A-3 o sin PDF/A): las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
 | `PdfId` | El identificador del tráiler (`/ID`), calculado del contenido al guardar |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
 | `ImageFit`, `Leaders`, `Shapes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice y los caminos de las cajas |

@@ -114,8 +114,9 @@ son de cada documento y van en la llamada: `toPdf(documento, destino, Attachment
 tipo, relación)` es inmutable y copia los bytes; `withDescription` y `withModified` dan la descripción y la fecha de
 modificación. Todo está en `model`. Los dos `toPdf` sin adjuntos equivalen a `Attachments.NONE`.
 
-Un adjunto sin `pdfA(A3B)` o `pdfA(A3A)` es `ATTACHMENT_REQUIRES_PDFA3`, un `StxtPdfException` de tipo `RESOURCE` (es la
-configuración de quien convierte, no el documento) y sin línea. Un XMP que no es XML, dos adjuntos con el mismo
+Un adjunto va con `pdfA(A3B)` o `pdfA(A3A)`, y también sin `pdfA`; con `pdfA(A2B)` o `pdfA(A2A)` es
+`ATTACHMENT_REQUIRES_PDFA3`, un `StxtPdfException` de tipo `RESOURCE` (es la configuración de quien convierte, no el
+documento) y sin línea. Un XMP que no es XML, dos adjuntos con el mismo
 nombre, un nombre en blanco o un tipo que no es `tipo/subtipo` son un `IllegalArgumentException` al construirlos, antes
 de convertir. `PdfDocumentWriter.write` recibe lo mismo (`ua`, `pdfA` y `Attachments`) como capa de bajo nivel.
 

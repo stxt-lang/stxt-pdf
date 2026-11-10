@@ -308,16 +308,50 @@ class PdfATest {
         }
     }
 
-    /** A file to embed in a PDF that is not PDF/A-3 is the fault of the configuration, not of the document. */
+    /**
+     * Without PDF/A the files are embedded the same, as any PDF allows: the same file specification, in the
+     * {@code EmbeddedFiles} tree and in {@code AF}, and the PDF is still PDF/UA-1 and declares no PDF/A.
+     */
     @Test
-    void anAttachmentNeedsPdfA3() {
-        for (PdfA pdfA : new PdfA[] {null, PdfA.A2B, PdfA.A2A}) {
+    void embedsTheFilesWithoutPdfA() throws Exception {
+        byte[] pdf = pdf(null, facturX());
+        assertEquals(Map.of(), PdfUa.failedRules(pdf, 1));
+        try (PDDocument doc = Loader.loadPDF(pdf)) {
+            PDDocumentCatalog catalog = doc.getDocumentCatalog();
+            Map<String, PDComplexFileSpecification> files = catalog.getNames().getEmbeddedFiles().getNames();
+            assertEquals(List.of("factur-x.xml"), List.copyOf(files.keySet()));
+            PDComplexFileSpecification specification = files.get("factur-x.xml");
+            assertEquals("factur-x.xml", specification.getFile());
+            assertEquals("factur-x.xml", specification.getFileUnicode());
+            assertEquals("Factur-X invoice", specification.getFileDescription());
+            assertEquals("Alternative", specification.getCOSObject().getNameAsString("AFRelationship"));
+            PDEmbeddedFile file = specification.getEmbeddedFile();
+            assertEquals("text/xml", file.getSubtype());
+            assertArrayEquals(FACTUR_X_XML.getBytes(StandardCharsets.UTF_8), file.toByteArray());
+            assertNull(file.getModDate());
+            COSArray associated = (COSArray) catalog.getCOSObject().getDictionaryObject("AF");
+            assertEquals(1, associated.size());
+            assertEquals(specification.getCOSObject(), associated.getObject(0));
+            assertEquals(List.of(), catalog.getOutputIntents());
+            String xmp = new String(catalog.getMetadata().toByteArray(), StandardCharsets.UTF_8);
+            assertFalse(xmp.contains("pdfaid"), xmp);
+        }
+    }
+
+    /**
+     * A file to embed in a PDF/A that is not PDF/A-3 is the fault of the configuration, not of the document:
+     * PDF/A-2 only admits other PDF/A files.
+     */
+    @Test
+    void anAttachmentInAPdfANeedsPdfA3() {
+        for (PdfA pdfA : new PdfA[] {PdfA.A2B, PdfA.A2A}) {
             InvalidModelException e = assertThrows(InvalidModelException.class, () -> pdf(pdfA, facturX()),
                     String.valueOf(pdfA));
             assertEquals(ErrorCode.ATTACHMENT_REQUIRES_PDFA3, e.errorCode());
             assertEquals(StxtPdfException.Kind.RESOURCE, e.kind());
             assertEquals(StxtPdfException.NO_LINE, e.line());
             assertTrue(e.getMessage().contains("factur-x.xml"), e.getMessage());
+            assertTrue(e.getMessage().contains(pdfA.toString()), e.getMessage());
         }
     }
 

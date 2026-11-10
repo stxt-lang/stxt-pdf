@@ -81,8 +81,8 @@ public final class PdfDocumentWriter {
      *
      * @throws IllegalArgumentException if {@code ua} is neither 1 nor 2, or if it is 2 (PDF 2.0) with a PDF/A, which
      *         are PDF 1.7 files
-     * @throws InvalidModelException {@code ATTACHMENT_REQUIRES_PDFA3} if there are files to embed and the PDF is not
-     *         PDF/A-3
+     * @throws InvalidModelException {@code ATTACHMENT_REQUIRES_PDFA3} if there are files to embed and the PDF is a
+     *         PDF/A that is not PDF/A-3
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments) throws IOException {
@@ -155,8 +155,8 @@ public final class PdfDocumentWriter {
      *
      * @throws IllegalArgumentException if {@code ua} is neither 1 nor 2, or if it is 2 (PDF 2.0) with a PDF/A, which
      *         are PDF 1.7 files
-     * @throws InvalidModelException {@code ATTACHMENT_REQUIRES_PDFA3} if there are files to embed and the PDF is not
-     *         PDF/A-3
+     * @throws InvalidModelException {@code ATTACHMENT_REQUIRES_PDFA3} if there are files to embed and the PDF is a
+     *         PDF/A that is not PDF/A-3
      */
     private record PdfOptions(boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation,
                               Progress progress, String producer) {
@@ -169,11 +169,11 @@ public final class PdfDocumentWriter {
                 throw new IllegalArgumentException("PDF/UA-2 is a PDF 2.0 file and " + pdfA + " a PDF 1.7 one: "
                         + "a PDF cannot comply with both");
             }
-            if (!attachments.files().isEmpty() && (pdfA == null || !pdfA.allowsAttachments())) {
+            // Without PDF/A, any PDF carries files; of the PDF/A, only part 3.
+            if (!attachments.files().isEmpty() && pdfA != null && !pdfA.allowsAttachments()) {
                 throw new InvalidModelException(InvalidModelException.NO_LINE, ErrorCode.ATTACHMENT_REQUIRES_PDFA3,
-                        "Embedding a file (" + attachments.files().get(0).name() + ") needs PDF/A-3, "
-                        + "Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is "
-                        + (pdfA == null ? "not PDF/A" : pdfA));
+                        "Embedding a file (" + attachments.files().get(0).name() + ") in a PDF/A needs PDF/A-3, "
+                        + "Converter.builder().pdfA(PdfA.A3B) or PdfA.A3A; the PDF is " + pdfA);
             }
         }
     }

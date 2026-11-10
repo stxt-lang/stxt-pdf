@@ -127,9 +127,9 @@ sobre PDF 2.0, no está hecho.
 
 ### Ficheros adjuntos (Factur-X)
 
-Con PDF/A-3, el PDF lleva ficheros dentro. Es cómo funciona la factura electrónica Factur-X / ZUGFeRD: un PDF/A-3 con
-el XML de la factura adjunto. Los adjuntos se pasan en cada llamada, porque son de cada documento y no de la
-configuración:
+El PDF puede llevar ficheros dentro: con PDF/A-3, o sin PDF/A. Es cómo funciona la factura electrónica Factur-X /
+ZUGFeRD: un PDF/A-3 con el XML de la factura adjunto. Los adjuntos se pasan en cada llamada, porque son de cada
+documento y no de la configuración:
 
 ```java
 Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE)
@@ -145,16 +145,19 @@ mismo documento da los mismos bytes. `withXmp` añade los metadatos XMP que acom
 unos (el nombre del fichero, el tipo de documento, la versión y el perfil) y su especificación da el fragmento, que se
 pasa tal cual. El motor no sabe de facturas: no genera el XML ni sus metadatos, solo los incrusta.
 
-Un adjunto en un PDF que no es PDF/A-3 es un error, `ATTACHMENT_REQUIRES_PDFA3` ([Errores](errors.md#códigos)):
-PDF/A-2 solo admite adjuntar otros PDF/A.
+Un adjunto en un PDF/A-2 es un error, `ATTACHMENT_REQUIRES_PDFA3` ([Errores](errors.md#códigos)): PDF/A-2 solo admite
+adjuntar otros PDF/A. Sin PDF/A no hay norma que lo impida y el fichero se adjunta igual, con lo mismo que en un
+PDF/A-3 (también el `AF` del catálogo, que un visor de PDF 1.7 no mira); es lo que sirve para un PDF que se va a cifrar,
+que no puede ser PDF/A.
 
 > **Decisión:** los adjuntos van en la llamada a `toPdf` y no en el `Converter`: el `Converter` se crea una vez y se
 > comparte, y el XML de una factura es de esa factura. *Alternativa descartada:* `attach(...)` en el `builder`, que
 > obliga a un `Converter` por documento.
 
-> **Decisión:** un adjunto sin PDF/A-3 es un error y no un PDF con el fichero dentro: en PDF/A-2 está prohibido, y
-> fuera de PDF/A sería un caso más que no pide nadie. *Alternativa descartada:* admitirlo en cualquier PDF, que PDF 1.7
-> permite.
+> **Decisión:** un adjunto es un error solo donde la norma lo prohíbe, en PDF/A-2; sin PDF/A se adjunta, que PDF 1.7 lo
+> permite. Quien cifra el PDF no puede pedir PDF/A, y sin esto tenía que adjuntar el fichero por su cuenta con PDFBox:
+> dos formas de escribir lo mismo, que acababan siendo distintas. *Alternativa descartada:* exigir PDF/A-3 siempre, que
+> es lo que se hacía hasta la 0.13.0.
 
 > **Decisión:** el motor incrusta el XML que le dan y escribe los metadatos que le dan: Factur-X tiene perfiles y
 > versiones, y las facturas son de quien convierte. *Alternativa descartada:* `facturX(xml, perfil)`, que ataría el

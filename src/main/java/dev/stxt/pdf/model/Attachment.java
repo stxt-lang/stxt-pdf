@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
  * A file embedded in the PDF (reference/common/pdf.md): its name, its bytes, its media type and its relationship with
  * the document ({@code AFRelationship}). It is the piece of Factur-X / ZUGFeRD: the XML of the invoice is attached as
  * {@code factur-x.xml}, {@code text/xml}, {@link Relationship#ALTERNATIVE}, and the engine does not generate it, it
- * only embeds it. It needs PDF/A-3 ({@link PdfA}): with any other PDF, {@code ATTACHMENT_REQUIRES_PDFA3}. Immutable.
+ * only embeds it. It goes in a PDF/A-3 ({@link PdfA}) and in a PDF that is not PDF/A; with PDF/A-2,
+ * {@code ATTACHMENT_REQUIRES_PDFA3}. Immutable.
  *
  * <pre>{@code
  * Attachment invoice = Attachment.of("factur-x.xml", xml, "text/xml", Attachment.Relationship.ALTERNATIVE)

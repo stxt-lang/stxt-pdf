@@ -400,8 +400,9 @@ public final class Converter {
 
     /**
      * Lays out {@code document} and writes the PDF, with the files and the XMP of {@code attachments} embedded
-     * (reference/implementation/api.md), to {@code target}, which is not closed. A file to embed needs
-     * {@link Builder#pdfA PDF/A-3}: otherwise, {@code ATTACHMENT_REQUIRES_PDFA3}.
+     * (reference/implementation/api.md), to {@code target}, which is not closed. A file to embed goes
+     * in a {@link Builder#pdfA PDF/A-3} and in a PDF that is not PDF/A: with PDF/A-2,
+     * {@code ATTACHMENT_REQUIRES_PDFA3}.
      *
      * @param document the document as {@link DocumentReader} returns it; not {@code null}
      * @param target where the PDF is written; not {@code null}

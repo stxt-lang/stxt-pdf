@@ -395,8 +395,9 @@ public enum ErrorCode {
 
     // --- The PDF (when writing) --------------------------------------------------------------
     /**
-     * A file to embed ({@code Attachment}) in a PDF that is not PDF/A-3, the only one that admits files of any kind
-     * (reference/common/pdf.md); it belongs to no line: it is the configuration of whoever converts.
+     * A file to embed ({@code Attachment}) in a PDF/A that is not PDF/A-3, the only part that admits files of any
+     * kind (reference/common/pdf.md); it belongs to no line: it is the configuration of whoever converts. Without
+     * PDF/A there is no error: any PDF carries files.
      */
     ATTACHMENT_REQUIRES_PDFA3(Kind.RESOURCE),
 

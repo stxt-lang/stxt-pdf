@@ -49,8 +49,8 @@ class ErrorCatalogTest {
             ErrorCode.REFERENCE_UNSTABLE,
             // A PDF of more than 20 MB does not fit in the repository: LimitsTest tests it with a lower limit.
             ErrorCode.PDF_TOO_LARGE,
-            // It is not an error of a document but of the configuration of whoever converts (an attachment without
-            // PDF/A-3): PdfATest tests it.
+            // It is not an error of a document but of the configuration of whoever converts (an attachment in a
+            // PDF/A-2): PdfATest tests it.
             ErrorCode.ATTACHMENT_REQUIRES_PDFA3);
 
     private final DocumentReader reader = new DocumentReader();

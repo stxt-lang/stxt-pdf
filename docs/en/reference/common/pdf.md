@@ -128,9 +128,9 @@ PDF/A-4, on PDF 2.0, is not done.
 
 ### Embedded files (Factur-X)
 
-With PDF/A-3, the PDF carries files inside. It is how the Factur-X / ZUGFeRD electronic invoice works: a PDF/A-3 with
-the XML of the invoice embedded. The attachments are passed with each call, because they belong to each document and
-not to the configuration:
+The PDF can carry files inside: with PDF/A-3, or without PDF/A. It is how the Factur-X / ZUGFeRD electronic invoice
+works: a PDF/A-3 with the XML of the invoice embedded. The attachments are passed with each call, because they belong
+to each document and not to the configuration:
 
 ```java
 Attachment xml = Attachment.of("factur-x.xml", bytes, "text/xml", Attachment.Relationship.ALTERNATIVE)
@@ -147,16 +147,19 @@ attachments: Factur-X requires some (the file name, the document type, the versi
 specification gives the fragment, which is passed as it is. The engine knows nothing about invoices: it does not
 generate the XML or its metadata, it only embeds them.
 
-An attachment in a PDF that is not PDF/A-3 is an error, `ATTACHMENT_REQUIRES_PDFA3` ([Errors](errors.md#codes)):
-PDF/A-2 only allows embedding other PDF/A files.
+An attachment in a PDF/A-2 is an error, `ATTACHMENT_REQUIRES_PDFA3` ([Errors](errors.md#codes)): PDF/A-2 only allows
+embedding other PDF/A files. Without PDF/A no standard forbids it and the file is embedded the same, with what a
+PDF/A-3 carries (the `AF` of the catalog too, which a PDF 1.7 viewer does not look at); it is what a PDF that is going
+to be encrypted needs, since it cannot be PDF/A.
 
 > **Decision:** the attachments go in the call to `toPdf` and not in the `Converter`: the `Converter` is created once
 > and shared, and the XML of an invoice belongs to that invoice. *Rejected alternative:* `attach(...)` in the
 > `builder`, which forces one `Converter` per document.
 
-> **Decision:** an attachment without PDF/A-3 is an error and not a PDF with the file inside: in PDF/A-2 it is
-> forbidden, and outside PDF/A it would be one more case nobody asks for. *Rejected alternative:* allowing it in any
-> PDF, which PDF 1.7 permits.
+> **Decision:** an attachment is an error only where the standard forbids it, in PDF/A-2; without PDF/A it is embedded,
+> which PDF 1.7 permits. Whoever encrypts the PDF cannot ask for PDF/A, and without this had to embed the file on their
+> own with PDFBox: two ways of writing the same thing, which ended up being different. *Rejected alternative:* requiring
+> PDF/A-3 always, which is what was done up to 0.13.0.
 
 > **Decision:** the engine embeds the XML it is given and writes the metadata it is given: Factur-X has profiles and
 > versions, and the invoices belong to the caller. *Rejected alternative:* `facturX(xml, profile)`, which would tie the
