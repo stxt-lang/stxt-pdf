@@ -59,7 +59,7 @@ are always included. Of an exception, what is read from it is promised, not its 
 | `resources.ResourceException`, `resources.ImageFormatException`, `model.InternalException`, `model.CancelledException` | `CODE` and what it inherits |
 | `layout.LaidOutDocument` | All |
 | `fragment.Page`, `fragment.Fragment`, `fragment.TextLine`, `fragment.TextLine.Run`, `fragment.Rule` | All |
-| `fragment.Placed`, `fragment.Placed.Column` | All |
+| `fragment.PageFragment`, `fragment.PageFragment.Column` | All |
 | `tree.PageSetup`, `tree.PageSetup.Paper`, `tree.PageSetup.Orientation`, `tree.Metadata` | All |
 | `tree.Box` | `id()`, `element()`, `role()`, `line()`, `anonymous()`, `parent()`, `children()`, `text()` |
 | `tree.Element` | Its constants, `canonicalName()`, `label()`, `role()`, `headingLevel()` |
@@ -75,7 +75,7 @@ What `layOut` returns is part of the contract: `LaidOutDocument`, its pages and 
 one, its lines and the text of each run, and, of the box of each fragment, what identifies it and places it in the
 document. A service can count the pages or measure how full each one is without painting anything. They are `record`s
 that only gain components: what a component says today it will always say. Where each fragment ended up on the paper
-is what `Placed` says ([Where each box ended up](#where-each-box-ended-up)), which is part of the contract too.
+is what `PageFragment` says ([Where each box ended up](#where-each-box-ended-up)), which is part of the contract too.
 
 Everything else the jar exposes as public is so because another package of the engine uses it, not for the caller:
 `Engine`, `PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` and the groups of `Style`, `Resources.fonts()` and
@@ -608,7 +608,7 @@ left half written. Underneath, `PdfDocumentWriter.write` has the same overload w
 LaidOutDocument laidOut = converter.layOut(doc);
 try (PDDocument pdf = new PDDocument()) {
     converter.toPdf(laidOut, pdf);
-    for (Placed signature : laidOut.placed("signature")) {    // one fragment per page the box falls on
+    for (PageFragment signature : laidOut.fragments("signature")) {    // one fragment per page the box falls on
         Rect box = signature.borderBox();                     // in points, from the top left of the paper
         PDPage page = pdf.getPage(signature.page() - 1);
         float height = page.getMediaBox().getHeight();        // PDF measures from the bottom
@@ -619,15 +619,15 @@ try (PDDocument pdf = new PDDocument()) {
 ```
 
 A `Fragment` only says where it is inside the content box of its parent. Whoever draws over a laid-out box (a stamp, a
-signature, the filling of the blank it leaves) needs to know where it is on the paper, and that is what `Placed`
+signature, the filling of the blank it leaves) needs to know where it is on the paper, and that is what `PageFragment`
 (`fragment`) says: a fragment with its boxes **in points from the top left corner of the paper**, with `y` growing
 downward, which are the coordinates the page is painted with. They are reached from three places:
 
-- `laidOut.placed(id)`: the fragments of the box with that `Id`, in page order; one for each page it falls on, and in a
+- `laidOut.fragments(id)`: the fragments of the box with that `Id`, in page order; one for each page it falls on, and in a
   `Page overlay`, one for each page it repeats on. Empty if no laid-out box has that `Id`.
-- `laidOut.placedById()`: the same for every box with an `Id`, by `Id`, in a single pass through the document.
-  `placed(id)` goes through the whole document each time: whoever asks for many boxes asks for this map once.
-- `page.placed()`: the roots of a page, in the order they are painted in: its flow, its footnote area if it has one and
+- `laidOut.fragmentsById()`: the same for every box with an `Id`, by `Id`, in a single pass through the document.
+  `fragments(id)` goes through the whole document each time: whoever asks for many boxes asks for this map once.
+- `page.fragments()`: the roots of a page, in the order they are painted in: its flow, its footnote area if it has one and
   its `Page overlay` boxes. `children()` goes down from each one.
 
 | Method | What it gives |
@@ -639,7 +639,7 @@ downward, which are the coordinates the page is painted with. They are reached f
 | `bounds()` | The rectangle of the paper that encloses the border box as it is painted, with its rotation and those of its ancestors. Without rotations, `borderBox()`. |
 | `inFlow()` | Whether it is in the flow of its parent: `false` in an `Overlay`, a `Page overlay` and the footnote area. A `Frame` is in the flow, moved. |
 | `children()` | Its child fragments, already placed, in tree order: those of its flow and, after them, the `Overlay` boxes it resolves. |
-| `columns()` | In a `Columns`, its columns from left to right, **the empty ones too**: the box of each one (its width, and the height of the content box of the fragment) and its content on that page (`flow()`, a `Placed`; `null` in a column the content did not reach). Empty in the other boxes. |
+| `columns()` | In a `Columns`, its columns from left to right, **the empty ones too**: the box of each one (its width, and the height of the content box of the fragment) and its content on that page (`flow()`, a `PageFragment`; `null` in a column the content did not reach). Empty in the other boxes. |
 | `painted()` | The rectangle of the paper that encloses what the fragment and what it has in its flow **paint**, with the rotations applied; empty if they paint nothing. |
 
 **What is painted** (`painted()`) is not what the box takes up: a box with neither border nor background reaches the
@@ -655,23 +655,23 @@ columns are those from before the rotation: inside a box with `Rotate`, its chil
 it, which is what their positions refer to. Where each thing is seen is what `bounds()` and `painted()` say. In a box
 rotated in flow, `bounds()` is the room it takes up in the flow.
 
-`PlacedMatchesPaintingTest` lays out every case of `test/golden` and checks that each fragment has in `Placed` the same
+`PageFragmentMatchesPaintingTest` lays out every case of `test/golden` and checks that each fragment has in `PageFragment` the same
 box and the same rectangle as in the walk the page is painted with.
 
 > **Decision:** the position on the paper is asked for, and not stored in the `Fragment`: a fragment is placed inside
 > its parent, and during the layout it moves whole with it (a column to its place, a row to its page) without touching
-> its descendants. `Placed` adds it up when asked, with the same rule the page is painted with. *Rejected
+> its descendants. `PageFragment` adds it up when asked, with the same rule the page is painted with. *Rejected
 > alternatives:* storing the absolute position in each fragment, which would force rewriting the subtree at every move;
 > leaving the sum to the integrator, which is repeating outside what the engine knows (the origin of the page area, the
 > unrotated box of a box rotated in flow, that a `Page overlay` does not turn with the box that declares it, how many
 > columns come out of a `Min column width`), and a change in the engine would move their drawings without any error.
 
-> **Decision:** the boxes of `Placed` are those from before the rotation, and `bounds()` and `painted()`, those from
+> **Decision:** the boxes of `PageFragment` are those from before the rotation, and `bounds()` and `painted()`, those from
 > after it: with the first ones one goes down to the children and understands the box, with the second ones one knows
 > which part of the paper it touches. *Rejected alternative:* giving only the rectangle that encloses what is rotated,
 > from which the place of nothing inside can be worked out.
 
-> **Decision:** `placed(id)` gives an empty list, and not an error, if no box has that `Id`: a box with an `Id` may be
+> **Decision:** `fragments(id)` gives an empty list, and not an error, if no box has that `Id`: a box with an `Id` may be
 > on no page (a `Page overlay` with `Pages: not-first` in a one-page document), and the integrator decides whether
 > that is an error. *Rejected alternative:* an exception, which would force knowing beforehand whether the box was laid
 > out.

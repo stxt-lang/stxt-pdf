@@ -3,7 +3,7 @@ package dev.stxt.pdf.paint;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.fragment.Placed;
+import dev.stxt.pdf.fragment.PageFragment;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Rect;
@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@link Placed} says where each fragment is with its own walk through the page, and the painting with that of
- * {@link StackingContext}: the two have to agree, or whoever draws over a box with what {@code Placed} says would draw
- * somewhere else. Every golden case ({@code test/golden}: each layout algorithm, the overlays, the rotations, the
+ * {@link PageFragment} says where each fragment is with its own walk through the page, and the painting with that of
+ * {@link StackingContext}: the two have to agree, or whoever draws over a box with what {@code PageFragment} says would
+ * draw somewhere else. Every golden case ({@code test/golden}: each layout algorithm, the overlays, the rotations, the
  * footnotes) is laid out and, page by page, each fragment of the flow and of the footnote area has to have the same
  * border box and the same enclosing rectangle in both.
  */
-class PlacedMatchesPaintingTest {
+class PageFragmentMatchesPaintingTest {
 
     private static final Path GOLDEN = Path.of("test", "golden");
     private static final double TOLERANCE = 1e-6;
@@ -60,18 +60,18 @@ class PlacedMatchesPaintingTest {
             StackingContext.build(page.content(), page.footnotes(), List.of(), area.x(), area.y())
                     .visit((f, borderBox, turns) -> painted.add(new Seen(f, borderBox, turns.envelope(borderBox))));
 
-            List<Seen> placed = new ArrayList<>();
+            List<Seen> asked = new ArrayList<>();
             // The flow and the footnote area: the painting does not walk through the Page overlay boxes of the page.
-            List<Placed> roots = page.placed();
-            for (Placed root : roots.subList(0, page.footnotes() != null ? 2 : 1)) {
-                collect(root, placed);
+            List<PageFragment> roots = page.fragments();
+            for (PageFragment root : roots.subList(0, page.footnotes() != null ? 2 : 1)) {
+                collect(root, asked);
             }
 
             String where = dir.getFileName() + ", page " + page.number();
-            assertEquals(painted.size(), placed.size(), where);
+            assertEquals(painted.size(), asked.size(), where);
             for (int i = 0; i < painted.size(); i++) {
                 Seen expected = painted.get(i);
-                Seen actual = placed.get(i);
+                Seen actual = asked.get(i);
                 String which = where + ", fragment " + i + " (" + expected.fragment().box().describe() + ")";
                 assertSame(expected.fragment(), actual.fragment(), which);
                 assertRect(expected.borderBox(), actual.borderBox(), which + ", border box");
@@ -81,9 +81,9 @@ class PlacedMatchesPaintingTest {
     }
 
     /** Document order: an ancestor before its descendants. */
-    private static void collect(Placed placed, List<Seen> seen) {
-        seen.add(new Seen(placed.fragment(), placed.borderBox(), placed.bounds()));
-        for (Placed child : placed.children()) {
+    private static void collect(PageFragment node, List<Seen> seen) {
+        seen.add(new Seen(node.fragment(), node.borderBox(), node.bounds()));
+        for (PageFragment child : node.children()) {
             collect(child, seen);
         }
     }

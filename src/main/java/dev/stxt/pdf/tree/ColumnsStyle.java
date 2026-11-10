@@ -102,7 +102,7 @@ public final class ColumnsStyle extends StyleGroup {
      * The number of columns (reference/components/columns.md): with only {@code Count}, that number; with only
      * {@code Min column width}, as many columns of at least that width as fit, and at least one; with both, as many
      * as fit without exceeding {@code Count}. The only place that computes it: the layout and whoever asks where the
-     * columns ended up ({@code Placed.columns()}) read it here.
+     * columns ended up ({@code PageFragment.columns()}) read it here.
      *
      * @param count     {@code Count}; {@code null} if it is not declared
      * @param minWidth  {@code Min column width}, in points; {@code null} if it is not declared

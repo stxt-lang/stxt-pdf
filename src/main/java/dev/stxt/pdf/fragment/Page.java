@@ -68,11 +68,11 @@ public record Page(int number, Fragment content, List<Fragment> pageOverlays, Pa
     }
 
     /**
-     * {@return the fragments of the page where they are on the paper ({@link Placed}), in the order they are painted
-     * in: its flow ({@link #content()}), its footnote area if it has one and its {@code Page overlay} boxes. Each one
-     * gives its descendants ({@link Placed#children()})}
+     * {@return the fragments of the page where they are on the paper ({@link PageFragment}), in the order they are
+     * painted in: its flow ({@link #content()}), its footnote area if it has one and its {@code Page overlay} boxes.
+     * Each one gives its descendants ({@link PageFragment#children()})}
      */
-    public List<Placed> placed() {
-        return Placed.of(this);
+    public List<PageFragment> fragments() {
+        return PageFragment.of(this);
     }
 }

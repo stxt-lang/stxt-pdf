@@ -24,9 +24,9 @@ import java.util.Optional;
  * signature, the filling of the blank it leaves) asks here instead of adding up the borders and the paddings of its
  * ancestors.
  *
- * <p>They come from {@link Page#placed()}, the roots of a page, and from
- * {@code LaidOutDocument.placed(id)}, the fragments of the box with an {@code Id}; {@link #children()} goes down from
- * each one. Immutable, like the fragment it places.</p>
+ * <p>They come from {@link Page#fragments()}, the roots of a page, and from
+ * {@code LaidOutDocument.fragments(id)}, the fragments of the box with an {@code Id}; {@link #children()} goes down from
+ * each one. Immutable, like its fragment.</p>
  *
  * <p>The boxes are the unrotated ones: inside a box with {@code Rotate}
  * (reference/common/layers-and-rotation.md), where its content is before the rotation, which is what its children
@@ -34,9 +34,9 @@ import java.util.Optional;
  * {@code Overflow: clip} and the rounded corners are not taken into account: they hide content, they do not move
  * it.</p>
  */
-public final class Placed {
+public final class PageFragment {
 
-    /** No rotation. It is shared: nobody modifies a transform once a {@code Placed} holds it. */
+    /** No rotation. It is shared: nobody modifies a transform once a {@code PageFragment} holds it. */
     private static final AffineTransform UNROTATED = new AffineTransform();
 
     private final int page;
@@ -49,7 +49,7 @@ public final class Placed {
      * A fragment at ({@code x}, {@code y}) of the paper: the position of its border box or, in a box rotated in flow,
      * of the rectangle that encloses it.
      */
-    private Placed(int page, Fragment fragment, double x, double y, AffineTransform outer) {
+    private PageFragment(int page, Fragment fragment, double x, double y, AffineTransform outer) {
         this.page = page;
         this.fragment = fragment;
         this.borderBox = fragment.borderBox(x, y);
@@ -60,16 +60,17 @@ public final class Placed {
      * The roots of a page, as it is painted: the flow, at the corner of the page area; the footnote area, if the page
      * has one, and the {@code Page overlay} boxes, relative to it.
      */
-    static List<Placed> of(Page page) {
+    static List<PageFragment> of(Page page) {
         Rect area = page.pageSetup().pageArea();
-        List<Placed> roots = new ArrayList<>();
-        roots.add(new Placed(page.number(), page.content(), area.x(), area.y(), UNROTATED));
+        List<PageFragment> roots = new ArrayList<>();
+        roots.add(new PageFragment(page.number(), page.content(), area.x(), area.y(), UNROTATED));
         if (page.footnotes() != null) {
             Fragment notes = page.footnotes();
-            roots.add(new Placed(page.number(), notes, area.x() + notes.x(), area.y() + notes.y(), UNROTATED));
+            roots.add(new PageFragment(page.number(), notes, area.x() + notes.x(), area.y() + notes.y(), UNROTATED));
         }
         for (Fragment overlay : page.pageOverlays()) {
-            roots.add(new Placed(page.number(), overlay, area.x() + overlay.x(), area.y() + overlay.y(), UNROTATED));
+            roots.add(new PageFragment(page.number(), overlay, area.x() + overlay.x(), area.y() + overlay.y(),
+                    UNROTATED));
         }
         return List.copyOf(roots);
     }
@@ -118,20 +119,20 @@ public final class Placed {
     }
 
     /**
-     * {@return its child fragments, placed, in tree order: those of its flow and, after them, the {@code Overlay}
+     * {@return its child fragments, on the paper like this one, in tree order: those of its flow and, after them, the {@code Overlay}
      * boxes it resolves}
      */
-    public List<Placed> children() {
+    public List<PageFragment> children() {
         if (fragment.children().isEmpty()) {
             return List.of();
         }
         Rect content = contentBox();
         AffineTransform inner = inner();
-        List<Placed> children = new ArrayList<>(fragment.children().size());
+        List<PageFragment> children = new ArrayList<>(fragment.children().size());
         for (Fragment child : fragment.children()) {
             // A Page overlay is of the page: it does not turn with the box that declares it.
             boolean ofThePage = child.box().style().position() == Position.PAGE_OVERLAY;
-            children.add(new Placed(page, child, content.x() + child.x(), content.y() + child.y(),
+            children.add(new PageFragment(page, child, content.x() + child.x(), content.y() + child.y(),
                     ofThePage ? UNROTATED : inner));
         }
         return List.copyOf(children);
@@ -154,7 +155,7 @@ public final class Placed {
         int count = columns.countIn(content.width());
         double width = columns.widthIn(content.width());
         // The layout fills them in order: the k-th flow is that of the k-th column.
-        List<Placed> flows = children().stream()
+        List<PageFragment> flows = children().stream()
                 .filter(child -> child.fragment().box().role() == Element.Role.FLOW).toList();
         List<Column> result = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -206,11 +207,11 @@ public final class Placed {
         for (Rule rule : fragment.rules()) {
             add(reach, inner, new Rect(content.x() + rule.x(), content.y() + rule.y(), rule.width(), rule.height()));
         }
-        List<Placed> children = children();
+        List<PageFragment> children = children();
         if (style.layout() == Layout.COLUMNS && style.columns().separator() > 0) {
             addSeparators(reach, inner, content, style.columns().separator(), children);
         }
-        for (Placed child : children) {
+        for (PageFragment child : children) {
             if (child.inFlow()) {
                 child.addPainted(reach);
             }
@@ -222,8 +223,8 @@ public final class Placed {
      * tall as the tallest column, as it is painted.
      */
     private static void addSeparators(double[] reach, AffineTransform inner, Rect content, double thickness,
-                                      List<Placed> children) {
-        List<Fragment> flows = children.stream().map(Placed::fragment)
+                                      List<PageFragment> children) {
+        List<Fragment> flows = children.stream().map(PageFragment::fragment)
                 .filter(f -> f.box().role() == Element.Role.FLOW).toList();
         double height = flows.stream().mapToDouble(Fragment::height).max().orElse(0);
         for (int i = 1; i < flows.size(); i++) {
@@ -265,16 +266,16 @@ public final class Placed {
     @Override
     public String toString() {
         Box box = fragment.box();
-        return "Placed[page=" + page + ", " + box.element() + (box.id() != null ? " " + box.id() : "") + ", borderBox="
-                + borderBox + "]";
+        return "PageFragment[page=" + page + ", " + box.element() + (box.id() != null ? " " + box.id() : "")
+                + ", borderBox=" + borderBox + "]";
     }
 
     /**
      * A column of a fragment of a {@code Columns}.
      *
      * @param box  the column on the paper, unrotated: its width, and the height of the content box of the fragment
-     * @param flow the content the column has on this page, placed; {@code null} in a column the content did not reach
+     * @param flow the content the column has on this page; {@code null} in a column the content did not reach
      */
-    public record Column(Rect box, Placed flow) {
+    public record Column(Rect box, PageFragment flow) {
     }
 }

@@ -43,7 +43,7 @@ Las dependencias van en un solo sentido y sin ciclos. `ArchitectureTest` tiene e
 | `resources` | `model` | La carpeta de recursos (`Resources`), las fuentes (`FontLibrary`, `FontFile`, `KerningPairs`) y las imágenes (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | El árbol de cajas (`Box`, `Element`, `Style` y sus grupos) y su construcción (`BoxTreeBuilder` y sus piezas), los errores del modelo (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
-| `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, `Rule` (las líneas de una tabla con bordes fusionados), los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`), las reglas de corte (`BreakRules`) y `Placed`, un fragmento con sus cajas en el papel |
+| `fragment` | `model`, `tree` | El resultado del layout: `Fragment`, `Page`, `TextLine`, `Rule` (las líneas de una tabla con bordes fusionados), los tokens de corte (`BreakToken`, `BreakAppeal`, `Unit`), las reglas de corte (`BreakRules`) y `PageFragment`, un fragmento con sus cajas en el papel |
 | `layout` | `fragment`, `model`, `resources`, `tree` | El motor (`Engine`, `Paginator`, `Overflow`, `ModuleSizes`) y un subpackage por algoritmo: `block`, `inline` (con `inline.hyphenation`, los patrones de partición), `stack`, `grid`, `table`, `columns`, `position` e `image` |
 | `output` | `fragment`, `model` | `StxtDump`, el volcado de los tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | El pintado (`StackingContext`, `Canvas`) y los dos lienzos: el PDF (`PdfDocumentWriter`, `PdfCanvas` y sus piezas) y el SVG (`SvgCanvas`) |

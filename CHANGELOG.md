@@ -15,15 +15,15 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   would merge with them. They neither stay inside the box nor come out of it, so the content of a box with a
   background, of a cell or of a section starts and ends at its edge whatever margins a rule gives its elements. It can
   come from a rule of `Styles`, except in a `Section`. "Trimming the margins" in the reference of `Block`.
-- **Where each box ended up on the paper.** `LaidOutDocument.placed(id)` gives the fragments of the box with that
-  `Id`, one per page it falls on, as `Placed` (`fragment`): the fragment with its border box and its content box in
-  points from the top left corner of the paper, which a `Fragment` only gives relative to its parent.
-  `placedById()` gives them for every box with an `Id` in one pass, and `Page.placed()`, the roots of a page;
-  `children()` goes down from each one. A `Placed` also says the rectangle that encloses it once rotated (`bounds()`),
-  whether it is in the flow (`inFlow()`), the columns of a `Columns`, the empty ones too, each with its box and its
-  content (`columns()`), and the rectangle that encloses what it and its flow really paint (`painted()`): where the
-  content of a page or of a column ends, to draw over a laid out box or to fill the blank below it without adding up
-  borders and paddings outside the engine. It is in the promised API. "Where each box ended up" in "Using from Java".
+- **Where each box ended up on the paper.** `LaidOutDocument.fragments(id)` gives the fragments of the box with that
+  `Id`, one per page it falls on, as `PageFragment` (`fragment`): the fragment with its border box and its content box
+  in points from the top left corner of the paper, which a `Fragment` only gives relative to its parent.
+  `fragmentsById()` gives them for every box with an `Id` in one pass, and `Page.fragments()`, the roots of a page;
+  `children()` goes down from each one. A `PageFragment` also says the rectangle that encloses it once rotated
+  (`bounds()`), whether it is in the flow (`inFlow()`), the columns of a `Columns`, the empty ones too, each with its
+  box and its content (`columns()`), and the rectangle that encloses what it and its flow really paint (`painted()`):
+  where the content of a page or of a column ends, to draw over a laid out box or to fill the blank below it without
+  adding up borders and paddings outside the engine. It is in the promised API. "Where each box ended up" in "Using from Java".
 
 ## [0.13.0] - 2026-11-08
 
@@ -208,7 +208,7 @@ still change before 1.0.
   of a row that is split together with the following ones (an item takes up several rows), one that `Max height` keeps
   shorter than its row and a box that is not broken (`Rotate`, `Overflow: clip`) are not lengthened: they keep the
   height they had unsplit. "Breaks in `Stack`, `Grid` and `Table`" in the reference.
-  `UnitBreaker.Placed` has a new component, `stretched` (the constructor without it stays), and `ConstraintSpace`, the
+  `UnitBreaker.PageFragment` has a new component, `stretched` (the constructor without it stays), and `ConstraintSpace`, the
   method `withFixedHeight`.
 
 ### Fixed

@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Where each fragment ended up on the paper ({@link Placed}, reference/implementation/api.md). Pages of 595 pt wide
- * with margins of 40: the page area starts at (40, 40) and measures 515 wide. With the fixed metrics, a character
- * measures 5 pt and a line 12.
+ * Where each fragment ended up on the paper ({@link PageFragment}, reference/implementation/api.md). Pages of 595 pt
+ * wide with margins of 40: the page area starts at (40, 40) and measures 515 wide. With the fixed metrics, a
+ * character measures 5 pt and a line 12.
  */
-class PlacedTest {
+class PageFragmentTest {
 
     /**
      * What makes a block of a container whole ({@code Keep together}): a block with only a {@code Height} can be
@@ -38,10 +38,10 @@ class PlacedTest {
         return Math.round(v * 100) / 100.0;
     }
 
-    private static Placed only(LaidOutDocument document, String id) {
-        List<Placed> placed = document.placed(id);
-        assertEquals(1, placed.size(), id);
-        return placed.get(0);
+    private static PageFragment only(LaidOutDocument document, String id) {
+        List<PageFragment> found = document.fragments(id);
+        assertEquals(1, found.size(), id);
+        return found.get(0);
     }
 
     /** A box of 30 inside another with a border of 2 and a padding of 10 20 30 40 (top, right, bottom, left). */
@@ -50,7 +50,7 @@ class PlacedTest {
         LaidOutDocument document = LayoutFixture.layOut(
                 "\tBlock:", "\t\tId: O", "\t\tBox:", "\t\t\tBorder: 2", "\t\t\tPadding: 10 20 30 40",
                 "\t\tBlock:", "\t\t\tId: I", "\t\t\tBox:", "\t\t\t\tHeight: 30").document();
-        Placed outer = only(document, "O");
+        PageFragment outer = only(document, "O");
         assertEquals(1, outer.page());
         assertEquals("O", outer.fragment().box().id());
         assertRect(40, 40, 515, 74, outer.borderBox());
@@ -58,7 +58,7 @@ class PlacedTest {
         assertEquals(outer.borderBox(), outer.bounds());
         assertTrue(outer.inFlow());
 
-        Placed inner = only(document, "I");
+        PageFragment inner = only(document, "I");
         assertRect(82, 52, 451, 30, inner.borderBox());
         // Going down from the parent gives the same box as asking for the child.
         assertEquals(1, outer.children().size());
@@ -70,9 +70,9 @@ class PlacedTest {
     void aBoxThatIsNotThereGivesNothing() {
         LaidOutDocument document = LayoutFixture.layOut("\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 30")
                 .document();
-        assertEquals(List.of(), document.placed("B"));
-        assertFalse(document.placedById().containsKey("B"));
-        assertThrows(NullPointerException.class, () -> document.placed(null));
+        assertEquals(List.of(), document.fragments("B"));
+        assertFalse(document.fragmentsById().containsKey("B"));
+        assertThrows(NullPointerException.class, () -> document.fragments(null));
     }
 
     /** Page area of 100: after a block of 30, the two blocks of 50 of {@code O} do not fit on the first page. */
@@ -83,8 +83,8 @@ class PlacedTest {
                 "\tBlock:", "\t\tId: O",
                 "\t\tBlock:", "\t\t\tId: C1", "\t\t\tBox:", "\t\t\t\tHeight: 50", WHOLE[0], WHOLE[1],
                 "\t\tBlock:", "\t\t\tId: C2", "\t\t\tBox:", "\t\t\t\tHeight: 50", WHOLE[0], WHOLE[1]).document();
-        List<Placed> outer = document.placed("O");
-        assertEquals(List.of(1, 2), outer.stream().map(Placed::page).toList());
+        List<PageFragment> outer = document.fragments("O");
+        assertEquals(List.of(1, 2), outer.stream().map(PageFragment::page).toList());
         assertRect(40, 70, 515, 50, outer.get(0).borderBox());
         assertEquals(40, outer.get(1).borderBox().y(), 1e-9);
         assertTrue(outer.get(0).fragment().first());
@@ -100,10 +100,10 @@ class PlacedTest {
                 "\tBlock:", "\t\tId: O",
                 "\t\tBlock:", "\t\t\tId: C1", "\t\t\tBox:", "\t\t\t\tHeight: 50", WHOLE[0], WHOLE[1],
                 "\t\tBlock:", "\t\t\tId: C2", "\t\t\tBox:", "\t\t\t\tHeight: 50", WHOLE[0], WHOLE[1]).document();
-        Map<String, List<Placed>> byId = document.placedById();
+        Map<String, List<PageFragment>> byId = document.fragmentsById();
         assertEquals(List.of("A", "O", "C1", "C2"), byId.keySet().stream().filter(id -> id.length() <= 2).toList());
         for (String id : List.of("A", "O", "C1", "C2")) {
-            List<Placed> asked = document.placed(id);
+            List<PageFragment> asked = document.fragments(id);
             assertEquals(asked.size(), byId.get(id).size(), id);
             for (int i = 0; i < asked.size(); i++) {
                 assertEquals(asked.get(i).page(), byId.get(id).get(i).page(), id);
@@ -120,14 +120,14 @@ class PlacedTest {
                 "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 80",
                 "\tPage overlay:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 10");
-        List<Placed> overlay = l.document().placed("F");
-        assertEquals(List.of(1, 2), overlay.stream().map(Placed::page).toList());
-        for (Placed placed : overlay) {
-            assertEquals(l.rect(placed.page(), "F"), placed.borderBox());
-            assertFalse(placed.inFlow());
+        List<PageFragment> overlay = l.document().fragments("F");
+        assertEquals(List.of(1, 2), overlay.stream().map(PageFragment::page).toList());
+        for (PageFragment each : overlay) {
+            assertEquals(l.rect(each.page(), "F"), each.borderBox());
+            assertFalse(each.inFlow());
         }
         // The roots of a page: its flow and its Page overlay boxes.
-        List<Placed> roots = l.document().pages().get(0).placed();
+        List<PageFragment> roots = l.document().pages().get(0).fragments();
         assertEquals(2, roots.size());
         assertRect(40, 40, 515, 100, roots.get(0).borderBox());
         assertEquals("F", roots.get(1).fragment().box().id());
@@ -143,8 +143,8 @@ class PlacedTest {
                 "\tColumns:", "\t\tId: M", "\t\tCount: 3", "\t\tGap: 15", "\t\tBalance: false",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #cccccc",
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 20").document();
-        Placed columns = only(document, "M");
-        List<Placed.Column> all = columns.columns();
+        PageFragment columns = only(document, "M");
+        List<PageFragment.Column> all = columns.columns();
         assertEquals(3, all.size());
         assertRect(40, 40, 161.67, 50, all.get(0).box());
         assertRect(216.67, 40, 161.67, 50, all.get(1).box());
@@ -165,7 +165,7 @@ class PlacedTest {
                 "\t\tBox:", "\t\t\tBorder: 5", "\t\t\tPadding: 10",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", WHOLE[0], WHOLE[1],
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 30", WHOLE[0], WHOLE[1]).document();
-        List<Placed.Column> all = only(document, "M").columns();
+        List<PageFragment.Column> all = only(document, "M").columns();
         assertEquals(2, all.size());
         // Content box of 485 from (55, 55): two columns of 235.
         assertRect(55, 55, 235, 30, all.get(0).box());
@@ -181,7 +181,7 @@ class PlacedTest {
         LaidOutDocument document = LayoutFixture.layOut(
                 "\tColumns:", "\t\tId: M", "\t\tMin column width: 150", "\t\tGap: 10",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", WHOLE[0], WHOLE[1]).document();
-        List<Placed.Column> all = only(document, "M").columns();
+        List<PageFragment.Column> all = only(document, "M").columns();
         assertEquals(3, all.size());
         assertRect(40, 40, 165, 30, all.get(0).box());
         assertRect(390, 40, 165, 30, all.get(2).box());
@@ -193,7 +193,7 @@ class PlacedTest {
         LaidOutDocument document = LayoutFixture.layOut(
                 "\tBlock:", "\t\tId: O", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tText: aaaa", "\t\t\tId: T").document();
-        Placed outer = only(document, "O");
+        PageFragment outer = only(document, "O");
         assertRect(40, 40, 515, 100, outer.borderBox());
         assertRect(40, 40, 20, 12, outer.painted().orElseThrow());
         assertRect(40, 40, 20, 12, only(document, "T").painted().orElseThrow());
@@ -221,7 +221,7 @@ class PlacedTest {
                 "\t\tText: aaaa",
                 "\t\tOverlay:", "\t\t\tId: V", "\t\t\tOffset: 60 auto auto 0",
                 "\t\t\tBox:", "\t\t\t\tWidth: 50", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #cccccc").document();
-        Placed overlay = only(document, "V");
+        PageFragment overlay = only(document, "V");
         assertFalse(overlay.inFlow());
         assertRect(40, 100, 50, 30, overlay.borderBox());
         assertRect(40, 100, 50, 30, overlay.painted().orElseThrow());
@@ -229,8 +229,8 @@ class PlacedTest {
     }
 
     /**
-     * A {@code Frame} of 200 × 50 rotated 90 degrees keeps its place in the flow: its box is the unrotated one, and what
-     * is seen is 50 × 200 around its center, (140, 165), after a block of 100. What it contains turns with it.
+     * A {@code Frame} of 200 × 50 rotated 90 degrees keeps its place in the flow: its box is the unrotated one, and
+     * what is seen is 50 × 200 around its center, (140, 165), after a block of 100. What it contains turns with it.
      */
     @Test
     void aRotatedBoxSaysWhereItIsAndWhereItIsSeen() {
@@ -239,10 +239,10 @@ class PlacedTest {
                 "\tFrame:", "\t\tId: R", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 50",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 20", "\t\t\t\tBackground: #cccccc")
                 .document();
-        Placed frame = only(document, "R");
+        PageFragment frame = only(document, "R");
         assertRect(40, 140, 200, 50, frame.borderBox());
         assertRect(115, 65, 50, 200, frame.bounds());
-        Placed child = only(document, "C");
+        PageFragment child = only(document, "C");
         assertRect(40, 140, 200, 20, child.borderBox());
         // The strip at the top of the unrotated box ends up at the right of the rotated one.
         assertRect(145, 65, 20, 200, child.bounds());
@@ -258,7 +258,7 @@ class PlacedTest {
         LaidOutDocument document = LayoutFixture.layOut(
                 "\tBlock:", "\t\tId: T", "\t\tRotate: 90", "\t\tBox:", "\t\t\tWidth: 200", "\t\t\tHeight: 50",
                 "\t\t\tBackground: #cccccc").document();
-        Placed turned = only(document, "T");
+        PageFragment turned = only(document, "T");
         assertRect(40, 40, 50, 200, turned.bounds());
         assertRect(-35, 115, 200, 50, turned.borderBox());
         assertRect(40, 40, 50, 200, turned.painted().orElseThrow());
