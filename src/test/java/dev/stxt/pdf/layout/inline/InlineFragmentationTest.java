@@ -1,18 +1,19 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.model.TextFormat;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPagedRuns;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.TextFormat;
 
 /**
  * Pages of 180 pt with margins of 40: page area of 515 × 100 from (40, 40). With

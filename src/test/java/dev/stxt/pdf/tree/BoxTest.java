@@ -1,19 +1,20 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.Value;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /** The box tree is written only in {@code tree} and does not change after it is built. */
 class BoxTest {

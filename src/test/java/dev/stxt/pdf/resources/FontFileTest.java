@@ -1,8 +1,7 @@
 package dev.stxt.pdf.resources;
 
-import org.apache.fontbox.ttf.CmapLookup;
-import org.apache.fontbox.ttf.TrueTypeFont;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,8 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.apache.fontbox.ttf.CmapLookup;
+import org.apache.fontbox.ttf.TrueTypeFont;
+import org.junit.jupiter.api.Test;
 
 /** The widths of {@link FontFile} on the fonts of the repository, TTF and OTF, against what fontbox answers. */
 class FontFileTest {

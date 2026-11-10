@@ -1,17 +1,18 @@
 package dev.stxt.pdf.layout.columns;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.assertRect;
 import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.block;
 import static dev.stxt.pdf.layout.columns.ColumnsLayoutTest.columnsElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
 
 /**
  * Blocks in columns on pages of 180 pt with margins of 40: page area of 515 × 100 from

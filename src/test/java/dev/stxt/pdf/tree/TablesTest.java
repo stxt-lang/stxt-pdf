@@ -1,5 +1,14 @@
 package dev.stxt.pdf.tree;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.FontWeight;
@@ -9,14 +18,6 @@ import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Stroke;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Tables when building the tree (reference/components/table.md): translation into a grid, rows and cells. */
 class TablesTest {

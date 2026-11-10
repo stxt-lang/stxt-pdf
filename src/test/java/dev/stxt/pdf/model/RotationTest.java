@@ -1,13 +1,13 @@
 package dev.stxt.pdf.model;
 
-import org.junit.jupiter.api.Test;
-
-import java.awt.geom.AffineTransform;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.geom.AffineTransform;
+
+import org.junit.jupiter.api.Test;
 
 /** {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md). */
 class RotationTest {

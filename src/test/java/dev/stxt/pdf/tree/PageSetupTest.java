@@ -1,11 +1,12 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Rect;
 
 /** {@code Mirror margins} (reference/components/document.md): the medium of each physical page. */
 class PageSetupTest {

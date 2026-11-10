@@ -1,17 +1,5 @@
 package dev.stxt.pdf.resources;
 
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -19,6 +7,19 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
 
 /**
  * Resources that come from several places (reference/implementation/api.md): a folder of fonts, folders of images

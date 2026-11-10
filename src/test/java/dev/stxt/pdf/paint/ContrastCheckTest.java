@@ -1,19 +1,20 @@
 package dev.stxt.pdf.paint;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.model.Check;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The contrast of the text with what is below it (reference/common/pdf.md): 4.5:1, or 3:1 for large text, with the

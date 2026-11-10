@@ -1,26 +1,27 @@
 package dev.stxt.pdf.stxt;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.TextNode;
-import dev.stxt.pdf.tree.DocumentSyntaxException;
-import dev.stxt.pdf.tree.ErrorCode;
-import dev.stxt.pdf.tree.InvalidModelException;
-import dev.stxt.pdf.resources.ResourceException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.TextNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.resources.ResourceException;
+import dev.stxt.pdf.tree.DocumentSyntaxException;
+import dev.stxt.pdf.tree.ErrorCode;
+import dev.stxt.pdf.tree.InvalidModelException;
 
 class DocumentReaderTest {
 

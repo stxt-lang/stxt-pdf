@@ -1,18 +1,19 @@
 package dev.stxt.pdf.tree;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The nested rules of {@code Styles} (reference/common/styles.md): a rule written inside another applies to the

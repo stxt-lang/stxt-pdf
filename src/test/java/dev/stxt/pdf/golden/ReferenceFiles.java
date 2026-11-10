@@ -1,14 +1,8 @@
 package dev.stxt.pdf.golden;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.Tolerance;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +15,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.model.Tolerance;
 
 /**
  * What the reference tests ({@link GoldenTest}) and the example tests ({@code ExamplesTest}) share: comparing

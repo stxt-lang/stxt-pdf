@@ -1,5 +1,16 @@
 package dev.stxt.pdf.convert;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Limits;
@@ -9,16 +20,6 @@ import dev.stxt.pdf.resources.ImageFile;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The {@link Limits} of a conversion: they apply exactly where they say (a document

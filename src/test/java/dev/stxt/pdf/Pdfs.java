@@ -1,11 +1,11 @@
 package dev.stxt.pdf;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.stxt.DocumentReader;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /** The PDF of a test document, with the default styles and resources. */
 public final class Pdfs {

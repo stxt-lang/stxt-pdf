@@ -1,5 +1,11 @@
 package dev.stxt.pdf.tree;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Paint;
@@ -7,11 +13,6 @@ import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Reusable rules of {@code Styles}: what they apply to, with what priority and how they merge. */
 class StylesTest {

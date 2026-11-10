@@ -1,15 +1,16 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.tree.PageSetup;
-import org.junit.jupiter.api.Test;
-
-import java.util.OptionalDouble;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.OptionalDouble;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.tree.PageSetup;
 
 class ConstraintSpaceTest {
 

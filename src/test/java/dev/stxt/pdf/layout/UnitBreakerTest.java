@@ -1,5 +1,16 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalDouble;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.BreakAppeal;
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
@@ -12,16 +23,6 @@ import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Break between units (reference/common/breaks.md) with synthetic units: a container 100 pt

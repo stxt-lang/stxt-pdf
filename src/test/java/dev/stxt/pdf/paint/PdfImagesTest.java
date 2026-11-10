@@ -1,9 +1,22 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.resources.Resources;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -19,22 +32,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.resources.Resources;
 
 /**
  * The images embedded in the PDF (reference/components/image.md): each file once, the PNG with its transparency and

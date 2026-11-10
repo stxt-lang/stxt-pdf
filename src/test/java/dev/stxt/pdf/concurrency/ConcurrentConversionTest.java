@@ -1,14 +1,8 @@
 package dev.stxt.pdf.concurrency;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,9 +22,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * Conversion is thread-safe with one {@code Engine} per conversion (which is what {@link Converter} does):

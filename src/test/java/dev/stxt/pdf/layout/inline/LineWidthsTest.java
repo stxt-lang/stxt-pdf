@@ -1,5 +1,12 @@
 package dev.stxt.pdf.layout.inline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.FontFace;
@@ -8,12 +15,6 @@ import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Lines of different widths (reference/components/block.md), with {@link FixedMetrics} at size 10: a word of four

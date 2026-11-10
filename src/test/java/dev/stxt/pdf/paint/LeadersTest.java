@@ -1,13 +1,14 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.model.Leader;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Leader;
+import dev.stxt.pdf.model.Rect;
 
 class LeadersTest {
 

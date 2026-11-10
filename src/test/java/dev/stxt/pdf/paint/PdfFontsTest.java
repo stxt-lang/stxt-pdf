@@ -1,11 +1,19 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSArray;
@@ -23,19 +31,12 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The fonts of the PDF (reference/implementation/pdf.md): each one embedded once as a Type 0 font, as a subset when

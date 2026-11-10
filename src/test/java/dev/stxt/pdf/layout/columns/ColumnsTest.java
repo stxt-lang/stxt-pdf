@@ -1,8 +1,8 @@
 package dev.stxt.pdf.layout.columns;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /** Number and width of the columns (reference/components/columns.md). */
 class ColumnsTest {

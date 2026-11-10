@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Rect;
 
 /**
  * The footnotes on the page (reference/components/footnote.md): pages of 200 pt, so the page area measures 515 × 120

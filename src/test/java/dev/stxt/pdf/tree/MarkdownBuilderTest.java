@@ -1,26 +1,27 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.InlineImage;
-import dev.stxt.pdf.model.RunStyle;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.InlineImage;
+import dev.stxt.pdf.model.RunStyle;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The translation of {@code Markdown} into STXT nodes (reference/components/markdown.md). The {@code Markdown}

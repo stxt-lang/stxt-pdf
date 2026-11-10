@@ -1,12 +1,12 @@
 package dev.stxt.pdf.model;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 /** The fill of a background (reference/common/box.md): solid colors and gradients. */
 class PaintTest {

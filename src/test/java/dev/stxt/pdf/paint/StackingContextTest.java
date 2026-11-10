@@ -1,5 +1,16 @@
 package dev.stxt.pdf.paint;
 
+import static dev.stxt.pdf.tree.TextRuns.link;
+import static dev.stxt.pdf.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.Engine;
@@ -16,16 +27,6 @@ import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.TextRuns;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static dev.stxt.pdf.tree.TextRuns.link;
-import static dev.stxt.pdf.tree.TextRuns.run;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Painting order (reference/common/box.md), seen through the background colors that are painted. */
 class StackingContextTest {

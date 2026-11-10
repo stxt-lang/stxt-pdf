@@ -1,8 +1,13 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.golden.PdfUa;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
@@ -11,13 +16,9 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.golden.PdfUa;
 
 /**
  * The PDF of an image inside a text (reference/common/text-formatting.md): drawn in the place of its run, a

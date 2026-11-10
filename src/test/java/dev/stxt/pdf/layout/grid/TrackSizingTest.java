@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout.grid;
 
-import dev.stxt.pdf.layout.grid.TrackSizing.Distribution;
-import dev.stxt.pdf.model.ValueParser;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.grid.TrackSizing.Distribution;
+import dev.stxt.pdf.model.ValueParser;
 
 class TrackSizingTest {
 

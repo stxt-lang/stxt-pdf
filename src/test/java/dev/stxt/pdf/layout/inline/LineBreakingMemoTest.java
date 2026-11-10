@@ -1,16 +1,17 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.tree.Box;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.tree.Box;
 
 /** The memorized line breaking is made once per box and key, and forgotten box by box. */
 class LineBreakingMemoTest {

@@ -1,8 +1,20 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.golden.PdfUa;
+import static dev.stxt.pdf.PdfStructures.kids;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -18,20 +30,9 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static dev.stxt.pdf.PdfStructures.kids;
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.golden.PdfUa;
 
 /**
  * The structure tree of the tagged PDF (reference/implementation/pdf.md): one element per box in document order,

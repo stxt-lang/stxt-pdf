@@ -1,21 +1,22 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.model.Marker;
-import dev.stxt.pdf.model.Paint;
-import dev.stxt.pdf.model.Sides;
-import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.model.Preformatted;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.Paint;
+import dev.stxt.pdf.model.Preformatted;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Value;
 
 /** The {@code Markdown} in the box tree (reference/components/markdown.md). */
 class MarkdownTest {

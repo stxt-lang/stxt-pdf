@@ -1,6 +1,9 @@
 package dev.stxt.pdf.tree;
 
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.tree.SchemaNodes.canonical;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -8,10 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static dev.stxt.pdf.tree.SchemaNodes.canonical;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@link Element} and the schema say the same: the schema is the only definition of the structure,

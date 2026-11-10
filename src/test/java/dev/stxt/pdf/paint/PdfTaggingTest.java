@@ -1,16 +1,18 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.layout.inline.PdfMetrics;
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.pdf.tree.TextRuns;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static dev.stxt.pdf.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSName;
@@ -23,18 +25,17 @@ import org.apache.pdfbox.pdmodel.documentinterchange.markedcontent.PDPropertyLis
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static dev.stxt.pdf.tree.TextRuns.run;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.TextRuns;
 
 /**
  * The marked content of a page (reference/implementation/pdf.md): the text of a box in one marked content whatever

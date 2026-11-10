@@ -1,12 +1,12 @@
 package dev.stxt.pdf.tree;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 /** The marks of the styled runs of a Markdown text before parsing it (reference/common/text-formatting.md). */
 class RunMarksTest {

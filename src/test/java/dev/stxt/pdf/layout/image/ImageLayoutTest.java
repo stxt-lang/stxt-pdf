@@ -1,5 +1,14 @@
 package dev.stxt.pdf.layout.image;
 
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.OptionalDouble;
+import java.util.function.Supplier;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
@@ -11,14 +20,6 @@ import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.OptionalDouble;
-import java.util.function.Supplier;
-
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Sizing and placement of {@code Image} (reference/components/image.md), with the images of

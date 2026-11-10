@@ -1,12 +1,13 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.Fragment;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
 
 /**
  * The numbering of headings, {@code Numbered} (reference/components/heading.md), laid out. With

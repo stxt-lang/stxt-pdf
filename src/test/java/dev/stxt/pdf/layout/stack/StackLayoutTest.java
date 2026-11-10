@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout.stack;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Distribution;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Distribution;
+import dev.stxt.pdf.model.Rect;
 
 class StackLayoutTest {
 

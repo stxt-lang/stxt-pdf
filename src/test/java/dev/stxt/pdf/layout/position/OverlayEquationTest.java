@@ -1,11 +1,12 @@
 package dev.stxt.pdf.layout.position;
 
-import dev.stxt.pdf.layout.IntrinsicSizes;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.OptionalDouble;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.IntrinsicSizes;
 
 class OverlayEquationTest {
 

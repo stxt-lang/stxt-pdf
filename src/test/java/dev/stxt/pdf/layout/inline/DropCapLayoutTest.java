@@ -1,15 +1,16 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
 
 /**
  * Drop caps (reference/components/text.md). Page area of 515 from (40, 40); lines of 12 (Size 10), 5 pt per

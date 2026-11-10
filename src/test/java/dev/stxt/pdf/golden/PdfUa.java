@@ -1,6 +1,10 @@
 package dev.stxt.pdf.golden;
 
-import dev.stxt.pdf.model.PdfA;
+import java.io.ByteArrayInputStream;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import org.verapdf.gf.foundry.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.Foundries;
 import org.verapdf.pdfa.PDFAParser;
@@ -8,10 +12,7 @@ import org.verapdf.pdfa.PDFAValidator;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.TestAssertion;
 
-import java.io.ByteArrayInputStream;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import dev.stxt.pdf.model.PdfA;
 
 /**
  * Validation of a PDF against PDF/UA-1, PDF/UA-2 or a PDF/A with veraPDF (for the tests only). It gives the

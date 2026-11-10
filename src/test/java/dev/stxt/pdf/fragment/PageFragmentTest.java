@@ -1,20 +1,21 @@
 package dev.stxt.pdf.fragment;
 
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
 
 /**
  * Where each fragment ended up on the paper ({@link PageFragment}, reference/implementation/api.md). Pages of 595 pt

@@ -1,7 +1,15 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
+import static dev.stxt.pdf.PdfStructures.document;
+import static dev.stxt.pdf.PdfStructures.kids;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.COSObjectable;
@@ -12,15 +20,8 @@ import org.apache.pdfbox.pdmodel.interactive.action.PDActionURI;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static dev.stxt.pdf.PdfStructures.document;
-import static dev.stxt.pdf.PdfStructures.kids;
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
 
 /**
  * The {@code Link} elements of the structure tree (reference/implementation/pdf.md, "Links"): what each one wraps,

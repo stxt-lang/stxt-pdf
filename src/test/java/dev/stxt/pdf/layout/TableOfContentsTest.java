@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.tree.Element;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.tree.Element;
 
 /**
  * {@code Table of contents} (reference/components/table-of-contents.md). Pages of 180 pt with margins of 40: page

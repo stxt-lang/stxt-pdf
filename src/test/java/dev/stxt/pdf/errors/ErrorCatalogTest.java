@@ -1,13 +1,8 @@
 package dev.stxt.pdf.errors;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.pdf.tree.ErrorCode;
-import dev.stxt.pdf.model.StxtPdfException;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,9 +20,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.model.StxtPdfException;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.ErrorCode;
 
 /**
  * Error catalog ({@code test/errors/<group>/*.stxt}): each file is a document that must

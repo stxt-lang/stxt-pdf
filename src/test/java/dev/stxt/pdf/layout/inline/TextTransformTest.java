@@ -1,18 +1,19 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.model.RunStyle;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.TextCase;
-import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Locale;
 
-import static dev.stxt.pdf.tree.TextRuns.run;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.RunStyle;
+import dev.stxt.pdf.model.TextCase;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.tree.StyleEditor;
 
 class TextTransformTest {
 

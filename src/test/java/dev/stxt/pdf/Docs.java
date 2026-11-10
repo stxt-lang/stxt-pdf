@@ -1,10 +1,10 @@
 package dev.stxt.pdf;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.stxt.DocumentReader;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * Helpers for writing test documents: the smallest header ({@link #header}), the typography the text needs

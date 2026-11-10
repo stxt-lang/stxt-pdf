@@ -1,12 +1,12 @@
 package dev.stxt.pdf;
 
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDMarkedContentReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDObjectReference;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureTreeRoot;
-
-import java.util.List;
 
 /** Reading the structure tree of a tagged PDF (reference/implementation/pdf.md) in the tests. */
 public final class PdfStructures {

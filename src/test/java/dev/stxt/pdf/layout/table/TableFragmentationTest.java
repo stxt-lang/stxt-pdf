@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout.table;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
 
 /**
  * Repeated header and footer (reference/components/table.md). Pages of 180 pt with margins of 40: page

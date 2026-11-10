@@ -1,7 +1,12 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
@@ -11,12 +16,8 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
 
 /**
  * The bookmarks of the PDF (reference/implementation/pdf.md, "Bookmarks"): one per heading, nested by level, that

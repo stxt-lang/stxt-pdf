@@ -1,12 +1,13 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.model.Reference;
-import org.junit.jupiter.api.Test;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.model.Reference;
 
 /**
  * References and page numbers written as text (reference/common/references.md): inside another pair of braces in any

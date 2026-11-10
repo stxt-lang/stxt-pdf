@@ -1,20 +1,21 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
-import dev.stxt.pdf.layout.IntrinsicSizes;
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.LineBreaking;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static dev.stxt.pdf.tree.TextRuns.spaced;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.IntrinsicSizes;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.LineBreaking;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
 
 class LineBreakerTest {
 

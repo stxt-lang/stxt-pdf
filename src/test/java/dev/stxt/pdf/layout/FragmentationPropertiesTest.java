@@ -1,12 +1,12 @@
 package dev.stxt.pdf.layout;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * Fragmentation property with random documents and pages: the fragments of a paragraph spread over several pages add

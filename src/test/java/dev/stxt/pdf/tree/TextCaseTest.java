@@ -1,16 +1,17 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.TextCase;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.Locale;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Locale;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.TextCase;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * {@code Case}, {@code Letter spacing} and {@code Small caps} in the tree (reference/common/text-formatting.md).

@@ -1,15 +1,16 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LayoutResultTest {
 

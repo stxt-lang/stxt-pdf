@@ -1,5 +1,11 @@
 package dev.stxt.pdf.layout;
 
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
@@ -7,11 +13,6 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
-import org.junit.jupiter.api.Test;
-
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * {@code {page of: id}} (reference/common/references.md). Pages of 180 pt with margins of 40: page

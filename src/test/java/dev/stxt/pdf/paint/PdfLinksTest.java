@@ -1,12 +1,20 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.Pdfs;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.stxt.DocumentReader;
+import static dev.stxt.pdf.PdfStructures.document;
+import static dev.stxt.pdf.PdfStructures.kids;
+import static dev.stxt.pdf.PdfStructures.section;
+import static dev.stxt.pdf.PdfStructures.types;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.COSObjectable;
@@ -22,20 +30,13 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.List;
-import java.util.Map;
-
-import static dev.stxt.pdf.PdfStructures.document;
-import static dev.stxt.pdf.PdfStructures.kids;
-import static dev.stxt.pdf.PdfStructures.section;
-import static dev.stxt.pdf.PdfStructures.types;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.Pdfs;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The link annotations of the PDF (reference/implementation/pdf.md, reference/common/links.md): one per clickable

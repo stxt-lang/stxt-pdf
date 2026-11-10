@@ -1,11 +1,10 @@
 package dev.stxt.pdf.resources;
 
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import org.apache.fontbox.ttf.CmapLookup;
-import org.apache.fontbox.ttf.TrueTypeFont;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,11 +15,13 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.fontbox.ttf.CmapLookup;
+import org.apache.fontbox.ttf.TrueTypeFont;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
 
 /**
  * The kerning pairs of the fonts of the repository ({@link KerningPairs}, {@link FontFile#kerning}), against the values

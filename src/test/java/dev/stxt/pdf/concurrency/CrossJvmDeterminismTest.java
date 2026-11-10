@@ -1,11 +1,6 @@
 package dev.stxt.pdf.concurrency;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.model.Check;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +11,13 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.model.Check;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The PDF of each example and of each golden case is the same in another JVM, byte for byte. In another JVM the {@code identityHashCode} of the boxes changes, and with it the order in which an

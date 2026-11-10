@@ -1,19 +1,20 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.TextFormat;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutRuns;
+import static dev.stxt.pdf.tree.TextRuns.run;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static dev.stxt.pdf.layout.LayoutFixture.layOutRuns;
-import static dev.stxt.pdf.tree.TextRuns.run;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.TextFormat;
 
 /** With {@link FixedMetrics}, each character measures 5 pt with {@code Size: 10}. */
 class InlineLayoutTest {

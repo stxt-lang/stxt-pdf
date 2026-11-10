@@ -1,19 +1,20 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Position;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.Position;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
 
 /**
  * The footnotes in the box tree (reference/components/footnote.md): the area of each section, the notes that hang

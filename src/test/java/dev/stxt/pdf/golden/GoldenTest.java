@@ -1,19 +1,6 @@
 package dev.stxt.pdf.golden;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.model.Check;
-import dev.stxt.pdf.output.StxtDump;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.paint.SvgCanvas;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.runtime.STXT;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +12,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Check;
+import dev.stxt.pdf.output.StxtDump;
+import dev.stxt.pdf.paint.SvgCanvas;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.runtime.STXT;
 
 /**
  * Reference tests (reference/implementation/testing.md): each folder of {@code golden/} contains

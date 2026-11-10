@@ -1,13 +1,14 @@
 package dev.stxt.pdf;
 
-import dev.stxt.InlineNode;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.InlineNode;
 
 /**
  * {@link Docs}: the rewriting of the test documents. Most test classes write their documents through it, so a

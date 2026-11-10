@@ -1,15 +1,8 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.fragment.PageFragment;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,9 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.fragment.PageFragment;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * {@link PageFragment} says where each fragment is with its own walk through the page, and the painting with that of

@@ -1,14 +1,15 @@
 package dev.stxt.pdf.layout.block;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
 
 class BlockLayoutTest {
 

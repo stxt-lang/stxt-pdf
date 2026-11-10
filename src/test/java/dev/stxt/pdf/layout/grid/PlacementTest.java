@@ -1,14 +1,15 @@
 package dev.stxt.pdf.layout.grid;
 
-import dev.stxt.pdf.model.Area;
-import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.Direction;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Area;
+import dev.stxt.pdf.model.Cell;
+import dev.stxt.pdf.model.Direction;
 
 /** Automatic placement of the items in the grid (reference/components/grid.md). */
 class PlacementTest {

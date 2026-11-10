@@ -1,14 +1,15 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.tree.ErrorCode;
-import dev.stxt.pdf.tree.InvalidModelException;
-import org.junit.jupiter.api.Test;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.tree.ErrorCode;
+import dev.stxt.pdf.tree.InvalidModelException;
 
 /**
  * The narrowest module of a {@code Barcode} (reference/components/barcode.md): its content box, once laid out, leaves

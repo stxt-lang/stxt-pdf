@@ -1,11 +1,12 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.TextLine;
-import org.junit.jupiter.api.Test;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.TextLine;
 
 /**
  * Running heads, {@code {heading N}} and {@code {heading N: first}} in a {@code Page overlay}

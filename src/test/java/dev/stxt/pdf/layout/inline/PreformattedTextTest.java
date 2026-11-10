@@ -1,5 +1,16 @@
 package dev.stxt.pdf.layout.inline;
 
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.layout.LayoutFixture;
@@ -8,16 +19,6 @@ import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@code Preformatted: true} and {@code wrap} and {@code Tab size} (reference/common/text-formatting.md). With

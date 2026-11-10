@@ -1,10 +1,11 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.model.Fit;
-import dev.stxt.pdf.model.Rect;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import dev.stxt.pdf.model.Fit;
+import dev.stxt.pdf.model.Rect;
 
 class ImageFitTest {
 

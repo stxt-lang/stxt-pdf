@@ -1,17 +1,18 @@
 package dev.stxt.pdf.layout.block;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.OptionalDouble;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.MarginStrut;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.BoxTreeBuilder;
-import org.junit.jupiter.api.Test;
-
-import java.util.OptionalDouble;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * The margins predicted to come out of a block at the top ({@link LeadingMargins}) are the ones its layout returns

@@ -1,5 +1,17 @@
 package dev.stxt.pdf.convert;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.layout.LaidOutDocument;
@@ -7,17 +19,6 @@ import dev.stxt.pdf.model.Attachments;
 import dev.stxt.pdf.model.Cancellation;
 import dev.stxt.pdf.model.InternalException;
 import dev.stxt.pdf.model.Progress;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * The progress of a conversion (reference/implementation/api.md): a {@link Progress} given with the call is told

@@ -1,12 +1,12 @@
 package dev.stxt.pdf.tree;
 
+import java.util.List;
+import java.util.Map;
+
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.model.RunStyle;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Formatted runs for the tests (reference/common/text-formatting.md). The document does not have syntax to write

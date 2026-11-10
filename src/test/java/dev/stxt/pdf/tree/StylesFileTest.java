@@ -1,22 +1,23 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.model.Sides;
-import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Value;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The separate styles document (reference/common/styles.md): its rules weigh less than those of the

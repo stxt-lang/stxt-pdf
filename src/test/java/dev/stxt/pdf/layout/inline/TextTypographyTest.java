@@ -1,18 +1,19 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.TextFormat;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.TextFormat;
 
 /**
  * {@code Case}, {@code Letter spacing} and {@code Small caps} (reference/common/text-formatting.md). With {@link

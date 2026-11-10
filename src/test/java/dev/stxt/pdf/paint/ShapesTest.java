@@ -1,20 +1,21 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.pdf.model.Corners;
-import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.model.Radii;
-import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.model.Sides;
-import dev.stxt.pdf.model.Value;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Corners;
+import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Radii;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.Sides;
+import dev.stxt.pdf.model.Value;
 
 /** The paths of the shapes that the canvases paint (reference/common/box.md). */
 class ShapesTest {

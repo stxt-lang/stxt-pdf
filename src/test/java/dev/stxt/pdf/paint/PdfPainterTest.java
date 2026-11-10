@@ -1,15 +1,15 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.model.Cancellation;
-import dev.stxt.pdf.model.CancelledException;
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.resources.Resources;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -23,15 +23,16 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPa
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.Cancellation;
+import dev.stxt.pdf.model.CancelledException;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.resources.Resources;
 
 /**
  * {@link PdfPainter}: a laid out page painted on a page of a document that is not the engine's

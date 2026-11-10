@@ -1,6 +1,9 @@
 package dev.stxt.pdf.tree;
 
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.tree.SchemaNodes.canonical;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -9,10 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static dev.stxt.pdf.tree.SchemaNodes.canonical;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 /** Each constant of {@link PropertyKey} is the key of a property that the schema allows in its place. */
 class PropertyKeyTest {

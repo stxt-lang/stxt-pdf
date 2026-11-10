@@ -1,14 +1,15 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.model.Alignment;
-import dev.stxt.pdf.model.Insets;
-import dev.stxt.pdf.model.Value;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.OptionalDouble;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Alignment;
+import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Value;
 
 class SizingTest {
 

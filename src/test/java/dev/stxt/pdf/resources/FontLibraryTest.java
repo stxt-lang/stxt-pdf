@@ -1,10 +1,12 @@
 package dev.stxt.pdf.resources;
 
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,13 +17,12 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
 
 /** On the fonts of the repository ({@code resources/fonts}) and copies of them in temporary folders. */
 class FontLibraryTest {

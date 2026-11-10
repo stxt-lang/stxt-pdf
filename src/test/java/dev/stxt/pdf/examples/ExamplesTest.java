@@ -1,24 +1,9 @@
 package dev.stxt.pdf.examples;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.pdf.model.Attachments;
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.model.PdfA;
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.golden.ReferenceFiles;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.paint.ContrastCheck;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.layout.inline.PdfMetrics;
-import dev.stxt.pdf.output.StxtDump;
-import dev.stxt.pdf.paint.PdfDocumentWriter;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.runtime.STXT;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.TestFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -33,10 +18,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.TestFactory;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.golden.ReferenceFiles;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.model.Attachments;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.model.PdfA;
+import dev.stxt.pdf.output.StxtDump;
+import dev.stxt.pdf.paint.ContrastCheck;
+import dev.stxt.pdf.paint.PdfDocumentWriter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.runtime.STXT;
 
 /**
  * Examples of complete documents ({@code test/examples/NN-name/}). Unlike the golden cases,

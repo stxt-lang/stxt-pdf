@@ -1,13 +1,9 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.model.TextFormat;
-import dev.stxt.pdf.model.TextRun;
-import dev.stxt.pdf.model.LineBreaking;
-import dev.stxt.pdf.resources.Resources;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.model.Tolerance.fits;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +12,15 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static dev.stxt.pdf.model.Tolerance.fits;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.LineBreaking;
+import dev.stxt.pdf.model.TextFormat;
+import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.resources.Resources;
 
 /**
  * Line-breaking properties with random texts and widths, with both algorithms:

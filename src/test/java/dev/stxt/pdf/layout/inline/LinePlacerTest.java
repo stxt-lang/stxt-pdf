@@ -1,5 +1,13 @@
 package dev.stxt.pdf.layout.inline;
 
+import static dev.stxt.pdf.tree.TextRuns.run;
+import static dev.stxt.pdf.tree.TextRuns.spaced;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
@@ -8,13 +16,6 @@ import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static dev.stxt.pdf.tree.TextRuns.run;
-import static dev.stxt.pdf.tree.TextRuns.spaced;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** The geometry of a line (reference/common/text-formatting.md): measures, alignment and justification. */
 class LinePlacerTest {

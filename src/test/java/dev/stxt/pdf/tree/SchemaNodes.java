@@ -1,9 +1,5 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.InlineNode;
-import dev.stxt.Node;
-import dev.stxt.runtime.STXT;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -12,6 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import dev.stxt.InlineNode;
+import dev.stxt.Node;
+import dev.stxt.runtime.STXT;
 
 /** The schema read as data, for the tests that compare it with the code. */
 final class SchemaNodes {

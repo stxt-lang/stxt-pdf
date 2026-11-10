@@ -1,5 +1,7 @@
 package dev.stxt.pdf.layout.inline;
 
+import java.util.List;
+
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.layout.IntrinsicSizes;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
@@ -7,8 +9,6 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.tree.Style;
-
-import java.util.List;
 
 /**
  * Short forms of the line breaking for the tests: a text in one line width, plain text, no letter spacing, no

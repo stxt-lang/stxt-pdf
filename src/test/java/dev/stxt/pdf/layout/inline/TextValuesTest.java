@@ -1,16 +1,17 @@
 package dev.stxt.pdf.layout.inline;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Reference;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /** What the texts are worth between the passes of the pagination, with {@link FixedMetrics}: 5 pt per character. */
 class TextValuesTest {

@@ -1,5 +1,12 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
@@ -7,13 +14,6 @@ import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.TextRuns;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Lays out a document 595 pt wide with margins of 40 (page area of 515 pt from

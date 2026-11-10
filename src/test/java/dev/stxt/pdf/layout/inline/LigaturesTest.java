@@ -1,16 +1,14 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.model.FontFace;
-import dev.stxt.pdf.model.FontStyle;
-import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.paint.PdfDocumentWriter;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
@@ -19,14 +17,17 @@ import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.paint.PdfDocumentWriter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * {@code Ligatures} (reference/common/text-formatting.md): without it, one glyph per character; with it, the text is

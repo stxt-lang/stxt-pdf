@@ -1,12 +1,13 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.model.Edges;
-import dev.stxt.pdf.model.Insets;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.OptionalDouble;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.model.Edges;
+import dev.stxt.pdf.model.Insets;
 
 /**
  * Distribution of the height, the border and the padding between fragments (reference/common/breaks.md). All the

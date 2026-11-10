@@ -1,5 +1,14 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+import java.util.OptionalDouble;
+import java.util.function.Supplier;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Sides;
@@ -7,14 +16,6 @@ import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** Used box model (reference/common/box.md), with hand-written styles. */
 class BoxModelTest {

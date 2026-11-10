@@ -1,19 +1,20 @@
 package dev.stxt.pdf.tree;
 
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Break;
-import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.Break;
+import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /** Blocks in columns when building the tree (reference/components/columns.md): properties and column flow. */
 class ColumnsElementTest {

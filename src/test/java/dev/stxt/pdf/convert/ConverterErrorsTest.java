@@ -1,6 +1,24 @@
 package dev.stxt.pdf.convert;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import dev.stxt.InlineNode;
+import dev.stxt.exceptions.LimitException;
+import dev.stxt.exceptions.ParseException;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
@@ -14,23 +32,6 @@ import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.DocumentSyntaxException;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
-import dev.stxt.exceptions.LimitException;
-import dev.stxt.exceptions.ParseException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The errors of a conversion (reference/common/errors.md): all of them are a {@link StxtPdfException} and its

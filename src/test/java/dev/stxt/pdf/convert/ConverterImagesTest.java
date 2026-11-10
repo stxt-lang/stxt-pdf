@@ -1,12 +1,10 @@
 package dev.stxt.pdf.convert;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.StxtPdfException;
-import dev.stxt.pdf.model.StxtPdfException.Kind;
-import dev.stxt.pdf.resources.Resources;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,11 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.StxtPdfException;
+import dev.stxt.pdf.model.StxtPdfException.Kind;
+import dev.stxt.pdf.resources.Resources;
 
 /**
  * Conversions with resources that are not a single folder (reference/implementation/api.md): fonts and images given

@@ -1,5 +1,13 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.OptionalDouble;
+import java.util.function.Supplier;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Position;
@@ -7,13 +15,6 @@ import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Element;
 import dev.stxt.pdf.tree.StyleEditor;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** Sizing of an item in the space its container gives it (reference/common/box.md), with hand-written styles. */
 class ItemSizingTest {

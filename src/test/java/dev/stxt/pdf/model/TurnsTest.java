@@ -1,14 +1,14 @@
 package dev.stxt.pdf.model;
 
-import org.junit.jupiter.api.Test;
-
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+
+import org.junit.jupiter.api.Test;
 
 /** The stack of the rotations a painting is inside (reference/common/layers-and-rotation.md). */
 class TurnsTest {

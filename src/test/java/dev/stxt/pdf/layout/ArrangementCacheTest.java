@@ -1,13 +1,14 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.Page;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * What a stack, a grid or a table arranges before breaking it between its units (placement, tracks, items at their

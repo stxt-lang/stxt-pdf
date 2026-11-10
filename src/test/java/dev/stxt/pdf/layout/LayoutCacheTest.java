@@ -1,5 +1,15 @@
 package dev.stxt.pdf.layout;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalDouble;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.layout.inline.FixedMetrics;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
@@ -7,15 +17,6 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.stxt.DocumentReader;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.BoxTreeBuilder;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Regression test for the architecture rule (reference/architecture.md): every recursion of layout and intrinsic sizes

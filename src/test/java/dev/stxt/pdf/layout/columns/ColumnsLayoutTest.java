@@ -1,18 +1,19 @@
 package dev.stxt.pdf.layout.columns;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import dev.stxt.pdf.tree.InvalidModelException;
-import org.junit.jupiter.api.Test;
+import static dev.stxt.pdf.layout.LayoutFixture.layOut;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static dev.stxt.pdf.layout.LayoutFixture.layOut;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.tree.InvalidModelException;
 
 /**
  * Blocks in columns on an A4 page (page area of 515 × 762 from (40, 40)),

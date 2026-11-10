@@ -1,17 +1,18 @@
 package dev.stxt.pdf.layout.block;
 
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.fragment.TextLine;
-import dev.stxt.pdf.layout.LayoutFixture;
-import dev.stxt.pdf.model.Rect;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.Rect;
 
 /**
  * Side boxes (reference/components/block.md). Page area of 515 from (40, 40); lines of 12 and 5 pt per character:

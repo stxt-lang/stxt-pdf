@@ -1,11 +1,12 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.pdf.fragment.Fragment;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * Paginating again because the total needs more figures or because the page of a reference changes only lays out

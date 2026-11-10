@@ -1,12 +1,8 @@
 package dev.stxt.pdf.layout;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.layout.inline.PdfMetrics;
-import dev.stxt.pdf.output.StxtDump;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.pdf.tree.BoxTreeBuilder;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -18,9 +14,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.output.StxtDump;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.BoxTreeBuilder;
 
 /**
  * The contract of {@link Engine}: the protocol with the {@link Paginator} is not

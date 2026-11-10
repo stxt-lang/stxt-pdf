@@ -1,19 +1,5 @@
 package dev.stxt.pdf.tree;
 
-import com.google.zxing.common.BitArray;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.common.DecoderResult;
-import com.google.zxing.oned.Code128Reader;
-import com.google.zxing.oned.EAN13Reader;
-import com.google.zxing.qrcode.decoder.Decoder;
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.model.Modules;
-import dev.stxt.pdf.model.Value;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,6 +7,22 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import com.google.zxing.common.BitArray;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.common.DecoderResult;
+import com.google.zxing.oned.Code128Reader;
+import com.google.zxing.oned.EAN13Reader;
+import com.google.zxing.qrcode.decoder.Decoder;
+
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.Modules;
+import dev.stxt.pdf.model.Value;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The image of a {@code Barcode} (reference/components/barcode.md): the modules that are generated are read back with

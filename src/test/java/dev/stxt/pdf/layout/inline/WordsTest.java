@@ -1,12 +1,13 @@
 package dev.stxt.pdf.layout.inline;
 
-import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
-import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
+import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
 
 /**
  * The break points of a word by the patterns of its language (reference/common/typography.md). The words of a text are

@@ -1,17 +1,21 @@
 package dev.stxt.pdf.paint;
 
-import dev.stxt.InlineNode;
-import dev.stxt.pdf.Docs;
-import dev.stxt.pdf.convert.Converter;
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.model.Attachment;
-import dev.stxt.pdf.model.Attachment.Relationship;
-import dev.stxt.pdf.model.Attachments;
-import dev.stxt.pdf.model.PdfA;
-import dev.stxt.pdf.model.StxtPdfException;
-import dev.stxt.pdf.stxt.DocumentReader;
-import dev.stxt.pdf.tree.ErrorCode;
-import dev.stxt.pdf.tree.InvalidModelException;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
@@ -24,21 +28,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import dev.stxt.InlineNode;
+import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.convert.Converter;
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.model.Attachment;
+import dev.stxt.pdf.model.Attachment.Relationship;
+import dev.stxt.pdf.model.Attachments;
+import dev.stxt.pdf.model.PdfA;
+import dev.stxt.pdf.model.StxtPdfException;
+import dev.stxt.pdf.stxt.DocumentReader;
+import dev.stxt.pdf.tree.ErrorCode;
+import dev.stxt.pdf.tree.InvalidModelException;
 
 /**
  * The PDF with PDF/A (reference/implementation/pdf.md): the declaration in the XMP packet, the output intent with the

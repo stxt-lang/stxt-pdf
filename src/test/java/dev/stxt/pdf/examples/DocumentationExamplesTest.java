@@ -1,19 +1,7 @@
 package dev.stxt.pdf.examples;
 
-import dev.stxt.pdf.golden.PdfUa;
-import dev.stxt.pdf.golden.ReferenceFiles;
-import dev.stxt.pdf.layout.Engine;
-import dev.stxt.pdf.paint.ContrastCheck;
-import dev.stxt.pdf.layout.LaidOutDocument;
-import dev.stxt.pdf.layout.inline.PdfMetrics;
-import dev.stxt.pdf.model.Limits;
-import dev.stxt.pdf.paint.PdfDocumentWriter;
-import dev.stxt.pdf.resources.Resources;
-import dev.stxt.pdf.stxt.DocumentReader;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,8 +15,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+
+import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.golden.ReferenceFiles;
+import dev.stxt.pdf.layout.Engine;
+import dev.stxt.pdf.layout.LaidOutDocument;
+import dev.stxt.pdf.layout.inline.PdfMetrics;
+import dev.stxt.pdf.model.Limits;
+import dev.stxt.pdf.paint.ContrastCheck;
+import dev.stxt.pdf.paint.PdfDocumentWriter;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * The complete documents of the documentation (each code block of the READMEs, the manual and the reference, in every

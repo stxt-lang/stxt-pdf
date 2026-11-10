@@ -1,12 +1,13 @@
 package dev.stxt.pdf.layout.position;
 
-import dev.stxt.pdf.layout.LayoutFixture;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import dev.stxt.pdf.layout.LayoutFixture;
 
 /** {@code Pages} of a {@code Page overlay} (reference/components/frame-and-overlays.md): on which pages it appears. */
 class PageOverlayPagesTest {

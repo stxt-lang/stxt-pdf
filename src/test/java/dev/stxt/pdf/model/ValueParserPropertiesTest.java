@@ -1,10 +1,10 @@
 package dev.stxt.pdf.model;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
 
 /**
  * Properties of {@link ValueParser} with random texts: the only thing it can throw is an

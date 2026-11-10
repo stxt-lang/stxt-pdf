@@ -1,9 +1,9 @@
 package dev.stxt.pdf.layout;
 
-import org.junit.jupiter.api.Test;
-
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /** {@code {number of: id}} (reference/common/references.md): the number that the marker of an item writes. */
 class NumberReferencesTest {
