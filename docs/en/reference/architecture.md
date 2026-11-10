@@ -43,7 +43,7 @@ Dependencies go in a single direction and without cycles. `ArchitectureTest` sta
 | `resources` | `model` | The resources folder (`Resources`), fonts (`FontLibrary`, `FontFile`, `KerningPairs`) and images (`ImageLibrary`, `ImageFile`, `SvgInspector`, `PdfInspector`, `PdfGlyphs`) |
 | `tree` | `model` | The box tree (`Box`, `Element`, `Style` and its groups) and its construction (`BoxTreeBuilder` and its parts), the model errors (`InvalidModelException`, `ErrorCode`) |
 | `stxt` | `model`, `resources`, `tree` | `DocumentReader` |
-| `fragment` | `model`, `tree` | The result of the layout: `Fragment`, `Page`, `TextLine`, `Rule` (the lines of a table with merged borders), the break tokens (`BreakToken`, `BreakAppeal`, `Unit`) and the break rules (`BreakRules`) |
+| `fragment` | `model`, `tree` | The result of the layout: `Fragment`, `Page`, `TextLine`, `Rule` (the lines of a table with merged borders), the break tokens (`BreakToken`, `BreakAppeal`, `Unit`), the break rules (`BreakRules`) and `Placed`, a fragment with its boxes on the paper |
 | `layout` | `fragment`, `model`, `resources`, `tree` | The engine (`Engine`, `Paginator`, `Overflow`, `ModuleSizes`) and one subpackage per algorithm: `block`, `inline` (with `inline.hyphenation`, the hyphenation patterns), `stack`, `grid`, `table`, `columns`, `position` and `image` |
 | `output` | `fragment`, `model` | `StxtDump`, the dump for the tests |
 | `paint` | `fragment`, `layout`, `model`, `resources`, `tree` | Painting (`StackingContext`, `Canvas`) and the two canvases: the PDF (`PdfDocumentWriter`, `PdfCanvas` and its parts) and the SVG (`SvgCanvas`) |

@@ -1,6 +1,6 @@
 package dev.stxt.pdf.layout.columns;
 
-import static dev.stxt.pdf.model.Tolerance.EPSILON;
+import dev.stxt.pdf.tree.ColumnsStyle;
 
 /**
  * Number and width of the columns of a {@code Columns} (reference/components/columns.md):
@@ -28,16 +28,9 @@ record Columns(int count, double width, double gap) {
      * @param available width of the content box of the {@code Columns}
      */
     static Columns of(Integer count, Double width, double gap, double available) {
-        int n;
-        if (width == null) {
-            n = count;
-        } else {
-            n = Math.max(1, (int) Math.floor((available + gap + EPSILON) / (width + gap)));
-            if (count != null) {
-                n = Math.min(n, count);
-            }
-        }
-        return new Columns(n, Math.max(0, (available - (n - 1) * gap) / n), gap);
+        // The arithmetic is of the style, which also gives it to whoever asks where the columns ended up.
+        int n = ColumnsStyle.count(count, width, gap, available);
+        return new Columns(n, ColumnsStyle.width(n, gap, available), gap);
     }
 
     /** Position of the column {@code column} (from 0), from the content box of the {@code Columns}. */

@@ -32,12 +32,14 @@ public final class LayoutFixture {
     /** Suffix of the key of the marker of an item. */
     private static final String MARKER = "#marker";
 
+    private final LaidOutDocument document;
     private final List<Page> pages;
     private final List<Map<String, Fragment>> fragments = new ArrayList<>();
     private final List<Map<String, Rect>> rects = new ArrayList<>();
 
-    private LayoutFixture(List<Page> pages) {
-        this.pages = pages;
+    private LayoutFixture(LaidOutDocument document) {
+        this.document = document;
+        this.pages = document.pages();
         for (Page page : pages) {
             Map<String, Fragment> f = new HashMap<>();
             Map<String, Rect> r = new HashMap<>();
@@ -84,7 +86,12 @@ public final class LayoutFixture {
 
     private static LayoutFixture layOut(String pageSetup, Map<String, List<TextRun>> runs, String... boxLines) {
         String doc = "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n" + pageSetup + FONT + String.join("\n", boxLines);
-        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)).pages());
+        return new LayoutFixture(new Engine().layOutDocument(TextRuns.build(READER.read(Docs.sectioned(Docs.mergeStyles(doc))), runs)));
+    }
+
+    /** The laid out document, for what asks it and not its pages. */
+    public LaidOutDocument document() {
+        return document;
     }
 
     public int pages() {

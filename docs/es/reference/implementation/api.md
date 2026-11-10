@@ -60,6 +60,7 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 | `resources.ResourceException`, `resources.ImageFormatException`, `model.InternalException`, `model.CancelledException` | `CODE` y lo que hereda |
 | `layout.LaidOutDocument` | Todo |
 | `fragment.Page`, `fragment.Fragment`, `fragment.TextLine`, `fragment.TextLine.Run`, `fragment.Rule` | Todo |
+| `fragment.Placed`, `fragment.Placed.Column` | Todo |
 | `tree.PageSetup`, `tree.PageSetup.Paper`, `tree.PageSetup.Orientation`, `tree.Metadata` | Todo |
 | `tree.Box` | `id()`, `element()`, `role()`, `line()`, `anonymous()`, `parent()`, `children()`, `text()` |
 | `tree.Element` | Sus constantes, `canonicalName()`, `label()`, `role()`, `headingLevel()` |
@@ -74,7 +75,8 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 Lo que `layOut` devuelve entra en el contrato: `LaidOutDocument`, sus páginas y sus fragmentos, con la geometría de cada
 uno, sus líneas y el texto de cada tramo, y de la caja de cada fragmento lo que la identifica y la sitúa en el documento.
 Un servicio puede contar las páginas o medir cuánto llena cada una sin pintar nada. Son `record`s que solo ganan
-componentes: lo que un componente dice hoy lo dirá siempre.
+componentes: lo que un componente dice hoy lo dirá siempre. Dónde ha quedado cada fragmento en el papel lo dice
+`Placed` ([Dónde ha quedado cada caja](#dónde-ha-quedado-cada-caja)), que también entra.
 
 Lo demás que el jar expone como público lo es porque otro package del motor lo usa, no para quien convierte: `Engine`,
 `PdfDocumentWriter`, `BoxTreeBuilder`, `Box.style()` y los grupos de `Style`, `Resources.fonts()` e `images()` con sus
@@ -554,7 +556,7 @@ un error del motor ni del documento, y una barra de progreso no tiene por qué p
 
 Dos formas de usar el motor desde un programa que ya trabaja con PDFBox: escribir el documento en un `PDDocument`
 abierto, que guarda quien lo abrió después de añadirle lo que el motor no escribe, y pintar una página maquetada sobre
-una página de cualquier documento.
+una página de cualquier documento. Para lo primero, el documento maquetado dice dónde ha quedado cada caja en el papel.
 
 ### En un `PDDocument` abierto
 
@@ -588,6 +590,83 @@ medias. Por debajo, `PdfDocumentWriter.write` tiene la misma sobrecarga con un `
 > `PDDocument` abierto se escriben con PDFBox antes de guardar, sin reabrir el fichero, y el motor no tiene que saber de
 > gestores documentales ni de marcas de agua. *Alternativa descartada:* un `Meta` en `Document` y un `Blend` en
 > `Page overlay`, que eran lo que pedía el primer consumidor del motor.
+
+### Dónde ha quedado cada caja
+
+```java
+LaidOutDocument laidOut = converter.layOut(doc);
+try (PDDocument pdf = new PDDocument()) {
+    converter.toPdf(laidOut, pdf);
+    for (Placed firma : laidOut.placed("firma")) {            // un fragmento por página en la que cae la caja
+        Rect caja = firma.borderBox();                        // en puntos, desde arriba a la izquierda del papel
+        PDPage pagina = pdf.getPage(firma.page() - 1);
+        float alto = pagina.getMediaBox().getHeight();        // PDF mide desde abajo
+        stamp(pdf, pagina, caja.x(), alto - caja.bottom(), caja.width(), caja.height());
+    }
+    pdf.save(out);
+}
+```
+
+Un `Fragment` solo dice dónde está dentro de la caja de contenido de su padre. Quien dibuja sobre una caja ya maquetada
+(un sello, una firma, el relleno del blanco que deja) necesita saber dónde está en el papel, y eso lo dice `Placed`
+(`fragment`): un fragmento con sus cajas **en puntos desde la esquina superior izquierda del papel**, con la `y` hacia
+abajo, que son las coordenadas con las que se pinta la página. Se llega a ellos por tres sitios:
+
+- `laidOut.placed(id)`: los fragmentos de la caja con ese `Id`, en orden de página; uno por cada página en la que cae, y
+  en un `Page overlay`, uno por cada página en la que se repite. Vacía si ninguna caja maquetada lleva ese `Id`.
+- `laidOut.placedById()`: lo mismo para todas las cajas con `Id`, por `Id`, en una sola pasada por el documento.
+  `placed(id)` recorre el documento entero cada vez: quien pregunta por muchas cajas pide este mapa una vez.
+- `page.placed()`: las raíces de una página, en el orden en que se pintan: su flujo, su área de notas al pie si la tiene
+  y sus `Page overlay`. Desde cada una se baja con `children()`.
+
+| Método | Lo que da |
+|---|---|
+| `page()` | El número de la página, desde 1 (`Page.number()`). |
+| `fragment()` | El fragmento: el trozo de la caja que cae en esa página, con su caja (`box().id()`), sus líneas y lo demás. |
+| `borderBox()` | La caja de borde en el papel, sin girar. |
+| `contentBox()` | La caja de contenido: la de borde menos el borde y el relleno de ese fragmento. Es a la que se refieren sus hijos y sus líneas. |
+| `bounds()` | El rectángulo del papel que encierra la caja de borde tal como se pinta, con su giro y los de sus antecesores. Sin giros, `borderBox()`. |
+| `inFlow()` | Si está en el flujo de su padre: `false` en un `Overlay`, un `Page overlay` y el área de notas al pie. Un `Frame` está en el flujo, desplazado. |
+| `children()` | Sus fragmentos hijos, ya colocados, en el orden del árbol: los de su flujo y, detrás, los `Overlay` que resuelve. |
+| `columns()` | En un `Columns`, sus columnas de izquierda a derecha, **también las vacías**: la caja de cada una (su ancho, y el alto de la caja de contenido del fragmento) y su contenido en esa página (`flow()`, un `Placed`; `null` en la columna a la que el contenido no llegó). Vacía en las demás cajas. |
+| `painted()` | El rectángulo del papel que encierra lo que el fragmento y lo que lleva en su flujo **pintan**, con los giros aplicados; vacío si no pintan nada. |
+
+**Lo que se pinta** (`painted()`) no es lo que la caja ocupa: una caja sin borde ni fondo llega hasta el fondo de su caja
+de borde y no pinta nada allí. Cuentan las cajas con borde o con un fondo que no sea del todo transparente, las imágenes
+y los códigos, las cajas de línea del texto (no la tinta de cada letra), las líneas de las tablas y las de entre
+columnas, y las guías de un índice. No cuenta lo que va encima del flujo (`Overlay`, `Page overlay`), salvo que se
+pregunte al propio `Overlay`. Con ello se sabe dónde acaba de verdad el contenido de una página o de una columna: lo
+que queda en blanco debajo. Ni `painted()` ni `bounds()` tienen en cuenta `Overflow: clip` ni las esquinas redondeadas,
+que esconden contenido pero no lo mueven.
+
+**Con giros** ([Capas y giro](../common/layers-and-rotation.md)), `borderBox()`, `contentBox()` y las columnas son las de
+antes de girar: dentro de una caja con `Rotate`, sus hijos están donde estarían sin el giro, que es a lo que se refieren
+sus posiciones. Dónde se ve cada cosa lo dicen `bounds()` y `painted()`. En una caja girada en el flujo, `bounds()` es
+el sitio que ocupa en el flujo.
+
+`PlacedMatchesPaintingTest` maqueta cada caso de `test/golden` y comprueba que cada fragmento tiene en `Placed` la misma
+caja y el mismo rectángulo que en el recorrido con el que se pinta la página.
+
+> **Decisión:** la posición en el papel se pregunta, y no se guarda en el `Fragment`: un fragmento se coloca dentro de
+> su padre, y mientras se maqueta se mueve entero con él (una columna a su sitio, una fila a su página) sin tocar a sus
+> descendientes. `Placed` hace la suma al preguntar, con la misma regla con la que se pinta. *Alternativas
+> descartadas:* guardar la posición absoluta en cada fragmento, que obligaría a reescribir el subárbol en cada
+> movimiento; dejar la suma a quien integra, que es repetir fuera lo que sabe el motor (el origen del área de página, la
+> caja sin girar de un giro en flujo, que un `Page overlay` no gira con quien lo declara, cuántas columnas salen de un
+> `Min column width`), y un cambio del motor movería sus dibujos sin dar ningún error.
+
+> **Decisión:** las cajas de `Placed` son las de antes del giro, y `bounds()` y `painted()`, las de después: con las
+> primeras se baja a los hijos y se entiende la caja, con las segundas se sabe qué parte del papel toca. *Alternativa
+> descartada:* dar solo el rectángulo que encierra lo girado, del que no se puede sacar dónde está nada de lo de dentro.
+
+> **Decisión:** `placed(id)` da una lista vacía, y no un error, si ninguna caja lleva ese `Id`: una caja con `Id` puede
+> no estar en ninguna página (un `Page overlay` con `Pages: not-first` en un documento de una página), y quien integra
+> decide si eso es un error. *Alternativa descartada:* una excepción, que obligaría a saber antes si la caja se maquetó.
+
+> **Decisión:** un fondo del todo transparente no cuenta como pintado, y una línea de texto cuenta con su caja de línea
+> entera: lo primero no se ve, y lo segundo es lo que el texto ocupa, que no depende de qué letras lleve la línea.
+> *Alternativa descartada:* la tinta de los glifos, que haría que dos líneas del mismo párrafo acabaran a distinta
+> altura según tengan o no una «p» o una «g».
 
 ### Una página sobre una página ajena
 

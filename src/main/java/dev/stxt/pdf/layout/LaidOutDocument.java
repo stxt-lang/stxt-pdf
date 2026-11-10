@@ -1,12 +1,18 @@
 package dev.stxt.pdf.layout;
 
 import dev.stxt.pdf.fragment.Page;
+import dev.stxt.pdf.fragment.Placed;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.PageSetup;
 import dev.stxt.pdf.tree.Metadata;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Result of {@link Engine#layOutDocument}: what the output (SVG, PDF or the test dump) needs without building
@@ -53,5 +59,59 @@ public record LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, 
      */
     public LaidOutDocument(PageSetup pageSetup, Metadata metadata, Box root, List<Page> pages) {
         this(pageSetup, metadata, root, pages, null);
+    }
+
+    /**
+     * Where the box with that {@code Id} ended up (reference/implementation/api.md): its fragments, one per page it
+     * falls on, each with its boxes on the paper ({@link Placed}). A {@code Page overlay} gives one per page it
+     * repeats on. It goes through the whole document once: whoever asks for many boxes asks for
+     * {@link #placedById()} once instead.
+     *
+     * @param id the {@code Id} of the box; not {@code null}
+     * @return its fragments, in page order; empty if no laid out box has that {@code Id}
+     */
+    public List<Placed> placed(String id) {
+        Objects.requireNonNull(id, "id");
+        List<Placed> found = new ArrayList<>();
+        for (Page page : pages) {
+            for (Placed root : page.placed()) {
+                collect(root, id, found);
+            }
+        }
+        return List.copyOf(found);
+    }
+
+    /**
+     * {@return where every box with an {@code Id} ended up: its fragments ({@link #placed(String)}) by {@code Id}, in
+     * the order the document is painted in. One pass through the document}
+     */
+    public Map<String, List<Placed>> placedById() {
+        Map<String, List<Placed>> byId = new LinkedHashMap<>();
+        for (Page page : pages) {
+            for (Placed root : page.placed()) {
+                index(root, byId);
+            }
+        }
+        byId.replaceAll((id, placed) -> List.copyOf(placed));
+        return Collections.unmodifiableMap(byId);
+    }
+
+    private static void collect(Placed placed, String id, List<Placed> found) {
+        if (id.equals(placed.fragment().box().id())) {
+            found.add(placed);
+        }
+        for (Placed child : placed.children()) {
+            collect(child, id, found);
+        }
+    }
+
+    private static void index(Placed placed, Map<String, List<Placed>> byId) {
+        String id = placed.fragment().box().id();
+        if (id != null) {
+            byId.computeIfAbsent(id, k -> new ArrayList<>()).add(placed);
+        }
+        for (Placed child : placed.children()) {
+            index(child, byId);
+        }
     }
 }

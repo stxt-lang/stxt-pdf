@@ -66,4 +66,13 @@ public record Page(int number, Fragment content, List<Fragment> pageOverlays, Pa
     public boolean numbered() {
         return printed > 0;
     }
+
+    /**
+     * {@return the fragments of the page where they are on the paper ({@link Placed}), in the order they are painted
+     * in: its flow ({@link #content()}), its footnote area if it has one and its {@code Page overlay} boxes. Each one
+     * gives its descendants ({@link Placed#children()})}
+     */
+    public List<Placed> placed() {
+        return Placed.of(this);
+    }
 }
