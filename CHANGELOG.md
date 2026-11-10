@@ -5,16 +5,15 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.14.0] - 2026-11-10
+
+A box that drops the margins of its children at its edges, where each box ended up on the paper, the author and the
+producer of the PDF, and attachments in a PDF that is not PDF/A. **From 0.13.0**: an `Attachment` without `pdfA` is
+embedded instead of being `ATTACHMENT_REQUIRES_PDFA3`, which stays only for PDF/A-2 and changes its message; and
+`tree.Metadata` has a fourth component, `author`, so its constructor takes four arguments instead of three. The names
+of the `dev.stxt.pdf` namespace and the Java API may still change before 1.0.
 
 ### Added
-
-- **The author and the producer of the PDF.** `Author` in `Document` (optional, a non-empty text) is who writes the
-  document, and `Converter.Builder.producer(String)` the software that makes the PDF. The engine writes each one in the
-  document information (`Author`, `Producer`) and in the XMP packet (`dc:creator`, `pdf:Producer`), equal in both, as
-  PDF/A requires; whoever integrates no longer has to rewrite the XMP packet after `toPdf`. Without them, the PDF has
-  no author and no producer, as before. `Metadata` gains the `author` component. "`Author`" in the reference of
-  `Document` and "Title, subject, author and producer" in "The PDF".
 
 - **`Trim margins`** (`none`, `both`, `top`, `bottom`), in `Block`, `Frame`, `List item`, `Cell` and `Section`: the
   box drops the margins of its children that touch its top border (`top`: the top one of the first child), its bottom
@@ -31,6 +30,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   box and its content (`columns()`), and the rectangle that encloses what it and its flow really paint (`painted()`):
   where the content of a page or of a column ends, to draw over a laid out box or to fill the blank below it without
   adding up borders and paddings outside the engine. It is in the promised API. "Where each box ended up" in "Using from Java".
+- **The author and the producer of the PDF.** `Author` in `Document` (optional, a non-empty text) is who writes the
+  document, and `Converter.Builder.producer(String)` the software that makes the PDF. The engine writes each one in the
+  document information (`Author`, `Producer`) and in the XMP packet (`dc:creator`, `pdf:Producer`), equal in both, as
+  PDF/A requires; whoever integrates no longer has to rewrite the XMP packet after `toPdf`. Without them, the PDF has
+  no author and no producer, as before. `Metadata` gains the `author` component. "`Author`" in the reference of
+  `Document` and "Title, subject, author and producer" in "The PDF".
 
 ### Changed
 

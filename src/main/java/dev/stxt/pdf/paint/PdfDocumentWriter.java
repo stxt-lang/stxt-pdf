@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * <p>The document can also be written into a {@link PDDocument} the caller has open and saves afterwards
  * ({@link #write(LaidOutDocument, Resources, Limits, PDDocument, boolean, int, PdfA, Attachments, Cancellation,
- * Progress)}), and a single page can be painted on a page of any document with {@link PdfPainter}.</p>
+ * Progress, String)}), and a single page can be painted on a page of any document with {@link PdfPainter}.</p>
  *
  * <p><strong>Threads:</strong> {@link #write} is static and all its state (the PDF document, the embedded
  * fonts, the structure, the links) belongs to that call, so it can be called concurrently from several
