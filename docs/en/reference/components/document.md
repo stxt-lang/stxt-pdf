@@ -1,7 +1,7 @@
 # `Document`
 
 The root of every document: `Document`, with the namespace `dev.stxt.pdf`. It has exactly one `Page`, one `Title` and one
-`Language`, an optional `Subject`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
+`Language`, an optional `Subject` and `Author`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
 which hold the content. A document has no loose content and no `Typography`: the base typography goes in the rule
 `For element: Document`.
 
@@ -106,6 +106,24 @@ as its subject, which the viewer shows in the document properties and which docu
 > processor and of a PDF viewer. *Rejected alternative:* `Description`, the name of its copy in the XMP metadata
 > (`dc:description`), which would be mistaken for a text that describes the content for whoever cannot see it, which is
 > `Alt`.
+
+## `Author`
+
+`Author` says who writes the document, a person or an organization: `Author: Northern Insurance`. It is optional, at
+most one, and a non-empty text (`VALUE_NOT_ALLOWED` if it is empty). It does not affect the layout: it goes to the PDF
+as its author, which the viewer shows in the document properties
+([The PDF](../common/pdf.md#title-subject-author-and-producer)). Without `Author`, the PDF has no author. The software
+that makes the PDF, the producer, does not belong to the document but to whoever converts it:
+`Converter.builder().producer(...)` ([Using from Java](../implementation/api.md#converting)).
+
+> **Decision:** the author goes in the document and the producer in the `Converter`. The author changes from one
+> document to another and is part of what is written: with it in the document, the same STXT gives the same PDF with
+> any program that converts it. The producer is the program, the same in all its documents. The engine writes both in
+> the document information and in the XMP at once, which PDF/A requires to be equal. *Rejected alternatives:* that
+> whoever integrates sets them with PDFBox after `toPdf`, which forces rewriting the XMP packet the engine wrote and
+> keeping both places equal from outside; both in the document, which would make every document carry the name of the
+> program that converts it; and a list of authors, which the `Author` of the document information, a single text, does
+> not admit.
 
 ## `Section`
 

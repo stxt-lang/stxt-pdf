@@ -32,6 +32,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `pdfA(PdfA)` | El PDF/A que cumple además el PDF: `A2B`, `A2A`, `A3B` o `A3A` ([abajo](#pdfa-y-adjuntos)); por defecto, ninguno. Con `pdfUa(2)`, `build()` es un `IllegalArgumentException` |
 | `exclude(Check...)` | Quita comprobaciones. Por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
 | `cancellation(Cancellation)` | La que para todas las conversiones del `Converter`; por defecto, ninguna ([Cancelar una conversión](#cancelar-una-conversión)) |
+| `producer(String)` | El programa que hace el PDF, en el `Producer` de la información del documento y en el `pdf:Producer` del XMP ([El PDF](../common/pdf.md#título-asunto-autor-y-productor)); por defecto, ninguno. Vacío es un `IllegalArgumentException`. El autor es del documento (`Author`) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si
@@ -577,7 +578,7 @@ quien lo abrió, y por eso el identificador del fichero (`/ID`) es el que PDFBox
 ([El PDF por dentro](pdf.md#páginas-fuentes-y-metadatos)): dos guardados no dan los mismos bytes. El `PDDocument` tiene
 que estar **sin páginas** (otra cosa es un `IllegalArgumentException`): un documento se escribe entero, porque su árbol de
 estructura, sus etiquetas de página y sus metadatos son de todo el PDF. Lo que el `PDDocument` tuviera (claves del
-diccionario `Info`) se queda, salvo lo que el documento escribe: el título, el asunto, el idioma y el paquete XMP, que
+diccionario `Info`) se queda, salvo lo que el documento escribe: el título, el asunto, el autor, el productor, el idioma y el paquete XMP, que
 se sustituye entero; por eso las claves propias se ponen después. Si la conversión se cancela, el documento queda a
 medias. Por debajo, `PdfDocumentWriter.write` tiene la misma sobrecarga con un `PDDocument`.
 

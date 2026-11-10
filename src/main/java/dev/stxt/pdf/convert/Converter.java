@@ -110,6 +110,8 @@ public final class Converter {
     private final int pdfUa;
     private final PdfA pdfA;
     private final Cancellation cancellation;
+    /** The software that the PDF names as its producer ({@link Builder#producer}); {@code null} for none. */
+    private final String producer;
 
     private Converter(Builder builder) {
         this.resources = builder.resources;
@@ -125,6 +127,7 @@ public final class Converter {
         this.pdfUa = builder.pdfUa;
         this.pdfA = builder.pdfA;
         this.cancellation = builder.cancellation;
+        this.producer = builder.producer;
     }
 
     /** The same configuration as {@code other}, with a new snapshot of its resources ({@link #reloaded()}). */
@@ -149,6 +152,7 @@ public final class Converter {
         this.pdfUa = other.pdfUa;
         this.pdfA = other.pdfA;
         this.cancellation = other.cancellation;
+        this.producer = other.producer;
     }
 
     /**
@@ -197,6 +201,7 @@ public final class Converter {
         b.pdfUa = pdfUa;
         b.pdfA = pdfA;
         b.cancellation = cancellation;
+        b.producer = producer;
         return b;
     }
 
@@ -540,7 +545,7 @@ public final class Converter {
         Objects.requireNonNull(progress, "progress");
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         guarded(() -> PdfDocumentWriter.write(document, resources(document), limits, target, debug, pdfUa, pdfA,
-                attachments, stop, progress));
+                attachments, stop, progress, producer));
     }
 
     /**
@@ -551,7 +556,7 @@ public final class Converter {
      * does not write (keys of its own in the information dictionary, a stamp on every page, encryption) and saves it;
      * the file identifier is then the one PDFBox gives it, not the one of the content, so two saves do not give the
      * same bytes. What {@code target} had before is kept, except what the document writes (its title, subject,
-     * language and XMP packet). A single page is painted on a page of any document with
+     * author, language and XMP packet) and the producer of the converter ({@link Builder#producer}). A single page is painted on a page of any document with
      * {@link dev.stxt.pdf.paint.PdfPainter}.
      *
      * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}
@@ -591,7 +596,7 @@ public final class Converter {
         }
         Cancellation stop = this.cancellation.or(Objects.requireNonNull(cancellation, "cancellation"));
         guarded(() -> PdfDocumentWriter.write(document, resources(document), limits, target, debug, pdfUa, pdfA,
-                attachments, stop, progress));
+                attachments, stop, progress, producer));
     }
 
     /**
@@ -706,6 +711,7 @@ public final class Converter {
         private int pdfUa = 1;
         private PdfA pdfA;
         private Cancellation cancellation = Cancellation.NONE;
+        private String producer;
 
         private Builder() {
         }
@@ -884,6 +890,24 @@ public final class Converter {
          */
         public Builder debug(boolean debug) {
             this.debug = debug;
+            return this;
+        }
+
+        /**
+         * The software that makes the PDFs of this converter, as the PDF names its producer (reference/common/pdf.md):
+         * in the document information ({@code Producer}) and in the XMP packet ({@code pdf:Producer}), which PDF/A
+         * requires to agree. By default none. It is of whoever converts, not of the document: the author is
+         * ({@code Author} of {@code Document}).
+         *
+         * @param producer the name of the software, as {@code "My service 2.1"}; not {@code null} nor blank
+         * @return this builder
+         * @throws IllegalArgumentException if it is blank
+         */
+        public Builder producer(String producer) {
+            if (Objects.requireNonNull(producer, "producer").isBlank()) {
+                throw new IllegalArgumentException("The producer needs a text");
+            }
+            this.producer = producer.strip();
             return this;
         }
 

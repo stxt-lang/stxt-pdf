@@ -21,7 +21,7 @@ Cada elemento solo admite los hijos que tienen sentido en él: sus propiedades y
 define el [schema](#schema), así que una propiedad fuera de su sitio (`Column sizes` en un `Stack`, `Offset` en un `Block`) es
 un error al leer el documento, también en el editor.
 
-La raíz es `Document`, con exactamente un `Page`, un `Title` y un `Language`, un `Subject` opcional, un `Styles` opcional con las reglas
+La raíz es `Document`, con exactamente un `Page`, un `Title` y un `Language`, un `Subject` y un `Author` opcionales, un `Styles` opcional con las reglas
 reutilizables ([Styles](styles.md)), los `Page overlay` de todo el documento y una o más `Section` con el contenido
 ([Document](../components/document.md)). No hay contenido suelto: todo lo que se maqueta va dentro de una sección. Las
 reglas pueden venir también de un documento de estilos aparte ([Styles](styles.md#documento-de-estilos-aparte)).
@@ -189,7 +189,7 @@ vez, y los elementos, las veces que se quiera.
 
 | Nodo | Hijos |
 |---|---|
-| `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Subject`, `Styles`; `Page overlay`, `Section` (al menos una) |
+| `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Subject`, `Author`, `Styles`; `Page overlay`, `Section` (al menos una) |
 | `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elementos |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |

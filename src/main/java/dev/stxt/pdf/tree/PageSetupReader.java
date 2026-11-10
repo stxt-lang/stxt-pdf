@@ -35,17 +35,18 @@ final class PageSetupReader {
     }
 
     /**
-     * {@code Title}, {@code Language} and {@code Subject} of {@code Document}: a non-empty title, a BCP 47 tag and, if
-     * there is one, a non-empty subject.
+     * {@code Title}, {@code Language}, {@code Subject} and {@code Author} of {@code Document}: a non-empty title, a BCP 47
+     * tag and, if there are, a non-empty subject and author.
      */
     static Metadata metadata(InlineNode document) {
         String title = child(document, "title").map(n -> text(n, "Title")).orElse(null);
         String language = child(document, "language").map(ValueReader::language).orElse(null);
         String subject = child(document, "subject").map(n -> text(n, "Subject")).orElse(null);
-        return new Metadata(title, language, subject);
+        String author = child(document, "author").map(n -> text(n, "Author")).orElse(null);
+        return new Metadata(title, language, subject, author);
     }
 
-    /** The text of a {@code Title} or a {@code Subject}, which cannot be empty. */
+    /** The text of a {@code Title}, a {@code Subject} or an {@code Author}, which cannot be empty. */
     private static String text(Node n, String name) {
         String t = n.getText().trim();
         if (t.isEmpty()) {

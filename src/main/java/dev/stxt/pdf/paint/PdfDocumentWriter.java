@@ -86,7 +86,7 @@ public final class PdfDocumentWriter {
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
             boolean debug, int ua, PdfA pdfA, Attachments attachments) throws IOException {
-        write(document, resources, limits, target, debug, ua, pdfA, attachments, Cancellation.NONE, Progress.NONE);
+        write(document, resources, limits, target, debug, ua, pdfA, attachments, Cancellation.NONE, Progress.NONE, null);
     }
 
     /**
@@ -95,11 +95,13 @@ public final class PdfDocumentWriter {
      * (reference/implementation/api.md): it is asked at each page before painting it, at each image the first time it
      * is embedded or drawn, and before saving. Nothing has been written to {@code target} then: the PDF is written
      * whole at the end. And telling {@code progress} each page painted and, once the PDF is written, that it is done.
+     * With {@code producer} the PDF names the software that made it ({@code null} for none: then no {@code Producer},
+     * unless PDFBox writes one when saving).
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, OutputStream target,
-            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
-            throws IOException {
-        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress);
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress,
+            String producer) throws IOException {
+        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress, producer);
         try (PDDocument doc = new PDDocument()) {
             paint(document, resources, limits, doc, options);
             cancellation.check();
@@ -120,24 +122,24 @@ public final class PdfDocumentWriter {
      * file (reference/implementation/api.md): the same pages, fonts, structure tree, bookmarks, links, page labels,
      * metadata, PDF/A declaration and embedded files as
      * {@link #write(LaidOutDocument, Resources, Limits, OutputStream, boolean, int, PdfA, Attachments, Cancellation,
-     * Progress)}, with two differences. The document is not saved: the caller saves it, after adding what the engine
+     * Progress, String)}, with two differences. The document is not saved: the caller saves it, after adding what the engine
      * does not write (its own keys in the information dictionary, a stamp on every page, encryption...). And the file
      * identifier is the one PDFBox gives it when saved, not the one of the content ({@link PdfId}), so two saves do
      * not give the same bytes. Besides the pages, what was in {@code target} before is kept, except what the document
-     * writes (its title, subject, language and XMP packet). On a {@link dev.stxt.pdf.model.CancelledException}, the
+     * writes (its title, subject, author, producer, language and XMP packet). On a {@link dev.stxt.pdf.model.CancelledException}, the
      * document is left half written.
      *
      * @throws IllegalArgumentException if {@code target} already has pages: a document is written whole, into a new
      *         {@link PDDocument}
      */
     public static void write(LaidOutDocument document, Resources resources, Limits limits, PDDocument target,
-            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress)
-            throws IOException {
+            boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation, Progress progress,
+            String producer) throws IOException {
         if (target.getNumberOfPages() > 0) {
             throw new IllegalArgumentException("The document is written into a PDDocument without pages, and this "
                     + "one has " + target.getNumberOfPages() + "; one page at a time goes with PdfPainter");
         }
-        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress);
+        PdfOptions options = new PdfOptions(debug, ua, pdfA, attachments, cancellation, progress, producer);
         try {
             paint(document, resources, limits, target, options);
         } catch (UncheckedIOException e) {
@@ -148,8 +150,8 @@ public final class PdfDocumentWriter {
 
     /**
      * How the document is written, what the public {@code write} methods receive: the outlines of {@code debug}, the
-     * part of PDF/UA, the PDF/A ({@code null} for none), the embedded files and the extra XMP, the cancellation and the
-     * progress.
+     * part of PDF/UA, the PDF/A ({@code null} for none), the embedded files and the extra XMP, the cancellation, the
+     * progress and the producer ({@code null} for none).
      *
      * @throws IllegalArgumentException if {@code ua} is neither 1 nor 2, or if it is 2 (PDF 2.0) with a PDF/A, which
      *         are PDF 1.7 files
@@ -157,7 +159,7 @@ public final class PdfDocumentWriter {
      *         PDF/A-3
      */
     private record PdfOptions(boolean debug, int ua, PdfA pdfA, Attachments attachments, Cancellation cancellation,
-                              Progress progress) {
+                              Progress progress, String producer) {
 
         PdfOptions {
             if (ua != 1 && ua != 2) {
@@ -190,7 +192,8 @@ public final class PdfDocumentWriter {
             PdfStructure structure = new PdfStructure(doc, document.root(), UaProfile.of(options.ua()));
             PdfLinks links = new PdfLinks();
             PdfPageWriter writer = new PdfPageWriter(doc, resources, fonts, images, structure, links);
-            PdfMetadata.write(doc, document.metadata(), options.ua(), options.pdfA(), options.attachments().xmp());
+            PdfMetadata.write(doc, document.metadata(), options.producer(), options.ua(), options.pdfA(),
+                    options.attachments().xmp());
             // All the pages exist before any is painted: a link may point forward.
             List<PDPage> pdfPages = new ArrayList<>();
             for (int i = 0; i < pages.size(); i++) {

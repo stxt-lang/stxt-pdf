@@ -4,6 +4,7 @@
 
 - **`Language`** y **`Title`**: obligatorios.
 - **`Subject`**: opcional, de qué trata el documento.
+- **`Author`**: opcional, quién lo escribe.
 - **`Page`**: el papel y los márgenes.
 - **`Styles`**: opcional, con las reglas de estilo ([Estilos](../common/styles.md)).
 - **`Page overlay`**: opcionales, las cabeceras y los pies de todo el documento.
@@ -74,6 +75,9 @@ reglas. Los dos son obligatorios, porque sin ellos el PDF no es accesible.
 
 `Subject` es opcional: una frase que dice de qué trata el documento. Es el asunto del PDF, que el visor enseña en las
 propiedades del documento y que usan los gestores documentales y los buscadores.
+
+`Author` también es opcional: quién escribe el documento, una persona o una organización. Es el autor del PDF, que el
+visor enseña en las propiedades del documento.
 
 ## `Page`
 

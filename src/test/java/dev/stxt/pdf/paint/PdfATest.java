@@ -53,6 +53,7 @@ class PdfATest {
             "\tLanguage: es",
             "\tTitle: Prueba & PDF/A",
             "\tSubject: Lo que <restringe> PDF/A",
+            "\tAuthor: Peña & <Hijos>",
             "\tPage:",
             "\t\tWidth: 400",
             "\t\tHeight: 500",
@@ -161,13 +162,16 @@ class PdfATest {
 
     private static final DocumentReader READER = new DocumentReader();
 
+    /** The producer of the converter, with what the XMP escapes. */
+    private static final String PRODUCER = "Servicio <PDF> & más 2.1";
+
     private static InlineNode document() {
         return READER.read(Docs.sectioned(DOCUMENT));
     }
 
     private static byte[] pdf(PdfA pdfA, Attachments attachments) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.Builder builder = Converter.builder();
+        Converter.Builder builder = Converter.builder().producer(PRODUCER);
         if (pdfA != null) {
             builder.pdfA(pdfA);
         }
@@ -199,6 +203,7 @@ class PdfATest {
             assertEquals("Lo que <restringe> PDF/A", doc.getDocumentInformation().getSubject());
             assertTrue(xmp.contains("<dc:description><rdf:Alt><rdf:li xml:lang=\"x-default\">"
                     + "Lo que &lt;restringe&gt; PDF/A</rdf:li></rdf:Alt></dc:description>"), xmp);
+            assertAuthorAndProducer(doc, xmp);
             List<PDOutputIntent> intents = doc.getDocumentCatalog().getOutputIntents();
             assertEquals(1, intents.size());
             assertEquals("sRGB IEC61966-2.1", intents.get(0).getOutputConditionIdentifier());
@@ -206,7 +211,19 @@ class PdfATest {
         }
     }
 
-    /** Without PDF/A nothing changes: no output intent and no declaration. */
+    /**
+     * The author of the document and the producer of the converter agree in the document information and in the XMP,
+     * as PDF/A requires ({@code dc:creator} and {@code pdf:Producer}).
+     */
+    private static void assertAuthorAndProducer(PDDocument doc, String xmp) {
+        assertEquals("Peña & <Hijos>", doc.getDocumentInformation().getAuthor());
+        assertEquals(PRODUCER, doc.getDocumentInformation().getProducer());
+        assertTrue(xmp.contains("<dc:creator><rdf:Seq><rdf:li>Peña &amp; &lt;Hijos&gt;</rdf:li></rdf:Seq></dc:creator>"),
+                xmp);
+        assertTrue(xmp.contains("<pdf:Producer>Servicio &lt;PDF&gt; &amp; más 2.1</pdf:Producer>"), xmp);
+    }
+
+    /** Without PDF/A nothing changes: no output intent and no declaration; the author and the producer, the same. */
     @Test
     void withoutPdfAThereIsNoOutputIntent() throws Exception {
         try (PDDocument doc = Loader.loadPDF(pdf(null, Attachments.NONE))) {
@@ -214,7 +231,32 @@ class PdfATest {
             String xmp = new String(doc.getDocumentCatalog().getMetadata().toByteArray(), StandardCharsets.UTF_8);
             assertFalse(xmp.contains("pdfaid"), xmp);
             assertNull(doc.getDocumentCatalog().getNames());
+            assertAuthorAndProducer(doc, xmp);
         }
+    }
+
+    /** Without an author or a producer, the PDF names none: the engine does not make one up. */
+    @Test
+    void withoutAuthorOrProducerThereAreNone() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Converter.builder().pdfA(PdfA.A3A).build()
+                .toPdf(READER.read(Docs.sectioned(DOCUMENT.replace("\tAuthor: Peña & <Hijos>\n", ""))), out);
+        byte[] pdf = out.toByteArray();
+        assertEquals(Map.of(), PdfUa.failedRules(pdf, PdfUa.flavour(PdfA.A3A)));
+        try (PDDocument doc = Loader.loadPDF(pdf)) {
+            assertNull(doc.getDocumentInformation().getAuthor());
+            assertNull(doc.getDocumentInformation().getProducer());
+            String xmp = new String(doc.getDocumentCatalog().getMetadata().toByteArray(), StandardCharsets.UTF_8);
+            assertFalse(xmp.contains("dc:creator"), xmp);
+            assertFalse(xmp.contains("pdf:Producer"), xmp);
+        }
+    }
+
+    /** The producer is a text: a blank one is a mistake of whoever builds the converter. */
+    @Test
+    void aBlankProducerIsNotAccepted() {
+        assertThrows(IllegalArgumentException.class, () -> Converter.builder().producer(" "));
+        assertThrows(NullPointerException.class, () -> Converter.builder().producer(null));
     }
 
     /**

@@ -101,7 +101,7 @@ Las piezas:
 
 | Clase | Qué hace |
 |---|---|
-| `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title`, `Language` y `Subject` |
+| `PageSetupReader` | `Page` (con la herencia por grupos de las secciones), `Title`, `Language`, `Subject` y `Author` |
 | `SectionReader` | Las propiedades de una `Section` (`Id`, `Page`, la numeración de páginas y de notas, `Inherit page overlays`, `Begin on`) y sus reglas; la caja, el área de notas y `SECTION_EMPTY` quedan en `BoxTreeBuilder.section` |
 | `ValueReader` | Interpreta los valores de cada propiedad y comprueba sus formas |
 | `PropertyReader` | Los grupos, las propiedades de `Stack`, `Grid` e `Item` y las propias de los elementos, con tablas `Map<String, Property>` |

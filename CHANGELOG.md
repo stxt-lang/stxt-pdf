@@ -9,6 +9,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **The author and the producer of the PDF.** `Author` in `Document` (optional, a non-empty text) is who writes the
+  document, and `Converter.Builder.producer(String)` the software that makes the PDF. The engine writes each one in the
+  document information (`Author`, `Producer`) and in the XMP packet (`dc:creator`, `pdf:Producer`), equal in both, as
+  PDF/A requires; whoever integrates no longer has to rewrite the XMP packet after `toPdf`. Without them, the PDF has
+  no author and no producer, as before. `Metadata` gains the `author` component. "`Author`" in the reference of
+  `Document` and "Title, subject, author and producer" in "The PDF".
+
 - **`Trim margins`** (`none`, `both`, `top`, `bottom`), in `Block`, `Frame`, `List item`, `Cell` and `Section`: the
   box drops the margins of its children that touch its top border (`top`: the top one of the first child), its bottom
   border (`bottom`: the bottom one of the last) or both (`both`), and those of their own first and last children that

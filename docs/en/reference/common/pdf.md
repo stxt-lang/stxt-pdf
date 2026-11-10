@@ -78,12 +78,15 @@ The caller can turn the check off ([Using from Java](../implementation/api.md#co
 One per heading, with its text (and its number, if it has one), nested by level, and leading to the heading. The viewer
 shows them when the document is opened.
 
-## Title and subject
+## Title, subject, author and producer
 
 `Title` is what the viewer shows instead of the file name. `Subject`, if there is one, is the subject of the PDF: the
 viewer shows it in the document properties, and document managers and search engines read it
-([Document](../components/document.md#subject)). Both go in the document information and in the XMP metadata, the same
-in both places, as PDF/A requires.
+([Document](../components/document.md#subject)). `Author`, if there is one, is its author
+([Document](../components/document.md#author)), and the producer, the software that makes it, is given by whoever
+converts with `Converter.builder().producer(...)` ([Using from Java](../implementation/api.md#converting));
+without it, the PDF has none. All four go in the document information and in the XMP metadata, the same in both
+places, as PDF/A requires.
 
 ## PDF/A
 

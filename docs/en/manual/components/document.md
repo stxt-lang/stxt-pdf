@@ -4,6 +4,7 @@
 
 - **`Language`** and **`Title`**: required.
 - **`Subject`**: optional, what the document is about.
+- **`Author`**: optional, who writes it.
 - **`Page`**: the paper and the margins.
 - **`Styles`**: optional, with the style rules ([Styles](../common/styles.md)).
 - **`Page overlay`**: optional, the headers and footers of the whole document.
@@ -74,6 +75,9 @@ rules. Both are required, because without them the PDF is not accessible.
 
 `Subject` is optional: a sentence that says what the document is about. It is the subject of the PDF, which the viewer
 shows in the document properties and which document managers and search engines use.
+
+`Author` is optional too: who writes the document, a person or an organization. It is the author of the PDF, which the
+viewer shows in the document properties.
 
 ## `Page`
 

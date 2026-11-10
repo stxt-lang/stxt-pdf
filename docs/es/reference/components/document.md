@@ -1,7 +1,7 @@
 # `Document`
 
 La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Page`, un `Title` y un
-`Language`, un `Subject` opcional, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
+`Language`, un `Subject` y un `Author` opcionales, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
 `For element: Document`.
 
@@ -106,6 +106,23 @@ visor enseña en las propiedades del documento y que leen los gestores documenta
 > **Decisión:** se llama `Subject`, como la entrada del PDF y el campo «Asunto» de las propiedades de un procesador de
 > textos y de un visor de PDF. *Alternativa descartada:* `Description`, el nombre de su copia en los metadatos XMP
 > (`dc:description`), que se confundiría con un texto que describe el contenido para quien no lo ve, que es `Alt`.
+
+## `Author`
+
+`Author` dice quién escribe el documento, una persona o una organización: `Author: Seguros del Norte`. Es opcional,
+como mucho uno, y es un texto no vacío (`VALUE_NOT_ALLOWED` si está vacío). No afecta al layout: va al PDF como su
+autor, que el visor enseña en las propiedades del documento ([El PDF](../common/pdf.md#título-asunto-autor-y-productor)).
+Sin `Author`, el PDF no lleva autor. El programa que hace el PDF, el productor, no es del documento sino de quien
+convierte: `Converter.builder().producer(...)` ([Uso desde Java](../implementation/api.md#convertir)).
+
+> **Decisión:** el autor va en el documento y el productor en el `Converter`. El autor cambia de un documento a otro y
+> es parte de lo que se escribe: con él en el documento, el mismo STXT da el mismo PDF con cualquier programa que lo
+> convierta. El productor es el programa, el mismo en todos sus documentos. Los dos los escribe el motor en la
+> información del documento y en el XMP a la vez, que PDF/A exige iguales. *Alternativas descartadas:* que quien
+> integra los ponga con PDFBox después de `toPdf`, que obliga a reescribir el paquete XMP que ha escrito el motor y a
+> mantener los dos sitios iguales por fuera; los dos en el documento, que haría escribir en cada documento el nombre del
+> programa que lo convierte; y una lista de autores, que el `Author` de la información del documento, un solo texto, no
+> admite.
 
 ## `Section`
 

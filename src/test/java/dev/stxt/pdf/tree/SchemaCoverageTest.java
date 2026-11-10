@@ -35,6 +35,7 @@ class SchemaCoverageTest {
             // Document
             Map.entry("Title", "Title: Informe"),
             Map.entry("Subject", "Subject: Resultados del año"),
+            Map.entry("Author", "Author: Ana Pérez"),
             Map.entry("Language", "Language: es"),
             // Section
             Map.entry("Page numbering", "Page numbering: restart"),

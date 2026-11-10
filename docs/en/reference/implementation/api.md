@@ -31,6 +31,7 @@ List<String> svg = converter.toSvg(laidOut);   // one string per page
 | `pdfA(PdfA)` | The PDF/A the PDF also conforms to: `A2B`, `A2A`, `A3B` or `A3A` ([below](#pdfa-and-attachments)); by default, none. With `pdfUa(2)`, `build()` is an `IllegalArgumentException` |
 | `exclude(Check...)` | Removes checks. By default all of them are made ([Checks](#checks)) |
 | `cancellation(Cancellation)` | The one that stops every conversion of the `Converter`; by default, none ([Canceling a conversion](#canceling-a-conversion)) |
+| `producer(String)` | The software that makes the PDF, in the `Producer` of the document information and in the `pdf:Producer` of the XMP ([The PDF](../common/pdf.md#title-subject-author-and-producer)); by default, none. A blank one is an `IllegalArgumentException`. The author belongs to the document (`Author`) |
 
 > **Decision:** the configuration is an immutable object, `Converter`, thread-safe because each conversion creates its
 > own `Engine`, with `layOut`, `toPdf` (of a document or of one already laid out) and `toSvg`. The styles are never `null`: if
@@ -588,7 +589,7 @@ and so the file identifier (`/ID`) is the one PDFBox gives it when saving and no
 ([The PDF inside](pdf.md#pages-fonts-and-metadata)): two saves do not give the same bytes. The `PDDocument` has to be
 **without pages** (anything else is an `IllegalArgumentException`): a document is written whole, because its structure
 tree, its page labels and its metadata belong to the whole PDF. What the `PDDocument` had (keys of the `Info`
-dictionary) is kept, except what the document writes: the title, the subject, the language and the XMP packet, which is
+dictionary) is kept, except what the document writes: the title, the subject, the author, the producer, the language and the XMP packet, which is
 replaced whole; that is why the caller's own keys are set afterwards. If the conversion is canceled, the document is
 left half written. Underneath, `PdfDocumentWriter.write` has the same overload with a `PDDocument`.
 
