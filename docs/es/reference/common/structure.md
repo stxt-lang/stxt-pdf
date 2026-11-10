@@ -109,7 +109,7 @@ Text: Resultados del trimestre
 | `In table of contents` | `true`, `false` | `true` | Encabezados, `Figure` | Si el encabezado o la figura tiene entrada en los índices ([Encabezados](../components/heading.md#fuera-del-índice), [Figure](../components/figure.md#índices)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` o `#id` | sin valor | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](links.md)). No se hereda ni cambia el aspecto. |
 | `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta la fusión de márgenes con los hijos ([Block](../components/block.md#fusión-de-márgenes)). |
-| `Trim margins` | booleano | `false` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Descarta los márgenes de los hijos que tocan el borde de arriba y el de abajo de la caja ([Block](../components/block.md#recortar-los-márgenes-trim-margins)). |
+| `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Descarta los márgenes de los hijos que tocan el borde de arriba de la caja, el de abajo o los dos ([Block](../components/block.md#recortar-los-márgenes-trim-margins)). |
 | `Side` | `left`, `right` | sin valor | `Image`, `Barcode`, `Block`, `Figure` | Caja lateral: el texto que la sigue corre a su lado ([Block](../components/block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | `Text`, `Paragraph`, `Block`, encabezados, `Markdown`, `Image`, `Barcode`, `Figure` | Baja la caja por debajo de las cajas laterales anteriores ([Block](../components/block.md#cajas-laterales-side)). |
 | `Drop cap` | entero de 2 a 5 | sin valor | `Paragraph` | Letra capitular de tantas líneas ([Text](../components/text.md#letra-capitular-drop-cap)). |

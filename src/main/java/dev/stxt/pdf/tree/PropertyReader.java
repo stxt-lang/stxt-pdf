@@ -28,6 +28,7 @@ import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
+import dev.stxt.pdf.model.TrimMargins;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
 import dev.stxt.pdf.model.Preformatted;
@@ -137,7 +138,7 @@ final class PropertyReader {
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
-            entry("trim-margins", (p, s) -> s.setTrimMargins(bool(p))),
+            entry("trim-margins", (p, s) -> s.setTrimMargins(enumValue(TrimMargins.class, p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),

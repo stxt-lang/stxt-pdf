@@ -36,7 +36,7 @@ Document (dev.stxt.pdf):
         Paragraph: Después, retira la tapa con cuidado.
 ```
 
-Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins` y `Rotate` (girarlo con todo lo que contiene,
+Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins` y `Rotate` (girarlo con todo lo que contiene,
 [Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)), y dentro cualquier elemento.
 
 ## Cómo coloca a sus hijos
@@ -55,6 +55,30 @@ posicionados.
 El margen de arriba del primer hijo (y el de abajo del último) sale fuera del `Block` si este no tiene ni borde ni relleno
 en ese lado: queda como margen del propio `Block`. Con `Isolate margins: true`, los márgenes de los hijos se quedan dentro. Un
 `Block` que es ítem de un `Stack` o un `Grid` ya los deja dentro, así que ahí `Isolate margins: true` es un error.
+
+## `Trim margins`
+
+En un `Block` con fondo, borde o relleno, el margen de arriba del primer hijo y el de abajo del último se quedan dentro,
+como un hueco entre el borde y el contenido. `Trim margins: both` los descarta: el contenido empieza y acaba junto al
+relleno, tengan el margen que tengan sus párrafos.
+
+```
+Block:
+    Trim margins: both
+    Box:
+        Background: #F1EFE8
+        Padding: 10
+    Paragraph: El primer párrafo empieza junto al relleno.
+        Box:
+            Margin: 12 0 12 0
+    Paragraph: El último acaba junto al relleno; entre los dos quedan 12.
+        Box:
+            Margin: 12 0 12 0
+```
+
+Con `top` o `bottom` solo se descarta el margen de ese lado; `none`, el valor por defecto, no descarta ninguno. Vale
+también en un `Frame`, un `List item`, una `Cell` y una `Section`, donde el primer elemento empieza entonces arriba del
+área útil. Los márgenes entre los hijos no cambian nunca.
 
 ## Una caja a un lado y el texto alrededor (`Side`)
 

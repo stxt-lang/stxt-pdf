@@ -3,6 +3,8 @@ package dev.stxt.pdf.layout.block;
 import dev.stxt.pdf.layout.LayoutFixture;
 import dev.stxt.pdf.model.Rect;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static dev.stxt.pdf.layout.LayoutFixture.layOutPaged;
@@ -66,7 +68,7 @@ class BlockLayoutTest {
     void trimMarginsDropsTheMarginsOfTheFirstAndTheLastChildInsideAPadding() {
         // Without Trim margins the padding keeps both margins inside: P would be 80 high and C would start at 65.
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tTrim margins: true", "\t\tBox:", "\t\t\tPadding: 5",
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: both", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
                 "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
         assertRect(40, 40, 515, 40, l.rect("P"));
@@ -78,7 +80,7 @@ class BlockLayoutTest {
     void trimMarginsDropsTheMarginsThatWouldComeOutOfAnOpenBox() {
         // Without Trim margins those of C come out of P and merge with its own: P would start at 60 and S at 110.
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tTrim margins: true", "\t\tBox:", "\t\t\tMargin: 10 0 0 0",
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: both", "\t\tBox:", "\t\t\tMargin: 10 0 0 0",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
                 "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 5 0 0 0");
         assertRect(40, 50, 515, 30, l.rect("P"));
@@ -90,7 +92,7 @@ class BlockLayoutTest {
     void trimMarginsDropsTheMarginsOfTheFirstDescendantsAtAnyDepth() {
         // The margins of C come out of B, which is open, and touch the top and the bottom of P: they are dropped too.
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tTrim margins: true", "\t\tBox:", "\t\t\tPadding: 5",
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: both", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tMargin: 8 0 8 0",
                 "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30", "\t\t\t\t\tMargin: 20 0 20 0");
         assertRect(40, 40, 515, 40, l.rect("P"));
@@ -100,7 +102,7 @@ class BlockLayoutTest {
     @Test
     void trimMarginsKeepsTheMarginsBetweenTheChildren() {
         LayoutFixture l = layOut(
-                "\tBlock:", "\t\tId: P", "\t\tTrim margins: true", "\t\tBox:", "\t\t\tPadding: 5",
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: both", "\t\tBox:", "\t\t\tPadding: 5",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 12 0 20 0");
         assertRect(40, 40, 515, 90, l.rect("P"));
@@ -120,7 +122,7 @@ class BlockLayoutTest {
     @Test
     void trimMarginsInASectionStartsItsFirstChildAtTheTopOfThePageArea() {
         LayoutFixture l = layOut(
-                "\tSection:", "\t\tTrim margins: true",
+                "\tSection:", "\t\tTrim margins: both",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 12 0",
                 "\t\tBlock:", "\t\t\tId: D", "\t\t\tBox:", "\t\t\t\tHeight: 30");
         assertRect(40, 40, 515, 30, l.rect("C"));
@@ -132,7 +134,7 @@ class BlockLayoutTest {
         // The cell is as high as its block: without Trim margins it would be 70 high, with both margins inside.
         LayoutFixture l = layOut(
                 "\tTable:", "\t\tColumn sizes: *", "\t\tBody:", "\t\t\tRow:",
-                "\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tTrim margins: true",
+                "\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tTrim margins: both",
                 "\t\t\t\t\tBlock:", "\t\t\t\t\t\tId: C", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30",
                 "\t\t\t\t\t\t\tMargin: 20 0 20 0");
         assertRect(40, 40, 515, 30, l.rect("K"));
@@ -143,7 +145,7 @@ class BlockLayoutTest {
     void trimMarginsInAListItemDropsTheMarginsOfItsFirstAndItsLastElement() {
         LayoutFixture l = layOut(
                 "\tList:", "\t\tMarker: none",
-                "\t\tList item:", "\t\t\tId: L", "\t\t\tTrim margins: true", "\t\t\tBox:", "\t\t\t\tPadding: 5 0",
+                "\t\tList item:", "\t\t\tId: L", "\t\t\tTrim margins: both", "\t\t\tBox:", "\t\t\t\tPadding: 5 0",
                 "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\t\t\t\tMargin: 20 0 20 0");
         assertRect(40, 40, 515, 40, l.rect("L"));
@@ -153,11 +155,109 @@ class BlockLayoutTest {
     @Test
     void aRuleGivesTrimMarginsToTheBoxesOfAStyle() {
         LayoutFixture l = layOut(
-                "\tStyles:", "\t\tFor style: panel", "\t\t\tTrim margins: true", "\t\t\tBox:", "\t\t\t\tPadding: 5",
+                "\tStyles:", "\t\tFor style: panel", "\t\t\tTrim margins: both", "\t\t\tBox:", "\t\t\t\tPadding: 5",
                 "\tBlock:", "\t\tId: P", "\t\tStyle: panel",
                 "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0");
         assertRect(40, 40, 515, 40, l.rect("P"));
         assertRect(45, 45, 505, 30, l.rect("C"));
+    }
+
+    @Test
+    void trimMarginsTopDropsOnlyTheMarginOfTheFirstChildInsideAPadding() {
+        // The bottom margin of C stays inside the padding: P is 5 + 30 + 20 + 5 high.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: top", "\t\tBox:", "\t\t\tPadding: 5",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
+        assertRect(40, 40, 515, 60, l.rect("P"));
+        assertRect(45, 45, 505, 30, l.rect("C"));
+        assertRect(40, 100, 515, 10, l.rect("S"));
+    }
+
+    @Test
+    void trimMarginsBottomDropsOnlyTheMarginOfTheLastChildInsideAPadding() {
+        // The top margin of C stays inside the padding: C starts at 40 + 5 + 20 and P is 5 + 20 + 30 + 5 high.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: bottom", "\t\tBox:", "\t\t\tPadding: 5",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
+        assertRect(40, 40, 515, 60, l.rect("P"));
+        assertRect(45, 65, 505, 30, l.rect("C"));
+        assertRect(40, 100, 515, 10, l.rect("S"));
+    }
+
+    @Test
+    void trimMarginsTopLetsTheBottomMarginComeOutOfAnOpenBox() {
+        // The top margin of C is dropped and P keeps only its own 10; the bottom one comes out and merges with the 5
+        // of S, which starts at 50 + 30 + 20.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: top", "\t\tBox:", "\t\t\tMargin: 10 0 0 0",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 5 0 0 0");
+        assertRect(40, 50, 515, 30, l.rect("P"));
+        assertRect(40, 50, 515, 30, l.rect("C"));
+        assertRect(40, 100, 515, 10, l.rect("S"));
+    }
+
+    @Test
+    void trimMarginsBottomLetsTheTopMarginComeOutOfAnOpenBox() {
+        // The top margin of C comes out and merges with the 10 of P, which starts at 40 + 20; the bottom one is
+        // dropped, and S keeps only its own 5.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: bottom", "\t\tBox:", "\t\t\tMargin: 10 0 0 0",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tMargin: 5 0 0 0");
+        assertRect(40, 60, 515, 30, l.rect("P"));
+        assertRect(40, 60, 515, 30, l.rect("C"));
+        assertRect(40, 95, 515, 10, l.rect("S"));
+    }
+
+    @Test
+    void theMarginsOfAnEmptyChildComeOutOfABoxThatDoesNotTrim() {
+        // The control of the next test: the 20 of the empty child of P separate A from S.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tBlock:", "\t\tId: P",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
+        assertRect(40, 70, 515, 10, l.rect("S"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"both", "top", "bottom"})
+    void trimMarginsOnEitherSideDropsTheMarginsOfABoxWithoutContent(String trim) {
+        // The margins of the empty child touch the top and the bottom of P at once: any side drops them.
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: A", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: " + trim,
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tMargin: 20 0 20 0",
+                "\tBlock:", "\t\tId: S", "\t\tBox:", "\t\t\tHeight: 10");
+        assertRect(40, 50, 515, 10, l.rect("S"));
+    }
+
+    @Test
+    void trimMarginsNoneIsNotTrimming() {
+        LayoutFixture l = layOut(
+                "\tBlock:", "\t\tId: P", "\t\tTrim margins: none", "\t\tBox:", "\t\t\tPadding: 5",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 20 0");
+        assertRect(40, 40, 515, 80, l.rect("P"));
+        assertRect(45, 65, 505, 30, l.rect("C"));
+    }
+
+    @Test
+    void trimMarginsBottomInASectionKeepsTheTopMarginOfItsFirstChild() {
+        LayoutFixture l = layOut(
+                "\tSection:", "\t\tTrim margins: bottom",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 0 0");
+        assertRect(40, 60, 515, 30, l.rect("C"));
+    }
+
+    @Test
+    void trimMarginsTopInASectionStartsItsFirstChildAtTheTopOfThePageArea() {
+        LayoutFixture l = layOut(
+                "\tSection:", "\t\tTrim margins: top",
+                "\t\tBlock:", "\t\t\tId: C", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tMargin: 20 0 0 0");
+        assertRect(40, 40, 515, 30, l.rect("C"));
     }
 
     @Test

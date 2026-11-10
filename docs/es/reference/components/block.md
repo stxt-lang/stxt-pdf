@@ -68,14 +68,14 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 
 ## Recortar los márgenes (`Trim margins`)
 
-Una caja con `Trim margins: true` **descarta los márgenes que tocan su borde de arriba y su borde de abajo desde
-dentro**: el margen de arriba de su primer hijo en flujo y el de abajo del último, con los de sus propios primeros y
-últimos hijos que se fusionarían con ellos. Esos márgenes ni se quedan dentro de la caja ni salen de ella: no se aplican.
-Los márgenes entre los hijos no cambian.
+Una caja con `Trim margins` **descarta los márgenes que tocan su borde de arriba, su borde de abajo o los dos desde
+dentro**: el margen de arriba de su primer hijo en flujo (`top`), el de abajo del último (`bottom`) o los dos (`both`),
+con los de sus propios primeros y últimos hijos que se fusionarían con ellos. Esos márgenes ni se quedan dentro de la
+caja ni salen de ella: no se aplican. Los márgenes entre los hijos no cambian.
 
 ```
 Block:
-    Trim margins: true
+    Trim margins: both
     Box:
         Background: #F1EFE8
         Padding: 10
@@ -87,22 +87,25 @@ Block:
             Margin: 12 0 12 0
 ```
 
-Sin `Trim margins`, el relleno contiene los dos márgenes y la caja mediría 24 más. Sirve para lo que tiene fondo,
-borde o relleno, para las celdas y para el principio de una sección, donde los márgenes de dentro no se fusionan con
-nada y se quedarían como un hueco.
+Sin `Trim margins`, el relleno contiene los dos márgenes y la caja mediría 24 más; con `top` o `bottom`, contiene el
+que no se descarta y la caja mediría 12 más. Sirve para lo que tiene fondo, borde o relleno, para las celdas y para el
+principio de una sección, donde los márgenes de dentro no se fusionan con nada y se quedarían como un hueco.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Trim margins` | booleano | `false` | Descarta los márgenes de los hijos que tocan el borde de arriba y el de abajo de la caja. En `Block`, `Frame`, `List item`, `Cell` y `Section`. |
+| `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Qué márgenes de los hijos se descartan: los que tocan el borde de arriba de la caja (`top`), el de abajo (`bottom`) o los dos (`both`). En `Block`, `Frame`, `List item`, `Cell` y `Section`. |
 
 - **Arriba, en el primer fragmento; abajo, en el último.** En una caja partida entre páginas, los márgenes que tocan
   el corte se truncan como siempre ([Cortes](../common/breaks.md#márgenes-en-los-cortes)).
 - **Vale también en una caja abierta** (sin borde, relleno ni `Isolate margins`): los márgenes de sus hijos, que
-  saldrían y se fusionarían con los suyos, se descartan, y la caja conserva solo su propio `Margin`.
+  saldrían y se fusionarían con los suyos, se descartan, y la caja conserva solo su propio `Margin`. En el lado que
+  no se recorta, salen como siempre.
+- **Una caja sin contenido** (solo hijos vacíos) tiene márgenes que tocan a la vez su borde de arriba y el de abajo:
+  `top`, `bottom` y `both` los descartan.
 - **Los hijos vacíos** de antes del primero con contenido, o de después del último, dejan pasar sus márgenes: se
   descartan con los demás.
-- **En una `Section`** recorta en su área útil: el primer elemento empieza arriba del área aunque tenga margen. El
-  de abajo del último ya se trunca al final de la página.
+- **En una `Section`** recorta en su área útil: con `both` o `top`, el primer elemento empieza arriba del área
+  aunque tenga margen. El de abajo del último ya se trunca al final de la página.
 - **Una `Cell` con valor**, que es un texto, no tiene hijos: `Trim margins` no cambia nada en ella y no es un error,
   para que una regla `For element: Cell` valga para todas.
 - Puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)),
@@ -113,8 +116,10 @@ nada y se quedarían como un hueco.
 > mismo margen a todos. *Alternativa descartada:* un margen distinto para el primer y el último hijo (selectores de
 > posición), que no alcanza a los hijos de los hijos.
 
-> **Decisión:** una sola propiedad para arriba y abajo. *Alternativa descartada:* elegir el lado (`top`, `bottom`),
-> que no ha hecho falta: lo que no se quiere recortar lleva un relleno.
+> **Decisión:** una sola propiedad con el lado como valor (`none`, `both`, `top`, `bottom`), como `Pages` o `Side`.
+> *Alternativas descartadas:* un booleano que recorta siempre los dos lados, que no se puede ampliar después sin
+> romper los documentos que lo usan; y dos propiedades (`Trim top margin`, `Trim bottom margin`), dos líneas para el
+> caso habitual, que es los dos.
 
 ## Cajas laterales (`Side`)
 

@@ -12,6 +12,7 @@ import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
+import dev.stxt.pdf.model.TrimMargins;
 import dev.stxt.pdf.model.Value;
 
 /**
@@ -67,7 +68,7 @@ public final class Style extends StyleGroup {
     /** Only in a {@code Page overlay}: the pages it appears on. */
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
-    private boolean trimMargins;
+    private TrimMargins trimMargins = TrimMargins.NONE;
     /**
      * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), in {@code Frame},
      * {@code Overlay}, {@code Page overlay}, {@code Image} and the in-flow boxes that {@link #rotatesInFlow()} admits;
@@ -235,15 +236,15 @@ public final class Style extends StyleGroup {
     }
 
     /**
-     * {@code Trim margins} (reference/components/block.md): the margins that touch the top and the bottom of the box
-     * from inside, those of its first and its last in-flow child, are dropped: they neither stay inside it nor come
-     * out of it.
+     * {@code Trim margins} (reference/components/block.md): which of the margins that touch the box from inside are
+     * dropped, the top one of its first in-flow child, the bottom one of its last one, both or none. A dropped margin
+     * neither stays inside the box nor comes out of it.
      */
-    public boolean trimMargins() {
+    public TrimMargins trimMargins() {
         return trimMargins;
     }
 
-    void setTrimMargins(boolean v) {
+    void setTrimMargins(TrimMargins v) {
         writable();
         trimMargins = v;
     }

@@ -1440,8 +1440,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: BOOLEAN
 		Description: Whether the box isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false.
 	Node: Trim margins
-		Type: BOOLEAN
-		Description: Whether the box drops the margins that touch its top and its bottom from inside: with true, the top margin of its first child and the bottom margin of its last child (and those of their own first and last children that would merge with them) are not applied; they neither stay inside the box nor come out of it. By default, false.
+		Type: ENUM
+		Description: Which of the margins that touch the box from inside it drops: top, the top margin of its first child; bottom, the bottom margin of its last child; both, the two of them; none (by default), neither. With them go those of their own first and last children that would merge with them. A dropped margin is not applied: it neither stays inside the box nor comes out of it.
+		Values:
+			Value: none
+			Value: both
+			Value: top
+			Value: bottom
 	Node: Offset
 		Description: Offset: top, right, bottom, left (1 to 4 values).
 	Node: Layer

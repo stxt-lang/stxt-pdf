@@ -121,7 +121,7 @@ content is in one of them.
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | How its page numbers are written: `1`, `i`, `I`. With `none` it is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `Start` | integer ≥ 1 | `1` | With `restart`, the number of its first page. Without `restart` it is `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | boolean | `true` | Whether it carries the `Page overlay` elements of the document. With `false`, only its own appear. |
-| `Trim margins` | boolean | `false` | Drops the top margin of its first element and the bottom margin of its last one: the content starts at the top of the page area ([Block](block.md#trimming-the-margins-trim-margins)). |
+| `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Drops the top margin of its first element (`top`), the bottom margin of its last one (`bottom`) or both: with `both` or `top`, the content starts at the top of the page area ([Block](block.md#trimming-the-margins-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | On which physical page it begins ([double-sided](#beginning-on-an-odd-page)). In the first section, `odd` is `BEGIN_ON_FIRST_SECTION`. |
 | `Footnote numbering` | `continue`, `restart` | `continue` | Whether its footnotes follow the counter of the document or start again at 1 ([Footnote](footnote.md#numbering)). |
 | `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How its footnotes are numbered, in the call and in the note. |

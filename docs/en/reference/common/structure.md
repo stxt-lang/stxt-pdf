@@ -109,7 +109,7 @@ Text: Quarterly results
 | `In table of contents` | `true`, `false` | `true` | Headings, `Figure` | Whether the heading or the figure has an entry in the tables of contents ([Headings](../components/heading.md#outside-the-table-of-contents), [Figure](../components/figure.md#tables-of-contents)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` or `#id` | none | Elements except `Markdown` and `Table of contents` | Makes the whole box clickable ([Links](links.md)). It is not inherited and does not change the appearance. |
 | `Isolate margins` | boolean | `false` | `Block`, `Frame` | Stops margin merging with the children ([Block](../components/block.md#margin-merging)). |
-| `Trim margins` | boolean | `false` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Drops the margins of the children that touch the top and the bottom border of the box ([Block](../components/block.md#trimming-the-margins-trim-margins)). |
+| `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Drops the margins of the children that touch the top border of the box, the bottom one or both ([Block](../components/block.md#trimming-the-margins-trim-margins)). |
 | `Side` | `left`, `right` | none | `Image`, `Barcode`, `Block`, `Figure` | Side box: the text that follows it runs beside it ([Block](../components/block.md#side-boxes-side)). |
 | `Clear` | boolean | `false` | `Text`, `Paragraph`, `Block`, headings, `Markdown`, `Image`, `Barcode`, `Figure` | Moves the box below the side boxes before it ([Block](../components/block.md#side-boxes-side)). |
 | `Drop cap` | integer from 2 to 5 | none | `Paragraph` | Drop cap of that many lines ([Text](../components/text.md#drop-cap-drop-cap)). |

@@ -189,9 +189,11 @@ public final class BlockLayout implements LayoutAlgorithm {
         final Stacking stack;
         /**
          * {@code Trim margins} (reference/components/block.md): the margins that touch the top of the box in its first
-         * fragment and the bottom in its last one are dropped; they neither stay inside the box nor come out of it.
+         * fragment ({@code trimTop}) and the bottom in its last one ({@code trimBottom}) are dropped; they neither stay
+         * inside the box nor come out of it.
          */
-        final boolean trim;
+        final boolean trimTop;
+        final boolean trimBottom;
         /** There is already an in-flow child with content in this fragment (it does not let its margins through). */
         boolean progress;
         /** Last in-flow child placed in this fragment, for the quality of the next break. */
@@ -213,10 +215,11 @@ public final class BlockLayout implements LayoutAlgorithm {
             this.contentRemaining = fragmenting
                     ? childSpace.fragmentainerRemaining().getAsDouble() - reserved : Double.POSITIVE_INFINITY;
             // In a fragment that continues the box no margin comes out at the top.
-            this.trim = box.style().trimMargins();
-            // With Trim margins the first child also starts at 0, as when its margins come out: they are dropped
+            this.trimTop = box.style().trimMargins().top();
+            this.trimBottom = box.style().trimMargins().bottom();
+            // Trimming the top, the first child also starts at 0, as when its margins come out: they are dropped
             // (topOut).
-            this.stack = new Stacking(first && (trim || (!box.isolatesMargins() && model.openAtTop())));
+            this.stack = new Stacking(first && (trimTop || (!box.isolatesMargins() && model.openAtTop())));
             inherit();
         }
 
@@ -557,9 +560,9 @@ public final class BlockLayout implements LayoutAlgorithm {
                     .orElse(children);
         }
 
-        /** The margins that come out of the box at the top: none if it trims them, which drops them. */
+        /** The margins that come out of the box at the top: none if it trims those of its top, which drops them. */
         MarginStrut topOut() {
-            return trim ? MarginStrut.EMPTY : stack.topOut();
+            return trimTop ? MarginStrut.EMPTY : stack.topOut();
         }
 
         /** All children placed. */
@@ -567,7 +570,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             boolean openAtBottom = !box.isolatesMargins() && model.openAtBottom();
             double cursor = stack.cursor();
             MarginStrut strut = stack.strut();
-            if (!openAtBottom && !trim && !stack.atTop() && fragmenting && reserved == 0 && !box.isLayoutRoot()
+            if (!openAtBottom && !trimBottom && !stack.atTop() && fragmenting && reserved == 0 && !box.isLayoutRoot()
                     && fits(cursor, contentRemaining) && !fits(cursor + strut.resolve(), contentRemaining)
                     && endsWithContent(cursor + strut.resolve())) {
                 // The box contains the margin at the end of its content, so the margin has to fit on the page like the
@@ -592,20 +595,22 @@ public final class BlockLayout implements LayoutAlgorithm {
             if (stack.atTop()) {
                 // No child with content: the margins of the empty children come out at the top.
                 contentHeight = 0;
-                // (A box that trims its margins is also here when it is not open at the top: it is not empty then.)
+                // (A box that trims the margins of its top is also here when it is not open at the top: it is not
+                // empty then.) Those margins touch the top and the bottom of the box at once: trimming either side
+                // drops them.
                 boolean empty = openAtBottom && !box.isolatesMargins() && model.openAtTop() && model.usedHeight(0) == 0;
-                out = new AdjoiningMargins(trim ? MarginStrut.EMPTY : strut, MarginStrut.EMPTY, empty);
-            } else if (trim) {
+                out = new AdjoiningMargins(trimTop || trimBottom ? MarginStrut.EMPTY : strut, MarginStrut.EMPTY, empty);
+            } else if (trimBottom) {
                 // The margin below the last child is dropped: it neither stays inside nor comes out.
                 contentHeight = cursor;
-                out = AdjoiningMargins.NONE;
+                out = new AdjoiningMargins(topOut(), MarginStrut.EMPTY, false);
             } else if (openAtBottom) {
                 contentHeight = cursor;
-                out = new AdjoiningMargins(stack.topOut(), strut, false);
+                out = new AdjoiningMargins(topOut(), strut, false);
             } else {
                 // The border, the padding, a fixed height or an own context contain the last margin.
                 contentHeight = cursor + strut.resolve();
-                out = new AdjoiningMargins(stack.topOut(), MarginStrut.EMPTY, false);
+                out = new AdjoiningMargins(topOut(), MarginStrut.EMPTY, false);
             }
             double sides = sidesBottom(fragments.size());
             if (sides > 0 && sides >= contentHeight + (out.bottom().resolve()) - EPSILON) {

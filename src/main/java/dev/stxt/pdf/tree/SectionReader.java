@@ -3,6 +3,7 @@ package dev.stxt.pdf.tree;
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.NumberFormat;
+import dev.stxt.pdf.model.TrimMargins;
 
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.Nodes.inline;
@@ -28,7 +29,7 @@ final class SectionReader {
     record Properties(String id, PageSetup pageSetup, Section.PageNumbering numbering, NumberFormat pageNumberFormat,
                       int start, boolean inheritPageOverlays, Section.BeginOn beginOn,
                       Section.FootnoteNumbering footnoteNumbering, NumberFormat footnoteNumberFormat,
-                      boolean trimMargins) {
+                      TrimMargins trimMargins) {
     }
 
     /**
@@ -47,7 +48,7 @@ final class SectionReader {
         Section.BeginOn beginOn = Section.BeginOn.ANY;
         Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
         NumberFormat footnoteNumberFormat = NumberFormat.DECIMAL;
-        boolean trimMargins = false;
+        TrimMargins trimMargins = TrimMargins.NONE;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
@@ -64,7 +65,7 @@ final class SectionReader {
                     startNode = p;
                 }
                 case "inherit-page-overlays" -> inheritPageOverlays = bool(p);
-                case "trim-margins" -> trimMargins = bool(p);
+                case "trim-margins" -> trimMargins = enumValue(TrimMargins.class, p);
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {

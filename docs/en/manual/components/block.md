@@ -36,7 +36,7 @@ Document (dev.stxt.pdf):
         Paragraph: Then remove the cover carefully.
 ```
 
-It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins` and `Rotate` (rotating it with everything
+It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins` and `Rotate` (rotating it with everything
 it contains, [Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)), and any element inside.
 
 ## How it places its children
@@ -55,6 +55,30 @@ The top margin of the first child (and the bottom margin of the last one) goes o
 neither border nor padding on that side: it becomes a margin of the `Block` itself. With `Isolate margins: true`, the
 margins of the children stay inside. A `Block` that is an item of a `Stack` or a `Grid` already keeps them inside, so
 there `Isolate margins: true` is an error.
+
+## `Trim margins`
+
+In a `Block` with a background, a border or a padding, the top margin of the first child and the bottom margin of the
+last one stay inside, as a gap between the edge and the content. `Trim margins: both` drops them: the content starts
+and ends at the padding, whatever margins its paragraphs have.
+
+```
+Block:
+    Trim margins: both
+    Box:
+        Background: #F1EFE8
+        Padding: 10
+    Paragraph: The first paragraph starts at the padding.
+        Box:
+            Margin: 12 0 12 0
+    Paragraph: The last one ends at the padding; 12 are left between the two.
+        Box:
+            Margin: 12 0 12 0
+```
+
+With `top` or `bottom` only the margin of that side is dropped; `none`, the default, drops none. It also works in a
+`Frame`, a `List item`, a `Cell` and a `Section`, where the first element then starts at the top of the page area. The
+margins between the children never change.
 
 ## A box at one side with the text around it (`Side`)
 
