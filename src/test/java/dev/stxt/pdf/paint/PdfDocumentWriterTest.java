@@ -103,7 +103,7 @@ class PdfDocumentWriterTest {
      * with the language of the JVM: in Turkish, "vi" would be "Vİ".
      */
     @Test
-    void pageLabelsKeepThePageStyleAndTheStart() throws Exception {
+    void pageLabelsKeepThePageStyleAndTheFirstNumber() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(SECTIONS_HEAD
                 + "\tSection:\n\t\tPage number format: lower-roman\n\t\tText: Prefacio\n\t\tText: Más\n\t\t\tBreak:\n\t\t\t\tBefore: page\n"
                 + "\tSection:\n\t\tPage numbering: restart\n\t\tFirst number: 5\n\t\tText: Cuerpo\n"

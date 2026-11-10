@@ -17,7 +17,7 @@ final class ImageFit {
 
     /**
      * Rectangle of the image, in the coordinates of {@code content}: with {@code inside} it fits
-     * whole and centered; with {@code fill} it covers it, centered, and is clipped to the content
+     * whole and centered; with {@code crop} it covers it, centered, and is clipped to the content
      * box; with {@code stretch} it is the content box.
      *
      * @param width  natural width of the image (only its proportion counts)

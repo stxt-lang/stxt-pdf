@@ -16,7 +16,7 @@ import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
-import dev.stxt.pdf.model.GridAreas;
+import dev.stxt.pdf.model.AreaMap;
 import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Leader;
 import dev.stxt.pdf.model.Links;
@@ -135,7 +135,7 @@ final class PropertyReader {
             entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("marker-image", PropertyReader::markerImage),
-            entry("first-number", (p, s) -> s.list().setStart(integer(p))),
+            entry("first-number", (p, s) -> s.list().setFirstNumber(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
             entry("trim-margins", (p, s) -> s.setTrimMargins(enumValue(TrimMargins.class, p))),
@@ -148,12 +148,12 @@ final class PropertyReader {
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
-            entry("barcode-format", (p, s) -> s.image().setFormat(enumValue(BarcodeFormat.class, p))),
+            entry("barcode-format", (p, s) -> s.image().setBarcodeFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
             entry("quiet-zone", (p, s) -> s.image().setQuietZone(quietZone(p))),
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
             entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
-            entry("entries", (p, s) -> s.tableOfContents().setOf(enumValue(Listing.class, p))),
+            entry("entries", (p, s) -> s.tableOfContents().setEntries(enumValue(Listing.class, p))),
             entry("levels", TableOfContentsBuilder::levels),
             entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 
@@ -354,7 +354,7 @@ final class PropertyReader {
                 List<Value> gap = gap(p);
                 s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
             }
-            case "area-map" -> s.grid().setAreas(placement(p, () -> GridAreas.parse(p.getText())));
+            case "area-map" -> s.grid().setAreaMap(placement(p, () -> AreaMap.parse(p.getText())));
             case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
@@ -386,7 +386,7 @@ final class PropertyReader {
      * ({@code item.grow}), except {@code Layer}. The value of {@code Area} is the placement ({@code item.area}, with
      * the line of the {@code Area}), with the names looked up in {@code areas}, those of the parent grid.
      */
-    static void item(InlineNode w, Style s, GridAreas areas) {
+    static void item(InlineNode w, Style s, AreaMap areas) {
         if (w.getCanonicalName().equals("area") && !w.getText().isBlank()) {
             s.declared(PropertyKey.ITEM_AREA, w.getLine());
             s.item().setArea(placement(w, () -> Cell.parse(w.getText(), areas)));

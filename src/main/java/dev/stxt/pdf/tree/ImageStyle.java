@@ -16,7 +16,7 @@ public final class ImageStyle extends StyleGroup {
     private Fit fit = Fit.INSIDE;
     /** Page of a PDF, from 1. */
     private int pdfPage = 1;
-    private BarcodeFormat format = BarcodeFormat.QR;
+    private BarcodeFormat barcodeFormat = BarcodeFormat.QR;
     private ErrorCorrection errorCorrection = ErrorCorrection.MEDIUM;
     /** Quiet zone of a {@code Barcode}, in modules on each side; {@code null} = that of its format. */
     private Integer quietZone;
@@ -53,13 +53,13 @@ public final class ImageStyle extends StyleGroup {
     }
 
     /** The format of a {@code Barcode}; {@code qr} if it is not declared. */
-    public BarcodeFormat format() {
-        return format;
+    public BarcodeFormat barcodeFormat() {
+        return barcodeFormat;
     }
 
-    void setFormat(BarcodeFormat v) {
+    void setBarcodeFormat(BarcodeFormat v) {
         writable();
-        format = v;
+        barcodeFormat = v;
     }
 
     /** The error correction of a QR code; {@code medium} if it is not declared. */

@@ -43,7 +43,7 @@ class ListsTest {
     }
 
     @Test
-    void numberingStartsAtStartAndFollowsNumber() {
+    void numberingStartsAtFirstNumberAndFollowsNumber() {
         Box list = root("\tList:", "\t\tMarker: decimal", "\t\tFirst number: 3",
                 "\t\tList item:", "\t\t\tText: a",
                 "\t\tList item:", "\t\t\tText: b",

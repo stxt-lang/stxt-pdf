@@ -83,7 +83,7 @@ final class Barcodes implements ImageGenerator {
     public Modules generate(InlineNode n, Style s) {
         String data = data(n);
         Integer quiet = s.image().quietZone();
-        return switch (s.image().format()) {
+        return switch (s.image().barcodeFormat()) {
             case QR -> qr(n, data, s.image().errorCorrection(), quiet == null ? QR_QUIET_ZONE : quiet);
             case CODE_128 -> code128(n, data, quiet == null ? CODE_128_QUIET_ZONE : quiet);
             case EAN_13 -> ean13(n, data, quiet == null ? EAN_13_QUIET_ZONE_LEFT : quiet,

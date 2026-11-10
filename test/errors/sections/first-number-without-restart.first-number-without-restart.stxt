@@ -1,5 +1,5 @@
 # Case: First number without Page numbering: restart
-# Code: START_WITHOUT_RESTART
+# Code: FIRST_NUMBER_WITHOUT_RESTART
 # Line: 16
 Document (dev.stxt.pdf):
 	Language: es

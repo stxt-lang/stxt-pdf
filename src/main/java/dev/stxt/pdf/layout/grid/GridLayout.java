@@ -38,7 +38,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ITEM_AREA;
 /**
  * Layout {@code grid} (reference/components/grid.md). Steps:
  * <ol>
- *   <li>Placement: {@link dev.stxt.pdf.model.GridAreas}, {@link Cell} and {@link Placement}.</li>
+ *   <li>Placement: {@link dev.stxt.pdf.model.AreaMap}, {@link Cell} and {@link Placement}.</li>
  *   <li>Columns: {@link TrackSizing} with the narrowest and natural widths; those of a table share the free space in
  *       proportion to their content.</li>
  *   <li>Rows: {@link TrackSizing} with the height of each item at the width of its columns.</li>
@@ -71,8 +71,8 @@ public final class GridLayout implements LayoutAlgorithm {
 
     private static Grid grid(Box box) {
         Style s = box.style();
-        int explicitColumns = Math.max(s.grid().columnSizes().size(), s.grid().areas().columns());
-        int explicitRows = Math.max(s.grid().rowSizes().size(), s.grid().areas().rows());
+        int explicitColumns = Math.max(s.grid().columnSizes().size(), s.grid().areaMap().columns());
+        int explicitRows = Math.max(s.grid().rowSizes().size(), s.grid().areaMap().rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style().item().area()).toList();
         Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().flow());

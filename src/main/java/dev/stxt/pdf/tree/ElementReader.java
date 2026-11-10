@@ -377,7 +377,7 @@ enum ElementReader {
      */
     void wrapper(InlineNode wrapper, Style s, Box parent) {
         if (wrapper != null) {
-            item(wrapper, s, parent.style().grid().areas());
+            item(wrapper, s, parent.style().grid().areaMap());
         }
     }
 

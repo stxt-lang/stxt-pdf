@@ -11,7 +11,7 @@ import dev.stxt.pdf.model.Listing;
 public final class TableOfContentsStyle extends StyleGroup {
 
     /** {@code Entries}: the headings (by default), the figures or the tables. */
-    private Listing of = Listing.HEADINGS;
+    private Listing entries = Listing.HEADINGS;
     /** First and last heading level listed by a {@code Table of contents} ({@code Levels}). */
     private int from = 1;
     private int to = 3;
@@ -21,13 +21,13 @@ public final class TableOfContentsStyle extends StyleGroup {
     TableOfContentsStyle() {
     }
 
-    public Listing of() {
-        return of;
+    public Listing entries() {
+        return entries;
     }
 
-    void setOf(Listing v) {
+    void setEntries(Listing v) {
         writable();
-        of = v;
+        entries = v;
     }
 
     public int from() {

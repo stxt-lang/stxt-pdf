@@ -287,7 +287,7 @@ public enum ErrorCode {
     /** An {@code auto} margin where it neither centers nor absorbs anything. */
     MARGIN_AUTO_WITHOUT_EFFECT,
     /** {@code First number} in a {@code Section} without {@code Page numbering: restart}. */
-    START_WITHOUT_RESTART,
+    FIRST_NUMBER_WITHOUT_RESTART,
     /**
      * Something that is not the appearance ({@code Background}, {@code Border}, {@code Border color},
      * {@code Corner radius}) in the {@code Box} of a {@code Row}.

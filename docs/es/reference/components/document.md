@@ -136,7 +136,7 @@ contenido está en alguna.
 | `Page` | como el del documento | el del documento | Ver [abajo](#el-page-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
-| `First number` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
+| `First number` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `FIRST_NUMBER_WITHOUT_RESTART`. |
 | `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Descarta el margen de arriba de su primer elemento (`top`), el de abajo del último (`bottom`) o los dos: con `both` o `top`, el contenido empieza arriba del área útil ([Block](block.md#recortar-los-márgenes-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
@@ -227,7 +227,7 @@ Section:
 ```
 
 Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. Un `First number` sin `restart`,
-que no tendría efecto porque la sección sigue la cuenta de la anterior, es `START_WITHOUT_RESTART`.
+que no tendría efecto porque la sección sigue la cuenta de la anterior, es `FIRST_NUMBER_WITHOUT_RESTART`.
 
 > **Decisión:** el estilo es de la sección y no del contador: una sección `continue` en romanos sigue la cuenta de la
 > anterior y la escribe en romanos. Solo cifras y romanos, que son los de las páginas de los libros. *Alternativa

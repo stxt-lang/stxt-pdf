@@ -24,11 +24,16 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   - `Line breaking: balanced` is **`Line breaking: optimal`**: it is the Knuth-Plass algorithm, and in web layout
     "balance" evens out the length of the lines. In Java, `LineBreaking.BALANCED` is `LineBreaking.OPTIMAL`.
   - `Table columns` is **`Table column sizes`**, in a `Markdown`: its values become the `Column sizes` of the tables.
+- **The Java API follows the names**: `ListStyle.start()` is `firstNumber()`, `GridStyle.areas()` is `areaMap()` and
+  its type `model.GridAreas` is `model.AreaMap`, `ImageStyle.format()` is `barcodeFormat()`,
+  `TableOfContentsStyle.of()` is `entries()` and the component `start` of the record `Section` is `firstNumber`.
 - `Pdf page` is written **`PDF page`** in the schema and in the documentation. Both spellings are the same node.
 - The descriptions of `Offset`, `Layer` and `Wrap` in the schema say what each one does in each element and its
   default.
-- The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `START_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
-  `SINGLE_COLUMN`, `TABLE_ORDER`, `MARKDOWN_PROPERTY_MISSING` and of the errors of `Area map` and of `Entries` name the properties with their new names. The codes do not change.
+- The error code `START_WITHOUT_RESTART` is **`FIRST_NUMBER_WITHOUT_RESTART`**, like the property it is about.
+- The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `FIRST_NUMBER_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
+  `SINGLE_COLUMN`, `TABLE_ORDER`, `MARKDOWN_PROPERTY_MISSING` and of the errors of `Area map` and of `Entries` name
+  the properties with their new names.
 
 ## [0.14.0] - 2026-11-10
 

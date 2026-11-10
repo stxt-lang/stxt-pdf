@@ -186,9 +186,9 @@ final class ModelValidator {
             throw error(n, ErrorCode.BARCODE_WITHOUT_ALT, "The Barcode needs Alt, the text that says what it is and "
                     + "where it leads to whoever cannot see it, as in Alt: QR code of the invoice verification");
         }
-        if (s.isDeclared(ERROR_CORRECTION) && s.image().format() != BarcodeFormat.QR) {
+        if (s.isDeclared(ERROR_CORRECTION) && s.image().barcodeFormat() != BarcodeFormat.QR) {
             throw error(s.line(ERROR_CORRECTION), ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, "Error correction only "
-                    + "has an effect on a QR code, and the Barcode is " + s.image().format().name().toLowerCase(Locale.ROOT)
+                    + "has an effect on a QR code, and the Barcode is " + s.image().barcodeFormat().name().toLowerCase(Locale.ROOT)
                     .replace('_', '-') + ": it is not needed");
         }
         Nodes.child(n, "typography").map(Nodes::inline).ifPresent(t -> t.getChildren().stream()

@@ -168,7 +168,7 @@ class ColumnsLayoutTest {
     }
 
     @Test
-    void heightIsFilledInOrderWithFillAuto() {
+    void heightIsFilledInOrderWithBalanceFalse() {
         LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
                 "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
                 block("D", 30, true)));

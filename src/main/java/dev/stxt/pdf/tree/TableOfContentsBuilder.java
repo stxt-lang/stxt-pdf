@@ -103,9 +103,9 @@ final class TableOfContentsBuilder {
             throw error(contents.line(), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "The table of contents needs Size: it is declared in the "
                     + "Typography of the Table of contents, of an ancestor or of Styles (For element: Document)");
         }
-        Listing of = s.tableOfContents().of();
+        Listing entries = s.tableOfContents().entries();
         List<Box> listed;
-        if (of == Listing.HEADINGS) {
+        if (entries == Listing.HEADINGS) {
             listed = headings.stream()
                     .filter(h -> h.headingLevel() >= s.tableOfContents().from() && h.headingLevel() <= s.tableOfContents().to()).toList();
             if (listed.isEmpty()) {
@@ -113,17 +113,17 @@ final class TableOfContentsBuilder {
                         + s.tableOfContents().from() + " to " + s.tableOfContents().to() + " (Levels): it would have no entries");
             }
         } else {
-            String what = of.name().toLowerCase(Locale.ROOT);
+            String what = entries.name().toLowerCase(Locale.ROOT);
             if (s.isDeclared(LEVELS)) {
                 throw error(s.line(LEVELS), ErrorCode.LEVELS_WITHOUT_HEADINGS, "Levels has no effect in a table of contents "
                         + "with Entries: " + what + ", which lists the " + what + " and not the headings: it is not needed");
             }
-            FigureCounter counter = of == Listing.FIGURES ? FigureCounter.FIGURES : FigureCounter.TABLES;
+            FigureCounter counter = entries == Listing.FIGURES ? FigureCounter.FIGURES : FigureCounter.TABLES;
             listed = ctx.figures.stream()
                     .filter(f -> f.style().figure().counter() == counter && f.style().inTableOfContents()).toList();
             if (listed.isEmpty()) {
                 throw error(contents.line(), ErrorCode.TABLE_OF_CONTENTS_EMPTY, "The table of contents has no "
-                        + (of == Listing.FIGURES ? "figure" : "table") + " to list (Entries: " + what + "): it would have no "
+                        + (entries == Listing.FIGURES ? "figure" : "table") + " to list (Entries: " + what + "): it would have no "
                         + "entries. A Figure with a Caption counts as one, with the counter of its content or its Figure counter");
             }
         }

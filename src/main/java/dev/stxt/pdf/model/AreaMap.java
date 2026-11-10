@@ -14,16 +14,16 @@ import java.util.Map;
  * @param rows    number of rows the block declares
  * @param columns number of columns the block declares
  */
-public record GridAreas(Map<String, Area> named, int rows, int columns) {
+public record AreaMap(Map<String, Area> named, int rows, int columns) {
 
     /** A grid without {@code Area map}. */
-    public static final GridAreas NONE = new GridAreas(Map.of(), 0, 0);
+    public static final AreaMap NONE = new AreaMap(Map.of(), 0, 0);
 
-    public GridAreas {
+    public AreaMap {
         named = Collections.unmodifiableMap(new LinkedHashMap<>(named));
     }
 
-    public static GridAreas parse(String block) {
+    public static AreaMap parse(String block) {
         List<String[]> rows = block.lines()
                 .filter(l -> !l.isBlank())
                 .map(l -> l.trim().split("\\s+"))
@@ -67,6 +67,6 @@ public record GridAreas(Map<String, Area> named, int rows, int columns) {
             }
             areas.put(e.getKey(), new Area(b[0] + 1, b[1] + 1, b[2] - b[0] + 1, b[3] - b[1] + 1));
         }
-        return new GridAreas(areas, rows.size(), columns);
+        return new AreaMap(areas, rows.size(), columns);
     }
 }

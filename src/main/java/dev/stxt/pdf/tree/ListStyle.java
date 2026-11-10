@@ -12,7 +12,7 @@ public final class ListStyle extends StyleGroup {
     /** Marker of the items of a {@code List}; {@code null} in the other boxes. */
     private Marker marker;
     /** Number of the first item of a {@code List}. */
-    private int start = 1;
+    private int firstNumber = 1;
     /** Number that a {@code List item} sets; {@code null} = the one after that of the previous item. */
     private Integer number;
     /** Path of the {@code Marker image}, relative to {@code images/}; {@code null} if it does not declare one. */
@@ -34,13 +34,13 @@ public final class ListStyle extends StyleGroup {
         marker = v;
     }
 
-    public int start() {
-        return start;
+    public int firstNumber() {
+        return firstNumber;
     }
 
-    void setStart(int v) {
+    void setFirstNumber(int v) {
         writable();
-        start = v;
+        firstNumber = v;
     }
 
     public Integer number() {

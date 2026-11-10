@@ -21,7 +21,7 @@ public record Cell(Integer row, Integer column, int rows, int columns) {
     }
 
     /** Parses the value of {@code Area}; names are looked up in the {@code Area map} of the grid. */
-    public static Cell parse(String text, GridAreas areas) {
+    public static Cell parse(String text, AreaMap areas) {
         if (text == null || text.isBlank()) {
             return AUTO;
         }

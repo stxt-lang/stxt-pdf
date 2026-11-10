@@ -2,7 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Direction;
-import dev.stxt.pdf.model.GridAreas;
+import dev.stxt.pdf.model.AreaMap;
 import dev.stxt.pdf.model.Value;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public final class GridStyle extends StyleGroup {
 
     private List<Value> columnSizes = List.of();
     private List<Value> rowSizes = List.of();
-    /** {@code Area map} already interpreted; {@link GridAreas#NONE} if it is not declared. */
-    private GridAreas areas = GridAreas.NONE;
+    /** {@code Area map} already interpreted; {@link AreaMap#NONE} if it is not declared. */
+    private AreaMap areaMap = AreaMap.NONE;
     private Direction flow = Direction.HORIZONTAL;
     private Alignment horizontal = Alignment.STRETCH;
     private Alignment vertical = Alignment.STRETCH;
@@ -50,13 +50,13 @@ public final class GridStyle extends StyleGroup {
         rowSizes = v;
     }
 
-    public GridAreas areas() {
-        return areas;
+    public AreaMap areaMap() {
+        return areaMap;
     }
 
-    void setAreas(GridAreas v) {
+    void setAreaMap(AreaMap v) {
         writable();
-        areas = v;
+        areaMap = v;
     }
 
     public Direction flow() {

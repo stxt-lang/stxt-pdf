@@ -38,7 +38,7 @@ final class ListBuilder {
         }
         List<Box> previous = list.children();
         int number = s.list().number() != null ? s.list().number()
-                : previous.isEmpty() ? list.style().list().start()
+                : previous.isEmpty() ? list.style().list().firstNumber()
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
             throw error(s.list().number() != null ? s.line(NUMBER) : SourceLine.of(n.getLine()),
@@ -140,8 +140,8 @@ final class ListBuilder {
             throw error(s.line(FIRST_NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "First number has no effect with Marker: "
                     + markerName(s.list().marker()) + ", which does not number the items");
         }
-        if (!ListMarkers.inRange(s.list().marker(), s.list().start())) {
-            throw error(s.line(FIRST_NUMBER), ErrorCode.LIST_NUMBER_RANGE, "First number: " + s.list().start() + " cannot be "
+        if (!ListMarkers.inRange(s.list().marker(), s.list().firstNumber())) {
+            throw error(s.line(FIRST_NUMBER), ErrorCode.LIST_NUMBER_RANGE, "First number: " + s.list().firstNumber() + " cannot be "
                     + "written with Marker: " + markerName(s.list().marker()) + ", which numbers "
                     + ListMarkers.range(s.list().marker()));
         }

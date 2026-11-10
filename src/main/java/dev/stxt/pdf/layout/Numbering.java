@@ -36,7 +36,7 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
             Section.PageNumbering mode = section.numbering();
             if (mode == Section.PageNumbering.RESTART) {
                 Arrays.fill(totals, tandaFirst, i, counter);
-                counter = section.start() - 1;
+                counter = section.firstNumber() - 1;
                 tandaFirst = i;
             }
             int own = results.get(k).size() + (blankAfter[k] ? 1 : 0);

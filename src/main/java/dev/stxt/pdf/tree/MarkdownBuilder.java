@@ -199,7 +199,7 @@ final class MarkdownBuilder {
         private final int firstLine;
         private final Optional<PropertyNode> bullet;
         private final Optional<PropertyNode> numbering;
-        private final Optional<PropertyNode> tableColumns;
+        private final Optional<PropertyNode> tableColumnSizes;
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
@@ -231,7 +231,7 @@ final class MarkdownBuilder {
             this.inlineOnly = inlineOnly;
             this.bullet = properties.apply("bullet-markers");
             this.numbering = properties.apply("number-markers");
-            this.tableColumns = properties.apply("table-column-sizes");
+            this.tableColumnSizes = properties.apply("table-column-sizes");
             this.bullets = bullet.map(p -> markers(p, false)).orElse(List.of());
             this.numberings = numbering.map(p -> markers(p, true)).orElse(List.of());
         }
@@ -390,7 +390,7 @@ final class MarkdownBuilder {
         }
 
         private InlineNode table(TableBlock t, int line) {
-            if (tableColumns.isEmpty()) {
+            if (tableColumnSizes.isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, "The table needs Table column sizes in its "
                         + "Markdown (line " + markdown.getLine() + ") or in a rule of Styles: equal or auto");
             }
@@ -411,11 +411,11 @@ final class MarkdownBuilder {
             for (org.commonmark.node.Node c = head.getFirstChild().getFirstChild(); c != null; c = c.getNext()) {
                 columns++;
             }
-            Node mode = tableColumns.get().node();
+            Node mode = tableColumnSizes.get().node();
             String track = mode.getText().trim().equals("equal") ? "*" : "auto";
             InlineNode table = node("Table", "", line);
             table.addChild(generated(node("Column sizes", "repeat(" + columns + ", " + track + ")", mode.getLine()),
-                    tableColumns.get()));
+                    tableColumnSizes.get()));
             table.addChild(rows("Header rows", head));
             table.addChild(rows("Body rows", body));
             for (org.commonmark.node.Node r = body.getFirstChild(); r != null; r = r.getNext()) {

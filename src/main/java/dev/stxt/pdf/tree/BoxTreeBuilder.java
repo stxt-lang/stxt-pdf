@@ -224,7 +224,7 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.SECTION_EMPTY, "The section has no content: without elements (Page overlays do not "
                     + "count, they take no space) it has no page");
         }
-        return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.start(), p.inheritPageOverlays(),
+        return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.firstNumber(), p.inheritPageOverlays(),
                 p.beginOn(), p.footnoteNumbering(), p.footnoteNumberFormat(), footnotes);
     }
 

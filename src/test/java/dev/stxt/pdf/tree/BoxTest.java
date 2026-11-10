@@ -93,7 +93,7 @@ class BoxTest {
         Style s = list.style();
         assertThrows(IllegalStateException.class, () -> s.setIsolateMargins(true));
         assertThrows(IllegalStateException.class, () -> s.declared(PropertyKey.FONT_SIZE, 3));
-        assertThrows(IllegalStateException.class, () -> s.list().setStart(4));
+        assertThrows(IllegalStateException.class, () -> s.list().setFirstNumber(4));
         assertThrows(IllegalStateException.class, () -> s.box().setHeight(Value.pt(10)));
         // The group that a box inherits is a copy of its own, and it is closed too.
         assertNotSame(s.typography(), text.style().typography());

@@ -210,7 +210,7 @@ class RuleElementPropertiesTest {
     }
 
     @Test
-    void theMarkersAndTheTableColumnsOfAMarkdownComeFromARule() {
+    void theMarkersAndTheTableColumnSizesOfAMarkdownComeFromARule() {
         Box markdown = root(
                 "For element: Markdown", "\tBullet markers: dash", "\tTable column sizes: equal",
                 "---",
