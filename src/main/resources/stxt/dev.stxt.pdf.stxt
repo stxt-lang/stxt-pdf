@@ -68,6 +68,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Footnote number format
 				Max: 1
+			Child: Trim margins
+				Max: 1
 			Child: Block
 			Child: Stack
 			Child: Grid
@@ -108,6 +110,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Isolate margins
+				Max: 1
+			Child: Trim margins
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -416,6 +420,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Marker image
 				Max: 1
+			Child: Trim margins
+				Max: 1
 			Child: Block
 			Child: Stack
 			Child: Grid
@@ -518,6 +524,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Break
 				Max: 1
 			Child: Isolate margins
+				Max: 1
+			Child: Trim margins
 				Max: 1
 			Child: Offset
 				Max: 1
@@ -824,6 +832,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Row header
 				Max: 1
+			Child: Trim margins
+				Max: 1
 			Child: Block
 			Child: Stack
 			Child: Grid
@@ -1083,6 +1093,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Isolate margins
 				Max: 1
+			Child: Trim margins
+				Max: 1
 			Child: Bullet markers
 				Max: 1
 			Child: Number markers
@@ -1174,6 +1186,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Isolate margins
 				Max: 1
+			Child: Trim margins
+				Max: 1
 			Child: Bullet markers
 				Max: 1
 			Child: Number markers
@@ -1264,6 +1278,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Clear
 				Max: 1
 			Child: Isolate margins
+				Max: 1
+			Child: Trim margins
 				Max: 1
 			Child: Bullet markers
 				Max: 1
@@ -1423,6 +1439,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Isolate margins
 		Type: BOOLEAN
 		Description: Whether the box isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false.
+	Node: Trim margins
+		Type: BOOLEAN
+		Description: Whether the box drops the margins that touch its top and its bottom from inside: with true, the top margin of its first child and the bottom margin of its last child (and those of their own first and last children that would merge with them) are not applied; they neither stay inside the box nor come out of it. By default, false.
 	Node: Offset
 		Description: Offset: top, right, bottom, left (1 to 4 values).
 	Node: Layer

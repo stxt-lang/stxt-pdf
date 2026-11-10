@@ -67,6 +67,7 @@ public final class Style extends StyleGroup {
     /** Only in a {@code Page overlay}: the pages it appears on. */
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
+    private boolean trimMargins;
     /**
      * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), in {@code Frame},
      * {@code Overlay}, {@code Page overlay}, {@code Image} and the in-flow boxes that {@link #rotatesInFlow()} admits;
@@ -231,6 +232,20 @@ public final class Style extends StyleGroup {
     void setIsolateMargins(boolean v) {
         writable();
         isolateMargins = v;
+    }
+
+    /**
+     * {@code Trim margins} (reference/components/block.md): the margins that touch the top and the bottom of the box
+     * from inside, those of its first and its last in-flow child, are dropped: they neither stay inside it nor come
+     * out of it.
+     */
+    public boolean trimMargins() {
+        return trimMargins;
+    }
+
+    void setTrimMargins(boolean v) {
+        writable();
+        trimMargins = v;
     }
 
     public Rotation rotation() {

@@ -50,6 +50,7 @@ class SchemaCoverageTest {
             Map.entry("Link", "Link: https://example.com/a"),
             Map.entry("In table of contents", "In table of contents: false"),
             Map.entry("Isolate margins", "Isolate margins: true"),
+            Map.entry("Trim margins", "Trim margins: true"),
             Map.entry("Offset", "Offset: 10 auto auto 10"),
             Map.entry("Layer", "Layer: 1"),
             Map.entry("Pages", "Pages: not-first"),
@@ -324,7 +325,8 @@ class SchemaCoverageTest {
         String body = "\tStack:\n\t\tItem:\n\t\t\tBlock:\n\t\t\t\t{}";
         if (!ITEM_PROPERTIES.contains(child)) {
             element = TEMPLATES.keySet().stream()
-                    .filter(e -> !e.contains(" > ") && !e.equals("Item") && !e.equals("Area"))
+                    // Not a Section, which declares Trim margins but takes no element property from a rule.
+                    .filter(e -> !e.contains(" > ") && !e.equals("Item") && !e.equals("Area") && !e.equals("Section"))
                     .filter(e -> children.getOrDefault(e, List.of()).contains(child))
                     .findFirst().orElseThrow(() -> new AssertionError("No element template declares " + child));
             body = TEMPLATES.getOrDefault(element + " > " + child, TEMPLATES.get(element)).document()

@@ -121,6 +121,7 @@ contenido está en alguna.
 | `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `Start` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `START_WITHOUT_RESTART`. |
 | `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
+| `Trim margins` | booleano | `false` | Descarta el margen de arriba de su primer elemento y el de abajo del último: el contenido empieza arriba del área útil ([Block](block.md#recortar-los-márgenes-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
 | `Footnote numbering` | `continue`, `restart` | `continue` | Si sus notas al pie siguen el contador del documento o vuelven a empezar en 1 ([Footnote](footnote.md#numeración)). |
 | `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se numeran sus notas al pie, en la llamada y en la nota. |

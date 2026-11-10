@@ -75,6 +75,12 @@ class LeadingMarginsTest {
     }
 
     @Test
+    void trimmingTheMarginsDropsThem() {
+        assertEquals(MarginStrut.EMPTY, predicted("\t\tBlock:\n\t\t\tId: B\n\t\t\tTrim margins: true\n"
+                + "\t\t\tHeading 1:\n\t\t\t\tText: Capítulo\n\t\t\t\tBox:\n\t\t\t\t\tMargin: 24 0 12 0\n"));
+    }
+
+    @Test
     void anEmptyChildLetsBothOfItsMarginsThrough() {
         assertEquals(new MarginStrut(10, -4), predicted("\t\tBlock:\n\t\t\tId: B\n\t\t\tBlock:\n\t\t\t\tBox:\n"
                 + "\t\t\t\t\tMargin: 10 0 -4 0\n\t\t\tParagraph: Texto\n\t\t\t\tBox:\n\t\t\t\t\tMargin: 8 0 0 0\n"));

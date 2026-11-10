@@ -66,6 +66,56 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 > **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
 
+## Recortar los márgenes (`Trim margins`)
+
+Una caja con `Trim margins: true` **descarta los márgenes que tocan su borde de arriba y su borde de abajo desde
+dentro**: el margen de arriba de su primer hijo en flujo y el de abajo del último, con los de sus propios primeros y
+últimos hijos que se fusionarían con ellos. Esos márgenes ni se quedan dentro de la caja ni salen de ella: no se aplican.
+Los márgenes entre los hijos no cambian.
+
+```
+Block:
+    Trim margins: true
+    Box:
+        Background: #F1EFE8
+        Padding: 10
+    Paragraph: El primer párrafo empieza junto al relleno.
+        Box:
+            Margin: 12 0 12 0
+    Paragraph: El último acaba junto al relleno; entre los dos quedan 12.
+        Box:
+            Margin: 12 0 12 0
+```
+
+Sin `Trim margins`, el relleno contiene los dos márgenes y la caja mediría 24 más. Sirve para lo que tiene fondo,
+borde o relleno, para las celdas y para el principio de una sección, donde los márgenes de dentro no se fusionan con
+nada y se quedarían como un hueco.
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Trim margins` | booleano | `false` | Descarta los márgenes de los hijos que tocan el borde de arriba y el de abajo de la caja. En `Block`, `Frame`, `List item`, `Cell` y `Section`. |
+
+- **Arriba, en el primer fragmento; abajo, en el último.** En una caja partida entre páginas, los márgenes que tocan
+  el corte se truncan como siempre ([Cortes](../common/breaks.md#márgenes-en-los-cortes)).
+- **Vale también en una caja abierta** (sin borde, relleno ni `Isolate margins`): los márgenes de sus hijos, que
+  saldrían y se fusionarían con los suyos, se descartan, y la caja conserva solo su propio `Margin`.
+- **Los hijos vacíos** de antes del primero con contenido, o de después del último, dejan pasar sus márgenes: se
+  descartan con los demás.
+- **En una `Section`** recorta en su área útil: el primer elemento empieza arriba del área aunque tenga margen. El
+  de abajo del último ya se trunca al final de la página.
+- **Una `Cell` con valor**, que es un texto, no tiene hijos: `Trim margins` no cambia nada en ella y no es un error,
+  para que una regla `For element: Cell` valga para todas.
+- Puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)),
+  salvo en una `Section`, a la que una regla solo da `Typography`.
+
+> **Decisión:** los márgenes se descartan en la caja que los contiene, y no se quitan en cada hijo: quien escribe el
+> contenido no sabe si su párrafo será el primero de una caja con fondo, y una regla (`For element: Paragraph`) da el
+> mismo margen a todos. *Alternativa descartada:* un margen distinto para el primer y el último hijo (selectores de
+> posición), que no alcanza a los hijos de los hijos.
+
+> **Decisión:** una sola propiedad para arriba y abajo. *Alternativa descartada:* elegir el lado (`top`, `bottom`),
+> que no ha hecho falta: lo que no se quiere recortar lleva un relleno.
+
 ## Cajas laterales (`Side`)
 
 Una `Image`, un `Barcode` o un `Block` en flujo de bloque con `Side: left` o `Side: right` es una **caja lateral**: se

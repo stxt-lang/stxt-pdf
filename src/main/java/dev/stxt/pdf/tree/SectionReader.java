@@ -27,7 +27,8 @@ final class SectionReader {
      */
     record Properties(String id, PageSetup pageSetup, Section.PageNumbering numbering, NumberFormat pageNumberFormat,
                       int start, boolean inheritPageOverlays, Section.BeginOn beginOn,
-                      Section.FootnoteNumbering footnoteNumbering, NumberFormat footnoteNumberFormat) {
+                      Section.FootnoteNumbering footnoteNumbering, NumberFormat footnoteNumberFormat,
+                      boolean trimMargins) {
     }
 
     /**
@@ -46,6 +47,7 @@ final class SectionReader {
         Section.BeginOn beginOn = Section.BeginOn.ANY;
         Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
         NumberFormat footnoteNumberFormat = NumberFormat.DECIMAL;
+        boolean trimMargins = false;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
@@ -62,6 +64,7 @@ final class SectionReader {
                     startNode = p;
                 }
                 case "inherit-page-overlays" -> inheritPageOverlays = bool(p);
+                case "trim-margins" -> trimMargins = bool(p);
                 case "begin-on" -> {
                     beginOn = enumValue(Section.BeginOn.class, p);
                     if (first && beginOn == Section.BeginOn.ODD) {
@@ -84,6 +87,6 @@ final class SectionReader {
                     + "effect with Page numbering: none, because the pages of the section have no number: it is not needed");
         }
         return new Properties(id, pageSetup.pageSetup(), numbering, pageNumberFormat, start, inheritPageOverlays,
-                beginOn, footnoteNumbering, footnoteNumberFormat);
+                beginOn, footnoteNumbering, footnoteNumberFormat, trimMargins);
     }
 }

@@ -66,6 +66,56 @@ of `Stack` and `Grid` (also the cells of a `Table`), the columns of a `Columns`,
 > **Decision:** `Isolate margins` exists only where it can have an effect: `Overlay`, `Page overlay` and the items already isolate, and `Stack`, `Grid`
 > and `Text` have no children in block flow. In a `Block` or a `Frame` that is an item, `Isolate margins: true` is an error.
 
+## Trimming the margins (`Trim margins`)
+
+A box with `Trim margins: true` **drops the margins that touch its top and its bottom border from inside**: the top
+margin of its first in-flow child and the bottom margin of its last one, with those of their own first and last children
+that would merge with them. Those margins neither stay inside the box nor come out of it: they are not applied. The
+margins between the children do not change.
+
+```
+Block:
+    Trim margins: true
+    Box:
+        Background: #F1EFE8
+        Padding: 10
+    Paragraph: The first paragraph starts at the padding.
+        Box:
+            Margin: 12 0 12 0
+    Paragraph: The last one ends at the padding; 12 are left between the two.
+        Box:
+            Margin: 12 0 12 0
+```
+
+Without `Trim margins`, the padding contains both margins and the box would be 24 higher. It is for what has a
+background, a border or a padding, for the cells and for the start of a section, where the margins inside merge with
+nothing and would stay as a gap.
+
+| Property | Values | Default | Notes |
+|---|---|---|---|
+| `Trim margins` | boolean | `false` | Drops the margins of the children that touch the top and the bottom border of the box. In `Block`, `Frame`, `List item`, `Cell` and `Section`. |
+
+- **At the top, in the first fragment; at the bottom, in the last one.** In a box broken between pages, the margins that
+  touch the break are truncated as always ([Breaks](../common/breaks.md#margins-at-breaks)).
+- **It also works in an open box** (without border, padding or `Isolate margins`): the margins of its children, which
+  would come out and merge with its own, are dropped, and the box keeps only its own `Margin`.
+- **The empty children** before the first one with content, or after the last one, let their margins through: they are
+  dropped with the rest.
+- **In a `Section`** it trims in its page area: the first element starts at the top of the area even if it has a
+  margin. The bottom one of the last element is already truncated at the end of the page.
+- **A `Cell` with a value**, which is a text, has no children: `Trim margins` changes nothing in it and is not an
+  error, so that a rule `For element: Cell` is valid for all of them.
+- It can come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), except in a
+  `Section`, to which a rule only gives `Typography`.
+
+> **Decision:** the margins are dropped in the box that contains them, not removed in each child: whoever writes the
+> content does not know whether their paragraph will be the first one of a box with a background, and a rule
+> (`For element: Paragraph`) gives the same margin to all. *Discarded alternative:* a different margin for the first
+> and the last child (position selectors), which does not reach the children of the children.
+
+> **Decision:** a single property for the top and the bottom. *Discarded alternative:* choosing the side (`top`,
+> `bottom`), which has not been needed: what must not be trimmed has a padding.
+
 ## Side boxes (`Side`)
 
 An `Image`, a `Barcode` or a `Block` in block flow with `Side: left` or `Side: right` is a **side box**: it is placed at

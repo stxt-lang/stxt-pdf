@@ -137,6 +137,7 @@ final class PropertyReader {
             entry("start", (p, s) -> s.list().setStart(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
+            entry("trim-margins", (p, s) -> s.setTrimMargins(bool(p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),

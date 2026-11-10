@@ -159,7 +159,7 @@ final class StyleRules {
             "count", "min-column-width", "separator", "separator-color", "balance",
             "marker", "marker-image", "fit", "format", "error-correction", "quiet-zone",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
-            "drop-cap", "side", "clear", "isolate-margins",
+            "drop-cap", "side", "clear", "isolate-margins", "trim-margins",
             "bullet-markers", "number-markers", "table-columns",
             "grow", "shrink", "base-size");
 

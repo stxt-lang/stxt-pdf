@@ -5,6 +5,17 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Added
+
+- **`Trim margins`**, in `Block`, `Frame`, `List item`, `Cell` and `Section`: with `true`, the box drops the
+  margins of its children that touch its top and its bottom border (the top one of the first child, the bottom one of
+  the last, and those of their own first and last children that would merge with them). They neither stay inside the
+  box nor come out of it, so the content of a box with a background, of a cell or of a section starts and ends at its
+  edge whatever margins a rule gives its elements. It can come from a rule of `Styles`, except in a `Section`.
+  "Trimming the margins" in the reference of `Block`.
+
 ## [0.13.0] - 2026-11-08
 
 Rules of `Styles` that give the properties of an element (`Gap`, `Fit`, `Marker`, `Column sizes`...) and rules nested

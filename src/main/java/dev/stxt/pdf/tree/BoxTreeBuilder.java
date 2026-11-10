@@ -209,6 +209,8 @@ public final class BoxTreeBuilder {
         s.setPosition(Position.STATIC);
         ctx.rules.applySection(n, s);
         SectionReader.Properties p = SectionReader.read(ctx, n, documentPageSetup, first);
+        // The page area drops the margins that touch its top and its bottom (reference/components/block.md).
+        s.setTrimMargins(p.trimMargins());
         Box box = new Box(p.id(), Element.SECTION, s, false, n.getLine());
         ctx.definiteHeight.put(box, true);
         // The footnote area of the section (reference/components/footnote.md): its notes hang from it, not from the

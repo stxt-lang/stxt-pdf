@@ -109,6 +109,7 @@ Text: Resultados del trimestre
 | `In table of contents` | `true`, `false` | `true` | Encabezados, `Figure` | Si el encabezado o la figura tiene entrada en los índices ([Encabezados](../components/heading.md#fuera-del-índice), [Figure](../components/figure.md#índices)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` o `#id` | sin valor | Elementos salvo `Markdown` y `Table of contents` | Hace clicable la caja entera ([Enlaces](links.md)). No se hereda ni cambia el aspecto. |
 | `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta la fusión de márgenes con los hijos ([Block](../components/block.md#fusión-de-márgenes)). |
+| `Trim margins` | booleano | `false` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Descarta los márgenes de los hijos que tocan el borde de arriba y el de abajo de la caja ([Block](../components/block.md#recortar-los-márgenes-trim-margins)). |
 | `Side` | `left`, `right` | sin valor | `Image`, `Barcode`, `Block`, `Figure` | Caja lateral: el texto que la sigue corre a su lado ([Block](../components/block.md#cajas-laterales-side)). |
 | `Clear` | booleano | `false` | `Text`, `Paragraph`, `Block`, encabezados, `Markdown`, `Image`, `Barcode`, `Figure` | Baja la caja por debajo de las cajas laterales anteriores ([Block](../components/block.md#cajas-laterales-side)). |
 | `Drop cap` | entero de 2 a 5 | sin valor | `Paragraph` | Letra capitular de tantas líneas ([Text](../components/text.md#letra-capitular-drop-cap)). |
@@ -189,22 +190,22 @@ vez, y los elementos, las veces que se quiera.
 | Nodo | Hijos |
 |---|---|
 | `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Subject`, `Styles`; `Page overlay`, `Section` (al menos una) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`; elementos |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `Start`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elementos |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` y las propiedades de elemento de aspecto y de reparto ([Styles](styles.md#propiedades-de-elemento)), como mucho una de cada |
 | `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Rotate`, `Side`, `Clear`; elementos |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Clear`; elementos |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Areas`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, además, `Drop cap` |
 | `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio, propio o de una regla), `Marker image` (con `Alt` y `Height`), `Start`; `List item` (al menos uno) |
-| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (con `Alt` y `Height`); elementos salvo los encabezados (al menos uno) |
+| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (con `Alt` y `Height`), `Trim margins`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio, propio o de una regla), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body` (obligatorio), `Footer rows` |
 | `Header rows`, `Body`, `Footer rows` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
-| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`; elementos salvo los encabezados |
+| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`; elementos salvo los encabezados |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table columns`, `Clear`, `Content` (obligatorio) |
 | `Footnote` | `Id` (obligatorio), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
@@ -213,7 +214,7 @@ vez, y los elementos, las veces que se quiera.
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
 | `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Pdf page`, `Rotate`, `Side`, `Clear` |
 | `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`), `Break`, `Alt` (obligatorio), `Format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
-| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
+| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |

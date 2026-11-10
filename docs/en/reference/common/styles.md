@@ -72,15 +72,16 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
 | `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
 | `List` | `Marker`, `Marker image` |
-| `List item` | `Marker image` |
+| `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Clear` |
 | `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
 | `Heading 1` to `Heading 6` | `In table of contents`, `Clear` |
 | `Paragraph` | `Drop cap`, `Clear` |
 | `Text` | `Clear` |
-| `Block` | `Isolate margins`, `Side`, `Clear` |
-| `Frame` | `Isolate margins` |
+| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Clear` |
+| `Frame` | `Isolate margins`, `Trim margins` |
+| `Cell` | `Trim margins` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
 | `Table of contents` | `Levels`, `Leader` |
 | the element of an `Item` | `Grow`, `Shrink`, `Base size` |

@@ -73,15 +73,16 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
 | `Columns` | `Count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
 | `List` | `Marker`, `Marker image` |
-| `List item` | `Marker image` |
+| `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Clear` |
 | `Barcode` | `Format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
 | `Heading 1` a `Heading 6` | `In table of contents`, `Clear` |
 | `Paragraph` | `Drop cap`, `Clear` |
 | `Text` | `Clear` |
-| `Block` | `Isolate margins`, `Side`, `Clear` |
-| `Frame` | `Isolate margins` |
+| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Clear` |
+| `Frame` | `Isolate margins`, `Trim margins` |
+| `Cell` | `Trim margins` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table columns`, `Clear` |
 | `Table of contents` | `Levels`, `Leader` |
 | el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |

@@ -12,7 +12,7 @@ import dev.stxt.pdf.tree.Box;
  * The margins that will come out of a box at the top when it is laid out as its first fragment
  * (reference/components/block.md), predicted from the tree before laying it out: those of the chain of its first
  * in-flow descendants while each box is open at the top (block flow, without border or padding at the top, not
- * isolating margins), plus those of the empty children before each of them, which let both of theirs through. Side
+ * isolating margins nor trimming them), plus those of the empty children before each of them, which let both of theirs through. Side
  * boxes and out-of-flow boxes do not take part in the vertical flow and are skipped, as in {@link BlockLayout}.
  *
  * <p>It is a prediction, not the rule: a text counts as non-empty (whether it has lines is only known once it is laid
@@ -34,7 +34,8 @@ final class LeadingMargins {
         MarginStrut out = MarginStrut.EMPTY;
         Box current = box;
         ConstraintSpace s = space;
-        while (current.style().layout() == Layout.BLOCK && !current.isolatesMargins()) {
+        // A box that trims its margins drops those of its first child: nothing comes out of it.
+        while (current.style().layout() == Layout.BLOCK && !current.isolatesMargins() && !current.style().trimMargins()) {
             BoxModel model = BoxModel.resolve(current, s, context);
             if (!model.openAtTop()) {
                 return out;
