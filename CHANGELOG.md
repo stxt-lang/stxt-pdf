@@ -9,6 +9,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **Block quotes and horizontal rules in a `Markdown`**: `> ...` and `---`, `***` or `___`, which were
+  `MARKDOWN_UNSUPPORTED`, are translated into two generated elements, **`Block quote`** and **`Divider`**. Like
+  `Code block`, they are not written in the document and the `For element` rules name them. A quote is a block with
+  what it contains (paragraphs, lists, tables, code, another quote), with a left `Border` of 2 and a left `Padding`
+  of 12 by default; a divider is an empty block with a top `Border` of 0.5 across the whole width. Their rule replaces
+  that look property by property, and it goes loose or nested in the rule of an element. A heading inside a quote is
+  still `MARKDOWN_UNSUPPORTED`, and `For element: Divider` does not allow `Typography`. In the tagged PDF a quote is
+  a `BlockQuote` and a divider is an artifact. A text that comes from outside (the data of a template) no longer
+  fails because of a line of hyphens. In a text with `Markup: markdown`, `>` and `---` are still text. "Block quotes
+  and dividers" in the reference of `Markdown`.
+- `Element.BLOCK_QUOTE` and `Element.DIVIDER`, with the roles `Element.Role.BLOCK_QUOTE` and `Element.Role.DIVIDER`:
+  a `switch` over `Role` without a `default` has two more cases.
 - **`Vertical`** (`start`, `center`, `end`), in `Cell`, `start` by default: where the content of a cell goes when
   its row is taller than it. The box of the cell stays stretched to its row, with its whole `Background` and
   `Border`, and its line or its elements move inside its content box. It is for the short cells of an invoice or a

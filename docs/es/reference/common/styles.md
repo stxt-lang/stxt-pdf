@@ -12,7 +12,7 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 |---|---|---|
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
-| `For element` | un elemento generado por el motor: `Code block`, `TOC 1` a `TOC 6` o `Footnote area` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
+| `For element` | un elemento generado por el motor: `Code block`, `Block quote`, `Divider`, `TOC 1` a `TOC 6` o `Footnote area` | los bloques de código, las citas y las líneas horizontales de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
 | `For element` | una posición en una tabla: `Header cell`, `Body cell`, `Footer cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../components/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style`, las celdas de una `Row` con él en su `Style` y los tramos con estilo `[texto]{nombre}` ([Formato del texto](text-formatting.md#tramos-con-estilo)) |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
@@ -93,7 +93,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
   `Text`) es `STYLE_NOT_ALLOWED`, con la línea de la propiedad en la regla. En `For element` el error sale al leer la
   regla, aunque no se aplique a ningún elemento; en `For style` y `For id`, al aplicarla, porque el mismo nombre puede
   ir en elementos de tipos distintos. Las reglas de posición de una celda admiten las de `Cell`, y `For column`, solo
-  `Vertical`. `For element: Document` y los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`) no
+  `Vertical`. `For element: Document` y los elementos generados (`Code block`, `Block quote`, `Divider`, `TOC 1` a `TOC 6`, `Footnote area`) no
   admiten ninguna, y una regla que llega a una `Section` tampoco.
 - **El valor se comprueba al leer la regla.** En `For style` y `For id` tiene que valer en alguno de los elementos que
   tienen la propiedad: `Gap: 1 2 3` es `VALUE_NOT_ALLOWED` en cualquier caso, y `Horizontal: justify`, que vale en un
@@ -166,9 +166,9 @@ La foto de la ficha mide 205 de alto y el bloque `body` lleva su relleno; la fot
   el documento, `Section` incluida. Dentro van `For element` (también las posiciones de celda, `Header cell`,
   `Body cell`...), `For style` y `For column`. Un nivel: una regla dentro de otra, no dentro de una anidada
   (`STYLE_NESTED_TOO_DEEP`). No contienen reglas `For element: Document`, las de posición de celda, `For column` ni las de
-  los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`), y dentro no van `For element: Document`,
+  los elementos generados (`Code block`, `Block quote`, `Divider`, `TOC 1` a `TOC 6`, `Footnote area`), y dentro no van `For element: Document`,
   `Section`, `TOC 1` a `TOC 6` ni `Footnote area`, que nunca están dentro de un elemento (`STYLE_NOT_ALLOWED`);
-  `Code block` sí, que está dentro de su `Markdown`.
+  `Code block`, `Block quote` y `Divider` sí, que están dentro de su `Markdown`.
 - **Qué es «dentro».** Los ancestros del elemento tal como está escrito: la `Section`, los elementos y la `Row` de una
   celda, con su `Style` y su `Id`. `Item` y `Area` no cuentan ni estorban. Lo que genera un `Markdown` está dentro del
   `Markdown`; una `Footnote` está donde se escribe, aunque herede del área de notas; las entradas de un

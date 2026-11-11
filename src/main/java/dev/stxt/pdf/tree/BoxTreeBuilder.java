@@ -276,12 +276,14 @@ public final class BoxTreeBuilder {
      */
     Box element(BuildContext ctx, InlineNode n, Box parent, InlineNode wrapper, CellPosition position) {
         ctx.cancellation.check();
-        Element kind = ctx.codeBlocks.contains(n) ? Element.CODE_BLOCK : Element.of(n.getCanonicalName()).orElseThrow();
+        Element generated = ctx.generatedKinds.get(n);
+        Element kind = generated != null ? generated : Element.of(n.getCanonicalName()).orElseThrow();
         ElementReader reader = ElementReader.of(kind);
         place(ctx, n, kind);
         Style s = Style.inheriting(parent.style());
         s.setLayout(reader.layout(n, kind));
         s.setPosition(kind.position());
+        reader.defaults(s);
         reader.inherited(wrapper, s);
         Map<String, PropertyNode> fromRules = ctx.rules.apply(n, kind, s, parent, wrapper, position, ctx.ancestors());
         if (!fromRules.isEmpty()) {

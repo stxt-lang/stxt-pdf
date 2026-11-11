@@ -1,4 +1,4 @@
-# Case: Block quote in Markdown
+# Case: HTML in Markdown
 # Code: MARKDOWN_UNSUPPORTED
 # Line: 20
 Document (dev.stxt.pdf):
@@ -17,4 +17,4 @@ Document (dev.stxt.pdf):
 			Content >>
 				Primer párrafo.
 
-				> Una cita
+				<div>Una cita</div>

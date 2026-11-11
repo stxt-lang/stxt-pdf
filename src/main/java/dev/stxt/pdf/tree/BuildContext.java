@@ -8,13 +8,11 @@ import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static dev.stxt.pdf.tree.Nodes.error;
@@ -59,10 +57,11 @@ final class BuildContext {
      */
     final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
     /**
-     * The {@code Text} that {@link MarkdownBuilder} generates as code blocks: their element is {@code Code block}
+     * The element of the nodes that {@link MarkdownBuilder} generates and is not that of their name: a {@code Text}
+     * that is a {@code Code block}, a {@code Block} that is a {@code Block quote} or a {@code Divider}
      * (reference/components/markdown.md).
      */
-    final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
+    final Map<Node, Element> generatedKinds = new IdentityHashMap<>();
     /** The footnotes: their calls, their boxes and their numbering (reference/components/footnote.md). */
     final Footnotes footnotes = new Footnotes();
     /**

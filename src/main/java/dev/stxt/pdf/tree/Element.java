@@ -148,6 +148,18 @@ public enum Element {
      */
     CODE_BLOCK("Code block", Layout.INLINE, true),
     /**
+     * A block quote of a {@link #MARKDOWN} ({@code > ...}, reference/components/markdown.md): a generated block with
+     * what the quote contains. It is not written in the document, but the {@code For element} rules name it
+     * ({@code Block quote}) to change its default look.
+     */
+    BLOCK_QUOTE("Block quote", Layout.BLOCK),
+    /**
+     * A horizontal rule of a {@link #MARKDOWN} ({@code ---}, reference/components/markdown.md): a generated empty
+     * block whose top border is the line. It is not written in the document, but the {@code For element} rules name it
+     * ({@code Divider}) to change the line.
+     */
+    DIVIDER("Divider", Layout.BLOCK),
+    /**
      * The entries of a {@link #TABLE_OF_CONTENTS}, one per heading level (those of a table of contents of figures or
      * tables are {@link #TOC_1}): a generated {@code Stack} with the title, the leader and the page number. They are
      * not written in the document, but the {@code For element} rules name them ({@code TOC 2}) to style them
@@ -224,8 +236,8 @@ public enum Element {
     }
 
     /**
-     * The elements that a {@code For element} rule can name: the written ones, the code blocks, the table of
-     * contents entries and the footnote area.
+     * The elements that a {@code For element} rule can name: the written ones, the code blocks, the block quotes and
+     * the dividers of a {@code Markdown}, the table of contents entries and the footnote area.
      */
     public static List<Element> selectable() {
         return Arrays.stream(values()).filter(e -> e.label != null).toList();
@@ -325,6 +337,10 @@ public enum Element {
         TABLE_OF_CONTENTS,
         /** A footnote ({@code Footnote}, reference/components/footnote.md): read after the paragraph that calls it. */
         NOTE,
+        /** A block quote of a {@code Markdown}: one or more blocks quoted from somewhere else. */
+        BLOCK_QUOTE,
+        /** A horizontal rule of a {@code Markdown}: it has no content, it is only painted. */
+        DIVIDER,
         /**
          * The footnote area of a section: it has no meaning of its own, its notes are read where they are called,
          * and it is painted (the rule, the background) without being content.
@@ -369,6 +385,8 @@ public enum Element {
             case CAPTION -> Role.CAPTION;
             case TABLE_OF_CONTENTS -> Role.TABLE_OF_CONTENTS;
             case FOOTNOTE -> Role.NOTE;
+            case BLOCK_QUOTE -> Role.BLOCK_QUOTE;
+            case DIVIDER -> Role.DIVIDER;
             case FOOTNOTES -> Role.FOOTNOTES;
             case TOC_1, TOC_2, TOC_3, TOC_4, TOC_5,
                  TOC_6 -> Role.TOC_ENTRY;

@@ -87,12 +87,14 @@ así:
 | `[^id]` | la llamada a la nota al pie con ese `Id`: un tramo en superíndice con su número ([Footnote](footnote.md)) |
 | `\` al final de la línea | un salto de línea forzado: la línea acaba ahí, dentro del mismo párrafo ([abajo](#saltos-de-línea-forzados)) |
 | Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
+| `> texto` | `Block quote`: un bloque con lo que la cita contiene, traducido igual ([abajo](#citas-y-líneas-horizontales)) |
+| `---`, `***`, `___` | `Divider`: una línea a todo el ancho ([abajo](#citas-y-líneas-horizontales)) |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
 | `![Alt](ruta)`, dentro de un texto | imagen en línea: un tramo que es la imagen, tan alta como la letra ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) |
 
 Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](destino "título")`), imágenes con título
 (`![Alt](ruta "título")`), la etiqueta de lenguaje de un bloque de código
-(```` ```java ````: no hay resaltado), citas, HTML, líneas horizontales, un salto de línea forzado sin texto antes en su
+(```` ```java ````: no hay resaltado), un encabezado dentro de una cita, HTML, un salto de línea forzado sin texto antes en su
 línea ([abajo](#saltos-de-línea-forzados)) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se
 escribe en el propio enlace).
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
@@ -175,6 +177,61 @@ con la línea de `Code font`.
 > **Decisión:** el bloque de código es un elemento generado que solo nombran las reglas. *Alternativa descartada:* un
 > `Code block` también escribible, o un estilo automático `code`, que reservaría un nombre de estilo al autor.
 
+## Citas y líneas horizontales
+
+```
+Styles:
+    For element: Block quote
+        Box:
+            Padding: 0 0 0 10
+            Border: 0 0 0 3
+            Border color: #8A8478
+        Typography:
+            Italic: true
+Markdown:
+    Content >>
+        Según el acta:
+
+        > Se aprueba el presupuesto
+        > por unanimidad.
+
+        ---
+
+        Sin más asuntos, se levanta la sesión.
+```
+
+Una cita (`> ...`) y una línea horizontal (`---`, `***` o `___`) son dos **elementos generados**: no se escriben en
+el documento ni tienen `Id` o `Style`, y los nombran las reglas `For element`, como `Code block`.
+
+| Elemento | Qué es | Aspecto por defecto | Su regla admite |
+|---|---|---|---|
+| `Block quote` | un bloque con lo que la cita contiene | `Padding` izquierdo de 12 y `Border` izquierdo de 2, del color del texto | `Box`, `Typography`, `Break` |
+| `Divider` | un bloque vacío cuyo borde superior es la línea | `Border` superior de 0,5, del color del texto, a todo el ancho | `Box`, `Break` |
+
+- **El contenido de una cita** se traduce como el resto: párrafos, listas, tablas, código y otra cita dentro. Un
+  encabezado dentro de una cita es `MARKDOWN_UNSUPPORTED`, como dentro de una lista, y una cita sin contenido (`>`
+  solo), `TEXT_CONTENT`.
+- **El aspecto por defecto** lo sustituye la regla propiedad a propiedad: un `Padding` de la regla quita el de 12 y
+  deja el borde, y `Border: 0` deja la cita sin línea.
+- **Separación.** Ni la cita ni la línea tienen márgenes propios: las separa de lo de arriba y de lo de abajo lo que
+  separa los bloques del `Markdown` (el `Margin` de `For element: Paragraph`), o un `Margin` en su regla.
+- **`Typography`.** La de `For element: Block quote` la hereda lo que la cita contiene. `For element: Divider` no la
+  admite (`STYLE_NOT_ALLOWED`): no tiene texto, y el color de su línea es su `Border color`.
+- **Reglas.** `For element: Block` no los alcanza. Sus reglas no admiten propiedades de elemento ni contienen reglas
+  anidadas, y van dentro de la regla de un elemento, porque los dos están dentro de su `Markdown`
+  ([Styles](../common/styles.md#reglas-anidadas)).
+- **Cortes.** Una cita se parte entre páginas como un `Block`; `Keep together: true` en su regla lo evita.
+- **`Markup: markdown`.** En el Markdown en línea de un texto, `>` y `---` siguen siendo texto
+  ([Formato del texto](../common/text-formatting.md)).
+
+> **Decisión:** dos elementos generados, `Block quote` (el término de CommonMark, como `Code block`) y `Divider`.
+> *Alternativa descartada:* traducirlos a un `Block` anónimo, que no se podría estilar, y `Rule` para la línea, que en
+> el API ya es el nombre de las líneas de los bordes fusionados (`fragment.Rule`).
+
+> **Decisión:** los dos tienen un aspecto por defecto, como el área de notas al pie: sin él, una cita no se distinguiría
+> de un párrafo y una línea no se vería. *Alternativa descartada:* exigir su regla, como el `Padding` de las listas,
+> que haría fallar por una línea de guiones un texto que llega de fuera.
+
 ## Listas
 
 El nivel de una lista es el número de listas de su mismo tipo que la contienen: la primera lista con viñetas usa el primer
@@ -239,10 +296,11 @@ Los errores de un párrafo de varias líneas señalan la primera, y los de una c
 ## Accesibilidad
 
 Lo generado se lee como lo escrito a mano: encabezados, párrafos, listas y tablas, y sus encabezados son marcadores.
+Una cita se lee como cita, y una línea horizontal no se lee.
 
 ## Lo que no hay
 
-- Citas, HTML, líneas horizontales, listas de tareas y resaltado de código. Las notas al pie se
+- HTML, listas de tareas y resaltado de código. Las notas al pie se
   llaman con `[^id]`, pero su contenido es una `Footnote`, no una definición `[^id]: ...` ([Footnote](footnote.md)).
 - Enlaces con título o con definición aparte, e imágenes con título.
 - Dos espacios al final de la línea como salto de línea forzado: STXT los quita.

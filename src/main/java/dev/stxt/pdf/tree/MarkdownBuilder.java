@@ -4,7 +4,6 @@ import static dev.stxt.pdf.tree.Nodes.child;
 import static dev.stxt.pdf.tree.Nodes.error;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +59,8 @@ import dev.stxt.pdf.model.TextRun;
 
 /**
  * Translates a {@code Markdown} (reference/components/markdown.md) into the STXT nodes of the elements that already
- * exist: headings to {@code Heading 1}...{@code Heading 6} with a {@code Text}, paragraphs to {@code Paragraph}, lists
+ * exist: headings to {@code Heading 1}...{@code Heading 6} with a {@code Text}, paragraphs to {@code Paragraph}, block quotes
+ * and horizontal rules to a {@code Block} (a {@code Block quote} and a {@code Divider}), lists
  * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
  * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md); an
  * image inside a text is a run that is the image ({@link InlineImage}, reference/common/text-formatting.md). A
@@ -104,8 +104,11 @@ final class MarkdownBuilder {
     /** A footnote call, {@code [^id]} (reference/components/footnote.md): the {@code Id} of a {@code Footnote}. */
     private static final Pattern FOOTNOTE_CALL = Pattern.compile("\\[\\^([^\\[\\]\\s]+)]");
 
-    private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, "
-            + "images and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
+    /** The {@code >} of the block quotes a line is in, at its start. */
+    private static final Pattern QUOTE_PREFIX = Pattern.compile("^(?:>\\s?)+");
+
+    private static final String SUBSET = "only headings, paragraphs, lists, tables, code blocks, block quotes, "
+            + "horizontal rules, images and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, "
             + "`code`, [links](target), ![images](path), [styled runs]{style} and line breaks (\\ at the end of the "
             + "line) are allowed";
 
@@ -117,9 +120,12 @@ final class MarkdownBuilder {
     /**
      * The generated elements, in order, and the runs of the formatted texts, by node ({@code Text}, {@code Paragraph}
      * or {@code Cell}). {@code sources} are the generated property nodes whose line is in a separate styles document:
-     * they come from a property of one of its rules ({@code Bullet markers}, {@code Table column sizes}).
+     * they come from a property of one of its rules ({@code Bullet markers}, {@code Table column sizes}). {@code kinds}
+     * are the generated nodes whose element is not that of their name: the {@code Text} of a code block is a
+     * {@code Code block}, and the {@code Block} of a quote or of a horizontal rule, a {@code Block quote} or a
+     * {@code Divider}.
      */
-    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Set<Node> codeBlocks,
+    record Translation(List<InlineNode> elements, Map<Node, List<TextRun>> runs, Map<Node, Element> kinds,
                        Map<Node, SourceLine> sources) {
     }
 
@@ -142,13 +148,13 @@ final class MarkdownBuilder {
         RunMarks.Marked marked = RunMarks.mark(content.getText(), content.getLine() + 1);
         Translator t = new Translator(markdown, properties, content.getLine() + 1, false,
                 content.getText().split("\n", -1), footnotes, marked.names());
-        List<InlineNode> elements = t.blocks(PARSER.parse(marked.text()), false);
+        List<InlineNode> elements = t.blocks(PARSER.parse(marked.text()), null);
         if (elements.isEmpty()) {
             throw error(content, ErrorCode.TEXT_CONTENT, "Markdown needs content in Content");
         }
         // Safety net: what is generated conforms to the schema, like what the author writes.
         elements.forEach(DocumentSchema::validate);
-        return new Translation(List.copyOf(elements), t.runs, t.codeBlocks, t.sources);
+        return new Translation(List.copyOf(elements), t.runs, t.kinds, t.sources);
     }
 
     /**
@@ -203,8 +209,10 @@ final class MarkdownBuilder {
         private final List<String> bullets;
         private final List<String> numberings;
         private final Map<Node, List<TextRun>> runs = new IdentityHashMap<>();
-        /** The {@code Text} nodes that are code blocks: the builder gives them the {@code Code block} element. */
-        private final Set<Node> codeBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
+        /** The element of the generated nodes that is not that of their name ({@link Translation}). */
+        private final Map<Node, Element> kinds = new IdentityHashMap<>();
+        /** Block quotes that contain the block being translated. */
+        private int quoteDepth;
         /** The generated property nodes whose line is in a separate styles document ({@link Translation}). */
         private final Map<Node, SourceLine> sources = new IdentityHashMap<>();
         /** Bulleted and numbered lists that contain the block being translated. */
@@ -236,21 +244,24 @@ final class MarkdownBuilder {
             this.numberings = numbering.map(p -> markers(p, true)).orElse(List.of());
         }
 
-        /** The child blocks of {@code parent}; {@code inItem} if they are inside a list item. */
-        List<InlineNode> blocks(org.commonmark.node.Node parent, boolean inItem) {
+        /**
+         * The child blocks of {@code parent}; {@code within} is what they are inside that takes no heading
+         * ({@code a list item}, {@code a block quote}), or {@code null}.
+         */
+        List<InlineNode> blocks(org.commonmark.node.Node parent, String within) {
             List<InlineNode> out = new ArrayList<>();
             for (org.commonmark.node.Node b = parent.getFirstChild(); b != null; b = b.getNext()) {
-                out.add(block(b, inItem));
+                out.add(block(b, within));
             }
             return out;
         }
 
-        private InlineNode block(org.commonmark.node.Node b, boolean inItem) {
+        private InlineNode block(org.commonmark.node.Node b, String within) {
             int line = line(b);
             if (b instanceof Heading h) {
-                if (inItem) {
-                    throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "A heading cannot be inside a "
-                            + "list item, as in a List item");
+                if (within != null) {
+                    throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "A heading cannot be inside " + within
+                            + ", as in a List item");
                 }
                 InlineNode heading = node("Heading " + h.getLevel(), "", line);
                 String id = headingId(h, line);
@@ -275,7 +286,34 @@ final class MarkdownBuilder {
             if (b instanceof FencedCodeBlock || b instanceof IndentedCodeBlock) {
                 return codeBlock(b, line);
             }
+            if (b instanceof BlockQuote q) {
+                return blockQuote(q, line);
+            }
+            if (b instanceof ThematicBreak) {
+                // A horizontal rule: an empty Block that is a Divider, whose top border is the line.
+                InlineNode divider = node("Block", "", line);
+                kinds.put(divider, Element.DIVIDER);
+                return divider;
+            }
             throw unsupported(b, line);
+        }
+
+        /**
+         * A block quote ({@code > ...}): a {@code Block} that is a {@code Block quote}, with what the quote contains
+         * translated like the rest (paragraphs, lists, code, another quote). A heading inside it is an error, as in a
+         * list item.
+         */
+        private InlineNode blockQuote(BlockQuote q, int line) {
+            InlineNode quote = node("Block", "", line);
+            quoteDepth++;
+            List<InlineNode> content = blocks(q, "a block quote");
+            quoteDepth--;
+            if (content.isEmpty()) {
+                throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown block quote needs content");
+            }
+            content.forEach(quote::addChild);
+            kinds.put(quote, Element.BLOCK_QUOTE);
+            return quote;
         }
 
         /**
@@ -308,7 +346,7 @@ final class MarkdownBuilder {
             // The Content >> goes on the line of the fences; when indented, on the line before the first line.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
                     fenced ? line : line - 1));
-            codeBlocks.add(text);
+            kinds.put(text, Element.CODE_BLOCK);
             return text;
         }
 
@@ -378,7 +416,7 @@ final class MarkdownBuilder {
             for (org.commonmark.node.Node i = l.getFirstChild(); i != null; i = i.getNext()) {
                 ListItem source = (ListItem) i;
                 InlineNode item = node("List item", "", line(source));
-                blocks(source, true).forEach(item::addChild);
+                blocks(source, "a list item").forEach(item::addChild);
                 list.addChild(item);
             }
             if (numbered) {
@@ -433,6 +471,10 @@ final class MarkdownBuilder {
                 return;
             }
             String text = source[row.getSourceSpans().get(0).getLineIndex()].strip();
+            if (quoteDepth > 0) {
+                // The row of a table inside a block quote: without the > of each quote that contains it.
+                text = QUOTE_PREFIX.matcher(text).replaceFirst("").strip();
+            }
             int cells = 1;
             for (int i = 0; i < text.length(); i++) {
                 char ch = text.charAt(i);
@@ -727,11 +769,7 @@ final class MarkdownBuilder {
 
         InvalidModelException unsupported(org.commonmark.node.Node n, int line) {
             String what;
-            if (n instanceof BlockQuote) {
-                what = "quotes (>)";
-            } else if (n instanceof ThematicBreak) {
-                what = "horizontal rules";
-            } else if (n instanceof HtmlBlock || n instanceof HtmlInline) {
+            if (n instanceof HtmlBlock || n instanceof HtmlInline) {
                 what = "HTML";
             } else if (n instanceof LinkReferenceDefinition) {
                 what = "link definitions";

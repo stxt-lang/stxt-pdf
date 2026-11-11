@@ -33,6 +33,7 @@ Styles:
 | `For element: Header cell`, `Body cell`, `Footer cell`, `Odd row cell`, `Even row cell` | The cells of a table according to where they are ([Table](../components/table.md)) |
 | `For column: 3` (or `For column: 2 4`) | The cells that start in that column (or columns) of a table |
 | `For element: Code block` | The code blocks of a `Markdown` |
+| `For element: Block quote`, `Divider` | The block quotes and the horizontal rules of a `Markdown` |
 | `For element: TOC 1` to `TOC 6` | The entries of a table of contents, by level ([Table of contents](../components/table-of-contents.md)) |
 
 Each rule accepts the `Box`, `Typography` and `Break` groups, and the [properties specific to an element](#element-properties)

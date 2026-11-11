@@ -142,6 +142,11 @@ final class StyleRules {
         }
     }
 
+    /**
+     * The elements a {@code Markdown} generates that the rules name: they are inside it, so a nested rule reaches them.
+     */
+    private static final Set<Element> IN_MARKDOWN = Set.of(Element.CODE_BLOCK, Element.BLOCK_QUOTE, Element.DIVIDER);
+
     /** The groups of a rule, which it can give any box. */
     private static final Set<String> GROUPS = Set.of("box", "typography", "break");
 
@@ -386,10 +391,16 @@ final class StyleRules {
                                 Element.selectable().stream().map(Element::label)),
                                 Arrays.stream(CellSelector.values()).map(CellSelector::label))
                         .collect(Collectors.joining(", ")) + ")"), source));
-        if (outer != null && (element == Element.SECTION || !(element.isWritten() || element == Element.CODE_BLOCK))) {
+        if (outer != null && (element == Element.SECTION || !(element.isWritten() || IN_MARKDOWN.contains(element)))) {
             throw located(error(rule, ErrorCode.STYLE_NOT_ALLOWED, selector(rule) + " cannot be inside "
                     + selector(outer) + ": " + (element == Element.SECTION ? "a Section is inside nothing"
                     : "the engine builds " + element.label() + " apart, inside no element")), source);
+        }
+        if (element == Element.DIVIDER) {
+            child(rule, "typography").ifPresent(t -> {
+                throw located(error(t, ErrorCode.STYLE_NOT_ALLOWED, "For element: Divider does not allow Typography: "
+                        + "a divider has no text. Its line is its top Border, with its Border color"), source);
+            });
         }
         elementRules.computeIfAbsent(element, k -> new ArrayList<>()).add(new ElementRule(rule, outer));
         return element.label();

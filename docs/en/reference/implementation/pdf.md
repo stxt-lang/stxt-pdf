@@ -52,6 +52,8 @@ One element per box, in the order of the document, which is the reading order:
 | `Text`, `Paragraph` | `P` |
 | `List`, `List item` | `L` and `LI`, with the marker in `Lbl` and the content in `LBody` |
 | `Table` and its parts | `Table`, `THead`, `TBody`, `TFoot`, `TR`, and `TH` or `TD` |
+| `Block quote` of a `Markdown` | `BlockQuote`, with what it contains |
+| `Divider` of a `Markdown` | none: it is painted as an *artifact* |
 | `Table of contents` and its entries | `TOC` and `TOCI`, with two `Span` (the title and the number) |
 | `Footnote` | `Note` (`FENote` with PDF/UA-2), with the number in a `Lbl`, right after the text that calls it; the call, a `Reference` inside that text ([below](#footnotes)) |
 | `Image` with `Alt`, `Barcode` | `Figure`, with `Alt` and `BBox` |
@@ -251,7 +253,7 @@ these differences, gathered in `UaProfile`, which the structure tree and its lin
 write:
 
 - **Namespace:** the structure tree declares that of PDF 2.0 (`Namespaces`, `http://iso.org/pdf2/ssn`) and each
-  element carries it in `NS`, except `TOC`, `TOCI` and `Reference`, which do not exist in PDF 2.0 and stay in that of PDF 1.7, the
+  element carries it in `NS`, except `TOC`, `TOCI`, `Reference` and `BlockQuote`, which do not exist in PDF 2.0 and stay in that of PDF 1.7, the
   default one.
 - **Tables of contents:** a `TOCI` cannot contain a `Link`: it is `TOCI → Reference → Link → title, number`, and the `TOCI` points with
   `Ref` to the element of the heading it leads to.

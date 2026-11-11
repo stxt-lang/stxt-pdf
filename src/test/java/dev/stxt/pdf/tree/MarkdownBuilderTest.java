@@ -377,7 +377,7 @@ class MarkdownBuilderTest {
                 "  Typography @17",
                 "    Preformatted: true @17",
                 "  Content: a  b\n  c @17"), outline(t.elements().get(1)));
-        assertEquals(Set.of(t.elements().get(1)), t.codeBlocks());
+        assertEquals(Map.of(t.elements().get(1), Element.CODE_BLOCK), t.kinds());
     }
 
     @Test

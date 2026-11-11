@@ -8,8 +8,10 @@ import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.RunStyle;
+import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.model.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -234,7 +236,7 @@ enum ElementReader {
             MarkdownBuilder.Translation t = MarkdownBuilder.translate(n, ctx.footnotes, name -> ctx.property(n, name));
             ctx.footnotes.noCalls = null;
             ctx.runs.putAll(t.runs());
-            ctx.codeBlocks.addAll(t.codeBlocks());
+            ctx.generatedKinds.putAll(t.kinds());
             ctx.sources.putAll(t.sources());
             ctx.within(ctx.scope().markdown(), () -> {
                 for (InlineNode e : t.elements()) {
@@ -309,8 +311,39 @@ enum ElementReader {
         }
     },
 
+    /**
+     * The block quote of a {@code Markdown} (reference/components/markdown.md): a block with a default look, a line
+     * on its left and its content set in from it, which a {@code For element: Block quote} rule changes property by
+     * property.
+     */
+    BLOCK_QUOTE {
+        @Override
+        void defaults(Style s) {
+            s.box().setPadding(new Sides<>(Value.pt(0), Value.pt(0), Value.pt(0), Value.pt(QUOTE_PADDING)));
+            s.box().setBorder(new Sides<>(Value.pt(0), Value.pt(0), Value.pt(0), Value.pt(QUOTE_BORDER)));
+        }
+    },
+
+    /**
+     * The horizontal rule of a {@code Markdown} (reference/components/markdown.md): an empty block whose top border is
+     * the line, which a {@code For element: Divider} rule changes.
+     */
+    DIVIDER {
+        @Override
+        void defaults(Style s) {
+            s.box().setBorder(new Sides<>(Value.pt(DIVIDER_BORDER), Value.pt(0), Value.pt(0), Value.pt(0)));
+        }
+    },
+
     /** The rest: {@code Block}, the headings, {@code List item}, the positioned boxes..., with their children. */
     CONTAINER;
+
+    /** Left padding of a block quote of a {@code Markdown}, by default, in points. */
+    static final double QUOTE_PADDING = 12;
+    /** Thickness of the line on the left of a block quote, by default, in points. */
+    static final double QUOTE_BORDER = 2;
+    /** Thickness of the line of a divider of a {@code Markdown}, by default, in points. */
+    static final double DIVIDER_BORDER = 0.5;
 
     /** A blank line inside the text: it separates paragraphs (reference/common/typography.md). */
     private static final Pattern BLANK_LINE = Pattern.compile("\\n[ \\t]*\\n");
@@ -340,6 +373,12 @@ enum ElementReader {
         if (kind == Element.CODE_BLOCK) {
             return CODE_BLOCK;
         }
+        if (kind == Element.BLOCK_QUOTE) {
+            return BLOCK_QUOTE;
+        }
+        if (kind == Element.DIVIDER) {
+            return DIVIDER;
+        }
         if (kind.hasText()) {
             return TEXT;
         }
@@ -363,6 +402,13 @@ enum ElementReader {
     /** The layout of the box: that of the element, except in a {@code Cell}. */
     Layout layout(InlineNode n, Element kind) {
         return kind.layout();
+    }
+
+    /**
+     * The look the engine gives it by default, before inheritance and the rules, which replace it property by
+     * property: that of the block quote and the divider of a {@code Markdown}.
+     */
+    void defaults(Style s) {
     }
 
     /**

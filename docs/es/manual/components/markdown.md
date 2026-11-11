@@ -92,18 +92,20 @@ del `Markdown` o, una vez para todo el documento, en `For element: Document`, y 
 | `` `código` `` | Código en línea, con `Code font` |
 | `[texto]{nombre}` | Una parte con el color o la fuente de la regla `For style: nombre` ([Formato del texto](../common/text-formatting.md#partes-con-otro-color-u-otra-fuente)) |
 | Un bloque de código (entre ```` ``` ```` o `~~~`, o sangrado cuatro espacios) | Un bloque preformateado con `Code font`, que se estila con `For element: Code block` |
+| `> texto` | Una cita: un bloque con una línea a su izquierda, que se estila con `For element: Block quote` |
+| `---`, `***` o `___` | Una línea horizontal, que se estila con `For element: Divider` |
 | `![texto alternativo](ruta)`, sola en su párrafo | Una `Image` |
 | `![texto alternativo](ruta)`, dentro de un párrafo | Una imagen pequeña en la frase, tan alta como la letra ([Formato del texto](../common/text-formatting.md#imágenes-en-la-frase)) |
 | `\` al final de la línea | Un salto de línea dentro del párrafo, como el de la firma del ejemplo |
 
-Lo demás es un error, para que nada se pierda en silencio. Por ejemplo: citas, HTML, líneas horizontales, imágenes o
+Lo demás es un error, para que nada se pierda en silencio. Por ejemplo: HTML, imágenes o
 enlaces con título, o la etiqueta de lenguaje de un bloque de código (no hay resaltado).
 
 ## Estilo
 
 Lo que genera un `Markdown` no tiene `Style`, ni `Id` salvo los encabezados con `{#id}`: se le da estilo con las reglas
 `For element` de `Styles` (`For element: Heading 1`, `For element: Paragraph`, `For element: List`, `For element: Code block`), que valen
-para todo el documento, y con la `Typography` del `Markdown`. Nada tiene estilo por defecto: sin `For element: List` con un
+para todo el documento, y con la `Typography` del `Markdown`. Solo las citas y las líneas horizontales tienen un aspecto por defecto, que su regla cambia. Lo demás, no: sin `For element: List` con un
 `Padding` izquierdo, las listas no tienen sitio para el marcador.
 
 ## Cosas a tener en cuenta

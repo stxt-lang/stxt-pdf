@@ -152,7 +152,8 @@ final class PdfStructure {
             box.children().forEach(child -> build(child, parent));
             return;
         }
-        if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER) {
+        if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER
+                || box.role() == Role.DIVIDER) {
             // Decorative (or the leader of a table of contents): no element, painted as an artifact; its link has one.
             links.standIns(box, parent);
             return;
@@ -430,7 +431,8 @@ final class PdfStructure {
             case SPAN, PAGE_NUMBER -> "Span";
             // A footnote: Note in PDF 1.7, FENote in PDF 2.0 (PDF/UA-2); its element takes the type of the profile.
             case NOTE -> "Note";
-            case LEADER, FLOW, BLOCK, FOOTNOTES -> "Div";
+            case BLOCK_QUOTE -> "BlockQuote";
+            case LEADER, FLOW, BLOCK, FOOTNOTES, DIVIDER -> "Div";
         };
     }
 

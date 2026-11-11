@@ -26,7 +26,7 @@ final class UaProfile {
     static final String PDF_2_NAMESPACE = "http://iso.org/pdf2/ssn";
 
     /** The types that are not in the PDF 2.0 namespace: they stay in that of PDF 1.7, the default one. */
-    private static final Set<String> PDF_1_7_ONLY = Set.of("TOC", "TOCI", "Reference");
+    private static final Set<String> PDF_1_7_ONLY = Set.of("TOC", "TOCI", "Reference", "BlockQuote");
 
     /**
      * With PDF/UA-2, the PDF 2.0 namespace of the elements, one dictionary shared by all of them; with PDF/UA-1,

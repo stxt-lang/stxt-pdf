@@ -58,9 +58,10 @@ class ElementTest {
         assertTrue(Element.of("item").isEmpty());
         // The column flow of a Columns is generated and has no name: "columns" is the Columns itself.
         assertEquals(Optional.of(Element.COLUMNS), Element.of("columns"));
-        // Generated: the marker, the band of a row, the column flow, the code block of a Markdown, the footnote area
-        // and, from the table of contents, six entries, the title, the leader and the page number.
-        assertEquals(Element.values().length - 14, Element.written().size());
+        // Generated: the marker, the band of a row, the column flow, the code block, the block quote and the divider
+        // of a Markdown, the footnote area and, from the table of contents, six entries, the title, the leader and
+        // the page number.
+        assertEquals(Element.values().length - 16, Element.written().size());
         // The footnote area is named by For element rules, but it is not written; a Footnote is.
         assertEquals(Optional.of(Element.FOOTNOTES), Element.of("footnote-area"));
         assertTrue(Element.selectable().contains(Element.FOOTNOTES), () -> "selectable: " + Element.selectable());
@@ -79,6 +80,13 @@ class ElementTest {
         assertTrue(Element.selectable().contains(Element.CODE_BLOCK), () -> "selectable: " + Element.selectable());
         assertFalse(Element.written().contains(Element.CODE_BLOCK), () -> "written: " + Element.written());
         assertTrue(Element.CODE_BLOCK.hasText());
+        // So are the block quote and the divider of a Markdown, which are blocks.
+        assertEquals(Optional.of(Element.BLOCK_QUOTE), Element.of("block-quote"));
+        assertEquals(Optional.of(Element.DIVIDER), Element.of("divider"));
+        assertTrue(Element.selectable().containsAll(List.of(Element.BLOCK_QUOTE, Element.DIVIDER)));
+        assertFalse(Element.written().contains(Element.BLOCK_QUOTE) || Element.written().contains(Element.DIVIDER));
+        assertEquals(Element.Role.BLOCK_QUOTE, Element.BLOCK_QUOTE.role());
+        assertEquals(Element.Role.DIVIDER, Element.DIVIDER.role());
         // The table of contents entries are named by For element rules, but they are not written.
         assertEquals(Optional.of(Element.TOC_2), Element.of("toc-2"));
         assertEquals(Element.TOC_4, Element.tocEntry(4));

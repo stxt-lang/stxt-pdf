@@ -87,12 +87,14 @@ as follows:
 | `[^id]` | the call of the footnote with that `Id`: a superscript run with its number ([Footnote](footnote.md)) |
 | `\` at the end of the line | a forced line break: the line ends there, within the same paragraph ([below](#forced-line-breaks)) |
 | Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |
+| `> text` | `Block quote`: a block with what the quote contains, translated the same way ([below](#block-quotes-and-dividers)) |
+| `---`, `***`, `___` | `Divider`: a line across the whole width ([below](#block-quotes-and-dividers)) |
 | `![Alt](path)`, alone in its paragraph | `Image` with that path and its `Alt`, or decorative with `![](path)` ([Image](image.md)) |
 | `![Alt](path)`, inside a text | inline image: a run that is the image, as tall as the letters ([Text formatting](../common/text-formatting.md#images-inside-a-text)) |
 
 Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](target "title")`), images with a title
 (`![Alt](path "title")`), the language tag of a code block
-(```` ```java ````: there is no highlighting), block quotes, HTML, horizontal rules, a forced line break without text
+(```` ```java ````: there is no highlighting), a heading inside a block quote, HTML, a forced line break without text
 before it on its line ([below](#forced-line-breaks)) and link definitions (`[x][ref]` with `[ref]: target`: the target is
 written in the link itself).
 A heading cannot go inside a list item either, as in a `List item`, nor can a table be left without rows below
@@ -176,6 +178,63 @@ with the line of `Code font`.
 > **Decision:** the code block is a generated element that only the rules name. *Rejected alternative:* a
 > `Code block` that can also be written, or an automatic `code` style, which would reserve a style name from the author.
 
+## Block quotes and dividers
+
+```
+Styles:
+    For element: Block quote
+        Box:
+            Padding: 0 0 0 10
+            Border: 0 0 0 3
+            Border color: #8A8478
+        Typography:
+            Italic: true
+Markdown:
+    Content >>
+        According to the minutes:
+
+        > The budget is approved
+        > unanimously.
+
+        ---
+
+        With no further business, the meeting is closed.
+```
+
+A block quote (`> ...`) and a horizontal rule (`---`, `***` or `___`) are two **generated elements**: they are not
+written in the document and have no `Id` or `Style`, and the `For element` rules name them, like `Code block`.
+
+| Element | What it is | Default look | Its rule allows |
+|---|---|---|---|
+| `Block quote` | a block with what the quote contains | left `Padding` of 12 and left `Border` of 2, in the color of the text | `Box`, `Typography`, `Break` |
+| `Divider` | an empty block whose top border is the line | top `Border` of 0.5, in the color of the text, across the whole width | `Box`, `Break` |
+
+- **The content of a quote** is translated like the rest: paragraphs, lists, tables, code and another quote inside. A
+  heading inside a quote is `MARKDOWN_UNSUPPORTED`, as inside a list, and a quote without content (`>` alone),
+  `TEXT_CONTENT`.
+- **The default look** is replaced by the rule property by property: a `Padding` in the rule removes the one of 12 and
+  leaves the border, and `Border: 0` leaves the quote without its line.
+- **Spacing.** Neither the quote nor the line has margins of its own: what separates them from what is above and below
+  is what separates the blocks of the `Markdown` (the `Margin` of `For element: Paragraph`), or a `Margin` in their
+  rule.
+- **`Typography`.** That of `For element: Block quote` is inherited by what the quote contains.
+  `For element: Divider` does not allow it (`STYLE_NOT_ALLOWED`): it has no text, and the color of its line is its
+  `Border color`.
+- **Rules.** `For element: Block` does not reach them. Their rules allow no element property and contain no nested
+  rules, and they go inside the rule of an element, because both are inside their `Markdown`
+  ([Styles](../common/styles.md#nested-rules)).
+- **Breaks.** A quote is split across pages like a `Block`; `Keep together: true` in its rule prevents it.
+- **`Markup: markdown`.** In the inline Markdown of a text, `>` and `---` are still text
+  ([Text formatting](../common/text-formatting.md)).
+
+> **Decision:** two generated elements, `Block quote` (the CommonMark term, like `Code block`) and `Divider`.
+> *Rejected alternative:* translating them into an anonymous `Block`, which could not be styled, and `Rule` for the
+> line, which in the API is already the name of the lines of the merged borders (`fragment.Rule`).
+
+> **Decision:** both have a default look, like the footnote area: without it, a quote would not be told apart from a
+> paragraph and a line would not be seen. *Rejected alternative:* requiring their rule, like the `Padding` of the
+> lists, which would make a text that comes from outside fail because of a line of hyphens.
+
 ## Lists
 
 The level of a list is the number of lists of its same type that contain it: the first bulleted list uses the first
@@ -240,10 +299,11 @@ The errors of a paragraph of several lines point to the first one, and those of 
 ## Accessibility
 
 What is generated is read like what is written by hand: headings, paragraphs, lists and tables, and its headings are bookmarks.
+A block quote is read as a quote, and a horizontal rule is not read.
 
 ## What is not supported
 
-- Block quotes, HTML, horizontal rules, task lists and code highlighting. Footnotes are called with
+- HTML, task lists and code highlighting. Footnotes are called with
   `[^id]`, but their content is a `Footnote`, not a definition `[^id]: ...` ([Footnote](footnote.md)).
 - Links with a title or with a separate definition, and images with a title.
 - Two spaces at the end of the line as a forced line break: STXT removes them.

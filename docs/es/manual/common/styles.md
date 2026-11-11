@@ -33,6 +33,7 @@ Styles:
 | `For element: Header cell`, `Body cell`, `Footer cell`, `Odd row cell`, `Even row cell` | A las celdas de una tabla según dónde están ([Table](../components/table.md)) |
 | `For column: 3` (o `For column: 2 4`) | A las celdas que empiezan en esa columna (o columnas) de una tabla |
 | `For element: Code block` | A los bloques de código de un `Markdown` |
+| `For element: Block quote`, `Divider` | A las citas y a las líneas horizontales de un `Markdown` |
 | `For element: TOC 1` a `TOC 6` | A las entradas de un índice, por nivel ([Table of contents](../components/table-of-contents.md)) |
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, y las [propiedades propias de un elemento](#propiedades-de-un-elemento)
