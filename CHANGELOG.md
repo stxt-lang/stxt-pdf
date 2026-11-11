@@ -5,18 +5,22 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.17.0] - 2026-11-11
 
-**From 0.16.0**: `tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of
-four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
+What the documents of today were missing, added before 1.0: the opacity of a box, dashed and dotted borders, baseline
+alignment in a row, superscripts and subscripts, four more barcode formats and the text under the bars, figures
+numbered by chapter, footnotes with symbols and called several times, the suffix of the markers of a list, the
+keywords of the PDF and page numbers in letters. No document that was valid changes. **From 0.16.0**, in the Java API:
+`tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of four.
+`tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
 `model.FootnoteNumberFormat` instead of a `model.NumberFormat`. `model.RunStyle` has a tenth component, `position`. A
 second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. `fragment.Rule` has
-two more components, `style` (a `model.LineStyle`) and `vertical`; its constructor with five arguments still makes a
-solid line.
-`paint.Canvas.image` takes a fourth argument, the lines of the readable text of a barcode (empty in any other image),
-and `model.Modules` has a seventh component, `text` (a `model.BarcodeText`, or `null`); its constructors with five and
-six arguments still make a drawing without text. `paint.Canvas` has two more methods, `beginOpacity` and `endOpacity`,
-which a canvas of its own has to implement. No document that was valid changes.
+two more components, `style` (a `model.LineStyle`) and `vertical`, and `model.Stroke` a third one, `style`; their
+constructors with five and with two arguments still make a solid line. `model.Modules` has a seventh component,
+`text` (a `model.BarcodeText`, or `null`); its constructors with five and six arguments still make a drawing without
+text. A canvas of its own has more to implement: `paint.Canvas` has three more methods, `line`, `beginOpacity` and
+`endOpacity`, its `border` takes a fifth argument, the `model.LineStyle` of the border, and its `image` a fourth one,
+the lines of the readable text of a barcode (empty in any other image).
 
 ### Added
 
@@ -47,7 +51,6 @@ which a canvas of its own has to implement. No document that was valid changes.
   `BARCODE_PROPERTY_WITHOUT_EFFECT`. In the tagged PDF the text is part of the figure of the code. `model.BarcodeFormat`
   gains `DATA_MATRIX`, `GS1_DATA_MATRIX`, `PDF417` and `GS1_128`, and `model.BarcodeText` is new. "Formats", "GS1 data"
   and "Readable text" in the reference of `Barcode`.
-
 - **Dashed and dotted borders.** `Border style`, of `Box`, draws the border with dashes (`dashed`) or dots (`dotted`);
   `solid` is the default. One value for the four sides: a line to cut along or to sign on is a box with a single side
   with a thickness. The dashes are three times as long as the border is thick and the dots as wide as it, and they are
@@ -93,7 +96,6 @@ which a canvas of its own has to implement. No document that was valid changes.
   In the tagged PDF it is a single `Note`, after the text of its first call, and each call is a `Reference` that points
   to it. All the calls to a note go in its section: one from another section is `FOOTNOTE_UNKNOWN`. Golden
   `53-footnote-symbols`.
-
 - **The suffix of the markers of a numbered list.** `Marker suffix` in `List` (optional) says what follows the number:
   `period`, the default (`1.`, `a.`), or `parenthesis` (`1)`, `a)`), the usual form of the clauses of a contract. It can
   come from a rule of `Styles`, like `Marker`, and it belongs to its list, not to the lists nested in it. In a list that
