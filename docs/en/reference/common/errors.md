@@ -16,7 +16,7 @@ document is what is obtained.
 ## What has no effect
 
 What an element declares and cannot have an effect because of how it is written is an error: `Line distribution` or a two-value `Gap`
-without `Wrap`, `Rotate origin` without `Rotate`, `Separator color` without `Separator`, an `auto` margin that does not center, or a `Break` inside
+without `Wrap items`, `Rotate origin` without `Rotate`, `Separator color` without `Separator`, an `auto` margin that does not center, or a `Break` inside
 an `Overlay`. These are not errors, on purpose:
 
 - **Writing the default value:** `Span: 1 1`, `Isolate margins: false`, `First number: 1`. It contradicts nothing.
@@ -31,7 +31,7 @@ an `Overlay`. These are not errors, on purpose:
 - **What can come later:** a rule that does not apply to any element, and `Inherit page overlays: false` without a `Page overlay` in the
   document. A template can add them.
 - **What depends on layout:** a minimum and a maximum in different units that clash (the minimum wins,
-  [The box](box.md#minimums-and-maximums)) and `Balance: false` in a `Columns` with no height to fill.
+  [The box](box.md#minimums-and-maximums)) and `Balance columns: false` in a `Columns` with no height to fill.
 - **The properties of a `Markdown` that its content does not use** (`Bullet markers` without lists): the content changes
   often ([Markdown](../components/markdown.md)).
 
@@ -144,9 +144,9 @@ an `Overlay`. These are not errors, on purpose:
 | `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS` | `Page number format` does not go in a `Section` with `Page numbering: none` | `Page number format has no effect with Page numbering: none...` |
 | `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` does not go in the first `Section`, which already starts on page 1 ([Document](../components/document.md#beginning-on-an-odd-page)) | `Begin on: odd has no effect in the first section...` |
 | `MIRROR_MARGINS_WITHOUT_EFFECT` | `Mirror margins: true` needs a left margin different from the right one, which are the ones it swaps ([Document](../components/document.md#mirror-margins)) | `Mirror margins: true has no effect with equal left and right margins (40 pt)...` |
-| `LINE_DISTRIBUTION_WITHOUT_WRAP` | `Line distribution` only with `Wrap: true` | `Line distribution only has an effect with Wrap: true...` |
-| `GAP_WITHOUT_WRAP` | A two-value `Gap` in a `Stack`, only with `Wrap: true` ([Stack](../components/stack.md#properties-of-the-stack)) | `Gap has two values, but without Wrap there is a single line and the first, the gap between rows, has no effect: one value is enough...` |
-| `SPLIT_ITEMS_WITHOUT_EFFECT` | `Split items` does not go in a vertical `Stack` with `Wrap: true`, which is never split ([Stack](../components/stack.md#breaks)) | `Split items has no effect in a vertical Stack with Wrap: true, which is never broken across pages...` |
+| `LINE_DISTRIBUTION_WITHOUT_WRAP` | `Line distribution` only with `Wrap items: true` | `Line distribution only has an effect with Wrap items: true...` |
+| `GAP_WITHOUT_WRAP` | A two-value `Gap` in a `Stack`, only with `Wrap items: true` ([Stack](../components/stack.md#properties-of-the-stack)) | `Gap has two values, but without Wrap items there is a single line and the first, the gap between rows, has no effect: one value is enough...` |
+| `SPLIT_ITEMS_WITHOUT_EFFECT` | `Split items` does not go in a vertical `Stack` with `Wrap items: true`, which is never split ([Stack](../components/stack.md#breaks)) | `Split items has no effect in a vertical Stack with Wrap items: true, which is never broken across pages...` |
 | `GROW_WITHOUT_EFFECT` | `Grow` in a vertical `Stack` needs a definite height in the container | `Grow has no effect: the vertical Stack of the parent has no definite height to distribute...` |
 | `ITEM_MAIN_AXIS` | An `Item` is only aligned on the cross axis of its `Stack`: `Vertical` in a horizontal one and `Horizontal` in a vertical one ([Stack](../components/stack.md#item)) | `Horizontal has no effect on an item of a Stack with Direction: horizontal, because it is its main axis...` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` is not combined with declared `Width` and `Height` | `Aspect ratio has no effect if Width and Height are declared` |

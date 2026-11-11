@@ -304,11 +304,11 @@ public enum ErrorCode {
     BEGIN_ON_FIRST_SECTION,
     /** {@code Mirror margins: true} in a {@code Page} whose left and right margins are equal. */
     MIRROR_MARGINS_WITHOUT_EFFECT,
-    /** {@code Line distribution} without {@code Wrap: true}. */
+    /** {@code Line distribution} without {@code Wrap items: true}. */
     LINE_DISTRIBUTION_WITHOUT_WRAP,
-    /** Two-value {@code Gap} in a {@code Stack} without {@code Wrap: true}. */
+    /** Two-value {@code Gap} in a {@code Stack} without {@code Wrap items: true}. */
     GAP_WITHOUT_WRAP,
-    /** {@code Split items} in a vertical {@code Stack} with {@code Wrap: true}, which is never broken across pages. */
+    /** {@code Split items} in a vertical {@code Stack} with {@code Wrap items: true}, which is never broken across pages. */
     SPLIT_ITEMS_WITHOUT_EFFECT,
     /** {@code Grow} in a vertical {@code Stack} without a definite height. */
     GROW_WITHOUT_EFFECT,

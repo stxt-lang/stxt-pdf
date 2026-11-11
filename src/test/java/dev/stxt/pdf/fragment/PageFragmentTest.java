@@ -141,7 +141,7 @@ class PageFragmentTest {
     @Test
     void theColumnsAreAllThereAlsoTheEmptyOnes() {
         LaidOutDocument document = LayoutFixture.layOut(
-                "\tColumns:", "\t\tId: M", "\t\tColumn count: 3", "\t\tGap: 15", "\t\tBalance: false",
+                "\tColumns:", "\t\tId: M", "\t\tColumn count: 3", "\t\tGap: 15", "\t\tBalance columns: false",
                 "\t\tBlock:", "\t\t\tId: A", "\t\t\tBox:", "\t\t\t\tHeight: 30", "\t\t\t\tBackground: #cccccc",
                 "\t\tBlock:", "\t\t\tId: B", "\t\t\tBox:", "\t\t\t\tHeight: 20").document();
         PageFragment columns = only(document, "M");

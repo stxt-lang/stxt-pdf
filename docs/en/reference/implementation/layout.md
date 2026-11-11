@@ -195,7 +195,7 @@ breaks it. What is memoized is immutable (`Arranged` and `Repeat` copy their lis
 placed and sized the whole table again, and the units of a grid were computed by going through all the items for each row
 (now, one pass over the items); `ArrangementCacheTest` counts the arrangements. A unit that does not fit in what is left of the page splits its items in parallel on that page
 (`Units.split`, from `Split rows` and `Split items`, and only where `Units.splittable` allows it, which the lines of a
-horizontal `Stack` with `Wrap` do not; with `false`, only the one that does not fit even at the start of a page),
+horizontal `Stack` with `Wrap items` do not; with `false`, only the one that does not fit even at the start of a page),
 repeating their layout with `ConstraintSpace.fragmented` and the space stored in `UnitBreaker.Placed`;
 `UnitBreaker.splitOnThisPage` compares the quality of that break with that of the best break between units
 (`BreakRules.cutUnits`) and keeps the last of the best ones, and the `BreakToken.Container` carries the token of each item. With `atFragmentainerStart` something has to be placed even if it overflows (progress guarantee). Tables repeat

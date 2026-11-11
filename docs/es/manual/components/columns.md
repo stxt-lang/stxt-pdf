@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 | `Gap` | `0` | El hueco entre columnas, un solo valor. Con `Column count: 1` es un error, porque no hay columnas que separar |
 | `Separator` | sin línea | El grosor de una línea entre columnas, en medio del hueco. No puede ser más ancho que el hueco, y con `Column count: 1` es un error |
 | `Separator color` | el del texto | El color de esa línea. Solo con `Separator` |
-| `Balance` | `true` | Con `true`, en la última página las columnas quedan igual de altas. Con `false`, se llenan en orden |
+| `Balance columns` | `true` | Con `true`, en la última página las columnas quedan igual de altas. Con `false`, se llenan en orden |
 
 `Column count`, `Min column width` o los dos son obligatorios. Admite además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`.
 
@@ -57,7 +57,7 @@ Document (dev.stxt.pdf):
 - Dentro, los elementos se apilan como en un `Block`. El contenido se corta entre columnas con las mismas reglas que entre
   páginas: sin líneas sueltas y respetando `Break`.
 - `Break` con `Before: column` o `After: column` salta a la columna siguiente, y con `page`, a la página siguiente.
-- Con `Balance: true`, la última página no deja una columna llena y otra vacía: el motor busca el alto con el que quedan
+- Con `Balance columns: true`, la última página no deja una columna llena y otra vacía: el motor busca el alto con el que quedan
   igualadas sin romper ninguna regla de corte.
 - Un `Height` en el `Columns` limita el alto de las columnas. Si el contenido no cabe, es un error.
 - Dentro de un `Columns` no puede haber `Overlay` ni `Page overlay`, ni porcentajes de alto.

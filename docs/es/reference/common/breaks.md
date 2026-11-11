@@ -175,7 +175,7 @@ paralelo si no cabe ni al principio de una página; si entonces algún ítem no 
 > rejilla de tarjetas) lo dice con `Split rows: false`. *Alternativa descartada:* partir solo la fila que no cabe en una
 > página entera, que fue la regla hasta la 0.8.0: una fila que cabía en una página dejaba la anterior casi vacía.
 
-Un `Stack` vertical con `Wrap` no se parte. Las tablas repiten además su cabecera y su pie
+Un `Stack` vertical con `Wrap items` no se parte. Las tablas repiten además su cabecera y su pie
 ([Table](../components/table.md#cortes)).
 
 ## Lo que no se parte

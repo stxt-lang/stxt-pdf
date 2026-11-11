@@ -91,9 +91,9 @@ Text: Quarterly results
 ```
 
 > **Decision:** inside a group the names are short (`Size`, `Align`, `Before`) except where they clash with another node:
-> `Line breaking` and not `Wrap`, which belongs to `Stack` and is something else, because a name is the same node in the whole schema.
+> `Line breaking` and not `Wrap items`, which belongs to `Stack` and is something else, because a name is the same node in the whole schema.
 
-> **Decision:** a name says what the thing is in the document and not the algorithm that lays it out (`Columns`, `Balance`), and
+> **Decision:** a name says what the thing is in the document and not the algorithm that lays it out (`Columns`, `Balance columns`), and
 > when publishing or a word processor already has a well-known one, that one is used (`Style` for a named style,
 > `Table of contents` and `TOC 1` to `TOC 6`, `Row header`, `Corner radius`). The axes are named by their direction on the page
 > (`Horizontal`, `Vertical`) and not by their role, and there are no two nearly identical names with different meanings (hence
@@ -197,7 +197,7 @@ once, and the elements, as many times as needed.
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` and the element properties of appearance and distribution ([Styles](styles.md#element-properties)), at most one of each |
 | `For column` | `Box`, `Typography`, `Break` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Below side boxes`; elements |
-| `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
+| `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap items`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Below side boxes`; `Paragraph`, besides, `Drop cap` |
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Below side boxes`; `Text` (at least one) |
@@ -207,7 +207,7 @@ once, and the elements, as many times as needed.
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`, `Vertical`; elements except headings |
-| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
+| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance columns`; in-flow elements |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |

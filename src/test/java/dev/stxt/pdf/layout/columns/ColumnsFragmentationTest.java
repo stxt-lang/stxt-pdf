@@ -54,7 +54,7 @@ class ColumnsFragmentationTest {
 
     @Test
     void fillAutoDoesNotBalanceTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), blocks(10)));
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false"), blocks(10)));
         assertRect(40, 40, 515, 50, l.rect(2, "M"));
         assertRect(40, 65, 250, 25, l.rect(2, "J"));
     }
@@ -105,7 +105,7 @@ class ColumnsFragmentationTest {
     /** A {@code Height} of 150 is the total: 100 on page 1 and 50 on page 2, which are filled in order. */
     @Test
     void heightAcrossPages() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false", "Box:",
                 "\tHeight: 150"), blocks(10)));
         assertEquals(2, l.pages());
         assertRect(40, 40, 515, 100, l.rect(1, "M"));
@@ -138,7 +138,7 @@ class ColumnsFragmentationTest {
      */
     @Test
     void cloneWithHeightLeavesTheRestToTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false", "Box:",
                 "\tHeight: 160", "\tPadding: 5", "Break:", "\tEdges: closed"), blocks(10, true)));
         assertEquals(2, l.pages());
         assertRect(305, 95, 245, 25, l.rect(1, "F"));
@@ -160,7 +160,7 @@ class ColumnsFragmentationTest {
     /** Height: 150 with twelve blocks: on page 2, 50 remain, two blocks per column (K starts the second). */
     @Test
     void theRestOfTheHeightLimitsTheLastPage() {
-        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOutPaged(PAGE, columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false", "Box:",
                 "\tHeight: 150"), blocks(12, true)));
         assertEquals(2, l.pages());
         assertRect(40, 65, 250, 25, l.rect(2, "J"));

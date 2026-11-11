@@ -12,7 +12,7 @@ import dev.stxt.pdf.model.Value;
 public final class StackStyle extends StyleGroup {
 
     private Direction direction = Direction.HORIZONTAL;
-    private boolean wrap;
+    private boolean wrapItems;
     /** {@code Horizontal} and {@code Vertical} as they were written; {@code null} = not declared. */
     private Distribution horizontal;
     private Distribution vertical;
@@ -45,13 +45,13 @@ public final class StackStyle extends StyleGroup {
         direction = v;
     }
 
-    public boolean wrap() {
-        return wrap;
+    public boolean wrapItems() {
+        return wrapItems;
     }
 
-    void setWrap(boolean v) {
+    void setWrapItems(boolean v) {
         writable();
-        wrap = v;
+        wrapItems = v;
     }
 
     public boolean splitItems() {

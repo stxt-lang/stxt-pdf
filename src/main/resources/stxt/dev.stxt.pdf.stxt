@@ -162,7 +162,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Direction
 				Max: 1
-			Child: Wrap
+			Child: Wrap items
 				Max: 1
 			Child: Gap
 				Max: 1
@@ -467,7 +467,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Separator color
 				Max: 1
-			Child: Balance
+			Child: Balance columns
 				Max: 1
 			Child: Block
 			Child: Stack
@@ -1033,7 +1033,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Direction
 				Max: 1
-			Child: Wrap
+			Child: Wrap items
 				Max: 1
 			Child: Gap
 				Max: 1
@@ -1065,7 +1065,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Separator color
 				Max: 1
-			Child: Balance
+			Child: Balance columns
 				Max: 1
 			Child: Marker
 				Max: 1
@@ -1126,7 +1126,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Direction
 				Max: 1
-			Child: Wrap
+			Child: Wrap items
 				Max: 1
 			Child: Gap
 				Max: 1
@@ -1158,7 +1158,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Separator color
 				Max: 1
-			Child: Balance
+			Child: Balance columns
 				Max: 1
 			Child: Marker
 				Max: 1
@@ -1219,7 +1219,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Direction
 				Max: 1
-			Child: Wrap
+			Child: Wrap items
 				Max: 1
 			Child: Gap
 				Max: 1
@@ -1251,7 +1251,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Separator color
 				Max: 1
-			Child: Balance
+			Child: Balance columns
 				Max: 1
 			Child: Marker
 				Max: 1
@@ -1735,7 +1735,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Values:
 			Value: horizontal
 			Value: vertical
-	Node: Wrap
+	Node: Wrap items
 		Type: BOOLEAN
 		Description: Whether the items that do not fit in a line go to the next one, so that they are distributed over several lines. By default, false.
 	Node: Split items
@@ -1745,7 +1745,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
 	Node: Line distribution
 		Type: ENUM
-		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), distribute (equal gaps, also at the edges) or stretch. Only with Wrap: true.
+		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), distribute (equal gaps, also at the edges) or stretch. Only with Wrap items: true.
 		Values:
 			Value: top
 			Value: bottom
@@ -1855,7 +1855,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Width of the line between the columns of a Columns, centered in Gap, which must be at least as wide.
 	Node: Separator color
 		Description: Color of the line between columns. By default, the Color of the text.
-	Node: Balance
+	Node: Balance columns
 		Type: BOOLEAN
 		Description: Distribution among the columns of a Columns: with true (by default) the columns of the last fragment are balanced; with false they are filled in order.
 

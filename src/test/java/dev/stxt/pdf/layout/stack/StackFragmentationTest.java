@@ -40,7 +40,7 @@ class StackFragmentationTest {
     void rowBreaksBetweenLines() {
         // One line per item (300 + 10 + 300 > 515): lines at 0, 50, 100 and 150.
         LayoutFixture l = layOutPaged(PAGE, concat(
-                new String[]{"\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10"},
+                new String[]{"\tStack:", "\t\tId: F", "\t\tWrap items: true", "\t\tGap: 10"},
                 item("I1", "Width: 300"), item("I2", "Width: 300"),
                 item("I3", "Width: 300"), item("I4", "Width: 300")));
         assertEquals(2, l.pages());
@@ -155,7 +155,7 @@ class StackFragmentationTest {
     }
 
     /**
-     * A column with Wrap breaks whole (it is a single unit). After X (50), F (Height: 60, lines of 40) fits
+     * A column with Wrap items breaks whole (it is a single unit). After X (50), F (Height: 60, lines of 40) fits
      * with its items on page 1 and its height continues on page 2.
      */
     @Test
@@ -163,7 +163,7 @@ class StackFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tBox:", "\t\t\tHeight: 50"},
                 new String[]{"\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical",
-                        "\t\tWrap: true", "\t\tLine distribution: left"},
+                        "\t\tWrap items: true", "\t\tLine distribution: left"},
                 item("A", "Width: 50"), item("B", "Width: 50")));
         assertRect(40, 90, 50, 40, l.rect(1, "A"));
         assertRect(90, 90, 50, 40, l.rect(1, "B"));

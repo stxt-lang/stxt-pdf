@@ -159,9 +159,9 @@ final class StyleRules {
      * never those of the {@code Item} or the {@code Area} that wraps the element.
      */
     static final Set<String> ELEMENT_PROPERTIES = Set.of(
-            "direction", "wrap", "gap", "horizontal", "vertical", "line-distribution", "split-items",
+            "direction", "wrap-items", "gap", "horizontal", "vertical", "line-distribution", "split-items",
             "column-sizes", "row-sizes", "area-map", "fill-order", "split-rows", "column-align",
-            "column-count", "min-column-width", "separator", "separator-color", "balance",
+            "column-count", "min-column-width", "separator", "separator-color", "balance-columns",
             "marker", "marker-image", "fit", "barcode-format", "error-correction", "quiet-zone",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
             "drop-cap", "side", "below-side-boxes", "isolate-margins", "trim-margins",

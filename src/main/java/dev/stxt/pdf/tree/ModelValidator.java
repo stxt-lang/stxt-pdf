@@ -93,9 +93,9 @@ final class ModelValidator {
                     + PropertyReader.axisEnds(!s.stack().isHorizontal()) + ", center or stretch and not "
                     + spread + ", which distributes the main axis (" + main + ")");
         }
-        if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrap()) {
+        if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrapItems()) {
             throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.LINE_DISTRIBUTION_WITHOUT_WRAP,
-                    "Line distribution only has an effect with Wrap: true, because without Wrap there is a single line");
+                    "Line distribution only has an effect with Wrap items: true, because without Wrap items there is a single line");
         }
         // The lines of a horizontal Stack go from top to bottom, and those of a vertical one, from left to right.
         Direction side = s.stack().lineDistributionSide();
@@ -106,17 +106,17 @@ final class ModelValidator {
                     + "to right") + ": it allows " + PropertyReader.axisEnds(!rows) + ", center, justify, distribute or "
                     + "stretch, and not " + PropertyReader.axisEnds(rows).replace(", ", " or "));
         }
-        // A vertical Stack with Wrap is never broken across pages (reference/components/stack.md).
-        if (s.isDeclared(STACK_SPLIT_ITEMS) && !s.stack().isHorizontal() && s.stack().wrap()) {
+        // A vertical Stack with Wrap items is never broken across pages (reference/components/stack.md).
+        if (s.isDeclared(STACK_SPLIT_ITEMS) && !s.stack().isHorizontal() && s.stack().wrapItems()) {
             throw error(s.line(STACK_SPLIT_ITEMS), ErrorCode.SPLIT_ITEMS_WITHOUT_EFFECT, "Split items has no effect in a "
-                    + "vertical Stack with Wrap: true, which is never broken across pages: its lines go side by side "
+                    + "vertical Stack with Wrap items: true, which is never broken across pages: its lines go side by side "
                     + "and the whole Stack moves to the next page if it does not fit");
         }
-        // Without Wrap there is a single line: no gap between rows in horizontal or between columns in vertical.
-        if (s.stack().gapPair() && !s.stack().wrap()) {
+        // Without Wrap items there is a single line: no gap between rows in horizontal or between columns in vertical.
+        if (s.stack().gapPair() && !s.stack().wrapItems()) {
             String unused = s.stack().direction() == Direction.HORIZONTAL
                     ? "first, the gap between rows," : "second, the gap between columns,";
-            throw error(s.line(STACK_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap has two values, but without Wrap there is a single"
+            throw error(s.line(STACK_GAP), ErrorCode.GAP_WITHOUT_WRAP, "Gap has two values, but without Wrap items there is a single"
                     + " line and the " + unused + " has no effect: one value is enough, the gap between items");
         }
     }
@@ -655,7 +655,7 @@ final class ModelValidator {
         }
         // In a stack, the gap between rows only counts in vertical or with several lines.
         boolean rowGapUsed = s.layout() == Layout.GRID
-                || (s.layout() == Layout.STACK && (s.stack().wrap() || s.stack().direction() == Direction.VERTICAL));
+                || (s.layout() == Layout.STACK && (s.stack().wrapItems() || s.stack().direction() == Direction.VERTICAL));
         Value rowGap = s.layout() == Layout.GRID ? s.grid().rowGap() : s.stack().rowGap();
         if (rowGapUsed && hasPercentage(rowGap)) {
             String gap = s.layout() == Layout.GRID ? GRID_GAP : STACK_GAP;

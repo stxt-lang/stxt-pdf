@@ -70,11 +70,11 @@ Cada hijo de un `Stack` va dentro de un `Item`, que envuelve **exactamente un el
 | Propiedad | Valores | Por defecto | Qué hace |
 |---|---|---|---|
 | `Direction` | `horizontal`, `vertical` | `horizontal` | En fila (`horizontal`) o en columna (`vertical`) |
-| `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap`, puede tener dos: entre filas y entre columnas |
-| `Wrap` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
+| `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap items`, puede tener dos: entre filas y entre columnas |
+| `Wrap items` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
 | `Horizontal` | `left`, `right`, `center`, `justify`, `distribute`. En columna: `left`, `right`, `center`, `stretch` | `left`. En columna: `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados, entre los ítems (`justify`) o en huecos iguales, también en los bordes (`distribute`). En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Stack` |
 | `Vertical` | `top`, `bottom`, `center`, `stretch`. En columna: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. En columna: `top` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila). En columna, dónde va lo que sobra |
-| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Con `Wrap`, cómo se reparten las líneas |
+| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Con `Wrap items`, cómo se reparten las líneas |
 
 ## Cómo se reparte el espacio
 

@@ -70,11 +70,11 @@ Each child of a `Stack` goes inside an `Item`, which wraps **exactly one element
 | Property | Values | Default | What it does |
 |---|---|---|---|
 | `Direction` | `horizontal`, `vertical` | `horizontal` | In a row (`horizontal`) or in a column (`vertical`) |
-| `Gap` | 1 or 2 measurements | `0` | The gap between items, and between lines if there are several. With `Wrap`, it can have two: between rows and between columns |
-| `Wrap` | `true`, `false` | `false` | Whether the items that do not fit move to another line |
+| `Gap` | 1 or 2 measurements | `0` | The gap between items, and between lines if there are several. With `Wrap items`, it can have two: between rows and between columns |
+| `Wrap items` | `true`, `false` | `false` | Whether the items that do not fit move to another line |
 | `Horizontal` | `left`, `right`, `center`, `justify`, `distribute`. In a column: `left`, `right`, `center`, `stretch` | `left`. In a column: `stretch` | In a row, where what is left over goes: at the start, at the end, on both sides, between the items (`justify`) or in equal gaps, also at the edges (`distribute`). In a column, how the items are aligned: `stretch` stretches them to the width of the `Stack` |
 | `Vertical` | `top`, `bottom`, `center`, `stretch`. In a column: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. In a column: `top` | The reverse of `Horizontal`. In a row, how the items are aligned (`stretch` stretches them to the height of the row). In a column, where what is left over goes |
-| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | With `Wrap`, how the lines are distributed |
+| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | With `Wrap items`, how the lines are distributed |
 
 ## How the space is shared out
 

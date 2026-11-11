@@ -177,7 +177,7 @@ in parallel if it does not fit at the start of a page either; if then some item 
 > `Split rows: false`. *Rejected alternative:* splitting only the row that does not fit on a whole page, which was the
 > rule until 0.8.0: a row that fit on a page left the previous one almost empty.
 
-When choosing the break, a split row counts as the worst of the breaks of its items. A vertical `Stack` with `Wrap` is not
+When choosing the break, a split row counts as the worst of the breaks of its items. A vertical `Stack` with `Wrap items` is not
 split. Tables also repeat their header and their footer ([Table](../components/table.md#breaks)).
 
 ## What is not split

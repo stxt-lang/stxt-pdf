@@ -26,7 +26,7 @@ Columns:
 | `Gap` | number ≥ 0 | `0` | Space between columns: a single measurement (two values are `VALUE_NOT_ALLOWED`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator` | number > 0 | no line | Thickness of the line between columns, centered in the gap. It does not exceed `Gap` (`SEPARATOR_WIDTH`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator color` | color | the text `Color` | Only with `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). It does not affect the layout. |
-| `Balance` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |
+| `Balance columns` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |
 
 `Column count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`), their own or from a rule. All of them can come
 from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
@@ -62,14 +62,14 @@ remains of it:
 
 1. They are filled **in order**: the first column, from where the content was left, and each of the following ones, from
    where the previous one ends. Filling stops when the content or the columns run out, or at a forced page break.
-2. If the content ends on this page and `Balance` is `true`, the columns are **balanced**: the minimum height is sought
+2. If the content ends on this page and `Balance columns` is `true`, the columns are **balanced**: the minimum height is sought
    with which the content fits in them without breaks between columns that violate more rules than those of filling in order.
-   With `Balance: false` they stay as in step 1. The pages on which the content does not end are not balanced.
+   With `Balance columns: false` they stay as in step 1. The pages on which the content does not end are not balanced.
 3. On that page, the `Columns` measures what its tallest column does (with `Height`, what any box with a definite height does,
    [Breaks](../common/breaks.md#definite-height-and-breaks)).
 
 Outside a page and without a definite height (a `Columns` that is an item of `Stack` or of `Grid`, or that is in an `Overlay`) there
-is no height to fill: the columns are always balanced, also with `Balance: false`.
+is no height to fill: the columns are always balanced, also with `Balance columns: false`.
 
 > **Decision:** balancing does not violate rules that filling in order respects: a block with `Keep together: true` does not
 > break and a three-line paragraph with widows and orphans of 2 is not distributed. *Rejected alternative:* a balancing that

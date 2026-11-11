@@ -181,7 +181,7 @@ class StackLayoutTest {
     void wrapBreaksIntoLines() {
         // 200 + 10 + 200 fit in 515; the third one moves to the second line.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tId: F", "\t\tWrap items: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 200",
                 "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 200",
@@ -197,7 +197,7 @@ class StackLayoutTest {
     void linesDistributionInADefiniteContainer() {
         // Lines of 20 + gap 10 + 20 in 100: 50 left over, centered.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: center",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap items: true", "\t\tGap: 10", "\t\tLine distribution: center",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
@@ -210,7 +210,7 @@ class StackLayoutTest {
     void linesStretchByDefault() {
         // Lines of 0 and 20 in 100 with a gap of 10: 70 left over, 35 for each line.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap items: true", "\t\tGap: 10",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 300",
                 "\t\t\t\t\tHeight: 20");
@@ -254,7 +254,7 @@ class StackLayoutTest {
                 a.formatted("maxA"), b.formatted("maxB"),
                 "\tStack:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10",
                 a.formatted("minA"), b.formatted("minB"),
-                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", "\t\tWrap: true",
+                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", "\t\tWrap items: true",
                 a.formatted("wrapA"), b.formatted("wrapB"));
         assertEquals(50, l.rect("max").width(), 1e-9);
         assertEquals(35, l.rect("min").width(), 1e-9);
@@ -317,7 +317,7 @@ class StackLayoutTest {
     void rowAndColumnGapsInARow() {
         // Gap: rows 7, columns 13. 200 + 13 + 200 = 413 fit in 515; the third one moves to another line, 7 lower.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tId: F", "\t\tWrap: true", "\t\tGap: 7 13",
+                "\tStack:", "\t\tId: F", "\t\tWrap items: true", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 200", "Height: 20"));
@@ -331,7 +331,7 @@ class StackLayoutTest {
         // In a column, the gap between items is that of the rows (7) and between lines, that of the columns (13):
         // 40 + 7 + 40 = 87 fit in 100; the third one moves to the next line, 100 + 13 to the right.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
+                "\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap items: true",
                 "\t\tLine distribution: left", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 40"),
@@ -343,12 +343,12 @@ class StackLayoutTest {
 
     @Test
     void intrinsicWidthsWithThreeItems() {
-        // Natural width of 5 + 10 + 15 and two gaps of 10, with and without Wrap; narrowest width without Wrap, the
+        // Natural width of 5 + 10 + 15 and two gaps of 10, with and without Wrap items; narrowest width without Wrap items, the
         // same with 5 + 10 + 15.
         String items = "\t\tItem:\n\t\t\tText: a\n\t\tItem:\n\t\t\tText: bb\n\t\tItem:\n\t\t\tText: ccc";
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: max", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", items,
-                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", "\t\tWrap: true",
+                "\tStack:", "\t\tId: wrap", "\t\tBox:", "\t\t\tWidth: natural", "\t\tGap: 10", "\t\tWrap items: true",
                 items,
                 "\tStack:", "\t\tId: min", "\t\tBox:", "\t\t\tWidth: narrowest", "\t\tGap: 10", items);
         assertEquals(50, l.rect("max").width(), 1e-9);
@@ -420,7 +420,7 @@ class StackLayoutTest {
     void threeLinesWithLinesBetween() {
         // Three lines of 20 with gaps of 10 in 100: 20 left over, 10 between every two lines.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tGap: 10", "\t\tLine distribution: justify",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap items: true", "\t\tGap: 10", "\t\tLine distribution: justify",
                 "\t\tItem:", block("A", "Width: 300", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 300", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 300", "Height: 20"));
@@ -433,11 +433,11 @@ class StackLayoutTest {
     void wrapCountsTheGapsExactly() {
         // 200 + 10 + 200 + 10 + 95 = 515: one line. With 110, the third one moves to another.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap items: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 95", "Height: 20"),
-                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap items: true", "\t\tGap: 10",
                 "\t\tItem:", block("D", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("E", "Width: 200", "Height: 20"),
                 "\t\tItem:", block("G", "Width: 110", "Height: 20"));
@@ -503,7 +503,7 @@ class StackLayoutTest {
     @Test
     void lineDistributionNamesTheSideOfTheAxisTheLinesGoAlong() {
         // Rows in 100 of height: two lines of 20, with the 60 left over above them with bottom.
-        String[] row = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tLine distribution: %s",
+        String[] row = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap items: true", "\t\tLine distribution: %s",
                 "\t\tItem:", block("A", "Width: 300", "Height: 20"), "\t\tItem:", block("B", "Width: 300", "Height: 20")};
         assertEquals(40, layOut(with(row, "top")).rect("A").y(), 1e-9);
         assertEquals(100, layOut(with(row, "bottom")).rect("A").y(), 1e-9);
@@ -511,7 +511,7 @@ class StackLayoutTest {
         assertEquals(60, layOut(with(row, "distribute")).rect("A").y(), 1e-9);
         assertEquals(100, layOut(with(row, "distribute")).rect("B").y(), 1e-9);
         // Columns in 515 of width: two lines of 100, with the 315 left over to their left with right.
-        String[] column = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true",
+        String[] column = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap items: true",
                 "\t\tLine distribution: %s", "\t\tItem:", block("A", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 40")};
         assertEquals(40, layOut(with(column, "left")).rect("A").x(), 1e-9);
@@ -534,10 +534,10 @@ class StackLayoutTest {
 
     @Test
     void columnLinesMeasureTheirItemsWithMargins() {
-        // Column with Wrap in 60 of height: A (50 wide and a margin of 5 on each side) and B, on another line. The
+        // Column with Wrap items in 60 of height: A (50 wide and a margin of 5 on each side) and B, on another line. The
         // first line measures 60, so B starts at 40 + 60.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLine distribution: left",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap items: true", "\t\tLine distribution: left",
                 "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
                 "\t\tItem:", block("B", "Width: 80", "Height: 40"));
         assertRect(45, 40, 50, 40, l.rect("A"));
@@ -559,7 +559,7 @@ class StackLayoutTest {
     void wrapCountsOneGapLessThanItems() {
         // 100 + 10 + 100 + 10 + 100 = 320; with the fourth one (190) and its gap, 520: it moves to another line.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tWrap: true", "\t\tGap: 10",
+                "\tStack:", "\t\tWrap items: true", "\t\tGap: 10",
                 "\t\tItem:", block("A", "Width: 100", "Height: 20"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 20"),
                 "\t\tItem:", block("C", "Width: 100", "Height: 20"),

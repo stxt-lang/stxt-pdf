@@ -87,7 +87,7 @@ final class PropertyReader {
     /**
      * Properties of the {@code Stack} element (the full structure is in the schema, reference/common/structure.md).
      */
-    static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution",
+    static final Set<String> STACK = Set.of("direction", "wrap-items", "gap", "horizontal", "vertical", "line-distribution",
             "split-items");
     /** Properties of the {@code Grid} and {@code Table} elements. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "area-map", "fill-order", "horizontal", "vertical",
@@ -95,7 +95,7 @@ final class PropertyReader {
     /** Properties of the {@code Cell} element, besides the standalone ones. */
     static final Set<String> CELL = Set.of("vertical");
     /** Properties of the {@code Columns} element. */
-    static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance");
+    static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance-columns");
 
     /** Reads a property into the style; its line is already recorded. */
     @FunctionalInterface
@@ -337,7 +337,7 @@ final class PropertyReader {
         s.declared(PropertyKey.stack(p.getCanonicalName()), p.getLine());
         switch (p.getCanonicalName()) {
             case "direction" -> s.stack().setDirection(enumValue(Direction.class, p));
-            case "wrap" -> s.stack().setWrap(bool(p));
+            case "wrap-items" -> s.stack().setWrapItems(bool(p));
             case "gap" -> {
                 List<Value> gap = gap(p);
                 s.stack().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
@@ -404,7 +404,7 @@ final class PropertyReader {
             case "gap" -> s.columns().setColumnGap(columnGap(p));
             case "separator" -> s.columns().setSeparator(positive(p));
             case "separator-color" -> s.columns().setSeparatorColor(color(p, s.namedColors()));
-            case "balance" -> s.columns().setBalance(bool(p));
+            case "balance-columns" -> s.columns().setBalance(bool(p));
             default -> throw unread(p);
         }
     }

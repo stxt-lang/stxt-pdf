@@ -26,7 +26,7 @@ Columns:
 | `Gap` | número ≥ 0 | `0` | Separación entre columnas: una sola medida (dos valores son `VALUE_NOT_ALLOWED`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Gap` (`SEPARATOR_WIDTH`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator color` | color | el `Color` del texto | Solo con `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). No afecta al layout. |
-| `Balance` | `true`, `false` | `true` | `true` iguala las columnas de la última página, y `false` las llena en orden. |
+| `Balance columns` | `true`, `false` | `true` | `true` iguala las columnas de la última página, y `false` las llena en orden. |
 
 `Column count`, `Min column width` o los dos son obligatorios (`COLUMNS_WITHOUT_COUNT`), propios o de una regla. Todas pueden venir
 de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
@@ -62,14 +62,14 @@ que le queda de él:
 
 1. Se llenan **en orden**: la primera columna, desde donde se quedó el contenido, y cada una de las siguientes, desde
    donde termina la anterior. Se para al acabar el contenido, las columnas o en un corte forzado de página.
-2. Si el contenido termina en esta página y `Balance` es `true`, las columnas se **equilibran**: se busca el alto mínimo
+2. Si el contenido termina en esta página y `Balance columns` es `true`, las columnas se **equilibran**: se busca el alto mínimo
    con el que el contenido cabe en ellas sin cortes entre columnas que incumplan más reglas que los del reparto en orden.
-   Con `Balance: false` se quedan como en el paso 1. Las páginas en las que el contenido no termina no se equilibran.
+   Con `Balance columns: false` se quedan como en el paso 1. Las páginas en las que el contenido no termina no se equilibran.
 3. El `Columns` mide en esa página lo que su columna más alta (con `Height`, lo de cualquier caja con alto definido,
    [Cortes](../common/breaks.md#alto-definido-y-cortes)).
 
 Fuera de una página y sin alto definido (un `Columns` que es un ítem de `Stack` o de `Grid`, o que está en un `Overlay`) no
-hay alto que llenar: las columnas se equilibran siempre, también con `Balance: false`.
+hay alto que llenar: las columnas se equilibran siempre, también con `Balance columns: false`.
 
 > **Decisión:** el equilibrado no incumple reglas que el reparto en orden respeta: un bloque con `Keep together: true` no se
 > parte y un párrafo de tres líneas con viudas y huérfanas de 2 no se reparte. *Alternativa descartada:* un equilibrado que

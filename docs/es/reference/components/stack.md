@@ -29,12 +29,12 @@ Stack:
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Direction` | `horizontal`, `vertical` | `horizontal` | El eje principal: en `horizontal` los ítems van uno al lado de otro, y en `vertical`, uno debajo de otro. |
-| `Wrap` | booleano | `false` | Permite repartir los ítems en varias líneas. |
-| `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap: true` (`GAP_WITHOUT_WRAP`). |
+| `Wrap items` | booleano | `false` | Permite repartir los ítems en varias líneas. |
+| `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap items: true` (`GAP_WITHOUT_WRAP`). |
 | `Horizontal` | en el eje principal: `left`, `right`, `center`, `justify`, `distribute`; en el cruzado: `left`, `right`, `center`, `stretch` | `left` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
 | `Vertical` | como `Horizontal`, con `top` y `bottom` en lugar de `left` y `right` | `top` en el principal; `stretch` en el cruzado | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
-| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
-| `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
+| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap items: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap items`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
 
@@ -44,9 +44,9 @@ Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](
 > `distribute` en el cruzado. *Alternativa descartada:* `Main axis` y `Cross axis`, que no cambian de sentido con `Direction`
 > pero obligan a pensar en ejes abstractos.
 
-> **Decisión:** sin `Wrap` hay una sola línea, así que de un `Gap` de dos valores solo actuaría uno, el hueco entre
+> **Decisión:** sin `Wrap items` hay una sola línea, así que de un `Gap` de dos valores solo actuaría uno, el hueco entre
 > ítems (el de las columnas en horizontal, el de las filas en vertical): es un error (`GAP_WITHOUT_WRAP`), como `Line distribution` sin
-> `Wrap`. Un solo valor sí vale, porque es el hueco entre ítems y, si hay varias líneas, también entre líneas. Por eso
+> `Wrap items`. Un solo valor sí vale, porque es el hueco entre ítems y, si hay varias líneas, también entre líneas. Por eso
 > `Gap: 5%` en un `Stack` horizontal de una línea sin alto definido no es un error: el hueco entre filas, que necesitaría ese
 > alto, no se usa. *Alternativa descartada:* aceptar los dos valores y no usar el que sobra, que deja en el documento una
 > medida sin efecto.
@@ -78,15 +78,15 @@ alineación del ítem (`Horizontal`, `Vertical`) y `Layer`, no: en una regla, `H
 3. **Tamaño hipotético:** la base limitada por el mínimo y el máximo del ítem. Con `Min width: auto` (`Min height: auto` en
    vertical), el mínimo es el **tamaño de su contenido**: el ancho más estrecho en horizontal y el alto del contenido en vertical, sin
    pasar del máximo del ítem y nunca mayor que su `Width` (o `Height`) declarado.
-4. **Líneas:** sin `Wrap`, una sola. Con `Wrap`, los ítems se añaden a la línea mientras sus tamaños hipotéticos y los
+4. **Líneas:** sin `Wrap items`, una sola. Con `Wrap items`, los ítems se añaden a la línea mientras sus tamaños hipotéticos y los
    huecos quepan.
 5. **Tamaños flexibles** (por línea), ver abajo.
 6. **Tamaño cruzado:** layout de cada ítem con su tamaño principal final (en horizontal, el texto se redistribuye con el ancho
-   final). La línea mide lo que el ítem más alto. Sin `Wrap` y con tamaño cruzado definido en el contenedor, la única línea
+   final). La línea mide lo que el ítem más alto. Sin `Wrap items` y con tamaño cruzado definido en el contenedor, la única línea
    mide lo que el contenedor.
 7. **Estirar:** los ítems con `stretch` y sin tamaño cruzado declarado pasan a medir lo que la línea, y se repite su layout.
    En vertical, si el contenedor tiene una sola línea, estos ítems se miden desde el principio con el ancho del contenedor.
-   Con `Wrap`, se miden con su ajuste al contenido y después se estiran al ancho de su línea sin recalcular su alto.
+   Con `Wrap items`, se miden con su ajuste al contenido y después se estiran al ancho de su línea sin recalcular su alto.
 8. **Alinear** en el eje principal, en el cruzado y las líneas en el contenedor.
 
 Con tamaño cruzado `auto`, el contenedor mide la suma de sus líneas más los huecos.
@@ -140,7 +140,7 @@ Un sobrante negativo después de encoger significa que los ítems no caben: es u
 
 ## Tamaños intrínsecos
 
-En horizontal y sin `Wrap`, el ancho más estrecho es la suma del ancho más estrecho de los ítems más los huecos, y con `Wrap`, el máximo de
+En horizontal y sin `Wrap items`, el ancho más estrecho es la suma del ancho más estrecho de los ítems más los huecos, y con `Wrap items`, el máximo de
 ellos. El ancho natural es la suma del ancho natural más los huecos. En vertical, los dos son el máximo de los ítems. Se usan
 los intrínsecos de cada ítem tal cual, sin `Base size`, `Grow` ni `Shrink` ([La caja](../common/box.md#tamaños-intrínsecos)).
 
@@ -149,7 +149,7 @@ los intrínsecos de cada ítem tal cual, sin `Base size`, `Grow` ni `Shrink` ([L
 En vertical, el corte se hace entre ítems, y en horizontal, entre líneas. Una línea o un ítem que no cabe en lo que queda de
 página se parte en paralelo en esa página ([Cortes](../common/breaks.md#cortes-en-stack-grid-y-table)); con
 `Split items: false` pasa entero a la siguiente, y solo se parte si no cabe ni en una página entera. Un `Stack` vertical con
-`Wrap` no se parte.
+`Wrap items` no se parte.
 
 ## Posicionadas
 

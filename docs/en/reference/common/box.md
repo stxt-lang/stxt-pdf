@@ -74,8 +74,8 @@ break (**natural width**):
 | `Text` | widest word | longest paragraph on one line |
 | `Image`, `Barcode` | natural width or, with a `Height` that is a measurement, the width that follows from it with the aspect ratio | same |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | maximum of the narrowest widths of the children | maximum of the natural widths of the children |
-| Horizontal `Stack`, without `Wrap` | sum of the narrowest widths of the items + gaps | sum of the natural widths + gaps |
-| Horizontal `Stack`, with `Wrap` | maximum of the narrowest widths of the items | sum of the natural widths + gaps |
+| Horizontal `Stack`, without `Wrap items` | sum of the narrowest widths of the items + gaps | sum of the natural widths + gaps |
+| Horizontal `Stack`, with `Wrap items` | maximum of the narrowest widths of the items | sum of the natural widths + gaps |
 | Vertical `Stack` | maximum of the items | maximum of the items |
 | `Grid` | sum of the columns sized without free space, plus the gaps | sum of the columns sized with infinite space and each item contributing its natural width also as a minimum, plus the gaps |
 | `Columns` | see [Columns](../components/columns.md#intrinsic-sizes) | |

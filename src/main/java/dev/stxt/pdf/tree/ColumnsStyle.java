@@ -18,7 +18,7 @@ public final class ColumnsStyle extends StyleGroup {
     private double separator = 0;
     /** {@code Separator color}; {@code null} = the {@code Color} of the text. */
     private String separatorColor;
-    /** {@code Balance}: evens out the columns of the last fragment. */
+    /** {@code Balance columns}: evens out the columns of the last fragment. */
     private boolean balance = true;
 
     ColumnsStyle() {

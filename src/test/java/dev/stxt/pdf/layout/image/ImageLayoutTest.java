@@ -321,7 +321,7 @@ class ImageLayoutTest {
                 "\tColumns:",
                 "\t\tId: M",
                 "\t\tColumn count: 2",
-                "\t\tBalance: false",
+                "\t\tBalance columns: false",
                 "\t\tBox:",
                 "\t\t\tHeight: 100",
                 "\t\tImage: test/wide.png",

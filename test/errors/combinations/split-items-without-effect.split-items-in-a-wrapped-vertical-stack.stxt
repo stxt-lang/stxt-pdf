@@ -1,4 +1,4 @@
-# Case: Split items in a vertical Stack with Wrap
+# Case: Split items in a vertical Stack with Wrap items
 # Code: SPLIT_ITEMS_WITHOUT_EFFECT
 # Line: 16
 Document (dev.stxt.pdf):
@@ -12,7 +12,7 @@ Document (dev.stxt.pdf):
 			Box:
 				Height: 100
 			Direction: vertical
-			Wrap: true
+			Wrap items: true
 			Split items: false
 			Item:
 				Block:

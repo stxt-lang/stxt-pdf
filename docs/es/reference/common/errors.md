@@ -15,7 +15,7 @@ se obtiene.
 ## Lo que no tiene efecto
 
 Lo que un elemento declara y no puede tener efecto por cómo está escrito es un error: `Line distribution` o un `Gap` de dos valores
-sin `Wrap`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un margen `auto` que no centra o un `Break` dentro de
+sin `Wrap items`, `Rotate origin` sin `Rotate`, `Separator color` sin `Separator`, un margen `auto` que no centra o un `Break` dentro de
 un `Overlay`. No lo es, a propósito:
 
 - **Escribir el valor por defecto:** `Span: 1 1`, `Isolate margins: false`, `First number: 1`. No contradice nada.
@@ -30,7 +30,7 @@ un `Overlay`. No lo es, a propósito:
 - **Lo que puede llegar después:** una regla que no se aplica a ningún elemento e `Inherit page overlays: false` sin `Page overlay` en el
   documento. Una plantilla puede añadirlos.
 - **Lo que depende de la maquetación:** un mínimo y un máximo en unidades distintas que chocan (gana el mínimo,
-  [La caja](box.md#mínimos-y-máximos)) y `Balance: false` en un `Columns` sin alto que llenar.
+  [La caja](box.md#mínimos-y-máximos)) y `Balance columns: false` en un `Columns` sin alto que llenar.
 - **Las propiedades de un `Markdown` que su contenido no usa** (`Bullet markers` sin listas): el contenido cambia a menudo
   ([Markdown](../components/markdown.md)).
 
@@ -143,9 +143,9 @@ un `Overlay`. No lo es, a propósito:
 | `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS` | `Page number format` no va en una `Section` con `Page numbering: none` | `Page number format has no effect with Page numbering: none...` |
 | `BEGIN_ON_FIRST_SECTION` | `Begin on: odd` no va en la primera `Section`, que ya empieza en la página 1 ([Document](../components/document.md#empezar-en-página-impar)) | `Begin on: odd has no effect in the first section...` |
 | `MIRROR_MARGINS_WITHOUT_EFFECT` | `Mirror margins: true` necesita un margen izquierdo distinto del derecho, que son los que intercambia ([Document](../components/document.md#márgenes-espejo)) | `Mirror margins: true has no effect with equal left and right margins (40 pt)...` |
-| `LINE_DISTRIBUTION_WITHOUT_WRAP` | `Line distribution` solo con `Wrap: true` | `Line distribution only has an effect with Wrap: true...` |
-| `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Stack`, solo con `Wrap: true` ([Stack](../components/stack.md#propiedades-del-stack)) | `Gap has two values, but without Wrap there is a single line and the first, the gap between rows, has no effect: one value is enough...` |
-| `SPLIT_ITEMS_WITHOUT_EFFECT` | `Split items` no va en un `Stack` vertical con `Wrap: true`, que no se parte nunca ([Stack](../components/stack.md#cortes)) | `Split items has no effect in a vertical Stack with Wrap: true, which is never broken across pages...` |
+| `LINE_DISTRIBUTION_WITHOUT_WRAP` | `Line distribution` solo con `Wrap items: true` | `Line distribution only has an effect with Wrap items: true...` |
+| `GAP_WITHOUT_WRAP` | Un `Gap` de dos valores en un `Stack`, solo con `Wrap items: true` ([Stack](../components/stack.md#propiedades-del-stack)) | `Gap has two values, but without Wrap items there is a single line and the first, the gap between rows, has no effect: one value is enough...` |
+| `SPLIT_ITEMS_WITHOUT_EFFECT` | `Split items` no va en un `Stack` vertical con `Wrap items: true`, que no se parte nunca ([Stack](../components/stack.md#cortes)) | `Split items has no effect in a vertical Stack with Wrap items: true, which is never broken across pages...` |
 | `GROW_WITHOUT_EFFECT` | `Grow` en un `Stack` vertical necesita un alto definido en el contenedor | `Grow has no effect: the vertical Stack of the parent has no definite height to distribute...` |
 | `ITEM_MAIN_AXIS` | Un `Item` solo se alinea en el eje cruzado de su `Stack`: `Vertical` en uno horizontal y `Horizontal` en uno vertical ([Stack](../components/stack.md#item)) | `Horizontal has no effect on an item of a Stack with Direction: horizontal, because it is its main axis...` |
 | `ASPECT_RATIO_CONFLICT` | `Aspect ratio` no se combina con `Width` y `Height` declarados | `Aspect ratio has no effect if Width and Height are declared` |

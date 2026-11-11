@@ -43,7 +43,7 @@ The complete list, with an example of each one, is in the [reference](../../refe
 
 Anything that would have no effect or contradicts something else is an error, so that the document says exactly what
 comes out in the PDF. A `Margin: auto` that does not center, a `Line distribution` or a two-measurement `Gap` in a
-`Stack` without `Wrap`, or a `Rotate origin` without `Rotate` would do nothing.
+`Stack` without `Wrap items`, or a `Rotate origin` without `Rotate` would do nothing.
 
 There are exceptions, so as not to get in the way: writing the default value (`Span: 1 1`), what is inherited (a
 `Typography` applies to what is inside), a `Border color` without `Border` or a `Corner radius` with nothing to round

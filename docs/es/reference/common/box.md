@@ -74,8 +74,8 @@ línea (**ancho natural**):
 | `Text` | palabra más ancha | párrafo más largo en una línea |
 | `Image`, `Barcode` | ancho natural o, con un `Height` que es una medida, el que sale de él con la proporción | igual |
 | `Block`, `Frame`, `Overlay`, `Page overlay` | máximo del ancho más estrecho de los hijos | máximo del ancho natural de los hijos |
-| `Stack` horizontal, sin `Wrap` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
-| `Stack` horizontal, con `Wrap` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
+| `Stack` horizontal, sin `Wrap items` | suma del ancho más estrecho de los ítems + huecos | suma del ancho natural + huecos |
+| `Stack` horizontal, con `Wrap items` | máximo del ancho más estrecho de los ítems | suma del ancho natural + huecos |
 | `Stack` vertical | máximo de los ítems | máximo de los ítems |
 | `Grid` | suma de las columnas dimensionadas sin espacio libre, más los huecos | suma de las columnas dimensionadas con espacio infinito y cada ítem aportando su ancho natural también como mínimo, más los huecos |
 | `Columns` | ver [Columns](../components/columns.md#tamaños-intrínsecos) | |

@@ -126,7 +126,7 @@ class SchemaCoverageTest {
             Map.entry("Edges", "Edges: closed"),
             // Stack and Item
             Map.entry("Direction", "Direction: vertical"),
-            Map.entry("Wrap", "Wrap: true"),
+            Map.entry("Wrap items", "Wrap items: true"),
             Map.entry("Split items", "Split items: false"),
             Map.entry("Split rows", "Split rows: false"),
             Map.entry("Merge borders", "Merge borders: false"),
@@ -151,7 +151,7 @@ class SchemaCoverageTest {
             Map.entry("Min column width", "Min column width: 100"),
             Map.entry("Separator", "Separator: 1"),
             Map.entry("Separator color", "Separator color: #999999"),
-            Map.entry("Balance", "Balance: false"),
+            Map.entry("Balance columns", "Balance columns: false"),
             // Markdown
             Map.entry("Bullet markers", "Bullet markers: bullet dash"),
             Map.entry("Number markers", "Number markers: decimal lower-alpha"),
@@ -207,8 +207,8 @@ class SchemaCoverageTest {
         }
         // A section with only a Page overlay has no content.
         t.put("Page overlay", new Template(HEADER + "\tBlock:\n\tPage overlay:\n\t\t{}"));
-        // Line distribution needs Wrap.
-        t.put("Stack", new Template(HEADER + "\tStack:\n\t\tWrap: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap")));
+        // Line distribution needs Wrap items.
+        t.put("Stack", new Template(HEADER + "\tStack:\n\t\tWrap items: true\n\t\t{}\n\t\tItem:\n\t\t\tBlock:", Set.of("Wrap items")));
         t.put("Grid", new Template(HEADER + "\tGrid:\n\t\t{}\n\t\tArea:\n\t\t\tBlock:"));
         for (String text : List.of("Text", "Paragraph")) {
             t.put(text, new Template(HEADER + "\t" + text + ":\n\t\t{}\n\t\tContent >>\n\t\t\tHola", Set.of("Content")));

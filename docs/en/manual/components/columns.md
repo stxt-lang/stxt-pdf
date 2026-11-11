@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 | `Gap` | `0` | The gap between columns, a single value. With `Column count: 1` it is an error, because there are no columns to separate |
 | `Separator` | no line | The thickness of a line between columns, in the middle of the gap. It cannot be wider than the gap, and with `Column count: 1` it is an error |
 | `Separator color` | the text color | The color of that line. Only with `Separator` |
-| `Balance` | `true` | With `true`, on the last page the columns are equally tall. With `false`, they are filled in order |
+| `Balance columns` | `true` | With `true`, on the last page the columns are equally tall. With `false`, they are filled in order |
 
 `Column count`, `Min column width` or both are required. It also accepts `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`.
 
@@ -57,7 +57,7 @@ Document (dev.stxt.pdf):
 - Inside, the elements are stacked as in a `Block`. The content is broken between columns with the same rules as between
   pages: without stray lines and respecting `Break`.
 - `Break` with `Before: column` or `After: column` jumps to the next column, and with `page`, to the next page.
-- With `Balance: true`, the last page does not leave one column full and another empty: the engine looks for the height at
+- With `Balance columns: true`, the last page does not leave one column full and another empty: the engine looks for the height at
   which they are even without violating any break rule.
 - A `Height` on the `Columns` limits the height of the columns. If the content does not fit, it is an error.
 - Inside a `Columns` there can be no `Overlay` or `Page overlay`, and no height percentages.

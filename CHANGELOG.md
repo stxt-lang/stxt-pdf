@@ -5,37 +5,48 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.16.0] - 2026-11-11
+
+The values of the enumerations reviewed before 1.0: sides of the page instead of `start` and `end`, no boolean
+values in an enumeration, and names that say what they do. **From 0.15.0**: `Break long words` and `Preformatted`
+no longer take `true` and `false`; `Horizontal`, `Vertical` and `Line distribution` no longer take `start`, `end`
+and `around`; `Wrap` is `Wrap items` and `Balance` is `Balance columns`; none of them has an alias for what it
+replaces. In the Java API, `TypographyStyle.breakLongWords()` returns an enum, `StackStyle.wrap()` is `wrapItems()`,
+`model.Preformatted` has other constants and `model.Distribution` loses `AROUND`. A document written for 0.15.0 with
+those values has to be changed, and once changed it is laid out the same, with one exception: with
+`Break long words`, a word that is cut starts a line of its own with `new-line`, and `same-line` is what `true` did.
+The names of the `dev.stxt.pdf` namespace and the Java API may still change before 1.0.
 
 ### Changed
 
 - **`Break long words` is an enumeration**: `never` (the default, what `false` was), `new-line` and `same-line`.
-  `true` and `false` are no longer values, with no alias. Both new values cut the part of a word wider than a whole
-  line of its box, and they differ in where that part starts: with `new-line`, in a line of its own, after the line
-  of the words and of the parts of its word before it, as in a word processor; with `same-line`, in the current
-  line, after them, which is what `true` did. "Long words" in the reference of `Typography`.
+  `true` and `false` are no longer values. Both new values cut the part of a word wider than a whole line of its
+  box, and they differ in where that part starts: with `new-line`, in a line of its own, after the line of the words
+  and of the parts of its word before it, as in a word processor; with `same-line`, in the current line, after them,
+  which is what `true` did. "Long words" in the reference of `Typography`.
 - **`Horizontal` and `Vertical` name the ends of their axis by the side of the page**: `left` and `right` in
-  `Horizontal`, `top` and `bottom` in `Vertical`, instead of `start` and `end`, which are no longer values of the
-  two, with no alias. It is so in `Stack`, `Grid`, `Area`, `Item` and `Cell`, and in the rules that give them. The
-  other values (`center`, `stretch`, `justify`, `around`, `distribute`) do not change.
-  **`Line distribution`** names them the same way, on the axis its lines go along: `top` and `bottom` in a
-  horizontal `Stack`, `left` and `right` in a vertical one, and the side of the other axis is `VALUE_NOT_ALLOWED`.
-  `start` and `end` are no longer values of any property. The Java
-  enums `model.Distribution` and `model.Alignment` keep `START` and `END`. No document is laid out differently.
+  `Horizontal`, `top` and `bottom` in `Vertical`, instead of `start` and `end`. It is so in `Stack`, `Grid`, `Area`,
+  `Item` and `Cell`, and in the rules that give them. **`Line distribution`** names them the same way, on the axis
+  its lines go along: `top` and `bottom` in a horizontal `Stack`, `left` and `right` in a vertical one, and the side
+  of the other axis is `VALUE_NOT_ALLOWED`. `start` and `end` are no longer values of any property. The Java enums
+  `model.Distribution` and `model.Alignment` keep `START` and `END`.
 - **`around` is no longer a value** of `Horizontal`, `Vertical` and `Line distribution`: it differed from
-  `distribute` only in the half gap it left at the edges, and no document asks for that by name. `justify` (from
-  edge to edge) and `distribute` (equal gaps, also at the edges) stay, and `Line distribution` takes `distribute`,
-  which it did not have. `model.Distribution` loses `AROUND`.
+  `distribute` only in the half gap it left at the edges. `justify` (from edge to edge) and `distribute` (equal
+  gaps, also at the edges) stay, and `Line distribution` takes `distribute`, which it did not have.
+  `model.Distribution` loses `AROUND`.
 - **`Preformatted` no longer takes `true` and `false`**: its values are `none` (the default, what `false` was),
-  `keep` (what `true` was) and `wrap`, with no alias for the old ones. It was the one enumeration with boolean
-  values. The constants of `model.Preformatted` are `NONE`, `KEEP` and `WRAP`, and the messages of the errors name
-  `Preformatted: keep`. No document is laid out differently. "Preformatted text" in the reference of
-  `Text formatting`.
+  `keep` (what `true` was) and `wrap`. It was the one enumeration with boolean values. The constants of
+  `model.Preformatted` are `NONE`, `KEEP` and `WRAP`, and the messages of the errors name `Preformatted: keep`.
+  "Preformatted text" in the reference of `Text formatting`.
+- **`Wrap` is `Wrap items` and `Balance` is `Balance columns`**: `Wrap`, of `Stack`, did not say what it wraps and
+  read like the value of `Preformatted: wrap`, and `Balance`, of `Columns`, did not say what it balances. They go
+  with `Split items` and `Split rows`. `StackStyle.wrap()` is `wrapItems()`; the error codes
+  `LINE_DISTRIBUTION_WITHOUT_WRAP` and `GAP_WITHOUT_WRAP` do not change, and their messages name `Wrap items`.
 - **The empty blocks of a `Markdown` are ignored**: a heading without text (`#` alone), an empty code block and a
   block quote without content (`>` alone), which were `TEXT_CONTENT`, generate no element. They are valid Markdown,
   they may come in a text from outside and they have nothing to paint. A `Markdown` left without any element and a
   heading without text and with an `Id` are still `TEXT_CONTENT`, and a list item without content is still an
-  error. "What is not supported" in the reference of `Markdown`.
+  error. "The subset" in the reference of `Markdown`.
 - `TypographyStyle.breakLongWords()` returns the new `model.BreakLongWords` instead of a `boolean`.
 
 ### Fixed

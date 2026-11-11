@@ -45,7 +45,7 @@ import static dev.stxt.pdf.tree.PropertyKey.MAX_HEIGHT;
  *                         and, with Height or Max height, what is left of it
  * fill in order: column i from the token of i−1, until the content, the columns
  *                or a forced page break run out
- * if the content ends here and Balance is true: the minimum height in which it fits without worse breaks
+ * if the content ends here and Balance columns is true: the minimum height in which it fits without worse breaks
  *                between columns (binary search)
  * no page or height to fill: always balanced
  * height of the content = that of the tallest column; of a definite Height, the Columns
@@ -165,7 +165,7 @@ public final class ColumnsLayout implements LayoutAlgorithm {
             double own = ownRemaining();
             double limit = Math.min(page, own);
             if (Double.isInfinite(limit)) {
-                // No page or height to fill: it is balanced, also with Balance: false.
+                // No page or height to fill: it is balanced, also with Balance columns: false.
                 double single = context.layout(flow, columnSpace(OptionalDouble.empty(), true), resume)
                         .fragment().height();
                 Fill fill = fill(single, true);

@@ -42,7 +42,7 @@ La lista completa, con un ejemplo de cada uno, está en la [referencia](../../re
 ## Por qué tantos errores
 
 Lo que no tendría efecto o se contradice es un error, para que el documento diga exactamente lo que sale en el PDF. Un
-`Margin: auto` que no centra, un `Line distribution` o un `Gap` de dos medidas en un `Stack` sin `Wrap` o un `Rotate origin` sin
+`Margin: auto` que no centra, un `Line distribution` o un `Gap` de dos medidas en un `Stack` sin `Wrap items` o un `Rotate origin` sin
 `Rotate` no harían nada.
 
 Hay excepciones, para no estorbar: escribir el valor por defecto (`Span: 1 1`), lo que se hereda (una

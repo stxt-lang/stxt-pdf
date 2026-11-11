@@ -194,7 +194,7 @@ memoizado es inmutable (`Arranged` y `Repeat` copian sus listas). Hasta la 0.9.0
 medía entera otra vez, y las unidades de un grid se calculaban recorriendo todos los ítems por cada fila (ahora, una
 pasada por los ítems); `ArrangementCacheTest` cuenta los repartos. Una unidad que no cabe en lo que queda de página parte sus ítems en paralelo en esa página
 (`Units.split`, de `Split rows` y `Split items`, y solo donde `Units.splittable` lo admite, que no es el caso de las líneas
-de un `Stack` horizontal con `Wrap`; con `false`, solo la que no cabe ni al principio de página), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
+de un `Stack` horizontal con `Wrap items`; con `false`, solo la que no cabe ni al principio de página), repitiendo su layout con `ConstraintSpace.fragmented` y el espacio guardado en `UnitBreaker.Placed`;
 `UnitBreaker.splitOnThisPage` compara la calidad de ese corte con la del mejor corte entre unidades (`BreakRules.cutUnits`)
 y se queda con el último de los mejores, y el `BreakToken.Container` lleva el token de cada ítem. Con `atFragmentainerStart` hay que colocar algo aunque desborde (garantía de progreso). Las tablas repiten
 cabecera y pie con `UnitBreaker.Repeat`. Las franjas de las filas (`Box.rows()`, `Element.ROW`) son `UnitBreaker.Band`:

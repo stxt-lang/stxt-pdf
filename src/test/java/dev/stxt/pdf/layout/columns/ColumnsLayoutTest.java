@@ -82,7 +82,7 @@ class ColumnsLayoutTest {
 
     @Test
     void fillAutoFillsInOrder() {
-        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false"), block("A", 30, false),
                 block("B", 30, false), block("C", 30, false), block("D", 30, false)));
         assertRect(40, 40, 515, 120, l.rect("M"));
         assertRect(40, 130, 250, 30, l.rect("D"));
@@ -130,7 +130,7 @@ class ColumnsLayoutTest {
     void trailingMarginThatDoesNotFitTheColumnOpensTheNextOne() {
         List<String> lines = new ArrayList<>(List.of("	Block:", "		Id: S", "		Box:", "			Height: 447", "		Break:",
                 "			Keep together: true"));
-        lines.addAll(List.of(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false"), block("A", 100, true),
+        lines.addAll(List.of(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false"), block("A", 100, true),
                 block("B", 100, true), sized("C", true, "Height: 100", "Margin: 0 0 20 0"))));
         LayoutFixture l = layOut(lines.toArray(String[]::new));
         assertEquals(1, l.pages());
@@ -151,7 +151,7 @@ class ColumnsLayoutTest {
 
     @Test
     void columnBreak() {
-        LayoutFixture l = layOut(columnsElement(List.of("Column count: 3", "Gap: 10", "Balance: false"), block("A", 30, false),
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 3", "Gap: 10", "Balance columns: false"), block("A", 30, false),
                 block("B", 30, false, "\t\t\tBreak:", "\t\t\t\tBefore: column"), block("C", 30, false)));
         assertRect(40, 40, 515, 60, l.rect("M"));
         assertRect(40, 40, 165, 30, l.rect("A"));
@@ -170,7 +170,7 @@ class ColumnsLayoutTest {
 
     @Test
     void heightIsFilledInOrderWithBalanceFalse() {
-        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:",
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false", "Box:",
                 "\tHeight: 100"), block("A", 30, true), block("B", 30, true), block("C", 30, true),
                 block("D", 30, true)));
         assertRect(40, 40, 515, 100, l.rect("M"));
@@ -207,7 +207,7 @@ class ColumnsLayoutTest {
     @Test
     void stackItemIsBalancedAndSizedByItsColumns() {
         List<String> lines = new ArrayList<>(List.of("\tStack:", "\t\tVertical: top", "\t\tItem:"));
-        for (String line : columnsElement(List.of("Column count: 2", "Gap: 10", "Balance: false"),
+        for (String line : columnsElement(List.of("Column count: 2", "Gap: 10", "Balance columns: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {
             lines.add("\t\t" + line);
@@ -275,7 +275,7 @@ class ColumnsLayoutTest {
      */
     @Test
     void heightWithBorderAndPaddingLeavesTheColumnsTheRest() {
-        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance: false", "Box:", "\tHeight: 60",
+        LayoutFixture l = layOut(columnsElement(List.of("Column count: 2", "Gap: 15", "Balance columns: false", "Box:", "\tHeight: 60",
                         "\tBorder: 5", "\tPadding: 5"), block("A", 12, true), block("B", 12, true), block("C", 12, true),
                 block("D", 12, true), block("E", 12, true)));
         assertRect(50, 74, 240, 12, l.rect("C"));

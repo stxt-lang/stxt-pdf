@@ -29,12 +29,12 @@ Stack:
 | Property | Values | Default | Notes |
 |---|---|---|---|
 | `Direction` | `horizontal`, `vertical` | `horizontal` | The main axis: in `horizontal` the items go side by side, and in `vertical`, one below another. |
-| `Wrap` | boolean | `false` | Allows the items to be distributed over several lines. |
-| `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap: true` (`GAP_WITHOUT_WRAP`). |
+| `Wrap items` | boolean | `false` | Allows the items to be distributed over several lines. |
+| `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap items: true` (`GAP_WITHOUT_WRAP`). |
 | `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
 | `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
-| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
-| `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
+| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap items: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap items`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
 
@@ -44,9 +44,9 @@ All of them can also come from a rule of `Styles` ([Element properties](../commo
 > `distribute` on the cross axis. *Rejected alternative:* `Main axis` and `Cross axis`, which do not change meaning with `Direction`
 > but force thinking in abstract axes.
 
-> **Decision:** without `Wrap` there is a single line, so of a two-value `Gap` only one would act, the gap between
+> **Decision:** without `Wrap items` there is a single line, so of a two-value `Gap` only one would act, the gap between
 > items (that of the columns in horizontal, that of the rows in vertical): it is an error (`GAP_WITHOUT_WRAP`), like `Line distribution` without
-> `Wrap`. A single value is valid, because it is the gap between items and, if there are several lines, also between lines. That is why
+> `Wrap items`. A single value is valid, because it is the gap between items and, if there are several lines, also between lines. That is why
 > `Gap: 5%` in a single-line horizontal `Stack` without a definite height is not an error: the gap between rows, which would need that
 > height, is not used. *Rejected alternative:* accepting both values and not using the extra one, which leaves in the document a
 > measurement without effect.
@@ -77,15 +77,15 @@ item (`Horizontal`, `Vertical`) and `Layer` cannot: in a rule, `Horizontal` and 
 3. **Hypothetical size:** the base limited by the minimum and the maximum of the item. With `Min width: auto` (`Min height: auto` in
    vertical), the minimum is the **size of its content**: the narrowest width in horizontal and the height of the content in vertical, without
    exceeding the maximum of the item and never larger than its declared `Width` (or `Height`).
-4. **Lines:** without `Wrap`, a single one. With `Wrap`, the items are added to the line while their hypothetical sizes and the
+4. **Lines:** without `Wrap items`, a single one. With `Wrap items`, the items are added to the line while their hypothetical sizes and the
    gaps fit.
 5. **Flexible sizes** (per line), described below.
 6. **Cross size:** layout of each item with its final main size (in horizontal, the text is redistributed with the final
-   width). The line measures what the tallest item does. Without `Wrap` and with a definite cross size on the container, the only line
+   width). The line measures what the tallest item does. Without `Wrap items` and with a definite cross size on the container, the only line
    measures what the container does.
 7. **Stretch:** the items with `stretch` and without a declared cross size come to measure what the line does, and their layout is repeated.
    In vertical, if the container has a single line, these items are measured from the start with the width of the container.
-   With `Wrap`, they are measured with their fit to the content and then stretched to the width of their line without recomputing their height.
+   With `Wrap items`, they are measured with their fit to the content and then stretched to the width of their line without recomputing their height.
 8. **Align** on the main axis, on the cross axis and the lines in the container.
 
 With an `auto` cross size, the container measures the sum of its lines plus the gaps.
@@ -140,7 +140,7 @@ A negative leftover space after shrinking means that the items do not fit: it is
 
 ## Intrinsic sizes
 
-In horizontal and without `Wrap`, the narrowest width is the sum of the narrowest widths of the items plus the gaps, and with `Wrap`, the maximum of
+In horizontal and without `Wrap items`, the narrowest width is the sum of the narrowest widths of the items plus the gaps, and with `Wrap items`, the maximum of
 them. The natural width is the sum of the natural widths plus the gaps. In vertical, both are the maximum of the items. The
 intrinsic sizes of each item are used as they are, without `Base size`, `Grow` or `Shrink` ([The box](../common/box.md#intrinsic-sizes)).
 
@@ -149,7 +149,7 @@ intrinsic sizes of each item are used as they are, without `Base size`, `Grow` o
 In vertical, the break is made between items, and in horizontal, between lines. A line or an item that does not fit in what is
 left of the page breaks in parallel on that page ([Breaks](../common/breaks.md#breaks-in-stack-grid-and-table)); with
 `Split items: false` it moves whole to the next one, and it is only split if it does not fit on a whole page either. A
-vertical `Stack` with `Wrap` does not break.
+vertical `Stack` with `Wrap items` does not break.
 
 ## Positioned elements
 

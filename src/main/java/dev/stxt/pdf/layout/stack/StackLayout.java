@@ -37,7 +37,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  *   <li>Base of each item: {@code Base size}, the declared size or the natural width.</li>
  *   <li>Hypothetical size: base limited by the minimum (with {@code Min width: auto}, the size
  *       of the content, not exceeding the declared one).</li>
- *   <li>Break into lines if {@code Wrap}.</li>
+ *   <li>Break into lines if {@code Wrap items}.</li>
  *   <li>Resolve flexible sizes with {@link StackResolver}.</li>
  *   <li>Cross size: layout of each item with its main size; the line measures the largest.</li>
  *   <li>Stretch the items with {@code stretch} and repeat their layout.</li>
@@ -45,7 +45,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * </ol>
  *
  * <p>The sizes of {@link StackItem} are margin box sizes; the {@code auto} margins are 0.
- * In a single-line container (without {@code Wrap}) with a definite cross size, the line
+ * In a single-line container (without {@code Wrap items}) with a definite cross size, the line
  * measures the same as the container. In vertical, the items with {@code stretch} of a single-line
  * container are measured already at the width of the container; in all other cases, with their fit
  * to the content.</p>
@@ -60,7 +60,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * <p>Across pages (reference/common/breaks.md) the break goes between lines in horizontal and between items in
  * vertical, with {@link UnitBreaker}; a line (in vertical, an item) that does not fit in what is left of the page is
  * split in parallel on that page ({@code Split items}, by default) or, with {@code Split items: false}, only if it
- * does not fit on a whole page. A vertical container with {@code Wrap} is not split.</p>
+ * does not fit on a whole page. A vertical container with {@code Wrap items} is not split.</p>
  */
 public final class StackLayout implements LayoutAlgorithm {
 
@@ -92,7 +92,7 @@ public final class StackLayout implements LayoutAlgorithm {
         IntrinsicSizes content;
         if (s.stack().direction() == Direction.VERTICAL) {
             content = new IntrinsicSizes(maxMin, maxMax);
-        } else if (s.stack().wrap()) {
+        } else if (s.stack().wrapItems()) {
             content = new IntrinsicSizes(maxMin, sumMax + gaps);
         } else {
             content = new IntrinsicSizes(sumMin + gaps, sumMax + gaps);
@@ -164,7 +164,7 @@ public final class StackLayout implements LayoutAlgorithm {
             this.s = box.style();
             this.model = model;
             this.row = s.stack().direction() == Direction.HORIZONTAL;
-            this.multiLine = s.stack().wrap();
+            this.multiLine = s.stack().wrapItems();
             this.contentWidth = model.contentWidth();
             this.contentHeight = model.contentHeight();
             this.mainSize = row ? OptionalDouble.of(contentWidth) : contentHeight;
@@ -235,7 +235,7 @@ public final class StackLayout implements LayoutAlgorithm {
 
         /**
          * Step 8: align. The fragmentation units are the lines in horizontal and the items in
-         * vertical (with Wrap, the whole container).
+         * vertical (with Wrap items, the whole container).
          */
         UnitBreaker.Arranged arrange(List<List<Item>> lines, CrossSizes cross, List<PendingOverlay> pending) {
             int n = lines.size();

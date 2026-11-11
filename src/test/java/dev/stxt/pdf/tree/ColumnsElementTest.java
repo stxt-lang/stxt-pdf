@@ -28,7 +28,7 @@ class ColumnsElementTest {
     @Test
     void contentGoesInTheColumnFlow() {
         Box columnsBox = root("\tColumns:", "\t\tId: m", "\t\tColumn count: 3", "\t\tGap: 12", "\t\tSeparator: 0.5",
-                "\t\tSeparator color: #999999", "\t\tBalance: false", "\t\tTypography:", "\t\t\tSize: 9",
+                "\t\tSeparator color: #999999", "\t\tBalance columns: false", "\t\tTypography:", "\t\t\tSize: 9",
                 "\t\tParagraph: Uno", "\t\tBlock:", "\t\t\tId: b").children().get(0);
         assertEquals(Element.COLUMNS, columnsBox.element());
         assertEquals(Layout.COLUMNS, columnsBox.style().layout());

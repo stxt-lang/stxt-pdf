@@ -67,10 +67,10 @@ They are those of appearance and distribution. The rule that applies to an eleme
 
 | Element | Properties in a rule |
 |---|---|
-| `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
+| `Stack` | `Direction`, `Wrap items`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
 | `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
-| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
+| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance columns` |
 | `List` | `Marker`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Below side boxes` |

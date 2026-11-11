@@ -22,7 +22,7 @@ In the schema:
 - `Text`, `Paragraph`, `Cell`, `Image`, `Barcode`, `Area`, `Caption`, `Marker image` and the rules of `Styles`, `INLINE` with
   children;
 - `Content`, `BLOCK`, and `Area map`, `TEXT`;
-- the switches (such as `Isolate margins`, `Wrap`, `Row header`, `In table of contents`, `Merge borders` or `Hyphenate`),
+- the switches (such as `Isolate margins`, `Wrap items`, `Row header`, `In table of contents`, `Merge borders` or `Hyphenate`),
   `BOOLEAN`;
 - the integers (such as `Layer`, `Widows`, `Orphans`, `First number`, `Number`, `Column count`, `Weight`, `Drop cap` or `Quiet zone`),
   `INTEGER`, and `Rotate`, `NUMBER`;
