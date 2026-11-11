@@ -50,6 +50,7 @@ public final class PropertyKey {
     public static final String FIRST_NUMBER = "first-number";
     public static final String NUMBER = "number";
     public static final String MARKER_IMAGE = "marker-image";
+    public static final String MARKER_SUFFIX = "marker-suffix";
     public static final String PDF_PAGE = "pdf-page";
     public static final String ERROR_CORRECTION = "error-correction";
     public static final String SIDE = "side";

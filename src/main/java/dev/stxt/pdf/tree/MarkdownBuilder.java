@@ -422,8 +422,14 @@ final class MarkdownBuilder {
             InlineNode list = node("List", "", line);
             list.addChild(generated(node("Marker", markers.get(Math.min(depth, markers.size() - 1)),
                     property.get().node().getLine()), property.get()));
-            if (l instanceof OrderedList o && o.getMarkerStartNumber() != 1) {
-                list.addChild(node("First number", Integer.toString(o.getMarkerStartNumber()), line));
+            if (l instanceof OrderedList o) {
+                // 1) asks for the parenthesis; 1. asks for nothing, and the list keeps the suffix of its rules.
+                if (")".equals(o.getMarkerDelimiter())) {
+                    list.addChild(node("Marker suffix", "parenthesis", line));
+                }
+                if (o.getMarkerStartNumber() != 1) {
+                    list.addChild(node("First number", Integer.toString(o.getMarkerStartNumber()), line));
+                }
             }
             for (org.commonmark.node.Node i = l.getFirstChild(); i != null; i = i.getNext()) {
                 ListItem source = (ListItem) i;

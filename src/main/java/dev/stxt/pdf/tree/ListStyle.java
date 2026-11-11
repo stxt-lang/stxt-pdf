@@ -1,16 +1,19 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 
 /**
- * The properties of lists (reference/components/list.md): the {@code Marker}, the {@code Marker image} and the
- * {@code First number} of a {@code List} and the {@code Number} and the {@code Marker image} of a {@code List item}. They are
+ * The properties of lists (reference/components/list.md): the {@code Marker}, the {@code Marker suffix}, the
+ * {@code Marker image} and the {@code First number} of a {@code List} and the {@code Number} and the {@code Marker image} of a {@code List item}. They are
  * not inherited.
  */
 public final class ListStyle extends StyleGroup {
 
     /** Marker of the items of a {@code List}; {@code null} in the other boxes. */
     private Marker marker;
+    /** What follows the number in the markers of a numbered {@code List}. */
+    private MarkerSuffix markerSuffix = MarkerSuffix.PERIOD;
     /** Number of the first item of a {@code List}. */
     private int firstNumber = 1;
     /** Number that a {@code List item} sets; {@code null} = the one after that of the previous item. */
@@ -32,6 +35,16 @@ public final class ListStyle extends StyleGroup {
     void setMarker(Marker v) {
         writable();
         marker = v;
+    }
+
+    /** {@code Marker suffix} of a {@code List}: what follows the number in its markers, a period by default. */
+    public MarkerSuffix markerSuffix() {
+        return markerSuffix;
+    }
+
+    void setMarkerSuffix(MarkerSuffix v) {
+        writable();
+        markerSuffix = v;
     }
 
     public int firstNumber() {

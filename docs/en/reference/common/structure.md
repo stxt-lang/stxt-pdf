@@ -201,7 +201,7 @@ once, and the elements, as many times as needed.
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Below side boxes`; `Paragraph`, besides, `Drop cap` |
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Below side boxes`; `Text` (at least one) |
-| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
+| `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker suffix`, `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (required), `Footer rows` |
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |

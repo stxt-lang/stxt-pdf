@@ -145,6 +145,7 @@ class SchemaCoverageTest {
             Map.entry("Vertical", "Vertical: center"),
             // Lists
             Map.entry("Marker", "Marker: decimal"),
+            Map.entry("Marker suffix", "Marker suffix: parenthesis"),
             Map.entry("First number", "First number: 3"),
             Map.entry("Number", "Number: 5"),
             // Columns

@@ -69,7 +69,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | `Content` | El Markdown, en un bloque `>>`. Obligatorio |
 | `Bullet markers` | El marcador de las listas con viñetas, uno por nivel: `bullet dash` usa `•` en el primer nivel y `–` en los siguientes. Obligatorio si hay listas con viñetas |
-| `Number markers` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas |
+| `Number markers` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas. Una lista escrita con `1)` lleva paréntesis en lugar de punto: `1)`, `a)` |
 | `Table column sizes` | Las columnas de las tablas: `equal` (todas iguales) o `auto` (según su contenido). Obligatorio si hay tablas |
 
 `Bullet markers`, `Number markers` y `Table column sizes` también pueden ir una vez para todo el documento, en una regla

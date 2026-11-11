@@ -27,11 +27,12 @@ List:
 | Property | Values | Default | Elements | Notes |
 |---|---|---|---|---|
 | `Marker` | `bullet`, `dash`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | required | `List` | Marker of the items: `•`, `–`, none, an image, or a numbering (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker suffix` | `period`, `parenthesis` | `period` | `List` | What follows the number in a numbering: a period (`1.`, `a.`) or a closing parenthesis (`1)`, `a)`). Only in the numberings. |
 | `Marker image` | path relative to `images/` | none | `List`, `List item` | The image of the marker with `Marker: image` ([Image markers](#image-markers)): that of the list serves all its items, and that of an item replaces it. It accepts `Alt` and `Height`. |
 | `First number` | integer | `1` | `List` | Number of the first item. Only in the numberings. |
 | `Number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
 
-`Marker` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number` and `Number` cannot. Without
+`Marker`, `Marker suffix` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number` and `Number` cannot. Without
 `Marker`, its own or from a rule, it is an error (`LIST_MARKER_MISSING`). The indent of the items is the left `Padding` of
 the `List`.
 
@@ -43,8 +44,37 @@ the `List`.
 
 `Marker` is required: whether the list is numbered is decided by the author. The marker is text in the typography of the
 `List item` (its own, inherited or from `For element: List item`): `•` (`bullet`), `–` (`dash`), none (`none`), or the number of the
-item with a period: `3.`, `c.`, `C.`, `iii.`, `III.`. It is always followed by a space, which separates it from the content. With
+item with its suffix: `3.`, `c.`, `C.`, `iii.`, `III.`. It is always followed by a space, which separates it from the content. With
 `image`, the marker is an image ([below](#image-markers)).
+
+The suffix is that of `Marker suffix`: a period (`period`, the default) or a closing parenthesis (`parenthesis`), which
+writes `3)`, `c)`, `C)`, `iii)`, `III)`.
+
+```
+List:
+    Marker: lower-alpha
+    Marker suffix: parenthesis
+    List item:
+        Paragraph: Purpose of the contract
+    List item:
+        Paragraph: Term
+```
+
+- It belongs to its list and not to the lists inside it: a nested list declares its own, takes it from a rule or has the period.
+- In a list that does not number (`bullet`, `dash`, `none`, `image`) it has no effect and is an error
+  (`LIST_SUFFIX_NOT_ALLOWED`), on the line of the `Marker suffix`, whether it comes from the list or from a rule.
+- It is not in `{number of: id}`, which writes the number without a suffix ([References](../common/references.md#number-of-id)).
+- It counts in the width of the marker, like the rest of its text (`LIST_MARKER_OVERFLOW`, [Position](#position)), and a
+  screen reader reads the marker with it ([Accessibility](#accessibility)).
+
+> **Decision:** the suffix is a property of its own, `Marker suffix`, and not more values of `Marker`.
+> *Rejected alternative:* `lower-alpha-parenthesis` and four other values, which duplicate the five numberings for each
+> suffix.
+
+> **Decision:** `Marker suffix` in a list that does not number is an error, like `First number`, also when it comes from a
+> rule: a rule that gives it goes with the `Marker` of the numbering, or names the numbered lists by their style.
+> *Rejected alternative:* that it had no effect without a warning, which lets through a `Marker suffix` written in the
+> wrong list.
 
 > **Decision:** the marker is text in the font of the item, without a hollow circle or a square, which IBM Plex Sans does not have.
 > *Rejected alternative:* drawing them as shapes.
@@ -142,5 +172,5 @@ the item has no marker for the reader ([The PDF inside](../implementation/pdf.md
 
 - Markers inside the item, with a style of their own different from the item or with other text.
 - Hollow circle and square.
-- Lists in reverse order and suffixes other than the period.
+- Lists in reverse order, and suffixes other than the period and the closing parenthesis: `(a)` in parentheses, `1:`, `1.-`.
 - Image markers in the lists of a `Markdown`.

@@ -42,12 +42,48 @@ Document (dev.stxt.pdf):
 | Property | Where | What it does |
 |---|---|---|
 | `Marker` | `List` | **Required**, in the list or in a rule of `Styles` ([Styles](../common/styles.md#element-properties)). `bullet` (•), `dash` (–), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker suffix` | `List` | What follows the number: `period` (`1.`, `a.`), the default, or `parenthesis` (`1)`, `a)`). Only in numbered lists |
 | `Marker image` | `List`, `List item` | The image of the marker with `Marker: image`, from `images/`. That of the list serves all its items; that of an item replaces it. It accepts `Alt` and `Height` |
 | `First number` | `List` | The number of the first item (1 by default). Only in numbered lists |
 | `Number` | `List item` | The number of this item. The following ones continue from it |
 
 `List` and `List item` also accept `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`. An item has one or more elements
 (a `Paragraph`, a `Text`, another `List`), but not headings.
+
+## Lists with a parenthesis
+
+The clauses of a contract or of a policy are often numbered with a parenthesis: `a)`, `b)`, `c)`. That is
+`Marker suffix: parenthesis`, in the list or, for all those of a style, in a rule with its `Marker`.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Terms
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+        For style: clauses
+            Marker: lower-alpha
+            Marker suffix: parenthesis
+    Section:
+        Paragraph: The policyholder undertakes to:
+        List:
+            Style: clauses
+            List item:
+                Paragraph: Pay the premium within the agreed period.
+            List item:
+                Paragraph: Report the claim within seven days.
+            List item:
+                Paragraph: Keep the remains until the appraisal.
+```
 
 ## Image markers
 
@@ -98,6 +134,8 @@ in the example. The markers are aligned to the right, next to the text with a sp
 - The marker uses the typography of the item and is aligned with its first line. That is why an item must start with a
   text: if it starts with a `Stack`, a `Grid` or an image, it is an error.
 - Each list numbers its items. A list inside another one starts again. A list with images does not number.
+- `Marker suffix` belongs to its list: a list inside another one has the period unless it declares its own. In a list that
+  does not number it is an error.
 - `Marker image` only makes sense with `Marker: image`; in another list it is an error, and so is an item of a list with
   `Marker: image` without an image, neither its own nor the list's.
 - If the item is split across pages, the marker goes on the first one.

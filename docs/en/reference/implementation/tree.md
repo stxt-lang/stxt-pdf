@@ -197,7 +197,7 @@ box that is passed to them.
 ## Generated elements
 
 - **List marker:** `ListBuilder` creates the box of the marker in `Box.marker`, generated and outside `children`
-  (`Element.MARKER`, `Box.isMarker()`): text with the typography of the item and the final space included (`"3. "`) or,
+  (`Element.MARKER`, `Box.isMarker()`): text with the typography of the item, the suffix of the `Marker suffix` of the list and the final space included (`"3. "`, `"c) "`, from `ListMarkers.text`) or,
   with `Marker: image`, an image box (`Box.isImage()`, with the path in `Box.image()` and the `Alt` and `Height` of the
   `Marker image` in its `ListStyle`), with the line of the `Marker image` of the item or, if it has none, of the list.
   `PropertyReader.markerImage` reads the `Marker image` with its children, `ListBuilder.validateList` and

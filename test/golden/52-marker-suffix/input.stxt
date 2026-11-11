@@ -1,0 +1,50 @@
+# The suffix of the markers of a numbering (reference/components/list.md#markers). Page of 595 × 300 with margins of
+# 40: page area of 515 × 220 from (40, 40). Lines of 12 (Size 10) and characters of 5, so "a) " and "9. " measure 15
+# and "10) " and "10. ", 20.
+#
+# The indent of the lists is their left Padding of 30, declared in Styles. clauses numbers in letters with a
+# parenthesis: its markers end at x = 70, where its items start. sub, nested in c2, declares no Marker suffix and
+# keeps the period: the suffix of a list is not that of the lists inside it. md is a Markdown whose list is written
+# with 9): it takes the parenthesis from there, with the Marker of Number markers.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 300
+		Margin: 40
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: List
+			Box:
+				Padding: 0 0 0 30
+	Section:
+		List:
+			Id: clauses
+			Marker: lower-alpha
+			Marker suffix: parenthesis
+			List item:
+				Id: c1
+				Text: Objeto del contrato
+			List item:
+				Id: c2
+				Text: Duración
+				List:
+					Id: sub
+					Marker: decimal
+					First number: 9
+					List item:
+						Id: s1
+						Text: Prórroga
+					List item:
+						Id: s2
+						Text: Renuncia
+		Markdown:
+			Id: md
+			Number markers: decimal
+			Content >>
+				9) Pago
+				10) Impago

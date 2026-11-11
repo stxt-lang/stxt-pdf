@@ -195,7 +195,7 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
 ## Elementos generados
 
 - **Marcador de lista:** `ListBuilder` crea en `Box.marker` la caja del marcador, generada y fuera de `children`
-  (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem y el espacio final incluido (`"3. "`) o, con
+  (`Element.MARKER`, `Box.isMarker()`): texto con la tipografía del ítem, el sufijo del `Marker suffix` de la lista y el espacio final incluidos (`"3. "`, `"c) "`, de `ListMarkers.text`) o, con
   `Marker: image`, una caja de imagen (`Box.isImage()`, con la ruta en `Box.image()` y el `Alt` y el `Height` del
   `Marker image` en su `ListStyle`), con la línea del `Marker image` del ítem o, si no tiene, de la lista.
   `PropertyReader.markerImage` lee el `Marker image` con sus hijos, `ListBuilder.validateList` y `validateItem`

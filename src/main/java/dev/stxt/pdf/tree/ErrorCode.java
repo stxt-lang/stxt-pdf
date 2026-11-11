@@ -68,6 +68,8 @@ public enum ErrorCode {
     LIST_NUMBER_RANGE,
     /** An item with a marker whose content does not start with a text to align it with. */
     LIST_ITEM_WITHOUT_LINE,
+    /** {@code Marker suffix} in a list that does not number ({@code bullet}, {@code dash}, {@code none}, {@code image}). */
+    LIST_SUFFIX_NOT_ALLOWED,
     /** {@code Marker image} in a list, or in an item of a list, whose {@code Marker} is not {@code image}. */
     LIST_IMAGE_NOT_ALLOWED,
     /** An item of a list with {@code Marker: image} that has no {@code Marker image}, its own or the list's. */

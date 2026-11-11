@@ -398,6 +398,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Marker
 				Max: 1
+			Child: Marker suffix
+				Max: 1
 			Child: Marker image
 				Max: 1
 			Child: First number
@@ -1071,6 +1073,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Marker
 				Max: 1
+			Child: Marker suffix
+				Max: 1
 			Child: Marker image
 				Max: 1
 			Child: Fit
@@ -1164,6 +1168,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Marker
 				Max: 1
+			Child: Marker suffix
+				Max: 1
 			Child: Marker image
 				Max: 1
 			Child: Fit
@@ -1256,6 +1262,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Balance columns
 				Max: 1
 			Child: Marker
+				Max: 1
+			Child: Marker suffix
 				Max: 1
 			Child: Marker image
 				Max: 1
@@ -1814,7 +1822,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Marker
 		Type: ENUM
-		Description: Marker of the items: bullet (•), dash (–) or none, an image (the Marker image of the list or of each item), or a numbering (1., a., A., i., I.).
+		Description: Marker of the items: bullet (•), dash (–) or none, an image (the Marker image of the list or of each item), or a numbering (1., a., A., i., I.; with Marker suffix: parenthesis, 1), a)...).
 		Values:
 			Value: bullet
 			Value: dash
@@ -1825,6 +1833,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: upper-alpha
 			Value: lower-roman
 			Value: upper-roman
+	Node: Marker suffix
+		Type: ENUM
+		Description: What follows the number in the markers of a numbered List: period (1., a.), the default, or parenthesis (1), a)). Only with a Marker that numbers.
+		Values:
+			Value: period
+			Value: parenthesis
 	Node: Marker image
 		Type: INLINE
 		Description: Image of the marker, with Marker: image, in the List (for all its items) or in a List item (its own, which replaces that of the list); the value is its path, relative to images/, as in an Image. As tall as the Size of the item unless it declares Height, as wide as its proportion gives, centered on the capitals of the first line of the item and followed by a space. With Alt it is read as a figure; without it, it is decorative.
@@ -1906,7 +1920,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Bullet markers
 		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none.
 	Node: Number markers
-		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman.
+		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman. A list written with 1) has Marker suffix: parenthesis.
 	Node: Table column sizes
 		Type: ENUM
 		Description: Columns of the tables of a Markdown: equal, all of the same width (repeat(n, *)); auto, each according to its content (repeat(n, auto)).

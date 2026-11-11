@@ -1,11 +1,12 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 import dev.stxt.pdf.model.NumberFormat;
 
 /**
  * Text of the marker of a list item (reference/components/list.md): a symbol ({@code •},
- * {@code –}) or a number with its suffix ({@code 3.}, {@code c.}, {@code iii.}), followed by the
+ * {@code –}) or a number with its suffix ({@code 3.}, {@code c)}, {@code iii.}), followed by the
  * space that separates it from the content.
  */
 final class ListMarkers {
@@ -18,14 +19,15 @@ final class ListMarkers {
 
     /**
      * Text of the marker, with the trailing space; {@code null} with {@code none} and with {@code image}, whose
-     * marker is not text. The number only counts in numberings, and it must be within their range ({@link #inRange}).
+     * marker is not text. The number and the suffix only count in numberings, and the number must be within their range
+     * ({@link #inRange}).
      */
-    static String text(Marker marker, int number) {
+    static String text(Marker marker, MarkerSuffix suffix, int number) {
         String label = switch (marker) {
             case NONE, IMAGE -> null;
             case BULLET -> "•";
             case DASH -> "–";
-            default -> number(marker, number) + ".";
+            default -> number(marker, number) + suffix.text();
         };
         return label == null ? null : label + " ";
     }

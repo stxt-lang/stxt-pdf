@@ -13,6 +13,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -248,6 +249,29 @@ class RuleElementPropertiesTest {
         InvalidModelException table = error("---", "Table:", "\tBody rows:", "\t\tRow:", "\t\t\tCell: a");
         assertEquals(ErrorCode.TABLE_COLUMN_SIZES_MISSING, table.errorCode());
         assertEquals(13, table.line());
+    }
+
+    @Test
+    void theMarkerSuffixComesFromARuleAlsoForTheListsOfAMarkdown() {
+        Box root = root(
+                "For style: clauses", "\tMarker: lower-alpha", "\tMarker suffix: parenthesis",
+                "For element: Markdown", "\tNumber markers: decimal", "\tFor element: List", "\t\tMarker suffix: parenthesis",
+                "---",
+                "List:", "\tStyle: clauses", "\tList item:", "\t\tParagraph: Uno",
+                "Markdown:", "\tContent >>", "\t\t1. uno", "\t\t2. dos");
+        Box list = root.children().get(0);
+        assertEquals(MarkerSuffix.PARENTHESIS, list.style().list().markerSuffix());
+        assertEquals("a) ", list.children().get(0).marker().text());
+        Box generated = root.children().get(1).children().get(0);
+        assertEquals("2) ", generated.children().get(1).marker().text());
+        // In a list that does not number it has no effect, also from a rule.
+        InvalidModelException e = error("For element: List", "\tMarker suffix: parenthesis",
+                "---",
+                "List:", "\tMarker: bullet", "\tList item:", "\t\tParagraph: Uno");
+        assertEquals(ErrorCode.LIST_SUFFIX_NOT_ALLOWED, e.errorCode());
+        // A box that is not a List cannot declare it.
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, error("For style: x", "\tMarker suffix: parenthesis",
+                "---", "Block:", "\tStyle: x", "\tText: a").errorCode());
     }
 
     @Test

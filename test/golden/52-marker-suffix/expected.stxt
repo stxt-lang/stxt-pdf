@@ -1,0 +1,27 @@
+# clauses from y = 40, with content from x = 70 (Padding 30). c1 (40) has "a) ", 15 wide, at x = 55; c2 (52), "b) ".
+# c2 measures its line and sub (24): 36. The items of sub start at x = 100: s1 (64) has "9. " (15) at x = 85, and
+# s2 (76), "10. " (20) at x = 80. clauses ends at 88, where md starts, with its two lines.
+Result:
+	Page: 1
+		Fragment: clauses
+			Rect: 40 40 515 48
+			Fragment: c1
+				Rect: 70 40 485 12
+				Marker: a)
+					Rect: 55 40 15 12
+			Fragment: c2
+				Rect: 70 52 485 36
+				Marker: b)
+					Rect: 55 52 15 12
+				Fragment: sub
+					Rect: 70 64 485 24
+					Fragment: s1
+						Rect: 100 64 455 12
+						Marker: 9.
+							Rect: 85 64 15 12
+					Fragment: s2
+						Rect: 100 76 455 12
+						Marker: 10.
+							Rect: 80 76 20 12
+		Fragment: md
+			Rect: 40 88 515 24

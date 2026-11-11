@@ -158,6 +158,17 @@ class MarkdownBuilderTest {
     }
 
     @Test
+    void aNumberedListWrittenWithAParenthesisTakesItAsItsSuffix() {
+        MarkdownBuilder.Translation t = translate(List.of("Number markers: lower-alpha"), "2) x", "3) y", "", "1. z");
+        assertEquals(List.of("List @16", "  Marker: lower-alpha @14", "  Marker suffix: parenthesis @16",
+                "  First number: 2 @16", "  List item @16", "    Paragraph: x @16", "  List item @17",
+                "    Paragraph: y @17"), outline(t.elements().get(0)));
+        // The period asks for nothing: the list keeps the suffix of its rules, or the default one.
+        assertEquals(List.of("List @19", "  Marker: lower-alpha @14", "  List item @19", "    Paragraph: z @19"),
+                outline(t.elements().get(1)));
+    }
+
+    @Test
     void anItemCanHaveSeveralParagraphs() {
         MarkdownBuilder.Translation t = translate(List.of("Number markers: decimal"), "1. uno", "", "   sigue");
         assertEquals(List.of("List @16", "  Marker: decimal @14", "  List item @16", "    Paragraph: uno @16",

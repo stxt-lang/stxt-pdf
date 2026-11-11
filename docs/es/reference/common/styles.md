@@ -72,7 +72,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance columns` |
-| `List` | `Marker`, `Marker image` |
+| `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Below side boxes` |
 | `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Below side boxes` |

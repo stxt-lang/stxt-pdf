@@ -42,12 +42,48 @@ Document (dev.stxt.pdf):
 | Propiedad | Dónde | Qué hace |
 |---|---|---|
 | `Marker` | `List` | **Obligatorio**, en la lista o en una regla de `Styles` ([Estilos](../common/styles.md#propiedades-de-un-elemento)). `bullet` (•), `dash` (–), `none`, `image` (una imagen), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker suffix` | `List` | Lo que sigue al número: `period` (`1.`, `a.`), por defecto, o `parenthesis` (`1)`, `a)`). Solo en las numeradas |
 | `Marker image` | `List`, `List item` | La imagen del marcador con `Marker: image`, de `images/`. La de la lista vale para todos sus ítems; la de un ítem la sustituye. Admite `Alt` y `Height` |
 | `First number` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
 elementos (un `Paragraph`, un `Text`, otra `List`), pero no encabezados.
+
+## Enumeraciones con paréntesis
+
+Las cláusulas de un contrato o de una póliza se numeran a menudo con un paréntesis: `a)`, `b)`, `c)`. Es
+`Marker suffix: parenthesis`, en la lista o, para todas las de un estilo, en una regla con su `Marker`.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Condiciones
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+        For style: clauses
+            Marker: lower-alpha
+            Marker suffix: parenthesis
+    Section:
+        Paragraph: El tomador se obliga a:
+        List:
+            Style: clauses
+            List item:
+                Paragraph: Pagar la prima en el plazo acordado.
+            List item:
+                Paragraph: Comunicar el siniestro en siete días.
+            List item:
+                Paragraph: Conservar los restos hasta la peritación.
+```
 
 ## Marcadores con imagen
 
@@ -98,6 +134,8 @@ marcadores quedan alineados a la derecha, pegados al texto con un espacio.
 - El marcador usa la tipografía del ítem y se alinea con su primera línea. Por eso un ítem tiene que empezar con un texto:
   si empieza con un `Stack`, un `Grid` o una imagen, es un error.
 - Cada lista numera sus ítems. Una lista dentro de otra empieza de nuevo. Una lista con imágenes no numera.
+- `Marker suffix` es de su lista: una lista dentro de otra lleva el punto si no declara el suyo. En una lista que no
+  numera es un error.
 - `Marker image` solo tiene sentido con `Marker: image`; en otra lista es un error, y un ítem de una lista con
   `Marker: image` sin imagen, ni suya ni de la lista, también.
 - Si el ítem se parte entre páginas, el marcador va en la primera.

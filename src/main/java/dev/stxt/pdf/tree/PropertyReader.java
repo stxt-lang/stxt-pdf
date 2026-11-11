@@ -23,6 +23,7 @@ import dev.stxt.pdf.model.Markup;
 import dev.stxt.pdf.model.Leader;
 import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Pages;
@@ -140,6 +141,7 @@ final class PropertyReader {
             entry("layer", (p, s) -> s.setLayer(integer(p))),
             entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
+            entry("marker-suffix", (p, s) -> s.list().setMarkerSuffix(enumValue(MarkerSuffix.class, p))),
             entry("marker-image", PropertyReader::markerImage),
             entry("first-number", (p, s) -> s.list().setFirstNumber(integer(p))),
             entry("number", (p, s) -> s.list().setNumber(integer(p))),

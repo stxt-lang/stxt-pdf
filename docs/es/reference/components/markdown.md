@@ -75,7 +75,7 @@ así:
 | `#` a `######` (y los subrayados con `===` y `---`) | `Heading 1` a `Heading 6`, con un `Text`, y con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
-| `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel y `First number`, el primer número si no es 1 |
+| `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel, `First number`, el primer número si no es 1, y, escrita con `1)`, `Marker suffix: parenthesis` ([Listas](#listas)) |
 | Tabla | `Table` con las `Column sizes` de `Table column sizes`, con la fila de cabecera en `Header rows` y el resto en `Body rows` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../common/text-formatting.md#tramos)) |
 | `*x*`, `_x_` | tramo en cursiva |
@@ -258,6 +258,16 @@ izquierdo, que se suele declarar en la regla `For element: List` ([List](list.md
 
 > **Decisión:** el nivel se cuenta por tipo: una lista numerada dentro de una con viñetas usa el primer marcador de
 > `Number markers`. *Alternativa descartada:* un nivel común a los dos tipos.
+
+Una lista escrita con `1)` lleva `Marker suffix: parenthesis`, y sus marcadores, el paréntesis: `1)`, `a)`
+([List](list.md#marcadores)). Una escrita con `1.` no declara `Marker suffix`: lleva el de una regla que le toque
+(`For element: List` dentro de `For element: Markdown`) o, sin ella, el punto. CommonMark empieza una lista nueva
+donde cambia el delimitador, así que cada lista tiene uno solo.
+
+> **Decisión:** el `1)` del autor pide el paréntesis y el `1.` no pide nada. *Alternativa descartada:* que `1.` declarase
+> `Marker suffix: period`, que impediría a una regla dar el paréntesis a las listas de un Markdown escrito con `1.`, la
+> forma habitual; o una propiedad `Number suffixes` por nivel, como `Number markers`, que repite lo que el autor ya
+> escribe.
 
 ## Tablas
 

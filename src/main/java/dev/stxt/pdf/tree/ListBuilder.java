@@ -10,6 +10,7 @@ import java.util.Locale;
 import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_IMAGE;
+import static dev.stxt.pdf.tree.PropertyKey.MARKER_SUFFIX;
 import static dev.stxt.pdf.tree.PropertyKey.NUMBER;
 import static dev.stxt.pdf.tree.PropertyKey.FIRST_NUMBER;
 
@@ -58,7 +59,7 @@ final class ListBuilder {
      */
     static Box marker(InlineNode n, Box item, Box list, int number) {
         Marker marker = list.style().list().marker();
-        String text = ListMarkers.text(marker, number);
+        String text = ListMarkers.text(marker, list.style().list().markerSuffix(), number);
         if (text == null && marker != Marker.IMAGE) {
             return null;
         }
@@ -127,13 +128,17 @@ final class ListBuilder {
     }
 
     /**
-     * {@code Marker image} only with {@code Marker: image}; {@code First number} only numbers, and within the range of the
-     * numbering.
+     * {@code Marker image} only with {@code Marker: image}; {@code Marker suffix} and {@code First number} only in a
+     * numbering, and the number within its range.
      */
     static void validateList(Style s) {
         if (s.isDeclared(MARKER_IMAGE) && s.list().marker() != Marker.IMAGE) {
             throw error(s.line(MARKER_IMAGE), ErrorCode.LIST_IMAGE_NOT_ALLOWED, "Marker image has no effect with "
                     + "Marker: " + markerName(s.list().marker()) + ": only Marker: image draws an image");
+        }
+        if (s.isDeclared(MARKER_SUFFIX) && !s.list().marker().numbered()) {
+            throw error(s.line(MARKER_SUFFIX), ErrorCode.LIST_SUFFIX_NOT_ALLOWED, "Marker suffix has no effect with "
+                    + "Marker: " + markerName(s.list().marker()) + ", which does not number the items");
         }
         if (!s.isDeclared(FIRST_NUMBER)) {
             return;

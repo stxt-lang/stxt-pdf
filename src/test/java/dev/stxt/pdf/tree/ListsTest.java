@@ -13,6 +13,7 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 import dev.stxt.pdf.stxt.DocumentReader;
 
 /** Lists when building the tree (reference/components/list.md): elements, numbering and rules. */
@@ -59,6 +60,35 @@ class ListsTest {
                 "\t\tList item:", "\t\t\tText: a", "\t\tList item:", "\t\t\tText: b").children().get(0);
         assertEquals(Marker.UPPER_ROMAN, list.style().list().marker());
         assertEquals(List.of("IV. ", "V. "), markers(list));
+    }
+
+    @Test
+    void theMarkerSuffixIsOfItsListAndNotOfTheNestedOnes() {
+        Box outer = root("\tList:", "\t\tMarker: lower-alpha", "\t\tMarker suffix: parenthesis",
+                "\t\tList item:", "\t\t\tId: clause", "\t\t\tText: a",
+                "\t\t\tList:", "\t\t\t\tMarker: decimal",
+                "\t\t\t\tList item:", "\t\t\t\t\tText: a1",
+                "\t\tList item:", "\t\t\tText: b").children().get(0);
+        assertEquals(MarkerSuffix.PARENTHESIS, outer.style().list().markerSuffix());
+        assertEquals(List.of("a) ", "b) "), markers(outer));
+        // What {number of: id} gives has no suffix.
+        assertEquals("a", outer.children().get(0).number());
+        Box inner = outer.children().get(0).children().get(1);
+        assertEquals(MarkerSuffix.PERIOD, inner.style().list().markerSuffix());
+        assertEquals(List.of("1. "), markers(inner));
+    }
+
+    @Test
+    void theMarkerSuffixIsOnlyOfANumbering() {
+        for (String marker : List.of("bullet", "dash", "none")) {
+            InvalidModelException e = error("\tList:", "\t\tMarker: " + marker, "\t\tMarker suffix: parenthesis",
+                    "\t\tList item:", "\t\t\tText: a");
+            assertEquals(ErrorCode.LIST_SUFFIX_NOT_ALLOWED, e.errorCode());
+            assertEquals(15, e.line());
+        }
+        assertEquals(ErrorCode.LIST_SUFFIX_NOT_ALLOWED, error("\tList:", "\t\tMarker: image",
+                "\t\tMarker suffix: period", "\t\tMarker image: test/check.svg", "\t\tList item:", "\t\t\tText: a")
+                .errorCode());
     }
 
     @Test

@@ -12,6 +12,14 @@ four. No document changes.
 
 ### Added
 
+- **The suffix of the markers of a numbered list.** `Marker suffix` in `List` (optional) says what follows the number:
+  `period`, the default (`1.`, `a.`), or `parenthesis` (`1)`, `a)`), the usual form of the clauses of a contract. It can
+  come from a rule of `Styles`, like `Marker`, and it belongs to its list, not to the lists nested in it. In a list that
+  does not number (`bullet`, `dash`, `none`, `image`) it is an error, `LIST_SUFFIX_NOT_ALLOWED`. A numbered list of a
+  `Markdown` written with `1)` has `Marker suffix: parenthesis`; one written with `1.` declares none, and keeps that of
+  its rules or the period. `{number of: id}` still writes the number without a suffix. `ListStyle` gains
+  `markerSuffix()`, and `model` the enum `MarkerSuffix`. "Markers" in the reference of `List` and "Lists" in that of
+  `Markdown`.
 - **The keywords of the PDF.** `Keywords` in `Document` (optional) gives the keywords of the document separated by
   commas: `Keywords: policy, home, general terms`. Each one is trimmed, and none can be empty: an empty `Keywords`, two
   commas in a row or a comma at the start or at the end are `VALUE_NOT_ALLOWED`. The engine writes them joined by a

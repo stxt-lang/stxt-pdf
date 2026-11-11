@@ -27,11 +27,12 @@ List:
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
 | `Marker` | `bullet`, `dash`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | obligatorio | `List` | Marcador de los ítems: `•`, `–`, ninguno, una imagen, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker suffix` | `period`, `parenthesis` | `period` | `List` | Lo que sigue al número en una numeración: un punto (`1.`, `a.`) o un paréntesis de cierre (`1)`, `a)`). Solo en las numeraciones. |
 | `Marker image` | ruta relativa a `images/` | sin valor | `List`, `List item` | La imagen del marcador con `Marker: image` ([Marcadores con imagen](#marcadores-con-imagen)): la de la lista vale para todos sus ítems, y la de un ítem la sustituye. Admite `Alt` y `Height`. |
 | `First number` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
 | `Number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
 
-`Marker` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number` y `Number`, no. Sin `Marker`, propio
+`Marker`, `Marker suffix` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number` y `Number`, no. Sin `Marker`, propio
 o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems es el `Padding` izquierdo de la `List`.
 
 > **Decisión:** un único elemento `List` con `Marker` obligatorio, que no se hereda: cada lista anidada declara el suyo o
@@ -42,8 +43,37 @@ o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems e
 
 `Marker` es obligatorio: si la lista es numerada lo decide el autor. El marcador es texto en la tipografía del
 `List item` (propia, heredada o de `For element: List item`): `•` (`bullet`), `–` (`dash`), ninguno (`none`), o el número del
-ítem con un punto: `3.`, `c.`, `C.`, `iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido. Con
+ítem con su sufijo: `3.`, `c.`, `C.`, `iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido. Con
 `image`, el marcador es una imagen ([abajo](#marcadores-con-imagen)).
+
+El sufijo es el de `Marker suffix`: un punto (`period`, por defecto) o un paréntesis de cierre (`parenthesis`), que
+escribe `3)`, `c)`, `C)`, `iii)`, `III)`.
+
+```
+List:
+    Marker: lower-alpha
+    Marker suffix: parenthesis
+    List item:
+        Paragraph: Objeto del contrato
+    List item:
+        Paragraph: Duración
+```
+
+- Es de su lista y no de las que tiene dentro: una lista anidada declara el suyo, lo toma de una regla o lleva el punto.
+- En una lista que no numera (`bullet`, `dash`, `none`, `image`) no tiene efecto y es un error
+  (`LIST_SUFFIX_NOT_ALLOWED`), en la línea del `Marker suffix`, venga de la lista o de una regla.
+- No está en `{number of: id}`, que escribe el número sin sufijo ([Referencias](../common/references.md#number-of-id)).
+- Cuenta en el ancho del marcador, como el resto de su texto (`LIST_MARKER_OVERFLOW`, [Posición](#posición)), y un lector
+  de pantalla lo lee con él ([Accesibilidad](#accesibilidad)).
+
+> **Decisión:** el sufijo es una propiedad aparte, `Marker suffix`, y no más valores de `Marker`.
+> *Alternativa descartada:* `lower-alpha-parenthesis` y otros cuatro valores, que duplican las cinco numeraciones por cada
+> sufijo.
+
+> **Decisión:** `Marker suffix` en una lista que no numera es un error, como `First number`, también si viene de una regla:
+> una regla que lo da va con el `Marker` de la numeración, o nombra las listas numeradas por su estilo.
+> *Alternativa descartada:* que no tuviera efecto sin avisar, que deja pasar un `Marker suffix` escrito en la lista
+> equivocada.
 
 > **Decisión:** el marcador es texto en la fuente del ítem, sin círculo hueco ni cuadrado, que IBM Plex Sans no tiene.
 > *Alternativa descartada:* dibujarlos como formas.
@@ -142,5 +172,5 @@ tiene marcador para el lector ([El PDF por dentro](../implementation/pdf.md#list
 
 - Marcadores dentro del ítem, con un estilo propio distinto del ítem o con otro texto.
 - Círculo hueco y cuadrado.
-- Listas en orden inverso y otros sufijos que el punto.
+- Listas en orden inverso, y otros sufijos que el punto y el paréntesis de cierre: `(a)` entre paréntesis, `1:`, `1.-`.
 - Marcadores con imagen en las listas de un `Markdown`.

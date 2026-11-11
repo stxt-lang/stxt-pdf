@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.model.Marker;
+import dev.stxt.pdf.model.MarkerSuffix;
 
 class ListMarkersTest {
 
@@ -31,32 +32,43 @@ class ListMarkersTest {
 
     @Test
     void symbolsEndWithASpace() {
-        assertEquals("• ", ListMarkers.text(Marker.BULLET, 0));
-        assertEquals("– ", ListMarkers.text(Marker.DASH, 0));
-        assertNull(ListMarkers.text(Marker.NONE, 0));
+        assertEquals("• ", ListMarkers.text(Marker.BULLET, MarkerSuffix.PERIOD, 0));
+        assertEquals("– ", ListMarkers.text(Marker.DASH, MarkerSuffix.PERIOD, 0));
+        assertNull(ListMarkers.text(Marker.NONE, MarkerSuffix.PERIOD, 0));
     }
 
     @Test
     void decimal() {
-        assertEquals("0. ", ListMarkers.text(Marker.DECIMAL, 0));
-        assertEquals("12. ", ListMarkers.text(Marker.DECIMAL, 12));
+        assertEquals("0. ", ListMarkers.text(Marker.DECIMAL, MarkerSuffix.PERIOD, 0));
+        assertEquals("12. ", ListMarkers.text(Marker.DECIMAL, MarkerSuffix.PERIOD, 12));
     }
 
     @Test
     void lettersContinueAfterZ() {
-        assertEquals("a. ", ListMarkers.text(Marker.LOWER_ALPHA, 1));
-        assertEquals("z. ", ListMarkers.text(Marker.LOWER_ALPHA, 26));
-        assertEquals("aa. ", ListMarkers.text(Marker.LOWER_ALPHA, 27));
-        assertEquals("AZ. ", ListMarkers.text(Marker.UPPER_ALPHA, 52));
-        assertEquals("BA. ", ListMarkers.text(Marker.UPPER_ALPHA, 53));
+        assertEquals("a. ", ListMarkers.text(Marker.LOWER_ALPHA, MarkerSuffix.PERIOD, 1));
+        assertEquals("z. ", ListMarkers.text(Marker.LOWER_ALPHA, MarkerSuffix.PERIOD, 26));
+        assertEquals("aa. ", ListMarkers.text(Marker.LOWER_ALPHA, MarkerSuffix.PERIOD, 27));
+        assertEquals("AZ. ", ListMarkers.text(Marker.UPPER_ALPHA, MarkerSuffix.PERIOD, 52));
+        assertEquals("BA. ", ListMarkers.text(Marker.UPPER_ALPHA, MarkerSuffix.PERIOD, 53));
+    }
+
+    @Test
+    void theSuffixFollowsTheNumberOfANumbering() {
+        assertEquals("12) ", ListMarkers.text(Marker.DECIMAL, MarkerSuffix.PARENTHESIS, 12));
+        assertEquals("c) ", ListMarkers.text(Marker.LOWER_ALPHA, MarkerSuffix.PARENTHESIS, 3));
+        assertEquals("IV) ", ListMarkers.text(Marker.UPPER_ROMAN, MarkerSuffix.PARENTHESIS, 4));
+        // A symbol has no suffix, and the number of {number of: id} does not carry it.
+        assertEquals("• ", ListMarkers.text(Marker.BULLET, MarkerSuffix.PARENTHESIS, 0));
+        assertNull(ListMarkers.text(Marker.IMAGE, MarkerSuffix.PARENTHESIS, 0));
+        assertEquals("c", ListMarkers.number(Marker.LOWER_ALPHA, 3));
     }
 
     @Test
     void romanNumerals() {
-        assertEquals("iv. ", ListMarkers.text(Marker.LOWER_ROMAN, 4));
-        assertEquals("xiv. ", ListMarkers.text(Marker.LOWER_ROMAN, 14));
-        assertEquals("MCMXCIV. ", ListMarkers.text(Marker.UPPER_ROMAN, 1994));
-        assertEquals("MMMCMXCIX. ", ListMarkers.text(Marker.UPPER_ROMAN, 3999));
+        assertEquals("iv. ", ListMarkers.text(Marker.LOWER_ROMAN, MarkerSuffix.PERIOD, 4));
+        assertEquals("xiv. ", ListMarkers.text(Marker.LOWER_ROMAN, MarkerSuffix.PERIOD, 14));
+        assertEquals("MCMXCIV. ", ListMarkers.text(Marker.UPPER_ROMAN, MarkerSuffix.PERIOD, 1994));
+        assertEquals("MMMCMXCIX. ", ListMarkers.text(Marker.UPPER_ROMAN, MarkerSuffix.PERIOD, 3999));
     }
 
     @Test

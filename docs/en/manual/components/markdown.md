@@ -69,7 +69,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | `Content` | The Markdown, in a `>>` block. Required |
 | `Bullet markers` | The marker of bulleted lists, one per level: `bullet dash` uses `•` on the first level and `–` on the following ones. Required if there are bulleted lists |
-| `Number markers` | The same for numbered lists: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Required if there are numbered lists |
+| `Number markers` | The same for numbered lists: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Required if there are numbered lists. A list written with `1)` has a parenthesis instead of a period: `1)`, `a)` |
 | `Table column sizes` | The columns of the tables: `equal` (all the same) or `auto` (according to their content). Required if there are tables |
 
 `Bullet markers`, `Number markers` and `Table column sizes` can also go once for the whole document, in a

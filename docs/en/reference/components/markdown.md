@@ -75,7 +75,7 @@ as follows:
 | `#` to `######` (and the ones underlined with `===` and `---`) | `Heading 1` to `Heading 6`, with a `Text`, and with `{#id}` at the end of the text (`## Sales {#sales}`), its `Id` |
 | Paragraph | `Paragraph` |
 | `-`, `*`, `+` | `List` with the `Marker` of `Bullet markers` for its level, with one `List item` per item |
-| `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level and `First number`, the first number if it is not 1 |
+| `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level, `First number`, the first number if it is not 1, and, written with `1)`, `Marker suffix: parenthesis` ([Lists](#lists)) |
 | Table | `Table` with the `Column sizes` of `Table column sizes`, with the header row in `Header rows` and the rest in `Body rows` |
 | `**x**`, `__x__` | bold run ([Text formatting](../common/text-formatting.md#runs)) |
 | `*x*`, `_x_` | italic run |
@@ -262,6 +262,16 @@ between items is given by the `Styles` rules. As in any list, the indent that le
 
 > **Decision:** the level is counted by type: a numbered list inside a bulleted one uses the first marker of
 > `Number markers`. *Rejected alternative:* a level shared by the two types.
+
+A list written with `1)` has `Marker suffix: parenthesis`, and its markers, the parenthesis: `1)`, `a)`
+([List](list.md#markers)). One written with `1.` declares no `Marker suffix`: it has that of a rule that applies to it
+(`For element: List` inside `For element: Markdown`) or, without one, the period. CommonMark starts a new list where
+the delimiter changes, so each list has only one.
+
+> **Decision:** the `1)` of the author asks for the parenthesis and `1.` asks for nothing. *Rejected alternative:* that
+> `1.` declared `Marker suffix: period`, which would keep a rule from giving the parenthesis to the lists of a Markdown
+> written with `1.`, the usual form; or a `Number suffixes` property per level, like `Number markers`, which repeats what
+> the author already writes.
 
 ## Tables
 
