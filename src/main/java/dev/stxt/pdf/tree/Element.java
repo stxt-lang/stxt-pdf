@@ -150,7 +150,7 @@ public enum Element {
     /**
      * A block quote of a {@link #MARKDOWN} ({@code > ...}, reference/components/markdown.md): a generated block with
      * what the quote contains. It is not written in the document, but the {@code For element} rules name it
-     * ({@code Block quote}) to change its default look.
+     * ({@code Block quote}) to give it its look: it has none by default.
      */
     BLOCK_QUOTE("Block quote", Layout.BLOCK),
     /**

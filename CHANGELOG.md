@@ -12,9 +12,9 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - **Block quotes and horizontal rules in a `Markdown`**: `> ...` and `---`, `***` or `___`, which were
   `MARKDOWN_UNSUPPORTED`, are translated into two generated elements, **`Block quote`** and **`Divider`**. Like
   `Code block`, they are not written in the document and the `For element` rules name them. A quote is a block with
-  what it contains (paragraphs, lists, tables, code, another quote), with a left `Border` of 2 and a left `Padding`
-  of 12 by default; a divider is an empty block with a top `Border` of 0.5 across the whole width. Their rule replaces
-  that look property by property, and it goes loose or nested in the rule of an element. A heading inside a quote is
+  what it contains (paragraphs, lists, tables, code, another quote), with no look of its own, like a heading: its
+  rule gives it its indent, its line or its background. A divider is an empty block with a top `Border` of 0.5 across
+  the whole width, which its rule changes. Their rules go loose or nested in the rule of an element. A heading inside a quote is
   still `MARKDOWN_UNSUPPORTED`, and `For element: Divider` does not allow `Typography`. In the tagged PDF a quote is
   a `BlockQuote` and a divider is an artifact. A text that comes from outside (the data of a template) no longer
   fails because of a line of hyphens. In a text with `Markup: markdown`, `>` and `---` are still text. "Block quotes

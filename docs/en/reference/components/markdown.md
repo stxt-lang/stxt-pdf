@@ -204,16 +204,18 @@ Markdown:
 A block quote (`> ...`) and a horizontal rule (`---`, `***` or `___`) are two **generated elements**: they are not
 written in the document and have no `Id` or `Style`, and the `For element` rules name them, like `Code block`.
 
-| Element | What it is | Default look | Its rule allows |
+| Element | What it is | Without a rule | Its rule allows |
 |---|---|---|---|
-| `Block quote` | a block with what the quote contains | left `Padding` of 12 and left `Border` of 2, in the color of the text | `Box`, `Typography`, `Break` |
-| `Divider` | an empty block whose top border is the line | top `Border` of 0.5, in the color of the text, across the whole width | `Box`, `Break` |
+| `Block quote` | a block with what the quote contains | a block with no border, padding or background | `Box`, `Typography`, `Break` |
+| `Divider` | an empty block whose top border is the line | a line of 0.5 (its top `Border`), in the color of the text, across the whole width | `Box`, `Break` |
 
 - **The content of a quote** is translated like the rest: paragraphs, lists, tables, code and another quote inside. A
   heading inside a quote is `MARKDOWN_UNSUPPORTED`, as inside a list, and a quote without content (`>` alone),
   `TEXT_CONTENT`.
-- **The default look** is replaced by the rule property by property: a `Padding` in the rule removes the one of 12 and
-  leaves the border, and `Border: 0` leaves the quote without its line.
+- **Look.** A quote has no default look, like the rest of what a `Markdown` generates: without a rule it looks like
+  the paragraphs it contains, and `For element: Block quote` gives it its indent, its line or its background, as in
+  the example. The line of a `Divider` is what the element is: its rule changes its thickness (`Border`), its color
+  (`Border color`) and its spacing (`Margin`).
 - **Spacing.** Neither the quote nor the line has margins of its own: what separates them from what is above and below
   is what separates the blocks of the `Markdown` (the `Margin` of `For element: Paragraph`), or a `Margin` in their
   rule.
@@ -231,9 +233,12 @@ written in the document and have no `Id` or `Style`, and the `For element` rules
 > *Rejected alternative:* translating them into an anonymous `Block`, which could not be styled, and `Rule` for the
 > line, which in the API is already the name of the lines of the merged borders (`fragment.Rule`).
 
-> **Decision:** both have a default look, like the footnote area: without it, a quote would not be told apart from a
-> paragraph and a line would not be seen. *Rejected alternative:* requiring their rule, like the `Padding` of the
-> lists, which would make a text that comes from outside fail because of a line of hyphens.
+> **Decision:** a quote has no default look, like a heading or a list: its rule gives it one, and in the tagged PDF it
+> is a quote even if it looks like a paragraph. The line of a `Divider` does have a thickness without a rule, like
+> the rule of the footnote area: it is what the element is, and without it there would be nothing. *Rejected
+> alternative:* a default indent and line in the quote, which would be the only style the engine gives to content,
+> and requiring the rule of the `Divider`, which would make a text that comes from outside fail because of a line of
+> hyphens.
 
 ## Lists
 

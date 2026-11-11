@@ -312,21 +312,10 @@ enum ElementReader {
     },
 
     /**
-     * The block quote of a {@code Markdown} (reference/components/markdown.md): a block with a default look, a line
-     * on its left and its content set in from it, which a {@code For element: Block quote} rule changes property by
-     * property.
-     */
-    BLOCK_QUOTE {
-        @Override
-        void defaults(Style s) {
-            s.box().setPadding(new Sides<>(Value.pt(0), Value.pt(0), Value.pt(0), Value.pt(QUOTE_PADDING)));
-            s.box().setBorder(new Sides<>(Value.pt(0), Value.pt(0), Value.pt(0), Value.pt(QUOTE_BORDER)));
-        }
-    },
-
-    /**
      * The horizontal rule of a {@code Markdown} (reference/components/markdown.md): an empty block whose top border is
-     * the line, which a {@code For element: Divider} rule changes.
+     * the line, which a {@code For element: Divider} rule changes. The line is what the element is, so it has a
+     * thickness by default; the block quote of a {@code Markdown}, like the rest of what it generates, has no look of
+     * its own and is a {@link #CONTAINER}.
      */
     DIVIDER {
         @Override
@@ -338,10 +327,6 @@ enum ElementReader {
     /** The rest: {@code Block}, the headings, {@code List item}, the positioned boxes..., with their children. */
     CONTAINER;
 
-    /** Left padding of a block quote of a {@code Markdown}, by default, in points. */
-    static final double QUOTE_PADDING = 12;
-    /** Thickness of the line on the left of a block quote, by default, in points. */
-    static final double QUOTE_BORDER = 2;
     /** Thickness of the line of a divider of a {@code Markdown}, by default, in points. */
     static final double DIVIDER_BORDER = 0.5;
 
@@ -373,9 +358,6 @@ enum ElementReader {
         if (kind == Element.CODE_BLOCK) {
             return CODE_BLOCK;
         }
-        if (kind == Element.BLOCK_QUOTE) {
-            return BLOCK_QUOTE;
-        }
         if (kind == Element.DIVIDER) {
             return DIVIDER;
         }
@@ -406,7 +388,7 @@ enum ElementReader {
 
     /**
      * The look the engine gives it by default, before inheritance and the rules, which replace it property by
-     * property: that of the block quote and the divider of a {@code Markdown}.
+     * property: the line of the divider of a {@code Markdown}.
      */
     void defaults(Style s) {
     }

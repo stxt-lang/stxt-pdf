@@ -203,16 +203,18 @@ Markdown:
 Una cita (`> ...`) y una línea horizontal (`---`, `***` o `___`) son dos **elementos generados**: no se escriben en
 el documento ni tienen `Id` o `Style`, y los nombran las reglas `For element`, como `Code block`.
 
-| Elemento | Qué es | Aspecto por defecto | Su regla admite |
+| Elemento | Qué es | Sin regla | Su regla admite |
 |---|---|---|---|
-| `Block quote` | un bloque con lo que la cita contiene | `Padding` izquierdo de 12 y `Border` izquierdo de 2, del color del texto | `Box`, `Typography`, `Break` |
-| `Divider` | un bloque vacío cuyo borde superior es la línea | `Border` superior de 0,5, del color del texto, a todo el ancho | `Box`, `Break` |
+| `Block quote` | un bloque con lo que la cita contiene | un bloque sin borde, relleno ni fondo | `Box`, `Typography`, `Break` |
+| `Divider` | un bloque vacío cuyo borde superior es la línea | una línea de 0,5 (su `Border` superior), del color del texto, a todo el ancho | `Box`, `Break` |
 
 - **El contenido de una cita** se traduce como el resto: párrafos, listas, tablas, código y otra cita dentro. Un
   encabezado dentro de una cita es `MARKDOWN_UNSUPPORTED`, como dentro de una lista, y una cita sin contenido (`>`
   solo), `TEXT_CONTENT`.
-- **El aspecto por defecto** lo sustituye la regla propiedad a propiedad: un `Padding` de la regla quita el de 12 y
-  deja el borde, y `Border: 0` deja la cita sin línea.
+- **Aspecto.** Una cita no tiene aspecto por defecto, como el resto de lo que genera un `Markdown`: sin regla se ve
+  como los párrafos que contiene, y `For element: Block quote` le da la sangría, la línea o el fondo, como en el
+  ejemplo. La línea de un `Divider` es lo que el elemento es: su regla cambia su grosor (`Border`), su color
+  (`Border color`) y su separación (`Margin`).
 - **Separación.** Ni la cita ni la línea tienen márgenes propios: las separa de lo de arriba y de lo de abajo lo que
   separa los bloques del `Markdown` (el `Margin` de `For element: Paragraph`), o un `Margin` en su regla.
 - **`Typography`.** La de `For element: Block quote` la hereda lo que la cita contiene. `For element: Divider` no la
@@ -228,9 +230,11 @@ el documento ni tienen `Id` o `Style`, y los nombran las reglas `For element`, c
 > *Alternativa descartada:* traducirlos a un `Block` anónimo, que no se podría estilar, y `Rule` para la línea, que en
 > el API ya es el nombre de las líneas de los bordes fusionados (`fragment.Rule`).
 
-> **Decisión:** los dos tienen un aspecto por defecto, como el área de notas al pie: sin él, una cita no se distinguiría
-> de un párrafo y una línea no se vería. *Alternativa descartada:* exigir su regla, como el `Padding` de las listas,
-> que haría fallar por una línea de guiones un texto que llega de fuera.
+> **Decisión:** una cita no tiene aspecto por defecto, como un encabezado o una lista: se lo da su regla, y en el PDF
+> etiquetado es una cita aunque se vea como un párrafo. La línea de un `Divider` sí tiene un grosor sin regla, como
+> el filete del área de notas al pie: es lo que el elemento es, y sin él no habría nada. *Alternativa descartada:* una
+> sangría y una línea por defecto en la cita, que sería el único estilo que el motor pone a un contenido, y exigir la
+> regla del `Divider`, que haría fallar por una línea de guiones un texto que llega de fuera.
 
 ## Listas
 

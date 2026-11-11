@@ -92,7 +92,7 @@ of the `Markdown` or, once for the whole document, in `For element: Document`, a
 | `` `code` `` | Inline code, with `Code font` |
 | `[text]{name}` | A part with the color or the font of the `For style: name` rule ([Text formatting](../common/text-formatting.md#parts-in-another-color-or-font)) |
 | A code block (between ```` ``` ```` or `~~~`, or indented four spaces) | A preformatted block with `Code font`, styled with `For element: Code block` |
-| `> text` | A block quote: a block with a line on its left, styled with `For element: Block quote` |
+| `> text` | A block quote: a block, to which `For element: Block quote` gives its indent, its line or its background |
 | `---`, `***` or `___` | A horizontal rule, styled with `For element: Divider` |
 | `![alt text](path)`, alone in its paragraph | An `Image` |
 | `![alt text](path)`, inside a paragraph | A small image in the sentence, as tall as the letters ([Text formatting](../common/text-formatting.md#images-in-the-sentence)) |
@@ -105,7 +105,7 @@ links with a title, or the language tag of a code block (there is no highlightin
 
 What a `Markdown` generates has no `Style`, and no `Id` except headings with `{#id}`: it is styled with the `For element`
 rules of `Styles` (`For element: Heading 1`, `For element: Paragraph`, `For element: List`, `For element: Code block`),
-which apply to the whole document, and with the `Typography` of the `Markdown`. Only the block quotes and the horizontal rules have a default look, which their rule changes. The rest does not: without
+which apply to the whole document, and with the `Typography` of the `Markdown`. Nothing has a default style, except the line of `---`, which is 0.5 thick: a block quote without `For element: Block quote` looks like a paragraph, and without
 `For element: List` with a left `Padding`, the lists have no room for the marker.
 
 ## Things to keep in mind

@@ -1,6 +1,6 @@
 # The generated elements have no Id and are not in this dump: what they measure is in what contains them.
-# m1 at y = 20: "Antes." (12); the quote at 32, 12 high, with its paragraph after the line of 2 and the padding of
-#   12, at x = 34 and 246 wide; the divider at 44, 0.5 high (its top border); "Después." at 44.5. m1 is 36.5 high.
+# m1 at y = 20: "Antes." (12); the quote at 32, 12 high, with its paragraph at x = 20 and 260 wide, like the others;
+#   the divider at 44, 0.5 high (its top border); "Después." at 44.5. m1 is 36.5 high.
 # b2 at y = 66.5, after its margin of 10. The outer quote has a padding of 4 and no border: its paragraph at
 #   (24, 70.5), 252 wide; the inner quote at 82.5, 20 high (4 + 12 + 4), with its paragraph at (28, 86.5), 244 wide;
 #   the outer one is 4 + 12 + 20 + 4 = 40 high and ends at 106.5. The divider, after its margin of 4, at 110.5 and 2

@@ -1,8 +1,8 @@
 # Block quotes and dividers of a Markdown (reference/components/markdown.md#block-quotes-and-dividers). Page area of
 # 260 × 160 from (20, 20); the lines of text are 12 high.
 #
-# m1, with the default look: the quote has a line of 2 on its left and a padding of 12, so its paragraph starts at
-#   x = 34 and is 246 wide; the divider is a line of 0.5 across the whole width, with nothing above or below it.
+# m1, without rules: the quote has no look of its own, and its paragraph goes like the ones around it; the divider is
+#   a line of 0.5 across the whole width, with nothing above or below it.
 # m2, inside a Block with Style: custom, whose nested rules change both: the quote has a background, a padding of 4
 #   and no line, and holds a paragraph and another quote, which takes the same rule; the divider is a line of 2 with a
 #   margin of 4 above and below.

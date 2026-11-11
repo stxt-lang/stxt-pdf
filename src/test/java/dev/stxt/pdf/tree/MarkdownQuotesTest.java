@@ -15,8 +15,8 @@ import dev.stxt.pdf.model.Value;
 
 /**
  * The block quotes ({@code > ...}) and the horizontal rules ({@code ---}) of a {@code Markdown} in the box tree
- * (reference/components/markdown.md): the generated elements {@code Block quote} and {@code Divider}, their default
- * look and the rules that change it.
+ * (reference/components/markdown.md): the generated elements {@code Block quote} and {@code Divider}, the line the
+ * divider has by default and the rules that give them their look.
  */
 class MarkdownQuotesTest {
 
@@ -64,10 +64,11 @@ class MarkdownQuotesTest {
     }
 
     @Test
-    void aBlockQuoteHasALineOnItsLeftByDefault() {
+    void aBlockQuoteHasNoLookOfItsOwn() {
+        // Like a heading or a list: without its rule it is a block with nothing around its content.
         Box quote = markdown("> Una cita").get(0);
-        assertEquals(sides(0, 0, 0, ElementReader.QUOTE_PADDING), quote.style().box().padding());
-        assertEquals(sides(0, 0, 0, ElementReader.QUOTE_BORDER), quote.style().box().border());
+        assertEquals(sides(0, 0, 0, 0), quote.style().box().padding());
+        assertEquals(sides(0, 0, 0, 0), quote.style().box().border());
     }
 
     @Test
@@ -110,15 +111,15 @@ class MarkdownQuotesTest {
     }
 
     @Test
-    void aRuleChangesTheirLookPropertyByProperty() {
+    void aRuleGivesTheQuoteItsLookAndChangesTheLineOfTheDivider() {
         List<Box> md = markdown(List.of("\tStyles:", "\t\tFor element: Block quote", "\t\t\tBox:",
                         "\t\t\t\tPadding: 4 8", "\t\t\t\tBackground: #F4F2EC", "\t\t\tTypography:", "\t\t\t\tItalic: true",
                         "\t\tFor element: Divider", "\t\t\tBox:", "\t\t\t\tBorder: 2 0 0 0", "\t\t\t\tMargin: 6 0"),
                 "> Una cita", "", "---");
         Box quote = md.get(0);
-        // The Padding of the rule replaces the default one; the Border, which the rule does not give, stays.
+        // The quote has what its rule gives it and nothing else.
         assertEquals(sides(4, 8, 4, 8), quote.style().box().padding());
-        assertEquals(sides(0, 0, 0, ElementReader.QUOTE_BORDER), quote.style().box().border());
+        assertEquals(sides(0, 0, 0, 0), quote.style().box().border());
         // The Typography of the quote is inherited by what it contains.
         assertEquals(dev.stxt.pdf.model.FontStyle.ITALIC, quote.children().get(0).style().typography().fontStyle());
         Box divider = md.get(1);
@@ -130,16 +131,16 @@ class MarkdownQuotesTest {
     void theRuleOfABlockDoesNotReachThem() {
         List<Box> md = markdown(List.of("\tStyles:", "\t\tFor element: Block", "\t\t\tBox:", "\t\t\t\tPadding: 30"),
                 "> Una cita", "", "---");
-        assertEquals(sides(0, 0, 0, ElementReader.QUOTE_PADDING), md.get(0).style().box().padding());
+        assertEquals(sides(0, 0, 0, 0), md.get(0).style().box().padding());
         assertEquals(sides(0, 0, 0, 0), md.get(1).style().box().padding());
     }
 
     @Test
     void aNestedRuleReachesThemInsideTheirMarkdown() {
         List<Box> md = markdown(List.of("\tStyles:", "\t\tFor element: Markdown", "\t\t\tFor element: Block quote",
-                "\t\t\t\tBox:", "\t\t\t\t\tBorder: 0", "\t\t\tFor element: Divider", "\t\t\t\tBox:",
+                "\t\t\t\tBox:", "\t\t\t\t\tBorder: 0 0 0 3", "\t\t\tFor element: Divider", "\t\t\t\tBox:",
                 "\t\t\t\t\tBorder: 1 0 0 0"), "> Una cita", "", "---");
-        assertEquals(sides(0, 0, 0, 0), md.get(0).style().box().border());
+        assertEquals(sides(0, 0, 0, 3), md.get(0).style().box().border());
         assertEquals(sides(1, 0, 0, 0), md.get(1).style().box().border());
     }
 

@@ -23,8 +23,21 @@ class MarkdownQuotesLayoutTest {
     }
 
     @Test
-    void aBlockQuoteSetsItsContentInFromItsLine() {
+    void aBlockQuoteWithoutARuleIsABlockWithNothingAroundItsContent() {
         Fragment md = layOut("\tMarkdown:", "\t\tId: M", "\t\tContent >>", "\t\t\tAntes.", "", "\t\t\t> Una cita.",
+                "", "\t\t\tDespués.").fragment("M");
+        Fragment quote = md.children().get(1);
+        assertEquals(Element.BLOCK_QUOTE, quote.box().element());
+        assertBox(0, 12, 515, 12, quote);
+        assertEquals(Insets.ZERO, quote.border());
+        assertEquals(Insets.ZERO, quote.padding());
+        assertBox(0, 0, 515, 12, quote.children().get(0));
+    }
+
+    @Test
+    void theRuleOfABlockQuoteSetsItsContentInFromItsLine() {
+        Fragment md = layOut("\tStyles:", "\t\tFor element: Block quote", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 12",
+                "\t\t\t\tBorder: 0 0 0 2", "\tMarkdown:", "\t\tId: M", "\t\tContent >>", "\t\t\tAntes.", "", "\t\t\t> Una cita.",
                 "", "\t\t\tDespués.").fragment("M");
         Fragment quote = md.children().get(1);
         assertEquals(Element.BLOCK_QUOTE, quote.box().element());
