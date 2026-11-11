@@ -4,7 +4,7 @@
 already paginated result and gives an error with the first of these
 situations:
 
-- **a word wider than its line, or a line of a text with `Preformatted: true` wider than its box**
+- **a word wider than its line, or a line of a text with `Preformatted: keep` wider than its box**
   (`TEXT_OVERFLOW`), at the line of the document where the word is. A word is here what cannot be split: each part
   between its break points ([Typography](typography.md#hyphenation-hyphenate)) and, with `Break long words`, a
   single character;

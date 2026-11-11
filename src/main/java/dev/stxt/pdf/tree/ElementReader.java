@@ -633,7 +633,7 @@ enum ElementReader {
                 throw error(line, ErrorCode.TEXT_BLANK_LINE, paragraph
                         ? "A Paragraph is a single paragraph: the blank line is not needed, or each one goes in its own Paragraph"
                         : "A Text has no paragraphs: the blank line is not needed, or each paragraph goes in its own "
-                        + "Paragraph (in a Block if they go together). In preformatted text (Preformatted: true) it is allowed");
+                        + "Paragraph (in a Block if they go together). In preformatted text (Preformatted: keep) it is allowed");
             }
         }
         box.setText(source.getText(), source.getLine(), source instanceof TextNode);

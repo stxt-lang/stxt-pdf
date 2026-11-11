@@ -229,7 +229,7 @@ que los del reparto en orden.
 
 ## Texto
 
-`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `Preformatted: true` o `wrap`, con `PreformattedText`.
+`InlineLayout` reparte el texto con `LineBreaker` (voraz o Knuth-Plass) o, con `Preformatted: keep` o `wrap`, con `PreformattedText`.
 El reparto va en cuatro piezas de `layout.inline`: `Words` parte el texto en palabras con sus puntos de corte,
 `Paragraph` las mide y da las posiciones donde puede acabar una línea, `LineBreaker` elige entre ellas con uno de los dos
 algoritmos y `LinePlacer` coloca cada línea en la caja de contenido (alineación, `justify` y las medidas de los tramos).
@@ -316,7 +316,9 @@ posición entre cada dos caracteres (`BreakIterator` de caracteres, que no separ
 parte que, como línea propia, no cabe en él; una palabra entera que cabe ni se mira. La primera parte de la primera
 palabra se mide contra ese ancho menos la `First line indent` positiva de la caja, se reparta el texto desde donde
 se reparta, para que las posiciones sean siempre las mismas. Los dos repartos siguen
-eligiendo entre posiciones. El voraz prueba las de la palabra que no cabe de la primera en adelante y se queda con la
+eligiendo entre posiciones, con una condición: una línea solo acaba en un corte de último recurso si empieza dentro
+de su parte larga, en su principio o en un corte anterior (`Paragraph.reaches`), y así la parte empieza en una línea
+propia. Eso es `new-line`; con `same-line` la condición no se aplica. El voraz prueba las de la palabra que no cabe de la primera en adelante y se queda con la
 última que cabe; deja de probar cuando la línea pasa del ancho disponible en más del cuerpo (`hyphenMargin`: lo que
 un guion añadido puede hacer que una posición anterior mida más que una posterior), así que una palabra de miles de
 caracteres cuesta por línea lo que la línea alcanza. Knuth-Plass cobra la penalización de un guion a toda línea que
@@ -340,8 +342,8 @@ justifica. El ancho natural del texto es el de su línea más ancha entre saltos
 
 > **Decisión:** los cortes de `Break long words` son posiciones de `Paragraph`, calculadas con el ancho de la caja al
 > medir el texto, y no un paso aparte tras el reparto: así los dos repartos, las cajas laterales y `Overflow: shrink`
-> los tratan sin saber de ellos. *Alternativa descartada:* partir después las líneas que desbordan, que no deja al
-> reparto llenar la línea en curso ni a Knuth-Plass contar con el corte.
+> los tratan sin saber de ellos. *Alternativa descartada:* partir después las líneas que desbordan, que no deja a
+> Knuth-Plass contar con el corte ni a las palabras siguientes continuar en la línea del último trozo.
 
 > **Decisión:** los dos repartos comparten las posiciones y las sumas de `Paragraph`, en lugar de un reparto por
 > átomos (partes de palabra) con sumas de prefijos: con ligaduras una palabra entera no mide lo que suman sus partes,

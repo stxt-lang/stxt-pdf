@@ -47,6 +47,23 @@ class ListLayoutTest {
     }
 
     @Test
+    void theMarkerDoesNotTakeTheFirstLineIndentItsItemInherits() {
+        // The text of the item is indented; its marker stays where it is without the indent.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
+                "\t\tTypography:", "\t\t\tFirst line indent: 30",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno", "\t\t\t\tId: T"));
+        assertRect(f.marker("A"), 45, 40, 15, 12);
+        assertEquals(30, f.fragment("T").lines().get(0).x(), 1e-9);
+        // A hanging indent in the padding of the text is not checked against the marker, which has no padding.
+        f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal",
+                "\t\tTypography:", "\t\t\tFirst line indent: -10",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno", "\t\t\t\tId: T",
+                "\t\t\t\tBox:", "\t\t\t\t\tPadding: 0 0 0 10"));
+        assertRect(f.marker("A"), 45, 40, 15, 12);
+        assertEquals(-10, f.fragment("T").lines().get(0).x(), 1e-9);
+    }
+
+    @Test
     void markersOfDifferentWidthAlignRight() {
         LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: decimal", "\t\tFirst number: 9",
                 "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Nueve",

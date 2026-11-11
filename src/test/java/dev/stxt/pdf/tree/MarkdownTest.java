@@ -104,7 +104,7 @@ class MarkdownTest {
         Box code = md.children().get(1);
         assertEquals(Element.CODE_BLOCK, code.element());
         assertEquals("a  b\n  c", code.text());
-        assertEquals(Preformatted.TRUE, code.style().typography().preformatted());
+        assertEquals(Preformatted.KEEP, code.style().typography().preformatted());
         assertEquals("IBM Plex Mono", code.style().typography().font());
     }
 
@@ -153,16 +153,16 @@ class MarkdownTest {
         assertEquals(8, code.style().typography().fontSize(), 1e-9);
         assertEquals(new Paint.Solid("#EEEEEE"), code.style().box().background());
         assertEquals(Sides.all(Value.pt(6)), code.style().box().padding());
-        assertEquals(Preformatted.TRUE, code.style().typography().preformatted());
+        assertEquals(Preformatted.KEEP, code.style().typography().preformatted());
         assertEquals("IBM Plex Mono", code.style().typography().font());
         // And the Text of the heading does not receive what belongs to the code block.
         assertNull(title.style().box().background());
     }
 
-    /** A {@code Text} written by hand with {@code Preformatted: true} is still a {@code Text}. */
+    /** A {@code Text} written by hand with {@code Preformatted: keep} is still a {@code Text}. */
     @Test
     void aWrittenPreformattedTextIsNotACodeBlock() {
-        Box root = build("\tText:", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\tContent >>", "\t\t\ta  b");
+        Box root = build("\tText:", "\t\tTypography:", "\t\t\tPreformatted: keep", "\t\tContent >>", "\t\t\ta  b");
         assertEquals(Element.TEXT, root.children().get(0).element());
     }
 }

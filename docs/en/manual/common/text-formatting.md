@@ -149,7 +149,7 @@ letter is its own. With `Ligatures: true` those of the font are used (IBM Plex S
 
 ## Preformatted text
 
-For code, terminal output or columns aligned with spaces. With `Preformatted: true`, the text **keeps its spaces and its
+For code, terminal output or columns aligned with spaces. With `Preformatted: keep`, the text **keeps its spaces and its
 line breaks**: each written line is a line in the PDF, including empty ones. With `Preformatted: wrap`, in addition, a
 line that is too long is broken between words. The usual approach is to use a monospaced font and write the text in a
 `Content >>`:
@@ -159,14 +159,14 @@ Text:
     Typography:
         Font: IBM Plex Mono
         Size: 9
-        Preformatted: true
+        Preformatted: keep
     Content >>
         $ thermostat --status
         temperature   21.5 °C
         setpoint      22.0 °C
 ```
 
-- With `Preformatted: true`, a line wider than the box is an error. It has to be shortened, or `Preformatted: wrap` used.
+- With `Preformatted: keep`, a line wider than the box is an error. It has to be shortened, or `Preformatted: wrap` used.
 - `Tab size` (4 by default) is the number of columns of a tab: each tab moves to the next column that is a multiple of
   `Tab size`, as in an editor.
 - Preformatted lines are not justified.

@@ -34,7 +34,7 @@ Styles:
 | `Color` | color | `#000000` | The color of the text |
 | `Line breaking` | `simple`, `optimal` | `simple` | How the text is broken into lines |
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
-| `Break long words` | `true`, `false` | `false` | Whether a word that does not fit in a whole line is cut, with no hyphen ([below](#long-words)) |
+| `Break long words` | `never`, `new-line`, `same-line` | `never` | Whether a word that does not fit in a whole line is cut, with no hyphen, and where it starts ([below](#long-words)) |
 | `First line indent` | length | `0` | How much the first line of each paragraph is indented ([below](#first-line-indent)) |
 | `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
@@ -149,15 +149,18 @@ written as the non-breaking hyphen (U+2011).
 ## Long words
 
 An IBAN, an email address or a URL have no place to be split at, and they do not fit in a narrow cell: they are an
-error. With `Break long words: true`, a word wider than a whole line of its box is cut at the last letter that
-fits, with no hyphen, and goes on in the next line:
+error. With `Break long words: new-line`, a word wider than a whole line of its box starts a line of its own, is cut
+at the last letter that fits, with no hyphen, and goes on in the next line:
 
 ```
 Styles:
     For element: Cell
         Typography:
-            Break long words: true
+            Break long words: new-line
 ```
+
+With `same-line`, the word does not start a line of its own: it follows the words before it and is cut where that
+line ends, leaving no short line before it. `never`, the default, does not cut it.
 
 Only what fits in no other way is cut: a word that fits in a line of its own goes whole to the next line, and one
 that has hyphens is split at them first. The text that is copied from the PDF is the whole word. It has no effect

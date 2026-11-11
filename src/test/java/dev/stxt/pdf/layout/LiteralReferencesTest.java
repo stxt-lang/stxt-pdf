@@ -50,7 +50,7 @@ class LiteralReferencesTest {
     @Test
     void itIsTheSameInPreformattedTextAndInACell() {
         LayoutFixture l = layOut(
-                "\tText:", "\t\tId: P", "\t\tTypography:", "\t\t\tPreformatted: true",
+                "\tText:", "\t\tId: P", "\t\tTypography:", "\t\t\tPreformatted: keep",
                 "\t\tContent >>", "\t\t\tuno {{page}}", "\t\t\t  dos {page}",
                 "\tTable:", "\t\tColumn sizes: *", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: {{pages}} y {pages}",
                 "\t\t\t\t\tId: C");

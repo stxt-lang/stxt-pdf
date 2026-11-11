@@ -16,4 +16,4 @@ Document (dev.stxt.pdf):
 		Paragraph: Hola
 			Drop cap: 3
 			Typography:
-				Preformatted: true
+				Preformatted: keep

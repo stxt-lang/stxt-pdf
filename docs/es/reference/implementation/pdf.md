@@ -87,7 +87,7 @@ Un elemento con `Case` o `Small caps` lleva `ActualText` con el texto escrito, p
 
 Una línea de texto normal que no es la última de su caja (o de su fragmento) acaba con un espacio invisible tras la última
 palabra: el corte de línea se come el espacio, y sin él quien une el texto de las líneas (un lector de pantalla, la
-extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `Preformatted: true`
+extracción, la búsqueda) pegaría las palabras. No cambia el ancho de la línea ni el layout. El texto de `Preformatted: keep`
 y `wrap` no lo lleva: sus líneas son líneas. Tampoco la primera línea de un `Paragraph` con `Drop cap`: la capitular es la
 primera letra de la palabra con que empieza la línea siguiente.
 

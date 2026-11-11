@@ -21,7 +21,7 @@ import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
 /**
- * {@code Preformatted: true} and {@code wrap} and {@code Tab size} (reference/common/text-formatting.md). With
+ * {@code Preformatted: keep} and {@code wrap} and {@code Tab size} (reference/common/text-formatting.md). With
  * {@link FixedMetrics}, each character measures 5 pt with {@code Size: 10}, and each line, 12.
  */
 class PreformattedTextTest {
@@ -46,7 +46,7 @@ class PreformattedTextTest {
 
     @Test
     void spacesAndLineBreaksAreKept() {
-        assertEquals(List.of("a  b", "  c   d", "e"), lines(100, List.of("Preformatted: true"), "a  b", "  c   d", "e"));
+        assertEquals(List.of("a  b", "  c   d", "e"), lines(100, List.of("Preformatted: keep"), "a  b", "  c   d", "e"));
     }
 
     @Test
@@ -56,7 +56,7 @@ class PreformattedTextTest {
 
     @Test
     void blankLinesAreLinesAndDoNotSeparateParagraphs() {
-        LayoutFixture l = layOut(text(100, List.of("Preformatted: true"), "a", "", "b").toArray(String[]::new));
+        LayoutFixture l = layOut(text(100, List.of("Preformatted: keep"), "a", "", "b").toArray(String[]::new));
         assertEquals(List.of("a", "", "b"), l.fragment("T").lines().stream().map(TextLine::text).toList());
         assertEquals(36, l.rect("T").height(), 1e-9);
     }
@@ -64,19 +64,19 @@ class PreformattedTextTest {
     @Test
     void tabsGoToTheNextTabStop() {
         assertEquals(List.of("a   b", "abcd    e", "ab  c"),
-                lines(100, List.of("Preformatted: true"), "a\tb", "abcd\te", "ab\tc"));
+                lines(100, List.of("Preformatted: keep"), "a\tb", "abcd\te", "ab\tc"));
     }
 
     @Test
     void tabSizeSetsTheTabStops() {
         assertEquals(List.of("a" + " ".repeat(7) + "b"),
-                lines(100, List.of("Preformatted: true", "Tab size: 8"), "a\tb"));
+                lines(100, List.of("Preformatted: keep", "Tab size: 8"), "a\tb"));
     }
 
     @Test
     void aForcedLineBreakEndsTheLine() {
         // Written as it is (U+2028) in the text, with true and with wrap.
-        for (String mode : List.of("true", "wrap")) {
+        for (String mode : List.of("keep", "wrap")) {
             assertEquals(List.of("ab  c", "d"), lines(100, List.of("Preformatted: " + mode),
                     "ab  c" + TextRun.LINE_SEPARATOR + "d"), mode);
         }
@@ -86,7 +86,7 @@ class PreformattedTextTest {
     void theLineBreakOfAMarkdownEndsTheLine() {
         // The text is read as Markdown first: its forced line break (a backslash at the end of the line) reaches the
         // preformatted text as U+2028.
-        assertEquals(List.of("ab", "cd"), lines(100, List.of("Preformatted: true", "Markup: markdown"), "ab\\", "cd"));
+        assertEquals(List.of("ab", "cd"), lines(100, List.of("Preformatted: keep", "Markup: markdown"), "ab\\", "cd"));
     }
 
     @Test
@@ -117,8 +117,8 @@ class PreformattedTextTest {
     void preformattedLinesAreNeverJustified() {
         // With true the lines fit in the box; with wrap the first one is a broken line, which without preformatting
         // would be justified.
-        for (String mode : List.of("true", "wrap")) {
-            List<TextLine> lines = layOut(text(mode.equals("true") ? 200 : 100, List.of("Preformatted: " + mode,
+        for (String mode : List.of("keep", "wrap")) {
+            List<TextLine> lines = layOut(text(mode.equals("keep") ? 200 : 100, List.of("Preformatted: " + mode,
                     "Align: justify"), "aaaa bbbb cccc dddd eeee", "ff gg").toArray(String[]::new)).fragment("T").lines();
             assertEquals(0, lines.get(0).wordSpacing(), 1e-9, mode);
             assertEquals(0, lines.get(0).x(), 1e-9, mode);
@@ -127,7 +127,7 @@ class PreformattedTextTest {
 
     @Test
     void eachLineIsAlignedOnItsOwn() {
-        List<TextLine> lines = layOut(text(100, List.of("Preformatted: true", "Align: right"), "ab", "abcd")
+        List<TextLine> lines = layOut(text(100, List.of("Preformatted: keep", "Align: right"), "ab", "abcd")
                 .toArray(String[]::new)).fragment("T").lines();
         assertEquals(90, lines.get(0).x(), 1e-9);
         assertEquals(80, lines.get(1).x(), 1e-9);
@@ -135,16 +135,16 @@ class PreformattedTextTest {
 
     @Test
     void preformattedAndTabSizeAreInherited() {
-        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\t\tTab size: 2",
+        LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tPreformatted: keep", "\t\t\tTab size: 2",
                 "\t\tText: a\tb", "\t\t\tId: A",
-                "\t\tText: a    b", "\t\t\tId: B", "\t\t\tTypography:", "\t\t\t\tPreformatted: false");
+                "\t\tText: a    b", "\t\t\tId: B", "\t\t\tTypography:", "\t\t\t\tPreformatted: none");
         assertEquals("a b", l.fragment("A").lines().get(0).text());
         assertEquals("a b", l.fragment("B").lines().get(0).text());
     }
 
     @Test
     void widthOfAnEmptyLineIsZeroEvenWithLetterSpacing() {
-        List<TextLine> lines = layOut(text(100, List.of("Preformatted: true", "Letter spacing: 2"), "ab", "", "ab")
+        List<TextLine> lines = layOut(text(100, List.of("Preformatted: keep", "Letter spacing: 2"), "ab", "", "ab")
                 .toArray(String[]::new)).fragment("T").lines();
         assertEquals(0, lines.get(1).width(), 1e-9);
         assertEquals(12, lines.get(0).width(), 1e-9);
@@ -152,13 +152,13 @@ class PreformattedTextTest {
 
     @Test
     void transformStillApplies() {
-        assertEquals(List.of("A  B"), lines(100, List.of("Preformatted: true", "Case: uppercase"), "a  b"));
+        assertEquals(List.of("A  B"), lines(100, List.of("Preformatted: keep", "Case: uppercase"), "a  b"));
     }
 
     @Test
     void anItemWithoutWidthIsAsWideAsItsWidestLine() {
         LayoutFixture l = layOut("\tStack:", "\t\tItem:", "\t\t\tText:", "\t\t\t\tId: T",
-                "\t\t\t\tTypography:", "\t\t\t\t\tPreformatted: true",
+                "\t\t\t\tTypography:", "\t\t\t\t\tPreformatted: keep",
                 "\t\t\t\tContent >>", "\t\t\t\t\tab", "\t\t\t\t\tabcdef  ");
         // The trailing space of a line of a block is removed by the parser: abcdef measures 30.
         assertEquals(30, l.rect("T").width(), 1e-9);
@@ -169,7 +169,7 @@ class PreformattedTextTest {
         // 100 pt of page area: 8 lines fit. With 9, the last one alone would be a widow: 2 move over.
         String[] nine = new String[9];
         Arrays.fill(nine, "x");
-        LayoutFixture l = layOutPaged(180, text(100, List.of("Preformatted: true"), nine).toArray(String[]::new));
+        LayoutFixture l = layOutPaged(180, text(100, List.of("Preformatted: keep"), nine).toArray(String[]::new));
         assertEquals(2, l.pages());
         assertEquals(7, l.fragment(1, "T").lines().size());
         assertEquals(2, l.fragment(2, "T").lines().size());
@@ -227,7 +227,7 @@ class PreformattedTextTest {
     @Test
     void severalTabsInALine() {
         // "a" reaches column 4, "bb" column 6 and the second tab column 8.
-        assertEquals(List.of("a   bb  c"), lines(100, List.of("Preformatted: true"), "a\tbb\tc"));
+        assertEquals(List.of("a   bb  c"), lines(100, List.of("Preformatted: keep"), "a\tbb\tc"));
     }
 
     @Test
@@ -235,7 +235,7 @@ class PreformattedTextTest {
         // pre does not break: its narrowest width is the whole line (45); pre-wrap, the longest word (25).
         LayoutFixture l = layOut(
                 "\tBlock:", "\t\tId: P", "\t\tBox:", "\t\t\tWidth: narrowest",
-                "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tPreformatted: true",
+                "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tPreformatted: keep",
                 "\tBlock:", "\t\tId: W", "\t\tBox:", "\t\t\tWidth: narrowest",
                 "\t\tText: aaa bbbbb", "\t\t\tTypography:", "\t\t\t\tPreformatted: wrap");
         assertEquals(45, l.rect("P").width(), 1e-9);

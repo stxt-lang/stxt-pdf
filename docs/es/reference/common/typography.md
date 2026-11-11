@@ -23,7 +23,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |
 | `Line breaking` | `simple`, `optimal` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Partir palabras con guion al final de la línea, con los patrones del idioma ([Guiones](#guiones-hyphenate)). |
-| `Break long words` | `true`, `false` | `false` | Cortar sin guion la parte de una palabra que no cabe en una línea entera ([Palabras largas](#palabras-largas-break-long-words)). |
+| `Break long words` | `never`, `new-line`, `same-line` | `never` | Cortar sin guion la parte de una palabra que no cabe en una línea entera, y dónde empieza ([Palabras largas](#palabras-largas-break-long-words)). |
 | `First line indent` | medida, sin % | `0` | Sangría de la primera línea del párrafo; puede ser negativa ([Sangría de primera línea](#sangría-de-primera-línea-first-line-indent)). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
@@ -31,8 +31,8 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
 | `Kerning` | `true`, `false` | `false` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
-| `Preformatted` | `false`, `true`, `wrap` | `false` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
-| `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: true` o `wrap`, las columnas de una tabulación. |
+| `Preformatted` | `none`, `keep`, `wrap` | `none` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
+| `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: keep` o `wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). Una `Figure` va numerada salvo que lo declare ella o una regla suya ([Figure](../components/figure.md#numeración)). |
 | `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado, o el de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado, o del pie de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
@@ -54,7 +54,7 @@ Tienen texto `Text`, `Paragraph` y una `Cell` con valor ([Text](../components/te
 Las secuencias de espacios y los saltos de línea simples equivalen a un espacio. Una **línea en blanco** es un error
 (`TEXT_BLANK_LINE`): cada `Text` y cada `Paragraph` es un solo párrafo. Dentro de él, una línea se puede acabar a la
 fuerza con el salto de línea de Markdown, `\` al final de la línea
-([Markdown](../components/markdown.md#saltos-de-línea-forzados)). Con `Preformatted: true` o `wrap` se
+([Markdown](../components/markdown.md#saltos-de-línea-forzados)). Con `Preformatted: keep` o `wrap` se
 conservan los espacios y los saltos de línea, también las líneas en blanco de un `Text`
 ([Formato del texto](text-formatting.md#texto-preformateado)).
 
@@ -134,13 +134,13 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
   Al principio o al final de la palabra es puntuación, como una comilla.
 - **Un guion blando** (U+00AD) escrito en el texto es un punto de corte explícito, con o sin `Hyphenate`: una palabra
   que lo lleva se parte solo ahí, y los patrones no añaden más. No se pinta ni se mide donde la palabra no se parte. En
-  un texto con `Preformatted: true` o `wrap` se descarta.
+  un texto con `Preformatted: keep` o `wrap` se descarta.
 - **Un guion escrito** (`-`, U+002D) con una letra o una cifra a cada lado es un punto de corte, con o sin
   `Hyphenate`: la palabra se parte **detrás de él** y no se añade otro guion (`REF-2026-` y `009812`, `físico-` y
   `químico`). No lo es al principio ni al final de la palabra, ni junto a otro guion o a un signo de puntuación. Las
   partes de una palabra así no se parten por los patrones; si además lleva guiones blandos, valen los dos. El guion
   de no separación (U+2011) no es un punto de corte: es la forma de mantener entera la palabra. No se aplica en un
-  texto con `Preformatted: true` o `wrap`.
+  texto con `Preformatted: keep` o `wrap`.
 - **El guion** es el de la fuente (`-`, U+002D), que tiene que tenerlo (`GLYPH_MISSING`), mide lo que mide en ella y
   se pinta con la fuente y el formato de la letra que lo precede (en negrita si ella lo está; nunca en versalitas).
   Cuenta en el ancho de la línea.
@@ -183,24 +183,35 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
 
 ## Palabras largas (`Break long words`)
 
-Con `Break long words: true`, la parte de una palabra que ya no se puede partir y es **más ancha que una línea entera
-de su caja** se corta por el último carácter que cabe, sin guion, tantas veces como haga falta. Es de `Typography`, se
-hereda y vale `false` por defecto. Es para lo que llega en los datos sin un sitio por donde partirse: un IBAN, una
+Con `Break long words: new-line` o `same-line`, la parte de una palabra que ya no se puede partir y es **más ancha
+que una línea entera de su caja** se corta por el último carácter que cabe, sin guion, tantas veces como haga falta.
+Con `never`, el valor por defecto, no se corta y es un error (`TEXT_OVERFLOW`). Es de `Typography` y se hereda. Es para lo que llega en los datos sin un sitio por donde partirse: un IBAN, una
 dirección de correo, una URL o un identificador en una celda estrecha.
 
 ```stxt
 Styles:
     For element: Cell
         Typography:
-            Break long words: true
+            Break long words: new-line
 ```
+
+Los dos valores que cortan se distinguen en dónde empieza la parte larga. En una línea de diez caracteres,
+`ID ES762077002400` queda:
+
+| Valor | Líneas | |
+|---|---|---|
+| `new-line` | `ID` / `ES76207700` / `2400` | La parte larga empieza en una línea propia, como en un procesador de textos |
+| `same-line` | `ID ES76207` / `7002400` | Empieza en la línea en curso, tras las palabras anteriores |
 
 - **Es el último recurso.** Una palabra que cabe en una línea vacía pasa a la línea siguiente, como sin la propiedad,
   y nunca se corta. Los guiones escritos, los blandos y los patrones de `Hyphenate` van antes: solo se corta la parte
   que, entre dos de esos puntos de corte, sigue sin caber en el ancho de la caja de contenido.
 - **Dónde se corta.** La parte larga puede acabar una línea tras cualquiera de sus caracteres, y la acaba tras el
-  último que cabe. Empieza en la línea en curso, a continuación de las palabras anteriores, si cabe en ella alguno de
-  sus caracteres. Junto a una caja lateral o a una letra capitular se corta al ancho de cada línea.
+  último que cabe. Con `new-line` empieza en una línea propia: las palabras anteriores, y las partes de su palabra
+  que van antes de ella (`REF-`), acaban la línea anterior. Con `same-line` empieza a continuación de ellas, si en
+  su línea cabe alguno de sus caracteres. Con los dos, las palabras siguientes continúan en la línea de su último
+  trozo. Junto a una
+  caja lateral o a una letra capitular se corta al ancho de cada línea.
 - **Un carácter** es lo que se lee como uno: una letra no se separa de sus marcas combinantes, ni las dos mitades de un
   par subrogado entre sí.
 - **Sin guion.** El corte no añade nada, y el texto que se copia o que lee un lector de pantalla es la palabra
@@ -217,11 +228,11 @@ Styles:
 - **Tamaños intrínsecos**: no cambian ([abajo](#tamaños-intrínsecos)).
 - **Con `Overflow: shrink`**, ninguna palabra es ya más ancha que la caja, así que el texto solo encoge si sus líneas
   no caben a lo alto ([Desbordamiento](overflow.md#encoger-el-texto-shrink)).
-- **Con `Preformatted: true` o `wrap`** no tiene efecto: las líneas son las escritas, o se parten solo entre palabras.
+- **Con `Preformatted: keep` o `wrap`** no tiene efecto: las líneas son las escritas, o se parten solo entre palabras.
   Escrito por el propio texto preformateado es un error (`BREAK_LONG_WORDS_IN_PREFORMATTED`); heredado o de una regla
   no se comprueba, como el resto de `Typography` ([Errores](errors.md#lo-que-no-tiene-efecto)).
 
-> **Decisión:** una propiedad, `false` por defecto: cortar una palabra por cualquier letra lo decide el autor.
+> **Decisión:** una propiedad, `never` por defecto: cortar una palabra por cualquier letra lo decide el autor.
 > *Alternativa descartada:* hacerlo siempre, que cambiaría un error por un corte feo sin que nadie lo pida, y un valor
 > más de `Overflow`, que es de la caja y no se hereda.
 
@@ -231,15 +242,16 @@ Styles:
 > que dejar un hueco: su umbral es la línea sangrada. *Alternativa descartada:* cortar toda palabra que no quepa en
 > lo que queda de línea, que partiría palabras corrientes.
 
-> **Decisión:** la parte larga empieza en la línea en curso, tras las palabras anteriores, como una palabra partida
-> con guion. *Alternativa descartada:* empezarla siempre en una línea propia, que deja una línea casi vacía delante
-> de cada dato largo.
+> **Decisión:** dónde empieza la parte larga lo elige el autor con el valor: `new-line`, en una línea propia, como
+> en un procesador de textos y con `overflow-wrap` de CSS, para que el dato empiece siempre en el margen de su caja;
+> `same-line`, en la línea en curso, que no deja una línea corta delante del dato. *Alternativa descartada:* un
+> booleano con una sola de las dos formas: las dos tienen su uso y ninguna es la buena para todo documento.
 
 > **Decisión:** `Break long words` no cambia el ancho más estrecho: una columna `auto` no se encoge hasta una letra
 > por tenerlo, y solo actúa cuando el ancho final no da. *Alternativa descartada:* que el ancho más estrecho fuera el
 > del carácter más ancho, con el que una tabla de columnas `auto` cortaría palabras que caben.
 
-> **Decisión:** en un texto preformateado es un error solo si lo escribe él, con `true` y con `wrap`. *Alternativa
+> **Decisión:** en un texto preformateado es un error solo si lo escribe él, con `Preformatted: keep` y con `wrap`. *Alternativa
 > descartada:* cortar las palabras largas de `wrap`, que ningún documento ha pedido, y el error también cuando se
 > hereda, que alcanzaría a cada bloque de código de un documento que lo declara en `For element: Document`.
 
@@ -269,8 +281,9 @@ Styles:
 ```
 
 - **Dónde se declara.** Se hereda, así que vale para toda caja con texto que la reciba: desde
-  `For element: Document` sangra también los encabezados, las celdas y los marcadores de las listas.
-  `For element: Paragraph` la da solo a los párrafos.
+  `For element: Document` sangra también los encabezados, las celdas y el texto de los ítems de las listas.
+  `For element: Paragraph` la da solo a los párrafos. El marcador de un `List item` no la recibe: queda donde
+  estaría sin ella ([List](../components/list.md#posición)).
 - **Solo la primera línea del párrafo.** No la que sigue a un salto de línea forzado
   ([Markdown](../components/markdown.md#saltos-de-línea-forzados)), ni la primera del fragmento cuando el párrafo
   continúa en otra página o columna.
@@ -287,10 +300,10 @@ Styles:
 - **Con `Drop cap`**, el párrafo no se sangra: la sangría que hereda o recibe de una regla no se le aplica, y su
   primera línea empieza tras la capitular. Una sangría distinta de 0 escrita en el propio párrafo es un error
   (`FIRST_LINE_INDENT_WITH_DROP_CAP`), con la línea del `Drop cap`: las dos mueven el principio del párrafo.
-- **Con `Preformatted: true` o `wrap`** se aplica igual, a la primera línea del texto; con `wrap`, esa línea se
+- **Con `Preformatted: keep` o `wrap`** se aplica igual, a la primera línea del texto; con `wrap`, esa línea se
   parte en lo que deja la sangría.
 - **Lo que no cabe.** Una sangría que no deja sitio a la primera palabra es `TEXT_OVERFLOW`: la palabra no pasa a
-  la línea siguiente. Con `Break long words: true`, esa palabra se corta por el último carácter que cabe tras la
+  la línea siguiente. Con `Break long words: new-line` o `same-line`, esa palabra se corta por el último carácter que cabe tras la
   sangría y sigue en la línea siguiente; si no cabe ni un carácter, es `TEXT_OVERFLOW`.
 - **Tamaños intrínsecos**: el ancho natural suma la sangría a la primera línea, y el más estrecho es el mayor entre
   la palabra más ancha y la primera palabra más la sangría ([abajo](#tamaños-intrínsecos)).
@@ -299,6 +312,11 @@ Styles:
 > `For element: Paragraph` da a los párrafos sin tocar encabezados ni celdas. *Alternativa descartada:* una
 > propiedad de `Paragraph` no heredada, que no serviría para las cláusulas escritas como `Text` ni desde un
 > `Block`.
+
+> **Decisión:** el marcador de un `List item` no recibe la sangría que hereda su ítem: es una etiqueta generada, no
+> un párrafo, y no tiene `Padding` en el que colgar una sangría negativa. *Alternativa descartada:* que la heredara
+> como el resto de la tipografía del ítem, con lo que una sangría francesa declarada sobre una lista sería
+> `FIRST_LINE_INDENT_OVERFLOW` por su marcador.
 
 > **Decisión:** una sangría negativa cabe en el `Padding` izquierdo de su caja, y si no es un error: el texto no
 > sale de su caja. Se comprueba con la caja ya maquetada, como lo que desborda, porque el relleno puede ser un
@@ -373,7 +391,7 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 El ancho más estrecho es la palabra más ancha (si tiene puntos de corte, por `Hyphenate`, por un guion blando o por
 un guion escrito, la más ancha de sus partes, con su guion), y el natural, el párrafo más largo en una sola línea
-(con `Preformatted: true` o `wrap`, ver [Formato del texto](text-formatting.md#tamaños-intrínsecos)).
+(con `Preformatted: keep` o `wrap`, ver [Formato del texto](text-formatting.md#tamaños-intrínsecos)).
 `Break long words` no cambia ninguno de los dos
 ([Palabras largas](#palabras-largas-break-long-words)). Con `First line indent`, el natural suma la sangría a la
 primera línea y el más estrecho es el mayor entre la palabra más ancha y la primera palabra (o su primera parte) más

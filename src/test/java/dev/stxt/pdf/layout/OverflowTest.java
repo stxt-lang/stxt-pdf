@@ -141,8 +141,8 @@ class OverflowTest {
     @Test
     void aPreformattedLineThatDoesNotFit() {
         InvalidModelException e = overflow(ErrorCode.TEXT_OVERFLOW, assertThrows(InvalidModelException.class,
-                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tPreformatted: true")));
-        assertContains("A line of a text with Preformatted: true", e);
+                () -> layOut("\tText: " + "a ".repeat(60), "\t\tTypography:", "\t\t\tPreformatted: keep")));
+        assertContains("A line of a text with Preformatted: keep", e);
         assertContains("the line measures 595 pt and the box leaves 515 pt", e);
     }
 

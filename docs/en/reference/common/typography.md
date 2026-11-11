@@ -23,7 +23,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |
 | `Line breaking` | `simple`, `optimal` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Split words with a hyphen at the end of the line, with the patterns of the language ([Hyphenation](#hyphenation-hyphenate)). |
-| `Break long words` | `true`, `false` | `false` | Cut, with no hyphen, the part of a word that does not fit in a whole line ([Long words](#long-words-break-long-words)). |
+| `Break long words` | `never`, `new-line`, `same-line` | `never` | Cut, with no hyphen, the part of a word that does not fit in a whole line, and where it starts ([Long words](#long-words-break-long-words)). |
 | `First line indent` | length, no % | `0` | Indent of the first line of the paragraph; it can be negative ([First line indent](#first-line-indent-first-line-indent)). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
@@ -31,8 +31,8 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
 | `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
 | `Kerning` | `true`, `false` | `false` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
-| `Preformatted` | `false`, `true`, `wrap` | `false` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
-| `Tab size` | integer ≥ 1 | `4` | With `Preformatted: true` or `wrap`, the columns of a tab. |
+| `Preformatted` | `none`, `keep`, `wrap` | `none` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
+| `Tab size` | integer ≥ 1 | `4` | With `Preformatted: keep` or `wrap`, the columns of a tab. |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). A `Figure` is numbered unless it, or a rule of its own, declares otherwise ([Figure](../components/figure.md#numbering)). |
 | `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How the number of the level of a heading, or that of a figure, is written ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
 | `Number label` | text with `{number}` | the number | What goes in front of the title of a numbered heading, or of the caption of a figure ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
@@ -54,7 +54,7 @@ What has no text ignores what it inherits without an error: a `Block` inherits `
 Sequences of spaces and single line breaks are equivalent to a space. A **blank line** is an error
 (`TEXT_BLANK_LINE`): each `Text` and each `Paragraph` is a single paragraph. Within it, a line can be ended on purpose
 with the Markdown line break, `\` at the end of the line
-([Markdown](../components/markdown.md#forced-line-breaks)). With `Preformatted: true` or `wrap`
+([Markdown](../components/markdown.md#forced-line-breaks)). With `Preformatted: keep` or `wrap`
 spaces and line breaks are kept, including the blank lines of a `Text`
 ([Text formatting](text-formatting.md#preformatted-text)).
 
@@ -136,13 +136,13 @@ by default.
   split. At the start or at the end of the word it is punctuation, like a quotation mark.
 - **A soft hyphen** (U+00AD) written in the text is an explicit break point, with or without `Hyphenate`: a word that
   has one is split only there, and the patterns add no more. It is neither painted nor measured where the word is not
-  split. In a text with `Preformatted: true` or `wrap` it is discarded.
+  split. In a text with `Preformatted: keep` or `wrap` it is discarded.
 - **A written hyphen** (`-`, U+002D) with a letter or a digit on each side is a break point, with or without
   `Hyphenate`: the word is split **after it** and no other hyphen is added (`REF-2026-` and `009812`, `socio-` and
   `economic`). It is not one at the start or at the end of the word, nor beside another hyphen or a punctuation
   mark. The parts of such a word are not split by the patterns; if it also has soft hyphens, both count. The
   non-breaking hyphen (U+2011) is not a break point: it is the way to keep the word whole. It does not apply in a
-  text with `Preformatted: true` or `wrap`.
+  text with `Preformatted: keep` or `wrap`.
 - **The hyphen** is the one of the font (`-`, U+002D), which has to have it (`GLYPH_MISSING`), measures what it
   measures in it and is painted with the font and the format of the letter before it (bold if that letter is bold;
   never in small caps). It counts in the width of the line.
@@ -186,23 +186,34 @@ by default.
 
 ## Long words (`Break long words`)
 
-With `Break long words: true`, the part of a word that cannot be split further and is **wider than a whole line of
-its box** is cut at the last character that fits, with no hyphen, as many times as needed. It belongs to
-`Typography`, it is inherited and it is `false` by default. It is for what arrives in the data with no place to be
+With `Break long words: new-line` or `same-line`, the part of a word that cannot be split further and is **wider
+than a whole line of its box** is cut at the last character that fits, with no hyphen, as many times as needed.
+With `never`, the default, it is not cut and it is an error (`TEXT_OVERFLOW`). It belongs to `Typography` and it is
+inherited. It is for what arrives in the data with no place to be
 split at: an IBAN, an email address, a URL or an identifier in a narrow cell.
 
 ```stxt
 Styles:
     For element: Cell
         Typography:
-            Break long words: true
+            Break long words: new-line
 ```
+
+The two values that cut differ in where the long part starts. In a line of ten characters, `ID ES762077002400`
+becomes:
+
+| Value | Lines | |
+|---|---|---|
+| `new-line` | `ID` / `ES76207700` / `2400` | The long part starts a line of its own, as in a word processor |
+| `same-line` | `ID ES76207` / `7002400` | It starts in the current line, after the words before it |
 
 - **It is the last resort.** A word that fits in an empty line goes to the next line, as without the property, and
   is never cut. Written hyphens, soft hyphens and the patterns of `Hyphenate` come first: only the part that, between
   two of those break points, still does not fit in the width of the content box is cut.
 - **Where it is cut.** The long part may end a line after any of its characters, and ends it after the last one
-  that fits. It starts in the current line, after the words before it, if any of its characters fits there. Beside a
+  that fits. With `new-line` it starts a line of its own: the words before it, and the parts of its word that come
+  before it (`REF-`), end the previous line. With `same-line` it starts after them, if any of its characters fits
+  in their line. With both, the words after it go on in the line of its last piece. Beside a
   side box or a drop cap it is cut at the width of each line.
 - **A character** is what is read as one: a letter is not separated from its combining marks, nor the two halves of
   a surrogate pair from each other.
@@ -220,12 +231,12 @@ Styles:
 - **Intrinsic sizes**: they do not change ([below](#intrinsic-sizes)).
 - **With `Overflow: shrink`**, no word is wider than the box any more, so the text only shrinks if its lines do not
   fit in the height ([Overflow](overflow.md#shrinking-the-text-shrink)).
-- **With `Preformatted: true` or `wrap`** it has no effect: the lines are the ones written, or are broken only
+- **With `Preformatted: keep` or `wrap`** it has no effect: the lines are the ones written, or are broken only
   between words. Written by the preformatted text itself it is an error (`BREAK_LONG_WORDS_IN_PREFORMATTED`);
   inherited or from a rule it is not checked, like the rest of `Typography`
   ([Errors](errors.md#what-has-no-effect)).
 
-> **Decision:** a property, `false` by default: cutting a word at any letter is the author's decision. *Rejected
+> **Decision:** a property, `never` by default: cutting a word at any letter is the author's decision. *Rejected
 > alternative:* doing it always, which would turn an error into an ugly cut nobody asked for, and one more value of
 > `Overflow`, which belongs to the box and is not inherited.
 
@@ -235,16 +246,17 @@ Styles:
 > in: its threshold is the indented line. *Rejected alternative:* cutting every word that does not fit in what is
 > left of the line, which would split ordinary words.
 
-> **Decision:** the long part starts in the current line, after the words before it, like a word split with a
-> hyphen. *Rejected alternative:* always starting it in a line of its own, which leaves an almost empty line before
-> each long piece of data.
+> **Decision:** where the long part starts is chosen by the author with the value: `new-line`, in a line of its
+> own, as in a word processor and with `overflow-wrap` in CSS, so that the data always starts at the edge of its
+> box; `same-line`, in the current line, which leaves no short line before the data. *Rejected alternative:* a
+> boolean with only one of the two: both have their use and neither is right for every document.
 
 > **Decision:** `Break long words` does not change the narrowest width: an `auto` column does not shrink to one
 > letter for having it, and it only acts when the final width is not enough. *Rejected alternative:* the narrowest
 > width being that of the widest character, with which a table of `auto` columns would cut words that fit.
 
-> **Decision:** in a preformatted text it is an error only if the text itself writes it, with `true` and with
-> `wrap`. *Rejected alternative:* cutting the long words of `wrap`, which no document has asked for, and the error
+> **Decision:** in a preformatted text it is an error only if the text itself writes it, with `Preformatted: keep`
+> and with `wrap`. *Rejected alternative:* cutting the long words of `wrap`, which no document has asked for, and the error
 > also when it is inherited, which would reach every code block of a document that declares it in
 > `For element: Document`.
 
@@ -274,8 +286,9 @@ Styles:
 ```
 
 - **Where it is declared.** It is inherited, so it applies to every box with text that gets it: from
-  `For element: Document` it also indents headings, cells and list markers. `For element: Paragraph` gives it only
-  to paragraphs.
+  `For element: Document` it also indents headings, cells and the text of list items. `For element: Paragraph`
+  gives it only to paragraphs. The marker of a `List item` does not get it: it stays where it would be without it
+  ([List](../components/list.md#position)).
 - **Only the first line of the paragraph.** Not the one after a forced line break
   ([Markdown](../components/markdown.md#forced-line-breaks)), nor the first one of the fragment when the paragraph
   goes on in another page or column.
@@ -291,10 +304,10 @@ Styles:
 - **With `Drop cap`**, the paragraph is not indented: the indent it inherits or gets from a rule is not applied to
   it, and its first line starts after the drop cap. An indent other than 0 written in the paragraph itself is an
   error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), at the line of the `Drop cap`: both move the start of the paragraph.
-- **With `Preformatted: true` or `wrap`** it applies the same way, to the first line of the text; with `wrap`,
+- **With `Preformatted: keep` or `wrap`** it applies the same way, to the first line of the text; with `wrap`,
   that line is broken at what the indent leaves.
 - **What does not fit.** An indent that leaves no room for the first word is `TEXT_OVERFLOW`: the word does not go
-  to the next line. With `Break long words: true`, that word is cut at the last character that fits after the
+  to the next line. With `Break long words: new-line` or `same-line`, that word is cut at the last character that fits after the
   indent and goes on in the next line; if not even one character fits, it is `TEXT_OVERFLOW`.
 - **Intrinsic sizes**: the natural width adds the indent to the first line, and the narrowest width is the greater
   of the widest word and the first word plus the indent ([below](#intrinsic-sizes)).
@@ -302,6 +315,11 @@ Styles:
 > **Decision:** a property of `Typography`, inherited like its whole group, which a `For element: Paragraph` rule
 > gives to paragraphs without touching headings or cells. *Rejected alternative:* a property of `Paragraph` that is
 > not inherited, which would not serve the clauses written as `Text` nor work from a `Block`.
+
+> **Decision:** the marker of a `List item` does not get the indent its item inherits: it is a generated label, not
+> a paragraph, and it has no `Padding` for a negative indent to hang in. *Rejected alternative:* inheriting it like
+> the rest of the typography of the item, with which a hanging indent declared over a list would be
+> `FIRST_LINE_INDENT_OVERFLOW` because of its marker.
 
 > **Decision:** a negative indent fits in the left `Padding` of its box, and otherwise it is an error: the text
 > does not leave its box. It is checked on the laid out box, like what overflows, because the padding may be a
@@ -378,7 +396,7 @@ several runs measures the sum of its parts. What is measured is exactly what is 
 
 The narrowest width is the widest word (if it has break points, from `Hyphenate`, from a soft hyphen or from a
 written hyphen, the widest of its parts, with its hyphen), and the natural width, the longest paragraph on a single
-line (with `Preformatted: true` or `wrap`, see [Text formatting](text-formatting.md#intrinsic-sizes)).
+line (with `Preformatted: keep` or `wrap`, see [Text formatting](text-formatting.md#intrinsic-sizes)).
 `Break long words` changes neither ([Long words](#long-words-break-long-words)). With `First line indent`, the
 natural width adds the indent to the first line and the narrowest width is the greater of the widest word and the
 first word (or its first part) plus the indent; with a negative indent, the natural width does not go below the

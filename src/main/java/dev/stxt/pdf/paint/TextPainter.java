@@ -113,7 +113,7 @@ final class TextPainter {
         // a word has no space: its two parts are one word, and neither does the drop cap (the first line of a
         // Paragraph with Drop cap, reference/components/text.md), which is the first letter of the word that starts
         // the line after it.
-        boolean spaceAfter = n < lines.size() - 1 && style.typography().preformatted() == Preformatted.FALSE
+        boolean spaceAfter = n < lines.size() - 1 && style.typography().preformatted() == Preformatted.NONE
                 && !l.splitsWord() && !(n == 0 && style.dropCap() > 0);
         double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
         // With letter spacing, whoever extracts the text guesses spaces between the letters: each sequence of runs of

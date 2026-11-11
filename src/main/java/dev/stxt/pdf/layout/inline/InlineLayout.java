@@ -15,6 +15,7 @@ import dev.stxt.pdf.layout.LayoutResult;
 import dev.stxt.pdf.layout.Slice;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenations;
 import dev.stxt.pdf.layout.inline.hyphenation.Hyphenator;
+import dev.stxt.pdf.model.BreakLongWords;
 import dev.stxt.pdf.model.Exclusion;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.Reference;
@@ -264,11 +265,13 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         // With Break long words, a part of a word wider than a whole line of the box is cut at any character; the
         // first one of the paragraph, wider than its indented line, which has no line before it to leave it for. The
-        // positions are the same from any position the text is broken from.
-        double longWord = s.typography().breakLongWords() ? available : Double.POSITIVE_INFINITY;
+        // positions are the same from any position the text is broken from. With new-line, the part starts a line.
+        BreakLongWords cut = s.typography().breakLongWords();
+        double longWord = cut.enabled() ? available : Double.POSITIVE_INFINITY;
         double firstPart = longWord - Math.max(0, s.typography().firstLineIndent());
         Paragraph paragraph = Paragraph.of(runs, measurer(), s.typography().fontFace(), fontSize,
-                s.typography().letterSpacing(), hyphenator(s), longWord, firstPart);
+                s.typography().letterSpacing(), hyphenator(s), longWord, firstPart,
+                cut == BreakLongWords.NEW_LINE);
         if (paragraph == null) {
             return new Broken(List.of(), fontSize, widths, dropCap);
         }

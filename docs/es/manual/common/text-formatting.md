@@ -149,7 +149,7 @@ No cambian lo que se lee ni lo que se copia, y no se aplican con interletraje.
 
 ## Texto preformateado
 
-Para código, salidas de terminal o columnas alineadas con espacios. Con `Preformatted: true`, el texto **conserva sus espacios
+Para código, salidas de terminal o columnas alineadas con espacios. Con `Preformatted: keep`, el texto **conserva sus espacios
 y sus saltos de línea**: cada línea escrita es una línea en el PDF, también las vacías. Con `Preformatted: wrap`, además, una línea
 demasiado larga se parte entre palabras. Lo normal es usar una fuente monoespaciada y escribir el texto en un `Content >>`:
 
@@ -158,14 +158,14 @@ Text:
     Typography:
         Font: IBM Plex Mono
         Size: 9
-        Preformatted: true
+        Preformatted: keep
     Content >>
         $ termostato --estado
         temperatura   21,5 °C
         consigna      22,0 °C
 ```
 
-- Con `Preformatted: true`, una línea más ancha que la caja es un error. Hay que acortarla o usar `Preformatted: wrap`.
+- Con `Preformatted: keep`, una línea más ancha que la caja es un error. Hay que acortarla o usar `Preformatted: wrap`.
 - `Tab size` (4 por defecto) es el número de columnas de un tabulador: cada tabulador lleva a la siguiente columna múltiplo
   de `Tab size`, como en un editor.
 - Las líneas preformateadas no se justifican.

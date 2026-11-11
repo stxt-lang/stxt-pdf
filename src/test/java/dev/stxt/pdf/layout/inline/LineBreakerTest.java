@@ -446,22 +446,40 @@ class LineBreakerTest {
     }
 
     @Test
-    void aLongWordStartsInTheLineThatHasRoomForSomeOfIt() {
-        // The word (15) is wider than the line (10): it is cut wherever a line ends, the first one included, which
-        // it shares with the word before it.
+    void aLongWordStartsALineOfItsOwn() {
+        // The word (15) is wider than the line (10): it does not start in the line of the word before it, which
+        // has room for some of it, and the words after it go on in the line its last part leaves.
         for (LineBreaking wrap : LineBreaking.values()) {
-            assertEquals(List.of("id ABCDEFG", "HIJKLMNO"),
+            assertEquals(List.of("id", "ABCDEFGHIJ", "KLMNO"),
                     texts(Lines.breakLongWords(TextRun.plain("id ABCDEFGHIJKLMNO"), 10, measurer, F, 1, wrap)),
+                    wrap.toString());
+            assertEquals(List.of("id", "ABCDEFGHIJ", "KLMNO fin"),
+                    texts(Lines.breakLongWords(TextRun.plain("id ABCDEFGHIJKLMNO fin"), 10, measurer, F, 1, wrap)),
                     wrap.toString());
         }
     }
 
     @Test
-    void onlyThePartsThatDoNotFitAreCut() {
+    void withSameLineALongWordStartsInTheLineThatHasRoomForSomeOfIt() {
+        // The word (15) is wider than the line (10): it is cut wherever a line ends, the first one included, which
+        // it shares with the word before it.
+        for (LineBreaking wrap : LineBreaking.values()) {
+            assertEquals(List.of("id ABCDEFG", "HIJKLMNO"), texts(Lines.breakLongWords(
+                    TextRun.plain("id ABCDEFGHIJKLMNO"), 10, measurer, F, 1, wrap, false)), wrap.toString());
+        }
         // "REF-" fits and "ABCDEFGHIJKLMNOP" (16) does not: the line is filled with the start of the long part.
-        assertEquals(List.of("REF-ABCDEF", "GHIJKLMNOP"),
-                texts(Lines.breakLongWords(TextRun.plain("REF-ABCDEFGHIJKLMNOP"), 10, measurer, F, 1,
-                        LineBreaking.SIMPLE)));
+        assertEquals(List.of("REF-ABCDEF", "GHIJKLMNOP"), texts(Lines.breakLongWords(
+                TextRun.plain("REF-ABCDEFGHIJKLMNOP"), 10, measurer, F, 1, LineBreaking.SIMPLE, false)));
+    }
+
+    @Test
+    void onlyThePartsThatDoNotFitAreCut() {
+        // "REF-" fits and "ABCDEFGHIJKLMNOP" (16) does not: the long part starts a line of its own, after the hyphen.
+        for (LineBreaking wrap : LineBreaking.values()) {
+            assertEquals(List.of("REF-", "ABCDEFGHIJ", "KLMNOP"),
+                    texts(Lines.breakLongWords(TextRun.plain("REF-ABCDEFGHIJKLMNOP"), 10, measurer, F, 1, wrap)),
+                    wrap.toString());
+        }
         // Every part of "REF-2026-009812" fits in width 7: the word is split only after its hyphens.
         for (LineBreaking wrap : LineBreaking.values()) {
             assertEquals(List.of("REF-", "2026-", "009812"),

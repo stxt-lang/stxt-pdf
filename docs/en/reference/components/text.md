@@ -19,7 +19,7 @@ lines ([Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-b
 
 The text goes in its value (`Text: A title`) or in a `Content >>` child with an indented block. One of the two is
 required, and both are not accepted (`TEXT_CONTENT`). A blank line is an error (`TEXT_BLANK_LINE`, on the line of the
-blank line), except in preformatted text (`Preformatted: true` or `wrap`), where it is one more line of the
+blank line), except in preformatted text (`Preformatted: keep` or `wrap`), where it is one more line of the
 text ([Text formatting](../common/text-formatting.md#preformatted-text)). By default the
 text is literal, and with `Markup: markdown` it accepts formatting within the line
 ([Text formatting](../common/text-formatting.md#inline-formatting-markup)).

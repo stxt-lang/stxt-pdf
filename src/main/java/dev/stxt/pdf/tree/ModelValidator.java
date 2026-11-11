@@ -248,19 +248,19 @@ final class ModelValidator {
     }
 
     /**
-     * {@code Break long words: true} written by the element itself needs a text whose words the line breaking may
+     * {@code Break long words} other than {@code never} written by the element itself needs a text whose words the line breaking may
      * split (reference/common/typography.md): a preformatted text keeps its lines as they are written
-     * ({@code Preformatted: true}) or breaks them only between words ({@code wrap}). Inherited or from a rule it is
+     * ({@code Preformatted: keep}) or breaks them only between words ({@code wrap}). Inherited or from a rule it is
      * not checked, like the rest of {@code Typography}: a {@code Code block} inside a box that has it is left alone.
      */
     static void validateBreakLongWords(InlineNode n, Box box) {
         TypographyStyle t = box.style().typography();
-        if (!box.hasText() || !t.breakLongWords() || !t.preformatted().enabled()) {
+        if (!box.hasText() || !t.breakLongWords().enabled() || !t.preformatted().enabled()) {
             return;
         }
         child(n, "typography").map(Nodes::inline).flatMap(g -> child(g, "break-long-words")).ifPresent(p -> {
             throw error(p, ErrorCode.BREAK_LONG_WORDS_IN_PREFORMATTED, "Break long words has no effect on a "
-                    + "preformatted text (Preformatted: true or wrap), whose lines are not broken inside a word: it "
+                    + "preformatted text (Preformatted: keep or wrap), whose lines are not broken inside a word: it "
                     + "is not needed");
         });
     }
@@ -418,7 +418,7 @@ final class ModelValidator {
         }
         if (s.typography().preformatted().enabled()) {
             throw error(s.line(DROP_CAP), ErrorCode.DROP_CAP_NOT_ALLOWED, "Drop cap has no effect on a preformatted "
-                    + "Paragraph (Preformatted: true or wrap), whose lines are the ones written: it is not needed");
+                    + "Paragraph (Preformatted: keep or wrap), whose lines are the ones written: it is not needed");
         }
         double indent = s.typography().firstLineIndent();
         if (indent == 0) {

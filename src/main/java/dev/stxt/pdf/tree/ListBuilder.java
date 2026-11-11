@@ -72,6 +72,8 @@ final class ListBuilder {
         }
         Style s = Style.inheriting(item.style());
         s.setLayout(Layout.INLINE);
+        // The indent is of the text of the item: the marker is a generated label with no padding to hang in.
+        s.typography().setFirstLineIndent(0);
         if (marker == Marker.IMAGE) {
             Style owner = item.style().list().markerImage() != null ? item.style() : list.style();
             if (owner.list().markerImage() == null) {

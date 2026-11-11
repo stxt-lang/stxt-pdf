@@ -167,7 +167,7 @@ class FirstLineIndentLayoutTest {
 
     @Test
     void aPreformattedTextIndentsItsFirstLine() {
-        List<TextLine> lines = layOut("\tText:", "\t\tId: T", "\t\tTypography:", "\t\t\tPreformatted: true",
+        List<TextLine> lines = layOut("\tText:", "\t\tId: T", "\t\tTypography:", "\t\t\tPreformatted: keep",
                 "\t\t\tFirst line indent: 20", "\t\tContent >>", "\t\t\tab", "\t\t\tcd").fragment("T").lines();
         assertEquals(List.of("ab", "cd"), texts(lines));
         assertEquals(20, lines.get(0).x(), 1e-9);
@@ -206,7 +206,7 @@ class FirstLineIndentLayoutTest {
         // The word (20) fits in a line of the box (30), not in the indented one (15): three characters and the rest.
         for (String breaking : List.of("simple", "optimal")) {
             LayoutFixture f = layOut("\tText: aaaa aaaa", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30",
-                    "\t\tTypography:", "\t\t\tFirst line indent: 15", "\t\t\tBreak long words: true",
+                    "\t\tTypography:", "\t\t\tFirst line indent: 15", "\t\t\tBreak long words: new-line",
                     "\t\t\tLine breaking: " + breaking);
             List<TextLine> lines = f.fragment("T").lines();
             assertEquals(List.of("aaa", "a aaaa"), texts(lines), breaking);
@@ -216,15 +216,15 @@ class FirstLineIndentLayoutTest {
         // Only the first word: a later one that does not fit in what is left of the first line goes whole to the next.
         assertEquals(List.of("aa", "aaaaa"), texts(layOut("\tText: aa aaaaa", "\t\tId: T", "\t\tBox:",
                 "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 15",
-                "\t\t\tBreak long words: true").fragment("T").lines()));
+                "\t\t\tBreak long words: new-line").fragment("T").lines()));
         // And a first word that fits after the indent is not cut.
         assertEquals(List.of("aaa", "aaaa"), texts(layOut("\tText: aaa aaaa", "\t\tId: T", "\t\tBox:",
                 "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 15",
-                "\t\t\tBreak long words: true").fragment("T").lines()));
+                "\t\t\tBreak long words: new-line").fragment("T").lines()));
         // An indent that leaves no room for a character still overflows.
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: aaaa aaaa",
                 "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 28",
-                "\t\t\tBreak long words: true"));
+                "\t\t\tBreak long words: new-line"));
         assertEquals(ErrorCode.TEXT_OVERFLOW, e.errorCode());
     }
 

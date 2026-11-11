@@ -24,7 +24,7 @@
 | **Page sequence** | The pages numbered since the last `Page numbering: restart`: `{pages}` is the last number of its sequence. |
 | **Paper** (`Paper`) | Named page size (`A4` or `Letter`), in portrait or, with `Orientation: landscape`, in landscape. |
 | **Positioned element** | `Frame`, `Overlay` or `Page overlay`. |
-| **Preformatted text** | Text that keeps its spaces and its line breaks (`Preformatted: true` or `wrap`). |
+| **Preformatted text** | Text that keeps its spaces and its line breaks (`Preformatted: keep` or `wrap`). |
 | **Caption** (`Caption`) | The text of a `Figure`, below its content or above a table, with the number of the figure before it ([Figure](../components/figure.md#the-caption-caption)). |
 | **Reference** | `{page of: id}` or `{number of: id}` in a text: the page where the box with that `Id` starts, or its number (that of an item, a heading or a figure) ([References](references.md)). |
 | **Reference container** | Rectangle against which the percentages, the `auto` values and the offsets of a box are resolved ([The box](box.md#the-reference-container)). |

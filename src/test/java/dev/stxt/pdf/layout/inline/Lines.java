@@ -69,12 +69,19 @@ final class Lines {
     }
 
     /**
-     * Lines of the text with {@code Break long words}, every line {@code available} wide: the parts of its words
-     * wider than a line are cut at any character.
+     * Lines of the text with {@code Break long words: new-line}, every line {@code available} wide: the parts of
+     * its words wider than a line are cut at any character and start a line of their own.
      */
     static List<LineBreaker.Line> breakLongWords(List<TextRun> runs, double available, TextMeasurer measurer,
                                                  FontFace font, double fontSize, LineBreaking wrap) {
-        Paragraph paragraph = Paragraph.of(runs, measurer, font, fontSize, 0, null, available);
+        return breakLongWords(runs, available, measurer, font, fontSize, wrap, true);
+    }
+
+    /** The same, with the parts that are cut in a line of their own ({@code newLine}) or in the current one. */
+    static List<LineBreaker.Line> breakLongWords(List<TextRun> runs, double available, TextMeasurer measurer,
+                                                 FontFace font, double fontSize, LineBreaking wrap,
+                                                 boolean newLine) {
+        Paragraph paragraph = Paragraph.of(runs, measurer, font, fontSize, 0, null, available, available, newLine);
         return paragraph == null ? List.of()
                 : LineBreaker.breakLines(paragraph, 0, LineWidths.uniform(available), wrap);
     }

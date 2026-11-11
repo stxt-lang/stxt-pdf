@@ -139,10 +139,10 @@ class PdfMetricsTest {
         assertDoesNotThrow(() -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
                 "\t\tText: Marta" + verticalTab + "Vidal" + TextRun.LINE_SEPARATOR + "Administración"));
         assertDoesNotThrow(() -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
-                "\t\t\tPreformatted: true", "\t\tText: Marta\tVidal" + TextRun.LINE_SEPARATOR + "Administración"));
+                "\t\t\tPreformatted: keep", "\t\tText: Marta\tVidal" + TextRun.LINE_SEPARATOR + "Administración"));
         InvalidModelException e = assertThrows(InvalidModelException.class,
                 () -> validate("\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans",
-                        "\t\t\tPreformatted: true", "\t\tText: Marta" + verticalTab + "Vidal"));
+                        "\t\t\tPreformatted: keep", "\t\tText: Marta" + verticalTab + "Vidal"));
         assertEquals(ErrorCode.GLYPH_MISSING, e.errorCode());
         assertEquals("line 16: The font IBM Plex Sans normal has no character U+000B", e.getMessage());
     }

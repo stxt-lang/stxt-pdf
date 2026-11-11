@@ -1,4 +1,4 @@
-# Case: Empty Markdown heading
+# Case: Empty Markdown heading with an Id
 # Code: TEXT_CONTENT
 # Line: 20
 Document (dev.stxt.pdf):
@@ -17,4 +17,4 @@ Document (dev.stxt.pdf):
 			Content >>
 				Párrafo.
 
-				#
+				# {#solo}

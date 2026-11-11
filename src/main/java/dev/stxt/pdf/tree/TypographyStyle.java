@@ -1,5 +1,6 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.BreakLongWords;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
@@ -45,9 +46,10 @@ public final class TypographyStyle extends StyleGroup {
     private boolean hyphenate;
     /**
      * {@code Break long words}: whether a part of a word that cannot be split further and is wider than a whole line
-     * of its box is cut at the last character that fits, with no hyphen (reference/common/typography.md). Inherited.
+     * of its box is cut at the last character that fits, with no hyphen, and where it starts
+     * (reference/common/typography.md). Inherited.
      */
-    private boolean breakLongWords;
+    private BreakLongWords breakLongWords = BreakLongWords.NEVER;
     /**
      * {@code First line indent}: how much later the first line of each paragraph starts, in points; negative, how
      * much earlier, in the left padding of its box (reference/common/typography.md). Inherited.
@@ -68,7 +70,7 @@ public final class TypographyStyle extends StyleGroup {
      * (reference/common/typography.md). Inherited.
      */
     private boolean kerning;
-    private Preformatted preformatted = Preformatted.FALSE;
+    private Preformatted preformatted = Preformatted.NONE;
     /** Columns of a tab in preformatted text ({@code Tab size}). */
     private int tabSize = 4;
     /**
@@ -218,11 +220,11 @@ public final class TypographyStyle extends StyleGroup {
         hyphenate = v;
     }
 
-    public boolean breakLongWords() {
+    public BreakLongWords breakLongWords() {
         return breakLongWords;
     }
 
-    void setBreakLongWords(boolean v) {
+    void setBreakLongWords(BreakLongWords v) {
         writable();
         breakLongWords = v;
     }

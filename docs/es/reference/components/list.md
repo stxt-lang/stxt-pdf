@@ -121,6 +121,8 @@ principio, los dos marcadores quedan en la misma línea).
 - Un ítem con marcador cuyo contenido no lleva así a un texto (empieza con un `Stack`, un `Grid`, una `Image`, un
   `Barcode` o un bloque vacío) es un error (`LIST_ITEM_WITHOUT_LINE`), en la línea de la caja que lo impide.
 - Un marcador más ancho que su sangría también (`LIST_MARKER_OVERFLOW`): no se sale de la lista.
+- El `First line indent` que hereda el ítem sangra su texto y no mueve el marcador
+  ([Tipografía](../common/typography.md#sangría-de-primera-línea-first-line-indent)).
 
 > **Decisión:** no hay una propiedad de sangría ni un ancho de marcador fijo: la sangría es el `Padding` de la `List`.
 > *Alternativa descartada:* una propiedad `Indent`, o alinear el marcador con el borde superior del ítem.

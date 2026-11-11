@@ -215,14 +215,14 @@ ni el que se copia.
 
 ## Texto preformateado
 
-Por defecto el espacio en blanco se colapsa. Con `Preformatted: true` o `wrap` el texto **conserva sus espacios y sus
+Por defecto el espacio en blanco se colapsa. Con `Preformatted: keep` o `wrap` el texto **conserva sus espacios y sus
 saltos de línea**: cada línea del texto es una línea de la caja, también las vacías. Una línea en blanco **no** separa
 párrafos: el texto entero es un párrafo para las viudas y huérfanas ([Cortes](breaks.md)), así que un bloque largo se
 parte entre líneas. Actúa en un `Text`, un `Paragraph` y una `Cell` con texto. Lo normal es una fuente monoespaciada y un
 `Content >>`, que conserva la sangría relativa (no los espacios al final de una línea ni las líneas en blanco del final).
 Un salto de línea al final del texto no añade una línea vacía.
 
-- **`true`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
+- **`keep`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
 - **`wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
   espacios del corte se pierden. Una palabra más ancha que la caja sigue siendo un error: en un texto preformateado
   una palabra no se parte tras un guion escrito ni se corta con `Break long words`
@@ -245,7 +245,7 @@ Un salto de línea al final del texto no añade una línea vacía.
 
 ### Tamaños intrínsecos
 
-Con `Preformatted: true`, el ancho más estrecho y el natural son la línea más ancha. Con `wrap`, el ancho más estrecho es la
+Con `Preformatted: keep`, el ancho más estrecho y el natural son la línea más ancha. Con `wrap`, el ancho más estrecho es la
 palabra más ancha y el natural, la línea más ancha.
 
 > **Decisión:** el texto preformateado es una propiedad heredable y no un elemento propio, que no cabría en una

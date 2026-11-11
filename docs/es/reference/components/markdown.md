@@ -86,7 +86,7 @@ así:
 | `[x]{nombre}` | tramo con estilo: con lo que declara la regla `For style: nombre` ([Formato del texto](../common/text-formatting.md#tramos-con-estilo)) |
 | `[^id]` | la llamada a la nota al pie con ese `Id`: un tramo en superíndice con su número ([Footnote](footnote.md)) |
 | `\` al final de la línea | un salto de línea forzado: la línea acaba ahí, dentro del mismo párrafo ([abajo](#saltos-de-línea-forzados)) |
-| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: true` cuya fuente es su `Code font`, con el código en su `Content` |
+| Bloque de código (con vallas ```` ``` ```` o sangrado cuatro espacios) | `Code block`: un `Text` con `Preformatted: keep` cuya fuente es su `Code font`, con el código en su `Content` |
 | `> texto` | `Block quote`: un bloque con lo que la cita contiene, traducido igual ([abajo](#citas-y-líneas-horizontales)) |
 | `---`, `***`, `___` | `Divider`: una línea a todo el ancho ([abajo](#citas-y-líneas-horizontales)) |
 | `![Alt](ruta)`, sola en su párrafo | `Image` con esa ruta y su `Alt`, o decorativa con `![](ruta)` ([Image](image.md)) |
@@ -98,7 +98,18 @@ Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](d
 línea ([abajo](#saltos-de-línea-forzados)) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se
 escribe en el propio enlace).
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
-la cabecera. Un `Markdown` sin contenido, o un encabezado o un párrafo sin texto, es `TEXT_CONTENT`.
+la cabecera.
+
+**Los bloques vacíos se ignoran**: un encabezado sin texto (`#` solo), un bloque de código vacío, una cita sin
+contenido (`>` solo) y un párrafo sin texto no generan ningún elemento, tampoco dentro de una cita o de un ítem. Dos
+vacíos siguen siendo un error: un `Markdown` que se queda sin ningún elemento, y un encabezado sin texto con `Id`
+(`# {#ventas}`), los dos `TEXT_CONTENT`. Un ítem de lista sin contenido (`-` solo) es `LIST_ITEM_EMPTY`, como un
+`List item` vacío: su marcador sí se pintaría.
+
+> **Decisión:** un bloque vacío se ignora. Es Markdown válido, puede llegar en un texto que viene de fuera (los
+> datos de una plantilla) y no tiene nada que pintar, así que ignorarlo no pierde nada. *Alternativa descartada:* un
+> error, como el de un `Text` vacío que escribe el autor: ese elemento está declarado, y este es un resto del texto.
+> No es lo que «no tendría efecto» (abajo): ahí el autor escribió algo que esperaba ver.
 
 Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
 `Link` o, dentro de un texto, una imagen en línea dentro de un enlace (`[![Alt](ruta)](destino)`).
@@ -152,13 +163,13 @@ familia de `Code font`: conserva el peso y el estilo del texto que lo rodea y se
 párrafo (``**`x`**`` es código en negrita), y puede estar dentro de un enlace. El espacio en blanco de una línea con
 código en línea se colapsa como en cualquier párrafo. Lo que conserva los espacios es el bloque.
 
-Un bloque de código es un `Text` con `Preformatted: true`
+Un bloque de código es un `Text` con `Preformatted: keep`
 ([Formato del texto](../common/text-formatting.md#texto-preformateado)) cuya fuente es su `Code font`, así
 que se parte entre líneas entre páginas y una línea más ancha que la caja es un error (`TEXT_OVERFLOW`). No tiene `Id` ni
 `Style`, pero es el elemento generado `Code block` y lo nombra la regla
 `For element: Code block` ([Styles](../common/styles.md)), con `Box`, `Typography` y `Break` (un fondo, un relleno, un
 tamaño menor o `Keep together: true`). No lo alcanza `For element: Text` (que sigue valiendo para los `Text` de los encabezados de
-un Markdown y para los que se escriben). Un `Text` escrito a mano con `Preformatted: true` tampoco es un `Code block`. Su
+un Markdown y para los que se escriben). Un `Text` escrito a mano con `Preformatted: keep` tampoco es un `Code block`. Su
 `Typography` es el del `Markdown`, así que `Size`, `Color`, `Tab size` o `Code font` se declaran en el `Typography` del
 `Markdown`, de un antecesor o en `For element: Code block`, que puede darle otra `Code font` que al código en línea. Un
 `Font` de `For element: Code block` no cambia nada, porque su fuente es su `Code font`. Se usa el `Line height` de la caja
@@ -210,7 +221,7 @@ el documento ni tienen `Id` o `Style`, y los nombran las reglas `For element`, c
 
 - **El contenido de una cita** se traduce como el resto: párrafos, listas, tablas, código y otra cita dentro. Un
   encabezado dentro de una cita es `MARKDOWN_UNSUPPORTED`, como dentro de una lista, y una cita sin contenido (`>`
-  solo), `TEXT_CONTENT`.
+  solo) se ignora ([arriba](#el-subconjunto)).
 - **Aspecto.** Una cita no tiene aspecto por defecto, como el resto de lo que genera un `Markdown`: sin regla se ve
   como los párrafos que contiene, y `For element: Block quote` le da la sangría, la línea o el fondo, como en el
   ejemplo. La línea de un `Divider` es lo que el elemento es: su regla cambia su grosor (`Border`), su color

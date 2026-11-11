@@ -232,7 +232,7 @@ than those of the in-order distribution.
 
 ## Text
 
-`InlineLayout` breaks the text into lines with `LineBreaker` (greedy or Knuth-Plass) or, with `Preformatted: true` or `wrap`, with `PreformattedText`.
+`InlineLayout` breaks the text into lines with `LineBreaker` (greedy or Knuth-Plass) or, with `Preformatted: keep` or `wrap`, with `PreformattedText`.
 The line breaking goes in four pieces of `layout.inline`: `Words` splits the text into words with their break points,
 `Paragraph` measures them and gives the positions where a line may end, `LineBreaker` chooses among them with one of the
 two algorithms and `LinePlacer` places each line in the content box (alignment, `justify` and the measures of the runs).
@@ -321,7 +321,9 @@ characters (a character `BreakIterator`, which does not separate a letter from i
 line of its own, does not fit in it; a whole word that fits is not even looked at. The first part of the first word
 is measured against that width minus the positive `First line indent` of the box, wherever the text is broken from,
 so that the positions are always the same. Both algorithms still choose
-among positions. The greedy one tries those of the word that does not fit from the first one on and keeps the last
+among positions, with one condition: a line ends at a cut of last resort only if it starts inside its long part, at
+its start or at an earlier cut (`Paragraph.reaches`), and so the part starts a line of its own. That is `new-line`; with `same-line` the
+condition does not apply. The greedy one tries those of the word that does not fit from the first one on and keeps the last
 one that fits; it stops trying when the line exceeds the available width by more than the font size
 (`hyphenMargin`: what an added hyphen can make an earlier position measure more than a later one), so a word of
 thousands of characters costs, per line, what the line reaches. Knuth-Plass charges the penalty of a hyphen to
@@ -346,7 +348,7 @@ justify it. The natural width of the text is that of its widest line between bre
 > **Decision:** the cuts of `Break long words` are positions of `Paragraph`, computed with the width of the box when
 > the text is measured, and not a separate step after the line breaking: this way both algorithms, the side boxes
 > and `Overflow: shrink` handle them without knowing about them. *Rejected alternative:* splitting afterwards the
-> lines that overflow, which does not let the line breaking fill the current line or Knuth-Plass count on the cut.
+> lines that overflow, which does not let Knuth-Plass count on the cut or the words after it go on in the line of the last piece.
 
 > **Decision:** both line breakings share the positions and the sums of `Paragraph`, instead of a breaking over atoms
 > (parts of words) with prefix sums: with ligatures a whole word does not measure what its parts add up to, and this

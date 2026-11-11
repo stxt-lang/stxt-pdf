@@ -166,6 +166,10 @@ public final class LineBreaker {
             // characters, and each line only looks at the ones it can reach.
             int cut = -1;
             for (int q = Math.max(a + 1, p.start(w)); q < whole; q++) {
+                if (!p.reaches(a, q)) {
+                    // A cut of a long part that this line does not start in: the part starts a line of its own.
+                    continue;
+                }
                 double width = p.width(a, q);
                 if (p.fitsMeasured(a, q, width, available)) {
                     cut = q;
@@ -268,6 +272,11 @@ public final class LineBreaker {
                         }
                         if (single && !fits(width, available) && widths.widerLater(k)) {
                             // Beside a side box, the piece goes to a wider line instead of overflowing.
+                            continue;
+                        }
+                        if (!p.reaches(i, j)) {
+                            // A long part starts a line of its own: no line that starts before it ends at one of
+                            // its cuts.
                             continue;
                         }
                         boolean lastResort = p.lastResort(j);

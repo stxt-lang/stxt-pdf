@@ -89,7 +89,7 @@ An element with `Case` or `Small caps` carries `ActualText` with the written tex
 
 A normal text line that is not the last of its box (or of its fragment) ends with an invisible space after the last
 word: the line break swallows the space, and without it whoever joins the text of the lines (a screen reader,
-extraction, search) would glue the words together. It changes neither the width of the line nor the layout. The text of `Preformatted: true`
+extraction, search) would glue the words together. It changes neither the width of the line nor the layout. The text of `Preformatted: keep`
 and `wrap` does not have it: its lines are lines. Neither does the first line of a `Paragraph` with `Drop cap`: the drop
 cap is the first letter of the word that starts the next line.
 

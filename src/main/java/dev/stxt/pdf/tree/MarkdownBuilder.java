@@ -62,7 +62,7 @@ import dev.stxt.pdf.model.TextRun;
  * exist: headings to {@code Heading 1}...{@code Heading 6} with a {@code Text}, paragraphs to {@code Paragraph}, block quotes
  * and horizontal rules to a {@code Block} (a {@code Block quote} and a {@code Divider}), lists
  * to {@code List} and {@code List item}, GFM tables to {@code Table}, code blocks to a {@code Text} with
- * {@code Preformatted: true} and images alone in their paragraph to {@code Image} (reference/components/image.md); an
+ * {@code Preformatted: keep} and images alone in their paragraph to {@code Image} (reference/components/image.md); an
  * image inside a text is a run that is the image ({@link InlineImage}, reference/common/text-formatting.md). A
  * link is an underlined run with its target (reference/common/links.md); inline code, a code run, which gets the
  * family of {@code Code font} when its box is built; a styled run ({@code [text]{name}}), a run with the name of its
@@ -246,16 +246,23 @@ final class MarkdownBuilder {
 
         /**
          * The child blocks of {@code parent}; {@code within} is what they are inside that takes no heading
-         * ({@code a list item}, {@code a block quote}), or {@code null}.
+         * ({@code a list item}, {@code a block quote}), or {@code null}. A block with nothing to paint is left out
+         * (reference/components/markdown.md): a heading or a paragraph without text, an empty code block and a
+         * block quote with no content are valid Markdown, which may come from outside, and ignoring them loses
+         * nothing.
          */
         List<InlineNode> blocks(org.commonmark.node.Node parent, String within) {
             List<InlineNode> out = new ArrayList<>();
             for (org.commonmark.node.Node b = parent.getFirstChild(); b != null; b = b.getNext()) {
-                out.add(block(b, within));
+                InlineNode block = block(b, within);
+                if (block != null) {
+                    out.add(block);
+                }
             }
             return out;
         }
 
+        /** The element of a block, or {@code null} if the block has nothing to paint. */
         private InlineNode block(org.commonmark.node.Node b, String within) {
             int line = line(b);
             if (b instanceof Heading h) {
@@ -268,14 +275,19 @@ final class MarkdownBuilder {
                 if (id != null) {
                     heading.addChild(node("Id", id, line));
                 }
-                heading.addChild(text("Text", h, line, "A Markdown heading needs text"));
+                // Without text it is left out, unless it has an Id, which something may refer to: that is an error.
+                InlineNode text = text("Text", h, line, id != null ? "A Markdown heading with an Id needs text" : null);
+                if (text == null) {
+                    return null;
+                }
+                heading.addChild(text);
                 return heading;
             }
             if (b instanceof Paragraph p) {
                 if (p.getFirstChild() instanceof Image i && i.getNext() == null) {
                     return image(i, line);
                 }
-                return text("Paragraph", p, line, "A Markdown paragraph needs text");
+                return text("Paragraph", p, line, null);
             }
             if (b instanceof ListBlock l) {
                 return list(l, line);
@@ -300,8 +312,8 @@ final class MarkdownBuilder {
 
         /**
          * A block quote ({@code > ...}): a {@code Block} that is a {@code Block quote}, with what the quote contains
-         * translated like the rest (paragraphs, lists, code, another quote). A heading inside it is an error, as in a
-         * list item.
+         * translated like the rest (paragraphs, lists, code, another quote); {@code null} if it has no content. A
+         * heading inside it is an error, as in a list item.
          */
         private InlineNode blockQuote(BlockQuote q, int line) {
             InlineNode quote = node("Block", "", line);
@@ -309,7 +321,7 @@ final class MarkdownBuilder {
             List<InlineNode> content = blocks(q, "a block quote");
             quoteDepth--;
             if (content.isEmpty()) {
-                throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown block quote needs content");
+                return null;
             }
             content.forEach(quote::addChild);
             kinds.put(quote, Element.BLOCK_QUOTE);
@@ -317,7 +329,7 @@ final class MarkdownBuilder {
         }
 
         /**
-         * A code block (fenced or indented): a {@code Text} with {@code Preformatted: true}, with the code in a
+         * A code block (fenced or indented): a {@code Text} with {@code Preformatted: keep}, with the code in a
          * {@code Content}; it is a {@code Code block} and its font is its {@code Code font} ({@link ElementReader}).
          * The language tag of the fences (<code>```java</code>) would have no effect, because there is no highlighting,
          * and it is an error.
@@ -337,11 +349,11 @@ final class MarkdownBuilder {
             // references are replaced as in any text, and one inside another pair of braces is text.
             literal = Reference.literal(RunMarks.unmark(literal, styleNames));
             if (literal.isBlank()) {
-                throw error(line, ErrorCode.TEXT_CONTENT, "A Markdown code block needs text");
+                return null;
             }
             InlineNode text = node("Text", "", line);
             InlineNode typography = node("Typography", "", line);
-            typography.addChild(node("Preformatted", "true", line));
+            typography.addChild(node("Preformatted", "keep", line));
             text.addChild(typography);
             // The Content >> goes on the line of the fences; when indented, on the line before the first line.
             text.addChild(new TextNode("Content", DocumentSchema.NAMESPACE, List.of(literal.split("\n", -1)),
@@ -548,11 +560,17 @@ final class MarkdownBuilder {
             return id;
         }
 
-        /** A {@code Text} or a {@code Paragraph} with the text of a block and its runs. */
+        /**
+         * A {@code Text} or a {@code Paragraph} with the text of a block and its runs. Without text, the error
+         * {@code empty} or, if it is {@code null}, no element.
+         */
         private InlineNode text(String name, org.commonmark.node.Node block, int line, String empty) {
             List<TextRun> text = inline(block, line);
             String value = TextRun.text(text);
             if (value.isBlank()) {
+                if (empty == null) {
+                    return null;
+                }
                 throw error(line, ErrorCode.TEXT_CONTENT, empty);
             }
             InlineNode node = node(name, value, line);

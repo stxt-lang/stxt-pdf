@@ -426,9 +426,9 @@ public final class Overflow {
         int index = box.text().indexOf(word);
         int line = index >= 0 ? box.textLineAt(index) : box.textLine();
         boolean shrinks = box.style().box().shrinks();
-        if (box.style().typography().preformatted() == Preformatted.TRUE) {
+        if (box.style().typography().preformatted() == Preformatted.KEEP) {
             return new InvalidModelException(line, ErrorCode.TEXT_OVERFLOW, "A line of a text with Preformatted: "
-                    + "true ('" + excerpt(word) + "'...) does not fit in the box" + atMinSize(box) + ": the line measures "
+                    + "keep ('" + excerpt(word) + "'...) does not fit in the box" + atMinSize(box) + ": the line measures "
                     + pt(l.width()) + " and the box leaves " + pt(width) + ". The box has to be wider, "
                     + (shrinks ? "Min size" : "the Size") + " smaller, or the text needs Preformatted: wrap, which "
                     + "breaks the lines" + shrinkHint(box));

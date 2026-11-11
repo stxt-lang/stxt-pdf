@@ -212,14 +212,14 @@ Mono). What is measured is what is painted. A ligature does not cross a space or
 
 ## Preformatted text
 
-By default white space is collapsed. With `Preformatted: true` or `wrap` the text **keeps its spaces and its
+By default white space is collapsed. With `Preformatted: keep` or `wrap` the text **keeps its spaces and its
 line breaks**: each line of the text is a line of the box, also the empty ones. A blank line does **not** separate
 paragraphs: the whole text is one paragraph for widows and orphans ([Breaks](breaks.md)), so a long block is
 split between lines. It acts in a `Text`, a `Paragraph` and a `Cell` with text. The usual choice is a monospaced font and a
 `Content >>`, which keeps the relative indent (not the spaces at the end of a line or the trailing blank lines).
 A line break at the end of the text does not add an empty line.
 
-- **`true`** does not break lines: one wider than the box is `TEXT_OVERFLOW`, with the line of the document where it is.
+- **`keep`** does not break lines: one wider than the box is `TEXT_OVERFLOW`, with the line of the document where it is.
 - **`wrap`** breaks lines that are too wide **between words**, with greedy line breaking. The indent is kept and the
   spaces at the break are lost. A word wider than the box is still an error: in a preformatted text a word is not
   split after a written hyphen, nor cut with `Break long words`
@@ -242,7 +242,7 @@ A line break at the end of the text does not add an empty line.
 
 ### Intrinsic sizes
 
-With `Preformatted: true`, the narrowest width and the natural width are the widest line. With `wrap`, the narrowest width is the
+With `Preformatted: keep`, the narrowest width and the natural width are the widest line. With `wrap`, the narrowest width is the
 widest word and the natural width, the widest line.
 
 > **Decision:** preformatted text is an inheritable property and not an element of its own, which would not fit in a

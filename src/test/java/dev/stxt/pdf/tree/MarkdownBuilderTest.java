@@ -375,7 +375,7 @@ class MarkdownBuilderTest {
         assertEquals(List.of(
                 "Text @17",
                 "  Typography @17",
-                "    Preformatted: true @17",
+                "    Preformatted: keep @17",
                 "  Content: a  b\n  c @17"), outline(t.elements().get(1)));
         assertEquals(Map.of(t.elements().get(1), Element.CODE_BLOCK), t.kinds());
     }
@@ -398,10 +398,23 @@ class MarkdownBuilderTest {
     }
 
     @Test
-    void anEmptyCodeBlockIsAnError() {
-        InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> translate("```", "```"));
-        assertEquals(ErrorCode.TEXT_CONTENT, e.errorCode());
+    void theBlocksWithNothingToPaintAreLeftOut() {
+        // An empty code block, a heading without text and an empty quote, also one inside another.
+        for (String[] empty : new String[][] {{"```", "```"}, {"#"}, {">"}, {"> >"}, {"> ```", "> ```"}}) {
+            String[] content = new String[empty.length + 4];
+            content[0] = "Antes.";
+            content[1] = "";
+            System.arraycopy(empty, 0, content, 2, empty.length);
+            content[empty.length + 2] = "";
+            content[empty.length + 3] = "Después.";
+            MarkdownBuilder.Translation t = translate(content);
+            assertEquals(2, t.elements().size(), String.join("|", empty));
+            assertEquals("Paragraph", t.elements().get(0).getName());
+            assertEquals("Paragraph", t.elements().get(1).getName());
+        }
+        // A Markdown with nothing else has no content.
+        assertEquals(ErrorCode.TEXT_CONTENT,
+                assertThrows(InvalidModelException.class, () -> translate("```", "```")).errorCode());
     }
 
     @Test

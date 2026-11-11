@@ -399,7 +399,7 @@ public enum ErrorCode {
      */
     HYPHENATION_LANGUAGE_UNSUPPORTED,
     /**
-     * {@code Break long words: true} written by a preformatted text, whose lines are not broken inside a word (line
+     * {@code Break long words: new-line} or {@code same-line} written by a preformatted text, whose lines are not broken inside a word (line
      * of the {@code Break long words}).
      */
     BREAK_LONG_WORDS_IN_PREFORMATTED,

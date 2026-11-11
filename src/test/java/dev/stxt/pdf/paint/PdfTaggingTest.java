@@ -135,7 +135,7 @@ class PdfTaggingTest {
      */
     @Test
     void wordsSplitWithoutAnAddedHyphenAreReadAsTheyAreWritten() throws Exception {
-        byte[] bytes = Pdfs.of(DOCUMENT + "\t\t\t\tBreak long words: true\n"
+        byte[] bytes = Pdfs.of(DOCUMENT + "\t\t\t\tBreak long words: new-line\n"
                 + "\tParagraph: REF-2026-009812 ES7620770024003102575766\n\t\tBox:\n\t\t\tWidth: 60\n");
         try (PDDocument pdf = Loader.loadPDF(bytes)) {
             List<String> lines = new PDFTextStripper().getText(pdf).strip().lines().toList();

@@ -121,6 +121,8 @@ start, both markers are on the same line).
 - An item with a marker whose content does not lead to a text in this way (it starts with a `Stack`, a `Grid`, an `Image`, a
   `Barcode` or an empty block) is an error (`LIST_ITEM_WITHOUT_LINE`), on the line of the box that prevents it.
 - So is a marker wider than its indent (`LIST_MARKER_OVERFLOW`): it does not stick out of the list.
+- The `First line indent` the item inherits indents its text and does not move the marker
+  ([Typography](../common/typography.md#first-line-indent-first-line-indent)).
 
 > **Decision:** there is no indent property and no fixed marker width: the indent is the `Padding` of the `List`.
 > *Rejected alternative:* an `Indent` property, or aligning the marker with the top edge of the item.

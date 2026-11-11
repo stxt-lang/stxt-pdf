@@ -36,7 +36,7 @@
 | **Referencia** | `{page of: id}` o `{number of: id}` en un texto: la página donde empieza la caja con ese `Id`, o su número (el de un ítem, un encabezado o una figura) ([Referencias](references.md)). |
 | **Sección** | Parte independiente del documento (`Section`): empieza una página y tiene su propio `Page`, sus `Page overlay` y su numeración ([Document](../components/document.md#section)). |
 | **Tanda** | Las páginas numeradas desde el último `Page numbering: restart`: `{pages}` es el último número de la suya. |
-| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`Preformatted: true` o `wrap`). |
+| **Texto preformateado** | Texto que conserva sus espacios y sus saltos de línea (`Preformatted: keep` o `wrap`). |
 | **Tramo** | Parte del texto de una caja con su formato (negrita, cursiva, subrayado, tachado, enlace, en el código otra familia y, en un tramo con estilo, lo que declara su regla `For style`) ([Formato del texto](text-formatting.md#tramos)). |
 | **Versalitas** | Minúsculas pintadas como mayúsculas más pequeñas (`Small caps`). |
 | **Viuda** (`Widows`) | Línea de un párrafo que pasa sola a la página siguiente. |

@@ -3,7 +3,7 @@
 **Nada puede desbordar**, salvo lo que una caja decide con [`Overflow`](#política-por-caja-overflow). El motor comprueba el
 resultado ya paginado y da un error con la primera de estas situaciones:
 
-- **una palabra más ancha que su línea, o una línea de un texto con `Preformatted: true` más ancha que su caja**
+- **una palabra más ancha que su línea, o una línea de un texto con `Preformatted: keep` más ancha que su caja**
   (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra. Una palabra es aquí lo que no se puede partir:
   cada parte entre sus puntos de corte ([Tipografía](typography.md#guiones-hyphenate)) y, con `Break long words`, un
   solo carácter;

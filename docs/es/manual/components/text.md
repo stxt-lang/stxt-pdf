@@ -45,7 +45,7 @@ los dos. Dentro del bloque:
 
 - Los saltos de línea simples son espacios, así que las líneas se pueden partir donde convenga.
 - Una línea en blanco es un error: para varios párrafos, varios `Paragraph`. Solo en un texto preformateado
-  (`Preformatted: true`, [Formato del texto](../common/text-formatting.md)) es una línea más del texto.
+  (`Preformatted: keep`, [Formato del texto](../common/text-formatting.md)) es una línea más del texto.
 
 El texto es literal salvo con `Markup: markdown` ([Formato del texto](../common/text-formatting.md)).
 Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: id}`, `{number of: id}`

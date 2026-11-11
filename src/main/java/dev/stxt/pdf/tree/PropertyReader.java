@@ -4,6 +4,7 @@ import dev.stxt.InlineNode;
 import dev.stxt.Node;
 import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.BarcodeFormat;
+import dev.stxt.pdf.model.BreakLongWords;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.CaptionPosition;
 import dev.stxt.pdf.model.FigureCounter;
@@ -116,7 +117,7 @@ final class PropertyReader {
             entry("color", (p, s) -> s.typography().setColor(color(p, s.namedColors()))),
             entry("line-breaking", (p, s) -> s.typography().setLineBreaking(enumValue(LineBreaking.class, p))),
             entry("hyphenate", (p, s) -> s.typography().setHyphenate(bool(p))),
-            entry("break-long-words", (p, s) -> s.typography().setBreakLongWords(bool(p))),
+            entry("break-long-words", (p, s) -> s.typography().setBreakLongWords(enumValue(BreakLongWords.class, p))),
             entry("first-line-indent", (p, s) -> s.typography().setFirstLineIndent(signedPoints(p))),
             entry("markup", (p, s) -> s.typography().setMarkup(enumValue(Markup.class, p))),
             entry("case", (p, s) -> s.typography().setTextCase(enumValue(TextCase.class, p))),

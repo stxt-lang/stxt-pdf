@@ -34,7 +34,7 @@ Styles:
 | `Color` | color | `#000000` | El color del texto |
 | `Line breaking` | `simple`, `optimal` | `simple` | Cómo se reparte el texto en líneas |
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
-| `Break long words` | `true`, `false` | `false` | Si se corta, sin guion, una palabra que no cabe en una línea entera ([abajo](#palabras-largas)) |
+| `Break long words` | `never`, `new-line`, `same-line` | `never` | Si se corta, sin guion, una palabra que no cabe en una línea entera, y dónde empieza ([abajo](#palabras-largas)) |
 | `First line indent` | medida | `0` | Lo que se sangra la primera línea de cada párrafo ([abajo](#sangría-de-primera-línea)) |
 | `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
@@ -148,15 +148,18 @@ guion de no separación (U+2011).
 ## Palabras largas
 
 Un IBAN, una dirección de correo o una URL no tienen por dónde partirse, y en una celda estrecha no caben: son un
-error. Con `Break long words: true`, una palabra más ancha que una línea entera de su caja se corta por la última
-letra que cabe, sin guion, y sigue en la línea siguiente:
+error. Con `Break long words: new-line`, una palabra más ancha que una línea entera de su caja empieza en una línea
+propia, se corta por la última letra que cabe, sin guion, y sigue en la línea siguiente:
 
 ```
 Styles:
     For element: Cell
         Typography:
-            Break long words: true
+            Break long words: new-line
 ```
+
+Con `same-line`, la palabra no empieza en una línea propia: sigue a las palabras anteriores y se corta donde acaba
+esa línea, sin dejar una línea corta delante. `never`, el valor por defecto, no la corta.
 
 Solo se corta lo que no cabe de ninguna otra forma: una palabra que cabe en una línea propia pasa entera a la línea
 siguiente, y una que tiene guiones se parte antes por ellos. El texto que se copia del PDF es la palabra entera. No

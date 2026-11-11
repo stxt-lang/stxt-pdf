@@ -27,7 +27,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 		For element: Cell
 			Typography:
-				Break long words: true
+				Break long words: new-line
 		For element: Text
 			Box:
 				Width: 100
@@ -57,4 +57,4 @@ Document (dev.stxt.pdf):
 			Id: optimal
 			Typography:
 				Line breaking: optimal
-				Break long words: true
+				Break long words: new-line

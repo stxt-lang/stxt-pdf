@@ -5,6 +5,34 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Changed
+
+- **`Break long words` is an enumeration**: `never` (the default, what `false` was), `new-line` and `same-line`.
+  `true` and `false` are no longer values, with no alias. Both new values cut the part of a word wider than a whole
+  line of its box, and they differ in where that part starts: with `new-line`, in a line of its own, after the line
+  of the words and of the parts of its word before it, as in a word processor; with `same-line`, in the current
+  line, after them, which is what `true` did. "Long words" in the reference of `Typography`.
+- **`Preformatted` no longer takes `true` and `false`**: its values are `none` (the default, what `false` was),
+  `keep` (what `true` was) and `wrap`, with no alias for the old ones. It was the one enumeration with boolean
+  values. The constants of `model.Preformatted` are `NONE`, `KEEP` and `WRAP`, and the messages of the errors name
+  `Preformatted: keep`. No document is laid out differently. "Preformatted text" in the reference of
+  `Text formatting`.
+- **The empty blocks of a `Markdown` are ignored**: a heading without text (`#` alone), an empty code block and a
+  block quote without content (`>` alone), which were `TEXT_CONTENT`, generate no element. They are valid Markdown,
+  they may come in a text from outside and they have nothing to paint. A `Markdown` left without any element and a
+  heading without text and with an `Id` are still `TEXT_CONTENT`, and a list item without content is still an
+  error. "What is not supported" in the reference of `Markdown`.
+- `TypographyStyle.breakLongWords()` returns the new `model.BreakLongWords` instead of a `boolean`.
+
+### Fixed
+
+- The marker of a `List item` no longer takes the `First line indent` its item inherits: a negative indent declared
+  over a list, with the left `Padding` it needs in the texts of its items, was `FIRST_LINE_INDENT_OVERFLOW` because
+  of the marker, which has no padding. The text of the item is indented as before, and the marker stays where it
+  is without the indent. "First line indent" in the reference of `Typography`.
+
 ## [0.15.0] - 2026-11-11
 
 Long words cut where they do not fit, the vertical alignment of the content of a cell, block quotes and dividers in a

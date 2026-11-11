@@ -26,7 +26,9 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  *
  * <p><strong>Cuts of last resort.</strong> A part of a word that cannot be split further and is wider than
  * {@code longWord}, the width of a whole line of the box, gets a break point between each two of its characters
- * ({@link #cutLongParts}), so that the line breaking can end a line at the last one that fits. A word that fits in a
+ * ({@link #cutLongParts}), so that the line breaking can end a line at the last one that fits; with
+ * {@code new-line} the part starts a line of its own, so only a line that starts in it ends at one of them
+ * ({@link #reaches}), and with {@code same-line}, any line. A word that fits in a
  * whole line has none: it goes to the next line, as always. The first part of the first word has no line before the
  * one it starts in, the first one of the paragraph, which a {@code First line indent} makes shorter: it is cut from
  * {@code firstPart}, the width of that line.</p>
@@ -52,6 +54,11 @@ final class Paragraph {
     private final int[] posOffset;
     /** How a line that ends at each position ends. */
     private final byte[] posKind;
+    /**
+     * For a cut of last resort of a part that starts a line of its own ({@code Break long words: new-line}), the
+     * position where the part starts; for the others, 0.
+     */
+    private final int[] posPart;
     /** start[w]: the position of the start of word w; start[n], the end of the text. */
     private final int[] start;
     /**
@@ -62,7 +69,8 @@ final class Paragraph {
     private final double[] tail;
 
     Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing) {
-        this(words, measurer, font, fontSize, letterSpacing, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        this(words, measurer, font, fontSize, letterSpacing, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+                false);
     }
 
     /**
@@ -71,9 +79,11 @@ final class Paragraph {
      *                 cut one
      * @param firstPart the same width for the first part of the first word: that of the first line of the paragraph,
      *                  with its {@code First line indent}; never greater than {@code longWord}
+     * @param newLine  whether a part that is cut starts a line of its own ({@code Break long words: new-line}) or
+     *                 the line in progress, after the words before it ({@code same-line})
      */
     Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing,
-              double longWord, double firstPart) {
+              double longWord, double firstPart, boolean newLine) {
         this.words = words;
         this.measurer = measurer;
         this.font = font;
@@ -111,13 +121,19 @@ final class Paragraph {
         posWord = new int[positions];
         posOffset = new int[positions];
         posKind = new byte[positions];
+        posPart = new int[positions];
         int p = 0;
         for (int w = 0; w < n; w++) {
+            int part = p;
             posWord[p] = w;
             posOffset[p++] = 0;
             for (int k = 0; k < breaks[w].length; k++) {
+                if (kinds[w][k] != LAST_RESORT) {
+                    part = p;
+                }
                 posWord[p] = w;
                 posKind[p] = kinds[w][k];
+                posPart[p] = newLine && kinds[w][k] == LAST_RESORT ? part : 0;
                 posOffset[p++] = breaks[w][k];
             }
         }
@@ -209,18 +225,20 @@ final class Paragraph {
      */
     static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                         double letterSpacing, Hyphenator hyphenator, double longWord) {
-        return of(runs, measurer, font, fontSize, letterSpacing, hyphenator, longWord, longWord);
+        return of(runs, measurer, font, fontSize, letterSpacing, hyphenator, longWord, longWord, true);
     }
 
     /**
      * The same, with the first line of the paragraph shorter than the rest ({@code First line indent}): the first
-     * part of the first word is cut from {@code firstPart}, the width of that line.
+     * part of the first word is cut from {@code firstPart}, the width of that line; with {@code newLine}, a part
+     * that is cut starts a line of its own.
      */
     static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
-                        double letterSpacing, Hyphenator hyphenator, double longWord, double firstPart) {
+                        double letterSpacing, Hyphenator hyphenator, double longWord, double firstPart,
+                        boolean newLine) {
         List<Words.Word> words = Words.words(runs, hyphenator);
         return words.isEmpty() ? null
-                : new Paragraph(words, measurer, font, fontSize, letterSpacing, longWord, firstPart);
+                : new Paragraph(words, measurer, font, fontSize, letterSpacing, longWord, firstPart, newLine);
     }
 
     int words() {
@@ -262,6 +280,16 @@ final class Paragraph {
      */
     boolean lastResort(int p) {
         return posKind[p] == LAST_RESORT;
+    }
+
+    /**
+     * Whether a line from {@code a} may end at position {@code b}: at a cut of last resort of a part that starts a
+     * line of its own ({@code Break long words: new-line}), only if it starts in that part, at its start or at an
+     * earlier cut of it, after the line of the words and the parts of its word before it
+     * (reference/common/typography.md).
+     */
+    boolean reaches(int a, int b) {
+        return a >= posPart[b];
     }
 
     /** Whether a forced line break comes right before position {@code p}: a line has to end there. */

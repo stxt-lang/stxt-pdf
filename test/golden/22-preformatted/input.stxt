@@ -30,7 +30,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: term
 			Typography:
-				Preformatted: true
+				Preformatted: keep
 			Content >>
 				> Ajustes > Bornes
 				L   230 V   [ OK ]
@@ -40,7 +40,7 @@ Document (dev.stxt.pdf):
 		Text:
 			Id: tabs
 			Typography:
-				Preformatted: true
+				Preformatted: keep
 				Tab size: 8
 			Content >>
 				a	b

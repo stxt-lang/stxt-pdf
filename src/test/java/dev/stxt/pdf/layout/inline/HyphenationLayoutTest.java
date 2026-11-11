@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.tree.DocumentSyntaxException;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 
@@ -82,7 +83,7 @@ class HyphenationLayoutTest {
 
     @Test
     void preformattedTextDropsTheSoftHyphens() {
-        List<TextLine> l = lines("ul­tra", 100, "Preformatted: true");
+        List<TextLine> l = lines("ul­tra", 100, "Preformatted: keep");
         assertEquals(List.of("ultra"), texts(l));
         assertEquals(25, l.get(0).width(), 1e-9);
     }
@@ -142,22 +143,33 @@ class HyphenationLayoutTest {
     @Test
     void breakLongWordsCutsTheWordWiderThanItsBox() {
         // Width 50 = 10 characters, and the IBAN has 24.
-        List<TextLine> l = lines("ES7620770024003102575766", 50, "Break long words: true");
+        List<TextLine> l = lines("ES7620770024003102575766", 50, "Break long words: new-line");
         assertEquals(List.of("ES76207700", "2400310257", "5766"), texts(l));
         assertTrue(l.stream().noneMatch(TextLine::hyphenated));
         assertEquals(List.of(true, true, false), l.stream().map(TextLine::splitsWord).toList());
         assertEquals(List.of("ES76207700", "2400310257", "5766"),
-                texts(lines("ES7620770024003102575766", 50, "Break long words: true", "Line breaking: optimal")));
+                texts(lines("ES7620770024003102575766", 50, "Break long words: new-line", "Line breaking: optimal")));
         // A word that fits in a line of its own is not cut: it goes to the next line.
-        assertEquals(List.of("IBAN", "ES76207700"), texts(lines("IBAN ES76207700", 50, "Break long words: true")));
+        assertEquals(List.of("IBAN", "ES76207700"), texts(lines("IBAN ES76207700", 50, "Break long words: new-line")));
+    }
+
+    @Test
+    void theLongWordStartsALineOfItsOwnOrTheCurrentOne() {
+        // Width 50 = 10 characters: "ID " takes 3 of the first line.
+        assertEquals(List.of("ID", "ES76207700", "2400"),
+                texts(lines("ID ES762077002400", 50, "Break long words: new-line")));
+        assertEquals(List.of("ID ES76207", "7002400"),
+                texts(lines("ID ES762077002400", 50, "Break long words: same-line")));
+        // true and false are not values of the property: the schema rejects them.
+        assertThrows(DocumentSyntaxException.class, () -> lines("ID ES762077002400", 50, "Break long words: true"));
     }
 
     @Test
     void breakLongWordsIsInherited() {
-        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: true",
+        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: new-line",
                 "\t\tText: ABCDEFGHIJKLMNOP", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\tText: ABCDEFGHIJ KLMNOP", "\t\t\tId: OFF", "\t\t\tBox:", "\t\t\t\tWidth: 50",
-                "\t\t\tTypography:", "\t\t\t\tBreak long words: false");
+                "\t\t\tTypography:", "\t\t\t\tBreak long words: never");
         assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(f.fragment("T").lines()));
         assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(f.fragment("OFF").lines()));
     }
@@ -168,7 +180,7 @@ class HyphenationLayoutTest {
         // the final width is not enough.
         LayoutFixture f = layOut("\tGrid:", "\t\tColumn sizes: narrowest", "\t\tArea:",
                 "\t\t\tText: ABCDEFGHIJKLMNOP", "\t\t\t\tId: B", "\t\t\t\tTypography:",
-                "\t\t\t\t\tBreak long words: true");
+                "\t\t\t\t\tBreak long words: new-line");
         assertEquals(80, f.rect("B").width(), 1e-9);
         assertEquals(List.of("ABCDEFGHIJKLMNOP"), texts(f.fragment("B").lines()));
         // With a written hyphen, the narrowest width is that of the widest part: "2026-" and "00981" (25).
@@ -182,23 +194,23 @@ class HyphenationLayoutTest {
     void aTextThatBreaksItsLongWordsDoesNotShrinkForItsWidth() {
         // With Overflow: shrink the text would go down to the Size at which the word fits; cut, it fits at its Size.
         List<TextLine> l = layOut("\tText: ABCDEFGHIJKLMNOP", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50",
-                "\t\t\tOverflow: shrink", "\t\tTypography:", "\t\t\tBreak long words: true").fragment("T").lines();
+                "\t\t\tOverflow: shrink", "\t\tTypography:", "\t\t\tBreak long words: new-line").fragment("T").lines();
         assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(l));
         assertEquals(10, l.get(0).fontSize(), 1e-9);
     }
 
     @Test
     void breakLongWordsWrittenByAPreformattedTextIsAnError() {
-        for (String preformatted : List.of("true", "wrap")) {
+        for (String preformatted : List.of("keep", "wrap")) {
             InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: abc",
-                    "\t\tTypography:", "\t\t\tPreformatted: " + preformatted, "\t\t\tBreak long words: true"));
+                    "\t\tTypography:", "\t\t\tPreformatted: " + preformatted, "\t\t\tBreak long words: new-line"));
             assertEquals(ErrorCode.BREAK_LONG_WORDS_IN_PREFORMATTED, e.errorCode(), preformatted);
         }
         // Inherited, it is not checked: the preformatted text of a box that has it is left alone.
-        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: true",
-                "\t\tText: abc", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tPreformatted: true");
+        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: new-line",
+                "\t\tText: abc", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tPreformatted: keep");
         assertEquals(List.of("abc"), texts(f.fragment("T").lines()));
-        // Nor is Break long words: false, which changes nothing.
-        layOut("\tText: abc", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\t\tBreak long words: false");
+        // Nor is Break long words: never, which changes nothing.
+        layOut("\tText: abc", "\t\tTypography:", "\t\t\tPreformatted: keep", "\t\t\tBreak long words: never");
     }
 }

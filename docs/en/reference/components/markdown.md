@@ -86,7 +86,7 @@ as follows:
 | `[x]{name}` | styled run: with what the `For style: name` rule declares ([Text formatting](../common/text-formatting.md#styled-runs)) |
 | `[^id]` | the call of the footnote with that `Id`: a superscript run with its number ([Footnote](footnote.md)) |
 | `\` at the end of the line | a forced line break: the line ends there, within the same paragraph ([below](#forced-line-breaks)) |
-| Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: true` whose font is its `Code font`, with the code in its `Content` |
+| Code block (with ```` ``` ```` fences or indented four spaces) | `Code block`: a `Text` with `Preformatted: keep` whose font is its `Code font`, with the code in its `Content` |
 | `> text` | `Block quote`: a block with what the quote contains, translated the same way ([below](#block-quotes-and-dividers)) |
 | `---`, `***`, `___` | `Divider`: a line across the whole width ([below](#block-quotes-and-dividers)) |
 | `![Alt](path)`, alone in its paragraph | `Image` with that path and its `Alt`, or decorative with `![](path)` ([Image](image.md)) |
@@ -98,7 +98,18 @@ Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](t
 before it on its line ([below](#forced-line-breaks)) and link definitions (`[x][ref]` with `[ref]: target`: the target is
 written in the link itself).
 A heading cannot go inside a list item either, as in a `List item`, nor can a table be left without rows below
-the header. A `Markdown` without content, or a heading or a paragraph without text, is `TEXT_CONTENT`.
+the header.
+
+**Empty blocks are ignored**: a heading without text (`#` alone), an empty code block, a quote without content (`>`
+alone) and a paragraph without text generate no element, also inside a quote or an item. Two empty things are still
+an error: a `Markdown` left without any element, and a heading without text and with an `Id` (`# {#sales}`), both
+`TEXT_CONTENT`. A list item without content (`-` alone) is `LIST_ITEM_EMPTY`, like an empty `List item`: its
+marker would be painted.
+
+> **Decision:** an empty block is ignored. It is valid Markdown, it may arrive in a text that comes from outside
+> (the data of a template) and it has nothing to paint, so ignoring it loses nothing. *Rejected alternative:* an
+> error, like that of an empty `Text` the author writes: that element is declared, and this is a leftover of the
+> text. It is not what "would have no effect" (below): there the author wrote something they expected to see.
 
 A `Bullet markers` or a `Number markers` with a marker of the other type is `VALUE_NOT_ALLOWED`. A clickable image is an `Image` with
 `Link` or, inside a text, an inline image inside a link (`[![Alt](path)](target)`).
@@ -153,13 +164,13 @@ family of `Code font`: it keeps the weight and the style of the text around it a
 paragraph (``**`x`**`` is bold code), and it can be inside a link. The white space of a line with
 inline code is collapsed as in any paragraph. What keeps the spaces is the block.
 
-A code block is a `Text` with `Preformatted: true`
+A code block is a `Text` with `Preformatted: keep`
 ([Text formatting](../common/text-formatting.md#preformatted-text)) whose font is its `Code font`, so
 it breaks between lines across pages and a line wider than the box is an error (`TEXT_OVERFLOW`). It has no `Id` or
 `Style`, but it is the generated element `Code block` and the rule
 `For element: Code block` names it ([Styles](../common/styles.md)), with `Box`, `Typography` and `Break` (a background, a padding, a
 smaller size or `Keep together: true`). `For element: Text` does not reach it (it still applies to the `Text` elements of the headings of
-a Markdown and to those that are written). A `Text` written by hand with `Preformatted: true` is not a `Code block` either. Its
+a Markdown and to those that are written). A `Text` written by hand with `Preformatted: keep` is not a `Code block` either. Its
 `Typography` is that of the `Markdown`, so `Size`, `Color`, `Tab size` or `Code font` are declared in the `Typography` of the
 `Markdown`, of an ancestor or in `For element: Code block`, which can give it a different `Code font` from the inline code. A
 `Font` in `For element: Code block` changes nothing, because its font is its `Code font`. The `Line height` of the box is used
@@ -210,8 +221,8 @@ written in the document and have no `Id` or `Style`, and the `For element` rules
 | `Divider` | an empty block whose top border is the line | a line of 0.5 (its top `Border`), in the color of the text, across the whole width | `Box`, `Break` |
 
 - **The content of a quote** is translated like the rest: paragraphs, lists, tables, code and another quote inside. A
-  heading inside a quote is `MARKDOWN_UNSUPPORTED`, as inside a list, and a quote without content (`>` alone),
-  `TEXT_CONTENT`.
+  heading inside a quote is `MARKDOWN_UNSUPPORTED`, as inside a list, and a quote without content (`>` alone)
+  is ignored ([above](#the-subset)).
 - **Look.** A quote has no default look, like the rest of what a `Markdown` generates: without a rule it looks like
   the paragraphs it contains, and `For element: Block quote` gives it its indent, its line or its background, as in
   the example. The line of a `Divider` is what the element is: its rule changes its thickness (`Border`), its color

@@ -15,5 +15,5 @@ Document (dev.stxt.pdf):
 	Section:
 		Text: ES7620770024003102575766
 			Typography:
-				Preformatted: true
-				Break long words: true
+				Preformatted: keep
+				Break long words: new-line

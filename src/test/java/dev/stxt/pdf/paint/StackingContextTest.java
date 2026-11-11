@@ -475,7 +475,7 @@ class StackingContextTest {
         assertEquals(List.of("[text", "'ver REF-2026-'", "'009812'", "]"), r.sequences);
         Recorder cut = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
                 "\tText: ABCDEFGHIJKLMNOP y más", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50",
-                "\t\tTypography:", "\t\t\tBreak long words: true");
+                "\t\tTypography:", "\t\t\tBreak long words: new-line");
         assertEquals(List.of("[text", "'ABCDEFGHIJ'", "'KLMNOP y '", "'más'", "]"), cut.sequences);
     }
 

@@ -45,7 +45,7 @@ two, never both. Inside the block:
 
 - Single line breaks are spaces, so the lines can be broken wherever is convenient.
 - A blank line is an error: for several paragraphs, several `Paragraph` elements. Only in preformatted text
-  (`Preformatted: true`, [Text formatting](../common/text-formatting.md)) is it one more line of the text.
+  (`Preformatted: keep`, [Text formatting](../common/text-formatting.md)) is it one more line of the text.
 
 The text is literal except with `Markup: markdown` ([Text formatting](../common/text-formatting.md)).
 It can contain page numbers and references: `{page}`, `{pages}`, `{page of: id}`, `{number of: id}`

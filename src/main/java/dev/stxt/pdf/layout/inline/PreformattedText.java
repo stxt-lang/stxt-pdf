@@ -10,7 +10,7 @@ import java.util.List;
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
- * Breaks into lines a text with {@code Preformatted: true} or {@code wrap}
+ * Breaks into lines a text with {@code Preformatted: keep} or {@code wrap}
  * (reference/common/text-formatting.md): the spaces and the line breaks of the text are kept.
  *
  * <p>Each line of the text is a line of the box, the empty ones too (a blank line does not
@@ -65,7 +65,7 @@ final class PreformattedText {
     }
 
     /**
-     * Narrowest width and natural width: with {@code true}, the widest line; with {@code wrap}, the
+     * Narrowest width and natural width: with {@code keep}, the widest line; with {@code wrap}, the
      * widest word and the widest line. The first line, and with {@code wrap} its first word, count with the
      * {@code firstLineIndent} added.
      */
