@@ -24,6 +24,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Line breaking` | `simple`, `optimal` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Partir palabras con guion al final de la línea, con los patrones del idioma ([Guiones](#guiones-hyphenate)). |
 | `Break long words` | `true`, `false` | `false` | Cortar sin guion la parte de una palabra que no cabe en una línea entera ([Palabras largas](#palabras-largas-break-long-words)). |
+| `First line indent` | medida, sin % | `0` | Sangría de la primera línea del párrafo; puede ser negativa ([Sangría de primera línea](#sangría-de-primera-línea-first-line-indent)). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
@@ -72,7 +73,9 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
 
 Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-laterales-side)) o a una letra capitular
 ([Text](../components/text.md#letra-capitular-drop-cap)) son más cortas que la caja de contenido: los dos repartos trabajan
-con el ancho de cada línea, y una palabra que no cabe en una línea corta la deja vacía y pasa a la siguiente.
+con el ancho de cada línea, y una palabra que no cabe en una línea corta la deja vacía y pasa a la siguiente. La
+primera línea de un párrafo con `First line indent` también tiene otro ancho
+([Sangría de primera línea](#sangría-de-primera-línea-first-line-indent)).
 
 Una palabra se parte tras un guion escrito en ella, donde lleva un guion blando o, con `Hyphenate`, por los patrones
 del idioma ([Guiones](#guiones-hyphenate)). En los dos repartos, una palabra más ancha que la línea, o una parte suya
@@ -236,6 +239,75 @@ Styles:
 > descartada:* cortar las palabras largas de `wrap`, que ningún documento ha pedido, y el error también cuando se
 > hereda, que alcanzaría a cada bloque de código de un documento que lo declara en `For element: Document`.
 
+## Sangría de primera línea (`First line indent`)
+
+`First line indent` desplaza el principio de la **primera línea** de cada caja de texto y acorta esa línea en lo
+mismo. Es de `Typography`, se hereda y vale `0` por defecto. Es una medida en puntos o en milímetros, sin
+porcentajes (`VALUE_NOT_ALLOWED`).
+
+```stxt
+Styles:
+    For element: Paragraph
+        Typography:
+            First line indent: 14
+```
+
+Con un valor negativo y `Padding` izquierdo es la **sangría francesa** de las cláusulas, las bibliografías y los
+glosarios: la primera línea empieza antes que las demás.
+
+```stxt
+Styles:
+    For style: clause
+        Box:
+            Padding: 0 0 0 30
+        Typography:
+            First line indent: -30
+```
+
+- **Dónde se declara.** Se hereda, así que vale para toda caja con texto que la reciba: desde
+  `For element: Document` sangra también los encabezados, las celdas y los marcadores de las listas.
+  `For element: Paragraph` la da solo a los párrafos.
+- **Solo la primera línea del párrafo.** No la que sigue a un salto de línea forzado
+  ([Markdown](../components/markdown.md#saltos-de-línea-forzados)), ni la primera del fragmento cuando el párrafo
+  continúa en otra página o columna.
+- **Alineación.** La línea se alinea en lo que queda tras la sangría: con `Align: center` o `right` se centra o se
+  lleva a la derecha en ese ancho, y con `justify` lo llena.
+- **Negativa.** La primera línea empieza a la izquierda de la caja de contenido, dentro del `Padding` izquierdo de
+  su caja, y mide eso de más. Si el valor absoluto pasa de ese `Padding`, la línea empezaría fuera de la caja: es un
+  error (`FIRST_LINE_INDENT_OVERFLOW`), con la línea del `First line indent`, aunque esté en una antecesora o en una
+  regla. Se compara con el relleno de la caja ya maquetada, así que un `Padding` en porcentaje cuenta por lo que
+  mide.
+- **Junto a una caja lateral** ([Block](../components/block.md#cajas-laterales-side)), la sangría se suma a lo que
+  la caja quita a la primera línea. El resto de un párrafo que se vuelve a repartir en la página siguiente no se
+  sangra.
+- **Con `Drop cap`** en el mismo párrafo es un error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), con la línea del
+  `Drop cap`: las dos mueven el principio del párrafo. Cuenta también la sangría que el párrafo hereda o recibe de
+  una regla; el párrafo con capitular declara `First line indent: 0`.
+- **Con `Preformatted: true` o `wrap`** se aplica igual, a la primera línea del texto; con `wrap`, esa línea se
+  parte en lo que deja la sangría.
+- **Lo que no cabe.** Una sangría que no deja sitio a la primera palabra es `TEXT_OVERFLOW`: la palabra no pasa a
+  la línea siguiente. `Break long words` sigue midiendo contra la línea entera de la caja.
+- **Tamaños intrínsecos**: el ancho natural suma la sangría a la primera línea, y el más estrecho es el mayor entre
+  la palabra más ancha y la primera palabra más la sangría ([abajo](#tamaños-intrínsecos)).
+
+> **Decisión:** una propiedad de `Typography`, heredada como todo su grupo, que una regla
+> `For element: Paragraph` da a los párrafos sin tocar encabezados ni celdas. *Alternativa descartada:* una
+> propiedad de `Paragraph` no heredada, que no serviría para las cláusulas escritas como `Text` ni desde un
+> `Block`.
+
+> **Decisión:** una sangría negativa cabe en el `Padding` izquierdo de su caja, y si no es un error: el texto no
+> sale de su caja. Se comprueba con la caja ya maquetada, como lo que desborda, porque el relleno puede ser un
+> porcentaje. *Alternativa descartada:* dejar que la línea salga de la caja, y comprobarlo al leer el documento, que
+> no alcanza a un `Padding` en porcentaje.
+
+> **Decisión:** con `Drop cap` es un error también cuando la sangría se hereda o viene de una regla: las dos mueven
+> el principio del párrafo y el motor no elige entre ellas. *Alternativa descartada:* que la capitular anule la
+> sangría sin decirlo, y comprobar solo la que escribe el propio párrafo.
+
+> **Decisión:** una primera palabra que no cabe tras la sangría desborda. *Alternativa descartada:* dejar vacía la
+> primera línea y bajar la palabra, como junto a una caja lateral, que daría un párrafo sin sangría detrás de una
+> línea en blanco.
+
 ## Kerning (`Kerning`)
 
 Con `Kerning: true` el texto se mide y se pinta con los pares de kerning de la fuente, que acercan o separan dos letras
@@ -295,7 +367,10 @@ El ancho más estrecho es la palabra más ancha (si tiene puntos de corte, por `
 un guion escrito, la más ancha de sus partes, con su guion), y el natural, el párrafo más largo en una sola línea
 (con `Preformatted: true` o `wrap`, ver [Formato del texto](text-formatting.md#tamaños-intrínsecos)).
 `Break long words` no cambia ninguno de los dos
-([Palabras largas](#palabras-largas-break-long-words)).
+([Palabras largas](#palabras-largas-break-long-words)). Con `First line indent`, el natural suma la sangría a la
+primera línea y el más estrecho es el mayor entre la palabra más ancha y la primera palabra (o su primera parte) más
+la sangría; con una sangría negativa, el natural no baja de la palabra más ancha
+([Sangría de primera línea](#sangría-de-primera-línea-first-line-indent)).
 
 ## Idioma (`Language`)
 
@@ -319,6 +394,7 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
   lado del guion.
 - Puntos de corte tras otros caracteres que el guion (`/`, `.`, `_`, `@`), impedir el corte tras un guion escrito de
   otra forma que con el guion de no separación, y cortar las palabras largas de un texto preformateado.
+- Sangría de primera línea en porcentaje, y sangrar la línea que sigue a un salto de línea forzado.
 - Tamaño distinto dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo cambia
   la familia, el peso, el estilo, el color, las mayúsculas y el interletraje
   ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.

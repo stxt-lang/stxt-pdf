@@ -117,6 +117,7 @@ final class PropertyReader {
             entry("line-breaking", (p, s) -> s.typography().setLineBreaking(enumValue(LineBreaking.class, p))),
             entry("hyphenate", (p, s) -> s.typography().setHyphenate(bool(p))),
             entry("break-long-words", (p, s) -> s.typography().setBreakLongWords(bool(p))),
+            entry("first-line-indent", (p, s) -> s.typography().setFirstLineIndent(signedPoints(p))),
             entry("markup", (p, s) -> s.typography().setMarkup(enumValue(Markup.class, p))),
             entry("case", (p, s) -> s.typography().setTextCase(enumValue(TextCase.class, p))),
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),

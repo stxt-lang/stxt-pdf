@@ -22,8 +22,10 @@ import java.util.List;
  *                    (reference/common/typography.md): the last run ends with it, the text that is read does not
  *                    (reference/implementation/pdf.md)
  * @param left        room taken from the left of the content box by a side box or a drop cap
- *                    (reference/components/block.md), already included in {@code x}; 0 in a line that has the whole
- *                    width
+ *                    (reference/components/block.md), and in the first line of a paragraph, by its
+ *                    {@code First line indent} (reference/common/typography.md), with which it can be negative: the
+ *                    line box starts in the left padding. Already included in {@code x}; 0 in a line that has the
+ *                    whole width
  * @param right       room taken from the right of the content box by a side box; 0 otherwise. The line box is the
  *                    content width minus {@code left} and {@code right}, and the line is aligned within it
  * @param splitsWord  whether the line ends inside a word, which goes on in the next line

@@ -1,0 +1,25 @@
+# Page 1: p1 at 20 and clause at 56, three lines each; img at (20, 92); p3 at 92, three lines, and p4 at 128 with
+#   4 lines. Page 2: the rest of p4, three lines, and p5 at 56 with 10 lines. Page 3: the rest of p5, three lines,
+#   and p6 at 56 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: p1
+			Rect: 20 20 260 36
+		Fragment: clause
+			Rect: 20 56 260 36
+		Fragment: img
+			Rect: 20 92 60 60
+		Fragment: p3
+			Rect: 20 92 260 36
+		Fragment: p4
+			Rect: 20 128 260 48
+	Page: 2
+		Fragment: p4
+			Rect: 20 20 260 36
+		Fragment: p5
+			Rect: 20 56 260 120
+	Page: 3
+		Fragment: p5
+			Rect: 20 20 260 36
+		Fragment: p6
+			Rect: 20 56 260 12

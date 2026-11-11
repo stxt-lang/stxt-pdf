@@ -55,6 +55,11 @@ import java.util.OptionalDouble;
  * start after it, like beside a side box, and the paragraph is at least that tall. The lines and their drop cap go
  * together: a page break does not fall among them.</p>
  *
+ * <p><strong>First line indent</strong> (reference/common/typography.md). The first line of the paragraph starts
+ * after the {@code First line indent} of the box, or before it if it is negative, and is that much shorter or longer
+ * ({@link LineWidths#withFirstLineIndent}); only that line: not the first one of a fragment that goes on from another
+ * page, whose text starts at a later position or at a later line.</p>
+ *
  * <p>{@code {page}} and {@code {pages}} are measured as a probe number and replaced when
  * pagination ends ({@link PageNumbers#number}). The references to other boxes and the running heads
  * ({@link Reference}) are replaced before breaking the text into lines, with the values the
@@ -223,7 +228,8 @@ public final class InlineLayout implements LayoutAlgorithm {
     /**
      * The lines of the text of the box at {@code fontSize} from position {@code from}, a single paragraph (in a
      * preformatted one, blank lines do not split it), beside the side boxes of the parent ({@code beside}) and, from
-     * the start of a {@code Paragraph} with {@code Drop cap}, beside its drop cap too.
+     * the start of a {@code Paragraph} with {@code Drop cap}, beside its drop cap too. Broken from its start, its
+     * first line has the {@code First line indent} of the box.
      */
     private Broken breakText(Box box, double available, double fontSize, List<Exclusion> beside, int from) {
         Style s = box.style();
@@ -231,24 +237,28 @@ public final class InlineLayout implements LayoutAlgorithm {
         if (!box.hasText()) {
             return new Broken(List.of(), fontSize, LineWidths.uniform(available), null);
         }
+        // Only the first line of the paragraph is indented: a text broken from a later position has none.
+        double indent = from == 0 ? s.typography().firstLineIndent() : 0;
         if (s.typography().preformatted().enabled()) {
             // Preformatted text keeps its lines: it goes below the side boxes, never beside them.
             List<LineBreaker.Line> lines = List.copyOf(PreformattedText.lines(runs(box), s.typography().tabSize(),
-                    s.typography().preformatted() == Preformatted.WRAP, available, measurer(),
+                    s.typography().preformatted() == Preformatted.WRAP, available, indent, measurer(),
                     s.typography().fontFace(), fontSize, s.typography().letterSpacing()));
-            return new Broken(lines, fontSize, LineWidths.uniform(available), null);
+            return new Broken(lines, fontSize, LineWidths.uniform(available).withFirstLineIndent(indent), null);
         }
-        LineWidths widths = LineWidths.of(available, lineHeight, beside);
+        LineWidths widths = LineWidths.of(available, lineHeight, beside).withFirstLineIndent(indent);
         List<TextRun> runs = runs(box);
         DropCap dropCap = null;
         if (s.dropCap() > 0) {
             dropCap = dropCap(box, runs, fontSize, lineHeight);
             if (dropCap != null) {
                 runs = dropCap.rest();
-                widths = widths.withDropCap(s.dropCap(), dropCap.width());
                 if (from > 0) {
-                    // The drop cap goes with the first lines: a fragment that starts later has none.
+                    // The drop cap goes with the first lines: a text broken from a later position has none, and
+                    // nothing takes room from its lines.
                     dropCap = null;
+                } else {
+                    widths = widths.withDropCap(s.dropCap(), dropCap.width());
                 }
             }
         }
@@ -348,10 +358,11 @@ public final class InlineLayout implements LayoutAlgorithm {
         }
         if (s.typography().preformatted().enabled()) {
             return PreformattedText.intrinsics(runs(box), s.typography().tabSize(), s.typography().preformatted() == Preformatted.WRAP,
-                    measurer(), s.typography().fontFace(), s.typography().fontSize(), s.typography().letterSpacing());
+                    s.typography().firstLineIndent(), measurer(), s.typography().fontFace(), s.typography().fontSize(),
+                    s.typography().letterSpacing());
         }
         return LineBreaker.intrinsics(textRuns(box), measurer(), s.typography().fontFace(), s.typography().fontSize(),
-                s.typography().letterSpacing(), hyphenator(s));
+                s.typography().letterSpacing(), hyphenator(s), s.typography().firstLineIndent());
     }
 
     @Override
@@ -448,10 +459,10 @@ public final class InlineLayout implements LayoutAlgorithm {
      * The widows of a text cut beside a side box: the lines that move to the next page are broken again there at
      * the whole width, so they are fewer than the ones left here. If fewer than {@code Widows}, the cut moves up
      * while the lines that stay respect {@code Orphans}; if it cannot, it stays where {@link BreakRules#cutLines} put
-     * it.
+     * it. A text whose lines differ only in its first line indent is not broken again: its cut stays.
      */
     private int widows(Box box, double available, OptionalDouble limit, Broken b, int end, int start, Style s) {
-        if (b.widths() == null || !b.widths().varies() || end >= b.lines().size()) {
+        if (b.widths() == null || !b.widths().shortened() || end >= b.lines().size()) {
             return end;
         }
         int cut = end;

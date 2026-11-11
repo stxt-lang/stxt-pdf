@@ -27,6 +27,7 @@ import static dev.stxt.pdf.layout.Messages.excerpt;
 import static dev.stxt.pdf.layout.Messages.pt;
 import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.pdf.tree.PropertyKey.BORDER;
+import static dev.stxt.pdf.tree.PropertyKey.FIRST_LINE_INDENT;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_ROWS;
 import static dev.stxt.pdf.tree.PropertyKey.HEIGHT;
@@ -53,6 +54,11 @@ import static dev.stxt.pdf.tree.PropertyKey.WIDTH;
  *
  * <p>What a box with {@code Overflow: clip} contains is painted clipped and is not checked against it nor against the
  * page (reference/common/overflow.md); each box inside it is still checked against its own parent.</p>
+ *
+ * <p>The first line of a text with a negative {@code First line indent} (reference/common/typography.md) starts
+ * before the content box, in the left padding of its box ({@link TextLine#left()} is negative): it does not overflow
+ * while the padding holds the indent, which is checked here because the padding may be a percentage
+ * ({@link #firstLineIndent}).</p>
  */
 public final class Overflow {
 
@@ -157,11 +163,14 @@ public final class Overflow {
     private static void content(Fragment f, double cx, double cy, double width, double height, boolean isPage,
                                 Rect page, Turns turns, boolean clipped) {
         boolean window = f.box().style().box().clips();
+        if (!f.lines().isEmpty()) {
+            firstLineIndent(f);
+        }
         for (TextLine l : f.lines()) {
             if (window) {
                 break;
             }
-            if (l.x() < -TOLERANCE || l.x() + l.width() > width + TOLERANCE) {
+            if (l.x() < Math.min(0, l.left()) - TOLERANCE || l.x() + l.width() > width + TOLERANCE) {
                 throw textOverflow(f.box(), l, width);
             }
             if (l.y() + l.height() > height + TOLERANCE) {
@@ -196,6 +205,24 @@ public final class Overflow {
             }
             fragment(c, cx, cy, page, turns, clipped || window);
         }
+    }
+
+    /**
+     * A negative {@code First line indent} fits in the left padding of the box of the text
+     * (reference/common/typography.md): its first line starts that much before the content box, and may not start
+     * outside the box. It is the value that is checked, in every fragment of the text and whatever is beside it.
+     */
+    private static void firstLineIndent(Fragment f) {
+        Style s = f.box().style();
+        double indent = s.typography().firstLineIndent();
+        if (indent >= 0 || -indent <= f.padding().left() + TOLERANCE) {
+            return;
+        }
+        throw new InvalidModelException(s.isDeclared(FIRST_LINE_INDENT) ? s.line(FIRST_LINE_INDENT)
+                : SourceLine.of(f.box().line()), ErrorCode.FIRST_LINE_INDENT_OVERFLOW, "First line indent ("
+                + pt(indent) + ") starts the first line of box " + f.box().describe() + " " + pt(-indent)
+                + " before its content, and the left Padding of the box leaves " + pt(f.padding().left())
+                + ": the Padding has to be increased or the indent reduced");
     }
 
     /**
@@ -246,7 +273,7 @@ public final class Overflow {
             double cx = x + c.border().left() + c.padding().left();
             // A word that does not fit in its own box is the culprit; if it fits, the box is.
             for (TextLine l : c.lines()) {
-                if (l.x() < -TOLERANCE || l.x() + l.width() > c.contentWidth() + TOLERANCE) {
+                if (l.x() < Math.min(0, l.left()) - TOLERANCE || l.x() + l.width() > c.contentWidth() + TOLERANCE) {
                     throw textOverflow(c.box(), l, c.contentWidth());
                 }
             }

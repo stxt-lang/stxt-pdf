@@ -1379,6 +1379,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break long words
 				Max: 1
+			Child: First line indent
+				Max: 1
 			Child: Markup
 				Max: 1
 			Child: Case
@@ -1631,6 +1633,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Break long words
 		Type: BOOLEAN
 		Description: Whether a part of a word that cannot be split further (it has no hyphen, written or soft, and Hyphenate does not split it) and is wider than a whole line of its box is cut at the last character that fits, with no hyphen, as many times as needed. By default, false: such a word is an error. Inherited. It is a last resort: a word that fits in a line of its own moves to the next line and is never cut. It does not change the narrowest width of the text. It has no effect on a preformatted text, where it is an error if the text itself declares it.
+	Node: First line indent
+		Description: How much later the first line of the text starts, a length (without percentages): that line is that much shorter, and the text is aligned in what is left of it. By default, 0. Inherited: it is usually given with For element: Paragraph, which leaves headings and cells alone. Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one of the part of a paragraph that goes on in another page or column. It can be negative (a hanging indent): the first line starts that much before the others, in the left Padding of its box, which has to be at least as large. It does not go in a Paragraph with Drop cap.
 	Node: Markup
 		Type: ENUM
 		Description: Inline formatting of the text: none (by default; the text is literal) or markdown (interprets **bold**, *italic*, ++underline++, ~~strikethrough~~ and [links](target), with the CommonMark escapes; it does nothing inside a Markdown).

@@ -231,6 +231,8 @@ A line break at the end of the text does not add an empty line.
   `right` and `center` align each line separately.
 - `Case`, `Letter spacing`, runs, `{page}` and references work as always. With `Markup: markdown` the
   text is interpreted first, so the lines that are kept are those of the paragraphs.
+- **First line indent.** `First line indent` moves the first line of the text, and only it; with `wrap`, that line
+  is broken at what the indent leaves ([Typography](typography.md#first-line-indent-first-line-indent)).
 - **Forced line break.** The character U+2028, which is also what the `\` at the end of a line leaves with
   `Markup: markdown`, ends the line like any other line break
   ([Markdown](../components/markdown.md#forced-line-breaks)).

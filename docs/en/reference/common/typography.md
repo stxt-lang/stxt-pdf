@@ -24,6 +24,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Line breaking` | `simple`, `optimal` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Split words with a hyphen at the end of the line, with the patterns of the language ([Hyphenation](#hyphenation-hyphenate)). |
 | `Break long words` | `true`, `false` | `false` | Cut, with no hyphen, the part of a word that does not fit in a whole line ([Long words](#long-words-break-long-words)). |
+| `First line indent` | length, no % | `0` | Indent of the first line of the paragraph; it can be negative ([First line indent](#first-line-indent-first-line-indent)). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
@@ -72,7 +73,8 @@ Text is broken into **lines** as wide as the content box:
 
 The lines beside a side box ([Block](../components/block.md#side-boxes-side)) or a drop cap
 ([Text](../components/text.md#drop-cap-drop-cap)) are shorter than the content box: both algorithms work with the width
-of each line, and a word that does not fit in a short line leaves it empty and goes to the next one.
+of each line, and a word that does not fit in a short line leaves it empty and goes to the next one. The first line
+of a paragraph with `First line indent` has another width too ([First line indent](#first-line-indent-first-line-indent)).
 
 A word is split after a hyphen written in it, where it has a soft hyphen or, with `Hyphenate`, by the patterns of
 the language ([Hyphenation](#hyphenation-hyphenate)). In both algorithms, a word wider than the line, or a part of it
@@ -242,6 +244,73 @@ Styles:
 > also when it is inherited, which would reach every code block of a document that declares it in
 > `For element: Document`.
 
+## First line indent (`First line indent`)
+
+`First line indent` moves the start of the **first line** of each box of text and shortens that line by as much. It
+belongs to `Typography`, it is inherited and it is `0` by default. It is a length in points or millimeters, with no
+percentages (`VALUE_NOT_ALLOWED`).
+
+```stxt
+Styles:
+    For element: Paragraph
+        Typography:
+            First line indent: 14
+```
+
+With a negative value and a left `Padding` it is the **hanging indent** of clauses, bibliographies and glossaries:
+the first line starts before the others.
+
+```stxt
+Styles:
+    For style: clause
+        Box:
+            Padding: 0 0 0 30
+        Typography:
+            First line indent: -30
+```
+
+- **Where it is declared.** It is inherited, so it applies to every box with text that gets it: from
+  `For element: Document` it also indents headings, cells and list markers. `For element: Paragraph` gives it only
+  to paragraphs.
+- **Only the first line of the paragraph.** Not the one after a forced line break
+  ([Markdown](../components/markdown.md#forced-line-breaks)), nor the first one of the fragment when the paragraph
+  goes on in another page or column.
+- **Alignment.** The line is aligned in what is left after the indent: with `Align: center` or `right` it is
+  centered or taken to the right in that width, and with `justify` it fills it.
+- **Negative.** The first line starts to the left of the content box, inside the left `Padding` of its box, and is
+  that much longer. If the absolute value is greater than that `Padding`, the line would start outside the box: it
+  is an error (`FIRST_LINE_INDENT_OVERFLOW`), at the line of the `First line indent`, even if it is in an ancestor
+  or in a rule. It is compared with the padding of the laid out box, so a `Padding` in percentage counts for what it
+  measures.
+- **Beside a side box** ([Block](../components/block.md#side-boxes-side)), the indent is added to what the box takes
+  from the first line. The rest of a paragraph that is broken again on the next page is not indented.
+- **With `Drop cap`** in the same paragraph it is an error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), at the line of the
+  `Drop cap`: both move the start of the paragraph. The indent the paragraph inherits or gets from a rule counts
+  too; the paragraph with the drop cap declares `First line indent: 0`.
+- **With `Preformatted: true` or `wrap`** it applies the same way, to the first line of the text; with `wrap`,
+  that line is broken at what the indent leaves.
+- **What does not fit.** An indent that leaves no room for the first word is `TEXT_OVERFLOW`: the word does not go
+  to the next line. `Break long words` still measures against the whole line of the box.
+- **Intrinsic sizes**: the natural width adds the indent to the first line, and the narrowest width is the greater
+  of the widest word and the first word plus the indent ([below](#intrinsic-sizes)).
+
+> **Decision:** a property of `Typography`, inherited like its whole group, which a `For element: Paragraph` rule
+> gives to paragraphs without touching headings or cells. *Rejected alternative:* a property of `Paragraph` that is
+> not inherited, which would not serve the clauses written as `Text` nor work from a `Block`.
+
+> **Decision:** a negative indent fits in the left `Padding` of its box, and otherwise it is an error: the text
+> does not leave its box. It is checked on the laid out box, like what overflows, because the padding may be a
+> percentage. *Rejected alternative:* letting the line leave the box, and checking it when the document is read,
+> which does not reach a `Padding` in percentage.
+
+> **Decision:** with `Drop cap` it is an error also when the indent is inherited or comes from a rule: both move
+> the start of the paragraph and the engine does not choose between them. *Rejected alternative:* the drop cap
+> cancelling the indent without saying so, and checking only the one the paragraph itself writes.
+
+> **Decision:** a first word that does not fit after the indent overflows. *Rejected alternative:* leaving the first
+> line empty and moving the word down, as beside a side box, which would give a paragraph with no indent after a
+> blank line.
+
 ## Kerning (`Kerning`)
 
 With `Kerning: true` the text is measured and painted with the kerning pairs of the font, which bring two specific
@@ -301,7 +370,10 @@ several runs measures the sum of its parts. What is measured is exactly what is 
 The narrowest width is the widest word (if it has break points, from `Hyphenate`, from a soft hyphen or from a
 written hyphen, the widest of its parts, with its hyphen), and the natural width, the longest paragraph on a single
 line (with `Preformatted: true` or `wrap`, see [Text formatting](text-formatting.md#intrinsic-sizes)).
-`Break long words` changes neither ([Long words](#long-words-break-long-words)).
+`Break long words` changes neither ([Long words](#long-words-break-long-words)). With `First line indent`, the
+natural width adds the indent to the first line and the narrowest width is the greater of the widest word and the
+first word (or its first part) plus the indent; with a negative indent, the natural width does not go below the
+widest word ([First line indent](#first-line-indent-first-line-indent)).
 
 ## Language (`Language`)
 
@@ -324,6 +396,7 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
   on each side of the hyphen.
 - Break points after characters other than the hyphen (`/`, `.`, `_`, `@`), preventing the break after a written
   hyphen in any other way than with the non-breaking hyphen, and cutting the long words of a preformatted text.
+- A first line indent in percentage, and indenting the line after a forced line break.
 - A different size within a line (except the drop cap and the superscript of a footnote): a run changes the family,
   the weight, the style, the color, the capitalization and the letter spacing
   ([Text formatting](text-formatting.md#styled-runs)), but not the size.

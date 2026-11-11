@@ -35,6 +35,7 @@ Styles:
 | `Line breaking` | `simple`, `optimal` | `simple` | How the text is broken into lines |
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
 | `Break long words` | `true`, `false` | `false` | Whether a word that does not fit in a whole line is cut, with no hyphen ([below](#long-words)) |
+| `First line indent` | length | `0` | How much the first line of each paragraph is indented ([below](#first-line-indent)) |
 | `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
@@ -161,6 +162,43 @@ Styles:
 Only what fits in no other way is cut: a word that fits in a line of its own goes whole to the next line, and one
 that has hyphens is split at them first. The text that is copied from the PDF is the whole word. It has no effect
 in a text with `Preformatted`.
+
+## First line indent
+
+In a contract or a long report, paragraphs are told apart by the indent of their first line. `First line indent`
+gives it, in points or in millimeters. It is inherited, and the usual thing is to declare it in a rule for the
+paragraphs, which leaves headings and cells alone:
+
+```
+Styles:
+    For element: Paragraph
+        Typography:
+            First line indent: 14
+```
+
+Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one of the
+next page when the paragraph goes on there.
+
+With a negative value the first line starts before the others: it is the **hanging indent** of the clauses of a
+contract, bibliographies and glossaries. That line goes in the left `Padding` of the box, which has to measure at
+least as much:
+
+```
+Styles:
+    For style: clause
+        Box:
+            Padding: 0 0 0 30
+        Typography:
+            First line indent: -30
+```
+
+```
+Text: FIRST.— The landlord grants the tenant the use of the dwelling, which the tenant uses as a main residence.
+    Style: clause
+```
+
+A paragraph with a drop cap (`Drop cap`) has no indent: if it gets one from a rule, it declares
+`First line indent: 0`.
 
 ## Kerning
 

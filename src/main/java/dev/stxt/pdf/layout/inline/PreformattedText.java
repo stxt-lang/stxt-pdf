@@ -22,20 +22,35 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * lines are not broken, so one wider than the box overflows; with {@code wrap} they are broken
  * between words (the spaces at the break are lost: they are not visible) and a word wider than the
  * box overflows.</p>
+ *
+ * <p>The first line of the text, and only it, starts after the {@code First line indent} of the box
+ * (reference/common/typography.md): with {@code wrap} it is broken at what the indent leaves, and the indent counts
+ * in the intrinsic sizes.</p>
  */
 final class PreformattedText {
 
     private PreformattedText() {
     }
 
-    /** The lines of the text for an available width. */
+    /** The lines of the text for an available width, without a first line indent. */
     static List<LineBreaker.Line> lines(List<TextRun> runs, int tabSize, boolean wrap, double available,
                                         TextMeasurer measurer, FontFace font, double fontSize,
                                         double letterSpacing) {
+        return lines(runs, tabSize, wrap, available, 0, measurer, font, fontSize, letterSpacing);
+    }
+
+    /**
+     * The lines of the text for an available width, the first of them {@code firstLineIndent} shorter (longer, if it
+     * is negative).
+     */
+    static List<LineBreaker.Line> lines(List<TextRun> runs, int tabSize, boolean wrap, double available,
+                                        double firstLineIndent, TextMeasurer measurer, FontFace font,
+                                        double fontSize, double letterSpacing) {
         List<LineBreaker.Line> lines = new ArrayList<>();
         for (List<TextRun> source : sourceLines(runs, tabSize)) {
             if (wrap) {
-                lines.addAll(wrap(source, available, measurer, font, fontSize, letterSpacing));
+                double first = lines.isEmpty() ? available - firstLineIndent : available;
+                lines.addAll(wrap(source, first, available, measurer, font, fontSize, letterSpacing));
             } else {
                 lines.add(new LineBreaker.Line(source));
             }
@@ -43,29 +58,42 @@ final class PreformattedText {
         return lines;
     }
 
-    /**
-     * Narrowest width and natural width: with {@code true}, the widest line; with {@code wrap}, the
-     * widest word and the widest line.
-     */
+    /** Narrowest width and natural width of a text without a first line indent. */
     static IntrinsicSizes intrinsics(List<TextRun> runs, int tabSize, boolean wrap, TextMeasurer measurer,
                                      FontFace font, double fontSize, double letterSpacing) {
+        return intrinsics(runs, tabSize, wrap, 0, measurer, font, fontSize, letterSpacing);
+    }
+
+    /**
+     * Narrowest width and natural width: with {@code true}, the widest line; with {@code wrap}, the
+     * widest word and the widest line. The first line, and with {@code wrap} its first word, count with the
+     * {@code firstLineIndent} added.
+     */
+    static IntrinsicSizes intrinsics(List<TextRun> runs, int tabSize, boolean wrap, double firstLineIndent,
+                                     TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing) {
         double min = 0;
         double max = 0;
+        // What the next line or word starts after: the indent, until the first one is measured.
+        double indent = firstLineIndent;
         for (List<TextRun> source : sourceLines(runs, tabSize)) {
             double width = LinePlacer.width(source, measurer, font, fontSize, letterSpacing);
-            max = Math.max(max, width);
+            max = Math.max(max, width + indent);
             if (!wrap) {
                 min = max;
+                indent = 0;
                 continue;
             }
             String text = TextRun.text(source);
             int[] starts = starts(source);
             for (int[] word : words(text)) {
                 min = Math.max(min, LinePlacer.width(slice(source, starts, text, word[0], word[1]), measurer, font,
-                        fontSize, letterSpacing));
+                        fontSize, letterSpacing) + indent);
+                indent = 0;
             }
+            indent = 0;
         }
-        return new IntrinsicSizes(min, max);
+        // With a negative indent, a single line is narrower than its widest word: the box is not.
+        return new IntrinsicSizes(min, Math.max(min, max));
     }
 
     /**
@@ -124,11 +152,13 @@ final class PreformattedText {
     /**
      * Breaks a {@code wrap} line with the greedy algorithm: a word moves to the next
      * line if, with it, the line does not fit and already had another word. The spaces before the
-     * first word (the indent) are kept; those at the break are not.
+     * first word (the indent) are kept; those at the break are not. The first of its lines has {@code first} points
+     * and the others, {@code available}.
      */
-    private static List<LineBreaker.Line> wrap(List<TextRun> source, double available, TextMeasurer measurer,
-                                               FontFace font, double fontSize, double letterSpacing) {
-        if (fits(LinePlacer.width(source, measurer, font, fontSize, letterSpacing), available)) {
+    private static List<LineBreaker.Line> wrap(List<TextRun> source, double first, double available,
+                                               TextMeasurer measurer, FontFace font, double fontSize,
+                                               double letterSpacing) {
+        if (fits(LinePlacer.width(source, measurer, font, fontSize, letterSpacing), first)) {
             return List.of(new LineBreaker.Line(source));
         }
         String text = TextRun.text(source);
@@ -138,7 +168,7 @@ final class PreformattedText {
         int lastEnd = 0;
         for (int[] word : words(text)) {
             if (lastEnd > lineStart && !fits(LinePlacer.width(slice(source, starts, text, lineStart, word[1]),
-                    measurer, font, fontSize, letterSpacing), available)) {
+                    measurer, font, fontSize, letterSpacing), lines.isEmpty() ? first : available)) {
                 lines.add(new LineBreaker.Line(slice(source, starts, text, lineStart, lastEnd)));
                 lineStart = word[0];
             }

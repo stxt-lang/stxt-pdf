@@ -7,6 +7,9 @@ resultado ya paginado y da un error con la primera de estas situaciones:
   (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra. Una palabra es aquí lo que no se puede partir:
   cada parte entre sus puntos de corte ([Tipografía](typography.md#guiones-hyphenate)) y, con `Break long words`, un
   solo carácter;
+- **una sangría de primera línea negativa mayor que el `Padding` izquierdo de su caja**
+  (`FIRST_LINE_INDENT_OVERFLOW`), en la línea del `First line indent`: la primera línea empezaría fuera de la caja
+  ([Tipografía](typography.md#sangría-de-primera-línea-first-line-indent));
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus márgenes horizontales
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija su `Height`, su `Max height`,

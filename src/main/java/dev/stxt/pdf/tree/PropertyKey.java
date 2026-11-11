@@ -39,6 +39,7 @@ public final class PropertyKey {
     public static final String COLOR = "color";
     public static final String CODE_FONT = "code-font";
     public static final String HYPHENATE = "hyphenate";
+    public static final String FIRST_LINE_INDENT = "first-line-indent";
     public static final String NUMBERED = "numbered";
 
     // Properties of the elements

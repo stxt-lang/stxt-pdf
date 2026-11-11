@@ -160,6 +160,11 @@ public enum ErrorCode {
     BELOW_SIDE_BOXES_WITHOUT_SIDE,
     /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
     DROP_CAP_NOT_ALLOWED,
+    /**
+     * {@code First line indent} other than 0, its own or inherited, in a {@code Paragraph} with {@code Drop cap}: both
+     * move the start of the paragraph (line of the {@code Drop cap}).
+     */
+    FIRST_LINE_INDENT_WITH_DROP_CAP,
 
     // --- Figures -------------------------------------------------------------------------------
     /**
@@ -363,6 +368,11 @@ public enum ErrorCode {
     PAGE_OVERFLOW,
     /** The marker of an item does not fit in the indent: the left padding of the list plus the margin of the item. */
     LIST_MARKER_OVERFLOW,
+    /**
+     * A negative {@code First line indent} greater than the left padding of the box of the text: its first line would
+     * start outside the box (line of the {@code First line indent}).
+     */
+    FIRST_LINE_INDENT_OVERFLOW,
     /**
      * The header and the footer of a table, which are repeated on each page, leave no room for the body on an empty
      * page.

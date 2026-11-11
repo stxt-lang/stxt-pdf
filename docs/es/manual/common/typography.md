@@ -35,6 +35,7 @@ Styles:
 | `Line breaking` | `simple`, `optimal` | `simple` | Cómo se reparte el texto en líneas |
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
 | `Break long words` | `true`, `false` | `false` | Si se corta, sin guion, una palabra que no cabe en una línea entera ([abajo](#palabras-largas)) |
+| `First line indent` | medida | `0` | Lo que se sangra la primera línea de cada párrafo ([abajo](#sangría-de-primera-línea)) |
 | `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
@@ -160,6 +161,43 @@ Styles:
 Solo se corta lo que no cabe de ninguna otra forma: una palabra que cabe en una línea propia pasa entera a la línea
 siguiente, y una que tiene guiones se parte antes por ellos. El texto que se copia del PDF es la palabra entera. No
 tiene efecto en un texto con `Preformatted`.
+
+## Sangría de primera línea
+
+En un contrato o en un informe largo los párrafos se distinguen por la sangría de su primera línea. `First line indent`
+la da, en puntos o en milímetros. Se hereda, y lo normal es declararla en una regla para los párrafos, que no toca los
+encabezados ni las celdas:
+
+```
+Styles:
+    For element: Paragraph
+        Typography:
+            First line indent: 14
+```
+
+Solo se sangra la primera línea del párrafo: no la que sigue a un salto de línea forzado, ni la primera de la página
+siguiente cuando el párrafo continúa en ella.
+
+Con un valor negativo la primera línea empieza antes que las demás: es la **sangría francesa** de las cláusulas de un
+contrato, las bibliografías y los glosarios. Esa línea va en el `Padding` izquierdo de la caja, que tiene que medir al
+menos lo mismo:
+
+```
+Styles:
+    For style: clause
+        Box:
+            Padding: 0 0 0 30
+        Typography:
+            First line indent: -30
+```
+
+```
+Text: PRIMERO.— El arrendador cede al arrendatario el uso de la vivienda, que este destina a domicilio habitual.
+    Style: clause
+```
+
+Un párrafo con letra capitular (`Drop cap`) no lleva sangría: si la recibe de una regla, declara
+`First line indent: 0`.
 
 ## Kerning
 

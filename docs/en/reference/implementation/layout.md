@@ -280,8 +280,23 @@ a `Paragraph` with `Drop cap` in every fragment (so the positions of the text do
 cap height of the font gives (`VerticalMetrics.capHeight`, from the `OS/2` table, or 0.7 without it) and places it as the
 first `TextLine` of the first fragment, with its baseline on that of line `N − 1`; the first `N` lines get its width as
 one more exclusion (`LineWidths.withDropCap`), the paragraph is at least `N` lines tall and `cutLines` gets
-`Orphans` ≥ `N`. `TextPainter` does not write the invisible space after the line of the drop cap, so that the text
+`Orphans` ≥ `N`. The rest of the text that is broken again from a later position, beside a side box, has no drop
+cap and no width taken from it. `TextPainter` does not write the invisible space after the line of the drop cap, so that the text
 that is read is still one word.
+
+**First line indent** ([Typography](../common/typography.md#first-line-indent-first-line-indent)). `InlineLayout` gives
+it to `LineWidths` (`withFirstLineIndent`) only when the text is broken from its start (position 0): the rest of a
+paragraph that is broken again beside a side box does not have it, and the one that goes on in another page with
+the lines it already had starts at a later line. It is added to `left(0)`, which with a negative indent is
+negative, and `varying()` is at least 1, so both algorithms treat it as one more line of another width.
+`widerLater` does not count it: the word that does not fit in the indented line overflows instead of leaving it
+empty. Nor does `shortened()`, which is what the widow count looks at to know whether the rest of the text will be
+broken again. In a preformatted text, `PreformattedText` breaks the first line of `wrap` at what the indent leaves.
+`LineBreaker.intrinsics` and `PreformattedText.intrinsics` add it to the first line. `Overflow` lets a line start
+before the content box as far as its `TextLine.left`, if it is negative, and checks in each fragment with text that
+a negative indent fits in its left padding (`FIRST_LINE_INDENT_OVERFLOW`): there the padding is in points, whether
+the document wrote it in points or as a percentage. The combination with `Drop cap` is rejected by
+`ModelValidator.validateDropCap` when the paragraph is read.
 
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
 box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns

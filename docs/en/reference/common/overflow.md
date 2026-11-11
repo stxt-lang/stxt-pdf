@@ -8,6 +8,9 @@ situations:
   (`TEXT_OVERFLOW`), at the line of the document where the word is. A word is here what cannot be split: each part
   between its break points ([Typography](typography.md#hyphenation-hyphenate)) and, with `Break long words`, a
   single character;
+- **a negative first line indent greater than the left `Padding` of its box** (`FIRST_LINE_INDENT_OVERFLOW`), at
+  the line of the `First line indent`: the first line would start outside the box
+  ([Typography](typography.md#first-line-indent-first-line-indent));
 - **a box that does not fit horizontally in the content box of its parent**, counting its horizontal margins
   (`BOX_OVERFLOW`), at the line of its `Width` (or `Min width`) if it declares one;
 - **content that exceeds the height of its box**: lines or children that do not fit in the height set by its `Height`, its

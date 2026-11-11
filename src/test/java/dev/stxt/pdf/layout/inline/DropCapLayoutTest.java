@@ -77,6 +77,24 @@ class DropCapLayoutTest {
     }
 
     @Test
+    void theRestOfAParagraphBrokenAgainOnTheNextPageHasNoRoomTakenByTheDropCap() {
+        // A page area of 100: a spacer of 40 and a side box of 60. The paragraph has 5 lines beside it, the first
+        // two beside its drop cap too; the rest is broken again on the next page at the whole width, 20 words a line.
+        LayoutFixture l = layOutPaged(180, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 40",
+                "\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
+                "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
+                "\tParagraph: " + words(150), "\t\tId: P", "\t\tDrop cap: 2");
+        assertEquals(2, l.pages());
+        assertEquals("X", l.fragment(1, "P").lines().get(0).text());
+        List<TextLine> rest = l.fragment(2, "P").lines();
+        for (int k = 0; k < 3; k++) {
+            assertEquals(0, rest.get(k).left(), 1e-9, "line " + k);
+            assertEquals(0, rest.get(k).x(), 1e-9, "line " + k);
+            assertEquals(20, rest.get(k).text().split(" ").length, "line " + k);
+        }
+    }
+
+    @Test
     void theDropCapGoesAfterASideBox() {
         LayoutFixture l = layOut("\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
                 "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",

@@ -9,6 +9,23 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **`First line indent`**, in `Typography`, inherited and `0` by default: a length in points or millimeters, with no
+  percentages, that moves the start of the first line of each box of text and shortens that line by as much; with
+  `Align: center` or `right` the line is aligned in what is left. It is how the paragraphs of contracts and long
+  reports are told apart, and it is usually given with `For element: Paragraph`, which leaves headings and cells
+  alone. Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one
+  of the part of a paragraph that goes on in another page or column. With a negative value and a left `Padding` it is
+  a hanging indent (clauses, bibliographies, glossaries): the first line starts in the padding of its box. Beside a
+  side box it is added to what the box takes, and a preformatted text indents its first line too. The natural width
+  of the text adds it, and the narrowest width is the greater of the widest word and the first word plus the indent.
+  An indent that leaves no room for the first word is `TEXT_OVERFLOW`. "First line indent" in the reference of
+  `Typography`.
+- The error codes **`FIRST_LINE_INDENT_OVERFLOW`**, a negative `First line indent` greater than the left `Padding` of
+  the box of the text, checked on the laid out box, so a `Padding` in percentage counts for what it measures (line of
+  the `First line indent`), and **`FIRST_LINE_INDENT_WITH_DROP_CAP`**, a `First line indent` other than 0, its own,
+  inherited or from a rule, in a `Paragraph` with `Drop cap` (line of the `Drop cap`).
+- `TypographyStyle.firstLineIndent()`. `TextLine.left()` includes the indent in the first line of a paragraph, and
+  is negative there with a negative indent that no side box makes up for.
 - **Block quotes and horizontal rules in a `Markdown`**: `> ...` and `---`, `***` or `___`, which were
   `MARKDOWN_UNSUPPORTED`, are translated into two generated elements, **`Block quote`** and **`Divider`**. Like
   `Code block`, they are not written in the document and the `For element` rules name them. A quote is a block with
@@ -92,6 +109,11 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `FIRST_NUMBER_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
   `SINGLE_COLUMN`, `TABLE_ORDER`, `MARKDOWN_PROPERTY_MISSING` and of the errors of `Area map` and of `Entries` name
   the properties with their new names.
+
+### Fixed
+
+- The rest of a `Paragraph` with `Drop cap` that is broken again on the next page, because a side box was beside
+  it, no longer leaves the room of the drop cap in its first lines: they started after a letter that was not there.
 
 ## [0.14.0] - 2026-11-10
 

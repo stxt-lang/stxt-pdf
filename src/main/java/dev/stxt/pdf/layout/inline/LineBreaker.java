@@ -362,14 +362,34 @@ public final class LineBreaker {
      */
     public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
                                             double fontSize, double letterSpacing, Hyphenator hyphenator) {
+        return intrinsics(runs, measurer, font, fontSize, letterSpacing, hyphenator, 0);
+    }
+
+    /**
+     * The intrinsic sizes of a text whose first line starts {@code firstLineIndent} points later
+     * ({@code First line indent}, reference/common/typography.md; earlier, if it is negative): the natural width is
+     * that of its lines with the indent added to the first one, and the narrowest, the greater of the widest word
+     * (or part) and the first word (or its first part) plus the indent.
+     *
+     * @param hyphenator the patterns of the language of the text; {@code null} splits words only at their soft hyphens
+     */
+    public static IntrinsicSizes intrinsics(List<TextRun> runs, TextMeasurer measurer, FontFace font,
+                                            double fontSize, double letterSpacing, Hyphenator hyphenator,
+                                            double firstLineIndent) {
         List<Words.Word> words = Words.words(runs, hyphenator);
         if (words.isEmpty()) {
             return IntrinsicSizes.ZERO;
         }
         double min = 0;
+        // What starts the first line: the first word or, if it has break points, its first part.
+        double first = Double.NaN;
         for (Words.Word word : words) {
             if (word.breaks().length == 0) {
-                min = Math.max(min, LinePlacer.width(word.parts(), measurer, font, fontSize, letterSpacing));
+                double width = LinePlacer.width(word.parts(), measurer, font, fontSize, letterSpacing);
+                min = Math.max(min, width);
+                if (Double.isNaN(first)) {
+                    first = width;
+                }
                 continue;
             }
             int from = 0;
@@ -378,19 +398,26 @@ public final class LineBreaker {
                 List<TextRun> part = Words.slice(word.parts(), from, to);
                 List<TextRun> measured = k < word.breaks().length && !word.written(k)
                         ? Words.hyphenated(part, word.parts(), to) : part;
-                min = Math.max(min, LinePlacer.width(measured, measurer, font, fontSize, letterSpacing));
+                double width = LinePlacer.width(measured, measurer, font, fontSize, letterSpacing);
+                min = Math.max(min, width);
+                if (Double.isNaN(first)) {
+                    first = width;
+                }
                 from = to;
             }
         }
+        min = Math.max(min, first + firstLineIndent);
         double natural = 0;
         int from = 0;
         for (int w = 0; w < words.size(); w++) {
             if (words.get(w).forced() || w == words.size() - 1) {
                 List<TextRun> line = Words.line(words.subList(from, w + 1)).runs();
-                natural = Math.max(natural, LinePlacer.width(line, measurer, font, fontSize, letterSpacing));
+                natural = Math.max(natural, LinePlacer.width(line, measurer, font, fontSize, letterSpacing)
+                        + (from == 0 ? firstLineIndent : 0));
                 from = w + 1;
             }
         }
-        return new IntrinsicSizes(min, natural);
+        // With a negative indent, a text of one line is narrower than its widest word: the box is not.
+        return new IntrinsicSizes(min, Math.max(min, natural));
     }
 }

@@ -102,6 +102,7 @@ class SchemaCoverageTest {
             Map.entry("Line breaking", "Line breaking: optimal"),
             Map.entry("Hyphenate", "Hyphenate: true"),
             Map.entry("Break long words", "Break long words: true"),
+            Map.entry("First line indent", "First line indent: 12"),
             Map.entry("Markup", "Markup: markdown"),
             Map.entry("Case", "Case: uppercase"),
             Map.entry("Letter spacing", "Letter spacing: 1.5"),

@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * The {@code Typography} group (reference/common/typography.md): the font, the size (and the minimum it may be
- * reduced to with {@code Overflow: shrink}), the line height, the alignment, the color, the case, the letter spacing, the kerning and the white space of the text, the hyphenation, the
+ * reduced to with {@code Overflow: shrink}), the line height, the alignment, the first line indent, the color, the case, the letter spacing, the kerning and the white space of the text, the hyphenation, the
  * numbering of the headings, the language and the widows and orphans. It is the only group that is
  * <strong>inherited</strong>: each box starts with a copy of its parent's ({@link Style#inheriting}).
  */
@@ -48,6 +48,11 @@ public final class TypographyStyle extends StyleGroup {
      * of its box is cut at the last character that fits, with no hyphen (reference/common/typography.md). Inherited.
      */
     private boolean breakLongWords;
+    /**
+     * {@code First line indent}: how much later the first line of each paragraph starts, in points; negative, how
+     * much earlier, in the left padding of its box (reference/common/typography.md). Inherited.
+     */
+    private double firstLineIndent;
     private Markup markup = Markup.NONE;
     private TextCase textCase = TextCase.NONE;
     /** Spacing between letters, in points; it can be negative. */
@@ -105,6 +110,7 @@ public final class TypographyStyle extends StyleGroup {
         lineBreaking = parent.lineBreaking;
         hyphenate = parent.hyphenate;
         breakLongWords = parent.breakLongWords;
+        firstLineIndent = parent.firstLineIndent;
         markup = parent.markup;
         textCase = parent.textCase;
         letterSpacing = parent.letterSpacing;
@@ -219,6 +225,15 @@ public final class TypographyStyle extends StyleGroup {
     void setBreakLongWords(boolean v) {
         writable();
         breakLongWords = v;
+    }
+
+    public double firstLineIndent() {
+        return firstLineIndent;
+    }
+
+    void setFirstLineIndent(double v) {
+        writable();
+        firstLineIndent = v;
     }
 
     public Markup markup() {

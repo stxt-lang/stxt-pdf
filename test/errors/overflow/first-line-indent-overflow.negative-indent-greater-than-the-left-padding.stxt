@@ -1,0 +1,20 @@
+# Case: Negative indent greater than the left padding
+# Code: FIRST_LINE_INDENT_OVERFLOW
+# Line: 20
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Paragraph: PRIMERO. El arrendatario destina la finca a vivienda.
+			Box:
+				Padding: 0 0 0 20
+			Typography:
+				First line indent: -30

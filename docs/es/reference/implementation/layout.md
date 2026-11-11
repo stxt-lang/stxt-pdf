@@ -275,8 +275,23 @@ tramos de un `Paragraph` con `Drop cap` en todos los fragmentos (así las posici
 cuerpo que da la altura de mayúsculas de la fuente (`VerticalMetrics.capHeight`, de la tabla `OS/2`, o 0,7 sin ella) y la
 coloca como la primera `TextLine` del primer fragmento, con la base en la de la línea `N − 1`; las `N` primeras líneas
 reciben su ancho como una exclusión más (`LineWidths.withDropCap`), el párrafo mide al menos `N` líneas y `cutLines` recibe
-`Orphans` ≥ `N`. `TextPainter` no escribe el espacio invisible tras la línea de la capitular, para que el texto que se
+`Orphans` ≥ `N`. El resto del texto que se vuelve a repartir desde una posición posterior, junto a una caja lateral,
+no tiene capitular ni ese ancho quitado. `TextPainter` no escribe el espacio invisible tras la línea de la capitular, para que el texto que se
 lee siga siendo una palabra.
+
+**Sangría de primera línea** ([Tipografía](../common/typography.md#sangría-de-primera-línea-first-line-indent)).
+`InlineLayout` la da a `LineWidths` (`withFirstLineIndent`) solo cuando el texto se reparte desde su principio
+(posición 0): el resto de un párrafo que se vuelve a repartir junto a una caja lateral no la lleva, y el que sigue en
+otra página con las líneas que ya tenía empieza en una línea posterior. Se suma a `left(0)`, que con una sangría
+negativa es negativo, y `varying()` es al menos 1, así que los dos repartos la tratan como una línea más de otro
+ancho. `widerLater` no la cuenta: la palabra que no cabe en la línea sangrada desborda en lugar de dejarla vacía. Ni
+`shortened()`, que es lo que mira el recuento de viudas para saber si el resto del texto se repartirá de nuevo. En
+un texto preformateado, `PreformattedText` parte la primera línea de `wrap` con lo que la sangría deja.
+`LineBreaker.intrinsics` y `PreformattedText.intrinsics` la suman a la primera línea. `Overflow` admite que una
+línea empiece antes de la caja de contenido hasta su `TextLine.left`, si es negativo, y comprueba en cada fragmento
+con texto que una sangría negativa cabe en su relleno izquierdo (`FIRST_LINE_INDENT_OVERFLOW`): ahí el relleno está
+en puntos, lo haya escrito el documento en puntos o en porcentaje. La combinación con `Drop cap` la rechaza
+`ModelValidator.validateDropCap` al leer el párrafo.
 
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
 (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones

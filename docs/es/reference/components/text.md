@@ -60,7 +60,9 @@ Paragraph: Había una vez, en un valle entre hayedos, un pueblo que cada otoño 
 El texto que se lee y se copia es el mismo: la letra sigue siendo la primera de su palabra. La altura de mayúsculas es la
 de la fuente (su tabla `OS/2`) y, sin ella, el 70 % del cuerpo. Es el primer carácter tal cual: con `Case: uppercase` se
 pone en mayúscula como el resto, y si el párrafo empieza por una comilla, la capitular es la comilla. No va en un párrafo
-preformateado (`DROP_CAP_NOT_ALLOWED`) ni fuera de 2 a 5 (`VALUE_NOT_ALLOWED`). Junto a una caja lateral
+preformateado (`DROP_CAP_NOT_ALLOWED`) ni fuera de 2 a 5 (`VALUE_NOT_ALLOWED`), ni en un párrafo con una sangría de
+primera línea distinta de 0, propia, heredada o de una regla (`FIRST_LINE_INDENT_WITH_DROP_CAP`,
+[Tipografía](../common/typography.md#sangría-de-primera-línea-first-line-indent)). Junto a una caja lateral
 ([Block](block.md#cajas-laterales-side)), la capitular va después de lo que la caja quita a las líneas.
 
 | Propiedad | Valores | Por defecto | Notas |
