@@ -161,7 +161,8 @@ final class StyleRules {
     static final Set<String> ELEMENT_PROPERTIES = Set.of(
             "direction", "wrap-items", "gap", "horizontal", "vertical", "line-distribution", "split-items",
             "column-sizes", "row-sizes", "area-map", "fill-order", "split-rows", "column-align",
-            "column-count", "min-column-width", "separator", "separator-color", "balance-columns",
+            "column-count", "min-column-width", "separator", "separator-color", "separator-style",
+            "balance-columns",
             "marker", "marker-suffix", "marker-image", "fit", "barcode-format", "error-correction", "quiet-zone",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
             "drop-cap", "side", "below-side-boxes", "isolate-margins", "trim-margins",

@@ -1,5 +1,7 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.LineStyle;
+
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
 
 /**
@@ -18,6 +20,8 @@ public final class ColumnsStyle extends StyleGroup {
     private double separator = 0;
     /** {@code Separator color}; {@code null} = the {@code Color} of the text. */
     private String separatorColor;
+    /** {@code Separator style}: how the line between columns is drawn. */
+    private LineStyle separatorStyle = LineStyle.SOLID;
     /** {@code Balance columns}: evens out the columns of the last fragment. */
     private boolean balance = true;
 
@@ -67,6 +71,15 @@ public final class ColumnsStyle extends StyleGroup {
     void setSeparatorColor(String v) {
         writable();
         separatorColor = v;
+    }
+
+    public LineStyle separatorStyle() {
+        return separatorStyle;
+    }
+
+    void setSeparatorStyle(LineStyle v) {
+        writable();
+        separatorStyle = v;
     }
 
     public boolean balance() {

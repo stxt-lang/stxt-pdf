@@ -10,6 +10,7 @@ import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Progress;
 import dev.stxt.pdf.model.Radii;
@@ -219,11 +220,14 @@ public final class SvgCanvas implements Canvas {
      * {@inheritDoc}
      *
      * <p>A ring (even-odd fill path) in the color of the sides; with different colors,
-     * one per side, clipped to the trapezoid of that side ({@link Shapes#sidePolygon}).</p>
+     * one per side, clipped to the trapezoid of that side ({@link Shapes#sidePolygon}). A border that is not solid is
+     * stroked with {@code stroke-dasharray} ({@link Dashes}).</p>
      */
     @Override
-    public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
-        if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
+    public void border(Rect r, Insets w, Radii radii, Sides<String> colors, LineStyle style) {
+        if (style != LineStyle.SOLID) {
+            patternBorder(r, w, radii, colors, style);
+        } else if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
             StringBuilder ring = new StringBuilder();
             Shapes.ring(pathWriter(ring), r, w, radii);
             String d = ring.toString().strip();
@@ -244,6 +248,85 @@ public final class SvgCanvas implements Canvas {
                 }
             }
         }
+    }
+
+    @Override
+    public void line(Rect r, boolean vertical, String color, LineStyle style) {
+        if (style == LineStyle.SOLID) {
+            background(r, color);
+        } else if (r.width() > 0 && r.height() > 0) {
+            stroke(Dashes.segment(r, vertical, style, 0, 0), color);
+        }
+    }
+
+    /**
+     * A border that is not solid: with square corners, the line of each side; with rounded ones, the line along the
+     * middle of the border, once if it has one color and, if not, once per side with a width, clipped to its
+     * trapezoid.
+     */
+    private void patternBorder(Rect r, Insets w, Radii radii, Sides<String> colors, LineStyle style) {
+        if (radii.isSquare()) {
+            for (Dashes.SideSegment side : Dashes.border(r, w, style)) {
+                stroke(side.segment(), side.side().of(colors));
+            }
+            return;
+        }
+        String uniform = Shapes.uniformColor(w, colors);
+        if (uniform != null) {
+            stroke(r, w, radii, uniform, style, "");
+            return;
+        }
+        for (Shapes.Side side : Shapes.Side.values()) {
+            if (side.of(w) > 0) {
+                String id = "c" + ids++;
+                StringBuilder polygon = new StringBuilder();
+                Shapes.sidePolygon(pathWriter(polygon), side, r, w, radii.inset(w));
+                svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(polygon.toString().strip())
+                        .append("\"/></clipPath>\n");
+                stroke(r, w, radii, side.of(colors), style, " clip-path=\"url(#" + id + ")\"");
+            }
+        }
+    }
+
+    /** Strokes the lines along the middle of a border with rounded corners, each with its pattern fitted to it. */
+    private void stroke(Rect r, Insets w, Radii radii, String color, LineStyle style, String clip) {
+        double width = Math.max(Math.max(w.top(), w.bottom()), Math.max(w.left(), w.right()));
+        for (Shapes.Run run : Shapes.centerlines(r, w, radii)) {
+            double length = Shapes.length(run.path());
+            Dashes.Pattern pattern = run.closed() ? Dashes.closed(style, length, width)
+                    : Dashes.open(style, length, width);
+            StringBuilder d = new StringBuilder();
+            run.path().accept(pathWriter(d));
+            svg.append("<path d=\"").append(d.toString().strip()).append("\" fill=\"none\"").append(clip)
+                    .append(strokeAttr(color, width, pattern)).append("/>\n");
+        }
+    }
+
+    /** Strokes a straight line with its pattern; nothing if there is no line. */
+    private void stroke(Dashes.Segment s, String color) {
+        if (s != null) {
+            svg.append(String.format(Locale.ROOT, "<line x1=\"%.2f\" y1=\"%.2f\" x2=\"%.2f\" y2=\"%.2f\"%s/>\n",
+                    s.x1(), s.y1(), s.x2(), s.y2(), strokeAttr(color, s.width(), s.pattern())));
+        }
+    }
+
+    /** {@code stroke="..."} of a color, with its opacity, its width and, with a pattern, its dashes. */
+    private static String strokeAttr(String color, double width, Dashes.Pattern pattern) {
+        float[] c = Colors.rgba(color);
+        StringBuilder attributes = new StringBuilder(String.format(Locale.ROOT,
+                " stroke=\"#%02x%02x%02x\" stroke-width=\"%.2f\"", Math.round(c[0] * 255), Math.round(c[1] * 255),
+                Math.round(c[2] * 255), width));
+        if (c[3] < 1f) {
+            attributes.append(String.format(Locale.ROOT, " stroke-opacity=\"%.3f\"", c[3]));
+        }
+        if (pattern != null) {
+            attributes.append(String.format(Locale.ROOT, " stroke-dasharray=\"%.3f %.3f\" stroke-dashoffset=\"%.3f\"",
+                    pattern.on(), pattern.off(), pattern.phase()));
+            if (pattern.round()) {
+                attributes.append(" stroke-linecap=\"round\"");
+            }
+        }
+        return attributes.toString();
     }
 
     /** The debugging SVG only draws: it neither marks the text nor creates links. */

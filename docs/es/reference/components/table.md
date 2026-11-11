@@ -41,7 +41,7 @@ Table:
 | `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Vertical` | `top`, `center`, `bottom` | `top` | `Cell` | Dónde va el contenido de la celda en el alto que le sobra ([Alineación vertical del contenido](#alineación-vertical-del-contenido-vertical)). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
-| `Box` | `Background`, `Border`, `Border color`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
+| `Box` | `Background`, `Border`, `Border color`, `Border style`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
 `Column sizes`, `Column align`, `Gap`, `Split rows` y el `Vertical` de las celdas también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Span` y
 `Row header`, no. Sin `Column sizes`, propio o de una regla, es un error (`TABLE_COLUMN_SIZES_MISSING`). `Merge borders` (`true` o `false`, por defecto `false`)
@@ -202,7 +202,7 @@ fila es para sus celdas o para su **franja**:
 - **`Break`.** Es el de sus celdas: con él se fuerza o se evita el corte antes o después de la fila, o dentro de ella. Una
   celda no declara `Break`, ni siquiera desde una regla (`STYLE_NOT_ALLOWED`, también la del estilo o el `Id` de su
   `Row`: el `Break` de la fila lo declara la `Row`).
-- **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color` y `Corner radius`. Cualquier otra propiedad
+- **`Box`.** Solo el aspecto de la franja: `Background`, `Border`, `Border color`, `Border style` y `Corner radius`. Cualquier otra propiedad
   (`Padding`, `Margin` o `Height`) no tendría efecto en una fila y es `ROW_BOX`.
 
 Una fila con `Box` o `Id` tiene una **franja**: un rectángulo que va de la primera columna a la última, con el `Gap`
@@ -279,9 +279,12 @@ Table:
   `MERGE_BORDERS_WITHOUT_EFFECT`, y si llega de una regla a otra caja (un `For style` que usan una tabla y un `Block`),
   esa caja no hace nada con él.
 - **La línea.** Entre dos celdas vecinas, la línea es el más ancho de los dos lados que se tocan, con su color
-  (`Border color`, o el del texto de la celda). Con el mismo ancho, gana el de la celda de arriba o el de la izquierda. Un
+  (`Border color`, o el del texto de la celda) y su estilo (`Border style`). Con el mismo ancho, gana el de la celda de arriba o el de la izquierda. Un
   lado sin borde no aporta nada: la línea es la del otro, y si ninguno tiene, no hay línea. En el ejemplo, la línea bajo
   la cabecera es la de las celdas de la cabecera (1,5), y las demás, de 0,5.
+- **El estilo.** Una línea de trazos o de puntos lleva su patrón de un extremo a otro de la tabla, y no celda a celda:
+  los tramos seguidos del mismo grosor, color y estilo son una sola línea
+  ([estilo del borde](../common/box.md#estilo-del-borde)).
 - **Por tramos.** Una celda que ocupa varias filas o columnas tiene un tramo de línea por cada celda que tiene al lado,
   cada uno resuelto con esa celda. Dentro de una celda que ocupa varias filas o columnas no hay línea.
 - **Dónde va.** Las líneas van sobre las líneas de la rejilla: la de entre dos celdas, centrada en ella; la del borde

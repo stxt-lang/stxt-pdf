@@ -41,7 +41,7 @@ Table:
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
 | `Vertical` | `top`, `center`, `bottom` | `top` | `Cell` | Where the content of the cell goes in the height it has left over ([Vertical alignment of the content](#vertical-alignment-of-the-content-vertical)). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
-| `Box` | `Background`, `Border`, `Border color`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
+| `Box` | `Background`, `Border`, `Border color`, `Border style`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
 
 `Column sizes`, `Column align`, `Gap`, `Split rows` and the `Vertical` of the cells can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Span` and
 `Row header` cannot. Without `Column sizes`, its own or from a rule, it is an error (`TABLE_COLUMN_SIZES_MISSING`).
@@ -203,7 +203,7 @@ row declares is for its cells or for its **band**:
 - **`Break`.** It is that of its cells: with it a break is forced or avoided before or after the row, or inside it. A
   cell does not declare `Break`, not even from a rule (`STYLE_NOT_ALLOWED`, also that of the style or the `Id` of its
   `Row`: the `Break` of the row is declared by the `Row`).
-- **`Box`.** Only the look of the band: `Background`, `Border`, `Border color` and `Corner radius`. Any other property
+- **`Box`.** Only the look of the band: `Background`, `Border`, `Border color`, `Border style` and `Corner radius`. Any other property
   (`Padding`, `Margin` or `Height`) would have no effect on a row and is `ROW_BOX`.
 
 A row with `Box` or `Id` has a **band**: a rectangle that goes from the first column to the last, with the `Gap`
@@ -280,9 +280,12 @@ Table:
   `MERGE_BORDERS_WITHOUT_EFFECT`, and if it reaches another box from a rule (a `For style` that a table and a `Block`
   use), that box does nothing with it.
 - **The line.** Between two neighboring cells, the line is the wider of the two sides that touch, with its color
-  (`Border color`, or that of the text of the cell). With the same width, that of the cell above or that of the one on
+  (`Border color`, or that of the text of the cell) and its style (`Border style`). With the same width, that of the cell above or that of the one on
   the left wins. A side without border contributes nothing: the line is that of the other one, and if neither has one,
   there is no line. In the example, the line under the header is that of the header cells (1.5), and the others, 0.5.
+- **The style.** A dashed or dotted line carries its pattern from one end of the table to the other, and not cell by
+  cell: consecutive segments of the same width, color and style are a single line
+  ([border style](../common/box.md#border-style)).
 - **By segments.** A cell that takes up several rows or columns has a segment of line for each cell next to it, each one
   resolved with that cell. Inside a cell that takes up several rows or columns there is no line.
 - **Where it goes.** The lines go on the lines of the grid: the one between two cells, centered on it; that of the outer

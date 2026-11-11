@@ -119,7 +119,7 @@ inherit) and `Break` (that of the row). A cell does not accept `Break`: breaks b
 
 With `Box`, a row has a background and a border of its own: a **band** from the first column to the last, under its
 cells. A row border is a whole line, also over the gap between columns, and the background of a cell covers that of its
-row. The `Box` of a `Row` only accepts `Background`, `Border`, `Border color` and `Corner radius`: the row measures what
+row. The `Box` of a `Row` only accepts `Background`, `Border`, `Border color`, `Border style` and `Corner radius`: the row measures what
 its cells measure, so a `Padding` or a `Height` on it is an error. The `Id` of a row also serves to link to it
 (`Link: #total`) or to cite its page (`{page of: total}`).
 
@@ -230,7 +230,7 @@ Document (dev.stxt.pdf):
                     Cell: 490.00
 ```
 
-- Between two cells with borders of different widths, the wider one wins, with its color: the line under the header is
+- Between two cells with borders of different widths, the wider one wins, with its color and its style (`Border style`): the line under the header is
   that of the header (1.5). With the same width and a different color, that of the cell above or that of the one on the
   left wins.
 - A cell without border draws nothing: the line that separates it from its neighbor is that of the neighbor.

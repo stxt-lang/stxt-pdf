@@ -120,7 +120,7 @@ celdas) y `Break` (el de la fila). Una celda no admite `Break`: los cortes son d
 
 Con `Box`, una fila tiene un fondo y un borde propios: una **franja** de la primera columna a la última, debajo de sus
 celdas. Un borde de fila es una línea entera, también por encima del hueco entre columnas, y el fondo de una celda tapa el
-de su fila. El `Box` de una `Row` solo admite `Background`, `Border`, `Border color` y `Corner radius`: la fila mide lo que sus
+de su fila. El `Box` de una `Row` solo admite `Background`, `Border`, `Border color`, `Border style` y `Corner radius`: la fila mide lo que sus
 celdas, así que un `Padding` o un `Height` en ella es un error. El `Id` de una fila sirve también para enlazarla
 (`Link: #total`) o para citar su página (`{page of: total}`).
 
@@ -231,7 +231,7 @@ Document (dev.stxt.pdf):
                     Cell: 490,00
 ```
 
-- Entre dos celdas con bordes de distinto ancho, gana el más ancho, con su color: la línea bajo la cabecera es la de la
+- Entre dos celdas con bordes de distinto ancho, gana el más ancho, con su color y su estilo (`Border style`): la línea bajo la cabecera es la de la
   cabecera (1,5). Con el mismo ancho y distinto color, gana el de la celda de arriba o el de la izquierda.
 - Una celda sin borde no dibuja nada: la línea que la separa de su vecina es la de la vecina.
 - La tabla no admite `Gap`, ni sus celdas `Corner radius`: el borde entre dos celdas no sería una línea. Una tabla que

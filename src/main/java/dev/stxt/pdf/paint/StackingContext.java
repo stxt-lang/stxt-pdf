@@ -421,7 +421,7 @@ public final class StackingContext {
         }
         // The border of a cell with merged borders is only the room for the lines that its table draws.
         if (p.f().box().mergedBorder() == null) {
-            canvas.border(borderBox, p.f().border(), radii, borderColors(s));
+            canvas.border(borderBox, p.f().border(), radii, borderColors(s), s.box().borderStyle());
         }
         if (s.columns().separator() > 0) {
             paintRules(canvas, p);
@@ -430,13 +430,14 @@ public final class StackingContext {
 
     /**
      * The lines of a fragment ({@link Fragment#rules}): the merged borders of a table
-     * (reference/components/table.md#merged-borders), each one a rectangle of its color relative to the content box.
+     * (reference/components/table.md#merged-borders), each one a line of its color and its style relative to the content box.
      * Like backgrounds, they are not content of the tagged PDF.
      */
     private static void paintFragmentRules(Canvas canvas, Piece p) {
         Rect content = p.borderBox().shrink(p.f().border()).shrink(p.f().padding());
         for (Rule r : p.f().rules()) {
-            canvas.background(new Rect(content.x() + r.x(), content.y() + r.y(), r.width(), r.height()), r.color());
+            canvas.line(new Rect(content.x() + r.x(), content.y() + r.y(), r.width(), r.height()), r.vertical(),
+                    r.color(), r.style());
         }
     }
 
@@ -481,8 +482,8 @@ public final class StackingContext {
         for (int i = 1; i < columns.size(); i++) {
             Fragment left = columns.get(i - 1);
             double middle = (left.x() + left.width() + columns.get(i).x()) / 2;
-            canvas.background(new Rect(content.x() + middle - s.columns().separator() / 2, content.y(), s.columns().separator(), height),
-                    color);
+            canvas.line(new Rect(content.x() + middle - s.columns().separator() / 2, content.y(),
+                    s.columns().separator(), height), true, color, s.columns().separatorStyle());
         }
     }
 

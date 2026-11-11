@@ -86,7 +86,7 @@ Las notas de una página van en el **área de notas**, una caja generada al pie 
 las notas heredan:
 
 - su `Typography` es la tipografía de todas las notas (`Size: 8`, por ejemplo);
-- su `Box` da el **filete** (el `Border` superior), la separación con el texto (el `Margin` superior) y el espacio hasta
+- su `Box` da el **filete** (el `Border` superior, con su `Border color` y su `Border style`), la separación con el texto (el `Margin` superior) y el espacio hasta
   la primera nota (el `Padding` superior), más el fondo, los demás bordes y los márgenes laterales.
 
 Por defecto el área tiene un margen superior de 8 pt, un filete de 0,5 pt del color del texto a todo el ancho y un

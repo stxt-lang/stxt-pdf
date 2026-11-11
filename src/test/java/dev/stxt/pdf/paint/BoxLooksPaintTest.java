@@ -310,6 +310,113 @@ class BoxLooksPaintTest {
         assertEquals(1, svg.split("<clipPath", -1).length - 1, svg);
     }
 
+    /**
+     * Border style: dashed (reference/common/box.md#border-style), with a border of 4 around the block of 100 × 40 at
+     * (20, 20). The top side fits 5 dashes of 12 with gaps of 10: from 20, 42, 64, 86 and 108. The left side, 40 long,
+     * fits 2 with a gap of 16, and starts under the top one.
+     */
+    @Test
+    void aDashedBorderLeavesGapsBetweenItsDashes() throws Exception {
+        BufferedImage page = render(doc("Border: 4\nBorder color: #FF0000\nBorder style: dashed"));
+        assertColor(page, 25, 22, 255, 0, 0, 0);
+        assertColor(page, 37, 22, 255, 255, 255, 0);
+        assertColor(page, 48, 22, 255, 0, 0, 0);
+        // Each side ends with a whole dash: the corner is painted.
+        assertColor(page, 118, 22, 255, 0, 0, 0);
+        assertColor(page, 22, 28, 255, 0, 0, 0);
+        assertColor(page, 22, 40, 255, 255, 255, 0);
+        assertColor(page, 22, 52, 255, 0, 0, 0);
+    }
+
+    /** Border style: dotted: on the top side, 13 dots of 4 with their centers 8 apart, from x = 22. */
+    @Test
+    void aDottedBorderIsARowOfDots() throws Exception {
+        BufferedImage page = render(doc("Border: 4\nBorder color: #FF0000\nBorder style: dotted"));
+        assertColor(page, 22, 22, 255, 0, 0, 0);
+        assertColor(page, 26, 22, 255, 255, 255, 0);
+        assertColor(page, 30, 22, 255, 0, 0, 0);
+        assertColor(page, 118, 22, 255, 0, 0, 0);
+        // The dots are round: the corner of the square a dot is in is empty.
+        assertColor(page, 20, 20, 255, 255, 255, 0);
+    }
+
+    /** Only the sides with a width are drawn: a dashed line to cut along is a top border. */
+    @Test
+    void aDashedBorderOnOneSideIsALine() throws Exception {
+        BufferedImage page = render(doc("Border: 4 0 0 0\nBorder color: #FF0000\nBorder style: dashed"));
+        assertColor(page, 21, 22, 255, 0, 0, 0);
+        assertColor(page, 20, 40, 255, 255, 255, 0);
+        assertColor(page, 119, 40, 255, 255, 255, 0);
+        assertColor(page, 70, 59, 255, 255, 255, 0);
+    }
+
+    private static int reds(BufferedImage page) {
+        int count = 0;
+        for (int y = 0; y < page.getHeight(); y++) {
+            for (int x = 0; x < page.getWidth(); x++) {
+                int[] c = rgb(page, x, y);
+                if (c[0] > 200 && c[1] < 60 && c[2] < 60) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * With Corner radius the pattern follows the curve: the dashes take about half of the ring a solid border fills,
+     * corners included, and nothing is painted outside it.
+     */
+    @Test
+    void aDashedBorderFollowsTheRoundedCorners() throws Exception {
+        String box = "Border: 4\nBorder color: #FF0000\nCorner radius: 16";
+        int solid = reds(render(doc(box)));
+        BufferedImage dashed = render(doc(box + "\nBorder style: dashed"));
+        int painted = reds(dashed);
+        assertTrue(painted > solid * 0.35 && painted < solid * 0.65, painted + " of " + solid);
+        assertColor(dashed, 21, 21, 255, 255, 255, 0);
+        assertColor(dashed, 70, 40, 255, 255, 255, 0);
+    }
+
+    @Test
+    void svgStrokesABorderThatIsNotSolid() {
+        String dashed = svg(doc("Border: 4\nBorder color: #FF0000\nBorder style: dashed"));
+        assertTrue(dashed.contains("<line x1=\"20.00\" y1=\"22.00\" x2=\"120.00\" y2=\"22.00\" stroke=\"#ff0000\" "
+                + "stroke-width=\"4.00\" stroke-dasharray=\"12.000 10.000\" stroke-dashoffset=\"0.000\"/>"), dashed);
+        assertEquals(4, dashed.split("<line ", -1).length - 1, dashed);
+        String dotted = svg(doc("Border: 4\nBorder color: #FF000080\nBorder style: dotted\nCorner radius: 16"));
+        assertTrue(dotted.contains("fill=\"none\" stroke=\"#ff0000\" stroke-width=\"4.00\" stroke-opacity=\"0.502\" "
+                + "stroke-dasharray=\"0.000 "), dotted);
+        assertTrue(dotted.contains("stroke-linecap=\"round\""), dotted);
+        String solid = svg(doc("Border: 4\nBorder style: solid"));
+        assertFalse(solid.contains("stroke-dasharray"), solid);
+    }
+
+    /** With a color per side and rounded corners, the line is stroked once per side, clipped to its trapezoid. */
+    @Test
+    void svgClipsARoundedBorderThatIsNotSolidToEachSide() {
+        String svg = svg(doc("Border: 4\nBorder color: #FF0000 #00FF00 #0000FF #FFFF00\nBorder style: dashed\n"
+                + "Corner radius: 16"));
+        assertEquals(4, svg.split("<clipPath", -1).length - 1, svg);
+        assertEquals(4, svg.split("stroke-dasharray", -1).length - 1, svg);
+    }
+
+    /**
+     * Separator style: the line between two columns of 90 with a Gap of 20, 4 wide, centered on x = 120: dots of 4
+     * from the top of the content box.
+     */
+    @Test
+    void theSeparatorOfAColumnsHasItsStyle() throws Exception {
+        String columns = HEAD + "\tColumns:\n\t\tColumn count: 2\n\t\tGap: 20\n\t\tSeparator: 4\n"
+                + "\t\tSeparator color: #FF0000\n\t\tSeparator style: dotted\n"
+                + "\t\tBlock:\n\t\t\tBox:\n\t\t\t\tHeight: 40\n\t\tBlock:\n\t\t\tBox:\n\t\t\t\tHeight: 40\n";
+        BufferedImage page = render(columns);
+        assertColor(page, 100, 22, 255, 0, 0, 0);
+        assertColor(page, 100, 26, 255, 255, 255, 0);
+        String svg = svg(columns);
+        assertTrue(svg.contains("<line x1=\"100.00\" y1=\"20.00\" x2=\"100.00\" y2=\"60.00\" stroke=\"#ff0000\""), svg);
+    }
+
     private static String svg(String document) {
         InlineNode input = new DocumentReader().read(Docs.sectioned(document));
         LaidOutDocument laidOut = new Engine().layOutDocument(input);

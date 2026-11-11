@@ -47,6 +47,7 @@ Document (dev.stxt.pdf):
 | `Gap` | `0` | El hueco entre columnas, un solo valor. Con `Column count: 1` es un error, porque no hay columnas que separar |
 | `Separator` | sin línea | El grosor de una línea entre columnas, en medio del hueco. No puede ser más ancho que el hueco, y con `Column count: 1` es un error |
 | `Separator color` | el del texto | El color de esa línea. Solo con `Separator` |
+| `Separator style` | `solid` | Cómo se dibuja esa línea: `solid`, `dashed` (trazos) o `dotted` (puntos). Solo con `Separator` |
 | `Balance columns` | `true` | Con `true`, en la última página las columnas quedan igual de altas. Con `false`, se llenan en orden |
 
 `Column count`, `Min column width` o los dos son obligatorios. Admite además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`.

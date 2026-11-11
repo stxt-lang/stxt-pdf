@@ -47,6 +47,7 @@ Document (dev.stxt.pdf):
 | `Gap` | `0` | The gap between columns, a single value. With `Column count: 1` it is an error, because there are no columns to separate |
 | `Separator` | no line | The thickness of a line between columns, in the middle of the gap. It cannot be wider than the gap, and with `Column count: 1` it is an error |
 | `Separator color` | the text color | The color of that line. Only with `Separator` |
+| `Separator style` | `solid` | How that line is drawn: `solid`, `dashed` or `dotted`. Only with `Separator` |
 | `Balance columns` | `true` | With `true`, on the last page the columns are equally tall. With `false`, they are filled in order |
 
 `Column count`, `Min column width` or both are required. It also accepts `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`.

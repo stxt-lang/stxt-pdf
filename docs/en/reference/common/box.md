@@ -35,6 +35,7 @@ The box model. It is not inherited.
 | `Padding` | 1 to 4 values (number ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 to 4 numbers ≥ 0 | `0` | Thickness. |
 | `Border color` | 1 to 4 colors | the text `Color` | Top, right, bottom, left ([Values](values.md#four-side-shorthands)). It does not affect the layout. |
+| `Border style` | `solid`, `dashed`, `dotted` | `solid` | How the border is drawn, the same on its four sides ([border style](#border-style)). It does not affect the layout. |
 | `Corner radius` | 1 to 4 values (number ≥ 0, % ≥ 0) | `0` | Rounded corners of the border box: top left, top right, bottom right, bottom left ([corners](#corners)). It does not affect the layout. |
 | `Background` | color or `linear(...)` | transparent | It is painted in the padding box ([background](#background-border-and-corners)). It does not affect the layout. |
 | `Overflow` | `error`, `shrink`, `clip` | `error` | What is done with what does not fit in the box ([Overflow](overflow.md#policy-per-box-overflow)). |
@@ -111,7 +112,7 @@ aspect ratio: that of its file, or that of `Aspect ratio`, and in it the ratio a
 
 ## Background, border and corners
 
-`Background`, `Border color` and `Corner radius` only change the appearance: none of them moves a box or changes its size. The background
+`Background`, `Border color`, `Border style` and `Corner radius` only change the appearance: none of them moves a box or changes its size. The background
 and the border go under the content ([Layers and rotation](layers-and-rotation.md#painting-order)). For someone who reads the PDF with a
 screen reader they are decoration ([The PDF](pdf.md#accessibility)).
 
@@ -149,8 +150,56 @@ radii of a side add up to more than the side, all of them are reduced by the sam
 It is the ring between the border box and the padding box. With a single color it is painted in one go. With different colors, each
 side gets its color, and two consecutive sides meet on the **diagonal** that joins the corner of the border box with that of
 the padding box (with rounded corners, the diagonal continues inward to cover the curve). A side without thickness does not
-have a color: `Border: 0 0 0 3` with `Border color: #B5651D` is a strip on the left. The border is always a
-solid line.
+have a color: `Border: 0 0 0 3` with `Border color: #B5651D` is a strip on the left.
+
+### Border style
+
+`Border style` draws the border with dashes (`dashed`) or with dots (`dotted`). By default it is `solid`, a continuous
+line. It applies to the four sides of the box:
+
+```
+Block:
+    Box:
+        Margin: 12 0
+        Border: 0.5 0 0 0
+        Border style: dashed
+```
+
+It is a line to cut along: only the top side has a thickness, so only that one is drawn.
+
+- **The pattern comes from the thickness.** A dash is three times as long as the border is thick, and so is the gap
+  between two dashes. A dot is a circle as wide as the thickness, and the centers of two dots are two thicknesses apart.
+  It is not declared.
+- **It is fitted to each side.** The gaps stretch or shrink just enough for the side to start and end with a whole dash
+  or dot: a square corner always has a dash or a dot. A side with no room for two dashes is solid.
+- **Square corners.** The corner where two sides meet belongs to the horizontal one: the vertical one starts below it,
+  with its pattern cut there, and nothing is painted twice. With one color per side, the corner has that of the
+  horizontal side, and there is no diagonal.
+- **Rounded corners.** With `Corner radius`, the pattern follows the curve: it is a single line along the middle of the
+  border, with a whole number of dashes or dots evenly spaced. For that the border must be equally thick on its four
+  sides: with `Corner radius` and sides of different thicknesses it is an error (`BORDER_STYLE_CONFLICT`), also if the
+  style or the radius comes from a rule.
+- **Broken boxes.** With `Edges: open`, the fragment that lacks the top or the bottom side draws an open line through
+  the sides it has, which starts and ends with a whole dash or dot at the break.
+- **The background.** It stays in the padding box: what is behind the box shows through the gaps of the border.
+- **Where else it applies.** In the band of a `Row`, in the line of a `Divider` of a `Markdown` and in the rule of the
+  footnote area, which are borders and take it from their rule. Between the cells of a table with `Merge borders`, the
+  line takes the style of the wider border ([Merged borders](../components/table.md#merged-borders)). The line between
+  the columns of a `Columns` has its own property, `Separator style` ([Columns](../components/columns.md#line-between-columns)).
+
+> **Decision:** one style for the box and not one per side. A line to cut along or to sign on is a box with a single
+> side with a thickness, and with one value there is no need to settle how a solid side and a dashed one meet at a
+> corner. *Discarded alternative:* 1 to 4 values, like `Border color`.
+
+> **Decision:** the pattern depends on the thickness alone and is fitted to the length of each side, so that the corners
+> always look the same. *Discarded alternative:* a property with the length of the dash and that of the gap.
+
+> **Decision:** with `Corner radius`, the pattern follows the curve and requires a border equally thick on its four
+> sides: a line of varying thickness has no pattern to follow. *Discarded alternatives:* making it always an error, and
+> rounded coupons could not be done, or painting the square border over a rounded background.
+
+> **Decision:** the background does not go under the border, as with a solid border. *Discarded alternative:* extending
+> it to the border box only when the border has gaps.
 
 ### Background
 
@@ -170,4 +219,4 @@ the corners are not painted twice.
 ## What is not supported
 
 - Shadows: PDF does not blur, and they would have to be approximated with semitransparent layers.
-- Border styles (dotted or double), several background layers or background images.
+- Double borders, a border style per side, several background layers or background images.

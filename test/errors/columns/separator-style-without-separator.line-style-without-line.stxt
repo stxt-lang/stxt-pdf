@@ -1,0 +1,20 @@
+# Case: Separator style without Separator, which is the width of the line
+# Code: SEPARATOR_STYLE_WITHOUT_SEPARATOR
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Columns:
+			Column count: 2
+			Gap: 20
+			Separator style: dashed
+			Text: Hola

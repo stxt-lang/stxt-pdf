@@ -24,6 +24,7 @@ public final class PropertyKey {
     public static final String MARGIN = "margin";
     public static final String PADDING = "padding";
     public static final String BORDER = "border";
+    public static final String BORDER_STYLE = "border-style";
     public static final String CORNER_RADIUS = "corner-radius";
     public static final String OVERFLOW = "overflow";
     public static final String MERGE_BORDERS = "merge-borders";
@@ -64,6 +65,7 @@ public final class PropertyKey {
     public static final String COLUMN_GAP = "gap";
     public static final String SEPARATOR = "separator";
     public static final String SEPARATOR_COLOR = "separator-color";
+    public static final String SEPARATOR_STYLE = "separator-style";
 
     // Break
     public static final String BREAK_BEFORE = "break-before";

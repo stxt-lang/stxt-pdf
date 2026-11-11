@@ -88,6 +88,7 @@ class SchemaCoverageTest {
             Map.entry("Padding", "Padding: 5"),
             Map.entry("Border", "Border: 1"),
             Map.entry("Border color", "Border color: #000000"),
+            Map.entry("Border style", "Border style: dashed"),
             Map.entry("Corner radius", "Corner radius: 4"),
             Map.entry("Background", "Background: #FFFFFF"),
             Map.entry("Overflow", "Overflow: error"),
@@ -155,6 +156,7 @@ class SchemaCoverageTest {
             Map.entry("Min column width", "Min column width: 100"),
             Map.entry("Separator", "Separator: 1"),
             Map.entry("Separator color", "Separator color: #999999"),
+            Map.entry("Separator style", "Separator style: dotted"),
             Map.entry("Balance columns", "Balance columns: false"),
             // Markdown
             Map.entry("Bullet markers", "Bullet markers: bullet dash"),
@@ -230,7 +232,7 @@ class SchemaCoverageTest {
         // The children of a Marker image (Alt, Height), in a list with Marker: image.
         t.put("Marker image", new Template(HEADER + "\tList:\n\t\tMarker: image\n\t\tMarker image: test/square.png\n"
                 + "\t\t\t{}\n\t\tList item:\n\t\t\tParagraph: Uno"));
-        // Separator needs a Gap that contains it, and Separator color, a Separator.
+        // Separator needs a Gap that contains it, and Separator color and Separator style, a Separator.
         t.put("Columns", new Template(HEADER + "\tColumns:\n\t\tColumn count: 2\n\t\tGap: 10\n\t\tSeparator: 1\n"
                 + "\t\t{}\n\t\tText: Hola", Set.of("Column count", "Gap", "Separator")));
         t.put("Markdown", new Template(HEADER + "\tMarkdown:\n\t\t{}\n\t\tContent >>\n\t\t\tHola",

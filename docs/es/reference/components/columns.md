@@ -26,6 +26,7 @@ Columns:
 | `Gap` | número ≥ 0 | `0` | Separación entre columnas: una sola medida (dos valores son `VALUE_NOT_ALLOWED`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator` | número > 0 | sin línea | Grosor de la línea entre columnas, centrada en el hueco. No pasa de `Gap` (`SEPARATOR_WIDTH`). Con `Column count: 1` es un error (`SINGLE_COLUMN`). |
 | `Separator color` | color | el `Color` del texto | Solo con `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). No afecta al layout. |
+| `Separator style` | `solid`, `dashed`, `dotted` | `solid` | Cómo se dibuja la línea. Solo con `Separator` (`SEPARATOR_STYLE_WITHOUT_SEPARATOR`). No afecta al layout. |
 | `Balance columns` | `true`, `false` | `true` | `true` iguala las columnas de la última página, y `false` las llena en orden. |
 
 `Column count`, `Min column width` o los dos son obligatorios (`COLUMNS_WITHOUT_COUNT`), propios o de una regla. Todas pueden venir
@@ -97,7 +98,9 @@ llenar sus cortes de columna necesiten más columnas de las que tiene ([Desborda
 
 Con `Separator`, entre cada dos columnas **con contenido** se pinta una línea de ese grosor, centrada en el hueco, desde arriba de
 la caja de contenido y con el alto de la columna más alta de esa página. Su color es `Separator color` o, sin él, el `Color` del
-texto. Se pinta con el fondo del `Columns`, debajo del contenido, y no puede ser más ancho que `Gap`.
+texto. Con `Separator style: dashed` o `dotted` es de trazos o de puntos, con el patrón del
+[estilo del borde](../common/box.md#estilo-del-borde) ajustado a su alto: empieza y acaba con un trazo o un punto entero.
+Se pinta con el fondo del `Columns`, debajo del contenido, y no puede ser más ancho que `Gap`.
 
 > **Decisión:** la línea no ocupa sitio, así que más ancha que el hueco se pintaría encima de las columnas.
 

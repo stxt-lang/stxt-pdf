@@ -176,4 +176,68 @@ class ShapesTest {
         assertEquals(List.of(1.0, 2.0, 3.0, 4.0), Arrays.stream(Shapes.Side.values()).map(side -> side.of(w)).toList());
         assertEquals(List.of("t", "r", "b", "l"), Arrays.stream(Shapes.Side.values()).map(side -> side.of(s)).toList());
     }
+
+    private static List<String> ops(Shapes.Run run) {
+        Recorder r = new Recorder();
+        run.path().accept(r);
+        return r.ops;
+    }
+
+    /** A border of 4 with its four sides: one closed line 2 inside the border box, with the radii 2 smaller. */
+    @Test
+    void theCenterlineOfAWholeBorderIsAClosedLineAlongItsMiddle() {
+        List<Shapes.Run> square = Shapes.centerlines(BOX, Insets.all(4), Radii.NONE);
+        assertEquals(1, square.size());
+        assertEquals(true, square.get(0).closed());
+        assertEquals(List.of("R 12.00 22.00 96.00 56.00"), ops(square.get(0)));
+
+        Radii radii = Radii.resolve(Corners.all(Value.pt(10)), 100, 60);
+        List<String> rounded = ops(Shapes.centerlines(BOX, Insets.all(4), radii).get(0));
+        assertEquals("M 20.00 22.00", rounded.get(0));
+        assertEquals("L 100.00 22.00", rounded.get(1));
+        assertEquals("Z", rounded.get(rounded.size() - 1));
+        assertEquals(4, rounded.stream().filter(op -> op.startsWith("C")).count());
+    }
+
+    /**
+     * The first fragment of a box broken across pages has no bottom side: one open line from the bottom left, up, over
+     * the top and down to the bottom right, which reaches the bottom edge of the box.
+     */
+    @Test
+    void aBorderWithoutASideIsAnOpenLineThroughTheOthers() {
+        Radii radii = Radii.resolve(Corners.all(Value.pt(10)), 100, 60).forFragment(true, false);
+        List<Shapes.Run> runs = Shapes.centerlines(BOX, new Insets(4, 4, 0, 4), radii);
+        assertEquals(1, runs.size());
+        assertEquals(false, runs.get(0).closed());
+        List<String> ops = ops(runs.get(0));
+        assertEquals("M 12.00 80.00", ops.get(0));
+        assertEquals("L 12.00 30.00", ops.get(1));
+        assertEquals("L 100.00 22.00", ops.get(3));
+        assertEquals("L 108.00 80.00", ops.get(ops.size() - 1));
+        assertEquals(2, ops.stream().filter(op -> op.startsWith("C")).count());
+    }
+
+    /** Two sides that do not touch are two lines. */
+    @Test
+    void sidesThatDoNotTouchAreSeparateLines() {
+        List<Shapes.Run> runs = Shapes.centerlines(BOX, new Insets(0, 4, 0, 4), Radii.NONE);
+        assertEquals(2, runs.size());
+        assertEquals(List.of("M 108.00 20.00", "L 108.00 80.00"), ops(runs.get(0)));
+        assertEquals(List.of("M 12.00 80.00", "L 12.00 20.00"), ops(runs.get(1)));
+        assertEquals(List.of(), Shapes.centerlines(BOX, Insets.ZERO, Radii.NONE));
+    }
+
+    /** The length of a rectangle is its perimeter, and that of a circle of radius 10, 2π × 10 (to a thousandth). */
+    @Test
+    void theLengthOfAPathFollowsItsCurves() {
+        assertEquals(320, Shapes.length(path -> Shapes.roundedRect(path, BOX, Radii.NONE)), 1e-9);
+        Rect square = new Rect(0, 0, 20, 20);
+        Radii circle = Radii.resolve(Corners.all(Value.pt(10)), 20, 20);
+        assertEquals(2 * Math.PI * 10, Shapes.length(path -> Shapes.roundedRect(path, square, circle)), 0.05);
+        assertEquals(60, Shapes.length(path -> {
+            path.moveTo(0, 0);
+            path.lineTo(30, 0);
+            path.lineTo(30, 30);
+        }), 1e-9);
+    }
 }

@@ -1,0 +1,129 @@
+# Border style and Separator style (reference/common/box.md#border-style). Page area of 260 × 360 from (20, 20).
+# The style of a line only changes how it is painted: every box measures what it would with a solid border.
+#
+# b1 to b6 (style b: Margin bottom 10): dashed with square corners; dotted with a color per side; dashed and dotted
+#   following a Corner radius, the dotted one in a translucent color; a dashed line to cut along (only the top side)
+#   and a dotted line to sign on (only the bottom side).
+# t: Merge borders, from a rule. Columns of 100 at x = 20 and 120. The cells have Padding: 2 and a dashed Border: 1 in
+#   #333333 and hold a block 10 high; the header cells (style head), a solid border in #C00000 with a bottom side of 2,
+#   which wins against the top side of the body: the line between the two rows is solid.
+#   Rows: header 1 + 14 + 1 = 16; body 1 + 14 + 1 = 16.
+# c: a Columns with a dotted Separator of 2, centered in its Gap of 20.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 400
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: b
+			Box:
+				Margin: 0 0 10 0
+		For element: Cell
+			Box:
+				Padding: 2
+				Border: 1
+				Border color: #333333
+				Border style: dashed
+		For element: Table
+			Box:
+				Merge borders: true
+				Margin: 0 0 10 0
+		For style: head
+			Box:
+				Border: 1 1 2 1
+				Border color: #C00000
+				Border style: solid
+		For style: fill
+			Box:
+				Height: 10
+				Background: #B5D4F4
+	Section:
+		Block:
+			Id: b1
+			Style: b
+			Box:
+				Height: 30
+				Border: 2
+				Border style: dashed
+		Block:
+			Id: b2
+			Style: b
+			Box:
+				Height: 30
+				Border: 2
+				Border color: #C00000 #1F6FB2 #2E7D32 #B5651D
+				Border style: dotted
+				Background: #F2F2F2
+		Block:
+			Id: b3
+			Style: b
+			Box:
+				Height: 40
+				Border: 2
+				Border style: dashed
+				Corner radius: 10
+				Background: #F2F2F2
+		Block:
+			Id: b4
+			Style: b
+			Box:
+				Height: 40
+				Border: 3
+				Border color: #1F6FB280
+				Border style: dotted
+				Corner radius: 12
+		Block:
+			Id: b5
+			Style: b
+			Box:
+				Height: 10
+				Border: 1 0 0 0
+				Border style: dashed
+		Block:
+			Id: b6
+			Style: b
+			Box:
+				Height: 10
+				Border: 0 0 0.5 0
+				Border style: dotted
+		Table:
+			Id: t
+			Column sizes: 100 100
+			Header rows:
+				Row:
+					Style: head
+					Cell:
+						Block:
+							Style: fill
+					Cell:
+						Block:
+							Style: fill
+			Body rows:
+				Row:
+					Cell:
+						Block:
+							Style: fill
+					Cell:
+						Block:
+							Style: fill
+		Columns:
+			Id: c
+			Column count: 2
+			Gap: 20
+			Separator: 2
+			Separator color: #C00000
+			Separator style: dotted
+			Block:
+				Box:
+					Height: 30
+					Background: #B5D4F4
+			Block:
+				Box:
+					Height: 30
+					Background: #B5D4F4

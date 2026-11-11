@@ -26,6 +26,7 @@ Columns:
 | `Gap` | number ≥ 0 | `0` | Space between columns: a single measurement (two values are `VALUE_NOT_ALLOWED`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator` | number > 0 | no line | Thickness of the line between columns, centered in the gap. It does not exceed `Gap` (`SEPARATOR_WIDTH`). With `Column count: 1` it is an error (`SINGLE_COLUMN`). |
 | `Separator color` | color | the text `Color` | Only with `Separator` (`SEPARATOR_COLOR_WITHOUT_SEPARATOR`). It does not affect the layout. |
+| `Separator style` | `solid`, `dashed`, `dotted` | `solid` | How the line is drawn. Only with `Separator` (`SEPARATOR_STYLE_WITHOUT_SEPARATOR`). It does not affect the layout. |
 | `Balance columns` | `true`, `false` | `true` | `true` evens out the columns of the last page, and `false` fills them in order. |
 
 `Column count`, `Min column width` or both are required (`COLUMNS_WITHOUT_COUNT`), their own or from a rule. All of them can come
@@ -97,7 +98,9 @@ fill, its column breaks need more columns than it has ([Overflow](../common/over
 
 With `Separator`, a line of that thickness is painted between each two columns **with content**, centered in the gap, from the top of
 the content box and with the height of the tallest column on that page. Its color is `Separator color` or, without it, the text
-`Color`. It is painted with the background of the `Columns`, below the content, and cannot be wider than `Gap`.
+`Color`. With `Separator style: dashed` or `dotted` it is made of dashes or dots, with the pattern of the
+[border style](../common/box.md#border-style) fitted to its height: it starts and ends with a whole dash or dot. It is
+painted with the background of the `Columns`, below the content, and cannot be wider than `Gap`.
 
 > **Decision:** the line takes up no space, so a line wider than the gap would be painted over the columns.
 

@@ -8,6 +8,7 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -124,7 +125,13 @@ public final class ContrastCheck implements Canvas {
     }
 
     @Override
-    public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
+    public void border(Rect r, Insets w, Radii radii, Sides<String> colors, LineStyle style) {
+    }
+
+    /** Like a solid line: its whole rectangle, whatever its style. */
+    @Override
+    public void line(Rect r, boolean vertical, String color, LineStyle style) {
+        background(r, color);
     }
 
     @Override

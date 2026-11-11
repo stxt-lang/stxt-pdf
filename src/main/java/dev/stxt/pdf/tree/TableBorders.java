@@ -76,7 +76,7 @@ final class TableBorders {
         }
     }
 
-    /** The border the cell declares, side by side: its width and its color, or that of its text. */
+    /** The border the cell declares, side by side: its width, its color, or that of its text, and its style. */
     private static Sides<Stroke> declared(Style s) {
         Sides<Value> w = s.box().border();
         Sides<String> c = s.box().borderColor() != null ? s.box().borderColor() : Sides.all(null);
@@ -86,7 +86,8 @@ final class TableBorders {
 
     private static Stroke stroke(Value width, String color, Style s) {
         double w = width.resolve(0).orElse(0);
-        return w <= Tolerance.EPSILON ? Stroke.NONE : new Stroke(w, color != null ? color : s.typography().color());
+        return w <= Tolerance.EPSILON ? Stroke.NONE
+                : new Stroke(w, color != null ? color : s.typography().color(), s.box().borderStyle());
     }
 
     /**

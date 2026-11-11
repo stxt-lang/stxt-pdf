@@ -10,11 +10,20 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 **From 0.16.0**: `tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of
 four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
 `model.FootnoteNumberFormat` instead of a `model.NumberFormat`. `model.RunStyle` has a tenth component, `position`. A
-second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. No document that was
-valid changes.
+second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. `fragment.Rule` has
+a sixth component, `style` (a `model.LineStyle`); its constructor with five arguments still makes a solid line. No
+document that was valid changes.
 
 ### Added
 
+- **Dashed and dotted borders.** `Border style`, of `Box`, draws the border with dashes (`dashed`) or dots (`dotted`);
+  `solid` is the default. One value for the four sides: a line to cut along or to sign on is a box with a single side
+  with a thickness. The dashes are three times as long as the border is thick and the dots as wide as it, and they are
+  spaced so that each side starts and ends with a whole one. With `Corner radius` the pattern follows the curve, and the
+  four sides of `Border` must be equally thick (`BORDER_STYLE_CONFLICT`). It also applies to the band of a `Row`, to the
+  line of a `Divider` of a `Markdown` and to the rule of the footnote area, and with `Merge borders` the line between
+  two cells takes the style of the wider border. `Separator style` does the same for the line between the columns of a
+  `Columns`, and needs `Separator` (`SEPARATOR_STYLE_WITHOUT_SEPARATOR`).
 - **Baseline alignment in a row.** `Vertical: baseline` in a `Stack` with `Direction: horizontal` and in its `Item`
   aligns the items of a line by the baseline of their first line of text: a small label next to a large figure. The
   baseline of an item is that of its first text, going down its first in-flow children; an item without text in first

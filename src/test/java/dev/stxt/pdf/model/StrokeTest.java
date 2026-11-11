@@ -32,4 +32,14 @@ class StrokeTest {
         assertTrue(Stroke.merge(Stroke.NONE, Stroke.NONE).isNone());
         assertFalse(THIN_GRAY.isNone());
     }
+
+    /** The style goes with the width and the color: the line between two sides is drawn like the wider one. */
+    @Test
+    void theStyleIsThatOfTheSideThatWins() {
+        Stroke thinDashed = new Stroke(1, "#333333", LineStyle.DASHED);
+        assertEquals(LineStyle.SOLID, THIN_GRAY.style());
+        assertEquals(WIDE_RED, Stroke.merge(thinDashed, WIDE_RED));
+        assertEquals(thinDashed, Stroke.merge(thinDashed, THIN_BLUE));
+        assertEquals(THIN_BLUE, Stroke.merge(THIN_BLUE, thinDashed));
+    }
 }

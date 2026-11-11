@@ -225,7 +225,7 @@ el documento ni tienen `Id` o `Style`, y los nombran las reglas `For element`, c
 - **Aspecto.** Una cita no tiene aspecto por defecto, como el resto de lo que genera un `Markdown`: sin regla se ve
   como los párrafos que contiene, y `For element: Block quote` le da la sangría, la línea o el fondo, como en el
   ejemplo. La línea de un `Divider` es lo que el elemento es: su regla cambia su grosor (`Border`), su color
-  (`Border color`) y su separación (`Margin`).
+  (`Border color`), su estilo (`Border style`) y su separación (`Margin`).
 - **Separación.** Ni la cita ni la línea tienen márgenes propios: las separa de lo de arriba y de lo de abajo lo que
   separa los bloques del `Markdown` (el `Margin` de `For element: Paragraph`), o un `Margin` en su regla.
 - **`Typography`.** La de `For element: Block quote` la hereda lo que la cita contiene. `For element: Divider` no la

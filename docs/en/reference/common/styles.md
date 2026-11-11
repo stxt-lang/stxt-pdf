@@ -70,7 +70,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Stack` | `Direction`, `Wrap items`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
 | `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
-| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance columns` |
+| `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Below side boxes` |

@@ -35,6 +35,7 @@ El modelo de caja. No se hereda.
 | `Padding` | 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | |
 | `Border` | 1 a 4 números ≥ 0 | `0` | Grosor. |
 | `Border color` | de 1 a 4 colores | el `Color` del texto | Arriba, derecha, abajo, izquierda ([Valores](values.md#abreviados-de-cuatro-lados)). No afecta al layout. |
+| `Border style` | `solid`, `dashed`, `dotted` | `solid` | Cómo se dibuja el borde, igual en sus cuatro lados ([estilo del borde](#estilo-del-borde)). No afecta al layout. |
 | `Corner radius` | de 1 a 4 valores (número ≥ 0, % ≥ 0) | `0` | Esquinas redondeadas de la caja de borde: arriba izquierda, arriba derecha, abajo derecha, abajo izquierda ([esquinas](#esquinas)). No afecta al layout. |
 | `Background` | color o `linear(...)` | transparente | Se pinta en la caja de relleno ([fondo](#fondo-borde-y-esquinas)). No afecta al layout. |
 | `Overflow` | `error`, `shrink`, `clip` | `error` | Qué se hace con lo que no cabe en la caja ([Desbordamiento](overflow.md#política-por-caja-overflow)). |
@@ -111,7 +112,7 @@ proporción: la de su fichero, o la de `Aspect ratio`, y en ella se aplica a la 
 
 ## Fondo, borde y esquinas
 
-`Background`, `Border color` y `Corner radius` solo cambian el aspecto: ninguno mueve ni cambia el tamaño de una caja. El fondo
+`Background`, `Border color`, `Border style` y `Corner radius` solo cambian el aspecto: ninguno mueve ni cambia el tamaño de una caja. El fondo
 y el borde van debajo del contenido ([Capas y giro](layers-and-rotation.md#orden-de-pintado)). Para quien lee el PDF con un
 lector de pantalla son decoración ([El PDF](pdf.md#accesibilidad)).
 
@@ -149,8 +150,56 @@ seguidos de un lado suman más que el lado, todos se reducen por el mismo factor
 Es el anillo entre la caja de borde y la de relleno. Con un solo color se pinta de una vez. Con colores distintos, cada
 lado va con su color, y dos lados seguidos se encuentran en la **diagonal** que une la esquina de la caja de borde con la de
 la de relleno (con esquinas redondeadas, la diagonal sigue hacia dentro para cubrir la curva). Un lado sin grosor no
-tiene color: `Border: 0 0 0 3` con `Border color: #B5651D` es una franja a la izquierda. El borde es siempre una línea
-continua.
+tiene color: `Border: 0 0 0 3` con `Border color: #B5651D` es una franja a la izquierda.
+
+### Estilo del borde
+
+`Border style` dibuja el borde con trazos (`dashed`) o con puntos (`dotted`). Por defecto es `solid`, una línea continua.
+Vale para los cuatro lados de la caja:
+
+```
+Block:
+    Box:
+        Margin: 12 0
+        Border: 0.5 0 0 0
+        Border style: dashed
+```
+
+Es una línea de corte: solo el lado de arriba tiene grosor, así que solo se dibuja ese.
+
+- **El patrón sale del grosor.** Un trazo mide tres veces el grosor del borde, y el hueco entre dos trazos, lo mismo. Un
+  punto es un círculo del diámetro del grosor, y entre los centros de dos puntos hay dos grosores. No se declara.
+- **Se ajusta a cada lado.** Los huecos se estiran o se encogen lo justo para que el lado empiece y acabe con un trazo
+  o un punto entero: en una esquina cuadrada hay siempre un trazo o un punto. Un lado donde no caben dos trazos es
+  continuo.
+- **Esquinas cuadradas.** La esquina donde se juntan dos lados es del lado horizontal: el vertical empieza debajo de él,
+  con su patrón cortado ahí, y nada se pinta dos veces. Con un color por lado, la esquina tiene el del lado horizontal,
+  y no hay diagonal.
+- **Esquinas redondeadas.** Con `Corner radius`, el patrón sigue la curva: es una sola línea por el medio del borde, con
+  un número entero de trazos o de puntos repartidos por igual. Para eso el borde tiene que medir lo mismo en sus
+  cuatro lados: con `Corner radius` y lados de grosores distintos es un error (`BORDER_STYLE_CONFLICT`), también si
+  el estilo o el radio llegan de una regla.
+- **Cajas partidas.** Con `Edges: open`, el fragmento que no tiene el lado de arriba o el de abajo dibuja una línea
+  abierta por los lados que tiene, que empieza y acaba con un trazo o un punto entero en el corte.
+- **El fondo.** Sigue en la caja de relleno: por los huecos del borde se ve lo que hay detrás de la caja.
+- **Dónde más vale.** En la franja de una `Row`, en la línea de un `Divider` de un `Markdown` y en el filete del área
+  de notas, que son bordes y lo toman de su regla. Entre las celdas de una tabla con `Merge borders`, la línea toma el
+  estilo del borde más ancho ([Bordes fusionados](../components/table.md#bordes-fusionados)). La línea entre las
+  columnas de un `Columns` tiene su propiedad, `Separator style` ([Columns](../components/columns.md#línea-entre-columnas)).
+
+> **Decisión:** un estilo para la caja y no uno por lado. Una línea de corte o de firma es una caja con un solo lado con
+> grosor, y con un valor no hay que resolver cómo se juntan en una esquina un lado continuo y uno de trazos.
+> *Alternativa descartada:* de 1 a 4 valores, como `Border color`.
+
+> **Decisión:** el patrón depende solo del grosor y se ajusta al largo de cada lado, para que las esquinas queden
+> siempre igual. *Alternativa descartada:* una propiedad con el largo del trazo y el del hueco.
+
+> **Decisión:** con `Corner radius`, el patrón sigue la curva y pide un borde del mismo grosor en sus cuatro lados: una
+> línea de grosor variable no tiene un patrón que seguir. *Alternativas descartadas:* que sea siempre un error, y los
+> cupones redondeados no se podrían hacer, o pintar el borde cuadrado sobre un fondo redondeado.
+
+> **Decisión:** el fondo no pasa debajo del borde, como en un borde continuo. *Alternativa descartada:* extenderlo a la
+> caja de borde solo cuando el borde tiene huecos.
 
 ### Fondo
 
@@ -170,4 +219,4 @@ las esquinas no se pintan dos veces.
 ## Lo que no hay
 
 - Sombras: el PDF no desenfoca y habría que aproximarlas con capas semitransparentes.
-- Estilos de borde (punteado o doble), varias capas de fondo ni imágenes de fondo.
+- Borde doble, un estilo de borde por lado, varias capas de fondo ni imágenes de fondo.

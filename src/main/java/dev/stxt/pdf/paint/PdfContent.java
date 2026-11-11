@@ -31,6 +31,8 @@ final class PdfContent {
     private final double pageHeight;
     /** Opacity graphics states of this page, by opacity (in thousandths). */
     private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
+    /** Opacity graphics states of this page for what is stroked, by opacity (in thousandths). */
+    private final Map<Integer, PDExtendedGraphicsState> strokeOpacities = new HashMap<>();
     /**
      * The current rotations ({@link #rotate}), in page coordinates (with y pointing down); needed by the link areas and
      * the {@code BBox} of the figures, which do not follow the content matrix.
@@ -115,6 +117,25 @@ final class PdfContent {
         if (translucent) {
             out.restoreGraphicsState();
         }
+    }
+
+    /**
+     * Strokes with the color {@code color} whatever {@code body} does, inside its own graphics state: the width, the
+     * dash pattern and the ends of the line that {@code body} sets end with it.
+     */
+    void stroking(String color, Operation body) throws IOException {
+        float[] rgba = Colors.rgba(color);
+        out.saveGraphicsState();
+        if (rgba[3] < 1f) {
+            out.setGraphicsStateParameters(strokeOpacities.computeIfAbsent(Math.round(rgba[3] * 1000), key -> {
+                PDExtendedGraphicsState state = new PDExtendedGraphicsState();
+                state.setStrokingAlphaConstant(rgba[3]);
+                return state;
+            }));
+        }
+        out.setStrokingColor(rgba[0], rgba[1], rgba[2]);
+        body.run();
+        out.restoreGraphicsState();
     }
 
     private PDExtendedGraphicsState opacity(float alpha) {

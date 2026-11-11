@@ -1,6 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Corners;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Sides;
@@ -8,7 +9,7 @@ import dev.stxt.pdf.model.Value;
 
 /**
  * The {@code Box} group (reference/common/box.md): the box model (sizes, margins, padding and border), its
- * appearance (background, border color and rounded corners), which only changes the painting, and what is done with
+ * appearance (background, border color and style, and rounded corners), which only changes the painting, and what is done with
  * what does not fit in it ({@code Overflow}, reference/common/overflow.md). It is not inherited.
  */
 public final class BoxStyle extends StyleGroup {
@@ -30,6 +31,8 @@ public final class BoxStyle extends StyleGroup {
     private Paint background;
     /** One color per side; {@code null} = the {@code Color} of the text ({@link TypographyStyle#color()}). */
     private Sides<String> borderColor;
+    /** {@code Border style}: how the border is drawn, the same on its four sides; painting only. */
+    private LineStyle borderStyle = LineStyle.SOLID;
     /** Rounded corners, of the border box; painting only. */
     private Corners<Value> cornerRadius = Corners.all(Value.pt(0));
     /** What is done with what does not fit in the box (reference/common/overflow.md). */
@@ -149,6 +152,15 @@ public final class BoxStyle extends StyleGroup {
     void setBorderColor(Sides<String> v) {
         writable();
         borderColor = v;
+    }
+
+    public LineStyle borderStyle() {
+        return borderStyle;
+    }
+
+    void setBorderStyle(LineStyle v) {
+        writable();
+        borderStyle = v;
     }
 
     public Corners<Value> cornerRadius() {

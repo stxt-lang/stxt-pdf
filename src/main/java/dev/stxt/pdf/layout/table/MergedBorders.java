@@ -30,7 +30,8 @@ import static dev.stxt.pdf.model.Tolerance.same;
  *
  * <p>Where two lines meet, the horizontal one goes into the vertical one by half its width, and the lines are painted
  * from the thinnest to the widest, so that the widest covers the junction. Consecutive pieces of the same line are
- * joined into one rectangle.</p>
+ * joined into one rectangle, so the pattern of a line that is not solid ({@code Border style}) runs along the whole
+ * line and not cell by cell.</p>
  */
 final class MergedBorders {
 
@@ -102,7 +103,7 @@ final class MergedBorders {
                 }
                 verticalWidths[i][j] = s.width();
                 double x = j == 0 ? 0 : j == columns ? width - s.width() : line(j) - s.width() / 2;
-                vertical.add(new Rule(x, row.top(), s.width(), row.height(), s.color()));
+                vertical.add(new Rule(x, row.top(), s.width(), row.height(), s.color(), s.style()));
             }
         }
         List<Rule> horizontal = new ArrayList<>();
@@ -136,7 +137,7 @@ final class MergedBorders {
                         i < m ? verticalWidths[i][c + 1] : 0);
                 double x0 = c == 0 ? 0 : starts.get(c) - startInto / 2;
                 double x1 = c == columns - 1 ? width : starts.get(c) + widths.get(c) + endInto / 2;
-                horizontal.add(new Rule(x0, y, x1 - x0, s.width(), s.color()));
+                horizontal.add(new Rule(x0, y, x1 - x0, s.width(), s.color(), s.style()));
             }
         }
         List<Rule> all = new ArrayList<>(joinVertical(vertical));
@@ -200,22 +201,28 @@ final class MergedBorders {
         return cell.style().breaks().edges() == Edges.CLOSED;
     }
 
-    /** Joins the vertical pieces of the same line that touch: same position, width and color. */
+    /** Joins the vertical pieces of the same line that touch: same position, width, color and style. */
     private static List<Rule> joinVertical(List<Rule> rules) {
         List<Rule> sorted = new ArrayList<>(rules);
         sorted.sort(Comparator.comparingDouble(Rule::x).thenComparingDouble(Rule::y));
         List<Rule> joined = new ArrayList<>();
         for (Rule r : sorted) {
             Rule last = joined.isEmpty() ? null : joined.get(joined.size() - 1);
-            if (last != null && same(last.x(), r.x()) && same(last.width(), r.width()) && last.color().equals(r.color())
+            if (last != null && same(last.x(), r.x()) && same(last.width(), r.width()) && sameLine(last, r)
                     && r.y() <= last.y() + last.height() + EPSILON) {
                 double end = Math.max(last.y() + last.height(), r.y() + r.height());
-                joined.set(joined.size() - 1, new Rule(last.x(), last.y(), last.width(), end - last.y(), last.color()));
+                joined.set(joined.size() - 1, new Rule(last.x(), last.y(), last.width(), end - last.y(), last.color(),
+                        last.style()));
             } else {
                 joined.add(r);
             }
         }
         return joined;
+    }
+
+    /** Whether two pieces are drawn the same: the same color and the same style. */
+    private static boolean sameLine(Rule a, Rule b) {
+        return a.color().equals(b.color()) && a.style() == b.style();
     }
 
     /** Joins the horizontal pieces of the same line that touch or overlap. */
@@ -226,9 +233,10 @@ final class MergedBorders {
         for (Rule r : sorted) {
             Rule last = joined.isEmpty() ? null : joined.get(joined.size() - 1);
             if (last != null && same(last.y(), r.y()) && same(last.height(), r.height())
-                    && last.color().equals(r.color()) && r.x() <= last.x() + last.width() + EPSILON) {
+                    && sameLine(last, r) && r.x() <= last.x() + last.width() + EPSILON) {
                 double end = Math.max(last.x() + last.width(), r.x() + r.width());
-                joined.set(joined.size() - 1, new Rule(last.x(), last.y(), end - last.x(), last.height(), last.color()));
+                joined.set(joined.size() - 1, new Rule(last.x(), last.y(), end - last.x(), last.height(), last.color(),
+                        last.style()));
             } else {
                 joined.add(r);
             }

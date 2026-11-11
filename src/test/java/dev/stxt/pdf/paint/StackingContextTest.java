@@ -66,7 +66,13 @@ class StackingContextTest {
         }
 
         @Override
-        public void border(Rect borderBox, Insets widths, Radii radii, Sides<String> colors) {
+        public void line(Rect r, boolean vertical, String color, dev.stxt.pdf.model.LineStyle style) {
+            background(r, color);
+        }
+
+        @Override
+        public void border(Rect borderBox, Insets widths, Radii radii, Sides<String> colors,
+                           dev.stxt.pdf.model.LineStyle style) {
             borderRadii.add(corners(radii));
             borderColors.add(colors);
         }

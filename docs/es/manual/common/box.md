@@ -25,6 +25,7 @@ Block:
 | `Padding` | El espacio de dentro, de 1 a 4 valores |
 | `Border` | El grosor del borde, de 1 a 4 valores |
 | `Border color` | El color del borde, de 1 a 4 colores. Por defecto, el del texto |
+| `Border style` | Cómo se dibuja el borde: `solid` (por defecto), `dashed` (trazos) o `dotted` (puntos) |
 | `Corner radius` | Las esquinas redondeadas, de 1 a 4 valores |
 | `Background` | El fondo: un color o un degradado |
 
@@ -60,6 +61,21 @@ vertical. Los ítems de un `Stack` o un `Grid` se centran con sus propias propie
 El borde se pinta entre el relleno y el margen. Con un color por lado, los lados se juntan en diagonal en las esquinas. Un
 lado con grosor 0 no se ve, así que `Border: 0 0 0 3` es una franja a la izquierda. El fondo se pinta detrás del contenido
 y del relleno, hasta el borde. Un fondo o un color con opacidad deja ver lo que hay debajo.
+
+**Trazos y puntos.** `Border style: dashed` dibuja el borde con trazos y `dotted`, con puntos. Con un solo lado con
+grosor es una línea de corte o de firma:
+
+```
+Block:
+    Box:
+        Margin: 12 0
+        Border: 0.5 0 0 0
+        Border style: dashed
+```
+
+El largo de los trazos y el tamaño de los puntos salen del grosor del borde, y se reparten para que cada lado empiece y
+acabe con uno entero. El estilo es el mismo en los cuatro lados. Con `Corner radius`, los trazos siguen la curva, y el
+borde tiene que medir lo mismo en sus cuatro lados (`BORDER_STYLE_CONFLICT`).
 
 ### Contraste
 

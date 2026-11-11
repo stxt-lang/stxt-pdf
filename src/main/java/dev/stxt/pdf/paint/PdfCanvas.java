@@ -5,6 +5,7 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -139,18 +140,100 @@ public final class PdfCanvas implements Canvas {
      * {@inheritDoc}
      *
      * <p>The ring between the border box and the padding box, filled with the even-odd rule; with
-     * different colors per side, once per side and clipped to its trapezoid.</p>
+     * different colors per side, once per side and clipped to its trapezoid. A border that is not solid is stroked
+     * with the dash pattern of the PDF ({@link Dashes}).</p>
      */
     @Override
-    public void border(Rect r, Insets w, Radii radii, Sides<String> colors) {
+    public void border(Rect r, Insets w, Radii radii, Sides<String> colors, LineStyle style) {
         if (w.top() > 0 || w.right() > 0 || w.bottom() > 0 || w.left() > 0) {
             String uniform = Shapes.uniformColor(w, colors);
-            if (uniform != null && radii.isSquare() && !Colors.isTranslucent(uniform)) {
+            if (style != LineStyle.SOLID) {
+                io(() -> patternBorder(r, w, radii, uniform, colors, style));
+            } else if (uniform != null && radii.isSquare() && !Colors.isTranslucent(uniform)) {
                 squareBorder(r, w, uniform);
             } else {
                 io(() -> ringBorder(r, w, radii, uniform, colors));
             }
         }
+    }
+
+    @Override
+    public void line(Rect r, boolean vertical, String color, LineStyle style) {
+        if (style == LineStyle.SOLID) {
+            background(r, color);
+        } else if (r.width() > 0 && r.height() > 0) {
+            io(() -> {
+                out.beginMarkedContent(COSName.ARTIFACT);
+                stroke(Dashes.segment(r, vertical, style, 0, 0), color);
+                out.endMarkedContent();
+            });
+        }
+    }
+
+    /**
+     * A border that is not solid: with square corners, the line of each side; with rounded ones, the line along the
+     * middle of the border, in one color ({@code color}) or, if it is {@code null}, once per side with a width,
+     * clipped to its trapezoid and with its color.
+     */
+    private void patternBorder(Rect r, Insets w, Radii radii, String color, Sides<String> colors, LineStyle style)
+            throws IOException {
+        out.beginMarkedContent(COSName.ARTIFACT);
+        if (radii.isSquare()) {
+            for (Dashes.SideSegment side : Dashes.border(r, w, style)) {
+                stroke(side.segment(), side.side().of(colors));
+            }
+        } else if (color != null) {
+            stroke(r, w, radii, color, style);
+        } else {
+            for (Shapes.Side side : Shapes.Side.values()) {
+                if (side.of(w) > 0) {
+                    out.saveGraphicsState();
+                    Shapes.sidePolygon(page.path(), side, r, w, radii.inset(w));
+                    out.clip();
+                    stroke(r, w, radii, side.of(colors), style);
+                    out.restoreGraphicsState();
+                }
+            }
+        }
+        out.endMarkedContent();
+    }
+
+    /** Strokes the lines along the middle of a border with rounded corners, each with its pattern fitted to it. */
+    private void stroke(Rect r, Insets w, Radii radii, String color, LineStyle style) throws IOException {
+        double width = Math.max(Math.max(w.top(), w.bottom()), Math.max(w.left(), w.right()));
+        for (Shapes.Run run : Shapes.centerlines(r, w, radii)) {
+            double length = Shapes.length(run.path());
+            Dashes.Pattern pattern = run.closed() ? Dashes.closed(style, length, width)
+                    : Dashes.open(style, length, width);
+            page.stroking(color, () -> {
+                pen(width, pattern);
+                run.path().accept(page.path());
+                out.stroke();
+            });
+        }
+    }
+
+    /** Strokes a straight line with its pattern; nothing if there is no line. */
+    private void stroke(Dashes.Segment s, String color) throws IOException {
+        if (s != null) {
+            page.stroking(color, () -> {
+                pen(s.width(), s.pattern());
+                out.moveTo((float) s.x1(), (float) (pageHeight - s.y1()));
+                out.lineTo((float) s.x2(), (float) (pageHeight - s.y2()));
+                out.stroke();
+            });
+        }
+    }
+
+    /** The width, the dash pattern and the ends of what is stroked next; without a pattern, a solid line. */
+    private void pen(double width, Dashes.Pattern pattern) throws IOException {
+        out.setLineWidth((float) width);
+        if (pattern == null) {
+            out.setLineDashPattern(new float[0], 0);
+        } else {
+            out.setLineDashPattern(new float[]{(float) pattern.on(), (float) pattern.off()}, (float) pattern.phase());
+        }
+        out.setLineCapStyle(pattern != null && pattern.round() ? 1 : 0);
     }
 
     /**

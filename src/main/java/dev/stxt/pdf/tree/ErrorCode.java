@@ -342,6 +342,13 @@ public enum ErrorCode {
     SINGLE_COLUMN,
     /** {@code Separator color} without {@code Separator}. */
     SEPARATOR_COLOR_WITHOUT_SEPARATOR,
+    /** {@code Separator style} without {@code Separator}. */
+    SEPARATOR_STYLE_WITHOUT_SEPARATOR,
+    /**
+     * A {@code Border style} other than {@code solid} in a box with {@code Corner radius} whose four sides are not
+     * equally wide: the pattern could not follow the curve.
+     */
+    BORDER_STYLE_CONFLICT,
     /** {@code Isolate margins: true} on an item of {@code Stack} or {@code Grid}, which already isolates. */
     ISOLATE_MARGINS_IN_ITEM,
     /**

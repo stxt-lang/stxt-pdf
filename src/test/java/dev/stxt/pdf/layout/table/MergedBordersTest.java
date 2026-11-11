@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Rule;
 import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.LineStyle;
 
 /**
  * The lines of the merged borders of a table across pages (reference/components/table.md#merged-borders). Pages of
@@ -147,5 +148,27 @@ class MergedBordersTest {
         List<Rule> vertical = l.fragment("T").rules().stream().filter(r -> r.height() > r.width()).toList();
         assertEquals(List.of(new Rule(0, 0, 1, 63, "#000000"), new Rule(257, 0, 1, 63, "#000000"),
                 new Rule(514, 0, 1, 63, "#000000")), vertical);
+    }
+
+    /**
+     * Border style: the line between two cells is drawn like the wider of their two borders. The header has a solid
+     * bottom border of 2 and the body a dashed border of 1: the line between them is solid, and the other lines of
+     * the body, dashed. A dashed piece and a solid one of the same line are not joined.
+     */
+    @Test
+    void theLineBetweenTwoCellsTakesTheStyleOfTheWiderBorder() {
+        String[] cell = {"\t\t\t\tCell:", "\t\t\t\t\tBlock:", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30"};
+        LayoutFixture l = layOut(concat(new String[]{"\tStyles:", "\t\tFor element: Cell", "\t\t\tBox:",
+                        "\t\t\t\tBorder: 1", "\t\t\t\tBorder style: dashed", "\t\tFor element: Header cell",
+                        "\t\t\tBox:", "\t\t\t\tBorder: 1 1 2 1", "\t\t\t\tBorder style: solid",
+                        "\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tBox:", "\t\t\tMerge borders: true",
+                        "\t\tHeader rows:", "\t\t\tRow:"}, cell, new String[]{"\t\tBody rows:", "\t\t\tRow:"}, cell));
+        List<Rule> horizontal = l.fragment("T").rules().stream().filter(r -> !r.vertical()).toList();
+        assertEquals(List.of(new Rule(0, 0, 515, 1, "#000000", LineStyle.SOLID),
+                new Rule(0, 63, 515, 1, "#000000", LineStyle.DASHED),
+                new Rule(0, 31, 515, 2, "#000000", LineStyle.SOLID)), horizontal);
+        List<Rule> left = l.fragment("T").rules().stream().filter(r -> r.vertical() && r.x() == 0).toList();
+        assertEquals(List.of(new Rule(0, 0, 1, 32, "#000000", LineStyle.SOLID),
+                new Rule(0, 32, 1, 32, "#000000", LineStyle.DASHED)), left);
     }
 }

@@ -25,6 +25,7 @@ import dev.stxt.pdf.model.Links;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.MarkerSuffix;
 import dev.stxt.pdf.model.NumberFormat;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Overflow;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.Side;
@@ -97,7 +98,8 @@ final class PropertyReader {
     /** Properties of the {@code Cell} element, besides the standalone ones. */
     static final Set<String> CELL = Set.of("vertical");
     /** Properties of the {@code Columns} element. */
-    static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance-columns");
+    static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "separator-style",
+            "balance-columns");
 
     /** Reads a property into the style; its line is already recorded. */
     @FunctionalInterface
@@ -188,6 +190,7 @@ final class PropertyReader {
                 case "padding" -> s.box().setPadding(nonNegativeSides(p, true));
                 case "border" -> s.box().setBorder(nonNegativeSides(p, false));
                 case "border-color" -> s.box().setBorderColor(colorSides(p, s.namedColors()));
+                case "border-style" -> s.box().setBorderStyle(enumValue(LineStyle.class, p));
                 case "corner-radius" -> s.box().setCornerRadius(radius(p));
                 case "background" -> s.box().setBackground(paint(p, s.namedColors()));
                 case "overflow" -> s.box().setOverflow(enumValue(Overflow.class, p));
@@ -430,6 +433,7 @@ final class PropertyReader {
             case "gap" -> s.columns().setColumnGap(columnGap(p));
             case "separator" -> s.columns().setSeparator(positive(p));
             case "separator-color" -> s.columns().setSeparatorColor(color(p, s.namedColors()));
+            case "separator-style" -> s.columns().setSeparatorStyle(enumValue(LineStyle.class, p));
             case "balance-columns" -> s.columns().setBalance(bool(p));
             default -> throw unread(p);
         }

@@ -5,9 +5,14 @@ import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * The shapes the canvases paint (reference/common/box.md): a rectangle with rounded
- * corners, the ring of a border and the four trapezoids it is split into. They are described as a path that
+ * corners, the ring of a border, the four trapezoids it is split into and the line along the middle of a border that
+ * is not solid. They are described as a path that
  * each canvas draws its own way ({@link Path}), so that the PDF and the SVG paint the same.
  */
 final class Shapes {
@@ -119,6 +124,122 @@ final class Shapes {
         path.lineTo(x0, y0 + tl.ry());
         corner(path, x0, y0 + tl.ry(), x0 + tl.rx(), y0, false, tl);
         path.close();
+    }
+
+    /**
+     * A line along the middle of a border, which a border that is not solid strokes with its pattern.
+     *
+     * @param closed whether it goes all the way round the box and ends where it starts
+     * @param path   draws it
+     */
+    record Run(boolean closed, Consumer<Path> path) {
+    }
+
+    /**
+     * The lines along the middle of the border of the border box {@code r}, through the sides with a width in
+     * {@code widths} and round the corners {@code radii} between two of them (reference/common/box.md#border-style):
+     * one closed line if the four sides have a width and, if not (a fragment of a box broken across pages), one open
+     * line per group of sides in a row, clockwise, which reaches the edge of the box at its two ends.
+     */
+    static List<Run> centerlines(Rect r, Insets widths, Radii radii) {
+        Insets half = new Insets(widths.top() / 2, widths.right() / 2, widths.bottom() / 2, widths.left() / 2);
+        Rect c = r.shrink(half);
+        Radii inner = radii.inset(half);
+        Side[] sides = Side.values();
+        boolean all = true;
+        for (Side side : sides) {
+            all &= side.of(widths) > 0;
+        }
+        if (all) {
+            return List.of(new Run(true, path -> roundedRect(path, c, inner)));
+        }
+        List<Run> runs = new ArrayList<>();
+        for (int i = 0; i < sides.length; i++) {
+            if (sides[i].of(widths) > 0 && sides[(i + 3) % 4].of(widths) <= 0) {
+                int count = 1;
+                while (sides[(i + count) % 4].of(widths) > 0) {
+                    count++;
+                }
+                int first = i;
+                int sidesInRun = count;
+                runs.add(new Run(false, path -> openRun(new Pen(path), c, inner, first, sidesInRun)));
+            }
+        }
+        return runs;
+    }
+
+    /** {@code count} sides in a row of the rectangle {@code c}, clockwise from the side {@code first}. */
+    private static void openRun(Path path, Rect c, Radii radii, int first, int count) {
+        double x0 = c.x();
+        double y0 = c.y();
+        double x1 = c.right();
+        double y1 = c.bottom();
+        // The corner each side starts at, clockwise from the top left; each side ends at the next one.
+        double[][] corners = {{x0, y0}, {x1, y0}, {x1, y1}, {x0, y1}};
+        Radii.Corner[] rounded = {radii.topLeft(), radii.topRight(), radii.bottomRight(), radii.bottomLeft()};
+        path.moveTo(corners[first][0], corners[first][1]);
+        for (int k = 0; k < count; k++) {
+            int side = (first + k) % 4;
+            int end = (side + 1) % 4;
+            double[] to = corners[end];
+            if (k == count - 1) {
+                path.lineTo(to[0], to[1]);
+                break;
+            }
+            // Round the corner into the next side. Top and bottom are horizontal, and leave their corner vertically.
+            Radii.Corner corner = rounded[end];
+            boolean horizontal = side % 2 == 0;
+            double[] from = corners[side];
+            double[] next = corners[(end + 1) % 4];
+            double fromX = to[0] - Math.signum(to[0] - from[0]) * corner.rx();
+            double fromY = to[1] - Math.signum(to[1] - from[1]) * corner.ry();
+            double toX = to[0] + Math.signum(next[0] - to[0]) * corner.rx();
+            double toY = to[1] + Math.signum(next[1] - to[1]) * corner.ry();
+            path.lineTo(fromX, fromY);
+            corner(path, fromX, fromY, toX, toY, horizontal, corner);
+        }
+    }
+
+    /** Steps a curve is split into to measure it. */
+    private static final int FLATTENING = 16;
+
+    /** The length of what {@code path} draws, with its curves measured as {@value #FLATTENING} straight pieces. */
+    static double length(Consumer<Path> path) {
+        double[] state = new double[5];
+        path.accept(new Path() {
+            @Override
+            public void moveTo(double x, double y) {
+                state[0] = x;
+                state[1] = y;
+                state[2] = x;
+                state[3] = y;
+            }
+
+            @Override
+            public void lineTo(double x, double y) {
+                state[4] += Math.hypot(x - state[0], y - state[1]);
+                state[0] = x;
+                state[1] = y;
+            }
+
+            @Override
+            public void curveTo(double x1, double y1, double x2, double y2, double x3, double y3) {
+                double fromX = state[0];
+                double fromY = state[1];
+                for (int i = 1; i <= FLATTENING; i++) {
+                    double t = (double) i / FLATTENING;
+                    double u = 1 - t;
+                    lineTo(u * u * u * fromX + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3,
+                            u * u * u * fromY + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3);
+                }
+            }
+
+            @Override
+            public void close() {
+                lineTo(state[2], state[3]);
+            }
+        });
+        return state[4];
     }
 
     /** A path that does not repeat the point it is already at: a square corner adds no line of length 0. */

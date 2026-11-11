@@ -207,7 +207,7 @@ vez, y los elementos, las veces que se quiera.
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (al menos una) |
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`, `Vertical`; elementos salvo los encabezados |
-| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance columns`; elementos en flujo |
+| `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (obligatorio) |
 | `Footnote` | `Id` (obligatorio), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
@@ -220,7 +220,7 @@ vez, y los elementos, las veces que se quiera.
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; un elemento en flujo |
-| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Corner radius`, `Background`, `Overflow`, `Merge borders` |
+| `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Border style`, `Corner radius`, `Background`, `Overflow`, `Merge borders` |
 | `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Min size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Break long words`, `First line indent`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Position`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 

@@ -3,11 +3,13 @@ package dev.stxt.pdf.output;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.fragment.Rule;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Rect;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Dumps the result of the layout to STXT (reference/implementation/testing.md). It is the format of the reference
@@ -102,14 +104,18 @@ public final class StxtDump {
 
     /**
      * The lines of the fragment ({@link Fragment#rules}, the merged borders of a table), in the order they are painted:
-     * {@code Rule: x y width height color}, in page coordinates like {@code Rect}.
+     * {@code Rule: x y width height color}, in page coordinates like {@code Rect}, and its style if it is not solid.
      */
     private static void appendRules(StringBuilder sb, String tab, double x, double y, Fragment f) {
         Rect content = f.borderBox(x, y).shrink(f.border()).shrink(f.padding());
         for (Rule r : f.rules()) {
             sb.append(tab).append("\tRule: ").append(format(content.x() + r.x())).append(' ')
                     .append(format(content.y() + r.y())).append(' ').append(format(r.width())).append(' ')
-                    .append(format(r.height())).append(' ').append(r.color()).append('\n');
+                    .append(format(r.height())).append(' ').append(r.color());
+            if (r.style() != LineStyle.SOLID) {
+                sb.append(' ').append(r.style().name().toLowerCase(Locale.ROOT));
+            }
+            sb.append('\n');
         }
     }
 

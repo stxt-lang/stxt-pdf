@@ -34,7 +34,8 @@ final class TableBuilder {
     private static final List<String> TABLE_GROUPS = List.of("header-rows", "body-rows", "footer-rows");
 
     /** What the {@code Box} of a {@code Row} allows: its look (reference/components/table.md#rows). */
-    private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "corner-radius");
+    private static final Set<String> ROW_LOOK = Set.of("background", "border", "border-color", "border-style",
+            "corner-radius");
 
     private TableBuilder() {
     }
@@ -165,11 +166,12 @@ final class TableBuilder {
             for (Node p : b.getChildren()) {
                 if (!ROW_LOOK.contains(p.getCanonicalName())) {
                     throw error(p, ErrorCode.ROW_BOX, p.getName() + " has no effect on a Row, which is not a layout "
-                            + "box: its Box only allows Background, Border, Border color and Corner radius; it goes on its "
+                            + "box: its Box only allows Background, Border, Border color, Border style and Corner radius; it goes on its "
                             + "cells");
                 }
             }
             box(b, s);
+            ModelValidator.validateBorderStyle(s);
         });
         Box box = new Box(id.map(ctx::id).orElse(null), Element.ROW, s, false, row.getLine());
         s.item().setArea(new Cell(tableRow, 1, 1, columns));

@@ -1,0 +1,33 @@
+# b1 to b6, one under another with 10 between them: 20, 60, 100, 150, 200 and 220.
+# t at y = 240: rows at 240 and 256; it ends at 272. Lines, from the thinnest to the widest: the vertical ones (left
+#   edge inside at 20, between the columns centered on 120 at 119.5, right edge inside at 219), solid in #C00000 along
+#   the header and dashed in #333333 along the body; the top edge inside (240), solid; the bottom edge inside (271),
+#   dashed; and last, the 2 wide one under the header, centered on 256 and solid.
+# c at y = 282, with its two blocks of 30 balanced, one per column.
+Result:
+	Page: 1
+		Fragment: b1
+			Rect: 20 20 260 30
+		Fragment: b2
+			Rect: 20 60 260 30
+		Fragment: b3
+			Rect: 20 100 260 40
+		Fragment: b4
+			Rect: 20 150 260 40
+		Fragment: b5
+			Rect: 20 200 260 10
+		Fragment: b6
+			Rect: 20 220 260 10
+		Fragment: t
+			Rect: 20 240 260 32
+			Rule: 20 240 1 16 #C00000
+			Rule: 20 256 1 16 #333333 dashed
+			Rule: 119.5 240 1 16 #C00000
+			Rule: 119.5 256 1 16 #333333 dashed
+			Rule: 219 240 1 16 #C00000
+			Rule: 219 256 1 16 #333333 dashed
+			Rule: 20 240 200 1 #C00000
+			Rule: 20 271 200 1 #333333 dashed
+			Rule: 20 255 200 2 #C00000
+		Fragment: c
+			Rect: 20 282 260 30

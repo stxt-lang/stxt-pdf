@@ -4,6 +4,7 @@ import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Paint;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
@@ -32,9 +33,21 @@ public interface Canvas {
      * {@code radii}) and the padding box, which is shared among the sides with a width in {@code w}
      * (each one with its color, split at the diagonal of each corner).
      *
+     * <p>A border that is not solid ({@code Border style}, reference/common/box.md#border-style) is a line along the
+     * middle of that ring with the pattern of {@code style}: with square corners, one line per side, fitted to it;
+     * with rounded ones, one line that follows the curve.</p>
+     *
      * @param colors the color of each side, already resolved
+     * @param style  how it is drawn
      */
-    void border(Rect r, Insets w, Radii radii, Sides<String> colors);
+    void border(Rect r, Insets w, Radii radii, Sides<String> colors, LineStyle style);
+
+    /**
+     * A straight line that fills {@code r}: a merged border of a table or the line between two columns. Solid, it is
+     * {@link #background}; if not, the pattern of {@code style} runs along the height of {@code r} if it is
+     * {@code vertical} and along its width if not, fitted to it.
+     */
+    void line(Rect r, boolean vertical, String color, LineStyle style);
 
     /**
      * What the canvas does with the meaning of what it paints: the marked text of the tagged PDF and the

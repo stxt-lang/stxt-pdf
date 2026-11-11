@@ -8,8 +8,10 @@ Cómo se dibuja un documento maquetado (package `paint`). Qué se dibuja está e
 `StackingContext` recorre los fragmentos de una página en el orden de pintado (contextos de apilamiento, `Layer`, fondos
 antes que texto) y llama a un `Canvas`. Resuelve los radios de cada fragmento (`Radii.resolve` sobre su caja de borde, y con
 `Edges: open`, `forFragment(first, last)` deja solo las esquinas de su lado) y llama a `Canvas.fill` (el fondo, con
-`radii.inset(borde)`), `Canvas.border` (un color por lado, ya resuelto) e `image` (con los radios de la caja de contenido).
-`Canvas.background(Rect, String)` queda para los rectángulos lisos (guías, líneas entre columnas, rayas del texto). La
+`radii.inset(borde)`), `Canvas.border` (un color por lado, ya resuelto, y el `LineStyle` de `Border style`) e `image` (con
+los radios de la caja de contenido). `Canvas.background(Rect, String)` queda para los rectángulos lisos (guías, rayas del
+texto) y `Canvas.line(Rect, boolean, String, LineStyle)`, para las líneas con estilo: los bordes fusionados de una
+tabla y la línea entre columnas, que con `solid` son un `background`. La
 línea base la calcula con `Canvas.vertical(font)` (`hhea` en PDF, la aproximación 0,8/0,2 en SVG). `Shapes` da lo que los dos
 lienzos pintan igual: el camino de una caja redondeada (cuartos de elipse como Bézier), el anillo del borde (`ring`), el
 trapecio de cada lado y el color de un borde que se pinta entero (`uniformColor`).
@@ -29,7 +31,7 @@ pintar y llaman a `Tagging.link`: la caja de borde de cada fragmento con `Link`,
 rectángulo de cada tramo con enlace de cada línea, uniendo los seguidos con el mismo destino, en `TextPainter`. El área de
 notas de una página (`Page.footnotes`) se pinta como una caja más en flujo, después del flujo y antes de los
 `Page overlay`. Las líneas de un fragmento (`Fragment.rules`, los bordes fusionados de una tabla) son un `Piece` más en
-flujo (`rules`), detrás de todos los descendientes del fragmento: se pintan con `Canvas.background` sobre los fondos de
+flujo (`rules`), detrás de todos los descendientes del fragmento: se pintan con `Canvas.line` sobre los fondos de
 las celdas y debajo de su texto, con los giros y los recortes de lo que contiene el fragmento. Una celda con bordes
 fusionados (`Box.mergedBorder()`) no pinta su borde, que es solo el sitio de esas líneas.
 
@@ -85,7 +87,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `PdfAttachments` | Los ficheros adjuntos (PDF/A-3 o sin PDF/A): las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
 | `PdfId` | El identificador del tráiler (`/ID`), calculado del contenido al guardar |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
-| `ImageFit`, `Leaders`, `Shapes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice y los caminos de las cajas |
+| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice, los caminos de las cajas y el patrón de las líneas de trazos y de puntos |
 
 > **Decisión:** los destinos internos se resuelven después de pintar todas las páginas, porque un enlace puede ir hacia
 > delante: se crean todas las páginas antes de pintar ninguna y se busca la esquina del primer fragmento de cada caja con
@@ -157,6 +159,22 @@ color. La opacidad de un color liso es un estado gráfico `ca` dentro de un `q`/
 
 > **Decisión:** `Canvas.border` recibe un color por lado, ya resuelto, `Canvas.fill` pinta el fondo de una caja con sus
 > radios e `image` recibe las esquinas con que recortar. `background(Rect, String)` queda para los rectángulos lisos.
+
+### Líneas de trazos y de puntos
+
+Un borde o una línea que no es `solid` ([estilo del borde](../common/box.md#estilo-del-borde)) no se rellena: se traza
+por su línea central con el patrón de guiones del formato (`d` en el PDF, `stroke-dasharray` en el SVG). `Dashes`, que
+es puro, calcula el patrón y lo ajusta al largo: `open` para una línea con dos extremos (un trazo o un punto entero en
+cada uno) y `closed` para una cerrada (un número entero de periodos). Un punto es un trazo de largo 0 con extremos
+redondos. `Dashes.border` da una línea por lado de un borde de esquinas cuadradas, con los lados verticales recortados
+por los horizontales, y `Dashes.segment`, la de un `Canvas.line`. Con esquinas redondeadas, `Shapes.centerlines` da el
+camino por el medio del borde (cerrado, o uno abierto por cada grupo de lados seguidos en un fragmento sin alguno de
+ellos) y `Shapes.length` lo mide, con las curvas en 16 tramos rectos. Con un color por lado, ese camino se traza una vez
+por lado, recortado a su trapecio (`sidePolygon`). `PdfContent.stroking` pone el color y la opacidad de trazo dentro de
+un `q ... Q`, así que el grosor, los guiones y los extremos no salen de él.
+
+> **Decisión:** el patrón de guiones del formato y no un rectángulo o un círculo por trazo: una línea de puntos a todo
+> el ancho son cientos de formas, y con el patrón es una sola operación. *Alternativa descartada:* dibujar cada trazo.
 
 ### Giro
 

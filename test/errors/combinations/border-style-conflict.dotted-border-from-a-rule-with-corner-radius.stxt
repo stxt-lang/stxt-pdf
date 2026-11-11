@@ -1,0 +1,24 @@
+# Case: Border style: dotted from a rule in a box with Corner radius and a wider bottom side
+# Code: BORDER_STYLE_CONFLICT
+# Line: 17
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: coupon
+			Box:
+				Border style: dotted
+	Section:
+		Block:
+			Style: coupon
+			Box:
+				Height: 40
+				Border: 1 1 3 1
+				Corner radius: 6

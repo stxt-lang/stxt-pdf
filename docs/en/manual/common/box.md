@@ -25,6 +25,7 @@ Block:
 | `Padding` | The space inside, from 1 to 4 values |
 | `Border` | The thickness of the border, from 1 to 4 values |
 | `Border color` | The color of the border, from 1 to 4 colors. By default, that of the text |
+| `Border style` | How the border is drawn: `solid` (by default), `dashed` or `dotted` |
 | `Corner radius` | The rounded corners, from 1 to 4 values |
 | `Background` | The background: a color or a gradient |
 
@@ -63,6 +64,21 @@ The border is painted between the padding and the margin. With one color per sid
 corners. A side with thickness 0 is not visible, so `Border: 0 0 0 3` is a strip on the left. The background is painted
 behind the content and the padding, up to the border. A background or a color with opacity lets what is underneath show
 through.
+
+**Dashes and dots.** `Border style: dashed` draws the border with dashes and `dotted`, with dots. With a single side
+with a thickness it is a line to cut along or to sign on:
+
+```
+Block:
+    Box:
+        Margin: 12 0
+        Border: 0.5 0 0 0
+        Border style: dashed
+```
+
+The length of the dashes and the size of the dots come from the thickness of the border, and they are spaced so that
+each side starts and ends with a whole one. The style is the same on the four sides. With `Corner radius`, the dashes
+follow the curve, and the border must be equally thick on its four sides (`BORDER_STYLE_CONFLICT`).
 
 ### Contrast
 

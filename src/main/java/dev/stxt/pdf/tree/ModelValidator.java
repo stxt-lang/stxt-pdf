@@ -9,7 +9,9 @@ import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_AFTER;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_BEFORE;
 import static dev.stxt.pdf.tree.PropertyKey.BELOW_SIDE_BOXES;
+import static dev.stxt.pdf.tree.PropertyKey.BORDER_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
+import static dev.stxt.pdf.tree.PropertyKey.CORNER_RADIUS;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.DROP_CAP;
 import static dev.stxt.pdf.tree.PropertyKey.ERROR_CORRECTION;
@@ -37,6 +39,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
 import static dev.stxt.pdf.tree.PropertyKey.ROTATE_ORIGIN;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
+import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_STYLE;
 import static dev.stxt.pdf.tree.PropertyKey.SIDE;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_LINE_DISTRIBUTION;
@@ -48,6 +51,7 @@ import static dev.stxt.pdf.tree.ValueReader.hasPercentage;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
@@ -57,6 +61,7 @@ import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Direction;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Layout;
+import dev.stxt.pdf.model.LineStyle;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.Tolerance;
@@ -148,6 +153,11 @@ final class ModelValidator {
             throw error(s.line(SEPARATOR_COLOR), ErrorCode.SEPARATOR_COLOR_WITHOUT_SEPARATOR,
                     "Separator color has no effect without Separator, the thickness of the rule between columns: the "
                             + "thickness is missing or the color is not needed");
+        }
+        if (s.isDeclared(SEPARATOR_STYLE) && !s.isDeclared(SEPARATOR)) {
+            throw error(s.line(SEPARATOR_STYLE), ErrorCode.SEPARATOR_STYLE_WITHOUT_SEPARATOR,
+                    "Separator style has no effect without Separator, the thickness of the rule between columns: the "
+                            + "thickness is missing or the style is not needed");
         }
         if (s.columns().separator() > s.columns().columnGap() + Tolerance.EPSILON) {
             String gap = s.isDeclared(COLUMN_GAP) ? "Gap (" + s.line(COLUMN_GAP) + ")"
@@ -363,6 +373,7 @@ final class ModelValidator {
                     + "a Stack with Direction: horizontal and is only valid there");
         }
         validateSide(s, stackItem, gridItem);
+        validateBorderStyle(s);
         validateOffset(s);
         validateMargins(s, parentLayout, stackItem, gridItem);
         if (s.isDeclared(ASPECT_RATIO) && !s.box().width().isAuto() && !s.box().height().isAuto()) {
@@ -374,6 +385,26 @@ final class ModelValidator {
         validatePercentages(ctx, s, parent, stackItem, gridItem);
         validateColumnBreaks(ctx, s);
         validateKeeps(s);
+    }
+
+    /**
+     * A border that is not solid follows the curve of {@code Corner radius} (reference/common/box.md#border-style),
+     * which it can only do along a border of one width: with rounded corners, the four sides of {@code Border} are
+     * equally wide. Also when the style or the corners come from a rule.
+     */
+    static void validateBorderStyle(Style s) {
+        if (s.box().borderStyle() == LineStyle.SOLID
+                || s.box().cornerRadius().asList().stream().allMatch(v -> Tolerance.same(v.resolve(1).orElse(1), 0))) {
+            return;
+        }
+        List<Double> widths = s.box().border().asList().stream().map(v -> v.resolve(0).orElse(0)).toList();
+        if (widths.stream().anyMatch(w -> !Tolerance.same(w, widths.get(0)))) {
+            throw error(s.line(BORDER_STYLE), ErrorCode.BORDER_STYLE_CONFLICT, "Border style: "
+                    + s.box().borderStyle().name().toLowerCase(Locale.ROOT) + " follows the curve of Corner radius ("
+                    + s.line(CORNER_RADIUS) + "), which it can only do along a border of one width, and the sides of "
+                    + "Border measure " + widths.stream().map(w -> pt(w)).collect(Collectors.joining(", "))
+                    + ": the four sides the same width, or square corners");
+        }
     }
 
     /**

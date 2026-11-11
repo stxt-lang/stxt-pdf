@@ -8,8 +8,10 @@ How a laid-out document is drawn (package `paint`). What is drawn is in [Layers 
 `StackingContext` walks the fragments of a page in painting order (stacking contexts, `Layer`, backgrounds
 before text) and calls a `Canvas`. It resolves the radii of each fragment (`Radii.resolve` on its border box, and with
 `Edges: open`, `forFragment(first, last)` keeps only the corners on its side) and calls `Canvas.fill` (the background, with
-`radii.inset(border)`), `Canvas.border` (one color per side, already resolved) and `image` (with the radii of the content box).
-`Canvas.background(Rect, String)` remains for plain rectangles (leaders, lines between columns, text lines). It computes the
+`radii.inset(border)`), `Canvas.border` (one color per side, already resolved, and the `LineStyle` of `Border style`) and
+`image` (with the radii of the content box). `Canvas.background(Rect, String)` remains for plain rectangles (leaders,
+text lines) and `Canvas.line(Rect, boolean, String, LineStyle)`, for the lines with a style: the merged borders of a
+table and the line between columns, which with `solid` are a `background`. It computes the
 baseline with `Canvas.vertical(font)` (`hhea` in PDF, the 0.8/0.2 approximation in SVG). `Shapes` gives what both
 canvases paint the same: the path of a rounded box (quarter ellipses as Bézier curves), the ring of the border (`ring`),
 the trapezoid of each side and the color of a border painted whole (`uniformColor`).
@@ -30,7 +32,7 @@ computed when painting and call `Tagging.link`: the border box of each fragment 
 same destination, in `TextPainter`. The footnote area of a page (`Page.footnotes`) is painted as one more in-flow box,
 after the flow and before the `Page overlay` boxes. The lines of a fragment (`Fragment.rules`, the merged borders of a
 table) are one more in-flow `Piece` (`rules`), after all the descendants of the fragment: they are painted with
-`Canvas.background` over the backgrounds of the cells and under their text, with the rotations and clips of what the
+`Canvas.line` over the backgrounds of the cells and under their text, with the rotations and clips of what the
 fragment contains. A cell with merged borders (`Box.mergedBorder()`) does not paint its border, which is only the room
 for those lines.
 
@@ -86,7 +88,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `PdfAttachments` | The embedded files (PDF/A-3 or no PDF/A): the file specifications, the `EmbeddedFiles` tree and the `AF` array |
 | `PdfId` | The identifier of the trailer (`/ID`), computed from the content when saving |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
-| `ImageFit`, `Leaders`, `Shapes` | Where an image is drawn according to `Fit`, the leader of a table of contents and the paths of the boxes |
+| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Where an image is drawn according to `Fit`, the leader of a table of contents, the paths of the boxes and the pattern of dashed and dotted lines |
 
 > **Decision:** internal destinations are resolved after all the pages have been painted, because a link can point
 > forward: all the pages are created before any is painted and the corner of the first fragment of each named box is looked up,
@@ -159,6 +161,22 @@ color. The opacity of a plain color is a graphics state `ca` inside a `q`/`Q` of
 
 > **Decision:** `Canvas.border` receives one color per side, already resolved, `Canvas.fill` paints the background of a box with its
 > radii and `image` receives the corners to clip with. `background(Rect, String)` remains for plain rectangles.
+
+### Dashed and dotted lines
+
+A border or a line that is not `solid` ([border style](../common/box.md#border-style)) is not filled: it is stroked
+along its center line with the dash pattern of the format (`d` in the PDF, `stroke-dasharray` in the SVG). `Dashes`,
+which is pure, computes the pattern and fits it to the length: `open` for a line with two ends (a whole dash or dot at
+each one) and `closed` for a closed one (a whole number of periods). A dot is a dash of length 0 with round ends.
+`Dashes.border` gives one line per side of a border with square corners, with the vertical sides trimmed by the
+horizontal ones, and `Dashes.segment`, that of a `Canvas.line`. With rounded corners, `Shapes.centerlines` gives the
+path along the middle of the border (closed, or an open one for each group of consecutive sides in a fragment that
+lacks one of them) and `Shapes.length` measures it, with the curves as 16 straight pieces. With one color per side,
+that path is stroked once per side, clipped to its trapezoid (`sidePolygon`). `PdfContent.stroking` sets the stroking
+color and opacity inside a `q ... Q`, so the width, the dashes and the line ends do not leave it.
+
+> **Decision:** the dash pattern of the format and not a rectangle or a circle per dash: a dotted line across the whole
+> width is hundreds of shapes, and with the pattern it is a single operation. *Discarded alternative:* drawing each dash.
 
 ### Rotation
 

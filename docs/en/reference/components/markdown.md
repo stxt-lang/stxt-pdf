@@ -226,7 +226,7 @@ written in the document and have no `Id` or `Style`, and the `For element` rules
 - **Look.** A quote has no default look, like the rest of what a `Markdown` generates: without a rule it looks like
   the paragraphs it contains, and `For element: Block quote` gives it its indent, its line or its background, as in
   the example. The line of a `Divider` is what the element is: its rule changes its thickness (`Border`), its color
-  (`Border color`) and its spacing (`Margin`).
+  (`Border color`), its style (`Border style`) and its spacing (`Margin`).
 - **Spacing.** Neither the quote nor the line has margins of its own: what separates them from what is above and below
   is what separates the blocks of the `Markdown` (the `Margin` of `For element: Paragraph`), or a `Margin` in their
   rule.
