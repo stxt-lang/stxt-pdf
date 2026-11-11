@@ -33,7 +33,7 @@ Stack:
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap: true` (`GAP_WITHOUT_WRAP`). |
 | `Horizontal` | en el eje principal: `left`, `right`, `center`, `justify`, `around`, `distribute`; en el cruzado: `left`, `right`, `center`, `stretch` | `left` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
 | `Vertical` | como `Horizontal`, con `top` y `bottom` en lugar de `left` y `right` | `top` en el principal; `stretch` en el cruzado | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
-| `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
@@ -103,10 +103,11 @@ Espacio libre = disponible − suma de tamaños hipotéticos − huecos.
 > **Decisión:** los márgenes no cuentan al encoger: dos ítems con `Base size: 300`, uno con 10 de margen a cada lado, en 515,
 > ceden lo mismo (52,5 cada uno). *Alternativa descartada:* ponderar con la base más los márgenes.
 
-> **Decisión:** `Horizontal` y `Vertical` nombran los extremos de su eje por el lado de la página, `left` y `right`,
-> `top` y `bottom`, como `Align`, `Side` y `Caption position`. `Line distribution` los llama `start` y `end`, porque
-> su eje depende de `Direction`: en un `Stack` horizontal las líneas se apilan de arriba abajo, y en uno vertical, de
-> izquierda a derecha. *Alternativa descartada:* `start` y `end` en las tres, que no dicen nada que el nombre de la
+> **Decisión:** `Horizontal`, `Vertical` y `Line distribution` nombran los extremos de su eje por el lado de la
+> página, `left` y `right`, `top` y `bottom`, como `Align`, `Side` y `Caption position`. El eje de
+> `Line distribution` depende de `Direction`: en un `Stack` horizontal las líneas se apilan de arriba abajo, y
+> admite `top` y `bottom`; en uno vertical van de izquierda a derecha, y admite `left` y `right`. El lado del otro
+> eje es `VALUE_NOT_ALLOWED`. *Alternativa descartada:* `start` y `end`, que no dicen nada que el nombre de la
 > propiedad no diga ya y obligan a recordar cuál es el principio: no hay escritura de derecha a izquierda.
 
 ### Alineación en el eje principal

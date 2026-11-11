@@ -17,8 +17,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - **`Horizontal` and `Vertical` name the ends of their axis by the side of the page**: `left` and `right` in
   `Horizontal`, `top` and `bottom` in `Vertical`, instead of `start` and `end`, which are no longer values of the
   two, with no alias. It is so in `Stack`, `Grid`, `Area`, `Item` and `Cell`, and in the rules that give them. The
-  other values (`center`, `stretch`, `justify`, `around`, `distribute`) do not change, nor does
-  `Line distribution`, whose axis depends on the `Direction` of its `Stack` and keeps `start` and `end`. The Java
+  other values (`center`, `stretch`, `justify`, `around`, `distribute`) do not change.
+  **`Line distribution`** names them the same way, on the axis its lines go along: `top` and `bottom` in a
+  horizontal `Stack`, `left` and `right` in a vertical one, and the side of the other axis is `VALUE_NOT_ALLOWED`.
+  `start` and `end` are no longer values of any property. The Java
   enums `model.Distribution` and `model.Alignment` keep `START` and `END`. No document is laid out differently.
 - **`Preformatted` no longer takes `true` and `false`**: its values are `none` (the default, what `false` was),
   `keep` (what `true` was) and `wrap`, with no alias for the old ones. It was the one enumeration with boolean

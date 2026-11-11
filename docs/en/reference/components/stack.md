@@ -33,7 +33,7 @@ Stack:
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap: true` (`GAP_WITHOUT_WRAP`). |
 | `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `around`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
 | `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
-| `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
@@ -102,12 +102,13 @@ Free space = available − sum of hypothetical sizes − gaps.
 > **Decision:** margins do not count when shrinking: two items with `Base size: 300`, one with a margin of 10 on each side, in 515,
 > give up the same (52.5 each). *Rejected alternative:* weighting with the base plus the margins.
 
-> **Decision:** `Horizontal` and `Vertical` name the ends of their axis by the side of the page, `left` and
-> `right`, `top` and `bottom`, like `Align`, `Side` and `Caption position`. `Line distribution` calls them `start`
-> and `end`, because its axis depends on `Direction`: in a horizontal `Stack` the lines are stacked from top to
-> bottom, and in a vertical one, from left to right. *Rejected alternative:* `start` and `end` in all three, which
-> say nothing the name of the property does not say already and make the author remember which one is the start:
-> there is no right-to-left writing.
+> **Decision:** `Horizontal`, `Vertical` and `Line distribution` name the ends of their axis by the side of the
+> page, `left` and `right`, `top` and `bottom`, like `Align`, `Side` and `Caption position`. The axis of
+> `Line distribution` depends on `Direction`: in a horizontal `Stack` the lines are stacked from top to bottom, and
+> it allows `top` and `bottom`; in a vertical one they go from left to right, and it allows `left` and `right`. The
+> side of the other axis is `VALUE_NOT_ALLOWED`. *Rejected alternative:* `start` and `end`, which say nothing the
+> name of the property does not say already and make the author remember which one is the start: there is no
+> right-to-left writing.
 
 ### Alignment on the main axis
 

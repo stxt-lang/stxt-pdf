@@ -1745,10 +1745,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
 	Node: Line distribution
 		Type: ENUM
-		Description: Distribution of the lines in the container: start, end, center, justify (the first and the last at the edges), around or stretch. Only with Wrap: true.
+		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), around or stretch. Only with Wrap: true.
 		Values:
-			Value: start
-			Value: end
+			Value: top
+			Value: bottom
+			Value: left
+			Value: right
 			Value: center
 			Value: justify
 			Value: around

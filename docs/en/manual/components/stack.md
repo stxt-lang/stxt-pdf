@@ -74,7 +74,7 @@ Each child of a `Stack` goes inside an `Item`, which wraps **exactly one element
 | `Wrap` | `true`, `false` | `false` | Whether the items that do not fit move to another line |
 | `Horizontal` | `left`, `right`, `center`, `justify`, `around`, `distribute`. In a column: `left`, `right`, `center`, `stretch` | `left`. In a column: `stretch` | In a row, where what is left over goes: at the start, at the end, on both sides or between the items (`justify`). In a column, how the items are aligned: `stretch` stretches them to the width of the `Stack` |
 | `Vertical` | `top`, `bottom`, `center`, `stretch`. In a column: `top`, `bottom`, `center`, `justify`, `around`, `distribute` | `stretch`. In a column: `top` | The reverse of `Horizontal`. In a row, how the items are aligned (`stretch` stretches them to the height of the row). In a column, where what is left over goes |
-| `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | With `Wrap`, how the lines are distributed |
+| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `around`, `stretch` | `stretch` | With `Wrap`, how the lines are distributed |
 
 ## How the space is shared out
 

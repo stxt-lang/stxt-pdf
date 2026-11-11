@@ -17,6 +17,11 @@ public final class StackStyle extends StyleGroup {
     private Distribution horizontal;
     private Distribution vertical;
     private Distribution lineDistribution = Distribution.STRETCH;
+    /**
+     * The axis of the side {@code Line distribution} was written with: {@code HORIZONTAL} for {@code left} or
+     * {@code right}, {@code VERTICAL} for {@code top} or {@code bottom}; {@code null} with a value that names no side.
+     */
+    private Direction lineDistributionSide;
     /** {@code Gap}: between rows and between columns. */
     private Value rowGap = Value.pt(0);
     private Value columnGap = Value.pt(0);
@@ -110,9 +115,15 @@ public final class StackStyle extends StyleGroup {
         return lineDistribution;
     }
 
-    void setLineDistribution(Distribution v) {
+    /** The axis of the side {@code Line distribution} names, or {@code null} ({@link ModelValidator}). */
+    Direction lineDistributionSide() {
+        return lineDistributionSide;
+    }
+
+    void setLineDistribution(Distribution v, Direction side) {
         writable();
         lineDistribution = v;
+        lineDistributionSide = side;
     }
 
     public Value rowGap() {

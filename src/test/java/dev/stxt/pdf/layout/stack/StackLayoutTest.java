@@ -3,10 +3,13 @@ package dev.stxt.pdf.layout.stack;
 import static dev.stxt.pdf.layout.LayoutFixture.layOut;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.tree.ErrorCode;
+import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Rect;
 
@@ -330,7 +333,7 @@ class StackLayoutTest {
         // 40 + 7 + 40 = 87 fit in 100; the third one moves to the next line, 100 + 13 to the right.
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 100", "\t\tDirection: vertical", "\t\tWrap: true",
-                "\t\tLine distribution: start", "\t\tGap: 7 13",
+                "\t\tLine distribution: left", "\t\tGap: 7 13",
                 "\t\tItem:", block("A", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("B", "Width: 100", "Height: 40"),
                 "\t\tItem:", block("C", "Width: 100", "Height: 40"));
@@ -499,11 +502,40 @@ class StackLayoutTest {
     }
 
     @Test
+    void lineDistributionNamesTheSideOfTheAxisTheLinesGoAlong() {
+        // Rows in 100 of height: two lines of 20, with the 60 left over above them with bottom.
+        String[] row = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 100", "\t\tWrap: true", "\t\tLine distribution: %s",
+                "\t\tItem:", block("A", "Width: 300", "Height: 20"), "\t\tItem:", block("B", "Width: 300", "Height: 20")};
+        assertEquals(40, layOut(with(row, "top")).rect("A").y(), 1e-9);
+        assertEquals(100, layOut(with(row, "bottom")).rect("A").y(), 1e-9);
+        // Columns in 515 of width: two lines of 100, with the 315 left over to their left with right.
+        String[] column = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true",
+                "\t\tLine distribution: %s", "\t\tItem:", block("A", "Width: 100", "Height: 40"),
+                "\t\tItem:", block("B", "Width: 100", "Height: 40")};
+        assertEquals(40, layOut(with(column, "left")).rect("A").x(), 1e-9);
+        assertEquals(355, layOut(with(column, "right")).rect("A").x(), 1e-9);
+        // The side of the other axis is not a value there.
+        for (String[] wrong : new String[][] {with(row, "left"), with(row, "right"), with(column, "top"),
+                with(column, "bottom")}) {
+            InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut(wrong));
+            assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
+        }
+    }
+
+    private static String[] with(String[] lines, String value) {
+        String[] out = lines.clone();
+        for (int i = 0; i < out.length; i++) {
+            out[i] = out[i].replace("%s", value);
+        }
+        return out;
+    }
+
+    @Test
     void columnLinesMeasureTheirItemsWithMargins() {
         // Column with Wrap in 60 of height: A (50 wide and a margin of 5 on each side) and B, on another line. The
         // first line measures 60, so B starts at 40 + 60.
         LayoutFixture l = layOut(
-                "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLine distribution: start",
+                "\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true", "\t\tLine distribution: left",
                 "\t\tItem:", block("A", "Width: 50", "Height: 40", "Margin: 0 5"),
                 "\t\tItem:", block("B", "Width: 80", "Height: 40"));
         assertRect(45, 40, 50, 40, l.rect("A"));

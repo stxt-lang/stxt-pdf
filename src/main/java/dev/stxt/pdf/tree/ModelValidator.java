@@ -97,6 +97,15 @@ final class ModelValidator {
             throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.LINE_DISTRIBUTION_WITHOUT_WRAP,
                     "Line distribution only has an effect with Wrap: true, because without Wrap there is a single line");
         }
+        // The lines of a horizontal Stack go from top to bottom, and those of a vertical one, from left to right.
+        Direction side = s.stack().lineDistributionSide();
+        if (side != null && side == s.stack().direction()) {
+            boolean rows = s.stack().isHorizontal();
+            throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.VALUE_NOT_ALLOWED, "Line distribution places the "
+                    + "lines of this Stack (" + direction + "), which go " + (rows ? "from top to bottom" : "from left "
+                    + "to right") + ": it allows " + PropertyReader.axisEnds(!rows) + ", center, justify, around or "
+                    + "stretch, and not " + PropertyReader.axisEnds(rows).replace(", ", " or "));
+        }
         // A vertical Stack with Wrap is never broken across pages (reference/components/stack.md).
         if (s.isDeclared(STACK_SPLIT_ITEMS) && !s.stack().isHorizontal() && s.stack().wrap()) {
             throw error(s.line(STACK_SPLIT_ITEMS), ErrorCode.SPLIT_ITEMS_WITHOUT_EFFECT, "Split items has no effect in a "

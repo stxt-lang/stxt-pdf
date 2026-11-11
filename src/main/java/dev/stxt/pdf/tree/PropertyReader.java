@@ -344,7 +344,7 @@ final class PropertyReader {
             }
             case "horizontal" -> s.stack().setHorizontal(axis(p));
             case "vertical" -> s.stack().setVertical(axis(p));
-            case "line-distribution" -> s.stack().setLineDistribution(enumValue(Distribution.class, p));
+            case "line-distribution" -> lineDistribution(p, s);
             case "split-items" -> s.stack().setSplitItems(bool(p));
             default -> throw unread(p);
         }
@@ -454,8 +454,7 @@ final class PropertyReader {
     /**
      * The value of {@code Horizontal} or {@code Vertical}, which name the two ends of their axis by their side of the
      * page: {@code left} and {@code right}, {@code top} and {@code bottom}. They are the {@code START} and the
-     * {@code END} of {@link Distribution}, which {@code Line distribution} writes as {@code start} and {@code end},
-     * because its axis depends on the {@code Direction} of the {@code Stack}. The sides of the other axis, and
+     * {@code END} of {@link Distribution}. The sides of the other axis, and
      * {@code start} and {@code end}, are not values of the property.
      */
     static Distribution axis(Node p) {
@@ -473,6 +472,29 @@ final class PropertyReader {
                     + " (the ends of its axis are " + axisEnds(horizontal) + ")");
         }
         return d;
+    }
+
+    /**
+     * {@code Line distribution} of a {@code Stack}: the two ends of its axis are named by the side of the page, and
+     * the axis is the one the lines are stacked along, which depends on {@code Direction}. The side is kept with the
+     * value, and {@link ModelValidator#validateStack} checks it against the direction once it is known.
+     */
+    private static void lineDistribution(Node p, Style s) {
+        String text = p.getText().trim().toLowerCase(Locale.ROOT);
+        switch (text) {
+            case "left" -> s.stack().setLineDistribution(Distribution.START, Direction.HORIZONTAL);
+            case "right" -> s.stack().setLineDistribution(Distribution.END, Direction.HORIZONTAL);
+            case "top" -> s.stack().setLineDistribution(Distribution.START, Direction.VERTICAL);
+            case "bottom" -> s.stack().setLineDistribution(Distribution.END, Direction.VERTICAL);
+            default -> {
+                Distribution d = enumValue(Distribution.class, p);
+                if (d == Distribution.START || d == Distribution.END) {
+                    throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + p.getName() + ": "
+                            + p.getText().trim());
+                }
+                s.stack().setLineDistribution(d, null);
+            }
+        }
     }
 
     /** The names of the two ends of an axis, for a message: {@code left, right} or {@code top, bottom}. */

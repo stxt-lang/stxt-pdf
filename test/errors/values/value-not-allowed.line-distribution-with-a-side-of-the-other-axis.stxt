@@ -1,0 +1,20 @@
+# Case: Line distribution: left in a horizontal Stack, whose lines go from top to bottom
+# Code: VALUE_NOT_ALLOWED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Stack:
+			Wrap: true
+			Line distribution: left
+			Item:
+				Text: Hola

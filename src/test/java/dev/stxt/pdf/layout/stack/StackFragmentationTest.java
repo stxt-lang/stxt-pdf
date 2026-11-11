@@ -163,7 +163,7 @@ class StackFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 new String[]{"\tBlock:", "\t\tBox:", "\t\t\tHeight: 50"},
                 new String[]{"\tStack:", "\t\tId: F", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical",
-                        "\t\tWrap: true", "\t\tLine distribution: start"},
+                        "\t\tWrap: true", "\t\tLine distribution: left"},
                 item("A", "Width: 50"), item("B", "Width: 50")));
         assertRect(40, 90, 50, 40, l.rect(1, "A"));
         assertRect(90, 90, 50, 40, l.rect(1, "B"));
