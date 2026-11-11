@@ -51,7 +51,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [`Columns`](components/columns.md) | `Columns` |
 | [`Frame`, `Overlay` y `Page overlay`](components/frame-and-overlays.md) | Los elementos posicionados |
 | [`Image`](components/image.md) | `Image`: PNG, JPEG y SVG |
-| [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 y EAN-13 |
+| [`Barcode`](components/barcode.md) | `Barcode`: QR, Data Matrix, PDF417, Code 128, EAN-13 y los GS1, y el texto legible |
 | [`Figure`](components/figure.md) | `Figure` y su `Caption`: figuras y tablas con pie numerado |
 | [`Markdown`](components/markdown.md) | `Markdown` y el elemento generado `Code block` |
 | [`Footnote`](components/footnote.md) | `Footnote`, la llamada `[^id]` y el área de notas generada `Footnote area` |

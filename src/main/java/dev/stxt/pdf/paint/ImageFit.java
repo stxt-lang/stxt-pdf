@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Rect;
@@ -41,5 +42,18 @@ final class ImageFit {
      */
     static List<Rect> modules(Modules modules, Rect content) {
         return modules.rects(place(modules.fit(), content, modules.naturalWidth(), modules.naturalHeight()));
+    }
+
+    /**
+     * The dark modules of a barcode with a readable text ({@code text}, relative to {@code content}; empty if it has
+     * none): the bars take the content box down to the line of the text, and the long ones go down to its middle.
+     */
+    static List<Rect> modules(Modules modules, Rect content, List<TextLine> text) {
+        if (text.isEmpty()) {
+            return modules(modules, content);
+        }
+        TextLine line = text.get(0);
+        Rect bars = new Rect(content.x(), content.y(), content.width(), Math.max(0, line.y()));
+        return modules.rects(bars, line.height() / 2);
     }
 }

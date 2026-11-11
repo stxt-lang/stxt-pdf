@@ -15,6 +15,7 @@ import static dev.stxt.pdf.tree.PropertyKey.CORNER_RADIUS;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.DROP_CAP;
 import static dev.stxt.pdf.tree.PropertyKey.ERROR_CORRECTION;
+import static dev.stxt.pdf.tree.PropertyKey.READABLE_TEXT;
 import static dev.stxt.pdf.tree.PropertyKey.FIRST_LINE_INDENT;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.GRID_GAP;
@@ -51,6 +52,7 @@ import static dev.stxt.pdf.tree.ValueReader.hasPercentage;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import dev.stxt.InlineNode;
@@ -202,26 +204,50 @@ final class ModelValidator {
         }
     }
 
+    /** What the {@code Typography} of a {@code Barcode} with {@code Readable text} allows: the font of that text. */
+    private static final Set<String> BARCODE_TEXT_TYPOGRAPHY = Set.of("color", "font", "size", "bold", "weight",
+            "italic");
+
     /**
      * The properties of a {@code Barcode} (reference/components/barcode.md): {@code Alt} is required, {@code Error
-     * correction} only has an effect on a QR code and, of its own {@code Typography}, only {@code Color} has one (the
-     * color of the modules). What a rule of {@code Styles} gives it is not checked, as with any box without text.
+     * correction} only has an effect on a QR code, {@code Readable text} on a one-dimensional barcode and, of its own
+     * {@code Typography}, only {@code Color} has one (the color of the modules), and with a readable text, also those
+     * of its font. What a rule of {@code Styles} gives its {@code Typography} is not checked, as with any box without
+     * text.
      */
     static void validateBarcode(InlineNode n, Style s) {
         if (s.image().alt() == null) {
             throw error(n, ErrorCode.BARCODE_WITHOUT_ALT, "The Barcode needs Alt, the text that says what it is and "
                     + "where it leads to whoever cannot see it, as in Alt: QR code of the invoice verification");
         }
-        if (s.isDeclared(ERROR_CORRECTION) && s.image().barcodeFormat() != BarcodeFormat.QR) {
+        BarcodeFormat format = s.image().barcodeFormat();
+        if (s.isDeclared(ERROR_CORRECTION) && format != BarcodeFormat.QR) {
             throw error(s.line(ERROR_CORRECTION), ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, "Error correction only "
-                    + "has an effect on a QR code, and the Barcode is " + s.image().barcodeFormat().name().toLowerCase(Locale.ROOT)
-                    .replace('_', '-') + ": it is not needed");
+                    + "has an effect on a QR code, and the Barcode is " + format.value() + ": it is not needed");
+        }
+        boolean text = s.image().readableText();
+        if (text && !format.isLinear()) {
+            throw error(s.line(READABLE_TEXT), ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, "Readable text only has an "
+                    + "effect on a barcode of one row (code-128, gs1-128 or ean-13), and the Barcode is "
+                    + format.value() + ": its text goes in a Text");
+        }
+        if (text && s.typography().font() == null) {
+            throw error(s.line(READABLE_TEXT), ErrorCode.TEXT_WITHOUT_FONT, "The readable text of the Barcode needs "
+                    + "Font: it is declared in the Typography of the Barcode, of an ancestor or of Styles (For "
+                    + "element: Document)");
+        }
+        if (text && !s.isDeclared(FONT_SIZE)) {
+            throw error(s.line(READABLE_TEXT), ErrorCode.TEXT_WITHOUT_FONT_SIZE, "The readable text of the Barcode "
+                    + "needs Size: it is declared in the Typography of the Barcode, of an ancestor or of Styles (For "
+                    + "element: Document)");
         }
         Nodes.child(n, "typography").map(Nodes::inline).ifPresent(t -> t.getChildren().stream()
-                .filter(p -> !p.getCanonicalName().equals("color")).findFirst().ifPresent(p -> {
+                .filter(p -> text ? !BARCODE_TEXT_TYPOGRAPHY.contains(p.getCanonicalName())
+                        : !p.getCanonicalName().equals("color")).findFirst().ifPresent(p -> {
                     throw error(p, ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, p.getName() + " has no effect on a "
-                            + "Barcode, which has no text: of its Typography, only Color has one, the color of the "
-                            + "modules");
+                            + "Barcode" + (text ? ": of its Typography, only Color, Font, Size, Bold, Weight and "
+                            + "Italic have one, on its readable text" : ", which has no text: of its Typography, "
+                            + "only Color has one, the color of the modules"));
                 }));
     }
 

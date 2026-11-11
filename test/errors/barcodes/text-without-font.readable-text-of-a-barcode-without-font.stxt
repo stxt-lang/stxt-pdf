@@ -1,0 +1,14 @@
+# Case: Readable text in a Barcode that no Typography gives a Font
+# Code: TEXT_WITHOUT_FONT
+# Line: 14
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: AL-2025-0388
+			Alt: Albarán AL-2025-0388
+			Barcode format: code-128
+			Readable text: true

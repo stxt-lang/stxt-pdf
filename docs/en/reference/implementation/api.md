@@ -148,7 +148,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAG
 ```
 
 `Engine` receives the removed ones and passes them to `Images`; unless `BARCODE_SIZE` is removed, it checks the modules
-with `ModuleSizes` after `Overflow`. The contrast is checked by `Converter.layOut` after layout.
+with `ModuleSizes` after `Overflow` (the readable text of a barcode is always checked). The contrast is checked by `Converter.layOut` after layout.
 
 > **Decision:** a single way to remove checks, an enum and `exclude`, instead of one boolean for each: by
 > default everything is done and what is removed is named. *Rejected alternative:* `checkContrast(boolean)` and one more method for

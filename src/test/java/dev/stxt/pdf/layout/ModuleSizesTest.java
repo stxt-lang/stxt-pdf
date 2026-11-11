@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 
@@ -112,5 +115,67 @@ class ModuleSizesTest {
         System.arraycopy(lines, 0, rotated, 0, lines.length);
         rotated[lines.length] = "\t\tRotate: 90";
         tooSmall(rotated);
+    }
+
+    private static String[] labeled(String value, String format, String size, String... box) {
+        String[] lines = barcode(value, format, box);
+        String[] all = new String[lines.length + 3];
+        System.arraycopy(lines, 0, all, 0, lines.length);
+        all[lines.length] = "\t\tReadable text: true";
+        all[lines.length + 1] = "\t\tTypography:";
+        all[lines.length + 2] = "\t\t\tSize: " + size;
+        return all;
+    }
+
+    private static InvalidModelException textOverflow(String... lines) {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut(lines));
+        assertEquals(ErrorCode.BARCODE_TEXT_OVERFLOW, e.errorCode(), e.getMessage());
+        return e;
+    }
+
+    /**
+     * The readable text adds its height to the natural one of the code and is placed at the bottom of the content
+     * box: with the metrics of the comparison, a text of size 8 is 8 tall and each character, 4.8 wide.
+     */
+    @Test
+    void theReadableTextTakesTheBottomOfTheBox() {
+        LayoutFixture ean = layOut(labeled(EAN_13, "ean-13", "8"));
+        Fragment f = ean.fragment("B");
+        assertEquals(113 * 0.33 * Value.POINTS_PER_MM, f.contentWidth(), 1e-6);
+        assertEquals(22.85 * Value.POINTS_PER_MM + 8, f.contentHeight(), 1e-6);
+        TextLine line = f.lines().get(0);
+        assertEquals(22.85 * Value.POINTS_PER_MM, line.y(), 1e-6);
+        assertEquals(8, line.height(), 1e-6);
+        assertEquals("8412345678905", line.text());
+        assertEquals(13, line.runs().size());
+        // The first digit, centered in the 7 modules before the bars (4 to 11); the second, under 14 to 21.
+        double module = 0.33 * Value.POINTS_PER_MM;
+        double width = line.runs().get(0).width();
+        assertEquals(7.5 * module - width / 2, line.runs().get(0).x(), 1e-6);
+        assertEquals(17.5 * module - width / 2, line.runs().get(1).x(), 1e-6);
+        // With a height, the text is taken from the bars.
+        Fragment fixed = layOut(labeled(CODE_128, "code-128", "8", "Width: 100", "Height: 30")).fragment("B");
+        assertEquals(30, fixed.contentHeight(), 1e-6);
+        assertEquals(22, fixed.lines().get(0).y(), 1e-6);
+        TextLine.Run run = fixed.lines().get(0).runs().get(0);
+        assertEquals("STXT", run.text());
+        assertEquals(50, run.x() + run.width() / 2, 1e-6);
+        // Without Readable text, there is no line.
+        assertTrue(layOut(barcode(CODE_128, "code-128", "Width: 100")).fragment("B").lines().isEmpty());
+    }
+
+    @Test
+    void aReadableTextThatDoesNotFitIsAnError() {
+        assertContains("does not fit in its content box", textOverflow(labeled(CODE_128, "code-128", "60",
+                "Width: 100")));
+        assertContains("runs into the piece before it", textOverflow(labeled(EAN_13, "ean-13", "14")));
+        assertContains("leaves no height for the bars", textOverflow(labeled(CODE_128, "code-128", "8", "Width: 100",
+                "Height: 8")));
+        // An EAN-13 without quiet zone has no room for its first digit.
+        String[] lines = labeled(EAN_13, "ean-13", "6");
+        String[] noZone = new String[lines.length + 1];
+        System.arraycopy(lines, 0, noZone, 0, lines.length);
+        noZone[lines.length] = "\t\tQuiet zone: 0";
+        assertContains("the first digit of an EAN-13 goes in its left quiet zone", textOverflow(noZone));
     }
 }

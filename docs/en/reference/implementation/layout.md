@@ -535,6 +535,14 @@ the width and the height in a matrix, and only the width in a stretched row (`Mo
 short is `BARCODE_TOO_SMALL`, with the line of its box ([Barcode](../components/barcode.md#minimum-module)). The generator
 puts the minimum in `Modules`, so `ModuleSizes` knows nothing about formats.
 
+The readable text of a barcode (`Readable text`, [Barcode](../components/barcode.md#readable-text)) is placed by
+`BarcodeTextLayout` (`layout`), which is the one that has the measurer: `Modules.text()` (`model.BarcodeText`) gives the
+pieces of the text in modules, each one centered under its own, and from them comes a `TextLine` at the bottom of the
+content box, as tall as the font (ascent plus descent), with a run (`TextLine.Run`) per piece. `ImageLayout` leaves it in
+the lines of the fragment, and `Engine.natural` adds that height to the natural one of the modules. `ModuleSizes` checks
+afterwards, whether `Check.BARCODE_SIZE` is removed or not, that each run fits in the content box and does not run into
+the one before it and that the line leaves height for the bars (`BARCODE_TEXT_OVERFLOW`).
+
 > **Decision:** the minimum module is checked on the paginated result, like the overflows, and not when measuring the
 > image (`Images.natural`), because a code is laid out with provisional sizes when a `Stack` or a `Grid` is measured.
 > *Rejected alternative:* checking it in `ImageLayout`, which would give errors from measuring passes.

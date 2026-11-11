@@ -82,7 +82,8 @@ depend on the `LayoutContext` interface.
     tables of contents, and `RunMarks`, the styled runs and the escaped braces of the Markdown ([The box tree](implementation/tree.md#text-and-runs));
   - `TableBorders`, the merged borders of a table, and `NamedColors`, the named colors of `Styles`;
   - `Barcodes`, the drawing of a `Barcode`: the first implementation of `ImageGenerator`, the extension point of the
-    generated images ([The box tree](implementation/tree.md#generated-images));
+    generated images ([The box tree](implementation/tree.md#generated-images)), with `Gs1` (GS1 data) and
+    `Gs1DataMatrix` (the matrix of a `gs1-data-matrix`);
   - `ModelValidator`, the rules that look at the box once read;
   - `Footnotes`, the footnotes: the area of each section, the numbering of the calls and their checks;
   - `Figures`, the figures with a caption: their counters, where the caption goes and their `Alt`.
@@ -102,7 +103,8 @@ depend on the `LayoutContext` interface.
 - **`Paginator`**: splits each section into pages, makes the references converge, numbers the pages and places the
   `Page overlay` elements.
 - **`Overflow`**: looks for overflows in the already paginated result.
-- **`ModuleSizes`**: checks in the already paginated result that the modules of each code are not below their minimum.
+- **`ModuleSizes`**: checks in the already paginated result that the modules of each code are not below their minimum,
+  and that the readable text of a barcode, which `BarcodeTextLayout` places, fits under its bars.
 - Pure parts of each algorithm: `LineBreaker` (line breaking, with the `Hyphenator` of `inline.hyphenation` to split
   words; the words in `Words`, their measures and positions in `Paragraph` and the placing of each line in
   `LinePlacer`), `StackResolver`, `TrackSizing` and `Placement` (grid), `ItemSizing` (the size of a `Stack` or `Grid` item in

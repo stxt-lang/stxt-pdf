@@ -82,7 +82,8 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
     los índices, y `RunMarks`, los tramos con estilo y las llaves escapadas del Markdown ([El árbol de cajas](implementation/tree.md#texto-y-tramos));
   - `TableBorders`, los bordes fusionados de una tabla, y `NamedColors`, los colores con nombre de `Styles`;
   - `Barcodes`, el dibujo de un `Barcode`: la primera implementación de `ImageGenerator`, el punto de extensión de las
-    imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas));
+    imágenes generadas ([El árbol de cajas](implementation/tree.md#imágenes-generadas)), con `Gs1` (los datos GS1) y
+    `Gs1DataMatrix` (la matriz de un `gs1-data-matrix`);
   - `ModelValidator`, las reglas que miran la caja ya leída;
   - `Footnotes`, las notas al pie: el área de cada sección, la numeración de las llamadas y sus comprobaciones;
   - `Figures`, las figuras con pie: sus contadores, dónde va el pie y su `Alt`.
@@ -103,7 +104,7 @@ algoritmo nombra `Engine`: dependen de la interfaz `LayoutContext`.
   `Page overlay`.
 - **`Overflow`**: busca los desbordamientos en el resultado ya paginado.
 - **`ModuleSizes`**: comprueba en el resultado ya paginado que los módulos de cada código no quedan por debajo de su
-  mínimo.
+  mínimo, y que el texto legible de un código de barras, que coloca `BarcodeTextLayout`, cabe bajo sus barras.
 - Piezas puras de cada algoritmo: `LineBreaker` (reparto en líneas, con el `Hyphenator` de `inline.hyphenation` para
   partir palabras; las palabras en `Words`, sus medidas y posiciones en `Paragraph` y la colocación de cada línea en
   `LinePlacer`), `StackResolver`, `TrackSizing` y `Placement` (grid), `ItemSizing` (el tamaño de un ítem de `Stack` o

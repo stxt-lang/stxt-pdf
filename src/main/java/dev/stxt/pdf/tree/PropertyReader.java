@@ -163,6 +163,7 @@ final class PropertyReader {
             entry("barcode-format", (p, s) -> s.image().setBarcodeFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
             entry("quiet-zone", (p, s) -> s.image().setQuietZone(quietZone(p))),
+            entry("readable-text", (p, s) -> s.image().setReadableText(bool(p))),
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
             entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
             entry("entries", (p, s) -> s.tableOfContents().setEntries(enumValue(Listing.class, p))),

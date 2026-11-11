@@ -51,7 +51,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [`Columns`](components/columns.md) | `Columns` |
 | [`Frame`, `Overlay` and `Page overlay`](components/frame-and-overlays.md) | The positioned elements |
 | [`Image`](components/image.md) | `Image`: PNG, JPEG and SVG |
-| [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 and EAN-13 |
+| [`Barcode`](components/barcode.md) | `Barcode`: QR, Data Matrix, PDF417, Code 128, EAN-13 and the GS1 ones, and the readable text |
 | [`Figure`](components/figure.md) | `Figure` and its `Caption`: figures and tables with a numbered caption |
 | [`Markdown`](components/markdown.md) | `Markdown` and the generated element `Code block` |
 | [`Footnote`](components/footnote.md) | `Footnote`, the call `[^id]` and the generated footnote area `Footnote area` |

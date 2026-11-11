@@ -984,7 +984,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Barcode
 		Type: INLINE
-		Description: QR code or barcode that the engine generates from its data, in the Barcode format qr (by default), code-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code; 0.33 mm by 22.85 mm in the others), with the quiet zone (Quiet zone) included; a QR code is drawn square and centered, and the others are stretched to the box. Alt is required. The modules have the Color of the Typography (only Color is allowed in its Typography) and the background is that of the Box.
+		Description: QR code or barcode that the engine generates from its data, in the Barcode format qr (by default), data-matrix, gs1-data-matrix, pdf417, code-128, gs1-128 or ean-13. The data goes in the value (Barcode: https://example.com/verify/1234) or, if it has several lines, in a Content >> block, one of the two. It is laid out as an Image: its natural size comes from its modules (0.5 mm in a QR code and a Data Matrix; 0.33 mm by 1 mm in a PDF417; 0.33 mm by 22.85 mm in the barcodes of one row), with the quiet zone (Quiet zone) included; a QR code, a Data Matrix and a PDF417 are drawn whole and centered, and the barcodes of one row are stretched to the box. Readable text puts the data as text under the bars of a barcode of one row. Alt is required. The modules have the Color of the Typography and the background is that of the Box; of its Typography, only Color is allowed and, with Readable text, also Font, Size, Bold, Weight and Italic, those of that text.
 		Children:
 			Child: Id
 				Max: 1
@@ -1005,6 +1005,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Error correction
 				Max: 1
 			Child: Quiet zone
+				Max: 1
+			Child: Readable text
 				Max: 1
 			Child: Rotate
 				Max: 1
@@ -1090,6 +1092,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Error correction
 				Max: 1
 			Child: Quiet zone
+				Max: 1
+			Child: Readable text
 				Max: 1
 			Child: Caption position
 				Max: 1
@@ -1188,6 +1192,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Quiet zone
 				Max: 1
+			Child: Readable text
+				Max: 1
 			Child: Caption position
 				Max: 1
 			Child: Figure counter
@@ -1284,6 +1290,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Error correction
 				Max: 1
 			Child: Quiet zone
+				Max: 1
+			Child: Readable text
 				Max: 1
 			Child: Caption position
 				Max: 1
@@ -1941,14 +1949,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Barcode format
 		Type: ENUM
-		Description: Symbology of a Barcode: qr (by default), a QR code; code-128, printable ASCII characters, up to 80; ean-13, 12 digits (the check digit is added) or 13 (it is checked).
+		Description: Symbology of a Barcode: qr (by default), a QR code; data-matrix, a square Data Matrix; pdf417, a PDF417; code-128, printable ASCII characters, up to 80; ean-13, 12 digits (the check digit is added) or 13 (it is checked); gs1-128 and gs1-data-matrix, a Code 128 and a Data Matrix with GS1 data, a list of application identifiers in parentheses, each one before its value, as in (01)09501101530003(10)AB-123.
 		Values:
 			Value: qr
+			Value: data-matrix
+			Value: gs1-data-matrix
+			Value: pdf417
 			Value: code-128
+			Value: gs1-128
 			Value: ean-13
 	Node: Error correction
 		Type: ENUM
-		Description: Error correction of a QR code, the part of its modules that can be damaged and it can still be read: low (7 %), medium (15 %, by default), quartile (25 %) or high (30 %). In another Barcode format, it is an error.
+		Description: Error correction of a QR code, the part of its modules that can be damaged and it can still be read: low (7 %), medium (15 %, by default), quartile (25 %) or high (30 %). In another Barcode format, it is an error: a Data Matrix has its own, and a PDF417 takes the level its standard recommends for its data.
 		Values:
 			Value: low
 			Value: medium
@@ -1956,7 +1968,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: high
 	Node: Quiet zone
 		Type: INTEGER
-		Description: Light modules on each side of a Barcode, which the reader needs around the code, from 0 to 40. By default, those of its standard: 4 in a QR code, 10 in a Code 128, and 11 on the left and 7 on the right in an EAN-13. They are part of its natural size, so in a box of a given size fewer modules of quiet zone give wider modules.
+		Description: Light modules on each side of a Barcode, which the reader needs around the code, from 0 to 40. By default, those of its standard: 4 in a QR code, 1 in a Data Matrix, 2 in a PDF417, 10 in a Code 128 and a GS1-128, and 11 on the left and 7 on the right in an EAN-13. They are part of its natural size, so in a box of a given size fewer modules of quiet zone give wider modules.
+	Node: Readable text
+		Type: BOOLEAN
+		Description: Whether a barcode of one row (code-128, gs1-128 or ean-13) has its data as text under its bars, in the font, the size and the color of its Typography. By default, false. In an EAN-13 it is laid out as on a product: the first digit at the left of the bars, each of the others under its seven modules and the guard bars going down between them; in the others, one centered line (in a GS1-128, with the parentheses of its application identifiers). Its height is added to the natural height of the code and, in a box of a given height, taken from the bars. A text that does not fit under its bars is an error. In another Barcode format, it is an error.
 
 	# Markdown
 

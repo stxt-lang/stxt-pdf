@@ -74,7 +74,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
 | `Image` | `Fit`, `Side`, `Below side boxes` |
-| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Below side boxes` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side`, `Below side boxes` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes` |
 | `Heading 1` to `Heading 6` | `In table of contents`, `Below side boxes` |
 | `Paragraph` | `Drop cap`, `Below side boxes` |

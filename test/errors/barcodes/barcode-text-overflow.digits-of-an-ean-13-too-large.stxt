@@ -1,0 +1,19 @@
+# Case: The digits of an EAN-13 too large for their seven modules
+# Code: BARCODE_TEXT_OVERFLOW
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 14
+	Section:
+		Barcode: 8412345678905
+			Alt: Código de producto
+			Barcode format: ean-13
+			Readable text: true

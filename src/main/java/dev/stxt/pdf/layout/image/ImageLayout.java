@@ -2,7 +2,9 @@ package dev.stxt.pdf.layout.image;
 
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.layout.AdjoiningMargins;
+import dev.stxt.pdf.layout.BarcodeTextLayout;
 import dev.stxt.pdf.layout.BoxModel;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.LayoutContext;
@@ -67,7 +69,17 @@ public final class ImageLayout implements LayoutAlgorithm {
             return LayoutResult.before(box);
         }
         Fragment fragment = new Fragment(box, 0, 0, model.width(), height, model.margin(), model.border(),
-                model.padding(), List.of(), List.of(), true, true);
+                model.padding(), List.of(), text(box, model, height), true, true);
         return LayoutResult.finished(fragment, List.of(), AdjoiningMargins.NONE);
+    }
+
+    /** The readable text of a {@code Barcode}, placed in its content box ({@link BarcodeTextLayout}). */
+    private List<TextLine> text(Box box, BoxModel model, double height) {
+        if (box.modules() == null || box.modules().text() == null) {
+            return List.of();
+        }
+        double width = model.width() - model.border().horizontal() - model.padding().horizontal();
+        double inner = height - model.border().vertical() - model.padding().vertical();
+        return BarcodeTextLayout.lines(box, Math.max(0, width), Math.max(0, inner), context.measurer());
     }
 }

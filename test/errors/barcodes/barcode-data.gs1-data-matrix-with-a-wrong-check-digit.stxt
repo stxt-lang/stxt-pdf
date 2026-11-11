@@ -1,0 +1,13 @@
+# Case: A GTIN of a GS1 Data Matrix with a wrong check digit
+# Code: BARCODE_DATA
+# Line: 11
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: (01)09501101530004(10)AB-123
+			Alt: Medicamento
+			Barcode format: gs1-data-matrix

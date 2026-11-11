@@ -1,0 +1,58 @@
+# Barcode formats and readable text (reference/components/barcode.md): page of 200 × 300 with margins of 20, page area
+# of 160 × 260 from (20, 20). One after the other in block flow.
+#   matrix: a Data Matrix with Width 40: its modules are square and so is its content box, 40 × 40. y = 20.
+#   gs1:    a GS1 Data Matrix with Width 40: 40 × 40. y = 60.
+#   pdf417: a PDF417 in a box of 160 × 40: it is drawn whole and centered, with the proportion of its modules. y = 100.
+#   label:  a GS1-128 with Width 160 and Height 36 and its readable text at Size 6: the text takes the 6 at the bottom
+#           (ascent 0.8 and descent 0.2 of the size, the metrics of the comparison) and the bars, the 30 above. y = 140.
+#   ean:    an EAN-13 with its readable text at Size 8 and Width 100. Its modules are 113 of 0.33 mm (37.29 mm,
+#           105.70 pt) by 22.85 mm (64.77 pt), and the text adds 8: the height is 100 × 72.77 / 105.70 = 68.84. y = 176.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 200
+		Height: 300
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 8
+	Section:
+		Barcode: L-2025-0388
+			Id: matrix
+			Alt: Lote L-2025-0388
+			Barcode format: data-matrix
+			Box:
+				Width: 40
+		Barcode: (01)09501101530003(17)261231(10)AB-123
+			Id: gs1
+			Alt: Medicamento, lote AB-123
+			Barcode format: gs1-data-matrix
+			Box:
+				Width: 40
+		Barcode: M1NOGAL/CARMEN EABC123 BCNMADIB 2714 320Y012A0042 100
+			Id: pdf417
+			Alt: Tarjeta de embarque
+			Barcode format: pdf417
+			Box:
+				Width: 160
+				Height: 40
+		Barcode: (00)395011015300000011
+			Id: label
+			Alt: Etiqueta del bulto 395011015300000011
+			Barcode format: gs1-128
+			Readable text: true
+			Box:
+				Width: 160
+				Height: 36
+			Typography:
+				Size: 6
+		Barcode: 8412345678905
+			Id: ean
+			Alt: Código de producto 8412345678905
+			Barcode format: ean-13
+			Readable text: true
+			Box:
+				Width: 100

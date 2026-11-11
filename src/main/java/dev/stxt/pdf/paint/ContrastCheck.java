@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Cancellation;
@@ -105,7 +106,7 @@ public final class ContrastCheck implements Canvas {
     }
 
     @Override
-    public void image(Box box, Rect content, Radii radii) {
+    public void image(Box box, Rect content, Radii radii, List<TextLine> text) {
         add(content, null);
     }
 

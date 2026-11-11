@@ -3,6 +3,7 @@ package dev.stxt.pdf.layout.inline;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.Reference;
 import dev.stxt.pdf.model.RunStyle;
+import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.resources.FontFile;
@@ -112,6 +113,15 @@ public final class PdfMetrics implements TextMeasurer {
         }
         if (box.marker() != null && box.marker().hasText()) {
             check(box.marker(), fonts, headings);
+        }
+        if (box.modules() != null && box.modules().text() != null) {
+            // The readable text of a barcode (reference/components/barcode.md), in the font of its box.
+            String text = box.modules().text().text();
+            FontFile font = font(box, fonts, new TextRun(text, TextFormat.PLAIN), 0);
+            text.codePoints().filter(cp -> !font.has(cp)).findFirst().ifPresent(cp -> {
+                throw new InvalidModelException(box.line(), ErrorCode.GLYPH_MISSING, "The font " + font.face()
+                        + " has no character " + describe(cp) + ", of the readable text of the Barcode");
+            });
         }
         box.children().forEach(child -> validate(child, fonts, headings));
     }

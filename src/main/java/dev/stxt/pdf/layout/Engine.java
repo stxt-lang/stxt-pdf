@@ -180,9 +180,7 @@ public final class Engine implements LayoutContext {
         try {
             List<Page> pages = new Paginator(this).paginate(tree);
             Overflow.check(pages, cancellation);
-            if (moduleSizes) {
-                ModuleSizes.check(pages, cancellation);
-            }
+            ModuleSizes.check(pages, cancellation, moduleSizes);
             progress.laidOut(pages.size());
             // The braces of the literal references stop being a mark: nothing is replaced in the lines any more.
             pages = LiteralBraces.shown(tree.root(), pages);
@@ -290,7 +288,10 @@ public final class Engine implements LayoutContext {
 
     @Override
     public NaturalSize natural(Box box) {
-        return images.natural(box);
+        NaturalSize natural = images.natural(box);
+        // The readable text of a barcode goes under its bars: its height is added to theirs.
+        double text = BarcodeTextLayout.height(box, measurer);
+        return text == 0 ? natural : new NaturalSize(natural.width(), natural.height() + text);
     }
 
     @Override

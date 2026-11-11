@@ -20,6 +20,7 @@ import com.google.zxing.oned.EAN13Reader;
 import com.google.zxing.qrcode.decoder.Decoder;
 
 import dev.stxt.pdf.Docs;
+import dev.stxt.pdf.model.BarcodeText;
 import dev.stxt.pdf.model.Modules;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
@@ -279,5 +280,191 @@ class BarcodesTest {
         Box box = barcode("\tStyles:", "\t\tFor element: Barcode", "\t\t\tTypography:", "\t\t\t\tColor: #1F3A5F",
                 "\tBarcode: https://stxt.dev", "\t\tAlt: Enlace");
         assertEquals("#1F3A5F", box.style().typography().color());
+    }
+
+    /** The Data Matrix without its quiet zone, as the decoder of ZXing reads it. */
+    private static DecoderResult decodeDataMatrix(Modules m) throws Exception {
+        int quiet = Barcodes.DATA_MATRIX_QUIET_ZONE;
+        int side = m.columns() - 2 * quiet;
+        BitMatrix matrix = new BitMatrix(side);
+        for (int y = 0; y < side; y++) {
+            for (int x = 0; x < side; x++) {
+                if (m.isDark(x + quiet, y + quiet)) {
+                    matrix.set(x, y);
+                }
+            }
+        }
+        return new com.google.zxing.datamatrix.decoder.Decoder().decode(matrix);
+    }
+
+    @Test
+    void aDataMatrixIsReadBack() throws Exception {
+        Modules m = modules("\tBarcode: L-2025-0388", "\t\tAlt: Lote", "\t\tBarcode format: data-matrix");
+        // 11 characters fit in the symbol of 14 × 14 modules, with 1 on each side: square, with square modules.
+        assertEquals(16, m.columns());
+        assertEquals(16, m.rows());
+        assertEquals(m.moduleWidth(), m.moduleHeight(), 1e-9);
+        assertEquals(16 * 0.5 * Value.POINTS_PER_MM, m.naturalWidth(), 1e-9);
+        assertEquals(0.25 * Value.POINTS_PER_MM, m.minModule(), 1e-9);
+        assertEquals("L-2025-0388", decodeDataMatrix(m).getText());
+        // The solid sides of the finder pattern are the left one and the bottom one, right after the quiet zone.
+        for (int i = 1; i < 15; i++) {
+            assertTrue(m.isDark(1, i));
+            assertTrue(m.isDark(i, 14));
+            assertFalse(m.isDark(0, i));
+            assertFalse(m.isDark(i, 15));
+        }
+        assertEquals("Peña Ceràmica, 120 €", decodeDataMatrix(modules("\tBarcode: Peña Ceràmica, 120 €", "\t\tAlt: Datos",
+                "\t\tBarcode format: data-matrix")).getText());
+    }
+
+    /** A GS1 Data Matrix starts with FNC1, and has another one after a value of variable length that is not the last. */
+    @Test
+    void aGs1DataMatrixIsReadBack() throws Exception {
+        DecoderResult result = decodeDataMatrix(modules("\tBarcode: (01)09501101530003(10)AB-123(17)261231",
+                "\t\tAlt: Etiqueta", "\t\tBarcode format: gs1-data-matrix"));
+        // The decoder of ZXing writes each FNC1 as a group separator, the first one too.
+        assertEquals((char) 0x1D + "0109501101530003" + "10AB-123" + (char) 0x1D + "17261231", result.getText());
+        // The symbology modifier of a GS1 Data Matrix: ]d2.
+        assertEquals(2, result.getSymbologyModifier());
+        // What does not fit in a GS1-128 fits in a GS1 Data Matrix: capitals, an FNC1 between them and an odd digit.
+        String longer = "(10)" + "A".repeat(30) + "(21)" + "B".repeat(30) + "(30)123(01)09501101530003";
+        assertEquals((char) 0x1D + "10" + "A".repeat(30) + (char) 0x1D + "21" + "B".repeat(30) + (char) 0x1D + "30123"
+                + (char) 0x1D + "0109501101530003", decodeDataMatrix(modules("\tBarcode: " + longer,
+                "\t\tAlt: Etiqueta", "\t\tBarcode format: gs1-data-matrix")).getText());
+        // A symbol of several regions (more than 26 × 26 modules), each one with its finder pattern.
+        String regions = "(10)" + "A".repeat(80) + "(21)" + "B".repeat(80);
+        Modules big = modules("\tBarcode: " + regions, "\t\tAlt: Etiqueta", "\t\tBarcode format: gs1-data-matrix");
+        assertTrue(big.columns() > 28, "columns: " + big.columns());
+        assertEquals((char) 0x1D + "10" + "A".repeat(80) + (char) 0x1D + "21" + "B".repeat(80),
+                decodeDataMatrix(big).getText());
+    }
+
+    @Test
+    void aPdf417HasRowsThreeModulesTall() {
+        Modules m = modules("\tBarcode: M1NOGAL/CARMEN EABC123 BCNMADIB 2714", "\t\tAlt: Tarjeta",
+                "\t\tBarcode format: pdf417");
+        assertTrue(m.rows() >= 3 + 2 * Barcodes.PDF417_QUIET_ZONE, "rows: " + m.rows());
+        assertEquals(0.33 * Value.POINTS_PER_MM, m.moduleWidth(), 1e-9);
+        assertEquals(3 * m.moduleWidth(), m.moduleHeight(), 1e-9);
+        // Every row starts with the start pattern, whose first bar is 8 modules wide, after the quiet zone.
+        for (int y = Barcodes.PDF417_QUIET_ZONE; y < m.rows() - Barcodes.PDF417_QUIET_ZONE; y++) {
+            assertFalse(m.isDark(Barcodes.PDF417_QUIET_ZONE - 1, y));
+            for (int x = 0; x < 8; x++) {
+                assertTrue(m.isDark(Barcodes.PDF417_QUIET_ZONE + x, y));
+            }
+            assertFalse(m.isDark(Barcodes.PDF417_QUIET_ZONE + 8, y));
+        }
+        assertEquals(2, Barcodes.pdf417Correction(40));
+        assertEquals(3, Barcodes.pdf417Correction(41));
+        assertEquals(4, Barcodes.pdf417Correction(161));
+        assertEquals(5, Barcodes.pdf417Correction(321));
+    }
+
+    /** A GS1-128 is a Code 128 whose first character is FNC1: the reader says so with the identifier ]C1. */
+    @Test
+    void aGs1128IsReadBack() throws Exception {
+        Modules m = modules("\tBarcode: (01)09501101530003(10)AB-123(17)261231", "\t\tAlt: Etiqueta",
+                "\t\tBarcode format: gs1-128");
+        com.google.zxing.Result result = new Code128Reader().decodeRow(0, row(m),
+                Map.of(com.google.zxing.DecodeHintType.ASSUME_GS1, Boolean.TRUE));
+        assertEquals("]C1" + "0109501101530003" + "10AB-123" + (char) 0x1D + "17261231", result.getText());
+        assertEquals(1, m.rows());
+        assertFalse(m.isDark(Barcodes.CODE_128_QUIET_ZONE - 1, 0));
+        assertTrue(m.isDark(Barcodes.CODE_128_QUIET_ZONE, 0));
+        assertNull(m.text());
+    }
+
+    @Test
+    void gs1DataThatCannotBeEncoded() {
+        String[] wrong = {
+            "0109501101530003", "is a list of application identifiers",
+            "(01)09501101530003(10", "is a list of application identifiers",
+            "(1)23", "2 to 4 digits",
+            "(10)", "has no value",
+            "(10)AB#1", "'#' (U+0023)",
+            "(01)0950110153000", "is 14 digits",
+            "(01)09501101530004", "The check digit of (01)09501101530004 is 3, not 4",
+            "(310)001250", "have 4 digits",
+            "(10)" + "A".repeat(91), "91 characters",
+            "(10)" + "A".repeat(30) + "(21)" + "B".repeat(30), "a GS1-128 holds at most 48",
+        };
+        for (int i = 0; i < wrong.length; i += 2) {
+            InvalidModelException e = error("\tBarcode: " + wrong[i], "\t\tAlt: Etiqueta", "\t\tBarcode format: gs1-128");
+            assertEquals(ErrorCode.BARCODE_DATA, e.errorCode(), wrong[i]);
+            assertTrue(e.getMessage().contains(wrong[i + 1]), e.getMessage());
+        }
+        InvalidModelException longMatrix = error("\tBarcode: (10)" + "A".repeat(90) + "(21)X".repeat(600),
+                "\t\tAlt: Etiqueta", "\t\tBarcode format: gs1-data-matrix");
+        assertTrue(longMatrix.getMessage().contains("does not fit in a Data Matrix"), longMatrix.getMessage());
+        InvalidModelException matrix = error("\tBarcode: " + "x".repeat(3000), "\t\tAlt: Datos",
+                "\t\tBarcode format: data-matrix");
+        assertTrue(matrix.getMessage().contains("does not fit in a Data Matrix"), matrix.getMessage());
+        InvalidModelException stacked = error("\tBarcode:", "\t\tAlt: Datos", "\t\tBarcode format: pdf417",
+                "\t\tContent >>", "\t\t\t" + "x".repeat(3000));
+        assertTrue(stacked.getMessage().contains("does not fit in a PDF417"), stacked.getMessage());
+    }
+
+    @Test
+    void checkDigitOfAGtinAndAnSscc() {
+        assertEquals(3, Barcodes.checkDigit("0950110153000"));
+        assertEquals(1, Barcodes.checkDigit("39501101530000001"));
+    }
+
+    /** The text of an EAN-13: the first digit in the quiet zone, the others under their seven modules, long guards. */
+    @Test
+    void theReadableTextOfAnEan13() {
+        Modules m = modules("\tBarcode: 841234567890", "\t\tAlt: Producto", "\t\tBarcode format: ean-13",
+                "\t\tReadable text: true", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 9");
+        BarcodeText text = m.text();
+        assertEquals("8412345678905", text.text());
+        assertEquals(13, text.labels().size());
+        assertEquals(new BarcodeText.Label("8", 4, 7), text.labels().get(0));
+        assertEquals(new BarcodeText.Label("4", 14, 7), text.labels().get(1));
+        assertEquals(new BarcodeText.Label("5", 49, 7), text.labels().get(6));
+        assertEquals(new BarcodeText.Label("6", 61, 7), text.labels().get(7));
+        assertEquals(new BarcodeText.Label("5", 96, 7), text.labels().get(12));
+        // Start, middle and end guards: 3, 5 and 3 modules.
+        assertEquals(11, text.longBars().cardinality());
+        assertTrue(text.isLong(11) && text.isLong(13) && text.isLong(56) && text.isLong(60) && text.isLong(103)
+                && text.isLong(105));
+        assertFalse(text.isLong(10) || text.isLong(14) || text.isLong(106));
+        // The text does not change the bars.
+        assertEquals(22.85 * Value.POINTS_PER_MM, m.naturalHeight(), 1e-9);
+    }
+
+    @Test
+    void theReadableTextOfACode128IsOneCenteredPiece() {
+        Modules code = modules("\tBarcode: AL-2025-0388", "\t\tAlt: Albarán", "\t\tBarcode format: code-128",
+                "\t\tReadable text: true", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 9");
+        assertEquals(java.util.List.of(new BarcodeText.Label("AL-2025-0388", 0, code.columns())), code.text().labels());
+        assertTrue(code.text().longBars().isEmpty());
+        Modules gs1 = modules("\tBarcode: (00)395011015300000011", "\t\tAlt: Bulto", "\t\tBarcode format: gs1-128",
+                "\t\tReadable text: true", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 9");
+        assertEquals("(00)395011015300000011", gs1.text().text());
+    }
+
+    @Test
+    void readableTextNeedsABarcodeOfOneRowAndAFont() {
+        InvalidModelException qr = error("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace", "\t\tReadable text: true");
+        assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, qr.errorCode());
+        assertTrue(qr.getMessage().contains("the Barcode is qr"), qr.getMessage());
+        assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, error("\tBarcode: L-1", "\t\tAlt: Lote",
+                "\t\tBarcode format: data-matrix", "\t\tReadable text: true").errorCode());
+        assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, error("\tBarcode: L-1", "\t\tAlt: Lote",
+                "\t\tBarcode format: pdf417", "\t\tError correction: high").errorCode());
+        // Readable text: false is the default, and says nothing in any format.
+        assertNull(modules("\tBarcode: https://stxt.dev", "\t\tAlt: Enlace", "\t\tReadable text: false").text());
+        assertEquals(ErrorCode.TEXT_WITHOUT_FONT, error("\tBarcode: STXT", "\t\tAlt: Referencia",
+                "\t\tBarcode format: code-128", "\t\tReadable text: true").errorCode());
+        assertEquals(ErrorCode.TEXT_WITHOUT_FONT_SIZE, error("\tBarcode: STXT", "\t\tAlt: Referencia",
+                "\t\tBarcode format: code-128", "\t\tReadable text: true", "\t\tTypography:",
+                "\t\t\tFont: IBM Plex Sans").errorCode());
+        // With a readable text, the Typography allows its font; still not what a line of text needs.
+        InvalidModelException align = error("\tBarcode: STXT", "\t\tAlt: Referencia", "\t\tBarcode format: code-128",
+                "\t\tReadable text: true", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tSize: 9",
+                "\t\t\tAlign: center");
+        assertEquals(ErrorCode.BARCODE_PROPERTY_WITHOUT_EFFECT, align.errorCode());
+        assertTrue(align.getMessage().contains("Align has no effect"), align.getMessage());
     }
 }

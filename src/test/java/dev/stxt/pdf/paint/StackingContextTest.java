@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.fragment.TextLine;
 import static dev.stxt.pdf.tree.TextRuns.link;
 import static dev.stxt.pdf.tree.TextRuns.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,7 +79,7 @@ class StackingContextTest {
         }
 
         @Override
-        public void image(Box box, Rect content, Radii radii) {
+        public void image(Box box, Rect content, Radii radii, List<TextLine> text) {
             imageRadii.add(corners(radii));
             events.add("image");
         }

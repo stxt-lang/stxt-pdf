@@ -1,5 +1,9 @@
 package dev.stxt.pdf.paint;
 
+import java.util.List;
+
+import dev.stxt.pdf.fragment.TextLine;
+
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
@@ -81,8 +85,12 @@ public interface Canvas {
      * the corners {@code radii} (those of the content box). A generated image, such as a {@code Barcode}
      * (reference/components/barcode.md), has no file: its modules ({@link Box#modules()}) are painted in the color
      * of its typography, placed according to {@link dev.stxt.pdf.model.Modules#fit()}.
+     *
+     * @param text the line of the readable text of a barcode ({@code Readable text}), relative to {@code content}, of
+     *             which it takes the bottom: the bars take what is above it, and it is painted in the font and the
+     *             color of the box, as part of the image. Empty in any other image
      */
-    void image(Box box, Rect content, Radii radii);
+    void image(Box box, Rect content, Radii radii, List<TextLine> text);
 
     /**
      * An image inside the text of the box ({@link InlineImage}, reference/common/text-formatting.md), drawn in

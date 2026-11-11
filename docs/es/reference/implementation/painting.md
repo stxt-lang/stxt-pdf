@@ -238,7 +238,11 @@ configuración sin `Name` (la `D` y las de `Configs`) y le quita sus `AS`: PDF/U
 Una imagen generada, como un `Barcode` (`Box.modules()`), no pasa por `PdfImages`: `PdfCanvas.modules` coloca la matriz
 con `ImageFit.modules` (`Modules.fit()`: `inside` si tiene varias filas, `stretch` si tiene una) y escribe un rectángulo
 por cada tramo de módulos oscuros seguidos de cada fila (`Modules.rects`), todos en un mismo trazado que se rellena una vez (`f`) con
-el color de la tipografía, dentro del recorte de las esquinas y del contenido marcado de su figura.
+el color de la tipografía, dentro del recorte de las esquinas y del contenido marcado de su figura. `Canvas.image` recibe
+las líneas del fragmento, que solo tiene un código de barras con texto legible: `ImageFit.modules` deja a las barras la
+caja de contenido hasta esa línea y alarga hasta su mitad las barras largas (`Modules.rects(Rect, double)`,
+`BarcodeText.isLong`), y el lienzo pinta cada tramo de la línea con `text`, en la fuente y el color de la caja, dentro
+del mismo contenido marcado: en el PDF etiquetado el texto es parte de la `Figure`, no un texto aparte.
 
 > **Decisión:** un solo trazado y un solo relleno, y no un relleno por módulo: dos rectángulos rellenados por separado
 > dejan ver una línea fina entre ellos en algunos visores por el suavizado, que en un QR se lee como un módulo claro.

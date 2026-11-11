@@ -497,7 +497,7 @@ public final class StackingContext {
                     p.f().border().right() + p.f().padding().right(),
                     p.f().border().bottom() + p.f().padding().bottom(),
                     p.f().border().left() + p.f().padding().left());
-            canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside));
+            canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside), p.f().lines());
         } else if (p.f().box().role() == Role.LEADER) {
             paintLeader(canvas, p);
         } else {

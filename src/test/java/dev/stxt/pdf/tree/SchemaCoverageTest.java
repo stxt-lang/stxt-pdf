@@ -178,6 +178,7 @@ class SchemaCoverageTest {
             Map.entry("Barcode format", "Barcode format: qr"),
             Map.entry("Error correction", "Error correction: high"),
             Map.entry("Quiet zone", "Quiet zone: 5"),
+            Map.entry("Readable text", "Readable text: true"),
             // Styles
             Map.entry("Named color", "Named color: brand #12315A"));
 
@@ -277,6 +278,9 @@ class SchemaCoverageTest {
         t.put("Typography > Position", new Template(HEADER + "\t\tFor style: sup\n\t\t\tTypography:\n\t\t\t\t{}\n"
                 + "\tText: m[2]{sup}\n\t\tTypography:\n\t\t\tMarkup: markdown"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
+        // Readable text is only of a barcode of one row.
+        t.put("Barcode > Readable text", new Template(HEADER + "\tBarcode: STXT-1\n\t\tAlt: Referencia\n"
+                + "\t\tBarcode format: code-128\n\t\t{}", Set.of("Barcode format")));
         // Below side boxes needs a side box before the element: the template of each element, with one in front.
         String side = "\tImage: test/square.png\n\t\tSide: left\n";
         for (String element : List.of("Block", "Text", "Paragraph", "Heading 1", "Heading 2", "Heading 3", "Heading 4",

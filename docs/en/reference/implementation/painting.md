@@ -242,7 +242,11 @@ error of those that have not been removed. `LayerUtility` also copies the layers
 A generated image, such as a `Barcode` (`Box.modules()`), does not go through `PdfImages`: `PdfCanvas.modules` places the
 matrix with `ImageFit.modules` (`Modules.fit()`: `inside` if it has several rows, `stretch` if it has one) and writes one
 rectangle for each run of consecutive dark modules of each row (`Modules.rects`), all in a single path that is filled once (`f`) with
-the color of the typography, inside the clip of the corners and the marked content of its figure.
+the color of the typography, inside the clip of the corners and the marked content of its figure. `Canvas.image` gets
+the lines of the fragment, which only a barcode with a readable text has: `ImageFit.modules` leaves the bars the content
+box down to that line and lengthens the long bars to its middle (`Modules.rects(Rect, double)`, `BarcodeText.isLong`),
+and the canvas paints each run of the line with `text`, in the font and the color of the box, inside the same marked
+content: in the tagged PDF the text is part of the `Figure`, not a separate text.
 
 > **Decision:** a single path and a single fill, and not one fill per module: two rectangles filled separately show a thin
 > line between them in some viewers because of anti-aliasing, which in a QR code reads as a light module.

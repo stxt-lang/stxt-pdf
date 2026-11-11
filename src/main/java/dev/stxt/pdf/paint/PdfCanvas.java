@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.Colors;
 import dev.stxt.pdf.model.DecorationMetrics;
 import dev.stxt.pdf.model.FontFace;
@@ -292,12 +293,12 @@ public final class PdfCanvas implements Canvas {
      * <em>artifact</em> ({@link PdfStructure}).</p>
      */
     @Override
-    public void image(Box box, Rect content, Radii radii) {
+    public void image(Box box, Rect content, Radii radii, List<TextLine> text) {
         if (content.width() <= 0 || content.height() <= 0) {
             return;
         }
         if (box.modules() != null) {
-            modules(box, content, radii);
+            modules(box, content, radii, text);
             return;
         }
         io(() -> {
@@ -356,14 +357,27 @@ public final class PdfCanvas implements Canvas {
         });
     }
 
+    /** The readable text of a barcode: each run of its line, with the baseline its font gives it in the line. */
+    private void readableText(Box box, Rect content, List<TextLine> text) {
+        for (TextLine line : text) {
+            FontFace font = box.style().typography().fontFace();
+            double baseline = vertical(font).baseline(content.y() + line.y(), line.height(), line.fontSize());
+            for (TextLine.Run run : line.runs()) {
+                text(content.x() + line.x() + run.x(), baseline, run.text(), font, line.fontSize(),
+                        box.style().typography().color(), 0, 0);
+            }
+        }
+    }
+
     /**
      * The modules of a generated image, such as a {@code Barcode} (reference/components/barcode.md), in the
      * {@code Color} of its {@code Typography}: one rectangle per run of dark modules of each row, all in a single path
      * that is filled once, so that no seam is seen between neighboring modules. The light ones are not painted: they
-     * are the background of the box.
+     * are the background of the box. The readable text of a barcode ({@code text}) goes in the same marked content, in
+     * the same color: it is part of the figure, which its {@code Alt} describes.
      */
-    private void modules(Box box, Rect content, Radii radii) {
-        List<Rect> modules = ImageFit.modules(box.modules(), content);
+    private void modules(Box box, Rect content, Radii radii, List<TextLine> text) {
+        List<Rect> modules = ImageFit.modules(box.modules(), content, text);
         io(() -> {
             tagging.beginImage(box, content);
             out.saveGraphicsState();
@@ -375,6 +389,7 @@ public final class PdfCanvas implements Canvas {
                 }
                 out.fill();
             });
+            readableText(box, content, text);
             out.restoreGraphicsState();
             out.endMarkedContent();
         });

@@ -528,6 +528,14 @@ el ancho y el alto en una matriz, y solo el ancho en una fila estirada (`Modules
 `BARCODE_TOO_SMALL`, con la línea de su caja ([Barcode](../components/barcode.md#módulo-mínimo)). El mínimo lo pone el
 generador en `Modules`, así que `ModuleSizes` no sabe de formatos.
 
+El texto legible de un código de barras (`Readable text`, [Barcode](../components/barcode.md#texto-legible)) lo coloca
+`BarcodeTextLayout` (`layout`), que es quien tiene el medidor: `Modules.text()` (`model.BarcodeText`) da los tramos del
+texto en módulos, cada uno centrado bajo los suyos, y de ellos sale una `TextLine` al pie de la caja de contenido, del
+alto de la fuente (ascendente más descendente), con un tramo (`TextLine.Run`) por pieza. `ImageLayout` la deja en las
+líneas del fragmento, y `Engine.natural` suma ese alto al natural de los módulos. `ModuleSizes` comprueba después, lo
+quite o no `Check.BARCODE_SIZE`, que cada tramo cabe en la caja de contenido y no pisa al anterior y que la línea deja
+alto a las barras (`BARCODE_TEXT_OVERFLOW`).
+
 > **Decisión:** el módulo mínimo se comprueba sobre el resultado paginado, como los desbordamientos, y no al medir la imagen
 > (`Images.natural`), porque un código se maqueta con tamaños provisionales al medir un `Stack` o un `Grid`.
 > *Alternativa descartada:* comprobarlo en `ImageLayout`, que daría errores por pasadas de medida.

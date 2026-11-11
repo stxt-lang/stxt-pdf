@@ -1,0 +1,13 @@
+# Five barcodes one after the other from y = 20 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: matrix
+			Rect: 20 20 40 40
+		Fragment: gs1
+			Rect: 20 60 40 40
+		Fragment: pdf417
+			Rect: 20 100 160 40
+		Fragment: label
+			Rect: 20 140 160 36
+		Fragment: ean
+			Rect: 20 176 100 68.84

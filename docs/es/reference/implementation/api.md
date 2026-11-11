@@ -145,7 +145,7 @@ Converter converter = Converter.builder().exclude(Check.CONTRAST, Check.PDF_IMAG
 ```
 
 `Engine` recibe las que se quitan y se las pasa a `Images`; si no se quita `BARCODE_SIZE`, comprueba los módulos con
-`ModuleSizes` después de `Overflow`. El contraste lo comprueba `Converter.layOut` después de maquetar.
+`ModuleSizes` después de `Overflow` (el texto legible de un código de barras se comprueba siempre). El contraste lo comprueba `Converter.layOut` después de maquetar.
 
 > **Decisión:** una sola forma de quitar comprobaciones, un enum y `exclude`, en vez de un booleano por cada una: por
 > defecto se hace todo y lo que se quita se nombra. *Alternativa descartada:* `checkContrast(boolean)` y un método más por

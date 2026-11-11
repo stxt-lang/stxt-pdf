@@ -164,6 +164,7 @@ final class StyleRules {
             "column-count", "min-column-width", "separator", "separator-color", "separator-style",
             "balance-columns",
             "marker", "marker-suffix", "marker-image", "fit", "barcode-format", "error-correction", "quiet-zone",
+            "readable-text",
             "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
             "drop-cap", "side", "below-side-boxes", "isolate-margins", "trim-margins",
             "bullet-markers", "number-markers", "table-column-sizes",

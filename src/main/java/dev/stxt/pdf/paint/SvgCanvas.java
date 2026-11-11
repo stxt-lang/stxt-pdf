@@ -1,5 +1,6 @@
 package dev.stxt.pdf.paint;
 
+import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.fragment.Page;
 import dev.stxt.pdf.layout.LaidOutDocument;
 import dev.stxt.pdf.model.Cancellation;
@@ -421,9 +422,9 @@ public final class SvgCanvas implements Canvas {
      * PDF inside an SVG: the page goes as a PNG, at 144 pixels per inch.</p>
      */
     @Override
-    public void image(Box box, Rect content, Radii radii) {
+    public void image(Box box, Rect content, Radii radii, List<TextLine> text) {
         if (box.modules() != null) {
-            modules(box, content, radii);
+            modules(box, content, radii, text);
             return;
         }
         if (resources == null) {
@@ -466,17 +467,25 @@ public final class SvgCanvas implements Canvas {
     /**
      * The modules of a generated image, such as a {@code Barcode} (reference/components/barcode.md): a path with one
      * rectangle per run of dark modules of each row, in the {@code Color} of its {@code Typography}, clipped to the
-     * content box with its corners.
+     * content box with its corners, and then the readable text of a barcode ({@code text}), in the same color.
      */
-    private void modules(Box box, Rect content, Radii radii) {
+    private void modules(Box box, Rect content, Radii radii, List<TextLine> text) {
         String id = "c" + ids++;
         svg.append("<clipPath id=\"").append(id).append("\"><path d=\"").append(path(content, radii))
                 .append("\"/></clipPath>\n<path clip-path=\"url(#").append(id).append(")\" d=\"");
-        for (Rect m : ImageFit.modules(box.modules(), content)) {
+        for (Rect m : ImageFit.modules(box.modules(), content, text)) {
             svg.append(String.format(Locale.ROOT, "M%.2f %.2fh%.2fv%.2fh%.2fz", m.x(), m.y(), m.width(), m.height(),
                     -m.width()));
         }
         svg.append("\"").append(fillAttr(box.style().typography().color())).append("/>\n");
+        for (TextLine line : text) {
+            FontFace font = box.style().typography().fontFace();
+            double baseline = vertical(font).baseline(content.y() + line.y(), line.height(), line.fontSize());
+            for (TextLine.Run run : line.runs()) {
+                text(content.x() + line.x() + run.x(), baseline, run.text(), font, line.fontSize(),
+                        box.style().typography().color(), 0, 0);
+            }
+        }
     }
 
     /**

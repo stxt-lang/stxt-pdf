@@ -20,6 +20,7 @@ public final class ImageStyle extends StyleGroup {
     private ErrorCorrection errorCorrection = ErrorCorrection.MEDIUM;
     /** Quiet zone of a {@code Barcode}, in modules on each side; {@code null} = that of its format. */
     private Integer quietZone;
+    private boolean readableText;
 
     ImageStyle() {
     }
@@ -75,6 +76,16 @@ public final class ImageStyle extends StyleGroup {
     /** The quiet zone of a {@code Barcode}, in modules on each side; {@code null} if it is not declared. */
     public Integer quietZone() {
         return quietZone;
+    }
+
+    /** Whether a one-dimensional {@code Barcode} has its data as text under its bars ({@code Readable text}). */
+    public boolean readableText() {
+        return readableText;
+    }
+
+    void setReadableText(boolean v) {
+        writable();
+        readableText = v;
     }
 
     void setQuietZone(int v) {

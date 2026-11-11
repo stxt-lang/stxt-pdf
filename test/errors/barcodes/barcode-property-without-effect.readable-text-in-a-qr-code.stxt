@@ -1,0 +1,13 @@
+# Case: Readable text in a QR code, which has no bars to go under
+# Code: BARCODE_PROPERTY_WITHOUT_EFFECT
+# Line: 13
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Barcode: https://example.com/verify/1234
+			Alt: Código de verificación
+			Readable text: true

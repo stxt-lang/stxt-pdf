@@ -11,10 +11,29 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
 `model.FootnoteNumberFormat` instead of a `model.NumberFormat`. `model.RunStyle` has a tenth component, `position`. A
 second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. `fragment.Rule` has
-a sixth component, `style` (a `model.LineStyle`); its constructor with five arguments still makes a solid line. No
-document that was valid changes.
+a sixth component, `style` (a `model.LineStyle`); its constructor with five arguments still makes a solid line.
+`paint.Canvas.image` takes a fourth argument, the lines of the readable text of a barcode (empty in any other image),
+and `model.Modules` has a seventh component, `text` (a `model.BarcodeText`, or `null`); its constructors with five and
+six arguments still make a drawing without text. No document that was valid changes.
 
 ### Added
+
+- **More barcode formats and the text under the bars.** `Barcode format` gains `data-matrix` (a square Data Matrix
+  ECC 200), `pdf417`, and the two GS1 symbologies, `gs1-128` and `gs1-data-matrix`. GS1 data is written as on the
+  label, with each application identifier in parentheses before its value, `(01)09501101530003(17)261231(10)AB-123`:
+  the engine puts the `FNC1` at the start and after each value of variable length, and checks the form, the length of
+  the identifiers of predefined length and the check digit of `(00)`, `(01)` and `(02)` (`BARCODE_DATA`). A Data Matrix
+  has modules of 0.5 mm and a quiet zone of 1; a PDF417, modules of 0.33 mm in rows three modules high, a quiet zone of
+  2 and the error correction level its standard recommends for its data; both are drawn whole and centered, like a QR
+  code, and their narrowest module is 0.25 mm. `Readable text: true` puts the data as text under the bars of a
+  `code-128`, a `gs1-128` or an `ean-13`, in the font, size and color of the `Typography` of the `Barcode`, which then
+  also allows `Font`, `Size`, `Bold`, `Weight` and `Italic`: in an EAN-13 as on a product (the first digit at the left
+  of the bars, each of the others under its seven modules and the guard bars going down between them), and one
+  centered line in the others. Its height is added to the natural height of the code. A text that does not fit under
+  its bars is the new error `BARCODE_TEXT_OVERFLOW`; in a QR code, a Data Matrix or a PDF417, `Readable text` is
+  `BARCODE_PROPERTY_WITHOUT_EFFECT`. In the tagged PDF the text is part of the figure of the code. `model.BarcodeFormat`
+  gains `DATA_MATRIX`, `GS1_DATA_MATRIX`, `PDF417` and `GS1_128`, and `model.BarcodeText` is new. "Formats", "GS1 data"
+  and "Readable text" in the reference of `Barcode`.
 
 - **Dashed and dotted borders.** `Border style`, of `Box`, draws the border with dashes (`dashed`) or dots (`dotted`);
   `solid` is the default. One value for the four sides: a line to cut along or to sign on is a box with a single side

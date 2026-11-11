@@ -396,6 +396,12 @@ public enum ErrorCode {
      * {@code Barcode}); the caller can remove the check ({@link dev.stxt.pdf.model.Check#BARCODE_SIZE}).
      */
     BARCODE_TOO_SMALL,
+    /**
+     * The readable text of a {@code Barcode} ({@code Readable text}) does not fit under its bars: a piece is wider
+     * than the modules it goes under and runs into the next one or out of the content box, or the text is as tall as
+     * the box (line of the {@code Barcode}).
+     */
+    BARCODE_TEXT_OVERFLOW,
 
     // --- Fonts --------------------------------------------------------------------------------
     /** {@code Font} is not in the fonts folder. */
