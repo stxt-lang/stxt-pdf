@@ -1,5 +1,6 @@
 package dev.stxt.pdf.layout;
 
+import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Insets;
 
 import static dev.stxt.pdf.model.Tolerance.EPSILON;
@@ -150,6 +151,26 @@ public record Slice(double height, Insets border, Insets padding, boolean finish
 
     private static Insets sides(Insets all, boolean top, boolean bottom) {
         return new Insets(top ? all.top() : 0, all.right(), bottom ? all.bottom() : 0, all.left());
+    }
+
+    /**
+     * How far down the content of this fragment goes in its content box ({@code Vertical} of a {@code Cell},
+     * reference/components/table.md): half of what the content leaves over with {@code CENTER}, all of it with
+     * {@code END} and nothing with the others. Only in the fragment the box ends in: in the previous ones the content
+     * goes on to the end of the page. Content taller than the box is not moved up.
+     *
+     * @param vertical where the content goes
+     * @param content  height of the content placed in this fragment
+     */
+    public double contentOffset(Alignment vertical, double content) {
+        if (!finished || (vertical != Alignment.CENTER && vertical != Alignment.END)) {
+            return 0;
+        }
+        double free = contentHeight() - Math.max(0, content);
+        if (free <= EPSILON) {
+            return 0;
+        }
+        return vertical == Alignment.CENTER ? free / 2 : free;
     }
 
     /** Height of the content box of this fragment. */

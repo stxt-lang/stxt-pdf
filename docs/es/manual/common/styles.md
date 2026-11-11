@@ -89,7 +89,7 @@ Document (dev.stxt.pdf):
 - **`Grow`, `Shrink` y `Base size` son del `Item`.** Los da la regla del elemento que va dentro del `Item` (aquí,
   `For style: name`). Si el `Item` también los declara, gana el `Item`.
 - **`Horizontal` y `Vertical`, en una regla, son las del `Stack` o el `Grid`.** La alineación de un ítem se escribe en
-  su `Item`.
+  su `Item`. `Vertical` es también la de una `Cell`: dónde va su contenido en el alto de la fila.
 - **Lo que identifica a un elemento o es su contenido no va en reglas:** `Id`, `Link`, `Alt`, `Offset`, `Rotate`, los
   números de una lista (`First number`, `Number`), `Span`, `Row header` y el texto. La lista completa, por elemento, está en la
   [referencia](../../reference/common/styles.md#propiedades-de-elemento).

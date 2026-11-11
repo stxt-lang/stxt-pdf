@@ -110,6 +110,7 @@ Text: Quarterly results
 | `Link` | `https://...`, `http://...`, `mailto:...` or `#id` | none | Elements except `Markdown` and `Table of contents` | Makes the whole box clickable ([Links](links.md)). It is not inherited and does not change the appearance. |
 | `Isolate margins` | boolean | `false` | `Block`, `Frame` | Stops margin merging with the children ([Block](../components/block.md#margin-merging)). |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Drops the margins of the children that touch the top border of the box, the bottom one or both ([Block](../components/block.md#trimming-the-margins-trim-margins)). |
+| `Vertical` | `start`, `center`, `end` | `start` | `Cell` | Where the content of the cell goes in the height it has left over ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)). In `Stack`, `Grid`, `Item` and `Area` it is the alignment or the distribution of each one. |
 | `Side` | `left`, `right` | none | `Image`, `Barcode`, `Block`, `Figure` | Side box: the text that follows it runs beside it ([Block](../components/block.md#side-boxes-side)). |
 | `Below side boxes` | boolean | `false` | `Text`, `Paragraph`, `Block`, headings, `Markdown`, `Image`, `Barcode`, `Figure` | Moves the box below the side boxes before it ([Block](../components/block.md#side-boxes-side)). |
 | `Drop cap` | integer from 2 to 5 | none | `Paragraph` | Drop cap of that many lines ([Text](../components/text.md#drop-cap-drop-cap)). |
@@ -205,7 +206,7 @@ once, and the elements, as many times as needed.
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (required), `Footer rows` |
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
-| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`; elements except headings |
+| `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`, `Vertical`; elements except headings |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; in-flow elements |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |

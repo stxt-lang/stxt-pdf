@@ -1,0 +1,113 @@
+# Vertical of a Cell (reference/components/table.md#vertical-alignment-of-the-content-vertical). Page area of
+# 260 × 160 from (20, 20). Every cell has Border: 0.5 and stays stretched to its row: what moves is its content.
+#
+# t1: five columns of 52 and one row, 60 high (the block of a1, 59 plus the border). The cells with a value (v2
+#   center, v3 end) move their line; the cells with elements (e4 center, e5 end from the rule For style: bottom) move
+#   their block, 20 high.
+# t2: s1 takes up the two rows (20 and 30, plus the border) and centers its line in the height of both.
+# t3: its row does not fit in what is left of page 1 and is split. p1 measures 100 (60 + 40) and k1, with
+#   Vertical: end, 80 (60 + 20): on page 1 their content reaches the end of the page and does not move; on page 2 the
+#   row measures what is left of p1, and what is left of k1, 20 shorter, goes to its bottom.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Table
+			Box:
+				Margin: 0 0 10 0
+		For element: Cell
+			Box:
+				Border: 0.5
+				Border color: #333333
+		For style: bottom
+			Vertical: end
+		For style: tall
+			Box:
+				Height: 59
+				Background: #F1EFE8
+		For style: mark
+			Box:
+				Height: 20
+				Background: #B5D4F4
+	Section:
+		Table:
+			Id: t1
+			Column sizes: 52 52 52 52 52
+			Body rows:
+				Row:
+					Cell:
+						Id: a1
+						Block:
+							Style: tall
+					Cell: Centro
+						Id: v2
+						Vertical: center
+					Cell: Abajo
+						Id: v3
+						Vertical: end
+					Cell:
+						Id: e4
+						Vertical: center
+						Block:
+							Id: m4
+							Style: mark
+					Cell:
+						Id: e5
+						Style: bottom
+						Block:
+							Id: m5
+							Style: mark
+		Table:
+			Id: t2
+			Column sizes: 130 130
+			Body rows:
+				Row:
+					Cell: Dos filas
+						Id: s1
+						Span: 2 1
+						Vertical: center
+					Cell:
+						Id: r1
+						Box:
+							Height: 20
+				Row:
+					Cell:
+						Id: r2
+						Box:
+							Height: 30
+		Table:
+			Id: t3
+			Column sizes: 130 130
+			Body rows:
+				Row:
+					Cell:
+						Id: p1
+						Block:
+							Id: p1a
+							Box:
+								Height: 60
+								Background: #E1F0E8
+						Block:
+							Id: p1b
+							Box:
+								Height: 40
+								Background: #F0E8E1
+					Cell:
+						Id: k1
+						Vertical: end
+						Block:
+							Id: k1a
+							Box:
+								Height: 60
+								Background: #E1E8F0
+						Block:
+							Id: k1b
+							Style: mark

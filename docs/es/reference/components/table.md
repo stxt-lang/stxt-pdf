@@ -39,10 +39,11 @@ Table:
 | `Split rows` | `true`, `false` | `true` | `Table` | Una fila que no cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo; con `false`, pasa entera a la siguiente ([Cortes](#cortes)). |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
+| `Vertical` | `start`, `center`, `end` | `start` | `Cell` | Dónde va el contenido de la celda en el alto que le sobra ([Alineación vertical del contenido](#alineación-vertical-del-contenido-vertical)). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
-`Column sizes`, `Column align`, `Gap` y `Split rows` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Span` y
+`Column sizes`, `Column align`, `Gap`, `Split rows` y el `Vertical` de las celdas también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Span` y
 `Row header`, no. Sin `Column sizes`, propio o de una regla, es un error (`TABLE_COLUMN_SIZES_MISSING`). `Merge borders` (`true` o `false`, por defecto `false`)
 va en el `Box` de la `Table`, así que también vale en una regla: el borde entre dos celdas se dibuja una sola vez, el más
 ancho de los dos ([Bordes fusionados](#bordes-fusionados)).
@@ -89,14 +90,73 @@ natural y a la fracción lo que queda. Las filas se dimensionan como en `Grid`.
 
 Una `Cell` es una caja con dos formas, como un `Text`: con valor (`Cell: 100`), es una caja de texto de una línea, y sin
 valor, un bloque con elementos (cualquiera salvo los encabezados), o vacía si no tiene ninguno. Las dos cosas a la vez son
-un error (`CELL_CONTENT`). Un texto largo va en un `Paragraph`. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Span` y
-`Row header`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
+un error (`CELL_CONTENT`). Un texto largo va en un `Paragraph`. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`,
+`Row header`, `Trim margins` y `Vertical`. Los bordes son los de cada celda, separados: una línea entre filas se dibuja con el borde inferior de las celdas.
 Con `Merge borders: true`, el borde entre dos celdas se dibuja una sola vez ([Bordes fusionados](#bordes-fusionados)).
 Los márgenes de una celda la separan de su área, como en un `Grid`.
 
 > **Decisión:** `Row header: true` va en cada celda que es cabecera de su fila (el concepto de una factura, la hora de un
 > horario): sirve también para la etiqueta de un pie de totales o la tercera columna de una agenda. *Alternativa
 > descartada:* `Row header columns: N` en la `Table`, que solo sirve para columnas enteras.
+
+## Alineación vertical del contenido (`Vertical`)
+
+Una celda se estira al alto de su fila y su contenido empieza arriba. `Vertical` dice dónde va el contenido cuando la
+fila es más alta que él:
+
+```
+Styles:
+    For element: Header cell
+        Vertical: end
+Table:
+    Column sizes: * 60
+    Header rows:
+        Row:
+            Cell: Concepto
+            Cell:
+                Paragraph: Importe sin impuestos
+    Body rows:
+        Row:
+            Cell:
+                Paragraph: Mesa de comedor en nogal macizo, con dos alas abatibles.
+            Cell: 640,00
+                Vertical: center
+```
+
+- **Valores.** `start` (por defecto) deja el contenido arriba, `center` lo centra y `end` lo lleva abajo. Los demás
+  valores de `Vertical` (`stretch`, `justify`, `around`, `distribute`) son `VALUE_NOT_ALLOWED` en una celda, que
+  está siempre estirada y tiene un solo contenido que colocar.
+- **Qué se mueve.** La caja de la celda sigue estirada a su fila, con su `Background` y su `Border` enteros. Se mueve
+  su contenido dentro de su caja de contenido: la línea de una celda con valor, o todos sus elementos juntos. Lo que
+  sobra es el alto de la caja de contenido menos el del contenido: con `center` va la mitad encima, y con `end`, todo.
+  Un contenido tan alto como la celda, o más, no se mueve.
+- **Es el `Vertical` de un `Stack` vertical**, que dice dónde va lo que sobra ([Stack](stack.md)), y no el de un
+  `Area` de `Grid`, con el que la caja deja de estirarse ([Grid](grid.md)).
+- **Los márgenes** de los elementos de la celda que quedan dentro de ella cuentan como contenido: el de arriba del
+  primero y el de abajo del último. `Trim margins` los descarta ([Block](block.md#recortar-los-márgenes-trim-margins)).
+- **Desde una regla.** Lo dan `For element: Cell`, las reglas de posición, `For column`, `For style` y `For id`, con
+  la prioridad de [Estilo de las celdas](#estilo-de-las-celdas). `Table` y `Row` no lo declaran: una regla
+  `For element: Cell` dentro de la regla de la tabla hace lo mismo, y las reglas del `Style` y del `Id` de una `Row`
+  llegan a sus celdas.
+- **`Span` y `Height`.** Una celda que ocupa varias filas usa el alto de todas. Una celda con `Height` propio no
+  tiene caso especial: el contenido se coloca en su caja de contenido.
+- **Filas partidas.** En una fila que se parte entre páginas ([Cortes](#cortes)), el contenido se coloca en el
+  fragmento en el que la celda **termina**, con el alto de la caja de contenido de ese fragmento y el del contenido que
+  hay en él. En los fragmentos anteriores el contenido llega al corte y no se mueve. El contenido que terminó en una
+  página anterior se queda donde está: si la fila sigue por otra celda, lo que la celda mide en la página siguiente
+  queda vacío.
+
+> **Decisión:** `Vertical` en `Cell`, con `start`, `center` y `end`: el nombre y los valores que ya tiene la
+> alineación vertical en `Stack`, `Grid`, `Item` y `Area`. *Alternativa descartada:* una propiedad nueva
+> (`Vertical align: top | middle | bottom`), otro nombre para lo mismo y con valores que no son los del namespace.
+
+> **Decisión:** la celda no deja de estirarse y lo que se mueve es su contenido. Su fondo y su borde siguen llenando la
+> fila, y los bordes fusionados no cambian. *Alternativa descartada:* el `Vertical` de un `Area`, que encoge la caja a
+> su contenido y deja el fondo de la celda en mitad de la fila.
+
+> **Decisión:** en una fila partida el contenido no pasa de una página a otra para alinearse: se coloca en el fragmento
+> en que la celda termina, con lo que hay en él. *Alternativa descartada:* alinear respecto al alto de la fila sin
+> partir, que no es el de ninguna página.
 
 ## Estilo de las celdas
 

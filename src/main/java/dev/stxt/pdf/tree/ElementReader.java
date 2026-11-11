@@ -113,9 +113,10 @@ enum ElementReader {
 
     /**
      * The {@code Cell} of a table (reference/components/table.md): with a value it is a text box and, without one, a
-     * block. Its row ({@code wrapper}) gives it its {@code Typography}, as inheritance, and its {@code Break}.
+     * block. Its row ({@code wrapper}) gives it its {@code Typography}, as inheritance, and its {@code Break}. Its
+     * {@code Vertical} places its content in the height its row leaves over.
      */
-    CELL(Set.of(), null, Set.of("span")) {
+    CELL(PropertyReader.CELL, PropertyReader::cell, Set.of("span")) {
         @Override
         Layout layout(InlineNode n, Element kind) {
             return n.getText().isBlank() ? kind.layout() : Layout.INLINE;

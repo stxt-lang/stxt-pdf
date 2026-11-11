@@ -150,8 +150,8 @@ final class StyleRules {
      * how an element looks and distributes its content. Not those of its identity, content, structure or position
      * ({@code Id}, {@code Link}, {@code Alt}, {@code Span}, {@code First number}, {@code Offset}, {@code Rotate}...). A rule
      * gives one to an element only if the element could declare it ({@link #declares}). {@code Horizontal} and
-     * {@code Vertical} are those of a {@code Stack} or a {@code Grid}, never those of the {@code Item} or the
-     * {@code Area} that wraps the element.
+     * {@code Vertical} are those of a {@code Stack} or a {@code Grid}, and {@code Vertical}, also that of a {@code Cell};
+     * never those of the {@code Item} or the {@code Area} that wraps the element.
      */
     static final Set<String> ELEMENT_PROPERTIES = Set.of(
             "direction", "wrap", "gap", "horizontal", "vertical", "line-distribution", "split-items",
@@ -242,7 +242,11 @@ final class StyleRules {
         String type = null;
         switch (rule.getCanonicalName()) {
             case "for-element" -> type = element(rule, selector, outer, source);
-            case "for-column" -> columnRules.add(columns(rule, outer, source));
+            case "for-column" -> {
+                columnRules.add(columns(rule, outer, source));
+                // Its element properties are those of the cells it applies to.
+                type = Element.CELL.label();
+            }
             case "for-style" -> {
                 String name = name(rule, "For style", source);
                 classRules.add(new ClassRule(name, rule, outer));

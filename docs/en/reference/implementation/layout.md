@@ -112,6 +112,19 @@ chooses it by the role of the box, [Table](../components/table.md)).
 > it was measured, so that its children have the definite base that the definite height rule promises. It costs one more layout per stretched
 > item. *Rejected alternative:* repeating it only if some descendant uses vertical percentages.
 
+**`Vertical` of a `Cell`** ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)). The cell is a
+stretched item like any other, and where its content goes is decided by its own algorithm: `BlockLayout` (the cell with
+elements) and `InlineLayout` (the cell with a value) ask `Slice.contentOffset` how far down the content goes in the
+fragment they have just computed, and shift the child fragments with their pending `Overlay` boxes, or the lines.
+`Slice.contentOffset` gives what is left over in the content box of the fragment, or half of it, and 0 if the box does
+not end in it. `GridLayout` and `UnitBreaker` know nothing about it: in a split row, the fragment the cell ends in is the
+one `UnitBreaker` lays out with the height of the row on that page (`ConstraintSpace.withFixedHeight`).
+
+> **Decision:** the shift is applied by the layout of the cell to its last fragment, and not by the grid when it places
+> it. It works the same without fragmenting, in a split row and in a cell with `Height`, and the cache keeps the fragment
+> already placed. *Rejected alternative:* a step of the grid that moved the children of each cell after stretching it,
+> which would have to be repeated on each path of `UnitBreaker`.
+
 ## Positioned boxes
 
 The algorithms do not lay out the `Overlay` and `Page overlay` children. They return them as `PendingOverlay` with their static position, and

@@ -81,7 +81,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Text` | `Below side boxes` |
 | `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
 | `Frame` | `Isolate margins`, `Trim margins` |
-| `Cell` | `Trim margins` |
+| `Cell` | `Trim margins`, `Vertical` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
 | `Table of contents` | `Levels`, `Leader` |
 | the element of an `Item` | `Grow`, `Shrink`, `Base size` |
@@ -91,14 +91,17 @@ They are those of appearance and distribution. The rule that applies to an eleme
 - **Only what the element can declare.** A rule that gives an element a property it does not have (a `Gap` to a `Text`)
   is `STYLE_NOT_ALLOWED`, with the line of the property in the rule. In `For element` the error comes when the rule is
   read, even if it applies to no element; in `For style` and `For id`, when it is applied, because the same name can go
-  on elements of different types. The position rules of a cell, `For column`, `For element: Document` and the generated
-  elements (`Code block`, `TOC 1` to `TOC 6`, `Footnote area`) allow none, and neither does a rule that reaches a `Section`.
+  on elements of different types. The position rules of a cell allow those of `Cell`, and `For column`, only
+  `Vertical`. `For element: Document` and the generated elements (`Code block`, `TOC 1` to `TOC 6`, `Footnote area`)
+  allow none, and neither does a rule that reaches a `Section`.
 - **The value is checked when the rule is read.** In `For style` and `For id` it has to be valid in one of the elements
   that have the property: `Gap: 1 2 3` is `VALUE_NOT_ALLOWED` in any case, and `Horizontal: justify`, which is valid in a
   `Stack`, is an error when it is applied to a `Grid`. What depends on the element is checked when the rule is applied:
   the `Column align` of a rule has one alignment per column of each table it reaches (`TABLE_COLUMN_ALIGN`).
 - **`Horizontal` and `Vertical`** are those of the `Stack` or the `Grid`, never those of the `Item` or the `Area` that
-  wraps the element: the alignment of an item is written in its `Item` or its `Area`.
+  wraps the element: the alignment of an item is written in its `Item` or its `Area`. `Vertical` is also that of a
+  `Cell` ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)), with its values: `start`,
+  `center` or `end`.
 - **`Grow`, `Shrink` and `Base size`** are of the `Item` ([Stack](../components/stack.md#item)), which is not a box: the
   rule of the element the `Item` wraps gives them, and what the `Item` declares wins over the rule. To an element that is
   not in an `Item` (also that of an `Area`) they are `STYLE_NOT_ALLOWED`.

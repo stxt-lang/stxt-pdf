@@ -82,7 +82,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Text` | `Below side boxes` |
 | `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
 | `Frame` | `Isolate margins`, `Trim margins` |
-| `Cell` | `Trim margins` |
+| `Cell` | `Trim margins`, `Vertical` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
 | `Table of contents` | `Levels`, `Leader` |
 | el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |
@@ -92,15 +92,17 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 - **Solo lo que el elemento puede declarar.** Una regla que da a un elemento una propiedad que no tiene (un `Gap` a un
   `Text`) es `STYLE_NOT_ALLOWED`, con la línea de la propiedad en la regla. En `For element` el error sale al leer la
   regla, aunque no se aplique a ningún elemento; en `For style` y `For id`, al aplicarla, porque el mismo nombre puede
-  ir en elementos de tipos distintos. Las reglas de posición de una celda, `For column`, `For element: Document` y los
-  elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`) no admiten ninguna, y una regla que llega a una
-  `Section` tampoco.
+  ir en elementos de tipos distintos. Las reglas de posición de una celda admiten las de `Cell`, y `For column`, solo
+  `Vertical`. `For element: Document` y los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`) no
+  admiten ninguna, y una regla que llega a una `Section` tampoco.
 - **El valor se comprueba al leer la regla.** En `For style` y `For id` tiene que valer en alguno de los elementos que
   tienen la propiedad: `Gap: 1 2 3` es `VALUE_NOT_ALLOWED` en cualquier caso, y `Horizontal: justify`, que vale en un
   `Stack`, es un error al aplicarlo a un `Grid`. Lo que depende del elemento se comprueba al aplicarla: el
   `Column align` de una regla tiene una alineación por columna de cada tabla a la que llega (`TABLE_COLUMN_ALIGN`).
 - **`Horizontal` y `Vertical`** son las del `Stack` o el `Grid`, nunca las del `Item` o el `Area` que envuelve el
-  elemento: la alineación de un ítem se escribe en su `Item` o su `Area`.
+  elemento: la alineación de un ítem se escribe en su `Item` o su `Area`. `Vertical` es también la de una `Cell`
+  ([Table](../components/table.md#alineación-vertical-del-contenido-vertical)), con sus valores: `start`, `center` o
+  `end`.
 - **`Grow`, `Shrink` y `Base size`** son del `Item` ([Stack](../components/stack.md#item)), que no es una caja: los da la
   regla del elemento que el `Item` envuelve, y lo que declara el `Item` gana a la regla. A un elemento que no está en un
   `Item` (también al de un `Area`) son `STYLE_NOT_ALLOWED`.

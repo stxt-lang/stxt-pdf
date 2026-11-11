@@ -110,6 +110,19 @@ elige por el papel de la caja, [Table](../components/table.md)).
 > medirlo, para que sus hijos tengan la base definida que promete la regla del alto definido. Cuesta un layout más por ítem
 > estirado. *Alternativa descartada:* repetirlo solo si algún descendiente usa porcentajes verticales.
 
+**`Vertical` de una `Cell`** ([Table](../components/table.md#alineación-vertical-del-contenido-vertical)). La celda es
+un ítem estirado como cualquier otro, y dónde va su contenido lo decide su propio algoritmo: `BlockLayout` (la celda con
+elementos) e `InlineLayout` (la celda con valor) preguntan a `Slice.contentOffset` cuánto baja el contenido en el
+fragmento que acaban de calcular, y desplazan los fragmentos hijos con sus cajas `Overlay` pendientes, o las líneas.
+`Slice.contentOffset` da lo que sobra en la caja de contenido del fragmento, o la mitad, y 0 si la caja no termina en
+él. `GridLayout` y `UnitBreaker` no saben nada de ello: en una fila partida, el fragmento en que la celda termina es el
+que `UnitBreaker` maqueta con el alto de la fila en esa página (`ConstraintSpace.withFixedHeight`).
+
+> **Decisión:** el desplazamiento lo aplica el layout de la celda a su último fragmento, y no el grid al colocarla. Vale
+> igual sin fragmentar, en una fila partida y en una celda con `Height`, y la caché guarda el fragmento ya colocado.
+> *Alternativa descartada:* un paso del grid que moviera los hijos de cada celda después de estirarla, que habría que
+> repetir en cada camino de `UnitBreaker`.
+
 ## Cajas posicionadas
 
 Los algoritmos no maquetan los hijos `Overlay` y `Page overlay`. Los devuelven como `PendingOverlay` con su posición estática, y

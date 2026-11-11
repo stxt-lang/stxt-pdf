@@ -1,0 +1,16 @@
+# Case: Vertical of a cell that stretches
+# Code: VALUE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Table:
+			Column sizes: *
+			Body rows:
+				Row:
+					Cell:
+						Vertical: stretch

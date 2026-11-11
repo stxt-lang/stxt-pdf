@@ -39,10 +39,11 @@ Table:
 | `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
 | `Span` | `rows columns`, two positive integers | `1 1` | `Cell` | Rows and columns that the cell takes up. |
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
+| `Vertical` | `start`, `center`, `end` | `start` | `Cell` | Where the content of the cell goes in the height it has left over ([Vertical alignment of the content](#vertical-alignment-of-the-content-vertical)). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
 
-`Column sizes`, `Column align`, `Gap` and `Split rows` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Span` and
+`Column sizes`, `Column align`, `Gap`, `Split rows` and the `Vertical` of the cells can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Span` and
 `Row header` cannot. Without `Column sizes`, its own or from a rule, it is an error (`TABLE_COLUMN_SIZES_MISSING`).
 `Merge borders` (`true` or `false`, by default
 `false`) goes in the `Box` of the `Table`, so it is also valid in a rule: the border between two cells is drawn once,
@@ -91,14 +92,72 @@ natural width and the fraction what remains. The rows are sized as in `Grid`.
 
 A `Cell` is a box with two forms, like a `Text`: with a value (`Cell: 100`), it is a text box of one line, and without
 a value, a block with elements (any except the headings), or empty if it has none. Both at the same time are
-an error (`CELL_CONTENT`). A long text goes in a `Paragraph`. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Span` and
-`Row header`. The borders are those of each cell, separate: a line between rows is drawn with the bottom border of the cells.
+an error (`CELL_CONTENT`). A long text goes in a `Paragraph`. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`,
+`Row header`, `Trim margins` and `Vertical`. The borders are those of each cell, separate: a line between rows is drawn with the bottom border of the cells.
 With `Merge borders: true`, the border between two cells is drawn once ([Merged borders](#merged-borders)).
 The margins of a cell separate it from its area, as in a `Grid`.
 
 > **Decision:** `Row header: true` goes in each cell that is the header of its row (the item of an invoice, the time of a
 > timetable): it also serves for the label of a totals footer or the third column of a schedule. *Rejected
 > alternative:* `Row header columns: N` in the `Table`, which only serves for whole columns.
+
+## Vertical alignment of the content (`Vertical`)
+
+A cell is stretched to the height of its row and its content starts at the top. `Vertical` says where the content goes
+when the row is taller than it:
+
+```
+Styles:
+    For element: Header cell
+        Vertical: end
+Table:
+    Column sizes: * 60
+    Header rows:
+        Row:
+            Cell: Item
+            Cell:
+                Paragraph: Amount before tax
+    Body rows:
+        Row:
+            Cell:
+                Paragraph: Dining table in solid walnut, with two drop leaves.
+            Cell: 640.00
+                Vertical: center
+```
+
+- **Values.** `start` (the default) leaves the content at the top, `center` centers it and `end` takes it to the
+  bottom. The other values of `Vertical` (`stretch`, `justify`, `around`, `distribute`) are `VALUE_NOT_ALLOWED` in a
+  cell, which is always stretched and has a single content to place.
+- **What moves.** The box of the cell stays stretched to its row, with its whole `Background` and `Border`. Its
+  content moves inside its content box: the line of a cell with a value, or all its elements together. What is left
+  over is the height of the content box minus that of the content: with `center` half of it goes above, and with
+  `end`, all of it. A content as tall as the cell, or taller, does not move.
+- **It is the `Vertical` of a vertical `Stack`**, which says where the leftover goes ([Stack](stack.md)), and not that
+  of an `Area` of a `Grid`, with which the box stops being stretched ([Grid](grid.md)).
+- **The margins** of the elements of the cell that stay inside it count as content: the top one of the first and the
+  bottom one of the last. `Trim margins` drops them ([Block](block.md#trimming-the-margins-trim-margins)).
+- **From a rule.** `For element: Cell`, the position rules, `For column`, `For style` and `For id` give it, with the
+  priority of [Cell style](#cell-style). `Table` and `Row` do not declare it: a `For element: Cell` rule inside the
+  rule of the table does the same, and the rules of the `Style` and the `Id` of a `Row` reach its cells.
+- **`Span` and `Height`.** A cell that takes up several rows uses the height of all of them. A cell with a `Height` of
+  its own has no special case: the content is placed in its content box.
+- **Split rows.** In a row that is split across pages ([Breaks](#breaks)), the content is placed in the fragment the
+  cell **ends** in, with the height of the content box of that fragment and that of the content in it. In the previous
+  fragments the content reaches the break and does not move. The content that ended on a previous page stays where it
+  is: if the row goes on because of another cell, what the cell measures on the next page is empty.
+
+> **Decision:** `Vertical` in `Cell`, with `start`, `center` and `end`: the name and the values the vertical
+> alignment already has in `Stack`, `Grid`, `Item` and `Area`. *Rejected alternative:* a new property
+> (`Vertical align: top | middle | bottom`), another name for the same thing and with values that are not those of the
+> namespace.
+
+> **Decision:** the cell does not stop being stretched, and what moves is its content. Its background and its border
+> still fill the row, and the merged borders do not change. *Rejected alternative:* the `Vertical` of an `Area`, which
+> shrinks the box to its content and leaves the background of the cell in the middle of the row.
+
+> **Decision:** in a split row the content does not move from one page to another to be aligned: it is placed in the
+> fragment the cell ends in, with what is in it. *Rejected alternative:* aligning against the height of the unsplit
+> row, which is that of no page.
 
 ## Cell style
 

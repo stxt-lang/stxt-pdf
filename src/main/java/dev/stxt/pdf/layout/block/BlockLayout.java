@@ -628,10 +628,19 @@ public final class BlockLayout implements LayoutAlgorithm {
                 // the parent breaks before the box instead.
                 return LayoutResult.before(box);
             }
+            // The Vertical of a Cell (reference/components/table.md): in the fragment the cell ends in, its content
+            // goes down in what its row leaves over.
+            double down = slice.contentOffset(box.style().cellVertical(), contentHeight);
+            List<Fragment> children = fragments;
+            List<PendingOverlay> overlays = pending;
+            if (down > 0) {
+                children = fragments.stream().map(f -> f.moved(f.x(), f.y() + down)).toList();
+                overlays = pending.stream().map(p -> p.translated(0, down)).toList();
+            }
             Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(),
-                    slice.border(), slice.padding(), withMarker(fragments, slice), List.of(), first, slice.finished());
+                    slice.border(), slice.padding(), withMarker(children, slice), List.of(), first, slice.finished());
             if (slice.finished()) {
-                return LayoutResult.finished(fragment, pending, out);
+                return LayoutResult.finished(fragment, overlays, out);
             }
             // The content has finished, but the box's own height continues on the next page.
             BreakToken token = new BreakToken.Block(box.children().size(), null, slice.consumed());

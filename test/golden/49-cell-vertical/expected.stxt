@@ -1,0 +1,59 @@
+# t1 at y = 20: one row, 60 high (the block of a1, 59, plus the border, 0.5 above and below). The content box of e4
+#   and e5 is 59 high from 20.5, and their block, 20: 39 are left over. m4 (center) goes 19.5 down, at 40, and m5
+#   (end), 39 down, at 59.5. The lines of v2 and v3 move the same way and are not in this dump.
+# t2 at y = 90, after the margin of 10: rows of 20 and 30; s1 takes up both, 50.
+# t3 at y = 150, with 30 left on page 1: the row is split. p1a and k1a place 29.5 under the top border and do not
+#   move: the cells go on. On page 2 p1 places the 30.5 left of p1a and p1b (40): 70.5 plus the bottom border, 71, and
+#   k1 is stretched to them. The content of k1 on this page is 50.5 (30.5 of k1a and k1b, 20), and its content box,
+#   70.5 from 20: 20 are left over and go above, so k1a starts at 40 and k1b at 70.5.
+Result:
+	Page: 1
+		Fragment: t1
+			Rect: 20 20 260 60
+			Fragment: a1
+				Rect: 20 20 52 60
+			Fragment: v2
+				Rect: 72 20 52 60
+			Fragment: v3
+				Rect: 124 20 52 60
+			Fragment: e4
+				Rect: 176 20 52 60
+				Fragment: m4
+					Rect: 176.5 40 51 20
+			Fragment: e5
+				Rect: 228 20 52 60
+				Fragment: m5
+					Rect: 228.5 59.5 51 20
+		Fragment: t2
+			Rect: 20 90 260 50
+			Fragment: s1
+				Rect: 20 90 130 50
+			Fragment: r1
+				Rect: 150 90 130 20
+			Fragment: r2
+				Rect: 150 110 130 30
+		Fragment: t3
+			Rect: 20 150 260 30
+			Fragment: p1
+				Rect: 20 150 130 30
+				Fragment: p1a
+					Rect: 20.5 150.5 129 29.5
+			Fragment: k1
+				Rect: 150 150 130 30
+				Fragment: k1a
+					Rect: 150.5 150.5 129 29.5
+	Page: 2
+		Fragment: t3
+			Rect: 20 20 260 71
+			Fragment: p1
+				Rect: 20 20 130 71
+				Fragment: p1a
+					Rect: 20.5 20 129 30.5
+				Fragment: p1b
+					Rect: 20.5 50.5 129 40
+			Fragment: k1
+				Rect: 150 20 130 71
+				Fragment: k1a
+					Rect: 150.5 40 129 30.5
+				Fragment: k1b
+					Rect: 150.5 70.5 129 20

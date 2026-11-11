@@ -404,13 +404,20 @@ public final class InlineLayout implements LayoutAlgorithm {
             }
         }
 
+        int placed = end - start;
+        double contentHeight = (dropCap ? Math.max(placed, s.dropCap()) : placed) * lineHeight;
+        Slice slice = Slice.of(model, first, BreakToken.consumed(from), contentHeight, end == texts.size(), space);
+        // The Vertical of a Cell with a value (reference/components/table.md): in the fragment the cell ends in, its
+        // lines go down in what its row leaves over. A Paragraph with Drop cap is never a cell.
+        double down = slice.contentOffset(s.cellVertical(), contentHeight);
+
         List<TextLine> lines = new ArrayList<>();
         if (dropCap) {
             lines.add(dropCapLine(s, b, lineHeight));
         }
         for (int j = start; j < end; j++) {
             LineBreaker.Line text = texts.get(j);
-            double y = (j - start) * lineHeight;
+            double y = down + (j - start) * lineHeight;
             double left = b.widths().left(j);
             double right = b.widths().right(j);
             if (text.isEmpty()) {
@@ -424,9 +431,6 @@ public final class InlineLayout implements LayoutAlgorithm {
                     y, lineHeight, text.hyphenated(), text.splitsWord()));
         }
 
-        int placed = end - start;
-        double contentHeight = (dropCap ? Math.max(placed, s.dropCap()) : placed) * lineHeight;
-        Slice slice = Slice.of(model, first, BreakToken.consumed(from), contentHeight, end == texts.size(), space);
         Fragment fragment = new Fragment(box, 0, 0, model.width(), slice.height(), model.margin(), slice.border(),
                 slice.padding(), List.of(), lines, first, slice.finished());
         if (!slice.finished()) {

@@ -9,6 +9,17 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Added
 
+- **`Vertical`** (`start`, `center`, `end`), in `Cell`, `start` by default: where the content of a cell goes when
+  its row is taller than it. The box of the cell stays stretched to its row, with its whole `Background` and
+  `Border`, and its line or its elements move inside its content box. It is for the short cells of an invoice or a
+  price list and for the headers of several lines, whose content always started at the top. A rule gives it too:
+  `For element: Cell`, the position rules (`Header cell`, `Odd row cell`...), `For style`, `For id` and
+  `For column`, which now allows this one element property. A cell that takes up several rows uses the height of all
+  of them, and in a row split across pages the content is placed in the fragment the cell ends in. The other values of
+  `Vertical` (`stretch`, `justify`, `around`, `distribute`) are `VALUE_NOT_ALLOWED` in a cell. "Vertical alignment
+  of the content" in the reference of `Table`.
+- `Style.cellVertical()`, the `Vertical` of a cell, and `Slice.contentOffset`, how far down it moves the content of a
+  fragment.
 - **`Break long words`** (`true`, `false`), in `Typography`, inherited and `false` by default: the part of a word
   that cannot be split further and is wider than a whole line of its box is cut at the last character that fits,
   with no hyphen, as many times as needed. It is for the data that has no place to be split at (an IBAN, an email

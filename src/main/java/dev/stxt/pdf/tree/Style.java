@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Layout;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Pages;
@@ -69,6 +70,7 @@ public final class Style extends StyleGroup {
     private Pages pages = Pages.ALL;
     private boolean isolateMargins;
     private TrimMargins trimMargins = TrimMargins.NONE;
+    private Alignment cellVertical = Alignment.START;
     /**
      * {@code Rotate} and {@code Rotate origin} (reference/common/layers-and-rotation.md), in {@code Frame},
      * {@code Overlay}, {@code Page overlay}, {@code Image} and the in-flow boxes that {@link #rotatesInFlow()} admits;
@@ -247,6 +249,20 @@ public final class Style extends StyleGroup {
     void setTrimMargins(TrimMargins v) {
         writable();
         trimMargins = v;
+    }
+
+    /**
+     * {@code Vertical} of a {@code Cell} (reference/components/table.md): where its content goes in the height its row
+     * leaves over, {@code START} (by default), {@code CENTER} or {@code END}; never {@code STRETCH}. The box of the
+     * cell stays stretched to its row. Not inherited.
+     */
+    public Alignment cellVertical() {
+        return cellVertical;
+    }
+
+    void setCellVertical(Alignment v) {
+        writable();
+        cellVertical = v;
     }
 
     public Rotation rotation() {

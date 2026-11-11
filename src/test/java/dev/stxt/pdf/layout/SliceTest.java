@@ -6,6 +6,7 @@ import java.util.OptionalDouble;
 
 import org.junit.jupiter.api.Test;
 
+import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.Insets;
 
@@ -133,6 +134,32 @@ class SliceTest {
         assertEquals(100, Slice.contentRemaining(AUTO, false, page(100)), 1e-9);
         // With clone, it is: it goes in every fragment.
         assertEquals(90, Slice.contentRemaining(AUTO_CLONE, false, page(100)), 1e-9);
+    }
+
+    @Test
+    void contentOffsetPutsTheContentInWhatItLeavesOver() {
+        // A content box of 90 with a content of 30: 60 left over.
+        Slice s = new Slice(100, BORDER, PADDING, true, 0);
+        assertEquals(0, s.contentOffset(Alignment.START, 30), 1e-9);
+        assertEquals(30, s.contentOffset(Alignment.CENTER, 30), 1e-9);
+        assertEquals(60, s.contentOffset(Alignment.END, 30), 1e-9);
+        assertEquals(0, s.contentOffset(Alignment.STRETCH, 30), 1e-9);
+        // A negative content (negative margins) counts as none.
+        assertEquals(90, s.contentOffset(Alignment.END, -10), 1e-9);
+    }
+
+    @Test
+    void contentOffsetDoesNotMoveContentThatFillsOrOverflowsTheBox() {
+        Slice s = new Slice(100, BORDER, PADDING, true, 0);
+        assertEquals(0, s.contentOffset(Alignment.CENTER, 90), 1e-9);
+        assertEquals(0, s.contentOffset(Alignment.END, 120), 1e-9);
+    }
+
+    @Test
+    void contentOffsetOnlyAppliesInTheFragmentTheBoxEndsIn() {
+        Slice goesOn = new Slice(100, BORDER, PADDING, false, 100);
+        assertEquals(0, goesOn.contentOffset(Alignment.CENTER, 30), 1e-9);
+        assertEquals(0, goesOn.contentOffset(Alignment.END, 30), 1e-9);
     }
 
     @Test

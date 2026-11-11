@@ -87,6 +87,18 @@ grid, with every border, there are [merged borders](#merged-borders). `Gap` on t
 **`Row header: true`** marks a cell as the header of its row (the item of an invoice, the time of a timetable): a screen
 reader reads it with each cell of the row. The cells of `Header rows` are already column headers.
 
+**`Vertical`** places the content of a cell that is shorter than its row: `center` centers it and `end` takes it to the
+bottom. By default it is `start`, the top. The cell still takes up the height of the row, with its background and its
+border. It is written in the cell or, for several, in a rule:
+
+```
+Styles:
+    For element: Header cell
+        Vertical: end
+    For column: 2 4
+        Vertical: center
+```
+
 ## Cell style
 
 Without repeating a style on each cell:

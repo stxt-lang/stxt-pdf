@@ -836,6 +836,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Trim margins
 				Max: 1
+			Child: Vertical
+				Max: 1
 			Child: Block
 			Child: Stack
 			Child: Grid
@@ -1307,6 +1309,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Typography
 				Max: 1
 			Child: Break
+				Max: 1
+			Child: Vertical
 				Max: 1
 
 	# Groups
@@ -1782,7 +1786,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack.
+		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: start (by default), center or end; the box of the cell stays stretched to its row.
 		Values:
 			Value: start
 			Value: end

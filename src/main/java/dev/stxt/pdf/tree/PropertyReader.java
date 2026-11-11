@@ -91,6 +91,8 @@ final class PropertyReader {
     /** Properties of the {@code Grid} and {@code Table} elements. */
     static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "area-map", "fill-order", "horizontal", "vertical",
             "split-rows");
+    /** Properties of the {@code Cell} element, besides the standalone ones. */
+    static final Set<String> CELL = Set.of("vertical");
     /** Properties of the {@code Columns} element. */
     static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance");
 
@@ -361,6 +363,28 @@ final class PropertyReader {
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
             case "split-rows" -> s.grid().setSplitRows(bool(p));
+            default -> throw unread(p);
+        }
+    }
+
+    /**
+     * {@code Vertical} of a {@code Cell} (reference/components/table.md): where its content goes in the height its row
+     * leaves over, {@code start}, {@code center} or {@code end}. The cell stays stretched to its row, so
+     * {@code stretch} does not apply, and there is one content to place, so neither do the values that distribute
+     * several. Its line is kept with a prefix ({@code cell.vertical}).
+     */
+    static void cell(Node p, Style s) {
+        s.declared("cell." + p.getCanonicalName(), p.getLine());
+        switch (p.getCanonicalName()) {
+            case "vertical" -> {
+                Distribution d = enumValue(Distribution.class, p);
+                if (d != Distribution.START && d != Distribution.CENTER && d != Distribution.END) {
+                    throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Vertical of a Cell says where its content goes in "
+                            + "the height its row leaves over: it allows start, center or end, and "
+                            + p.getText().trim() + " is not valid there (the cell is always stretched to its row)");
+                }
+                s.setCellVertical(Alignment.valueOf(d.name()));
+            }
             default -> throw unread(p);
         }
     }
