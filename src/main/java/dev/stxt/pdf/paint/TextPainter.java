@@ -54,6 +54,23 @@ final class TextPainter {
     }
 
     /**
+     * The readable text of a barcode ({@code Readable text}, reference/components/barcode.md), whose line is relative
+     * to the content box of its image: each run with the baseline that the font of the box gives it in the line, in
+     * the color of the box. The canvas marks it with the image it belongs to ({@link Canvas#image}).
+     */
+    static void paintReadable(Canvas canvas, Box box, Rect content, List<TextLine> text) {
+        for (TextLine line : text) {
+            // Inside the loop: a barcode without a readable text has no line, and may have no font.
+            FontFace font = box.style().typography().fontFace();
+            double baseline = canvas.vertical(font).baseline(content.y() + line.y(), line.height(), line.fontSize());
+            for (TextLine.Run run : line.runs()) {
+                canvas.text(content.x() + line.x() + run.x(), baseline, run.text(), font, line.fontSize(),
+                        box.style().typography().color(), 0, 0);
+            }
+        }
+    }
+
+    /**
      * The runs {@code from} to {@code to} (exclusive) of a line, which are one marked content: their {@code kind} and
      * {@code target}, the destination of a link or the {@code Id} of the footnote of a call ({@code null} otherwise).
      */

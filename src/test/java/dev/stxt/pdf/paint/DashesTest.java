@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.LineStyle;
+import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 
 /** The pattern of a line that is not solid (reference/common/box.md#border-style). */
@@ -164,5 +165,39 @@ class DashesTest {
         assertEquals(Shapes.Side.LEFT, sides.get(0).side());
         assertEquals(List.of(11.5, 20.0, 11.5, 80.0, 3.0),
                 List.of(left.x1(), left.y1(), left.x2(), left.y2(), left.width()));
+    }
+
+    /** The line of a rectangle has its pattern along its whole length, and an empty rectangle draws no line. */
+    @Test
+    void theLineOfARectangleIsFittedToItAndAnEmptyOneIsNoLine() {
+        Dashes.Segment line = Dashes.line(new Rect(10, 20, 2, 100), true, LineStyle.DASHED);
+        assertEquals(11, line.x1(), DELTA);
+        assertEquals(20, line.y1(), DELTA);
+        assertEquals(120, line.y2(), DELTA);
+        assertEquals(2, line.width(), DELTA);
+        assertEquals(Dashes.open(LineStyle.DASHED, 100, 2), line.pattern());
+        assertNull(Dashes.line(new Rect(10, 20, 0, 100), true, LineStyle.DASHED));
+        assertNull(Dashes.line(new Rect(10, 20, 100, 0), false, LineStyle.DOTTED));
+    }
+
+    /**
+     * A border of 4 on its four sides is one closed line, 2 × (96 + 56) = 304 long along its middle, with the pattern
+     * of a closed line; without its bottom side it is an open line, with that of a line with two ends. The line is
+     * as wide as the widest side.
+     */
+    @Test
+    void theLinesOfARoundedBorderHaveTheirPatternFittedToTheirLength() {
+        Rect box = new Rect(10, 20, 100, 60);
+        List<Dashes.Curve> whole = Dashes.rounded(box, Insets.all(4), Radii.NONE, LineStyle.DASHED);
+        assertEquals(1, whole.size());
+        assertEquals(4, whole.get(0).width(), DELTA);
+        assertEquals(Dashes.closed(LineStyle.DASHED, 304, 4), whole.get(0).pattern());
+
+        List<Dashes.Curve> open = Dashes.rounded(box, new Insets(4, 2, 0, 2), Radii.NONE, LineStyle.DOTTED);
+        assertEquals(1, open.size());
+        assertEquals(4, open.get(0).width(), DELTA);
+        double length = Shapes.length(open.get(0).path());
+        assertEquals(Dashes.open(LineStyle.DOTTED, length, 4), open.get(0).pattern());
+        assertEquals(List.of(), Dashes.rounded(box, Insets.ZERO, Radii.NONE, LineStyle.DASHED));
     }
 }

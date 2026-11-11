@@ -47,8 +47,11 @@ final class PdfContent {
     /** Graphics states of this page that give a transparency group its opacity, by opacity (in thousandths). */
     private final Map<Integer, PDExtendedGraphicsState> groupOpacities = new HashMap<>();
 
-    /** A transparency group being painted: its form and the stream that was being written when it started. */
-    private record Group(PDFormXObject form, PDPageContentStream outer) {
+    /**
+     * A transparency group being painted: its form, the opacity it is painted with when it ends and the stream that
+     * was being written when it started.
+     */
+    private record Group(PDFormXObject form, double opacity, PDPageContentStream outer) {
     }
     /** Opacity graphics states of this page, by opacity (in thousandths). */
     private final Map<Integer, PDExtendedGraphicsState> opacities = new HashMap<>();
@@ -181,10 +184,10 @@ final class PdfContent {
     /**
      * Starts a transparency group (ISO 32000-1, 11.6.6), that of a box with {@code Opacity}
      * (reference/common/layers-and-rotation.md): what is painted until {@link #endGroup} goes to the stream of a form
-     * with the coordinates of the page, which is then painted on it as a whole. The rotations and clips started inside
+     * with the coordinates of the page, which is then painted on it as a whole with the opacity {@code opacity}. The rotations and clips started inside
      * end inside. Returns the form, whose marked content the structure needs to tell from that of the page.
      */
-    PDFormXObject beginGroup() throws IOException {
+    PDFormXObject beginGroup(double opacity) throws IOException {
         // An appearance stream is the form that PDPageContentStream can write to.
         PDAppearanceStream form = new PDAppearanceStream(doc);
         form.setResources(new PDResources());
@@ -194,14 +197,15 @@ final class PdfContent {
         // Isolated: the group is painted on its own, and only the result is blended with what lies beneath.
         group.setBoolean(COSName.I, true);
         form.getCOSObject().setItem(COSName.GROUP, group);
-        groups.push(new Group(form, out));
+        groups.push(new Group(form, opacity, out));
         out = new PDPageContentStream(doc, form, form.getStream().createOutputStream(COSName.FLATE_DECODE));
         return form;
     }
 
-    /** Ends the group started with {@link #beginGroup} and paints it with the opacity {@code opacity}. */
-    void endGroup(double opacity) throws IOException {
+    /** Ends the group started with {@link #beginGroup} and paints it with its opacity. */
+    void endGroup() throws IOException {
         Group group = groups.pop();
+        double opacity = group.opacity();
         out.close();
         out = group.outer();
         out.saveGraphicsState();

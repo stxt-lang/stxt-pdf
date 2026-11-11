@@ -175,9 +175,10 @@ along its center line with the dash pattern of the format (`d` in the PDF, `stro
 which is pure, computes the pattern and fits it to the length: `open` for a line with two ends (a whole dash or dot at
 each one) and `closed` for a closed one (a whole number of periods). A dot is a dash of length 0 with round ends.
 `Dashes.border` gives one line per side of a border with square corners, with the vertical sides trimmed by the
-horizontal ones, and `Dashes.segment`, that of a `Canvas.line`. With rounded corners, `Shapes.centerlines` gives the
+horizontal ones, and `Dashes.line`, that of a `Canvas.line`. With rounded corners, `Shapes.centerlines` gives the
 path along the middle of the border (closed, or an open one for each group of consecutive sides in a fragment that
-lacks one of them) and `Shapes.length` measures it, with the curves as 16 straight pieces. With one color per side,
+lacks one of them) and `Shapes.length` measures it, with the curves as 16 straight pieces; `Dashes.rounded` gives each
+of those paths with its width and its pattern, so that the two canvases only stroke them. With one color per side,
 that path is stroked once per side, clipped to its trapezoid (`sidePolygon`). `PdfContent.stroking` sets the stroking
 color and opacity inside a `q ... Q`, so the width, the dashes and the line ends do not leave it.
 

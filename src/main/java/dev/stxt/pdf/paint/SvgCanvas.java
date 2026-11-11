@@ -266,8 +266,8 @@ public final class SvgCanvas implements Canvas {
     public void line(Rect r, boolean vertical, String color, LineStyle style) {
         if (style == LineStyle.SOLID) {
             background(r, color);
-        } else if (r.width() > 0 && r.height() > 0) {
-            stroke(Dashes.segment(r, vertical, style, 0, 0), color);
+        } else {
+            stroke(Dashes.line(r, vertical, style), color);
         }
     }
 
@@ -302,15 +302,11 @@ public final class SvgCanvas implements Canvas {
 
     /** Strokes the lines along the middle of a border with rounded corners, each with its pattern fitted to it. */
     private void stroke(Rect r, Insets w, Radii radii, String color, LineStyle style, String clip) {
-        double width = Math.max(Math.max(w.top(), w.bottom()), Math.max(w.left(), w.right()));
-        for (Shapes.Run run : Shapes.centerlines(r, w, radii)) {
-            double length = Shapes.length(run.path());
-            Dashes.Pattern pattern = run.closed() ? Dashes.closed(style, length, width)
-                    : Dashes.open(style, length, width);
+        for (Dashes.Curve curve : Dashes.rounded(r, w, radii, style)) {
             StringBuilder d = new StringBuilder();
-            run.path().accept(pathWriter(d));
+            curve.path().accept(pathWriter(d));
             svg.append("<path d=\"").append(d.toString().strip()).append("\" fill=\"none\"").append(clip)
-                    .append(strokeAttr(color, width, pattern)).append("/>\n");
+                    .append(strokeAttr(color, curve.width(), curve.pattern())).append("/>\n");
         }
     }
 
@@ -489,14 +485,7 @@ public final class SvgCanvas implements Canvas {
                     -m.width()));
         }
         svg.append("\"").append(fillAttr(box.style().typography().color())).append("/>\n");
-        for (TextLine line : text) {
-            FontFace font = box.style().typography().fontFace();
-            double baseline = vertical(font).baseline(content.y() + line.y(), line.height(), line.fontSize());
-            for (TextLine.Run run : line.runs()) {
-                text(content.x() + line.x() + run.x(), baseline, run.text(), font, line.fontSize(),
-                        box.style().typography().color(), 0, 0);
-            }
-        }
+        TextPainter.paintReadable(this, box, content, text);
     }
 
     /**

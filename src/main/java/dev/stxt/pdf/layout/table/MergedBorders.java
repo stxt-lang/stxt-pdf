@@ -103,7 +103,7 @@ final class MergedBorders {
                 }
                 verticalWidths[i][j] = s.width();
                 double x = j == 0 ? 0 : j == columns ? width - s.width() : line(j) - s.width() / 2;
-                vertical.add(new Rule(x, row.top(), s.width(), row.height(), s.color(), s.style()));
+                vertical.add(new Rule(x, row.top(), s.width(), row.height(), s.color(), s.style(), true));
             }
         }
         List<Rule> horizontal = new ArrayList<>();
@@ -137,13 +137,13 @@ final class MergedBorders {
                         i < m ? verticalWidths[i][c + 1] : 0);
                 double x0 = c == 0 ? 0 : starts.get(c) - startInto / 2;
                 double x1 = c == columns - 1 ? width : starts.get(c) + widths.get(c) + endInto / 2;
-                horizontal.add(new Rule(x0, y, x1 - x0, s.width(), s.color(), s.style()));
+                horizontal.add(new Rule(x0, y, x1 - x0, s.width(), s.color(), s.style(), false));
             }
         }
         List<Rule> all = new ArrayList<>(joinVertical(vertical));
         all.addAll(joinHorizontal(horizontal));
         // The widest last: it covers the junctions. The sort is stable: with the same width, vertical first.
-        all.sort(Comparator.comparingDouble(r -> Math.min(r.width(), r.height())));
+        all.sort(Comparator.comparingDouble(Rule::thickness));
         return all;
     }
 
@@ -212,7 +212,7 @@ final class MergedBorders {
                     && r.y() <= last.y() + last.height() + EPSILON) {
                 double end = Math.max(last.y() + last.height(), r.y() + r.height());
                 joined.set(joined.size() - 1, new Rule(last.x(), last.y(), last.width(), end - last.y(), last.color(),
-                        last.style()));
+                        last.style(), true));
             } else {
                 joined.add(r);
             }
@@ -236,7 +236,7 @@ final class MergedBorders {
                     && sameLine(last, r) && r.x() <= last.x() + last.width() + EPSILON) {
                 double end = Math.max(last.x() + last.width(), r.x() + r.width());
                 joined.set(joined.size() - 1, new Rule(last.x(), last.y(), end - last.x(), last.height(), last.color(),
-                        last.style()));
+                        last.style(), false));
             } else {
                 joined.add(r);
             }

@@ -23,8 +23,6 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.util.Matrix;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 
 import static dev.stxt.pdf.paint.PdfContent.io;
@@ -63,8 +61,6 @@ public final class PdfCanvas implements Canvas {
     private final PdfImages images;
     private final PdfTagging tagging;
     private final boolean debug;
-    /** The opacities of the transparency groups being painted ({@link #beginOpacity}), the innermost first. */
-    private final Deque<Double> opacities = new ArrayDeque<>();
 
     /** The stream being written: that of the page or that of the transparency group being painted. */
     private PDPageContentStream out() {
@@ -173,12 +169,15 @@ public final class PdfCanvas implements Canvas {
     public void line(Rect r, boolean vertical, String color, LineStyle style) {
         if (style == LineStyle.SOLID) {
             background(r, color);
-        } else if (r.width() > 0 && r.height() > 0) {
-            io(() -> {
-                out().beginMarkedContent(COSName.ARTIFACT);
-                stroke(Dashes.segment(r, vertical, style, 0, 0), color);
-                out().endMarkedContent();
-            });
+        } else {
+            Dashes.Segment segment = Dashes.line(r, vertical, style);
+            if (segment != null) {
+                io(() -> {
+                    out().beginMarkedContent(COSName.ARTIFACT);
+                    stroke(segment, color);
+                    out().endMarkedContent();
+                });
+            }
         }
     }
 
@@ -212,14 +211,10 @@ public final class PdfCanvas implements Canvas {
 
     /** Strokes the lines along the middle of a border with rounded corners, each with its pattern fitted to it. */
     private void stroke(Rect r, Insets w, Radii radii, String color, LineStyle style) throws IOException {
-        double width = Math.max(Math.max(w.top(), w.bottom()), Math.max(w.left(), w.right()));
-        for (Shapes.Run run : Shapes.centerlines(r, w, radii)) {
-            double length = Shapes.length(run.path());
-            Dashes.Pattern pattern = run.closed() ? Dashes.closed(style, length, width)
-                    : Dashes.open(style, length, width);
+        for (Dashes.Curve curve : Dashes.rounded(r, w, radii, style)) {
             page.stroking(color, () -> {
-                pen(width, pattern);
-                run.path().accept(page.path());
+                pen(curve.width(), curve.pattern());
+                curve.path().accept(page.path());
                 out().stroke();
             });
         }
@@ -368,18 +363,6 @@ public final class PdfCanvas implements Canvas {
         });
     }
 
-    /** The readable text of a barcode: each run of its line, with the baseline its font gives it in the line. */
-    private void readableText(Box box, Rect content, List<TextLine> text) {
-        for (TextLine line : text) {
-            FontFace font = box.style().typography().fontFace();
-            double baseline = vertical(font).baseline(content.y() + line.y(), line.height(), line.fontSize());
-            for (TextLine.Run run : line.runs()) {
-                text(content.x() + line.x() + run.x(), baseline, run.text(), font, line.fontSize(),
-                        box.style().typography().color(), 0, 0);
-            }
-        }
-    }
-
     /**
      * The modules of a generated image, such as a {@code Barcode} (reference/components/barcode.md), in the
      * {@code Color} of its {@code Typography}: one rectangle per run of dark modules of each row, all in a single path
@@ -400,7 +383,7 @@ public final class PdfCanvas implements Canvas {
                 }
                 out().fill();
             });
-            readableText(box, content, text);
+            TextPainter.paintReadable(this, box, content, text);
             out().restoreGraphicsState();
             out().endMarkedContent();
         });
@@ -430,14 +413,13 @@ public final class PdfCanvas implements Canvas {
      */
     @Override
     public void beginOpacity(double opacity) {
-        io(() -> tagging.beginGroup(page.beginGroup()));
-        opacities.push(opacity);
+        io(() -> tagging.beginGroup(page.beginGroup(opacity)));
     }
 
     @Override
     public void endOpacity() {
         tagging.endGroup();
-        io(() -> page.endGroup(opacities.pop()));
+        io(page::endGroup);
     }
 
     /** Closes what a failure while painting left open ({@link PdfContent#abandonGroups}). */

@@ -2,10 +2,12 @@ package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.LineStyle;
+import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The pattern of a line that is not solid (reference/common/box.md#border-style): the dashes of {@code dashed} and
@@ -119,6 +121,40 @@ final class Dashes {
         }
         double y = r.y() + width / 2;
         return new Segment(r.x() + start, y, r.x() + end, y, width, from);
+    }
+
+    /**
+     * The line that a merged border of a table or the line between two columns draws in the rectangle {@code r}
+     * ({@link Canvas#line}), with the pattern of {@code style} fitted to it. {@code null} if the rectangle is empty.
+     */
+    static Segment line(Rect r, boolean vertical, LineStyle style) {
+        return r.width() > 0 && r.height() > 0 ? segment(r, vertical, style, 0, 0) : null;
+    }
+
+    /**
+     * A line along the middle of a border with rounded corners to stroke.
+     *
+     * @param path    draws it
+     * @param width   its width: that of the widest side of the border
+     * @param pattern its dashes or dots, fitted to its length; {@code null} if it is solid
+     */
+    record Curve(Consumer<Shapes.Path> path, double width, Pattern pattern) {
+    }
+
+    /**
+     * The lines of a border with rounded corners that is not solid ({@link Shapes#centerlines}), each with its
+     * pattern fitted to its length: to the whole way round if it is closed and, if not, with a dash or a dot at each
+     * of its ends.
+     */
+    static List<Curve> rounded(Rect r, Insets w, Radii radii, LineStyle style) {
+        double width = Math.max(Math.max(w.top(), w.bottom()), Math.max(w.left(), w.right()));
+        List<Curve> curves = new ArrayList<>();
+        for (Shapes.Run run : Shapes.centerlines(r, w, radii)) {
+            double length = Shapes.length(run.path());
+            curves.add(new Curve(run.path(), width, run.closed() ? closed(style, length, width)
+                    : open(style, length, width)));
+        }
+        return curves;
     }
 
     /** The line of a side of a border, with the side it belongs to, which gives its color. */

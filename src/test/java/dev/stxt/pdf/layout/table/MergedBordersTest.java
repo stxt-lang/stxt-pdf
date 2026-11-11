@@ -164,11 +164,11 @@ class MergedBordersTest {
                         "\tTable:", "\t\tId: T", "\t\tColumn sizes: *", "\t\tBox:", "\t\t\tMerge borders: true",
                         "\t\tHeader rows:", "\t\t\tRow:"}, cell, new String[]{"\t\tBody rows:", "\t\t\tRow:"}, cell));
         List<Rule> horizontal = l.fragment("T").rules().stream().filter(r -> !r.vertical()).toList();
-        assertEquals(List.of(new Rule(0, 0, 515, 1, "#000000", LineStyle.SOLID),
-                new Rule(0, 63, 515, 1, "#000000", LineStyle.DASHED),
-                new Rule(0, 31, 515, 2, "#000000", LineStyle.SOLID)), horizontal);
+        assertEquals(List.of(new Rule(0, 0, 515, 1, "#000000", LineStyle.SOLID, false),
+                new Rule(0, 63, 515, 1, "#000000", LineStyle.DASHED, false),
+                new Rule(0, 31, 515, 2, "#000000", LineStyle.SOLID, false)), horizontal);
         List<Rule> left = l.fragment("T").rules().stream().filter(r -> r.vertical() && r.x() == 0).toList();
-        assertEquals(List.of(new Rule(0, 0, 1, 32, "#000000", LineStyle.SOLID),
-                new Rule(0, 32, 1, 32, "#000000", LineStyle.DASHED)), left);
+        assertEquals(List.of(new Rule(0, 0, 1, 32, "#000000", LineStyle.SOLID, true),
+                new Rule(0, 32, 1, 32, "#000000", LineStyle.DASHED, true)), left);
     }
 }

@@ -173,9 +173,10 @@ por su línea central con el patrón de guiones del formato (`d` en el PDF, `str
 es puro, calcula el patrón y lo ajusta al largo: `open` para una línea con dos extremos (un trazo o un punto entero en
 cada uno) y `closed` para una cerrada (un número entero de periodos). Un punto es un trazo de largo 0 con extremos
 redondos. `Dashes.border` da una línea por lado de un borde de esquinas cuadradas, con los lados verticales recortados
-por los horizontales, y `Dashes.segment`, la de un `Canvas.line`. Con esquinas redondeadas, `Shapes.centerlines` da el
+por los horizontales, y `Dashes.line`, la de un `Canvas.line`. Con esquinas redondeadas, `Shapes.centerlines` da el
 camino por el medio del borde (cerrado, o uno abierto por cada grupo de lados seguidos en un fragmento sin alguno de
-ellos) y `Shapes.length` lo mide, con las curvas en 16 tramos rectos. Con un color por lado, ese camino se traza una vez
+ellos) y `Shapes.length` lo mide, con las curvas en 16 tramos rectos; `Dashes.rounded` da cada uno de esos caminos con
+su grosor y su patrón, y los dos lienzos solo los trazan. Con un color por lado, ese camino se traza una vez
 por lado, recortado a su trapecio (`sidePolygon`). `PdfContent.stroking` pone el color y la opacidad de trazo dentro de
 un `q ... Q`, así que el grosor, los guiones y los extremos no salen de él.
 

@@ -12,17 +12,21 @@ import dev.stxt.pdf.model.LineStyle;
  * @param width  width
  * @param height height
  * @param color  its color ({@code #rrggbb})
- * @param style  how it is drawn ({@code Border style})
+ * @param style    how it is drawn ({@code Border style})
+ * @param vertical whether the line runs from top to bottom, and its pattern with it: its thickness is then its
+ *                 width, and if not, its height. Whoever builds the line says it, because a piece of a line can be
+ *                 shorter than it is thick
  */
-public record Rule(double x, double y, double width, double height, String color, LineStyle style) {
+public record Rule(double x, double y, double width, double height, String color, LineStyle style,
+                   boolean vertical) {
 
-    /** A solid line. */
+    /** A solid line, which has no pattern to run along it: it is vertical if it is taller than it is wide. */
     public Rule(double x, double y, double width, double height, String color) {
-        this(x, y, width, height, color, LineStyle.SOLID);
+        this(x, y, width, height, color, LineStyle.SOLID, height > width);
     }
 
-    /** Whether the line runs from top to bottom: it is taller than it is wide. */
-    public boolean vertical() {
-        return height > width;
+    /** How thick the line is: its width if it is vertical and its height if not. */
+    public double thickness() {
+        return vertical ? width : height;
     }
 }

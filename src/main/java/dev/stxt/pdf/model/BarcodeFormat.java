@@ -9,11 +9,6 @@ public enum BarcodeFormat {
         return this == CODE_128 || this == GS1_128 || this == EAN_13;
     }
 
-    /** Whether its data is a list of GS1 application identifiers, each one in parentheses before its value. */
-    public boolean isGs1() {
-        return this == GS1_128 || this == GS1_DATA_MATRIX;
-    }
-
     /** How the documents write it: {@code gs1-data-matrix}. */
     public String value() {
         return name().toLowerCase(java.util.Locale.ROOT).replace('_', '-');

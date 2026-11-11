@@ -11,7 +11,8 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
 `model.FootnoteNumberFormat` instead of a `model.NumberFormat`. `model.RunStyle` has a tenth component, `position`. A
 second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. `fragment.Rule` has
-a sixth component, `style` (a `model.LineStyle`); its constructor with five arguments still makes a solid line.
+two more components, `style` (a `model.LineStyle`) and `vertical`; its constructor with five arguments still makes a
+solid line.
 `paint.Canvas.image` takes a fourth argument, the lines of the readable text of a barcode (empty in any other image),
 and `model.Modules` has a seventh component, `text` (a `model.BarcodeText`, or `null`); its constructors with five and
 six arguments still make a drawing without text. `paint.Canvas` has two more methods, `beginOpacity` and `endOpacity`,
