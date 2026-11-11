@@ -4,6 +4,8 @@
 # Markup: markdown to put a bold word inside the sentence, and the payment details also carry Code
 # font: the IBAN and the BIC, as inline code, in the monospaced font. The labels are written as
 # a normal sentence and the rules put them in uppercase (Case) and space them out (Letter spacing).
+# In the masthead, the word and the number of the invoice, of sizes 28 and 12, share their baseline: a Stack with
+# Vertical: baseline.
 # Next to the payment details, the transfer QR code that banking apps read (the EPC format: beneficiary, IBAN,
 # amount and reference, one per line): a Barcode with its data in a Content block.
 Document (dev.stxt.pdf):
@@ -38,21 +40,23 @@ Document (dev.stxt.pdf):
 					Box:
 						Width: 172
 			Item:
-				Block:
-					Text: Factura
-						Typography:
-							Size: 28
-							Bold: true
-							Color: #3B2A1E
-							Align: right
-							Line height: 30
-							Case: uppercase
-							Letter spacing: 2
-					Text: Nº 2025-0147
-						Typography:
-							Size: 12
-							Color: #A65C1B
-							Align: right
+				Stack:
+					Gap: 10
+					Vertical: baseline
+					Item:
+						Text: Factura
+							Typography:
+								Size: 28
+								Bold: true
+								Color: #3B2A1E
+								Line height: 30
+								Case: uppercase
+								Letter spacing: 2
+					Item:
+						Text: Nº 2025-0147
+							Typography:
+								Size: 12
+								Color: #A65C1B
 		Grid:
 			Id: parties
 			Column sizes: * *

@@ -73,7 +73,7 @@ Cada hijo de un `Stack` va dentro de un `Item`, que envuelve **exactamente un el
 | `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap items`, puede tener dos: entre filas y entre columnas |
 | `Wrap items` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
 | `Horizontal` | `left`, `right`, `center`, `justify`, `distribute`. En columna: `left`, `right`, `center`, `stretch` | `left`. En columna: `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados, entre los ítems (`justify`) o en huecos iguales, también en los bordes (`distribute`). En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Stack` |
-| `Vertical` | `top`, `bottom`, `center`, `stretch`. En columna: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. En columna: `top` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila). En columna, dónde va lo que sobra |
+| `Vertical` | `top`, `bottom`, `center`, `stretch`, `baseline`. En columna: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. En columna: `top` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila y `baseline` los alinea por la línea base de su texto). En columna, dónde va lo que sobra |
 | `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Con `Wrap items`, cómo se reparten las líneas |
 
 ## Cómo se reparte el espacio
@@ -86,6 +86,43 @@ Cada hijo de un `Stack` va dentro de un `Item`, que envuelve **exactamente un el
 
 El reparto de lo que sobra solo actúa si ningún ítem crece. En fila, los ítems se estiran al alto de la fila
 (`Vertical: stretch`), salvo las imágenes, que conservan su proporción.
+
+## Textos de distinto tamaño en una fila (`Vertical: baseline`)
+
+Un rótulo pequeño junto a una cifra grande se alinea por la línea base del texto, la línea sobre la que se apoyan las
+letras, con `Vertical: baseline` en un `Stack` en fila:
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Total
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Section:
+        Stack:
+            Gap: 6
+            Vertical: baseline
+            Item:
+                Text: TOTAL
+            Item:
+                Text: 1.234,56
+                    Typography:
+                        Size: 24
+                        Bold: true
+            Item:
+                Text: EUR
+```
+
+- Cuenta la primera línea de cada ítem, también si el texto está dentro de un `Block`.
+- Un ítem sin texto, como una imagen, apoya su borde inferior en esa línea.
+- Un `Item` puede pedirlo solo para él (`Vertical: baseline` en el `Item`) o salirse de él (`Vertical: top`).
+- Solo vale en un `Stack` en fila: en uno en columna, en un `Grid` o en una celda es un error.
 
 ## Cosas a tener en cuenta
 

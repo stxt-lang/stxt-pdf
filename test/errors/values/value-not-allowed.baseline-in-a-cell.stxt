@@ -1,0 +1,22 @@
+# Case: baseline in the Vertical of a Cell, which places its content in the height of its row
+# Code: VALUE_NOT_ALLOWED
+# Line: 21
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Table:
+			Column sizes: * *
+			Body rows:
+				Row:
+					Cell: Hola
+						Vertical: baseline
+					Cell: Adiós

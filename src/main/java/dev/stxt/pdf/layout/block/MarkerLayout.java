@@ -2,6 +2,7 @@ package dev.stxt.pdf.layout.block;
 
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.Baselines;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.model.Insets;
@@ -40,7 +41,7 @@ final class MarkerLayout {
     static Optional<Fragment> place(Box item, List<Fragment> children, Insets border, Insets padding,
                                     LayoutContext context) {
         TextMeasurer measurer = context.measurer();
-        OptionalDouble baseline = firstBaseline(children, measurer);
+        OptionalDouble baseline = Baselines.first(children, measurer);
         if (baseline.isEmpty()) {
             return Optional.empty();
         }
@@ -68,34 +69,5 @@ final class MarkerLayout {
         // The marker box is generated: without margin, border or padding.
         return Optional.of(new Fragment(marker, x, y, width, height, Insets.ZERO, Insets.ZERO, Insets.ZERO,
                 List.of(), List.of(new TextLine(0, 0, width, height, t.fontSize(), marker.text())), true, true));
-    }
-
-    /**
-     * Baseline of the first line of some child fragments, relative to the content box of
-     * their parent: that of the first in-flow child, going down to a fragment with lines.
-     */
-    static OptionalDouble firstBaseline(List<Fragment> children, TextMeasurer measurer) {
-        double top = 0;
-        Optional<Fragment> next = firstInFlow(children);
-        while (next.isPresent() && next.get().first()) {
-            Fragment f = next.get();
-            double contentTop = top + f.y() + f.border().top() + f.padding().top();
-            if (!f.lines().isEmpty()) {
-                TextLine l = f.lines().get(0);
-                Style s = f.box().style();
-                return OptionalDouble.of(measurer.vertical(s.typography().fontFace())
-                        .baseline(contentTop + l.y(), l.height(), s.typography().fontSize()));
-            }
-            top = contentTop;
-            next = firstInFlow(f.children());
-        }
-        return OptionalDouble.empty();
-    }
-
-    /** The first in-flow fragment, not counting the markers. */
-    private static Optional<Fragment> firstInFlow(List<Fragment> fragments) {
-        return fragments.stream()
-                .filter(f -> !f.box().style().isOutOfFlow() && !f.box().isMarker())
-                .findFirst();
     }
 }

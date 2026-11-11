@@ -4,6 +4,7 @@ import dev.stxt.pdf.fragment.BreakRules;
 import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.Unit;
+import dev.stxt.pdf.layout.Baselines;
 import dev.stxt.pdf.layout.BoxModel;
 import dev.stxt.pdf.layout.ConstraintSpace;
 import dev.stxt.pdf.layout.IntrinsicSizes;
@@ -127,6 +128,11 @@ public final class StackLayout implements LayoutAlgorithm {
         ConstraintSpace space;
         /** In horizontal: its height is that of its line ({@code stretch}, without a height of its own). */
         boolean stretched;
+        /**
+         * In horizontal, with {@code baseline}: from the top of its margin box to the baseline of its first line of
+         * text or, without text, to the bottom of its margin box.
+         */
+        double ascent;
 
         Item(Box box, Insets margin, Alignment align) {
             this.box = box;
@@ -135,8 +141,11 @@ public final class StackLayout implements LayoutAlgorithm {
         }
     }
 
-    /** Cross size of each line and the space left over on the cross axis (step 6). */
-    private record CrossSizes(double[] lines, double free) {
+    /**
+     * Cross size of each line and the space left over on the cross axis (step 6). {@code baselines} is, for each line
+     * of a horizontal container, how far below its top the baseline of its items with {@code baseline} is.
+     */
+    private record CrossSizes(double[] lines, double free, double[] baselines) {
     }
 
     /** What a unit occupies on the axis of the break, and its items. */
@@ -201,10 +210,20 @@ public final class StackLayout implements LayoutAlgorithm {
         CrossSizes crossSizes(List<List<Item>> lines) {
             int n = lines.size();
             double[] lineCross = new double[n];
+            double[] baselines = new double[n];
             for (int l = 0; l < n; l++) {
+                // The items with baseline share the baseline of the line: the line is as tall as what is highest above
+                // it plus what is lowest below it, which can be more than its tallest item.
+                double below = 0;
                 for (Item it : lines.get(l)) {
                     lineCross[l] = Math.max(lineCross[l], it.cross);
+                    if (row && it.align == Alignment.BASELINE) {
+                        it.ascent = ascent(it);
+                        baselines[l] = Math.max(baselines[l], it.ascent);
+                        below = Math.max(below, it.cross - it.ascent);
+                    }
                 }
+                lineCross[l] = Math.max(lineCross[l], baselines[l] + below);
             }
             if (!multiLine && n == 1 && crossSize.isPresent()) {
                 lineCross[0] = crossSize.getAsDouble();
@@ -219,7 +238,17 @@ public final class StackLayout implements LayoutAlgorithm {
                 }
                 crossFree = 0;
             }
-            return new CrossSizes(lineCross, crossFree);
+            return new CrossSizes(lineCross, crossFree, baselines);
+        }
+
+        /**
+         * From the top of the margin box of an item to the baseline of its first line of text
+         * (reference/components/stack.md); without text first (an image, an empty box), to the bottom of its margin
+         * box, which rests on the baseline.
+         */
+        double ascent(Item it) {
+            OptionalDouble baseline = Baselines.first(it.result.fragment(), context.measurer());
+            return baseline.isPresent() ? it.margin.top() + baseline.getAsDouble() : it.cross;
         }
 
         /** Step 7: stretch the items with {@code stretch} to the cross size of their line. */
@@ -259,7 +288,8 @@ public final class StackLayout implements LayoutAlgorithm {
                     spans.add(new Span(crossPos, crossPos + lineCross[l], line.stream().map(it -> it.box).toList()));
                 }
                 for (Item it : line) {
-                    double offset = Sizing.align(it.align, lineCross[l], it.cross);
+                    double offset = row && it.align == Alignment.BASELINE ? cross.baselines()[l] - it.ascent
+                            : Sizing.align(it.align, lineCross[l], it.cross);
                     int unit = row ? l : multiLine ? 0 : spans.size();
                     if (!row && !multiLine) {
                         spans.add(new Span(mainPos, mainPos + it.main, List.of(it.box)));
@@ -490,7 +520,7 @@ public final class StackLayout implements LayoutAlgorithm {
             };
         }
         return switch (d) {
-            case START, STRETCH -> new double[]{0, 0};
+            case START, STRETCH, BASELINE -> new double[]{0, 0};
             case END -> new double[]{free, 0};
             case CENTER -> new double[]{free / 2, 0};
             case JUSTIFY -> new double[]{0, n > 1 ? free / (n - 1) : 0};

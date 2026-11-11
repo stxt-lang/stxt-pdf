@@ -566,4 +566,82 @@ class StackLayoutTest {
                 "\t\tItem:", block("D", "Width: 190", "Height: 20"));
         assertRect(40, 70, 190, 20, l.rect("D"));
     }
+
+    // --- Vertical: baseline (reference/components/stack.md). The text of the fixture is of size 10 in lines of 12:
+    // its baseline is 1 + 8 = 9 below the top of the line. At size 20 in lines of 24, 2 + 16 = 18.
+
+    @Test
+    void baselineAlignsTheFirstLinesOfTheItems() {
+        LayoutFixture l = layOut(
+                "\tStack:", "\t\tId: S", "\t\tVertical: baseline",
+                "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A",
+                "\t\tItem:", "\t\t\tText: bb", "\t\t\t\tId: B", "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20", "\t\t\t\t\tLine height: 24",
+                // The first line of a text inside a box with padding: 4 + 9 = 13 below its top.
+                "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tPadding: 4",
+                "\t\t\t\tText: cc", "\t\t\t\tText: dd");
+        assertRect(40, 49, 10, 12, l.rect("A"));
+        assertRect(50, 40, 20, 24, l.rect("B"));
+        assertRect(70, 45, 18, 32, l.rect("C"));
+        // 18 above the baseline, and C leaves 32 - 13 = 19 below it: the line is taller than its tallest item.
+        assertRect(40, 40, 515, 37, l.rect("S"));
+    }
+
+    @Test
+    void anItemWithoutTextRestsOnTheBaseline() {
+        LayoutFixture l = layOut(
+                "\tStack:", "\t\tId: S", "\t\tVertical: baseline",
+                "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10",
+                "\t\t\t\t\tHeight: 12",
+                "\t\tItem:", "\t\t\tText: bb", "\t\t\t\tId: B", "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20", "\t\t\t\t\tLine height: 24",
+                // Taller than what there is above the baseline: it raises the baseline of the line to 30.
+                "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 10",
+                "\t\t\t\t\tHeight: 30");
+        assertRect(40, 58, 10, 12, l.rect("A"));
+        assertRect(50, 52, 20, 24, l.rect("B"));
+        assertRect(70, 40, 10, 30, l.rect("C"));
+        assertRect(40, 40, 515, 36, l.rect("S"));
+    }
+
+    @Test
+    void anItemChoosesTheBaselineOrLeavesIt() {
+        // B and C share the baseline; A keeps the top of the line and D goes to its bottom.
+        LayoutFixture l = layOut(
+                "\tStack:", "\t\tVertical: top",
+                "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A",
+                "\t\tItem:", "\t\t\tVertical: baseline", "\t\t\tText: bb", "\t\t\t\tId: B",
+                "\t\tItem:", "\t\t\tVertical: baseline", "\t\t\tText: cc", "\t\t\t\tId: C", "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20", "\t\t\t\t\tLine height: 24",
+                "\t\tItem:", "\t\t\tVertical: bottom", "\t\t\tText: dd", "\t\t\t\tId: D");
+        assertRect(40, 40, 10, 12, l.rect("A"));
+        assertRect(50, 49, 10, 12, l.rect("B"));
+        assertRect(60, 40, 20, 24, l.rect("C"));
+        assertRect(80, 52, 10, 12, l.rect("D"));
+    }
+
+    @Test
+    void eachLineOfAWrappedStackHasItsBaseline() {
+        LayoutFixture l = layOut(
+                "\tStack:", "\t\tWrap items: true", "\t\tVertical: baseline", "\t\tBox:", "\t\t\tWidth: 30",
+                "\t\tItem:", "\t\t\tText: aa", "\t\t\t\tId: A",
+                "\t\tItem:", "\t\t\tText: bb", "\t\t\t\tId: B", "\t\t\t\tTypography:", "\t\t\t\t\tSize: 20", "\t\t\t\t\tLine height: 24",
+                "\t\tItem:", "\t\t\tText: cc", "\t\t\t\tId: C",
+                "\t\tItem:", "\t\t\tText: dd", "\t\t\t\tId: D");
+        assertRect(40, 49, 10, 12, l.rect("A"));
+        assertRect(50, 40, 20, 24, l.rect("B"));
+        // The second line has no big text: its two items are at its top.
+        assertRect(40, 64, 10, 12, l.rect("C"));
+        assertRect(50, 64, 10, 12, l.rect("D"));
+    }
+
+    @Test
+    void baselineIsOnlyOfTheCrossAxisOfAHorizontalStack() {
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut(
+                "\tStack:", "\t\tDirection: vertical", "\t\tVertical: baseline",
+                "\t\tItem:", "\t\t\tText: aa"));
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
+        // In the item of a vertical Stack, Vertical is the main axis whatever its value.
+        InvalidModelException item = assertThrows(InvalidModelException.class, () -> layOut(
+                "\tStack:", "\t\tDirection: vertical",
+                "\t\tItem:", "\t\t\tVertical: baseline", "\t\t\tText: aa"));
+        assertEquals(ErrorCode.ITEM_MAIN_AXIS, item.errorCode());
+    }
 }

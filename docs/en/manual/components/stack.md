@@ -73,7 +73,7 @@ Each child of a `Stack` goes inside an `Item`, which wraps **exactly one element
 | `Gap` | 1 or 2 measurements | `0` | The gap between items, and between lines if there are several. With `Wrap items`, it can have two: between rows and between columns |
 | `Wrap items` | `true`, `false` | `false` | Whether the items that do not fit move to another line |
 | `Horizontal` | `left`, `right`, `center`, `justify`, `distribute`. In a column: `left`, `right`, `center`, `stretch` | `left`. In a column: `stretch` | In a row, where what is left over goes: at the start, at the end, on both sides, between the items (`justify`) or in equal gaps, also at the edges (`distribute`). In a column, how the items are aligned: `stretch` stretches them to the width of the `Stack` |
-| `Vertical` | `top`, `bottom`, `center`, `stretch`. In a column: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. In a column: `top` | The reverse of `Horizontal`. In a row, how the items are aligned (`stretch` stretches them to the height of the row). In a column, where what is left over goes |
+| `Vertical` | `top`, `bottom`, `center`, `stretch`, `baseline`. In a column: `top`, `bottom`, `center`, `justify`, `distribute` | `stretch`. In a column: `top` | The reverse of `Horizontal`. In a row, how the items are aligned (`stretch` stretches them to the height of the row and `baseline` aligns them by the baseline of their text). In a column, where what is left over goes |
 | `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | With `Wrap items`, how the lines are distributed |
 
 ## How the space is shared out
@@ -87,6 +87,43 @@ Each child of a `Stack` goes inside an `Item`, which wraps **exactly one element
 
 The distribution of what is left over only applies if no item grows. In a row, the items are stretched to the height of
 the row (`Vertical: stretch`), except images, which keep their proportions.
+
+## Texts of different sizes in a row (`Vertical: baseline`)
+
+A small label next to a large figure is aligned by the baseline of the text, the line the letters rest on, with
+`Vertical: baseline` in a `Stack` in a row:
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Total
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+    Section:
+        Stack:
+            Gap: 6
+            Vertical: baseline
+            Item:
+                Text: TOTAL
+            Item:
+                Text: 1,234.56
+                    Typography:
+                        Size: 24
+                        Bold: true
+            Item:
+                Text: EUR
+```
+
+- The first line of each item counts, also if the text is inside a `Block`.
+- An item without text, such as an image, rests its bottom edge on that line.
+- An `Item` can ask for it only for itself (`Vertical: baseline` in the `Item`) or leave it (`Vertical: top`).
+- It is only valid in a `Stack` in a row: in one in a column, in a `Grid` or in a cell it is an error.
 
 ## Things to keep in mind
 

@@ -250,10 +250,14 @@ the line and as wide as its proportion, which `TextValues.WithImages` reads from
 delegates. `Images.validate` checks the images of the runs beforehand like those of the `Image` boxes (format, limits),
 with the line of the text.
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
-`List item` in its first fragment, with the baseline of its first line (`TextMeasurer.vertical`); an image marker is as
+`List item` in its first fragment, with the baseline of its first line (`Baselines.first`, which goes down the first in-flow
+fragment to one with lines and uses `TextMeasurer.vertical` with the size of the line); an image marker is as
 tall as `Height` or the `Size` of the item and as wide as its proportion gives (`LayoutContext.natural`), carries the
 space that separates it from the item as the right padding of the fragment, and is centered on the capitals
-(`VerticalMetrics.capHeight`) of the typography of the item on that baseline.
+(`VerticalMetrics.capHeight`) of the typography of the item on that baseline. `StackLayout` uses the same `Baselines.first` for
+`Vertical: baseline`: in `crossSizes` it keeps for each item what rises above its baseline (`Item.ascent`; without
+text, its whole height) and for each line the greatest (`CrossSizes.baselines`), with which the height of the line
+grows, and `arrange` places the item at the difference.
 
 **Side boxes** ([Block](../components/block.md#side-boxes-side)). `BlockLayout` places a child with `Side` whole, at its
 side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and

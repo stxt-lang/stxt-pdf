@@ -32,7 +32,7 @@ Stack:
 | `Wrap items` | boolean | `false` | Allows the items to be distributed over several lines. |
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap items: true` (`GAP_WITHOUT_WRAP`). |
 | `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
-| `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
+| `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right`; on the cross one, also `baseline` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line: `baseline` aligns them by the baseline of their text ([below](#baseline-alignment)). |
 | `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap items: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap items`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
@@ -62,7 +62,7 @@ other properties go on that element. The `Item` only adds how it takes part in t
 | `Grow` | number ≥ 0 | `0` | Share of the leftover space it receives. |
 | `Shrink` | number ≥ 0 | `1` | Share of the deficit it gives up, weighted by `Base size`. |
 | `Base size` | number, %, `auto` | `auto` | Starting size on the main axis. |
-| `Horizontal`, `Vertical` | `left` or `top`, `right` or `bottom`, `center`, `stretch` | that of the container | The alignment of the item on the cross axis, which overrides that of the container: `Vertical` in a horizontal `Stack`, `Horizontal` in a vertical one. The one on the main axis is an error (`ITEM_MAIN_AXIS`): there the `Stack` distributes, and the item grows or shrinks with `Grow` and `Shrink`. |
+| `Horizontal`, `Vertical` | `left` or `top`, `right` or `bottom`, `center`, `stretch`; in `Vertical`, also `baseline` | that of the container | The alignment of the item on the cross axis, which overrides that of the container: `Vertical` in a horizontal `Stack`, `Horizontal` in a vertical one. The one on the main axis is an error (`ITEM_MAIN_AXIS`): there the `Stack` distributes, and the item grows or shrinks with `Grow` and `Shrink`. |
 | `Layer` | integer | `auto` | Stacking order of the item ([Layers and rotation](../common/layers-and-rotation.md)). |
 
 `Grow`, `Shrink` and `Base size` can also come from a rule of `Styles` of the element the `Item` wraps, and what the
@@ -81,7 +81,8 @@ item (`Horizontal`, `Vertical`) and `Layer` cannot: in a rule, `Horizontal` and 
    gaps fit.
 5. **Flexible sizes** (per line), described below.
 6. **Cross size:** layout of each item with its final main size (in horizontal, the text is redistributed with the final
-   width). The line measures what the tallest item does. Without `Wrap items` and with a definite cross size on the container, the only line
+   width). The line measures what the tallest item does, or more if it has items with `baseline`
+   ([below](#baseline-alignment)). Without `Wrap items` and with a definite cross size on the container, the only line
    measures what the container does.
 7. **Stretch:** the items with `stretch` and without a declared cross size come to measure what the line does, and their layout is repeated.
    In vertical, if the container has a single line, these items are measured from the start with the width of the container.
@@ -126,6 +127,51 @@ A negative leftover space after shrinking means that the items do not fit: it is
 ([Overflow](../common/overflow.md)). The `auto` margins of an item are an error: alignment is done with
 `Horizontal` and `Vertical`.
 
+### Baseline alignment
+
+`Vertical: baseline`, in a `Stack` with `Direction: horizontal` or in one of its `Item`, puts the baselines of the
+items on the same line: a small label next to a large figure, a price and its unit.
+
+```
+Stack:
+    Gap: 6
+    Vertical: baseline
+    Item:
+        Text: TOTAL
+    Item:
+        Text: 1,234.56
+            Typography:
+                Size: 20
+    Item:
+        Text: EUR
+```
+
+- **The baseline of an item** is that of its first line of text: its own or, if it has no text of its own, that of its
+  first in-flow child, going down to the first text (a `Block` with padding and a `Paragraph` inside, the first
+  `List item` of a `List`). The marker of a list does not count.
+- **An item without a text in first place** (an `Image`, a `Barcode`, an empty `Block`, or a block that starts with one
+  of them) rests the bottom edge of its margin box on the baseline.
+- **The baseline of the line** is that of the item that rises the most above it, counting its top margin. The items
+  with `baseline` of a line share it, and the others (`top`, `center`, `bottom`, `stretch`) are aligned as always.
+- **The height of the line** is what rises the most above the baseline plus what goes down the most below it, which
+  can be more than the tallest item. If the container has a definite height and a single line, the group stays at the top.
+- An item with `baseline` is not stretched: it measures its height.
+- With `Wrap items`, each line of the `Stack` has its baseline.
+- **It is only valid there.** On the main axis (the `Vertical` of a `Stack` with `Direction: vertical`), in a `Grid`,
+  in an `Area` and in a `Cell` it is `VALUE_NOT_ALLOWED`, and in the `Item` of a vertical `Stack`, `ITEM_MAIN_AXIS`,
+  like any `Vertical`. `Horizontal` does not allow it.
+
+> **Decision:** the baseline is that of the first line of the item, which is the one read next to that of the item
+> beside it. *Alternative discarded:* that of the last one, which only helps when the long text goes first.
+
+> **Decision:** an item without text rests on the baseline, like an image in a sentence. *Alternative discarded:*
+> leaving it at the top, which separates an icon from the text it goes with.
+
+> **Decision:** `baseline` only aligns the items of a line of a horizontal `Stack`. The `Vertical` of a `Cell` places
+> its content in the height of its row and that of a `Grid`, each item in its area: neither aligns an item with the
+> one beside it. *Alternative discarded:* allowing it also in the cells of a row and in the rows of a `Grid`, which
+> mixes the baseline with the spanned cells, the split rows and the `auto` tracks.
+
 ## Behaviors to keep in mind
 
 - In a vertical `Stack`, `Grow` needs the container to have a definite height ([Values](../common/values.md#definite-height)):
@@ -158,5 +204,6 @@ box ([positioned elements](frame-and-overlays.md#overlay)).
 
 ## What is not supported
 
-- A visual order different from the document order, reversed directions and baseline alignment.
+- A visual order different from the document order and reversed directions.
+- Alignment by the baseline of the last line, and baseline alignment in a vertical `Stack`, a `Grid` or a `Table`.
 - `auto` margins on the items: they are errors.

@@ -86,6 +86,11 @@ final class ModelValidator {
                     + "this Stack (" + direction + ") and distributes the free space: it does not allow stretch. What stretches the "
                     + "items is their Grow");
         }
+        if (s.stack().mainAxis() == Distribution.BASELINE) {
+            throw error(s.line(s.stack().mainAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, main + " is the main axis of "
+                    + "this Stack (" + direction + ") and distributes the free space: it does not allow baseline, "
+                    + "which aligns the items of a line of a Stack with Direction: horizontal");
+        }
         String spread = crossSpread(s);
         if (spread != null) {
             throw error(s.line(s.stack().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " is the cross axis of "
@@ -351,6 +356,11 @@ final class ModelValidator {
 
         if (stackItem) {
             validateStackItem(s, parent);
+        }
+        if (gridItem && s.item().vertical() == Alignment.BASELINE) {
+            throw error(s.line(ITEM_VERTICAL), ErrorCode.VALUE_NOT_ALLOWED, "Vertical of an Area aligns the item in "
+                    + "its area: it allows top, bottom, center or stretch, and baseline aligns the items of a line of "
+                    + "a Stack with Direction: horizontal and is only valid there");
         }
         validateSide(s, stackItem, gridItem);
         validateOffset(s);

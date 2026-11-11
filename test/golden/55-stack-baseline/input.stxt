@@ -1,0 +1,85 @@
+# Vertical: baseline in a horizontal Stack (reference/components/stack.md): page of 240 × 160 with margins of 20, page
+# area of 200 × 120 from (20, 20). With the test metrics each character measures half its size, and the baseline of
+# a line is 80 % of the size below the top of the text, centered in the line: 9 in a text of size 10 in lines of 12,
+# and 18 in one of size 20 in lines of 24.
+#   total: a label of size 10, a figure of size 20 and its unit, of size 10, on the same baseline, 18 below the top
+#          of the line: the label and the unit go 9 lower than the figure. The line is 24 tall. y = 20.
+#   top:   the same three with Vertical: top, to compare: the three at the top of the line. y = 54.
+#   mixed: an image without text, which rests its bottom on the baseline (18 − 12 = 6 below the top); a box with a
+#          border of 1, padding of 4 and two lines, whose first line is 5 + 9 = 14 below its top (4 below the top of
+#          the line) and leaves 34 − 14 = 20 below the baseline, so the line is 18 + 20 = 38 tall; the figure; and a
+#          text with Vertical: bottom in its Item, at the bottom of the line (38 − 12 = 26). y = 88.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 240
+		Height: 160
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Line height: 12
+		For style: figure
+			Typography:
+				Size: 20
+				Line height: 24
+				Bold: true
+		For element: Stack
+			Gap: 5
+			Box:
+				Margin: 0 0 10 0
+	Section:
+		Stack:
+			Id: total
+			Vertical: baseline
+			Item:
+				Text: TOTAL
+					Id: label
+			Item:
+				Text: 1.234
+					Id: amount
+					Style: figure
+			Item:
+				Text: EUR
+					Id: unit
+		Stack:
+			Id: top
+			Vertical: top
+			Item:
+				Text: TOTAL
+					Id: top-label
+			Item:
+				Text: 1.234
+					Id: top-amount
+					Style: figure
+			Item:
+				Text: EUR
+					Id: top-unit
+		Stack:
+			Id: mixed
+			Vertical: baseline
+			Item:
+				Image: test/square.png
+					Id: image
+					Alt: Cuadrado
+					Box:
+						Width: 12
+			Item:
+				Block:
+					Id: boxed
+					Box:
+						Padding: 4
+						Border: 1
+					Text: dos
+					Text: filas
+			Item:
+				Text: 99
+					Id: mixed-amount
+					Style: figure
+			Item:
+				Vertical: bottom
+				Text: fin
+					Id: end

@@ -15,6 +15,14 @@ valid changes.
 
 ### Added
 
+- **Baseline alignment in a row.** `Vertical: baseline` in a `Stack` with `Direction: horizontal` and in its `Item`
+  aligns the items of a line by the baseline of their first line of text: a small label next to a large figure. The
+  baseline of an item is that of its first text, going down its first in-flow children; an item without text in first
+  place (an image, an empty box) rests the bottom of its margin box on it. The line is as tall as what rises the most
+  above the baseline plus what goes down the most below it, and with `Wrap items` each line has its own. On the main
+  axis of a vertical `Stack`, in a `Grid`, in an `Area` and in a `Cell` it is `VALUE_NOT_ALLOWED`. `model.Alignment`
+  and `model.Distribution` gain `BASELINE`. "Baseline alignment" in the reference of `Stack`. The invoice of the examples
+  (`01-invoice`) uses it in its masthead: the word and the number of the invoice, of sizes 28 and 12, on one baseline.
 - **Superscripts and subscripts.** `Position` in `Typography`: `normal` (the default), `superscript` or `subscript`. It
   goes in the `For style` rule of a styled run, as in `m[2]{sup}` and `CO[2]{sub}`: the run is measured and painted at
   70 % of the size of the box, raised 0.33 of it or lowered 0.15, without changing the height of the line, like the call

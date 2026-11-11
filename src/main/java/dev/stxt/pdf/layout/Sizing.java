@@ -56,11 +56,12 @@ public final class Sizing {
     /**
      * Offset of a box of size {@code size} aligned in a space {@code space}
      * (reference/components/stack.md and reference/components/grid.md). With {@code stretch} the box already takes
-     * up the space and starts at the beginning.
+     * up the space and starts at the beginning. {@code baseline} is not an offset in a space: the horizontal
+     * {@code Stack} places its items on the baseline of their line itself.
      */
     public static double align(Alignment alignment, double space, double size) {
         return switch (alignment) {
-            case START, STRETCH -> 0;
+            case START, STRETCH, BASELINE -> 0;
             case END -> space - size;
             case CENTER -> (space - size) / 2;
         };

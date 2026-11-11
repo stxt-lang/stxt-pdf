@@ -1827,12 +1827,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: top (by default), center or bottom; the box of the cell stays stretched to its row.
+		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. baseline is only for the cross axis of a Stack with Direction: horizontal and its Item: the items are aligned by the baseline of their first line of text, and an item without text rests its bottom on it. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: top (by default), center or bottom; the box of the cell stays stretched to its row.
 		Values:
 			Value: top
 			Value: bottom
 			Value: center
 			Value: stretch
+			Value: baseline
 			Value: justify
 			Value: distribute
 

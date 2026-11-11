@@ -1,0 +1,31 @@
+# Three rows with a bottom margin of 10 and a gap of 5 between items (see input.stxt). In the first, the label and the
+# unit go 9 below the figure; in the second, the three at the top. The third is 38 tall: the baseline is 18 below its
+# top and the box, 34 tall with its first line 14 below its top, leaves 20 below it.
+Result:
+	Page: 1
+		Fragment: total
+			Rect: 20 20 200 24
+			Fragment: label
+				Rect: 20 29 25 12
+			Fragment: amount
+				Rect: 50 20 50 24
+			Fragment: unit
+				Rect: 105 29 15 12
+		Fragment: top
+			Rect: 20 54 200 24
+			Fragment: top-label
+				Rect: 20 54 25 12
+			Fragment: top-amount
+				Rect: 50 54 50 24
+			Fragment: top-unit
+				Rect: 105 54 15 12
+		Fragment: mixed
+			Rect: 20 88 200 38
+			Fragment: image
+				Rect: 20 94 12 12
+			Fragment: boxed
+				Rect: 37 92 35 34
+			Fragment: mixed-amount
+				Rect: 77 88 20 24
+			Fragment: end
+				Rect: 102 114 15 12

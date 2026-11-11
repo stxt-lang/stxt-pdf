@@ -1,0 +1,20 @@
+# Case: baseline in the Vertical of a Grid, which aligns each item in its area and not with the one beside it
+# Code: VALUE_NOT_ALLOWED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Grid:
+			Column sizes: * *
+			Vertical: baseline
+			Area:
+				Text: Hola

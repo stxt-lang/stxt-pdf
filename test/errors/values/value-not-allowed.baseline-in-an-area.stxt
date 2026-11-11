@@ -1,0 +1,20 @@
+# Case: baseline in the Vertical of an Area of a Grid, which is only valid in the Item of a horizontal Stack
+# Code: VALUE_NOT_ALLOWED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Grid:
+			Column sizes: * *
+			Area:
+				Vertical: baseline
+				Text: Hola

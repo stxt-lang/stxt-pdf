@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.model.Distribution;
+import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.MarkerSuffix;
@@ -283,5 +284,21 @@ class RuleElementPropertiesTest {
         Box item = list.children().get(0);
         assertEquals("test/check.svg", item.style().list().markerImage());
         assertEquals("Sí", item.style().list().markerAlt());
+    }
+
+    /** Vertical: baseline comes from a rule like any other value of the cross axis, and only a horizontal Stack takes it. */
+    @Test
+    void aRuleGivesTheBaselineAlignmentToAStack() {
+        Box root = root(
+                "For element: Stack", "\tVertical: baseline",
+                "---",
+                "Stack:", "\tItem:", "\t\tText: a");
+        assertEquals(Alignment.BASELINE, root.children().get(0).style().stack().crossAxis());
+        // The same rule on a Grid, which aligns each item in its area, is an error on the line of the rule.
+        InvalidModelException grid = error("For style: x", "\tVertical: baseline",
+                "---",
+                "Grid:", "\tStyle: x", "\tColumn sizes: *", "\tArea:", "\t\tText: a");
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, grid.errorCode());
+        assertEquals(13, grid.line());
     }
 }

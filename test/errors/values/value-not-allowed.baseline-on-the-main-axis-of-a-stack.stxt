@@ -1,0 +1,20 @@
+# Case: baseline in the Vertical of a vertical Stack, its main axis, which distributes the leftover space
+# Code: VALUE_NOT_ALLOWED
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Stack:
+			Direction: vertical
+			Vertical: baseline
+			Item:
+				Text: Hola

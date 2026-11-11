@@ -381,7 +381,15 @@ final class PropertyReader {
             case "area-map" -> s.grid().setAreaMap(placement(p, () -> AreaMap.parse(p.getText())));
             case "fill-order" -> s.grid().setFillOrder(enumValue(FillOrder.class, p));
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
-            case "vertical" -> s.grid().setVertical(alignment(p));
+            case "vertical" -> {
+                Alignment vertical = alignment(p);
+                if (vertical == Alignment.BASELINE) {
+                    throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Vertical of a Grid aligns each item in its area: it "
+                            + "allows top, bottom, center or stretch, and baseline aligns the items of a line of a "
+                            + "Stack with Direction: horizontal and is only valid there");
+                }
+                s.grid().setVertical(vertical);
+            }
             case "split-rows" -> s.grid().setSplitRows(bool(p));
             default -> throw unread(p);
         }

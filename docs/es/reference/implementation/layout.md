@@ -246,10 +246,14 @@ y tan ancho como su proporción, que `TextValues.WithImages` lee del fichero a t
 (así también con `FixedMetrics` la imagen mide lo que es), y `PageNumbers.probing` delega. `Images.validate` comprueba
 antes las imágenes de los tramos como las de las `Image` (formato, límites), con la línea del texto.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
-`List item` en su primer fragmento, con la línea base de su primera línea (`TextMeasurer.vertical`); un marcador con imagen
+`List item` en su primer fragmento, con la línea base de su primera línea (`Baselines.first`, que baja por el primer
+fragmento en flujo hasta uno con líneas y usa `TextMeasurer.vertical` con el tamaño de la línea); un marcador con imagen
 mide `Height` o el `Size` del ítem de alto y lo que da su proporción (`LayoutContext.natural`) de ancho, lleva el espacio
 que lo separa del ítem como relleno derecho del fragmento, y se centra en las mayúsculas (`VerticalMetrics.capHeight`) de
-la tipografía del ítem sobre esa línea base.
+la tipografía del ítem sobre esa línea base. `StackLayout` usa el mismo `Baselines.first` para `Vertical: baseline`:
+en `crossSizes` guarda de cada ítem lo que sube sobre su línea base (`Item.ascent`; sin texto, su alto entero) y de
+cada línea la mayor (`CrossSizes.baselines`), con la que crece el alto de la línea, y `arrange` coloca el ítem en la
+diferencia.
 
 **Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
 a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita
