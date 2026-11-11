@@ -31,16 +31,16 @@ Stack:
 | `Direction` | `horizontal`, `vertical` | `horizontal` | El eje principal: en `horizontal` los ítems van uno al lado de otro, y en `vertical`, uno debajo de otro. |
 | `Wrap` | booleano | `false` | Permite repartir los ítems en varias líneas. |
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap: true` (`GAP_WITHOUT_WRAP`). |
-| `Horizontal` | en el eje principal: `left`, `right`, `center`, `justify`, `around`, `distribute`; en el cruzado: `left`, `right`, `center`, `stretch` | `left` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
+| `Horizontal` | en el eje principal: `left`, `right`, `center`, `justify`, `distribute`; en el cruzado: `left`, `right`, `center`, `stretch` | `left` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
 | `Vertical` | como `Horizontal`, con `top` y `bottom` en lugar de `left` y `right` | `top` en el principal; `stretch` en el cruzado | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
-| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Line distribution` | `top`, `bottom` (en horizontal) o `left`, `right` (en vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
 
 > **Decisión:** los ejes se nombran por su dirección en la página, `Horizontal` y `Vertical`, como en `Grid`, y no por su
 > papel. Qué hace cada uno lo dice `Direction`: el del eje principal reparte el sobrante y el del cruzado alinea los ítems,
-> y un valor que no es de su papel es un error (`VALUE_NOT_ALLOWED`): `stretch` en el principal, y `justify`, `around` o
+> y un valor que no es de su papel es un error (`VALUE_NOT_ALLOWED`): `stretch` en el principal, y `justify` o
 > `distribute` en el cruzado. *Alternativa descartada:* `Main axis` y `Cross axis`, que no cambian de sentido con `Direction`
 > pero obligan a pensar en ejes abstractos.
 
@@ -120,7 +120,6 @@ Con un sobrante `L` y `n` ítems (solo actúa si nadie crece):
 | `right` o `bottom` | L | hueco | 0 |
 | `center` | L/2 | hueco | L/2 |
 | `justify` | 0 | hueco + L/(n−1) | 0 |
-| `around` | L/2n | hueco + L/n | L/2n |
 | `distribute` | L/(n+1) | hueco + L/(n+1) | L/(n+1) |
 
 Un sobrante negativo después de encoger significa que los ítems no caben: es un error

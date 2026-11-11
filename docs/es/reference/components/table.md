@@ -124,7 +124,7 @@ Table:
 ```
 
 - **Valores.** `top` (por defecto) deja el contenido arriba, `center` lo centra y `bottom` lo lleva abajo. Los demás
-  valores de `Vertical` (`stretch`, `justify`, `around`, `distribute`) son `VALUE_NOT_ALLOWED` en una celda, que
+  valores de `Vertical` (`stretch`, `justify`, `distribute`) son `VALUE_NOT_ALLOWED` en una celda, que
   está siempre estirada y tiene un solo contenido que colocar.
 - **Qué se mueve.** La caja de la celda sigue estirada a su fila, con su `Background` y su `Border` enteros. Se mueve
   su contenido dentro de su caja de contenido: la línea de una celda con valor, o todos sus elementos juntos. Lo que

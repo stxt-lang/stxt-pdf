@@ -75,7 +75,7 @@ final class ModelValidator {
     /**
      * {@code Horizontal} and {@code Vertical}, {@code Line distribution} and {@code Gap} of a {@code Stack}: the one of
      * the main axis distributes and does not allow {@code stretch}; the one of the cross axis aligns and does not allow
-     * {@code justify}, {@code around} or {@code distribute} (reference/components/stack.md).
+     * {@code justify} or {@code distribute} (reference/components/stack.md).
      */
     static void validateStack(Style s) {
         String main = s.stack().isHorizontal() ? "Horizontal" : "Vertical";
@@ -103,7 +103,7 @@ final class ModelValidator {
             boolean rows = s.stack().isHorizontal();
             throw error(s.line(STACK_LINE_DISTRIBUTION), ErrorCode.VALUE_NOT_ALLOWED, "Line distribution places the "
                     + "lines of this Stack (" + direction + "), which go " + (rows ? "from top to bottom" : "from left "
-                    + "to right") + ": it allows " + PropertyReader.axisEnds(!rows) + ", center, justify, around or "
+                    + "to right") + ": it allows " + PropertyReader.axisEnds(!rows) + ", center, justify, distribute or "
                     + "stretch, and not " + PropertyReader.axisEnds(rows).replace(", ", " or "));
         }
         // A vertical Stack with Wrap is never broken across pages (reference/components/stack.md).
@@ -451,7 +451,7 @@ final class ModelValidator {
      */
     private static String crossSpread(Style s) {
         Distribution v = s.stack().crossDeclared();
-        return v == Distribution.JUSTIFY || v == Distribution.AROUND || v == Distribution.DISTRIBUTE
+        return v == Distribution.JUSTIFY || v == Distribution.DISTRIBUTE
                 ? v.name().toLowerCase(Locale.ROOT) : null;
     }
 

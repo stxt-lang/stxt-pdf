@@ -225,7 +225,7 @@ class CellVerticalTest {
 
     @Test
     void theValuesThatStretchOrDistributeAreNotAllowed() {
-        for (String value : new String[]{"stretch", "justify", "around", "distribute"}) {
+        for (String value : new String[]{"stretch", "justify", "distribute"}) {
             InvalidModelException e = error(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
                     cell("\t\t\t\t\tVertical: " + value)));
             assertEquals(ErrorCode.VALUE_NOT_ALLOWED.name(), e.code(), value);

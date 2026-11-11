@@ -126,7 +126,7 @@ Table:
 ```
 
 - **Values.** `top` (the default) leaves the content at the top, `center` centers it and `bottom` takes it to the
-  bottom. The other values of `Vertical` (`stretch`, `justify`, `around`, `distribute`) are `VALUE_NOT_ALLOWED` in a
+  bottom. The other values of `Vertical` (`stretch`, `justify`, `distribute`) are `VALUE_NOT_ALLOWED` in a
   cell, which is always stretched and has a single content to place.
 - **What moves.** The box of the cell stays stretched to its row, with its whole `Background` and `Border`. Its
   content moves inside its content box: the line of a cell with a value, or all its elements together. What is left

@@ -31,16 +31,16 @@ Stack:
 | `Direction` | `horizontal`, `vertical` | `horizontal` | The main axis: in `horizontal` the items go side by side, and in `vertical`, one below another. |
 | `Wrap` | boolean | `false` | Allows the items to be distributed over several lines. |
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap: true` (`GAP_WITHOUT_WRAP`). |
-| `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `around`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
+| `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
 | `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
-| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
+| `Line distribution` | `top`, `bottom` (in horizontal) or `left`, `right` (in vertical), `center`, `justify`, `distribute`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
 All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
 
 > **Decision:** the axes are named by their direction on the page, `Horizontal` and `Vertical`, as in `Grid`, and not by their
 > role. What each one does is set by `Direction`: the one on the main axis distributes the leftover space and the one on the cross axis aligns the items,
-> and a value that does not belong to its role is an error (`VALUE_NOT_ALLOWED`): `stretch` on the main axis, and `justify`, `around` or
+> and a value that does not belong to its role is an error (`VALUE_NOT_ALLOWED`): `stretch` on the main axis, and `justify` or
 > `distribute` on the cross axis. *Rejected alternative:* `Main axis` and `Cross axis`, which do not change meaning with `Direction`
 > but force thinking in abstract axes.
 
@@ -120,7 +120,6 @@ With a leftover space `L` and `n` items (it only acts if nothing grows):
 | `right` or `bottom` | L | gap | 0 |
 | `center` | L/2 | gap | L/2 |
 | `justify` | 0 | gap + L/(n−1) | 0 |
-| `around` | L/2n | gap + L/n | L/2n |
 | `distribute` | L/(n+1) | gap + L/(n+1) | L/(n+1) |
 
 A negative leftover space after shrinking means that the items do not fit: it is an error

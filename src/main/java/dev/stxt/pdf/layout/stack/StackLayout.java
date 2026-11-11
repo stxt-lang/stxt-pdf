@@ -473,8 +473,8 @@ public final class StackLayout implements LayoutAlgorithm {
 
     /**
      * Distribution of the leftover {@code free} among {@code n} elements (main axis table,
-     * reference/components/stack.md). If space is lacking, {@code justify} aligns to the start and {@code around} and
-     * {@code distribute} are centered.
+     * reference/components/stack.md). If space is lacking, {@code justify} aligns to the start and
+     * {@code distribute} is centered.
      *
      * @return {before the first, extra between elements}
      */
@@ -485,7 +485,7 @@ public final class StackLayout implements LayoutAlgorithm {
         if (free < 0) {
             d = switch (d) {
                 case JUSTIFY -> Distribution.START;
-                case AROUND, DISTRIBUTE -> Distribution.CENTER;
+                case DISTRIBUTE -> Distribution.CENTER;
                 default -> d;
             };
         }
@@ -494,7 +494,6 @@ public final class StackLayout implements LayoutAlgorithm {
             case END -> new double[]{free, 0};
             case CENTER -> new double[]{free / 2, 0};
             case JUSTIFY -> new double[]{0, n > 1 ? free / (n - 1) : 0};
-            case AROUND -> new double[]{free / (2 * n), free / n};
             case DISTRIBUTE -> new double[]{free / (n + 1), free / (n + 1)};
         };
     }

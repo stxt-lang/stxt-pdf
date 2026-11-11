@@ -22,6 +22,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   horizontal `Stack`, `left` and `right` in a vertical one, and the side of the other axis is `VALUE_NOT_ALLOWED`.
   `start` and `end` are no longer values of any property. The Java
   enums `model.Distribution` and `model.Alignment` keep `START` and `END`. No document is laid out differently.
+- **`around` is no longer a value** of `Horizontal`, `Vertical` and `Line distribution`: it differed from
+  `distribute` only in the half gap it left at the edges, and no document asks for that by name. `justify` (from
+  edge to edge) and `distribute` (equal gaps, also at the edges) stay, and `Line distribution` takes `distribute`,
+  which it did not have. `model.Distribution` loses `AROUND`.
 - **`Preformatted` no longer takes `true` and `false`**: its values are `none` (the default, what `false` was),
   `keep` (what `true` was) and `wrap`, with no alias for the old ones. It was the one enumeration with boolean
   values. The constants of `model.Preformatted` are `NONE`, `KEEP` and `WRAP`, and the messages of the errors name

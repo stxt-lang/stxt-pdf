@@ -296,7 +296,6 @@ class StackLayoutTest {
         assertArrayEquals(new double[]{0, 0}, StackLayout.distribute(Distribution.START, 30, 3), 1e-9);
         assertArrayEquals(new double[]{30, 0}, StackLayout.distribute(Distribution.END, 30, 3), 1e-9);
         assertArrayEquals(new double[]{0, 15}, StackLayout.distribute(Distribution.JUSTIFY, 30, 3), 1e-9);
-        assertArrayEquals(new double[]{5, 10}, StackLayout.distribute(Distribution.AROUND, 30, 3), 1e-9);
         assertArrayEquals(new double[]{7.5, 7.5}, StackLayout.distribute(Distribution.DISTRIBUTE, 30, 3), 1e-9);
         // Without room: justify at the start, distribute centered.
         assertArrayEquals(new double[]{0, 0}, StackLayout.distribute(Distribution.JUSTIFY, -30, 3), 1e-9);
@@ -508,6 +507,9 @@ class StackLayoutTest {
                 "\t\tItem:", block("A", "Width: 300", "Height: 20"), "\t\tItem:", block("B", "Width: 300", "Height: 20")};
         assertEquals(40, layOut(with(row, "top")).rect("A").y(), 1e-9);
         assertEquals(100, layOut(with(row, "bottom")).rect("A").y(), 1e-9);
+        // distribute: the 60 left over, in three equal gaps: above, between and below the two lines.
+        assertEquals(60, layOut(with(row, "distribute")).rect("A").y(), 1e-9);
+        assertEquals(100, layOut(with(row, "distribute")).rect("B").y(), 1e-9);
         // Columns in 515 of width: two lines of 100, with the 315 left over to their left with right.
         String[] column = {"\tStack:", "\t\tBox:", "\t\t\tHeight: 60", "\t\tDirection: vertical", "\t\tWrap: true",
                 "\t\tLine distribution: %s", "\t\tItem:", block("A", "Width: 100", "Height: 40"),

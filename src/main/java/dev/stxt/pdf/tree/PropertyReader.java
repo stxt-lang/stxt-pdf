@@ -504,12 +504,12 @@ final class PropertyReader {
 
     /**
      * {@code Horizontal} or {@code Vertical} of a {@code Grid}, an {@code Area} or an {@code Item}: an alignment.
-     * {@code justify}, {@code around} and {@code distribute} distribute the main axis of a {@code Stack} and are only
+     * {@code justify} and {@code distribute} distribute the main axis of a {@code Stack} and are only
      * valid there.
      */
     private static Alignment alignment(Node p) {
         Distribution d = axis(p);
-        if (d == Distribution.JUSTIFY || d == Distribution.AROUND || d == Distribution.DISTRIBUTE) {
+        if (d == Distribution.JUSTIFY || d == Distribution.DISTRIBUTE) {
             throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " aligns in place: it allows "
                     + axisEnds(p.getCanonicalName().equals("horizontal")) + ", center or "
                     + "stretch, and " + p.getText().trim() + " distributes the main axis of a Stack and is only valid there");

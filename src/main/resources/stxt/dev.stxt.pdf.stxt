@@ -1745,7 +1745,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
 	Node: Line distribution
 		Type: ENUM
-		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), around or stretch. Only with Wrap: true.
+		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), distribute (equal gaps, also at the edges) or stretch. Only with Wrap: true.
 		Values:
 			Value: top
 			Value: bottom
@@ -1753,7 +1753,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: right
 			Value: center
 			Value: justify
-			Value: around
+			Value: distribute
 			Value: stretch
 	Node: Grow
 		Description: Share of the leftover space that the item receives.
@@ -1785,14 +1785,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Only in a Table (from a rule of Styles, the other boxes ignore it): with true, the border between two cells is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it. False by default.
 	Node: Horizontal
 		Type: ENUM
-		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (left, right, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (left, right, center, justify, around or distribute); if not, the alignment of all the items (left, right, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
+		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (left, right, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (left, right, center, justify or distribute); if not, the alignment of all the items (left, right, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
 		Values:
 			Value: left
 			Value: right
 			Value: center
 			Value: stretch
 			Value: justify
-			Value: around
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
@@ -1803,7 +1802,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: center
 			Value: stretch
 			Value: justify
-			Value: around
 			Value: distribute
 
 	# List
