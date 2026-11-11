@@ -17,7 +17,9 @@ escribe el código está en [El pintado](painting.md#el-pdf).
   en las dos: en un CFF que no es CID, como el de un `.otf`, un CID es el número de glifo.
 - `Title` va a la información del documento y a los metadatos XMP, con `DisplayDocTitle` para que el visor lo muestre;
   `Subject`, si lo hay, al `Subject` de la información y al `dc:description` del XMP, el par que PDF/A exige iguales;
-  `Author`, si lo hay, al `Author` y al `dc:creator` (una lista ordenada de uno), y el productor del `Converter`, si lo
+  `Author`, si lo hay, al `Author` y al `dc:creator` (una lista ordenada de uno); `Keywords`, si lo hay, a las
+  `Keywords` y al `pdf:Keywords`, unidas por una coma y un espacio, y una a una al `dc:subject` (una lista sin orden); y
+  el productor del `Converter`, si lo
   tiene, al `Producer` y al `pdf:Producer`, otros dos pares iguales;
   y `Language` es el `Lang` del catálogo (`PdfMetadata`). Todo PDF declara PDF/UA-1 (`pdfuaid:part`) en sus metadatos
   XMP, o PDF/UA-2 si quien convierte lo pide ([abajo](#pdfua-2)), y PDF/A si lo pide ([abajo](#pdfa)).

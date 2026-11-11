@@ -1,0 +1,12 @@
+# Case: Empty keywords
+# Code: VALUE_NOT_ALLOWED
+# Line: 10
+Document (dev.stxt.pdf):
+	Language: es
+	Page:
+		Width: 595
+		Height: 842
+	Title: Informe
+	Keywords:
+	Section:
+		Text: Hola

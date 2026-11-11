@@ -101,7 +101,7 @@ The pieces:
 
 | Class | What it does |
 |---|---|
-| `PageSetupReader` | `Page` (with the inheritance by groups of the sections), `Title`, `Language`, `Subject` and `Author` |
+| `PageSetupReader` | `Page` (with the inheritance by groups of the sections), `Title`, `Language`, `Subject`, `Author` and `Keywords` |
 | `SectionReader` | The properties of a `Section` (`Id`, `Page`, the page and footnote numbering, `Inherit page overlays`, `Begin on`) and their rules; the box, the footnote area and `SECTION_EMPTY` stay in `BoxTreeBuilder.section` |
 | `ValueReader` | Interprets the values of each property and checks their forms |
 | `PropertyReader` | The groups, the properties of `Stack`, `Grid` and `Item` and those specific to the elements, with `Map<String, Property>` tables |

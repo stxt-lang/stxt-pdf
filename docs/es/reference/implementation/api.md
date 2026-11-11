@@ -32,7 +32,7 @@ List<String> svg = converter.toSvg(laidOut);   // una cadena por página
 | `pdfA(PdfA)` | El PDF/A que cumple además el PDF: `A2B`, `A2A`, `A3B` o `A3A` ([abajo](#pdfa-y-adjuntos)); por defecto, ninguno. Con `pdfUa(2)`, `build()` es un `IllegalArgumentException` |
 | `exclude(Check...)` | Quita comprobaciones. Por defecto se hacen todas ([Comprobaciones](#comprobaciones)) |
 | `cancellation(Cancellation)` | La que para todas las conversiones del `Converter`; por defecto, ninguna ([Cancelar una conversión](#cancelar-una-conversión)) |
-| `producer(String)` | El programa que hace el PDF, en el `Producer` de la información del documento y en el `pdf:Producer` del XMP ([El PDF](../common/pdf.md#título-asunto-autor-y-productor)); por defecto, ninguno. Vacío es un `IllegalArgumentException`. El autor es del documento (`Author`) |
+| `producer(String)` | El programa que hace el PDF, en el `Producer` de la información del documento y en el `pdf:Producer` del XMP ([El PDF](../common/pdf.md#título-asunto-autor-palabras-clave-y-productor)); por defecto, ninguno. Vacío es un `IllegalArgumentException`. El autor es del documento (`Author`) |
 
 > **Decisión:** la configuración es un objeto inmutable, `Converter`, seguro entre hilos porque cada conversión crea su
 > propio `Engine`, con `layOut`, `toPdf` (de un documento o de uno ya maquetado) y `toSvg`. Los estilos nunca son `null`: si

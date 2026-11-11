@@ -5,6 +5,21 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+**From 0.16.0**: `tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of
+four. No document changes.
+
+### Added
+
+- **The keywords of the PDF.** `Keywords` in `Document` (optional) gives the keywords of the document separated by
+  commas: `Keywords: policy, home, general terms`. Each one is trimmed, and none can be empty: an empty `Keywords`, two
+  commas in a row or a comma at the start or at the end are `VALUE_NOT_ALLOWED`. The engine writes them joined by a
+  comma and a space in the document information (`Keywords`) and in the XMP packet (`pdf:Keywords`), equal in both, as
+  PDF/A requires, and one by one in `dc:subject`. Without `Keywords`, the PDF has no keywords, as before. `Metadata`
+  gains the `keywords` component (a list, empty if there are none). "`Keywords`" in the reference of `Document` and
+  "Title, subject, author, keywords and producer" in "The PDF".
+
 ## [0.16.0] - 2026-11-11
 
 The values of the enumerations reviewed before 1.0: sides of the page instead of `start` and `end`, no boolean

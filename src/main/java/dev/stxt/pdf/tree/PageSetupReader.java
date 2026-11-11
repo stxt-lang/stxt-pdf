@@ -8,6 +8,7 @@ import dev.stxt.pdf.model.Tolerance;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +36,36 @@ final class PageSetupReader {
     }
 
     /**
-     * {@code Title}, {@code Language}, {@code Subject} and {@code Author} of {@code Document}: a non-empty title, a BCP 47
-     * tag and, if there are, a non-empty subject and author.
+     * {@code Title}, {@code Language}, {@code Subject}, {@code Author} and {@code Keywords} of {@code Document}: a
+     * non-empty title, a BCP 47 tag and, if there are, a non-empty subject and author and the keywords.
      */
     static Metadata metadata(InlineNode document) {
         String title = child(document, "title").map(n -> text(n, "Title")).orElse(null);
         String language = child(document, "language").map(ValueReader::language).orElse(null);
         String subject = child(document, "subject").map(n -> text(n, "Subject")).orElse(null);
         String author = child(document, "author").map(n -> text(n, "Author")).orElse(null);
-        return new Metadata(title, language, subject, author);
+        List<String> keywords = child(document, "keywords").map(PageSetupReader::keywords).orElse(List.of());
+        return new Metadata(title, language, subject, author, keywords);
     }
 
-    /** The text of a {@code Title}, a {@code Subject} or an {@code Author}, which cannot be empty. */
+    /**
+     * The keywords of a {@code Keywords}, separated by commas (reference/components/document.md): each one trimmed, and
+     * none empty, neither the whole text nor one before, between or after the commas.
+     */
+    private static List<String> keywords(Node n) {
+        String t = text(n, "Keywords");
+        List<String> keywords = new ArrayList<>();
+        for (String keyword : t.split(",", -1)) {
+            String k = keyword.trim();
+            if (k.isEmpty()) {
+                throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Each keyword of Keywords needs a text: " + t);
+            }
+            keywords.add(k);
+        }
+        return keywords;
+    }
+
+    /** The text of a {@code Title}, a {@code Subject}, an {@code Author} or a {@code Keywords}, which cannot be empty. */
     private static String text(Node n, String name) {
         String t = n.getText().trim();
         if (t.isEmpty()) {

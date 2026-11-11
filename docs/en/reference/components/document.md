@@ -1,7 +1,7 @@
 # `Document`
 
 The root of every document: `Document`, with the namespace `dev.stxt.pdf`. It has exactly one `Page`, one `Title` and one
-`Language`, an optional `Subject` and `Author`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
+`Language`, an optional `Subject`, `Author` and `Keywords`, an optional `Styles` ([Styles](../common/styles.md)), the `Page overlay` elements of the whole document and one or more `Section`,
 which hold the content. A document has no loose content and no `Typography`: the base typography goes in the rule
 `For element: Document`.
 
@@ -100,7 +100,7 @@ the one a screen reader uses. Both are required for the PDF to be accessible ([T
 `Subject` says what the document is about, in a sentence: `Subject: Terms of the home insurance policy`. It is optional,
 at most one, and a non-empty text (`VALUE_NOT_ALLOWED` if it is empty). It does not affect the layout: it goes to the PDF
 as its subject, which the viewer shows in the document properties and which document managers and search engines read
-([The PDF](../common/pdf.md#title-and-subject)). Without `Subject`, the PDF has no subject.
+([The PDF](../common/pdf.md#title-subject-author-keywords-and-producer)). Without `Subject`, the PDF has no subject.
 
 > **Decision:** it is called `Subject`, like the entry of the PDF and the «Subject» field of the properties of a word
 > processor and of a PDF viewer. *Rejected alternative:* `Description`, the name of its copy in the XMP metadata
@@ -112,7 +112,7 @@ as its subject, which the viewer shows in the document properties and which docu
 `Author` says who writes the document, a person or an organization: `Author: Northern Insurance`. It is optional, at
 most one, and a non-empty text (`VALUE_NOT_ALLOWED` if it is empty). It does not affect the layout: it goes to the PDF
 as its author, which the viewer shows in the document properties
-([The PDF](../common/pdf.md#title-subject-author-and-producer)). Without `Author`, the PDF has no author. The software
+([The PDF](../common/pdf.md#title-subject-author-keywords-and-producer)). Without `Author`, the PDF has no author. The software
 that makes the PDF, the producer, does not belong to the document but to whoever converts it:
 `Converter.builder().producer(...)` ([Using from Java](../implementation/api.md#converting)).
 
@@ -124,6 +124,22 @@ that makes the PDF, the producer, does not belong to the document but to whoever
 > keeping both places equal from outside; both in the document, which would make every document carry the name of the
 > program that converts it; and a list of authors, which the `Author` of the document information, a single text, does
 > not admit.
+
+## `Keywords`
+
+`Keywords` gives the keywords of the document, separated by commas: `Keywords: policy, home, general terms`. It is
+optional and at most one. Each keyword is taken without the blanks at its sides, and none can be left empty: an empty
+`Keywords`, two commas in a row or a comma at the start or at the end are `VALUE_NOT_ALLOWED`. It does not affect the
+layout: it goes to the PDF as its keywords, which the viewer shows in the document properties and which document
+managers and search engines read ([The PDF](../common/pdf.md#title-subject-author-keywords-and-producer)). Without `Keywords`, the PDF has no
+keywords.
+
+> **Decision:** a single line with the keywords separated by commas, like the «Tags» field of the properties of a word
+> processor. The engine writes them trimmed and joined by a comma and a space (`policy, home, general terms`) in the
+> `Keywords` of the document information and in the `pdf:Keywords` of the XMP, a single text in both, as PDF/A
+> requires, and one by one in the `dc:subject` of the XMP. An empty keyword is an error and is not skipped: it is
+> usually a typo. *Rejected alternatives:* a node per keyword, one more element for what the document information keeps
+> in a single text; and writing the text as it comes, which would carry the extra blanks and commas to the PDF.
 
 ## `Section`
 
@@ -304,6 +320,7 @@ ones, the other way round. The parity is that of the physical page, the same as 
 
 ## What is not supported
 
+- A keyword with a comma inside: the comma separates the keywords of `Keywords`.
 - A page background of the section's own (a full-bleed cover paints a block the size of the page) and a landscape
   page that is not a whole section.
 - Named pages or page rules: what changes from one part to another is a section.

@@ -126,7 +126,7 @@ public final class PdfDocumentWriter {
      * does not write (its own keys in the information dictionary, a stamp on every page, encryption...). And the file
      * identifier is the one PDFBox gives it when saved, not the one of the content ({@link PdfId}), so two saves do
      * not give the same bytes. Besides the pages, what was in {@code target} before is kept, except what the document
-     * writes (its title, subject, author, producer, language and XMP packet). On a {@link dev.stxt.pdf.model.CancelledException}, the
+     * writes (its title, subject, author, keywords, producer, language and XMP packet). On a {@link dev.stxt.pdf.model.CancelledException}, the
      * document is left half written.
      *
      * @throws IllegalArgumentException if {@code target} already has pages: a document is written whole, into a new

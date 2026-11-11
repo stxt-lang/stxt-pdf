@@ -1,7 +1,7 @@
 # `Document`
 
 La raíz de todo documento: `Document`, con el namespace `dev.stxt.pdf`. Tiene exactamente un `Page`, un `Title` y un
-`Language`, un `Subject` y un `Author` opcionales, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
+`Language`, un `Subject`, un `Author` y un `Keywords` opcionales, un `Styles` opcional ([Styles](../common/styles.md)), los `Page overlay` de todo el documento y una o más `Section`,
 que tienen el contenido. Un documento no tiene contenido suelto ni `Typography`: la tipografía base va en la regla
 `For element: Document`.
 
@@ -101,7 +101,7 @@ el que usa un lector de pantalla. Los dos son obligatorios para que el PDF sea a
 `Subject` dice de qué trata el documento, en una frase: `Subject: Condiciones de la póliza de hogar`. Es opcional, como mucho
 uno, y es un texto no vacío (`VALUE_NOT_ALLOWED` si está vacío). No afecta al layout: va al PDF como su asunto, que el
 visor enseña en las propiedades del documento y que leen los gestores documentales y los buscadores
-([El PDF](../common/pdf.md#título-y-asunto)). Sin `Subject`, el PDF no lleva asunto.
+([El PDF](../common/pdf.md#título-asunto-autor-palabras-clave-y-productor)). Sin `Subject`, el PDF no lleva asunto.
 
 > **Decisión:** se llama `Subject`, como la entrada del PDF y el campo «Asunto» de las propiedades de un procesador de
 > textos y de un visor de PDF. *Alternativa descartada:* `Description`, el nombre de su copia en los metadatos XMP
@@ -111,7 +111,7 @@ visor enseña en las propiedades del documento y que leen los gestores documenta
 
 `Author` dice quién escribe el documento, una persona o una organización: `Author: Seguros del Norte`. Es opcional,
 como mucho uno, y es un texto no vacío (`VALUE_NOT_ALLOWED` si está vacío). No afecta al layout: va al PDF como su
-autor, que el visor enseña en las propiedades del documento ([El PDF](../common/pdf.md#título-asunto-autor-y-productor)).
+autor, que el visor enseña en las propiedades del documento ([El PDF](../common/pdf.md#título-asunto-autor-palabras-clave-y-productor)).
 Sin `Author`, el PDF no lleva autor. El programa que hace el PDF, el productor, no es del documento sino de quien
 convierte: `Converter.builder().producer(...)` ([Uso desde Java](../implementation/api.md#convertir)).
 
@@ -123,6 +123,23 @@ convierte: `Converter.builder().producer(...)` ([Uso desde Java](../implementati
 > mantener los dos sitios iguales por fuera; los dos en el documento, que haría escribir en cada documento el nombre del
 > programa que lo convierte; y una lista de autores, que el `Author` de la información del documento, un solo texto, no
 > admite.
+
+## `Keywords`
+
+`Keywords` da las palabras clave del documento, separadas por comas: `Keywords: póliza, hogar, condiciones generales`.
+Es opcional y como mucho uno. Cada palabra clave se toma sin los blancos de los lados, y ninguna puede quedar vacía: un
+`Keywords` vacío, dos comas seguidas o una coma al principio o al final son `VALUE_NOT_ALLOWED`. No afecta al layout: va
+al PDF como sus palabras clave, que el visor enseña en las propiedades del documento y que leen los gestores
+documentales y los buscadores ([El PDF](../common/pdf.md#título-asunto-autor-palabras-clave-y-productor)). Sin `Keywords`, el PDF no lleva palabras
+clave.
+
+> **Decisión:** una sola línea con las palabras clave separadas por comas, como el campo «Etiquetas» de las propiedades
+> de un procesador de textos. El motor las escribe recortadas y unidas por una coma y un espacio
+> (`póliza, hogar, condiciones generales`) en las `Keywords` de la información del documento y en el `pdf:Keywords` del
+> XMP, un solo texto en los dos, como pide PDF/A, y una a una en el `dc:subject` del XMP. Una palabra clave vacía es un
+> error y no se salta: suele ser una errata. *Alternativas descartadas:* un nodo por palabra clave, un elemento más para
+> lo que la información del documento guarda en un solo texto; y escribir el texto tal como viene, que llevaría al PDF
+> los blancos y las comas sobrantes.
 
 ## `Section`
 
@@ -303,6 +320,7 @@ y lleva los márgenes de las pares, aunque no tenga nada que colocar.
 
 ## Lo que no hay
 
+- Una palabra clave con una coma dentro: la coma separa las palabras clave de `Keywords`.
 - Un fondo de página propio de la sección (una portada a sangre pinta un bloque del tamaño de la página) y una página
   apaisada que no sea una sección entera.
 - Páginas con nombre o reglas de página: lo que cambia de una parte a otra es una sección.

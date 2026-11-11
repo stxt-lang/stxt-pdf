@@ -78,14 +78,15 @@ está activa.
 Uno por encabezado, con su texto (y su número, si lo lleva), anidados por nivel y que llevan al encabezado. El visor los
 muestra al abrir el documento.
 
-## Título, asunto, autor y productor
+## Título, asunto, autor, palabras clave y productor
 
 `Title` es lo que el visor muestra en lugar del nombre del fichero. `Subject`, si lo hay, es el asunto del PDF: el visor lo
 enseña en las propiedades del documento, y los gestores documentales y los buscadores lo leen
 ([Document](../components/document.md#subject)). `Author`, si lo hay, es su autor ([Document](../components/document.md#author)),
-y el productor, el programa que lo hace, lo da quien convierte con `Converter.builder().producer(...)`
-([Uso desde Java](../implementation/api.md#convertir)); sin él, el PDF no lo lleva. Los cuatro van en la
-información del documento y en los metadatos XMP, iguales en los dos sitios, como pide PDF/A.
+`Keywords`, sus palabras clave ([Document](../components/document.md#keywords)), y el productor, el programa que lo hace, lo da quien convierte con `Converter.builder().producer(...)`
+([Uso desde Java](../implementation/api.md#convertir)); sin él, el PDF no lo lleva. Los cinco van en la
+información del documento y en los metadatos XMP, iguales en los dos sitios, como pide PDF/A; las palabras
+clave van además una a una en el `dc:subject` del XMP.
 
 ## PDF/A
 

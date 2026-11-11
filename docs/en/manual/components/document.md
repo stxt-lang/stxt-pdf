@@ -5,6 +5,7 @@
 - **`Language`** and **`Title`**: required.
 - **`Subject`**: optional, what the document is about.
 - **`Author`**: optional, who writes it.
+- **`Keywords`**: optional, the keywords, separated by commas.
 - **`Page`**: the paper and the margins.
 - **`Styles`**: optional, with the style rules ([Styles](../common/styles.md)).
 - **`Page overlay`**: optional, the headers and footers of the whole document.
@@ -15,6 +16,7 @@ Document (dev.stxt.pdf):
     Language: en
     Title: Annual report
     Subject: Results and activity of the company in 2025
+    Keywords: annual report, results, 2025
     Page:
         Paper: A4
         Margin: 56
@@ -78,6 +80,10 @@ shows in the document properties and which document managers and search engines 
 
 `Author` is optional too: who writes the document, a person or an organization. It is the author of the PDF, which the
 viewer shows in the document properties.
+
+`Keywords` is optional too: the keywords of the document, separated by commas (`Keywords: annual report, results,
+2025`). They are the keywords of the PDF, which the viewer shows in the document properties and which document managers
+and search engines use. None can be left empty: two commas in a row are an error.
 
 ## `Page`
 

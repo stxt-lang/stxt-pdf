@@ -31,7 +31,7 @@ List<String> svg = converter.toSvg(laidOut);   // one string per page
 | `pdfA(PdfA)` | The PDF/A the PDF also conforms to: `A2B`, `A2A`, `A3B` or `A3A` ([below](#pdfa-and-attachments)); by default, none. With `pdfUa(2)`, `build()` is an `IllegalArgumentException` |
 | `exclude(Check...)` | Removes checks. By default all of them are made ([Checks](#checks)) |
 | `cancellation(Cancellation)` | The one that stops every conversion of the `Converter`; by default, none ([Canceling a conversion](#canceling-a-conversion)) |
-| `producer(String)` | The software that makes the PDF, in the `Producer` of the document information and in the `pdf:Producer` of the XMP ([The PDF](../common/pdf.md#title-subject-author-and-producer)); by default, none. A blank one is an `IllegalArgumentException`. The author belongs to the document (`Author`) |
+| `producer(String)` | The software that makes the PDF, in the `Producer` of the document information and in the `pdf:Producer` of the XMP ([The PDF](../common/pdf.md#title-subject-author-keywords-and-producer)); by default, none. A blank one is an `IllegalArgumentException`. The author belongs to the document (`Author`) |
 
 > **Decision:** the configuration is an immutable object, `Converter`, thread-safe because each conversion creates its
 > own `Engine`, with `layOut`, `toPdf` (of a document or of one already laid out) and `toSvg`. The styles are never `null`: if

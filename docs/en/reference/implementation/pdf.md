@@ -18,7 +18,8 @@ code writes it is in [Painting](painting.md#the-pdf).
 - `Title` goes to the document information and to the XMP metadata, with `DisplayDocTitle` so that the viewer shows it;
   `Subject`, if there is one, to the `Subject` of the information and to the `dc:description` of the XMP, the pair that
   PDF/A requires to be equal; `Author`, if there is one, to the `Author` and to the `dc:creator` (an ordered list of
-  one), and the producer of the `Converter`, if it has one, to the `Producer` and to the `pdf:Producer`, two more equal
+  one); `Keywords`, if there is one, to the `Keywords` and to the `pdf:Keywords`, joined by a comma and a space, and one
+  by one to the `dc:subject` (an unordered list); and the producer of the `Converter`, if it has one, to the `Producer` and to the `pdf:Producer`, two more equal
   pairs; and `Language` is the `Lang` of the catalog (`PdfMetadata`). Every PDF declares PDF/UA-1 (`pdfuaid:part`) in its XMP
   metadata, or PDF/UA-2 if the caller asks for it ([below](#pdfua-2)), and PDF/A if the caller asks for it
   ([below](#pdfa)).

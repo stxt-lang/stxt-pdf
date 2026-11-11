@@ -21,7 +21,7 @@ Each element accepts only the children that make sense in it: its properties and
 is defined by the [schema](#schema), so a property out of place (`Column sizes` in a `Stack`, `Offset` in a `Block`) is
 an error when the document is read, in the editor too.
 
-The root is `Document`, with exactly one `Page`, one `Title` and one `Language`, an optional `Subject` and `Author`, an optional `Styles` with the reusable
+The root is `Document`, with exactly one `Page`, one `Title` and one `Language`, an optional `Subject`, `Author` and `Keywords`, an optional `Styles` with the reusable
 rules ([Styles](styles.md)), the `Page overlay` elements of the whole document and one or more `Section` with the content
 ([Document](../components/document.md)). There is no loose content: everything that is laid out goes inside a section. The
 rules can also come from a separate styles document ([Styles](styles.md#separate-styles-document)).
@@ -190,7 +190,7 @@ once, and the elements, as many times as needed.
 
 | Node | Children |
 |---|---|
-| `Document` | `Page`, `Title` and `Language` (exactly one of each), `Subject`, `Author`, `Styles`; `Page overlay`, `Section` (at least one) |
+| `Document` | `Page`, `Title` and `Language` (exactly one of each), `Subject`, `Author`, `Keywords`, `Styles`; `Page overlay`, `Section` (at least one) |
 | `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |

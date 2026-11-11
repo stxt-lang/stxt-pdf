@@ -5,6 +5,7 @@
 - **`Language`** y **`Title`**: obligatorios.
 - **`Subject`**: opcional, de qué trata el documento.
 - **`Author`**: opcional, quién lo escribe.
+- **`Keywords`**: opcional, las palabras clave, separadas por comas.
 - **`Page`**: el papel y los márgenes.
 - **`Styles`**: opcional, con las reglas de estilo ([Estilos](../common/styles.md)).
 - **`Page overlay`**: opcionales, las cabeceras y los pies de todo el documento.
@@ -15,6 +16,7 @@ Document (dev.stxt.pdf):
     Language: es
     Title: Informe anual
     Subject: Resultados y actividad de la empresa en 2025
+    Keywords: informe anual, resultados, 2025
     Page:
         Paper: A4
         Margin: 56
@@ -78,6 +80,10 @@ propiedades del documento y que usan los gestores documentales y los buscadores.
 
 `Author` también es opcional: quién escribe el documento, una persona o una organización. Es el autor del PDF, que el
 visor enseña en las propiedades del documento.
+
+`Keywords` también es opcional: las palabras clave del documento, separadas por comas (`Keywords: informe anual,
+resultados, 2025`). Son las palabras clave del PDF, que el visor enseña en las propiedades del documento y que usan los
+gestores documentales y los buscadores. Ninguna puede quedar vacía: dos comas seguidas son un error.
 
 ## `Page`
 

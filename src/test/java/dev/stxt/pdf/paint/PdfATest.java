@@ -55,6 +55,7 @@ class PdfATest {
             "\tTitle: Prueba & PDF/A",
             "\tSubject: Lo que <restringe> PDF/A",
             "\tAuthor: Peña & <Hijos>",
+            "\tKeywords: póliza,hogar ,  <condiciones> & anexos",
             "\tPage:",
             "\t\tWidth: 400",
             "\t\tHeight: 500",
@@ -204,7 +205,7 @@ class PdfATest {
             assertEquals("Lo que <restringe> PDF/A", doc.getDocumentInformation().getSubject());
             assertTrue(xmp.contains("<dc:description><rdf:Alt><rdf:li xml:lang=\"x-default\">"
                     + "Lo que &lt;restringe&gt; PDF/A</rdf:li></rdf:Alt></dc:description>"), xmp);
-            assertAuthorAndProducer(doc, xmp);
+            assertAuthorKeywordsAndProducer(doc, xmp);
             List<PDOutputIntent> intents = doc.getDocumentCatalog().getOutputIntents();
             assertEquals(1, intents.size());
             assertEquals("sRGB IEC61966-2.1", intents.get(0).getOutputConditionIdentifier());
@@ -213,11 +214,17 @@ class PdfATest {
     }
 
     /**
-     * The author of the document and the producer of the converter agree in the document information and in the XMP,
-     * as PDF/A requires ({@code dc:creator} and {@code pdf:Producer}).
+     * The author and the keywords of the document and the producer of the converter agree in the document information
+     * and in the XMP, as PDF/A requires ({@code dc:creator}, {@code pdf:Keywords} and {@code pdf:Producer}); the
+     * keywords go one by one in {@code dc:subject} too.
      */
-    private static void assertAuthorAndProducer(PDDocument doc, String xmp) {
+    private static void assertAuthorKeywordsAndProducer(PDDocument doc, String xmp) {
         assertEquals("Peña & <Hijos>", doc.getDocumentInformation().getAuthor());
+        // Trimmed and joined by a comma and a space.
+        assertEquals("póliza, hogar, <condiciones> & anexos", doc.getDocumentInformation().getKeywords());
+        assertTrue(xmp.contains("<pdf:Keywords>póliza, hogar, &lt;condiciones&gt; &amp; anexos</pdf:Keywords>"), xmp);
+        assertTrue(xmp.contains("<dc:subject><rdf:Bag><rdf:li>póliza</rdf:li><rdf:li>hogar</rdf:li>"
+                + "<rdf:li>&lt;condiciones&gt; &amp; anexos</rdf:li></rdf:Bag></dc:subject>"), xmp);
         assertEquals(PRODUCER, doc.getDocumentInformation().getProducer());
         assertTrue(xmp.contains("<dc:creator><rdf:Seq><rdf:li>Peña &amp; &lt;Hijos&gt;</rdf:li></rdf:Seq></dc:creator>"),
                 xmp);
@@ -232,23 +239,41 @@ class PdfATest {
             String xmp = new String(doc.getDocumentCatalog().getMetadata().toByteArray(), StandardCharsets.UTF_8);
             assertFalse(xmp.contains("pdfaid"), xmp);
             assertNull(doc.getDocumentCatalog().getNames());
-            assertAuthorAndProducer(doc, xmp);
+            assertAuthorKeywordsAndProducer(doc, xmp);
         }
     }
 
-    /** Without an author or a producer, the PDF names none: the engine does not make one up. */
+    /** Without an author, keywords or a producer, the PDF names none: the engine does not make them up. */
     @Test
-    void withoutAuthorOrProducerThereAreNone() throws Exception {
+    void withoutAuthorKeywordsOrProducerThereAreNone() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Converter.builder().pdfA(PdfA.A3A).build()
-                .toPdf(READER.read(Docs.sectioned(DOCUMENT.replace("\tAuthor: Peña & <Hijos>\n", ""))), out);
+        String document = DOCUMENT.replace("\tAuthor: Peña & <Hijos>\n", "")
+                .replace("\tKeywords: póliza,hogar ,  <condiciones> & anexos\n", "");
+        Converter.builder().pdfA(PdfA.A3A).build().toPdf(READER.read(Docs.sectioned(document)), out);
         byte[] pdf = out.toByteArray();
         assertEquals(Map.of(), PdfUa.failedRules(pdf, PdfUa.flavour(PdfA.A3A)));
         try (PDDocument doc = Loader.loadPDF(pdf)) {
             assertNull(doc.getDocumentInformation().getAuthor());
+            assertNull(doc.getDocumentInformation().getKeywords());
             assertNull(doc.getDocumentInformation().getProducer());
             String xmp = new String(doc.getDocumentCatalog().getMetadata().toByteArray(), StandardCharsets.UTF_8);
             assertFalse(xmp.contains("dc:creator"), xmp);
+            assertFalse(xmp.contains("dc:subject"), xmp);
+            assertFalse(xmp.contains("pdf:"), xmp);
+        }
+    }
+
+    /** Keywords without a producer: {@code pdf:Keywords} goes alone in its description, and PDF/A still passes. */
+    @Test
+    void keywordsWithoutAProducer() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Converter.builder().pdfA(PdfA.A2B).build().toPdf(document(), out);
+        byte[] pdf = out.toByteArray();
+        assertEquals(Map.of(), PdfUa.failedRules(pdf, PdfUa.flavour(PdfA.A2B)));
+        try (PDDocument doc = Loader.loadPDF(pdf)) {
+            assertEquals("póliza, hogar, <condiciones> & anexos", doc.getDocumentInformation().getKeywords());
+            String xmp = new String(doc.getDocumentCatalog().getMetadata().toByteArray(), StandardCharsets.UTF_8);
+            assertTrue(xmp.contains("<pdf:Keywords>"), xmp);
             assertFalse(xmp.contains("pdf:Producer"), xmp);
         }
     }

@@ -557,7 +557,7 @@ public final class Converter {
      * does not write (keys of its own in the information dictionary, a stamp on every page, encryption) and saves it;
      * the file identifier is then the one PDFBox gives it, not the one of the content, so two saves do not give the
      * same bytes. What {@code target} had before is kept, except what the document writes (its title, subject,
-     * author, language and XMP packet) and the producer of the converter ({@link Builder#producer}). A single page is painted on a page of any document with
+     * author, keywords, language and XMP packet) and the producer of the converter ({@link Builder#producer}). A single page is painted on a page of any document with
      * {@link dev.stxt.pdf.paint.PdfPainter}.
      *
      * @param document a document laid out by {@link #layOut(InlineNode)}; not {@code null}

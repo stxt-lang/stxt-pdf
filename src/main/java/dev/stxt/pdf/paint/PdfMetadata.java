@@ -18,14 +18,15 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * What the PDF says about itself (reference/implementation/pdf.md): the title, the subject, the author and the
- * language of the document, the producer that the converter names, the XMP packet with the declarations of PDF/UA and
+ * What the PDF says about itself (reference/implementation/pdf.md): the title, the subject, the author, the keywords
+ * and the language of the document, the producer that the converter names, the XMP packet with the declarations of PDF/UA and
  * of PDF/A, and the output intent of PDF/A.
  *
  * <p>The title goes in the document information and in the XMP metadata ({@code dc:title}), and the viewer shows it
  * instead of the file name; the subject, if there is one, goes in both too ({@code Subject} and
  * {@code dc:description}, which PDF/A requires to agree), and so do the author ({@code Author} and
- * {@code dc:creator}) and the producer ({@code Producer} and {@code pdf:Producer}); the language ({@code Lang} of the catalog) is that of all
+ * {@code dc:creator}), the keywords ({@code Keywords} and {@code pdf:Keywords}, and one by one in
+ * {@code dc:subject}) and the producer ({@code Producer} and {@code pdf:Producer}); the language ({@code Lang} of the catalog) is that of all
  * the content. A document always
  * has a {@code Title} (required): without a title the PDF would not comply with PDF/UA (7.1) and could not claim it.
  * With PDF/A, the packet carries {@code pdfaid:part} and {@code pdfaid:conformance} and the catalog an
@@ -60,8 +61,9 @@ final class PdfMetadata {
     }
 
     /**
-     * Writes the title, the subject, the author and the language of {@code metadata} and the {@code producer}
-     * ({@code null} for none), and the XMP packet if there is a title, a subject, an author, a producer, a PDF/A to
+     * Writes the title, the subject, the author, the keywords and the language of {@code metadata} and the
+     * {@code producer} ({@code null} for none), and the XMP packet if there is a title, a subject, an author, keywords,
+     * a producer, a PDF/A to
      * declare ({@code pdfA}, or {@code null}) or extra XMP ({@code extraXmp}: {@code rdf:Description} elements, or
      * {@code null}).
      */
@@ -83,11 +85,14 @@ final class PdfMetadata {
         if (metadata.author() != null) {
             doc.getDocumentInformation().setAuthor(metadata.author());
         }
+        if (!metadata.keywords().isEmpty()) {
+            doc.getDocumentInformation().setKeywords(keywords(metadata));
+        }
         if (producer != null) {
             doc.getDocumentInformation().setProducer(producer);
         }
-        if (metadata.title() != null || metadata.subject() != null || metadata.author() != null || producer != null
-                || pdfA != null || extraXmp != null) {
+        if (metadata.title() != null || metadata.subject() != null || metadata.author() != null
+                || !metadata.keywords().isEmpty() || producer != null || pdfA != null || extraXmp != null) {
             PDMetadata xmp = new PDMetadata(doc);
             xmp.importXMPMetadata(xmp(metadata, producer, ua, pdfA, extraXmp).getBytes(StandardCharsets.UTF_8));
             catalog.setMetadata(xmp);
@@ -98,8 +103,17 @@ final class PdfMetadata {
     }
 
     /**
+     * The keywords as the PDF writes them in the document information ({@code Keywords}) and in the XMP
+     * ({@code pdf:Keywords}), which PDF/A requires to agree: one text, separated by a comma and a space.
+     */
+    private static String keywords(Metadata metadata) {
+        return String.join(", ", metadata.keywords());
+    }
+
+    /**
      * The XMP packet: the title ({@code dc:title}), the subject ({@code dc:description}), the author
-     * ({@code dc:creator}, an ordered list of one) and the producer ({@code pdf:Producer}), each one if there is one,
+     * ({@code dc:creator}, an ordered list of one), the keywords (one by one in {@code dc:subject}, an unordered list,
+     * and in one text in {@code pdf:Keywords}) and the producer ({@code pdf:Producer}), each one if there is one,
      * the PDF/UA declaration if there is a title ({@code pdfuaid:part},
      * 1 or 2; 2 with the revision of the standard, {@code pdfuaid:rev}), the PDF/A declaration ({@code pdfaid:part}
      * and {@code pdfaid:conformance}, if {@code pdfA} is not {@code null}), the extension schemas (the description
@@ -110,11 +124,12 @@ final class PdfMetadata {
         String title = metadata.title();
         String subject = metadata.subject();
         String author = metadata.author();
+        List<String> keywords = metadata.keywords();
         StringBuilder packet = new StringBuilder();
         packet.append("<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n")
                 .append("<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n")
                 .append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n");
-        if (title != null || subject != null || author != null) {
+        if (title != null || subject != null || author != null || !keywords.isEmpty()) {
             packet.append("<rdf:Description rdf:about=\"\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\">\n");
             if (title != null) {
                 packet.append("<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">").append(escape(title))
@@ -128,12 +143,24 @@ final class PdfMetadata {
                 packet.append("<dc:creator><rdf:Seq><rdf:li>").append(escape(author))
                         .append("</rdf:li></rdf:Seq></dc:creator>\n");
             }
+            if (!keywords.isEmpty()) {
+                packet.append("<dc:subject><rdf:Bag>");
+                for (String keyword : keywords) {
+                    packet.append("<rdf:li>").append(escape(keyword)).append("</rdf:li>");
+                }
+                packet.append("</rdf:Bag></dc:subject>\n");
+            }
             packet.append("</rdf:Description>\n");
         }
-        if (producer != null) {
-            packet.append("<rdf:Description rdf:about=\"\" xmlns:pdf=\"http://ns.adobe.com/pdf/1.3/\">\n")
-                    .append("<pdf:Producer>").append(escape(producer)).append("</pdf:Producer>\n")
-                    .append("</rdf:Description>\n");
+        if (!keywords.isEmpty() || producer != null) {
+            packet.append("<rdf:Description rdf:about=\"\" xmlns:pdf=\"http://ns.adobe.com/pdf/1.3/\">\n");
+            if (!keywords.isEmpty()) {
+                packet.append("<pdf:Keywords>").append(escape(keywords(metadata))).append("</pdf:Keywords>\n");
+            }
+            if (producer != null) {
+                packet.append("<pdf:Producer>").append(escape(producer)).append("</pdf:Producer>\n");
+            }
+            packet.append("</rdf:Description>\n");
         }
         if (title != null) {
             packet.append("<rdf:Description rdf:about=\"\" xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\">\n")
