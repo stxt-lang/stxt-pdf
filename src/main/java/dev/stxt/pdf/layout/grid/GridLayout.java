@@ -19,7 +19,7 @@ import dev.stxt.pdf.model.Alignment;
 import dev.stxt.pdf.model.Area;
 import dev.stxt.pdf.model.Break;
 import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.Direction;
+import dev.stxt.pdf.model.FillOrder;
 import dev.stxt.pdf.model.Insets;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.tree.Box;
@@ -75,9 +75,9 @@ public final class GridLayout implements LayoutAlgorithm {
         int explicitRows = Math.max(s.grid().rowSizes().size(), s.grid().areaMap().rows());
         List<Box> items = box.inFlowChildren();
         List<Cell> cells = items.stream().map(i -> i.style().item().area()).toList();
-        Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().flow());
+        Placement.Result placement = Placement.place(cells, explicitColumns, explicitRows, s.grid().fillOrder());
         if (placement instanceof Placement.NoRoom e) {
-            throw noRoom(items.get(e.item()), e, s.grid().flow());
+            throw noRoom(items.get(e.item()), e, s.grid().fillOrder());
         }
         List<Area> areas = ((Placement.Placed) placement).areas();
         int columns = Math.max(1, explicitColumns);
@@ -90,11 +90,11 @@ public final class GridLayout implements LayoutAlgorithm {
     }
 
     /**
-     * The item asks for a row (a column, with {@code Flow: vertical}) that has no room left
+     * The item asks for a row (a column, with {@code Fill order: columns}) that has no room left
      * (reference/components/grid.md).
      */
-    private static InvalidModelException noRoom(Box item, Placement.NoRoom e, Direction flow) {
-        boolean row = flow == Direction.HORIZONTAL;
+    private static InvalidModelException noRoom(Box item, Placement.NoRoom e, FillOrder order) {
+        boolean row = order == FillOrder.ROWS;
         String track = row ? "row" : "column";
         String across = row ? "column" : "row";
         String hole = e.span() == 1 ? "1 free " + across : e.span() + " free " + across + "s";

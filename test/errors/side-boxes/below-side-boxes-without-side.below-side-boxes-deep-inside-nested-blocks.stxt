@@ -1,5 +1,5 @@
-# Case: Clear in a text nested in two Blocks, none of which has a side box
-# Code: CLEAR_WITHOUT_SIDE
+# Case: Below side boxes in a text nested in two Blocks, none of which has a side box
+# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE
 # Line: 19
 Document (dev.stxt.pdf):
 	Language: es
@@ -16,4 +16,4 @@ Document (dev.stxt.pdf):
 		Block:
 			Block:
 				Paragraph: Hola
-					Clear: true
+					Below side boxes: true

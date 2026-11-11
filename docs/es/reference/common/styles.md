@@ -12,7 +12,7 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 |---|---|---|
 | `For element` | `Document` | la raíz: su `Typography` es la base que heredan todas las cajas. Solo admite `Typography` |
 | `For element` | nombre de un elemento de caja (`Block`, `Text` o `Heading 1`) | todos los elementos de ese tipo |
-| `For element` | un elemento generado por el motor: `Code block`, `TOC 1` a `TOC 6` o `Footnotes` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
+| `For element` | un elemento generado por el motor: `Code block`, `TOC 1` a `TOC 6` o `Footnote area` | los bloques de código de un `Markdown` ([Markdown](../components/markdown.md#código)), las entradas de un `Table of contents` ([Table of contents](../components/table-of-contents.md#estilo)) o el área de notas al pie de cada página ([Footnote](../components/footnote.md#el-área-de-notas-footnotes)). No se escriben en el documento |
 | `For element` | una posición en una tabla: `Header cell`, `Body cell`, `Footer cell`, `Odd row cell` o `Even row cell` | las celdas de una `Table` en esa posición ([Table](../components/table.md#estilo-de-las-celdas)) |
 | `For style` | un nombre, sin espacios | los elementos con ese nombre en su `Style`, las celdas de una `Row` con él en su `Style` y los tramos con estilo `[texto]{nombre}` ([Formato del texto](text-formatting.md#tramos-con-estilo)) |
 | `For id` | un `Id`, sin espacios | el elemento con ese `Id` |
@@ -69,21 +69,21 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | Elemento | Propiedades en una regla |
 |---|---|
 | `Stack` | `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items` |
-| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Flow`, `Horizontal`, `Vertical`, `Split rows` |
+| `Grid` | `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows` |
 | `Table` | `Column sizes`, `Column align`, `Gap`, `Split rows` |
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance` |
 | `List` | `Marker`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Side`, `Clear` |
-| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Clear` |
-| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear` |
-| `Heading 1` a `Heading 6` | `In table of contents`, `Clear` |
-| `Paragraph` | `Drop cap`, `Clear` |
-| `Text` | `Clear` |
-| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Clear` |
+| `Image` | `Fit`, `Side`, `Below side boxes` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Side`, `Below side boxes` |
+| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes` |
+| `Heading 1` a `Heading 6` | `In table of contents`, `Below side boxes` |
+| `Paragraph` | `Drop cap`, `Below side boxes` |
+| `Text` | `Below side boxes` |
+| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
 | `Frame` | `Isolate margins`, `Trim margins` |
 | `Cell` | `Trim margins` |
-| `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Clear` |
+| `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
 | `Table of contents` | `Levels`, `Leader` |
 | el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |
 
@@ -93,7 +93,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
   `Text`) es `STYLE_NOT_ALLOWED`, con la línea de la propiedad en la regla. En `For element` el error sale al leer la
   regla, aunque no se aplique a ningún elemento; en `For style` y `For id`, al aplicarla, porque el mismo nombre puede
   ir en elementos de tipos distintos. Las reglas de posición de una celda, `For column`, `For element: Document` y los
-  elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnotes`) no admiten ninguna, y una regla que llega a una
+  elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`) no admiten ninguna, y una regla que llega a una
   `Section` tampoco.
 - **El valor se comprueba al leer la regla.** En `For style` y `For id` tiene que valer en alguno de los elementos que
   tienen la propiedad: `Gap: 1 2 3` es `VALUE_NOT_ALLOWED` en cualquier caso, y `Horizontal: justify`, que vale en un
@@ -164,13 +164,13 @@ La foto de la ficha mide 205 de alto y el bloque `body` lleva su relleno; la fot
   el documento, `Section` incluida. Dentro van `For element` (también las posiciones de celda, `Header cell`,
   `Body cell`...), `For style` y `For column`. Un nivel: una regla dentro de otra, no dentro de una anidada
   (`STYLE_NESTED_TOO_DEEP`). No contienen reglas `For element: Document`, las de posición de celda, `For column` ni las de
-  los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnotes`), y dentro no van `For element: Document`,
-  `Section`, `TOC 1` a `TOC 6` ni `Footnotes`, que nunca están dentro de un elemento (`STYLE_NOT_ALLOWED`);
+  los elementos generados (`Code block`, `TOC 1` a `TOC 6`, `Footnote area`), y dentro no van `For element: Document`,
+  `Section`, `TOC 1` a `TOC 6` ni `Footnote area`, que nunca están dentro de un elemento (`STYLE_NOT_ALLOWED`);
   `Code block` sí, que está dentro de su `Markdown`.
 - **Qué es «dentro».** Los ancestros del elemento tal como está escrito: la `Section`, los elementos y la `Row` de una
   celda, con su `Style` y su `Id`. `Item` y `Area` no cuentan ni estorban. Lo que genera un `Markdown` está dentro del
   `Markdown`; una `Footnote` está donde se escribe, aunque herede del área de notas; las entradas de un
-  `Table of contents` y el área `Footnotes` las construye el motor aparte y solo toman reglas sueltas.
+  `Table of contents` y el área `Footnote area` las construye el motor aparte y solo toman reglas sueltas.
 - **Prioridad.** Los niveles no cambian: una regla anidada es del nivel de su propio selector (un `For element` dentro de
   un `For style` sigue siendo un `For element`) y, **dentro de cada nivel, va después de la suelta**, así que gana. Entre
   dos anidadas del mismo nivel que llegan al mismo elemento gana la del **ancestro más cercano**; con el mismo ancestro,
@@ -303,7 +303,7 @@ Son errores:
 - una regla dentro de una regla anidada (`STYLE_NESTED_TOO_DEEP`);
 - una regla anidada en una que no puede contenerlas (`For element: Document`, una posición de celda, `For column`, un
   elemento generado) o que nombra lo que nunca está dentro de un elemento (`Document`, `Section`, `TOC 1` a `TOC 6`,
-  `Footnotes`) (`STYLE_NOT_ALLOWED`);
+  `Footnote area`) (`STYLE_NOT_ALLOWED`);
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
   una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);

@@ -5,7 +5,7 @@ a `Caption`, which goes below the content or, in a table, above it. The engine n
 writes the number before the caption ("1 Wiring diagram", or "Figure 1. Wiring diagram" with `Number label`), gives it
 with `{number of: id}` and lists it in a `Table of contents` with `Entries: figures` or `Entries: tables`
 ([Table of contents](table-of-contents.md#what-it-lists-of)). It accepts `Id`, `Style`, `Box`, `Typography`, `Break`,
-`In table of contents`, `Side` and `Clear`, and the properties below. It does not accept `Link`: the link goes in the
+`In table of contents`, `Side` and `Below side boxes`, and the properties below. It does not accept `Link`: the link goes in the
 element inside.
 
 ```
@@ -144,7 +144,7 @@ in the `Figure` for the rest: `Before`, `After`, `Keep with next`...
 Wherever an in-flow element goes, also as the element of an `Item` or an `Area`, but not inside a `Page overlay`, which
 is repeated on every page, nor inside a `Footnote`. With `Side` it is a side box, like a `Block`: it needs `Width` or
 `Max width` (`SIDE_WITHOUT_WIDTH`) and the text that follows it runs beside it, caption included
-([Block](block.md#side-boxes-side)). `Clear` moves it below the side boxes before it. A `Figure` does not run beside a
+([Block](block.md#side-boxes-side)). `Below side boxes` moves it below the side boxes before it. A `Figure` does not run beside a
 side box: it goes below it, like a table.
 
 ## Tables of contents

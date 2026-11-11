@@ -227,7 +227,7 @@ class NestedRulesTest {
         assertEquals(ErrorCode.STYLE_NESTED_TOO_DEEP, deep.errorCode());
         assertEquals(14, deep.line());
         // A For column cannot contain rules either: the schema does not allow it.
-        for (String outer : List.of("For element: Header cell", "For element: TOC 1", "For element: Footnotes",
+        for (String outer : List.of("For element: Header cell", "For element: TOC 1", "For element: Footnote area",
                 "For element: Code block")) {
             InvalidModelException e = error(outer, "\tFor element: Text", "\t\tBox:", "\t\t\tPadding: 1",
                     "---", "Block:");
@@ -241,7 +241,7 @@ class NestedRulesTest {
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, document.errorCode());
         assertEquals(3, document.line());
         for (String inner : List.of("For element: Document", "For element: Section", "For element: TOC 1",
-                "For element: Footnotes")) {
+                "For element: Footnote area")) {
             InvalidModelException e = error("For style: a", "\t" + inner, "\t\tTypography:", "\t\t\tBold: true",
                     "---", "Block:");
             assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode(), inner);

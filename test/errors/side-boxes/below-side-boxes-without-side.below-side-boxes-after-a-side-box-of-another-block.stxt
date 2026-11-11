@@ -1,5 +1,5 @@
-# Case: Clear in a Block whose side box is inside another Block, with a background, before it
-# Code: CLEAR_WITHOUT_SIDE
+# Case: Below side boxes in a Block whose side box is inside another Block, with a background, before it
+# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE
 # Line: 22
 Document (dev.stxt.pdf):
 	Language: es
@@ -19,4 +19,4 @@ Document (dev.stxt.pdf):
 			Image: test/square.png
 				Side: left
 		Paragraph: Hola
-			Clear: true
+			Below side boxes: true

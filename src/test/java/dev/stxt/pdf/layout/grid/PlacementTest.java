@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.model.Area;
 import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.Direction;
+import dev.stxt.pdf.model.FillOrder;
 
 /** Automatic placement of the items in the grid (reference/components/grid.md). */
 class PlacementTest {
@@ -79,10 +79,10 @@ class PlacementTest {
 
     @Test
     void fixedColumnWithoutRoomInColumnFlow() {
-        // With Flow: vertical, the fixed column is the one that does not grow: two rows, both occupied.
+        // With Fill order: columns, the fixed column is the one that does not grow: two rows, both occupied.
         assertInstanceOf(Placement.NoRoom.class, Placement.place(
                 List.of(new Cell(1, 1, 1, 1), new Cell(2, 1, 1, 1), new Cell(null, 1, 1, 1)), 1, 2,
-                Direction.VERTICAL));
+                FillOrder.COLUMNS));
     }
 
     // Cases that were missing according to mutation testing.

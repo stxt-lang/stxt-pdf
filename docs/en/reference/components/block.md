@@ -1,7 +1,7 @@
 # `Block`
 
 A box that stacks its children vertically. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
-`Rotate`, `Side` and `Clear`, and any element as a child. It goes wherever an in-flow element goes. With `Rotate`, it rotates with everything it contains
+`Rotate`, `Side` and `Below side boxes`, and any element as a child. It goes wherever an in-flow element goes. With `Rotate`, it rotates with everything it contains
 and takes up the rectangle that encloses it ([Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image)).
 With `Side`, it is a [side box](#side-boxes-side): the text that follows it runs beside it.
 
@@ -61,7 +61,7 @@ of `Stack` and `Grid` (also the cells of a `Table`), the columns of a `Columns`,
 |---|---|---|---|
 | `Isolate margins` | boolean | `false` | Isolates the margins of the box: stops margin merging with the children. Only in `Block` and `Frame`, and not in an item of `Stack` or `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
-`Isolate margins` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), like `Side` and `Clear`.
+`Isolate margins` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), like `Side` and `Below side boxes`.
 
 > **Decision:** `Isolate margins` exists only where it can have an effect: `Overlay`, `Page overlay` and the items already isolate, and `Stack`, `Grid`
 > and `Text` have no children in block flow. In a `Block` or a `Frame` that is an item, `Isolate margins: true` is an error.
@@ -148,10 +148,10 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
   where one on the left would be, so with that one it goes below. Everything else **goes below** the side boxes: a
   `Table`, a `Stack`, a `Grid`, a `Columns`, a `Table of contents`, a `Frame`, a rotated or clipped box, preformatted
   text and a text, block or heading with `Background` or `Border`, which would be painted over the box. What has
-  `Clear: true` goes below too.
-- **`Clear`.** `Clear: true` on a `Text`, a `Paragraph`, a `Block`, a heading, a `Markdown`, an `Image` or a `Barcode`
+  `Below side boxes: true` goes below too.
+- **`Below side boxes`.** `Below side boxes: true` on a `Text`, a `Paragraph`, a `Block`, a heading, a `Markdown`, an `Image` or a `Barcode`
   moves it below the side boxes before it, instead of running beside them. Without a side box before it, it is an
-  error (`CLEAR_WITHOUT_SIDE`).
+  error (`BELOW_SIDE_BOXES_WITHOUT_SIDE`).
 - **A word that does not fit** beside the box leaves that line empty and goes to the next one, up to the first line
   with the whole width; it is an overflow only if it does not fit there either (`TEXT_OVERFLOW`). With
   `Line breaking: optimal`, the line breaking takes the width of each line into account.
@@ -171,7 +171,7 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
 | Property | Values | Default | Notes |
 |---|---|---|---|
 | `Side` | `left`, `right` | none | Makes the box a side box. In `Image`, `Barcode` and `Block` (with `Width` or `Max width`). |
-| `Clear` | boolean | `false` | Moves the box below the side boxes before it. In `Text`, `Paragraph`, `Block`, the headings, `Markdown`, `Image` and `Barcode`. |
+| `Below side boxes` | boolean | `false` | Moves the box below the side boxes before it. In `Text`, `Paragraph`, `Block`, the headings, `Markdown`, `Image` and `Barcode`. |
 
 > **Decision:** the side box is the only thing that makes text run around another box; it is placed at its place in
 > the flow and does not move. *Rejected alternative:* floats as a general placement mechanism, which `Stack`, `Grid`,

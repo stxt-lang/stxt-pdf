@@ -1,7 +1,7 @@
 # `Block`
 
 Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
-`Rotate`, `Side` y `Clear`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
+`Rotate`, `Side` y `Below side boxes`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
 y ocupa el rectángulo que la envuelve ([Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image)).
 Con `Side`, es una [caja lateral](#cajas-laterales-side): el texto que la sigue corre a su lado.
 
@@ -61,7 +61,7 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 |---|---|---|---|
 | `Isolate margins` | booleano | `false` | Aísla los márgenes de la caja: corta la fusión de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Stack` o `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
-`Isolate margins` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)), como `Side` y `Clear`.
+`Isolate margins` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)), como `Side` y `Below side boxes`.
 
 > **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
@@ -147,10 +147,10 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
   así que con ella va debajo. Lo demás **se coloca debajo** de las cajas laterales: una `Table`, un `Stack`, un `Grid`,
   un `Columns`, un `Table of contents`, un `Frame`, una caja girada o recortada, un texto preformateado y un texto,
   bloque o encabezado con `Background` o `Border`, que se pintaría encima de la caja. También va debajo lo que lleva
-  `Clear: true`.
-- **`Clear`.** `Clear: true` en un `Text`, un `Paragraph`, un `Block`, un encabezado, un `Markdown`, una `Image` o un
+  `Below side boxes: true`.
+- **`Below side boxes`.** `Below side boxes: true` en un `Text`, un `Paragraph`, un `Block`, un encabezado, un `Markdown`, una `Image` o un
   `Barcode` lo baja por debajo de las cajas laterales que hay antes que él, en lugar de rodearlas. Sin una caja lateral
-  antes es un error (`CLEAR_WITHOUT_SIDE`).
+  antes es un error (`BELOW_SIDE_BOXES_WITHOUT_SIDE`).
 - **Una palabra que no cabe** al lado de la caja deja esa línea vacía y pasa a la siguiente, hasta la primera línea con el
   ancho entero; solo es un desbordamiento si tampoco cabe ahí (`TEXT_OVERFLOW`). Con `Line breaking: optimal`, el reparto
   tiene en cuenta el ancho de cada línea.
@@ -170,7 +170,7 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Side` | `left`, `right` | sin valor | Hace de la caja una caja lateral. En `Image`, `Barcode` y `Block` (con `Width` o `Max width`). |
-| `Clear` | booleano | `false` | Baja la caja por debajo de las cajas laterales anteriores. En `Text`, `Paragraph`, `Block`, los encabezados, `Markdown`, `Image` y `Barcode`. |
+| `Below side boxes` | booleano | `false` | Baja la caja por debajo de las cajas laterales anteriores. En `Text`, `Paragraph`, `Block`, los encabezados, `Markdown`, `Image` y `Barcode`. |
 
 > **Decisión:** la caja lateral es lo único que hace que el texto rodee a otra caja; se coloca en su sitio del flujo y
 > no se mueve. *Alternativa descartada:* los flotantes como mecanismo general de colocación, que `Stack`, `Grid`,

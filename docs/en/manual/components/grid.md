@@ -65,7 +65,7 @@ margins and the `Id` go on the element inside.
 | `Row sizes` | whatever each row measures | The height of each row |
 | `Gap` | `0` | The gap between cells (with two values: between rows and between columns) |
 | `Area map` | none | A drawing of the grid with names: one line per row, one name per cell, `.` for an empty cell |
-| `Flow` | `horizontal` | Whether the items without a fixed position are placed by rows (`horizontal`) or by columns (`vertical`) |
+| `Fill order` | `rows` | Whether the items without a fixed position are placed by rows (`rows`) or by columns (`columns`) |
 | `Horizontal`, `Vertical` | `stretch` | The alignment of the items in their cell: `start`, `end`, `center` or `stretch` (taking up the whole cell) |
 
 Each name in `Area map` must form a rectangle. If an item falls outside the declared rows, new rows are added.

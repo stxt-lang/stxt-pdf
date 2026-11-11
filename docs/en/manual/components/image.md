@@ -51,7 +51,7 @@ Document (dev.stxt.pdf):
 | `PDF page` | The page of a PDF that is drawn, from 1. Without `PDF page`, the first one. Only in a PDF |
 | `Rotate` | Rotating the image around its center. It takes up the rectangle that encloses it rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
 | `Side` | `left` or `right`: the image is placed at that side and the text that follows it runs beside it ([Block](block.md#a-box-at-one-side-with-the-text-around-it-side)) |
-| `Clear` | `true` moves the image below the side boxes before it |
+| `Below side boxes` | `true` moves the image below the side boxes before it |
 
 It also accepts `Id`, `Style`, `Link`, `Box` and `Break` (without `Keep together` or `Edges`: it is not split). It does not
 accept `Typography`.

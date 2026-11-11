@@ -40,7 +40,7 @@ Text:
 ## `Paragraph`
 
 A paragraph of the content: it accepts the same as a `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate`,
-`Clear` and the text in the value or in `Content`), and `Drop cap` besides, and is laid out in the same way. It is **a single
+`Below side boxes` and the text in the value or in `Content`), and `Drop cap` besides, and is laid out in the same way. It is **a single
 paragraph**: a blank line in its `Content` is an error (`TEXT_BLANK_LINE`), also in preformatted text. For several
 paragraphs, several `Paragraph` elements are used. The `For element: Paragraph` rules style the paragraphs without touching
 standalone text.

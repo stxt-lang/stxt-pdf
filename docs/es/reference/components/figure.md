@@ -5,7 +5,7 @@ un `Caption`, el pie, que va debajo del contenido o, en una tabla, encima. El mo
 escribe el número delante del pie («1 Esquema de conexión», o «Figura 1. Esquema de conexión» con `Number label`), lo da
 con `{number of: id}` y la lista en un `Table of contents` con `Entries: figures` o `Entries: tables`
 ([Table of contents](table-of-contents.md#qué-lista-of)). Admite `Id`, `Style`, `Box`, `Typography`, `Break`,
-`In table of contents`, `Side` y `Clear`, y las propiedades de abajo. No admite `Link`: el enlace va en el elemento de
+`In table of contents`, `Side` y `Below side boxes`, y las propiedades de abajo. No admite `Link`: el enlace va en el elemento de
 dentro.
 
 ```
@@ -140,7 +140,7 @@ lo demás: `Before`, `After`, `Keep with next`...
 Donde va un elemento en flujo, también como elemento de un `Item` o un `Area`, pero no dentro de un `Page overlay`, que
 se repite en cada página, ni dentro de una `Footnote`. Con `Side` es una caja lateral, como un `Block`: necesita `Width` o
 `Max width` (`SIDE_WITHOUT_WIDTH`) y el texto que la sigue corre a su lado, pie incluido
-([Block](block.md#cajas-laterales-side)). `Clear` la baja por debajo de las cajas laterales anteriores. Una `Figure` no
+([Block](block.md#cajas-laterales-side)). `Below side boxes` la baja por debajo de las cajas laterales anteriores. Una `Figure` no
 corre al lado de una caja lateral: va debajo de ella, como una tabla.
 
 ## Índices

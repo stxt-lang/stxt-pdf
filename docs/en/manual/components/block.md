@@ -105,7 +105,7 @@ Paragraph: The Molí path starts at the factory parking lot and follows the rive
 
 Paragraphs and texts run beside the box, also those of a `Block`, a heading, a `Markdown` or a list (a list, only if
 the box is on the right: its markers go on the left). A table, a `Stack` or a text with background or border go below
-the box, and so does anything with `Clear: true`. The box is not split across pages: if it does not fit, it moves to
+the box, and so does anything with `Below side boxes: true`. The box is not split across pages: if it does not fit, it moves to
 the next one with the first line that runs beside it.
 
 ## Recipes

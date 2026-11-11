@@ -60,9 +60,9 @@ dark brown modules inside a frame.)
 | `Alt` | non-empty text | required | What it is and where it leads, for whoever cannot see it ([Accessibility](#accessibility)). |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates it about its center, like an `Image`. |
 | `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
-| `Clear` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
+| `Below side boxes` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-`Barcode format`, `Error correction`, `Quiet zone`, `Side` and `Clear` can also come from a rule of `Styles`
+`Barcode format`, `Error correction`, `Quiet zone`, `Side` and `Below side boxes` can also come from a rule of `Styles`
 ([Element properties](../common/styles.md#element-properties)); the data, `Alt` and `Rotate` cannot.
 
 ## Formats

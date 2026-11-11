@@ -153,7 +153,7 @@ class RuleElementPropertiesTest {
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, error("For element: Section", "\tGrow: 1", "---", "Block:").errorCode());
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, error("For element: Header cell", "\tColumn sizes: *", "---",
                 "Block:").errorCode());
-        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, error("For element: Code block", "\tClear: true", "---",
+        assertEquals(ErrorCode.STYLE_NOT_ALLOWED, error("For element: Code block", "\tBelow side boxes: true", "---",
                 "Block:").errorCode());
         // The base typography of these documents is already a For element: Document: this one goes apart.
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, assertThrows(InvalidModelException.class, () -> root(
@@ -182,12 +182,12 @@ class RuleElementPropertiesTest {
     @Test
     void aSectionOrAStyledRunTakeNoElementProperty() {
         InvalidModelException section = assertThrows(InvalidModelException.class, () -> new BoxTreeBuilder().build(
-                READER.read(HEADER + Docs.TYPOGRAPHY + "\t\tFor style: x\n\t\t\tClear: true\n"
+                READER.read(HEADER + Docs.TYPOGRAPHY + "\t\tFor style: x\n\t\t\tBelow side boxes: true\n"
                         + "\tSection:\n\t\tStyle: x\n\t\tBlock:")));
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED, section.errorCode());
         assertEquals(13, section.line());
         InvalidModelException run = error(
-                "For style: x", "\tClear: true",
+                "For style: x", "\tBelow side boxes: true",
                 "---",
                 "Text: un [tramo]{x}", "\tTypography:", "\t\tMarkup: markdown");
         assertEquals(ErrorCode.STYLE_NOT_ALLOWED_IN_RUN, run.errorCode());

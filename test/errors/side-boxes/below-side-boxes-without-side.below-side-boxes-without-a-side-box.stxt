@@ -1,5 +1,5 @@
-# Case: Clear without a side box before the paragraph
-# Code: CLEAR_WITHOUT_SIDE
+# Case: Below side boxes without a side box before the paragraph
+# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE
 # Line: 17
 Document (dev.stxt.pdf):
 	Language: es
@@ -14,4 +14,4 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Paragraph: Hola
-			Clear: true
+			Below side boxes: true

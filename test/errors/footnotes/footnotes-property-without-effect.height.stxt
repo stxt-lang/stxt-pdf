@@ -1,4 +1,4 @@
-# Case: Height in For element: Footnotes
+# Case: Height in For element: Footnote area
 # Code: FOOTNOTES_PROPERTY_WITHOUT_EFFECT
 # Line: 19
 Document (dev.stxt.pdf):
@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 				Markup: markdown
-		For element: Footnotes
+		For element: Footnote area
 			Box:
 				Height: 50
 	Section:

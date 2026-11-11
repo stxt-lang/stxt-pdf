@@ -62,7 +62,7 @@ class ElementTest {
         // and, from the table of contents, six entries, the title, the leader and the page number.
         assertEquals(Element.values().length - 14, Element.written().size());
         // The footnote area is named by For element rules, but it is not written; a Footnote is.
-        assertEquals(Optional.of(Element.FOOTNOTES), Element.of("footnotes"));
+        assertEquals(Optional.of(Element.FOOTNOTES), Element.of("footnote-area"));
         assertTrue(Element.selectable().contains(Element.FOOTNOTES), () -> "selectable: " + Element.selectable());
         assertFalse(Element.written().contains(Element.FOOTNOTES), () -> "written: " + Element.written());
         assertTrue(Element.written().contains(Element.FOOTNOTE), () -> "written: " + Element.written());

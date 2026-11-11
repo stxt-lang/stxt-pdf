@@ -53,9 +53,9 @@ Puede llevar números de página y referencias: `{page}`, `{pages}`, `{page of: 
 
 ## Propiedades
 
-Admiten `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` y `Clear`. Necesitan `Font` y `Size`, propios o heredados
+Admiten `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` y `Below side boxes`. Necesitan `Font` y `Size`, propios o heredados
 ([Tipografía](../common/typography.md)). Con `Rotate: -90`, el texto va en vertical y ocupa su sitio girado
-([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)). Con `Clear: true`, el texto se coloca debajo de
+([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)). Con `Below side boxes: true`, el texto se coloca debajo de
 una caja lateral en vez de rodearla ([Block](block.md#una-caja-a-un-lado-y-el-texto-alrededor-side)).
 
 Un `Paragraph` admite además `Drop cap`: con `Drop cap: 3`, su primera letra es una letra capitular que ocupa las tres

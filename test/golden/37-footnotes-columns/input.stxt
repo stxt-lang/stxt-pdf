@@ -1,6 +1,6 @@
 # Footnotes in columns, in a table and with Keep together (reference/components/footnote.md), with the area styled.
 # Page area of 260 × 160 from (20, 20), which ends at y = 180. Lines of 12 (Size 10) in the text; the footnote area
-# (For element: Footnotes) has Size 8 (lines of 9.6; 4 pt per character), a top margin of 6, a rule of 1 and a padding of
+# (For element: Footnote area) has Size 8 (lines of 9.6; 4 pt per character), a top margin of 6, a rule of 1 and a padding of
 # 3: 10 more than its notes, which are separated by a margin of 2 (For element: Footnote).
 #
 # cols: two columns of 120 (24 characters per line); c1 calls g and c2 calls h in their first lines, 6 lines each, and
@@ -24,7 +24,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 				Markup: markdown
-		For element: Footnotes
+		For element: Footnote area
 			Typography:
 				Size: 8
 			Box:

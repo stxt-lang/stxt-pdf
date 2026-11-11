@@ -105,7 +105,7 @@ Paragraph: El camino del Molí sale del aparcamiento de la fábrica y sigue el r
 
 Rodean la caja los párrafos y los textos, también los de un `Block`, un encabezado, un `Markdown` o una lista (una lista,
 solo si la caja está a la derecha: sus marcadores van a la izquierda). Una tabla, un `Stack` o un texto con fondo o borde
-van debajo de la caja, y cualquier cosa con `Clear: true` también. La caja no se parte entre páginas: si no cabe, pasa a
+van debajo de la caja, y cualquier cosa con `Below side boxes: true` también. La caja no se parte entre páginas: si no cabe, pasa a
 la siguiente con la primera línea que la rodea.
 
 ## Recetas

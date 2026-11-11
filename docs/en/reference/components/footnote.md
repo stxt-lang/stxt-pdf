@@ -74,10 +74,10 @@ A `Footnote` cannot be inside a `Page overlay`, which is repeated on every page,
 > **Decision:** the note inherits from the area and not from where it is written: what surrounds it in the document has
 > nothing to do with the bottom of the page, where it is read.
 
-## The footnote area (`Footnotes`)
+## The footnote area (`Footnote area`)
 
 The notes of a page go in the **footnote area**, a generated box at the bottom of the page area, with the width of the
-page area, which the engine places on every page that has notes. The `For element: Footnotes` rules style it, and it
+page area, which the engine places on every page that has notes. The `For element: Footnote area` rules style it, and it
 is what the notes inherit:
 
 - its `Typography` is the typography of all the notes (`Size: 8`, for example);
@@ -90,7 +90,7 @@ and are an error (`FOOTNOTES_PROPERTY_WITHOUT_EFFECT`): it measures what the not
 
 ```
 Styles:
-    For element: Footnotes
+    For element: Footnote area
         Typography:
             Size: 8
             Line height: 11
@@ -158,7 +158,7 @@ A `Footnote` has an `Id`, so `{page of: id}` gives the page it is on (that of it
 | `FOOTNOTE_CALL_NOT_ALLOWED` | A call in a `Page overlay`, in a heading or inside a note |
 | `FOOTNOTE_NOT_ALLOWED` | A `Footnote` inside a `Page overlay` or inside another `Footnote` |
 | `FOOTNOTE_CONTENT` | A note that does not start with a paragraph, or whose `Markdown` generates headings, images or code blocks |
-| `FOOTNOTES_PROPERTY_WITHOUT_EFFECT` | A property of `For element: Footnotes` without effect on the area: its height, `Rotate`, `Overflow` |
+| `FOOTNOTES_PROPERTY_WITHOUT_EFFECT` | A property of `For element: Footnote area` without effect on the area: its height, `Rotate`, `Overflow` |
 | `FOOTNOTE_TOO_TALL` | A note that does not fit on a page with the text that calls it |
 
 ## Accessibility

@@ -11,7 +11,7 @@
 # the clauses refer to with {number of: annex-title}; recital III
 # refers to the clauses section with {number of: terms}.
 # Three footnotes ([^...] in the parties, in clause 4 and in clause 7, with their Footnote after the clauses): numbered
-# in order, at the bottom of their page, under a rule, with the typography of For element: Footnotes in styles.stxt.
+# in order, at the bottom of their page, under a rule, with the typography of For element: Footnote area in styles.stxt.
 Document (dev.stxt.pdf):
 	Page:
 		Paper: A4

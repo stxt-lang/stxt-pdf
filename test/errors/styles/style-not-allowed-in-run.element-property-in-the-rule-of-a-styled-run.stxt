@@ -1,4 +1,4 @@
-# Case: The rule of a styled run declares Clear, an element property, and a run is part of a line
+# Case: The rule of a styled run declares Below side boxes, an element property, and a run is part of a line
 # Code: STYLE_NOT_ALLOWED_IN_RUN
 # Line: 16
 Document (dev.stxt.pdf):
@@ -13,7 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 		For style: tag
-			Clear: true
+			Below side boxes: true
 	Section:
 		Text: Una [etiqueta]{tag} en la frase
 			Typography:

@@ -9,7 +9,7 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Changed
 
-- **Nine names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
+- **Twelve names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
   alone in a rule of `Styles`, and so that no two names are nearly the same. A document written for 0.14.0 that uses
   them has to be updated; the old names are not accepted.
   - `Start` is **`First number`**, in a `List` and in a `Section` (where it read like `Begin on`).
@@ -24,13 +24,21 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   - `Line breaking: balanced` is **`Line breaking: optimal`**: it is the Knuth-Plass algorithm, and in web layout
     "balance" evens out the length of the lines. In Java, `LineBreaking.BALANCED` is `LineBreaking.OPTIMAL`.
   - `Table columns` is **`Table column sizes`**, in a `Markdown`: its values become the `Column sizes` of the tables.
+  - `Clear` is **`Below side boxes`**: alone in a rule of `Styles`, `Clear: true` did not say what it does.
+  - `Flow` is **`Fill order`**, in a `Grid`, and its values are **`rows`** (the default, before `horizontal`) and
+    **`columns`** (before `vertical`): they name what is filled one by one.
+  - The generated element `Footnotes`, the footnote area, is **`Footnote area`** (`For element: Footnote area`): it
+    was one letter away from `For element: Footnote`, the rule of each note.
 - **The Java API follows the names**: `ListStyle.start()` is `firstNumber()`, `GridStyle.areas()` is `areaMap()` and
   its type `model.GridAreas` is `model.AreaMap`, `ImageStyle.format()` is `barcodeFormat()`,
-  `TableOfContentsStyle.of()` is `entries()` and the component `start` of the record `Section` is `firstNumber`.
+  `TableOfContentsStyle.of()` is `entries()`, the component `start` of the record `Section` is `firstNumber`,
+  `Style.clear()` is `belowSideBoxes()` and `GridStyle.flow()` is `fillOrder()`, of the new type `model.FillOrder`
+  (`ROWS`, `COLUMNS`) instead of `model.Direction`.
 - `Pdf page` is written **`PDF page`** in the schema and in the documentation. Both spellings are the same node.
 - The descriptions of `Offset`, `Layer` and `Wrap` in the schema say what each one does in each element and its
   default.
-- The error code `START_WITHOUT_RESTART` is **`FIRST_NUMBER_WITHOUT_RESTART`**, like the property it is about.
+- The error codes `START_WITHOUT_RESTART` and `CLEAR_WITHOUT_SIDE` are **`FIRST_NUMBER_WITHOUT_RESTART`** and
+  **`BELOW_SIDE_BOXES_WITHOUT_SIDE`**, like the properties they are about.
 - The messages of `LIST_NUMBER_NOT_ALLOWED`, `LIST_NUMBER_RANGE`, `FIRST_NUMBER_WITHOUT_RESTART`, `COLUMNS_WITHOUT_COUNT`,
   `SINGLE_COLUMN`, `TABLE_ORDER`, `MARKDOWN_PROPERTY_MISSING` and of the errors of `Area map` and of `Entries` name
   the properties with their new names.

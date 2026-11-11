@@ -60,7 +60,7 @@ class SchemaCoverageTest {
             Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
             // A Block with Side needs a width; an image does not mind it.
             Map.entry("Side", "Side: left\nBox:\n\tWidth: 100"),
-            Map.entry("Clear", "Clear: true"),
+            Map.entry("Below side boxes", "Below side boxes: true"),
             Map.entry("Drop cap", "Drop cap: 3"),
             // Page
             Map.entry("Paper", "Paper: A4"),
@@ -137,7 +137,7 @@ class SchemaCoverageTest {
             Map.entry("Column sizes", "Column sizes: 100"),
             Map.entry("Row sizes", "Row sizes: 20"),
             Map.entry("Area map", "Area map >>\n\ta"),
-            Map.entry("Flow", "Flow: vertical"),
+            Map.entry("Fill order", "Fill order: columns"),
             Map.entry("Horizontal", "Horizontal: center"),
             Map.entry("Vertical", "Vertical: center"),
             // Lists
@@ -266,12 +266,12 @@ class SchemaCoverageTest {
                 + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: a"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
-        // Clear needs a side box before the element: the template of each element, with one in front.
+        // Below side boxes needs a side box before the element: the template of each element, with one in front.
         String side = "\tImage: test/square.png\n\t\tSide: left\n";
         for (String element : List.of("Block", "Text", "Paragraph", "Heading 1", "Heading 2", "Heading 3", "Heading 4",
                 "Heading 5", "Heading 6", "Markdown", "Image", "Barcode", "Figure")) {
             Template base = t.get(element);
-            t.put(element + " > Clear", new Template(HEADER + side + base.document().substring(HEADER.length()),
+            t.put(element + " > Below side boxes", new Template(HEADER + side + base.document().substring(HEADER.length()),
                     base.present()));
         }
         return t;

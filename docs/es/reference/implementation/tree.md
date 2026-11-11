@@ -206,9 +206,9 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
   o, con `Entries: figures` o `tables`, por `Figure` de ese contador (`Element.TOC_1`), con el título o el pie, la guía y el
   número. Un encabezado o una figura sin `Id` recibe un nombre generado (`Box.anchor`), y `Box.key()` da el `Id` o ese
   nombre.
-- **Área de notas:** `Footnotes.beginSection` crea en cada sección la caja `Footnotes` (`Element.FOOTNOTES`,
+- **Área de notas:** `Footnotes.beginSection` crea en cada sección la caja `Footnote area` (`Element.FOOTNOTES`,
   `Position.FOOTNOTES`, fuera del flujo: `Style.isOutOfFlow()`), hija de la sección después de su contenido, con el
-  aspecto por defecto del filete y las reglas `For element: Footnotes` encima. Cada `Footnote` escrita en la sección
+  aspecto por defecto del filete y las reglas `For element: Footnote area` encima. Cada `Footnote` escrita en la sección
   (`buildContent`, `BoxTreeBuilder.footnote`) se construye con la familia `FOOTNOTE` de `ElementReader` y el área como
   padre, del que hereda, y es hija del área y no de la caja donde se escribe. `BlockLayout` no la ve; `PdfStructure` la
   coloca tras el texto que la llama ([El PDF por dentro](pdf.md#árbol-de-estructura)).

@@ -52,7 +52,7 @@ public final class PropertyKey {
     public static final String PDF_PAGE = "pdf-page";
     public static final String ERROR_CORRECTION = "error-correction";
     public static final String SIDE = "side";
-    public static final String CLEAR = "clear";
+    public static final String BELOW_SIDE_BOXES = "below-side-boxes";
     public static final String DROP_CAP = "drop-cap";
     public static final String ALT = "alt";
     public static final String LEVELS = "levels";

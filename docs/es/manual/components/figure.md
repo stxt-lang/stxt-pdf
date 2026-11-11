@@ -81,7 +81,7 @@ Document (dev.stxt.pdf):
 | `Alt` | obligatorio con un `Block` | El texto alternativo de la figura entera, solo cuando contiene un `Block`. Con una imagen, el `Alt` va en la imagen |
 | `In table of contents` | `true` | Con `false`, la figura no sale en los índices, pero sigue numerada |
 
-Admite además `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` y `Clear`. `Numbered: false` (en su `Typography` o en una
+Admite además `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` y `Below side boxes`. `Numbered: false` (en su `Typography` o en una
 regla) la deja sin número; `Number label` y `Number format` escriben el número como en los encabezados
 ([Encabezados](heading.md#numeración-numbered)).
 

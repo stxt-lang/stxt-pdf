@@ -208,9 +208,9 @@ box that is passed to them.
   or, with `Entries: figures` or `tables`, per `Figure` of that counter (`Element.TOC_1`), with the title or the caption, the
   leader and the number. A heading or a figure without `Id` receives a generated name (`Box.anchor`), and `Box.key()`
   gives the `Id` or that name.
-- **Footnote area:** `Footnotes.beginSection` creates in each section the `Footnotes` box (`Element.FOOTNOTES`,
+- **Footnote area:** `Footnotes.beginSection` creates in each section the `Footnote area` box (`Element.FOOTNOTES`,
   `Position.FOOTNOTES`, out of the flow: `Style.isOutOfFlow()`), a child of the section after its content, with the
-  default look of the rule and the `For element: Footnotes` rules on top. Each `Footnote` written in the section
+  default look of the rule and the `For element: Footnote area` rules on top. Each `Footnote` written in the section
   (`buildContent`, `BoxTreeBuilder.footnote`) is built with the `FOOTNOTE` family of `ElementReader` and the area as
   parent, from which it inherits, and is a child of the area and not of the box where it is written. `BlockLayout`
   does not see it; `PdfStructure` places it after the text that calls it ([The PDF inside](pdf.md#structure-tree)).

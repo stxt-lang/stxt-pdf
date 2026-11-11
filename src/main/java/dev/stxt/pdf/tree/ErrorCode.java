@@ -156,8 +156,8 @@ public enum ErrorCode {
     SIDE_WITHOUT_WIDTH,
     /** {@code Keep together} or {@code Edges} in a {@code Block} with {@code Side}, which is not split. */
     BREAK_IN_SIDE_BOX,
-    /** {@code Clear: true} without a side box before the box. */
-    CLEAR_WITHOUT_SIDE,
+    /** {@code Below side boxes: true} without a side box before the box. */
+    BELOW_SIDE_BOXES_WITHOUT_SIDE,
     /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
     DROP_CAP_NOT_ALLOWED,
 
@@ -227,7 +227,7 @@ public enum ErrorCode {
      */
     FOOTNOTE_CONTENT,
     /**
-     * A property of the footnote area ({@code For element: Footnotes}) that has no effect on it: its height,
+     * A property of the footnote area ({@code For element: Footnote area}) that has no effect on it: its height,
      * {@code Rotate} or {@code Overflow}.
      */
     FOOTNOTES_PROPERTY_WITHOUT_EFFECT,

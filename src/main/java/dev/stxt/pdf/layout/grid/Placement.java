@@ -2,7 +2,7 @@ package dev.stxt.pdf.layout.grid;
 
 import dev.stxt.pdf.model.Area;
 import dev.stxt.pdf.model.Cell;
-import dev.stxt.pdf.model.Direction;
+import dev.stxt.pdf.model.FillOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
  * without moving the cursor; if none is left, there is no placement ({@link NoRoom}): the row does not grow. With
  * a fixed column and an automatic row, it goes to the first free row from the cursor.</p>
  *
- * <p>{@code Flow: vertical} is the same algorithm with the axes swapped: the grid and the cells are
+ * <p>{@code Fill order: columns} is the same algorithm with the axes swapped: the grid and the cells are
  * transposed, the placement goes by rows and the transposition is undone.</p>
  */
 public final class Placement {
@@ -41,7 +41,7 @@ public final class Placement {
     }
 
     /**
-     * An item with a fixed row (the column, with {@code Flow: vertical}) does not fit in it.
+     * An item with a fixed row (the column, with {@code Fill order: columns}) does not fit in it.
      *
      * @param item   index of the item
      * @param track  the row (or the column) it asks for
@@ -54,13 +54,13 @@ public final class Placement {
     /**
      * @param cells   requested cells, in tree order
      * @param columns columns of the explicit grid
-     * @param rows    rows of the explicit grid (they only count with {@code Flow: vertical})
-     * @param flow    direction of the automatic placement
+     * @param rows    rows of the explicit grid (they only count with {@code Fill order: columns})
+     * @param order   order of the automatic placement
      * @return the area assigned to each item, in the same order, or {@link NoRoom} if an item with a fixed row (the
      *         column, in {@code column}) does not fit in it
      */
-    public static Result place(List<Cell> cells, int columns, int rows, Direction flow) {
-        if (flow == Direction.HORIZONTAL) {
+    public static Result place(List<Cell> cells, int columns, int rows, FillOrder order) {
+        if (order == FillOrder.ROWS) {
             return place(cells, columns);
         }
         List<Cell> transposed = cells.stream()

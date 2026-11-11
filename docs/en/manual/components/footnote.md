@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
         For element: Paragraph
             Box:
                 Margin: 0 0 10 0
-        For element: Footnotes
+        For element: Footnote area
             Typography:
                 Size: 8
                 Line height: 11
@@ -59,7 +59,7 @@ or to be inside a `Markdown`. In the `Section`, `Footnote numbering: restart` st
 - The note starts with a `Paragraph`, a `Text` or a `Markdown`, which gets the number as a superscript; after it, more
   paragraphs, lists or tables may follow. No headings or images.
 - Each note is called once, and every call has its note in the same section; otherwise it is an error.
-- The notes of a page go together at the bottom, under a rule, with the look of `For element: Footnotes` (the rule is
+- The notes of a page go together at the bottom, under a rule, with the look of `For element: Footnote area` (the rule is
   its top border; its typography is that of all the notes) and that of `For element: Footnote` (each note).
 - A line enters the page only if its note fits under it; otherwise it moves to the next page with the note. A long note
   may continue at the bottom of the next page.

@@ -111,7 +111,7 @@ Text: Resultados del trimestre
 | `Isolate margins` | booleano | `false` | `Block`, `Frame` | Corta la fusión de márgenes con los hijos ([Block](../components/block.md#fusión-de-márgenes)). |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Descarta los márgenes de los hijos que tocan el borde de arriba de la caja, el de abajo o los dos ([Block](../components/block.md#recortar-los-márgenes-trim-margins)). |
 | `Side` | `left`, `right` | sin valor | `Image`, `Barcode`, `Block`, `Figure` | Caja lateral: el texto que la sigue corre a su lado ([Block](../components/block.md#cajas-laterales-side)). |
-| `Clear` | booleano | `false` | `Text`, `Paragraph`, `Block`, encabezados, `Markdown`, `Image`, `Barcode`, `Figure` | Baja la caja por debajo de las cajas laterales anteriores ([Block](../components/block.md#cajas-laterales-side)). |
+| `Below side boxes` | booleano | `false` | `Text`, `Paragraph`, `Block`, encabezados, `Markdown`, `Image`, `Barcode`, `Figure` | Baja la caja por debajo de las cajas laterales anteriores ([Block](../components/block.md#cajas-laterales-side)). |
 | `Drop cap` | entero de 2 a 5 | sin valor | `Paragraph` | Letra capitular de tantas líneas ([Text](../components/text.md#letra-capitular-drop-cap)). |
 
 ## Orden y texto
@@ -195,11 +195,11 @@ vez, y los elementos, las veces que se quiera.
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` y las propiedades de elemento de aspecto y de reparto ([Styles](styles.md#propiedades-de-elemento)), como mucho una de cada |
 | `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Clear`; elementos |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Below side boxes`; elementos |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
-| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Flow`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
-| `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Clear`; `Paragraph`, además, `Drop cap` |
-| `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Clear`; `Text` (al menos uno) |
+| `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
+| `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Below side boxes`; `Paragraph`, además, `Drop cap` |
+| `Heading 1` a `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Below side boxes`; `Text` (al menos uno) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (obligatorio, propio o de una regla), `Marker image` (con `Alt` y `Height`), `First number`; `List item` (al menos uno) |
 | `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (con `Alt` y `Height`), `Trim margins`; elementos salvo los encabezados (al menos uno) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (obligatorio, propio o de una regla), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (obligatorio), `Footer rows` |
@@ -207,13 +207,13 @@ vez, y los elementos, las veces que se quiera.
 | `Row` | `Id`, `Style`, `Box` (solo el aspecto), `Typography`, `Break`; `Cell` (al menos una) |
 | `Cell` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Span`, `Row header`, `Trim margins`; elementos salvo los encabezados |
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Balance`; elementos en flujo |
-| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Clear`, `Content` (obligatorio) |
+| `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (obligatorio) |
 | `Footnote` | `Id` (obligatorio), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
-| `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Clear`; `Caption` (exactamente uno); `Image`, `Barcode`, `Table` o `Block` (uno) |
+| `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes`; `Caption` (exactamente uno); `Image`, `Barcode`, `Table` o `Block` (uno) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `PDF page`, `Rotate`, `Side`, `Clear` |
-| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`), `Break`, `Alt` (obligatorio), `Barcode format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Clear`, `Content` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `PDF page`, `Rotate`, `Side`, `Below side boxes` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`), `Break`, `Alt` (obligatorio), `Barcode format`, `Error correction`, `Quiet zone`, `Rotate`, `Side`, `Below side boxes`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elementos |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elementos |

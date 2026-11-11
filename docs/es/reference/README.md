@@ -41,7 +41,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | Página | Elementos |
 |---|---|
 | [`Document`](components/document.md) | `Document`, `Page`, `Title`, `Language` y `Section` |
-| [`Block`](components/block.md) | `Block`, el flujo de bloque, que comparten todos los bloques, y las cajas laterales (`Side`, `Clear`) |
+| [`Block`](components/block.md) | `Block`, el flujo de bloque, que comparten todos los bloques, y las cajas laterales (`Side`, `Below side boxes`) |
 | [`Text`](components/text.md) | `Text` y `Paragraph`, con la letra capitular (`Drop cap`) |
 | [Encabezados](components/heading.md) | `Heading 1` a `Heading 6` y su numeración |
 | [`List`](components/list.md) | `List` y `List item` |
@@ -54,7 +54,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 y EAN-13 |
 | [`Figure`](components/figure.md) | `Figure` y su `Caption`: figuras y tablas con pie numerado |
 | [`Markdown`](components/markdown.md) | `Markdown` y el elemento generado `Code block` |
-| [`Footnote`](components/footnote.md) | `Footnote`, la llamada `[^id]` y el área de notas generada `Footnotes` |
+| [`Footnote`](components/footnote.md) | `Footnote`, la llamada `[^id]` y el área de notas generada `Footnote area` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents`, de encabezados, de figuras o de tablas, y las entradas que genera |
 
 ## Implementación

@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
         For element: Paragraph
             Box:
                 Margin: 0 0 10 0
-        For element: Footnotes
+        For element: Footnote area
             Typography:
                 Size: 8
                 Line height: 11
@@ -59,7 +59,7 @@ arriba), o estar en un `Markdown`. En la `Section`, `Footnote numbering: restart
 - La nota empieza con un `Paragraph`, un `Text` o un `Markdown`, que recibe el número en superíndice; después puede
   llevar más párrafos, listas o tablas. Sin encabezados ni imágenes.
 - Cada nota se llama una vez, y toda llamada tiene su nota en la misma sección; si no, es un error.
-- Las notas de una página van juntas al pie, bajo un filete, con el aspecto de `For element: Footnotes` (el filete es su
+- Las notas de una página van juntas al pie, bajo un filete, con el aspecto de `For element: Footnote area` (el filete es su
   borde superior; su tipografía es la de todas las notas) y el de `For element: Footnote` (cada nota).
 - Una línea solo entra en la página si su nota cabe debajo; si no, pasa a la página siguiente con la nota. Una nota
   larga puede seguir al pie de la página siguiente.

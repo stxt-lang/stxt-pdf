@@ -482,13 +482,13 @@ public final class Box {
      * below them: a text box that is not preformatted, or a box in block flow whose children can (a {@code Block}, a
      * heading, a {@code Markdown}, a list and its items), so that the text inside it runs beside them too. Not a box
      * with background or border, which would be painted over the side box; not a side box itself, a cleared one
-     * ({@code Clear}), a rotated one or one with {@code Overflow: clip}, which are placed whole; and not a table of
+     * ({@code Below side boxes}), a rotated one or one with {@code Overflow: clip}, which are placed whole; and not a table of
      * contents or a container, whose entries or items are not text that shortens its lines. A list only runs beside
      * side boxes on the right: its markers hang at its left, where a side box on the left would be
      * ({@link dev.stxt.pdf.layout.block.BlockLayout} decides that with the side boxes in sight).
      */
     public boolean wrapsBesideSideBoxes() {
-        if (style.isSideBox() || style.clear() || style.position() != Position.STATIC || style.rotation() != null
+        if (style.isSideBox() || style.belowSideBoxes() || style.position() != Position.STATIC || style.rotation() != null
                 || style.box().clips() || style.box().background() != null
                 || Insets.resolve(style.box().border(), 0).horizontal() + Insets.resolve(style.box().border(), 0).vertical() > 0) {
             return false;

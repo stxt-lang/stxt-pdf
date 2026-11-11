@@ -104,7 +104,7 @@ class FootnotesTest {
     }
 
     /**
-     * The area has the default rule and spacing, which {@code For element: Footnotes} changes, and the notes inherit
+     * The area has the default rule and spacing, which {@code For element: Footnote area} changes, and the notes inherit
      * its typography; {@code For element: Footnote} styles each note.
      */
     @Test
@@ -118,7 +118,7 @@ class FootnotesTest {
         assertEquals(0, s.box().border().bottom().resolve(0).orElseThrow());
         assertEquals(10, plain.footnotes().children().get(0).style().typography().fontSize());
 
-        Section styled = build("\t\tFor element: Footnotes", "\t\t\tTypography:", "\t\t\t\tSize: 8",
+        Section styled = build("\t\tFor element: Footnote area", "\t\t\tTypography:", "\t\t\t\tSize: 8",
                 "\t\t\tBox:", "\t\t\t\tBorder: 0", "\t\t\t\tMargin: 20 0 0 0", "\t\tFor element: Footnote",
                 "\t\t\tBox:", "\t\t\t\tMargin: 0 0 3 0",
                 "\tSection:", "\t\tParagraph: Uno[^a].", "\t\tFootnote:", "\t\t\tId: a",

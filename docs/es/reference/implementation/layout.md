@@ -240,7 +240,7 @@ la tipografía del ítem sobre esa línea base.
 **Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
 a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita
 por cada lado, con sus márgenes). A cada hijo que rodea las cajas (`Box.wrapsBesideSideBoxes`: textos no preformateados,
-`Block`, encabezados, `Markdown`, listas e ítems de lista sin fondo ni borde, que no sean cajas laterales ni lleven `Clear`,
+`Block`, encabezados, `Markdown`, listas e ítems de lista sin fondo ni borde, que no sean cajas laterales ni lleven `Below side boxes`,
 posición, `Rotate` u `Overflow: clip`; las listas, solo junto a cajas derechas) le pasa en el
 `ConstraintSpace` las **exclusiones** (`model.Exclusion`: banda y lo que quita por cada lado, medidas desde la caja de
 borde del hijo), que forman parte de la clave de la caché; los demás hijos bajan hasta el final de las cajas laterales. Un
@@ -397,7 +397,7 @@ por caja con el resto de la clave), así que olvidar cuesta lo que las cajas olv
 **Notas al pie.** `FootnoteLayout` maqueta cada página de una sección con notas ([Footnote](../components/footnote.md)):
 el flujo con `ConstraintSpace.forPage(pageSetup, reserva)`, que quita a la raíz la altura reservada al pie, y las notas de
 las llamadas que caen en sus líneas (`TextFormat.footnote` en los tramos de las `TextLine`) apiladas en el área de notas
-de la sección (`Section.footnotes()`, la caja generada `Footnotes`, hija de la sección fuera de su flujo). Como el cuerpo
+de la sección (`Section.footnotes()`, la caja generada `Footnote area`, hija de la sección fuera de su flujo). Como el cuerpo
 es función de la reserva y las notas dependen del cuerpo, la reserva se busca por sondas: sin reserva; si las notas no
 caben, la altura entera de esas notas (en la que las de cualquier reserva mayor caben, porque menos sitio es menos
 flujo), salvo que no deje sitio al cuerpo (lo coloca forzado por la garantía de progreso y desborda: entonces, la mayor

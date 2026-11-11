@@ -51,7 +51,7 @@ Document (dev.stxt.pdf):
 | `PDF page` | La página de un PDF que se dibuja, desde 1. Sin `PDF page`, la primera. Solo en un PDF |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
 | `Side` | `left` o `right`: la imagen se coloca a ese lado y el texto que la sigue corre a su lado ([Block](block.md#una-caja-a-un-lado-y-el-texto-alrededor-side)) |
-| `Clear` | `true` baja la imagen por debajo de las cajas laterales que hay antes |
+| `Below side boxes` | `true` baja la imagen por debajo de las cajas laterales que hay antes |
 
 Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `Edges`: no se parte). No admite `Typography`.
 

@@ -41,7 +41,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | Page | Elements |
 |---|---|
 | [`Document`](components/document.md) | `Document`, `Page`, `Title`, `Language` and `Section` |
-| [`Block`](components/block.md) | `Block`, block flow, shared by all blocks, and the side boxes (`Side`, `Clear`) |
+| [`Block`](components/block.md) | `Block`, block flow, shared by all blocks, and the side boxes (`Side`, `Below side boxes`) |
 | [`Text`](components/text.md) | `Text` and `Paragraph`, with the drop cap (`Drop cap`) |
 | [Headings](components/heading.md) | `Heading 1` to `Heading 6` and their numbering |
 | [`List`](components/list.md) | `List` and `List item` |
@@ -54,7 +54,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [`Barcode`](components/barcode.md) | `Barcode`: QR, Code 128 and EAN-13 |
 | [`Figure`](components/figure.md) | `Figure` and its `Caption`: figures and tables with a numbered caption |
 | [`Markdown`](components/markdown.md) | `Markdown` and the generated element `Code block` |
-| [`Footnote`](components/footnote.md) | `Footnote`, the call `[^id]` and the generated footnote area `Footnotes` |
+| [`Footnote`](components/footnote.md) | `Footnote`, the call `[^id]` and the generated footnote area `Footnote area` |
 | [`Table of contents`](components/table-of-contents.md) | `Table of contents`, of headings, figures or tables, and the entries it generates |
 
 ## Implementation

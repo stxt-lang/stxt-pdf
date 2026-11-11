@@ -40,7 +40,7 @@ Text:
 ## `Paragraph`
 
 Un párrafo del contenido: admite lo mismo que un `Text` (`Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate`,
-`Clear` y el texto en el valor o en `Content`), y además `Drop cap`, y se maqueta igual. Es **un solo párrafo**: una línea
+`Below side boxes` y el texto en el valor o en `Content`), y además `Drop cap`, y se maqueta igual. Es **un solo párrafo**: una línea
 en blanco en su `Content` es un error (`TEXT_BLANK_LINE`), también en un texto preformateado. Para varios párrafos se
 usan varios `Paragraph`. Las reglas `For element: Paragraph` estilan los párrafos sin tocar los textos sueltos.
 

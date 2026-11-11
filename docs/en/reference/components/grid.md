@@ -21,7 +21,7 @@ Grid:
 | `Row sizes` | list of tracks | implicit `auto` rows | |
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`. |
 | `Area map` | text block | none | One row per line, with the names separated by spaces and `.` for an empty cell. |
-| `Flow` | `horizontal`, `vertical` | `horizontal` | Direction of automatic placement: `horizontal` fills the rows one by one, and `vertical`, the columns. |
+| `Fill order` | `rows`, `columns` | `rows` | Order of automatic placement: `rows` fills the rows one by one, and `columns`, the columns. |
 | `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Horizontal alignment of the items in their area. |
 | `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
 | `Split rows` | boolean | `true` | A row that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). |
@@ -53,13 +53,13 @@ automatically occupying two columns. `Area:` without a value is equivalent to `A
    all the rows must have the same number of cells.
 2. The items whose `Area` has a row and a column, or an area name, are placed.
 3. The rest are placed in tree order with a **cursor** that goes through the grid by rows (or by columns, with
-   `Flow: vertical`). Each item goes to the first free slot where it fits. The cursor only moves forward, so free slots can be left behind.
+   `Fill order: columns`). Each item goes to the first free slot where it fits. The cursor only moves forward, so free slots can be left behind.
 4. If an item falls outside the declared grid, implicit `auto` tracks are created.
 
 An item with **only the row fixed** (`Area: 2 auto`) goes to the first column of that row where it fits, without moving the cursor. If
 none is left, it is an error (`GRID_PLACEMENT`): the row does not create implicit columns. One with **only the column fixed**
 (`Area: auto 2`) goes to the first free row from the cursor, to the next one if the column is behind it, and moves the
-cursor behind itself. With `Flow: vertical` rows and columns are swapped. These items are placed in step 3, in tree
+cursor behind itself. With `Fill order: columns` rows and columns are swapped. These items are placed in step 3, in tree
 order with the automatic ones. An area name that does not exist or `Area map` that do not form rectangles are also
 `GRID_PLACEMENT`.
 

@@ -12,6 +12,7 @@ import dev.stxt.pdf.model.Cell;
 import dev.stxt.pdf.model.Edges;
 import dev.stxt.pdf.model.ErrorCorrection;
 import dev.stxt.pdf.model.Direction;
+import dev.stxt.pdf.model.FillOrder;
 import dev.stxt.pdf.model.Distribution;
 import dev.stxt.pdf.model.Fit;
 import dev.stxt.pdf.model.FontStyle;
@@ -88,7 +89,7 @@ final class PropertyReader {
     static final Set<String> STACK = Set.of("direction", "wrap", "gap", "horizontal", "vertical", "line-distribution",
             "split-items");
     /** Properties of the {@code Grid} and {@code Table} elements. */
-    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "area-map", "flow", "horizontal", "vertical",
+    static final Set<String> GRID = Set.of("column-sizes", "row-sizes", "gap", "area-map", "fill-order", "horizontal", "vertical",
             "split-rows");
     /** Properties of the {@code Columns} element. */
     static final Set<String> COLUMNS = Set.of("column-count", "min-column-width", "gap", "separator", "separator-color", "balance");
@@ -143,7 +144,7 @@ final class PropertyReader {
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),
             entry("side", (p, s) -> s.setSide(enumValue(Side.class, p))),
-            entry("clear", (p, s) -> s.setClear(bool(p))),
+            entry("below-side-boxes", (p, s) -> s.setBelowSideBoxes(bool(p))),
             entry("drop-cap", (p, s) -> s.setDropCap(dropCap(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
             entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
@@ -355,7 +356,7 @@ final class PropertyReader {
                 s.grid().setGap(gap.get(0), gap.get(gap.size() - 1));
             }
             case "area-map" -> s.grid().setAreaMap(placement(p, () -> AreaMap.parse(p.getText())));
-            case "flow" -> s.grid().setFlow(enumValue(Direction.class, p));
+            case "fill-order" -> s.grid().setFillOrder(enumValue(FillOrder.class, p));
             case "horizontal" -> s.grid().setHorizontal(alignment(p));
             case "vertical" -> s.grid().setVertical(alignment(p));
             case "split-rows" -> s.grid().setSplitRows(bool(p));

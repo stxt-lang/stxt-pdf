@@ -53,9 +53,9 @@ It can contain page numbers and references: `{page}`, `{pages}`, `{page of: id}`
 
 ## Properties
 
-They accept `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` and `Clear`. They need `Font` and `Size`, their own or
+They accept `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Rotate` and `Below side boxes`. They need `Font` and `Size`, their own or
 inherited ([Typography](../common/typography.md)). With `Rotate: -90`, the text is set vertically and takes up its place
-rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)). With `Clear: true`, the text goes
+rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)). With `Below side boxes: true`, the text goes
 below a side box instead of running beside it ([Block](block.md#a-box-at-one-side-with-the-text-around-it-side)).
 
 A `Paragraph` also accepts `Drop cap`: with `Drop cap: 3`, its first letter is a drop cap that takes up the first three

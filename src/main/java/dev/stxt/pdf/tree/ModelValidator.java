@@ -8,7 +8,7 @@ import static dev.stxt.pdf.tree.Nodes.position;
 import static dev.stxt.pdf.tree.PropertyKey.ASPECT_RATIO;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_AFTER;
 import static dev.stxt.pdf.tree.PropertyKey.BREAK_BEFORE;
-import static dev.stxt.pdf.tree.PropertyKey.CLEAR;
+import static dev.stxt.pdf.tree.PropertyKey.BELOW_SIDE_BOXES;
 import static dev.stxt.pdf.tree.PropertyKey.COLUMN_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.DECORATION;
 import static dev.stxt.pdf.tree.PropertyKey.DROP_CAP;
@@ -365,13 +365,13 @@ final class ModelValidator {
     }
 
     /**
-     * {@code Clear: true} (reference/components/block.md) only has an effect with a side box before the box: among
+     * {@code Below side boxes: true} (reference/components/block.md) only has an effect with a side box before the box: among
      * the siblings before it or, if its parent is a box whose text runs beside the side boxes of its own parent (a
      * {@code Block} without background or border, a heading, a {@code Markdown}), among the ones before that parent,
      * and so on up.
      */
-    static void validateClear(Style s, Box parent) {
-        if (!s.clear()) {
+    static void validateBelowSideBoxes(Style s, Box parent) {
+        if (!s.belowSideBoxes()) {
             return;
         }
         for (Box p = parent; p != null; p = p.parent()) {
@@ -382,8 +382,8 @@ final class ModelValidator {
                 break;
             }
         }
-        throw error(s.line(CLEAR), ErrorCode.CLEAR_WITHOUT_SIDE, "Clear has no effect without a side box (Side) before "
-                + "the box among its siblings: the side box is missing or Clear is not needed");
+        throw error(s.line(BELOW_SIDE_BOXES), ErrorCode.BELOW_SIDE_BOXES_WITHOUT_SIDE, "Below side boxes has no effect without a side box (Side) before "
+                + "the box among its siblings: the side box is missing or Below side boxes is not needed");
     }
 
     /**

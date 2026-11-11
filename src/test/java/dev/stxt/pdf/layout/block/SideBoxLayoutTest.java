@@ -102,7 +102,7 @@ class SideBoxLayoutTest {
 
     @Test
     void clearMovesTheTextBelowTheSideBoxes() {
-        LayoutFixture l = layOut(join(LEFT, new String[]{"\tParagraph: " + words(5), "\t\tId: P", "\t\tClear: true"}));
+        LayoutFixture l = layOut(join(LEFT, new String[]{"\tParagraph: " + words(5), "\t\tId: P", "\t\tBelow side boxes: true"}));
         assertRect(40, 100, 515, 12, l.rect("P"));
         assertEquals(0, l.fragment("P").lines().get(0).left(), 1e-9);
     }

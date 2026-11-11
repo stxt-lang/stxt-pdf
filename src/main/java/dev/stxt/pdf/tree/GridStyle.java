@@ -1,7 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import dev.stxt.pdf.model.Alignment;
-import dev.stxt.pdf.model.Direction;
+import dev.stxt.pdf.model.FillOrder;
 import dev.stxt.pdf.model.AreaMap;
 import dev.stxt.pdf.model.Value;
 
@@ -17,7 +17,7 @@ public final class GridStyle extends StyleGroup {
     private List<Value> rowSizes = List.of();
     /** {@code Area map} already interpreted; {@link AreaMap#NONE} if it is not declared. */
     private AreaMap areaMap = AreaMap.NONE;
-    private Direction flow = Direction.HORIZONTAL;
+    private FillOrder fillOrder = FillOrder.ROWS;
     private Alignment horizontal = Alignment.STRETCH;
     private Alignment vertical = Alignment.STRETCH;
     /** {@code Gap}: between rows ({@code row}) and between columns ({@code column}). */
@@ -59,13 +59,13 @@ public final class GridStyle extends StyleGroup {
         areaMap = v;
     }
 
-    public Direction flow() {
-        return flow;
+    public FillOrder fillOrder() {
+        return fillOrder;
     }
 
-    void setFlow(Direction v) {
+    void setFillOrder(FillOrder v) {
         writable();
-        flow = v;
+        fillOrder = v;
     }
 
     public boolean splitRows() {

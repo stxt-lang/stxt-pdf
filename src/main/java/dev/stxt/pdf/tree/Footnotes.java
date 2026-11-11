@@ -69,7 +69,7 @@ final class Footnotes {
 
     /**
      * Starts a section: its footnote area, which the caller adds to the box of the section after its content, out of
-     * its flow, with the {@code For element: Footnotes} rules over the default look (a rule of {@value #DEFAULT_RULE} pt on top, {@value #DEFAULT_GAP} pt above it and
+     * its flow, with the {@code For element: Footnote area} rules over the default look (a rule of {@value #DEFAULT_RULE} pt on top, {@value #DEFAULT_GAP} pt above it and
      * {@value #DEFAULT_PADDING} pt below), and its numbering.
      */
     Box beginSection(BuildContext ctx, InlineNode n, Box sectionBox, Section.FootnoteNumbering numbering,
@@ -94,14 +94,14 @@ final class Footnotes {
     }
 
     /**
-     * What a {@code For element: Footnotes} rule cannot change: the height of the area, which is that of the notes
+     * What a {@code For element: Footnote area} rule cannot change: the height of the area, which is that of the notes
      * of each page, its rotation and its overflow.
      */
     private static void validateArea(Style s) {
         for (String property : List.of(HEIGHT, MIN_HEIGHT, MAX_HEIGHT, ASPECT_RATIO, ROTATE, OVERFLOW)) {
             if (s.isDeclared(property)) {
                 throw error(s.line(property), ErrorCode.FOOTNOTES_PROPERTY_WITHOUT_EFFECT, Nodes.label(property)
-                        + " has no effect on Footnotes, the footnote area: its height is that of the notes of each "
+                        + " has no effect on the footnote area (Footnote area): its height is that of the notes of each "
                         + "page, and it is neither rotated nor clipped. It is not needed");
             }
         }

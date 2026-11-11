@@ -61,7 +61,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * a text, and a box whose children can run beside it ({@link Box#wrapsBesideSideBoxes}), receives what the side
  * boxes take from each of its sides as {@link ConstraintSpace#exclusions()}, measured from its own border box, and
  * shortens its lines; any other child (a table, a stack, a text with background or border, a child with
- * {@code Clear}, a list beside a side box on the left) is placed below the side boxes. The exclusions of the space of the box itself, which its parent
+ * {@code Below side boxes}, a list beside a side box on the left) is placed below the side boxes. The exclusions of the space of the box itself, which its parent
  * gives it when the box runs beside the side boxes of the parent, count like side boxes of its own, except for its
  * height. A side box is not split: if it does not fit in what is left of the page it moves to the next one, and the
  * break between it and the child that follows it is as bad as one that separates two boxes kept together, so that
@@ -366,7 +366,7 @@ public final class BlockLayout implements LayoutAlgorithm {
 
         /**
          * Places a side box (reference/components/block.md): whole, at its side of the content box, where the flow is
-         * now or below the side boxes of that side (and, with {@code Clear}, of both), with its margins as the
+         * now or below the side boxes of that side (and, with {@code Below side boxes}, of both), with its margins as the
          * separation from the text. The cursor does not move. If it does not fit in what is left of the page, the
          * box breaks before it, as before any child that does not fit.
          */
@@ -374,7 +374,7 @@ public final class BlockLayout implements LayoutAlgorithm {
             Insets margin = Insets.resolve(child.style().box().margin(), contentWidth);
             boolean onLeft = child.style().side() == Side.LEFT;
             double y = Math.max(stack.top(MarginStrut.EMPTY), clearance(onLeft));
-            if (child.style().clear()) {
+            if (child.style().belowSideBoxes()) {
                 y = Math.max(y, clearance());
             }
             LayoutResult r = context.layout(child, childSpace.unfragmented(), null);

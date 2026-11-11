@@ -60,9 +60,9 @@ marrón oscuro dentro de un marco.)
 | `Alt` | texto no vacío | obligatorio | Qué es y adónde lleva, para quien no lo ve ([Accesibilidad](#accesibilidad)). |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Lo gira sobre su centro, como una `Image`. |
 | `Side` | `left`, `right` | sin valor | Lo hace una caja lateral, como una `Image`: el texto que lo sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
-| `Clear` | booleano | `false` | Lo baja por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
+| `Below side boxes` | booleano | `false` | Lo baja por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
 
-`Barcode format`, `Error correction`, `Quiet zone`, `Side` y `Clear` también pueden venir de una regla de `Styles`
+`Barcode format`, `Error correction`, `Quiet zone`, `Side` y `Below side boxes` también pueden venir de una regla de `Styles`
 ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); los datos, `Alt` y `Rotate`, no.
 
 ## Formatos

@@ -6,7 +6,7 @@ import static dev.stxt.pdf.tree.ListBuilder.markerLine;
 import static dev.stxt.pdf.tree.ListBuilder.validateItem;
 import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
-import static dev.stxt.pdf.tree.ModelValidator.validateClear;
+import static dev.stxt.pdf.tree.ModelValidator.validateBelowSideBoxes;
 import static dev.stxt.pdf.tree.ModelValidator.validateClip;
 import static dev.stxt.pdf.tree.ModelValidator.validateDropCap;
 import static dev.stxt.pdf.tree.ModelValidator.validateOverflow;
@@ -294,7 +294,7 @@ public final class BoxTreeBuilder {
         withoutEffect(ctx, n, wrapper, s);
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
-        validateClear(s, parent);
+        validateBelowSideBoxes(s, parent);
         validateDropCap(s);
         if (kind.headingLevel() > 0) {
             // The engine avoids breaking inside the heading and after it (reference/components/heading.md); it is not

@@ -50,11 +50,11 @@ final class Nodes {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
-    /** Name of the positioned element: {@code Overlay}, {@code Page overlay} or the footnote area, {@code Footnotes}. */
+    /** Name of the positioned element: {@code Overlay}, {@code Page overlay} or the footnote area, {@code Footnote area}. */
     static String position(Style s) {
         return switch (s.position()) {
             case PAGE_OVERLAY -> "Page overlay";
-            case FOOTNOTES -> "Footnotes";
+            case FOOTNOTES -> "Footnote area";
             default -> "Overlay";
         };
     }

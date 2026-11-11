@@ -64,7 +64,7 @@ El `Area` admite además `Horizontal` y `Vertical` (la alineación del ítem en 
 | `Row sizes` | lo que mida cada fila | El alto de cada fila |
 | `Gap` | `0` | El hueco entre celdas (con dos valores: entre filas y entre columnas) |
 | `Area map` | sin valor | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
-| `Flow` | `horizontal` | Si los ítems sin sitio fijo se colocan por filas (`horizontal`) o por columnas (`vertical`) |
+| `Fill order` | `rows` | Si los ítems sin sitio fijo se colocan por filas (`rows`) o por columnas (`columns`) |
 | `Horizontal`, `Vertical` | `stretch` | La alineación de los ítems en su celda: `start`, `end`, `center` o `stretch` (ocupar toda la celda) |
 
 Cada nombre de `Area map` tiene que formar un rectángulo. Si un ítem cae fuera de las filas declaradas, se añaden filas nuevas.

@@ -245,7 +245,7 @@ space that separates it from the item as the right padding of the fragment, and 
 side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and
 what it takes from each side, margins included). To each child that runs beside the boxes (`Box.wrapsBesideSideBoxes`:
 texts that are not preformatted, `Block`, headings, `Markdown`, lists and list items without background or border that
-are not side boxes and have no `Clear`, position, `Rotate` or `Overflow: clip`; lists, only beside boxes on the right) it
+are not side boxes and have no `Below side boxes`, position, `Rotate` or `Overflow: clip`; lists, only beside boxes on the right) it
 passes in the `ConstraintSpace` the **exclusions** (`model.Exclusion`: band and what it
 takes from each side, measured from the border box of the child), which are part of the key of the cache; the other
 children go down to the bottom of the side boxes. A `Block` that receives exclusions treats them as inherited side boxes
@@ -402,7 +402,7 @@ per box with the rest of the key), so forgetting costs what the forgotten boxes 
 **Footnotes.** `FootnoteLayout` lays out each page of a section with footnotes ([Footnote](../components/footnote.md)):
 the flow with `ConstraintSpace.forPage(pageSetup, reserved)`, which takes from the root the height reserved at the
 bottom, and the notes of the calls that fall in its lines (`TextFormat.footnote` in the runs of the `TextLine`s) stacked
-in the footnote area of the section (`Section.footnotes()`, the generated box `Footnotes`, a child of the section out of
+in the footnote area of the section (`Section.footnotes()`, the generated box `Footnote area`, a child of the section out of
 its flow). Since the body is a function of the reservation and the notes depend on the body, the reservation is found
 by probes: no reservation; if the notes do not fit, the full height of those notes (in which those of any larger
 reservation fit, because less room is less flow), unless it leaves the body no room (it is placed by force by the

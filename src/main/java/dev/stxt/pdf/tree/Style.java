@@ -25,7 +25,7 @@ import dev.stxt.pdf.model.Value;
  * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
  * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
  * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
- * rotation, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Clear} and
+ * rotation, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Below side boxes} and
  * {@code Drop cap}) and the line where each property was declared, with its document ({@link SourceLine}).</p>
  *
  * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
@@ -97,8 +97,8 @@ public final class Style extends StyleGroup {
      * Not inherited.
      */
     private Side side;
-    /** {@code Clear}: the box goes below the side boxes before it (reference/components/block.md). Not inherited. */
-    private boolean clear;
+    /** {@code Below side boxes}: the box goes below the side boxes before it (reference/components/block.md). Not inherited. */
+    private boolean belowSideBoxes;
     /**
      * {@code Drop cap} of a {@code Paragraph} (reference/components/text.md): the lines its first letter takes up;
      * 0 = no drop cap. Not inherited.
@@ -363,13 +363,13 @@ public final class Style extends StyleGroup {
         };
     }
 
-    public boolean clear() {
-        return clear;
+    public boolean belowSideBoxes() {
+        return belowSideBoxes;
     }
 
-    void setClear(boolean v) {
+    void setBelowSideBoxes(boolean v) {
         writable();
-        clear = v;
+        belowSideBoxes = v;
     }
 
     /** Lines the drop cap of a {@code Paragraph} takes up; 0 without a drop cap. */
