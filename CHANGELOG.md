@@ -5,7 +5,15 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.15.0] - 2026-11-11
+
+Long words cut where they do not fit, the vertical alignment of the content of a cell, block quotes and dividers in a
+`Markdown`, the first line indent, and the names of the namespace reviewed before 1.0. **From 0.14.0**: twelve names
+of the `dev.stxt.pdf` namespace change, with no alias for the old ones, and so do the Java methods and types that
+follow them and two error codes; `fragment.TextLine` has a twelfth component, `splitsWord`, so its canonical
+constructor takes one argument more; `Element.Role` has two more constants; and a word is split after a hyphen
+written in it, so a document may break its lines differently. The names of the `dev.stxt.pdf` namespace and the Java
+API may still change before 1.0.
 
 ### Added
 
