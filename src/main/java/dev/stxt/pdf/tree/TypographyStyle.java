@@ -43,6 +43,11 @@ public final class TypographyStyle extends StyleGroup {
      * of {@link #locale} (reference/common/typography.md). Inherited.
      */
     private boolean hyphenate;
+    /**
+     * {@code Break long words}: whether a part of a word that cannot be split further and is wider than a whole line
+     * of its box is cut at the last character that fits, with no hyphen (reference/common/typography.md). Inherited.
+     */
+    private boolean breakLongWords;
     private Markup markup = Markup.NONE;
     private TextCase textCase = TextCase.NONE;
     /** Spacing between letters, in points; it can be negative. */
@@ -99,6 +104,7 @@ public final class TypographyStyle extends StyleGroup {
         textAlign = parent.textAlign;
         lineBreaking = parent.lineBreaking;
         hyphenate = parent.hyphenate;
+        breakLongWords = parent.breakLongWords;
         markup = parent.markup;
         textCase = parent.textCase;
         letterSpacing = parent.letterSpacing;
@@ -204,6 +210,15 @@ public final class TypographyStyle extends StyleGroup {
     void setHyphenate(boolean v) {
         writable();
         hyphenate = v;
+    }
+
+    public boolean breakLongWords() {
+        return breakLongWords;
+    }
+
+    void setBreakLongWords(boolean v) {
+        writable();
+        breakLongWords = v;
     }
 
     public Markup markup() {

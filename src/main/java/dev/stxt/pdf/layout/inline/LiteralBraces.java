@@ -77,7 +77,7 @@ public final class LiteralBraces {
             List<TextLine.Run> runs = l.runs().stream()
                     .map(r -> new TextLine.Run(r.x(), r.width(), Reference.shown(r.text()), r.format())).toList();
             lines.add(new TextLine(l.x(), l.y(), l.width(), l.height(), l.fontSize(), Reference.shown(l.text()),
-                    l.wordSpacing(), runs, l.hyphenated(), l.left(), l.right()));
+                    l.wordSpacing(), runs, l.hyphenated(), l.left(), l.right(), l.splitsWord()));
         }
         if (!changed) {
             return f;

@@ -1,0 +1,19 @@
+# Case: Break long words on a preformatted text
+# Code: BREAK_LONG_WORDS_IN_PREFORMATTED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Text: ES7620770024003102575766
+			Typography:
+				Preformatted: true
+				Break long words: true

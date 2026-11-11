@@ -98,6 +98,11 @@ secuencia de tramos que la termina va en un `Span` con `ActualText` donde el gui
 PDF etiquetado dice que el guion lo puso el reparto, y así quien extrae el texto no ve el guion y puede unir las dos
 partes. PDFBox lo descarta al extraer y da cada parte en su línea; Acrobat copia el guion blando, que no se ve.
 
+Una línea que acaba tras un guion escrito en la palabra (`REF-2026-`) o en un corte de `Break long words`
+([Tipografía](../common/typography.md#palabras-largas-break-long-words)) tampoco lleva el espacio invisible, y no
+lleva `ActualText`: el reparto no ha añadido nada, y lo que se lee es lo que se pinta (`TextLine.splitsWord` sin
+`hyphenated`).
+
 > **Decisión:** `ActualText` con el guion blando en la secuencia que acaba la línea, y no un `ActualText` vacío ni la
 > palabra entera en los dos trozos: el primero perdería la señal del corte y el segundo la duplicaría al extraer.
 

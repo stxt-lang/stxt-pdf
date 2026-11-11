@@ -31,9 +31,11 @@ import java.util.Objects;
  * sequence has one clickable area per line ({@link #paintLinkZone}).</p>
  *
  * <p>A line that is not the last one ends with an invisible space, so that whoever joins the lines does not run the
- * words together; a line split inside a word ({@link TextLine#hyphenated()}) does not, and the sequence that ends it
- * carries an {@code ActualText} in which the hyphen is the soft hyphen U+00AD, which is how a tagged PDF says that the
- * hyphen was added by the line breaking (reference/implementation/pdf.md).</p>
+ * words together; a line split inside a word ({@link TextLine#splitsWord()}) does not, and if the line breaking added
+ * a hyphen to it ({@link TextLine#hyphenated()}) the sequence that ends it carries an {@code ActualText} in which the
+ * hyphen is the soft hyphen U+00AD, which is how a tagged PDF says that the hyphen was added by the line breaking
+ * (reference/implementation/pdf.md). A line that ends with a hyphen written in the word, or with none
+ * ({@code Break long words}), is read as it is painted.</p>
  */
 final class TextPainter {
 
@@ -112,7 +114,7 @@ final class TextPainter {
         // Paragraph with Drop cap, reference/components/text.md), which is the first letter of the word that starts
         // the line after it.
         boolean spaceAfter = n < lines.size() - 1 && style.typography().preformatted() == Preformatted.FALSE
-                && !l.hyphenated() && !(n == 0 && style.dropCap() > 0);
+                && !l.splitsWord() && !(n == 0 && style.dropCap() > 0);
         double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
         // With letter spacing, whoever extracts the text guesses spaces between the letters: each sequence of runs of
         // a line carries its text separately (reference/implementation/pdf.md). A styled run can have its own.

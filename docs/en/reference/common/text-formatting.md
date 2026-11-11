@@ -221,7 +221,9 @@ A line break at the end of the text does not add an empty line.
 
 - **`true`** does not break lines: one wider than the box is `TEXT_OVERFLOW`, with the line of the document where it is.
 - **`wrap`** breaks lines that are too wide **between words**, with greedy line breaking. The indent is kept and the
-  spaces at the break are lost. A word wider than the box is still an error.
+  spaces at the break are lost. A word wider than the box is still an error: in a preformatted text a word is not
+  split after a written hyphen, nor cut with `Break long words`
+  ([Typography](typography.md#long-words-break-long-words)).
 - **Tabs (`Tab size`).** Each tab moves to the next column that is a multiple of `Tab size`, counting from the
   start of the line (with `Tab size: 4`, `a⇥b` is `a   b`, and `abcd⇥e`, `abcd    e`). A value less than 1 is
   `VALUE_NOT_ALLOWED`.

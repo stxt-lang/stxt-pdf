@@ -68,6 +68,17 @@ final class Lines {
                 : LineBreaker.breakLines(paragraph, 0, LineWidths.uniform(available), wrap);
     }
 
+    /**
+     * Lines of the text with {@code Break long words}, every line {@code available} wide: the parts of its words
+     * wider than a line are cut at any character.
+     */
+    static List<LineBreaker.Line> breakLongWords(List<TextRun> runs, double available, TextMeasurer measurer,
+                                                 FontFace font, double fontSize, LineBreaking wrap) {
+        Paragraph paragraph = Paragraph.of(runs, measurer, font, fontSize, 0, null, available);
+        return paragraph == null ? List.of()
+                : LineBreaker.breakLines(paragraph, 0, LineWidths.uniform(available), wrap);
+    }
+
     // --- Intrinsic sizes ----------------------------------------------------------------------------------------------
 
     /** Narrowest and natural width of a plain text. */
@@ -105,6 +116,6 @@ final class Lines {
     static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double available, boolean justify,
                           double y, double height) {
         return LinePlacer.place(runs, measurer, s, s.typography().fontSize(), 0, 0, available, justify, y, height,
-                false);
+                false, false);
     }
 }

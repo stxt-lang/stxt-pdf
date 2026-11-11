@@ -44,7 +44,8 @@ page. `PdfDestinations` uses it for the corner of each named box, also that of a
 into sequences (`Sequence`: the consecutive runs that are one marked content, with the same destination, the call or the
 number of a note, or an inline image, which goes alone) and paints each one; two consecutive text sequences of the same
 kind and destination, also from one line to the next, share their marked content. It adds the invisible space at the
-end of the broken lines and the `ActualText` of those that end in a hyphen or have letter spacing; the call and the
+end of the lines that end between words (not of those that split one, `TextLine.splitsWord`) and the `ActualText` of
+those that end in a hyphen added by the line breaking or have letter spacing; the call and the
 number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a superscript
 run is painted raised `TextFormat.rise()` of the size.
 

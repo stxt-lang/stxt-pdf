@@ -1373,6 +1373,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Hyphenate
 				Max: 1
+			Child: Break long words
+				Max: 1
 			Child: Markup
 				Max: 1
 			Child: Case
@@ -1621,7 +1623,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: optimal
 	Node: Hyphenate
 		Type: BOOLEAN
-		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split.
+		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split. So is a hyphen written between two letters or digits (REF-2026-0098): the line may end after it, with no other hyphen.
+	Node: Break long words
+		Type: BOOLEAN
+		Description: Whether a part of a word that cannot be split further (it has no hyphen, written or soft, and Hyphenate does not split it) and is wider than a whole line of its box is cut at the last character that fits, with no hyphen, as many times as needed. By default, false: such a word is an error. Inherited. It is a last resort: a word that fits in a line of its own moves to the next line and is never cut. It does not change the narrowest width of the text. It has no effect on a preformatted text, where it is an error if the text itself declares it.
 	Node: Markup
 		Type: ENUM
 		Description: Inline formatting of the text: none (by default; the text is literal) or markdown (interprets **bold**, *italic*, ++underline++, ~~strikethrough~~ and [links](target), with the CommonMark escapes; it does nothing inside a Markdown).

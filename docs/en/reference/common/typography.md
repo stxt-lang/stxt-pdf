@@ -23,6 +23,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Color` | color | `#000000` | Color of the text ([Values](values.md#colors)). |
 | `Line breaking` | `simple`, `optimal` | `simple` | Line breaking: greedy (`simple`) or Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Split words with a hyphen at the end of the line, with the patterns of the language ([Hyphenation](#hyphenation-hyphenate)). |
+| `Break long words` | `true`, `false` | `false` | Cut, with no hyphen, the part of a word that does not fit in a whole line ([Long words](#long-words-break-long-words)). |
 | `Markup` | `none`, `markdown` | `none` | Formatting within the line ([Text formatting](text-formatting.md#inline-formatting-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
@@ -73,9 +74,10 @@ The lines beside a side box ([Block](../components/block.md#side-boxes-side)) or
 ([Text](../components/text.md#drop-cap-drop-cap)) are shorter than the content box: both algorithms work with the width
 of each line, and a word that does not fit in a short line leaves it empty and goes to the next one.
 
-In both cases, a word wider than the line is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)), also with
-`Hyphenate` if none of its parts fits. Words are only split with `Hyphenate` or where the text has a soft hyphen
-([Hyphenation](#hyphenation-hyphenate)).
+A word is split after a hyphen written in it, where it has a soft hyphen or, with `Hyphenate`, by the patterns of
+the language ([Hyphenation](#hyphenation-hyphenate)). In both algorithms, a word wider than the line, or a part of it
+that cannot be split further, is an error (`TEXT_OVERFLOW`, [Overflow](overflow.md)), except with
+`Break long words`, which cuts it where it fits ([Long words](#long-words-break-long-words)).
 
 ## Weights (`Weight`)
 
@@ -125,7 +127,7 @@ by default.
   through its letters, which have to be all together: what goes before them (a quotation mark, a parenthesis) and after
   them (a period, a comma) stays with the first and the last part and does not count for the minima. A word with
   something that is not a letter among its letters (a digit, a hyphen, the middle dot of `col·lecció`) or with
-  `{page}`, `{pages}` or a reference is not split. Capitals are split like lowercase letters.
+  `{page}`, `{pages}` or a reference is not split by the patterns. Capitals are split like lowercase letters.
 - **The apostrophe** (`'` or `’`) among the letters of a word is one more letter in the languages whose patterns
   include it, `fr` and `it`: `l'information` is split `l'in-for-ma-tion` and `dell'amministrazione`,
   `del-l'am-mi-ni-stra-zio-ne`, and it counts for the minima. In the other languages a word with an apostrophe is not
@@ -133,18 +135,27 @@ by default.
 - **A soft hyphen** (U+00AD) written in the text is an explicit break point, with or without `Hyphenate`: a word that
   has one is split only there, and the patterns add no more. It is neither painted nor measured where the word is not
   split. In a text with `Preformatted: true` or `wrap` it is discarded.
+- **A written hyphen** (`-`, U+002D) with a letter or a digit on each side is a break point, with or without
+  `Hyphenate`: the word is split **after it** and no other hyphen is added (`REF-2026-` and `009812`, `socio-` and
+  `economic`). It is not one at the start or at the end of the word, nor beside another hyphen or a punctuation
+  mark. The parts of such a word are not split by the patterns; if it also has soft hyphens, both count. The
+  non-breaking hyphen (U+2011) is not a break point: it is the way to keep the word whole. It does not apply in a
+  text with `Preformatted: true` or `wrap`.
 - **The hyphen** is the one of the font (`-`, U+002D), which has to have it (`GLYPH_MISSING`), measures what it
   measures in it and is painted with the font and the format of the letter before it (bold if that letter is bold;
   never in small caps). It counts in the width of the line.
 - **In the line breaking**, with `simple`, when a word does not fit whole the longest part of it that fits with its
   hyphen is added and the rest starts the next line; with `optimal`, each break point is a possible break with TeX's
   penalty (50, squared, in the demerits of the line, and 10,000 more if two consecutive lines end with a hyphen). A
-  word wider than the line is split in as many parts as needed.
-- **Intrinsic sizes**: the narrowest width is the widest part that cannot be split further, with its hyphen.
-- **What is read**: the text that is copied or that a screen reader reads does not carry the hyphen; in its place
-  goes a soft hyphen (U+00AD), which is how a tagged PDF says that the hyphen was added by the line breaking, and the
-  split line does not carry the invisible space at its end
-  ([The PDF inside](../implementation/pdf.md#text-that-is-read)).
+  word wider than the line is split in as many parts as needed. The break after a written hyphen is one more break
+  point in both algorithms, and in `optimal` it has the same penalty and counts as a line that ends with a hyphen.
+- **Intrinsic sizes**: the narrowest width is the widest part that cannot be split further, with its hyphen: the one
+  the line breaking adds or, after a written hyphen, its own.
+- **What is read**: the text that is copied or that a screen reader reads does not carry the hyphen the line
+  breaking adds; in its place goes a soft hyphen (U+00AD), which is how a tagged PDF says that the hyphen was added
+  by the line breaking, and the split line does not carry the invisible space at its end
+  ([The PDF inside](../implementation/pdf.md#text-that-is-read)). A line that ends after a written hyphen is read as
+  it is painted, with its hyphen, and does not carry that space either.
 
 > **Decision:** the TeX patterns as resources of the engine, converted to a plain-text format of its own and without
 > dependencies; nine languages, and the rest are an error and not a silence. *Rejected alternative:* a hyphenation
@@ -166,6 +177,70 @@ by default.
 
 > **Decision:** a word with a soft hyphen is split only where it has one, as in TeX, where whoever writes the break
 > decides. *Rejected alternative:* adding the break points of the patterns.
+
+> **Decision:** a hyphen written between letters or digits is always a break point, with no property, as in any text
+> composition: a reference or a compound term does not stop fitting for having hyphens. *Rejected alternative:* a
+> property to turn it on, or breaking also after `/`, `.`, `_` and `@`, which is what `Break long words` covers.
+
+## Long words (`Break long words`)
+
+With `Break long words: true`, the part of a word that cannot be split further and is **wider than a whole line of
+its box** is cut at the last character that fits, with no hyphen, as many times as needed. It belongs to
+`Typography`, it is inherited and it is `false` by default. It is for what arrives in the data with no place to be
+split at: an IBAN, an email address, a URL or an identifier in a narrow cell.
+
+```stxt
+Styles:
+    For element: Cell
+        Typography:
+            Break long words: true
+```
+
+- **It is the last resort.** A word that fits in an empty line goes to the next line, as without the property, and
+  is never cut. Written hyphens, soft hyphens and the patterns of `Hyphenate` come first: only the part that, between
+  two of those break points, still does not fit in the width of the content box is cut.
+- **Where it is cut.** The long part may end a line after any of its characters, and ends it after the last one
+  that fits. It starts in the current line, after the words before it, if any of its characters fits there. Beside a
+  side box or a drop cap it is cut at the width of each line.
+- **A character** is what is read as one: a letter is not separated from its combining marks, nor the two halves of
+  a surrogate pair from each other.
+- **No hyphen.** The cut adds nothing, and the text that is copied or that a screen reader reads is the whole
+  word: the cut line does not carry the invisible space at its end
+  ([The PDF inside](../implementation/pdf.md#text-that-is-read)).
+- **In the line breaking**, with `optimal`, a line ends at such a cut only if one more character does not fit in
+  it. That line has no badness, because it is full, and it has the penalty of a hyphen, but not that of two
+  consecutive lines that end with a hyphen.
+- **What is not cut.** A word with `{page}`, `{pages}` or a reference. If not even one character fits in the line,
+  it is `TEXT_OVERFLOW`.
+- **Intrinsic sizes**: they do not change ([below](#intrinsic-sizes)).
+- **With `Overflow: shrink`**, no word is wider than the box any more, so the text only shrinks if its lines do not
+  fit in the height ([Overflow](overflow.md#shrinking-the-text-shrink)).
+- **With `Preformatted: true` or `wrap`** it has no effect: the lines are the ones written, or are broken only
+  between words. Written by the preformatted text itself it is an error (`BREAK_LONG_WORDS_IN_PREFORMATTED`);
+  inherited or from a rule it is not checked, like the rest of `Typography`
+  ([Errors](errors.md#what-has-no-effect)).
+
+> **Decision:** a property, `false` by default: cutting a word at any letter is the author's decision. *Rejected
+> alternative:* doing it always, which would turn an error into an ugly cut nobody asked for, and one more value of
+> `Overflow`, which belongs to the box and is not inherited.
+
+> **Decision:** the threshold is the whole line of the box and not what is left of the current line: a word that
+> fits in a line of its own is never cut, not beside a side box either, where it leaves the short lines empty like
+> any other. *Rejected alternative:* cutting every word that does not fit in what is left of the line, which would
+> split ordinary words.
+
+> **Decision:** the long part starts in the current line, after the words before it, like a word split with a
+> hyphen. *Rejected alternative:* always starting it in a line of its own, which leaves an almost empty line before
+> each long piece of data.
+
+> **Decision:** `Break long words` does not change the narrowest width: an `auto` column does not shrink to one
+> letter for having it, and it only acts when the final width is not enough. *Rejected alternative:* the narrowest
+> width being that of the widest character, with which a table of `auto` columns would cut words that fit.
+
+> **Decision:** in a preformatted text it is an error only if the text itself writes it, with `true` and with
+> `wrap`. *Rejected alternative:* cutting the long words of `wrap`, which no document has asked for, and the error
+> also when it is inherited, which would reach every code block of a document that declares it in
+> `For element: Document`.
 
 ## Kerning (`Kerning`)
 
@@ -223,9 +298,10 @@ several runs measures the sum of its parts. What is measured is exactly what is 
 
 ## Intrinsic sizes
 
-The narrowest width is the widest word (with `Hyphenate` or a soft hyphen, the widest part of a word with its
-hyphen), and the natural width, the longest paragraph on a single line (with `Preformatted: true` or `wrap`, see
-[Text formatting](text-formatting.md#intrinsic-sizes)).
+The narrowest width is the widest word (if it has break points, from `Hyphenate`, from a soft hyphen or from a
+written hyphen, the widest of its parts, with its hyphen), and the natural width, the longest paragraph on a single
+line (with `Preformatted: true` or `wrap`, see [Text formatting](text-formatting.md#intrinsic-sizes)).
+`Break long words` changes neither ([Long words](#long-words-break-long-words)).
 
 ## Language (`Language`)
 
@@ -246,6 +322,8 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 - Hyphenation patterns for languages other than `es`, `ca`, `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` and `pt`, those
   of the traditional German spelling, patterns or exceptions of the document's own, and changing the minimum letters
   on each side of the hyphen.
+- Break points after characters other than the hyphen (`/`, `.`, `_`, `@`), preventing the break after a written
+  hyphen in any other way than with the non-breaking hyphen, and cutting the long words of a preformatted text.
 - A different size within a line (except the drop cap and the superscript of a footnote): a run changes the family,
   the weight, the style, the color, the capitalization and the letter spacing
   ([Text formatting](text-formatting.md#styled-runs)), but not the size.

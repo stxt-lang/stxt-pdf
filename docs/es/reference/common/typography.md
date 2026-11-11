@@ -23,6 +23,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Color` | color | `#000000` | Color del texto ([Valores](values.md#colores)). |
 | `Line breaking` | `simple`, `optimal` | `simple` | Reparto en líneas: voraz (`simple`) o Knuth-Plass (`optimal`). |
 | `Hyphenate` | `true`, `false` | `false` | Partir palabras con guion al final de la línea, con los patrones del idioma ([Guiones](#guiones-hyphenate)). |
+| `Break long words` | `true`, `false` | `false` | Cortar sin guion la parte de una palabra que no cabe en una línea entera ([Palabras largas](#palabras-largas-break-long-words)). |
 | `Markup` | `none`, `markdown` | `none` | Formato dentro de la línea ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
@@ -73,9 +74,10 @@ Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-later
 ([Text](../components/text.md#letra-capitular-drop-cap)) son más cortas que la caja de contenido: los dos repartos trabajan
 con el ancho de cada línea, y una palabra que no cabe en una línea corta la deja vacía y pasa a la siguiente.
 
-En los dos casos, una palabra más ancha que la línea es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)),
-también con `Hyphenate` si ninguna de sus partes cabe. Las palabras solo se parten con `Hyphenate` o donde el texto
-lleva un guion blando ([Guiones](#guiones-hyphenate)).
+Una palabra se parte tras un guion escrito en ella, donde lleva un guion blando o, con `Hyphenate`, por los patrones
+del idioma ([Guiones](#guiones-hyphenate)). En los dos repartos, una palabra más ancha que la línea, o una parte suya
+que ya no se puede partir, es un error (`TEXT_OVERFLOW`, [Desbordamiento](overflow.md)), salvo con
+`Break long words`, que la corta por donde cabe ([Palabras largas](#palabras-largas-break-long-words)).
 
 ## Pesos (`Weight`)
 
@@ -122,7 +124,7 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
   letras, que tienen que ir todas seguidas: lo que va delante (una comilla, un paréntesis) y detrás (un punto, una
   coma) se queda con la primera y la última parte y no cuenta para los mínimos. Una palabra con algo que no es una
   letra entre sus letras (una cifra, un guion, el punto volado de `col·lecció`) o con `{page}`, `{pages}` o una
-  referencia no se parte. Las mayúsculas se parten como las minúsculas.
+  referencia no se parte por los patrones. Las mayúsculas se parten como las minúsculas.
 - **El apóstrofo** (`'` o `’`) entre las letras de una palabra es una letra más en los idiomas cuyos patrones lo
   incluyen, `fr` e `it`: `l'information` se parte `l'in-for-ma-tion` y `dell'amministrazione`,
   `del-l'am-mi-ni-stra-zio-ne`, y cuenta para los mínimos. En los demás idiomas una palabra con apóstrofo no se parte.
@@ -130,17 +132,26 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
 - **Un guion blando** (U+00AD) escrito en el texto es un punto de corte explícito, con o sin `Hyphenate`: una palabra
   que lo lleva se parte solo ahí, y los patrones no añaden más. No se pinta ni se mide donde la palabra no se parte. En
   un texto con `Preformatted: true` o `wrap` se descarta.
+- **Un guion escrito** (`-`, U+002D) con una letra o una cifra a cada lado es un punto de corte, con o sin
+  `Hyphenate`: la palabra se parte **detrás de él** y no se añade otro guion (`REF-2026-` y `009812`, `físico-` y
+  `químico`). No lo es al principio ni al final de la palabra, ni junto a otro guion o a un signo de puntuación. Las
+  partes de una palabra así no se parten por los patrones; si además lleva guiones blandos, valen los dos. El guion
+  de no separación (U+2011) no es un punto de corte: es la forma de mantener entera la palabra. No se aplica en un
+  texto con `Preformatted: true` o `wrap`.
 - **El guion** es el de la fuente (`-`, U+002D), que tiene que tenerlo (`GLYPH_MISSING`), mide lo que mide en ella y
   se pinta con la fuente y el formato de la letra que lo precede (en negrita si ella lo está; nunca en versalitas).
   Cuenta en el ancho de la línea.
 - **En el reparto**, con `simple`, cuando una palabra no cabe entera se añade la parte más larga que cabe con su guion
   y el resto empieza la línea siguiente; con `optimal`, cada punto de corte es un salto posible con la penalización de
   TeX (50, al cuadrado, en los deméritos de la línea, y 10 000 más si dos líneas seguidas acaban en guion). Una palabra
-  más ancha que la línea se parte en tantas partes como haga falta.
-- **Tamaños intrínsecos**: el ancho más estrecho es la parte más ancha que no se puede partir más, con su guion.
-- **Lo que se lee**: el texto que se copia o que lee un lector de pantalla no lleva el guion; en su lugar va un guion
-  blando (U+00AD), que es como un PDF etiquetado dice que el guion lo puso el reparto, y la línea partida no lleva el
-  espacio invisible del final ([El PDF por dentro](../implementation/pdf.md#texto-que-se-lee)).
+  más ancha que la línea se parte en tantas partes como haga falta. El corte tras un guion escrito es un punto de
+  corte más en los dos repartos, y en `optimal` lleva la misma penalización y cuenta como una línea acabada en guion.
+- **Tamaños intrínsecos**: el ancho más estrecho es la parte más ancha que no se puede partir más, con su guion: el
+  que añade el reparto o, tras un guion escrito, el suyo.
+- **Lo que se lee**: el texto que se copia o que lee un lector de pantalla no lleva el guion que añade el reparto; en
+  su lugar va un guion blando (U+00AD), que es como un PDF etiquetado dice que el guion lo puso el reparto, y la línea
+  partida no lleva el espacio invisible del final ([El PDF por dentro](../implementation/pdf.md#texto-que-se-lee)).
+  Una línea que acaba tras un guion escrito se lee como se pinta, con su guion, y tampoco lleva ese espacio.
 
 > **Decisión:** los patrones de TeX como recursos del motor, convertidos a un formato propio de texto plano y sin
 > dependencias; nueve idiomas, y los demás son un error y no un silencio. *Alternativa descartada:* una biblioteca de
@@ -161,6 +172,69 @@ patrones de partición del idioma de la caja (`Language`). Es de `Typography`, s
 
 > **Decisión:** una palabra con guion blando se parte solo donde lo lleva, como en TeX, donde quien escribe el corte
 > decide. *Alternativa descartada:* sumar los puntos de los patrones.
+
+> **Decisión:** un guion escrito entre letras o cifras es un punto de corte siempre, sin propiedad, como en cualquier
+> composición de texto: una referencia o un término compuesto no dejan de caber por llevar guiones. *Alternativa
+> descartada:* una propiedad para activarlo, o cortar también tras `/`, `.`, `_` y `@`, que es lo que cubre
+> `Break long words`.
+
+## Palabras largas (`Break long words`)
+
+Con `Break long words: true`, la parte de una palabra que ya no se puede partir y es **más ancha que una línea entera
+de su caja** se corta por el último carácter que cabe, sin guion, tantas veces como haga falta. Es de `Typography`, se
+hereda y vale `false` por defecto. Es para lo que llega en los datos sin un sitio por donde partirse: un IBAN, una
+dirección de correo, una URL o un identificador en una celda estrecha.
+
+```stxt
+Styles:
+    For element: Cell
+        Typography:
+            Break long words: true
+```
+
+- **Es el último recurso.** Una palabra que cabe en una línea vacía pasa a la línea siguiente, como sin la propiedad,
+  y nunca se corta. Los guiones escritos, los blandos y los patrones de `Hyphenate` van antes: solo se corta la parte
+  que, entre dos de esos puntos de corte, sigue sin caber en el ancho de la caja de contenido.
+- **Dónde se corta.** La parte larga puede acabar una línea tras cualquiera de sus caracteres, y la acaba tras el
+  último que cabe. Empieza en la línea en curso, a continuación de las palabras anteriores, si cabe en ella alguno de
+  sus caracteres. Junto a una caja lateral o a una letra capitular se corta al ancho de cada línea.
+- **Un carácter** es lo que se lee como uno: una letra no se separa de sus marcas combinantes, ni las dos mitades de un
+  par subrogado entre sí.
+- **Sin guion.** El corte no añade nada, y el texto que se copia o que lee un lector de pantalla es la palabra
+  entera: la línea cortada no lleva el espacio invisible del final
+  ([El PDF por dentro](../implementation/pdf.md#texto-que-se-lee)).
+- **En el reparto**, con `optimal`, una línea solo acaba en un corte así si no le cabe un carácter más. Esa línea no
+  tiene maldad, porque está llena, y lleva la penalización de un guion, pero no la de dos líneas seguidas acabadas en
+  guion.
+- **Lo que no se corta.** Una palabra con `{page}`, `{pages}` o una referencia. Si en la línea no cabe ni un carácter,
+  es `TEXT_OVERFLOW`.
+- **Tamaños intrínsecos**: no cambian ([abajo](#tamaños-intrínsecos)).
+- **Con `Overflow: shrink`**, ninguna palabra es ya más ancha que la caja, así que el texto solo encoge si sus líneas
+  no caben a lo alto ([Desbordamiento](overflow.md#encoger-el-texto-shrink)).
+- **Con `Preformatted: true` o `wrap`** no tiene efecto: las líneas son las escritas, o se parten solo entre palabras.
+  Escrito por el propio texto preformateado es un error (`BREAK_LONG_WORDS_IN_PREFORMATTED`); heredado o de una regla
+  no se comprueba, como el resto de `Typography` ([Errores](errors.md#lo-que-no-tiene-efecto)).
+
+> **Decisión:** una propiedad, `false` por defecto: cortar una palabra por cualquier letra lo decide el autor.
+> *Alternativa descartada:* hacerlo siempre, que cambiaría un error por un corte feo sin que nadie lo pida, y un valor
+> más de `Overflow`, que es de la caja y no se hereda.
+
+> **Decisión:** el umbral es la línea entera de la caja y no lo que queda de la línea en curso: una palabra que cabe
+> en una línea propia nunca se corta, tampoco junto a una caja lateral, donde deja vacías las líneas cortas como
+> cualquier otra. *Alternativa descartada:* cortar toda palabra que no quepa en lo que queda de línea, que partiría
+> palabras corrientes.
+
+> **Decisión:** la parte larga empieza en la línea en curso, tras las palabras anteriores, como una palabra partida
+> con guion. *Alternativa descartada:* empezarla siempre en una línea propia, que deja una línea casi vacía delante
+> de cada dato largo.
+
+> **Decisión:** `Break long words` no cambia el ancho más estrecho: una columna `auto` no se encoge hasta una letra
+> por tenerlo, y solo actúa cuando el ancho final no da. *Alternativa descartada:* que el ancho más estrecho fuera el
+> del carácter más ancho, con el que una tabla de columnas `auto` cortaría palabras que caben.
+
+> **Decisión:** en un texto preformateado es un error solo si lo escribe él, con `true` y con `wrap`. *Alternativa
+> descartada:* cortar las palabras largas de `wrap`, que ningún documento ha pedido, y el error también cuando se
+> hereda, que alcanzaría a cada bloque de código de un documento que lo declara en `For element: Document`.
 
 ## Kerning (`Kerning`)
 
@@ -217,9 +291,11 @@ varios tramos mide lo que suman sus partes. Lo que se mide es exactamente lo que
 
 ## Tamaños intrínsecos
 
-El ancho más estrecho es la palabra más ancha (con `Hyphenate` o un guion blando, la parte más ancha de una palabra
-con su guion), y el natural, el párrafo más largo en una sola línea (con `Preformatted: true` o `wrap`, ver
-[Formato del texto](text-formatting.md#tamaños-intrínsecos)).
+El ancho más estrecho es la palabra más ancha (si tiene puntos de corte, por `Hyphenate`, por un guion blando o por
+un guion escrito, la más ancha de sus partes, con su guion), y el natural, el párrafo más largo en una sola línea
+(con `Preformatted: true` o `wrap`, ver [Formato del texto](text-formatting.md#tamaños-intrínsecos)).
+`Break long words` no cambia ninguno de los dos
+([Palabras largas](#palabras-largas-break-long-words)).
 
 ## Idioma (`Language`)
 
@@ -241,6 +317,8 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 - Patrones de partición de otros idiomas que `es`, `ca`, `en-US`, `en-GB`, `de`, `fr`, `it`, `nl` y `pt`, los de la
   ortografía alemana tradicional, patrones o excepciones propios del documento, y cambiar los mínimos de letras a cada
   lado del guion.
+- Puntos de corte tras otros caracteres que el guion (`/`, `.`, `_`, `@`), impedir el corte tras un guion escrito de
+  otra forma que con el guion de no separación, y cortar las palabras largas de un texto preformateado.
 - Tamaño distinto dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo cambia
   la familia, el peso, el estilo, el color, las mayúsculas y el interletraje
   ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.

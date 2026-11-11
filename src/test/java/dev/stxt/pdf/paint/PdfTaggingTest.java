@@ -128,6 +128,30 @@ class PdfTaggingTest {
         assertEquals(Map.of(), PdfUa.failedRules(bytes));
     }
 
+    /**
+     * A word split after a hyphen written in it, or cut with {@code Break long words}, is painted as it is written:
+     * no hyphen is added, so there is no {@code ActualText}, and no space after the line, so whoever extracts the
+     * text can join its parts (reference/implementation/pdf.md).
+     */
+    @Test
+    void wordsSplitWithoutAnAddedHyphenAreReadAsTheyAreWritten() throws Exception {
+        byte[] bytes = Pdfs.of(DOCUMENT + "\t\t\t\tBreak long words: true\n"
+                + "\tParagraph: REF-2026-009812 ES7620770024003102575766\n\t\tBox:\n\t\t\tWidth: 60\n");
+        try (PDDocument pdf = Loader.loadPDF(bytes)) {
+            List<String> lines = new PDFTextStripper().getText(pdf).strip().lines().toList();
+            // The lines that end inside a word have nothing after their last character; the others, the space.
+            assertEquals("REF-2026-", lines.get(0));
+            assertEquals("REF-2026-009812ES7620770024003102575766",
+                    String.join("", lines).replace(" ", ""));
+            assertTrue(lines.size() > 3, lines.toString());
+            for (String line : lines.subList(2, lines.size() - 1)) {
+                assertEquals(line.stripTrailing(), line, lines.toString());
+            }
+            assertEquals(List.of(), actualTexts(pdf.getPage(0)));
+        }
+        assertEquals(Map.of(), PdfUa.failedRules(bytes));
+    }
+
     /** The {@code ActualText} of each marked content of the page, in order. */
     private static List<String> actualTexts(PDPage page) throws IOException {
         List<String> texts = new ArrayList<>();

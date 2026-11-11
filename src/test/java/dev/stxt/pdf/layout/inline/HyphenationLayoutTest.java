@@ -16,7 +16,8 @@ import dev.stxt.pdf.tree.ErrorCode;
 import dev.stxt.pdf.tree.InvalidModelException;
 
 /**
- * {@code Hyphenate} and the soft hyphen in the layout (reference/common/typography.md). With {@link FixedMetrics},
+ * {@code Hyphenate}, the soft hyphen, the written hyphen and {@code Break long words} in the layout
+ * (reference/common/typography.md). With {@link FixedMetrics},
  * each character measures 5 pt with {@code Size: 10}, the hyphen too; the fixture document is in Spanish.
  */
 class HyphenationLayoutTest {
@@ -114,5 +115,90 @@ class HyphenationLayoutTest {
                 "\t\tText: constitución", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tWidth: 40",
                 "\t\t\tTypography:", "\t\t\t\tLanguage: es");
         assertEquals(List.of("consti-", "tución"), texts(f.fragment("T").lines()));
+    }
+
+    // --- Written hyphens and Break long words -----------------------------------------------------------------------
+
+    @Test
+    void aWordIsSplitAfterItsWrittenHyphenWithoutAnyProperty() {
+        // Width 50 = 10 characters: "REF-2026-" (9) and "009812", with the hyphen of the text and no other.
+        List<TextLine> l = lines("REF-2026-009812", 50);
+        assertEquals(List.of("REF-2026-", "009812"), texts(l));
+        assertEquals(List.of(false, false), l.stream().map(TextLine::hyphenated).toList());
+        assertEquals(List.of(true, false), l.stream().map(TextLine::splitsWord).toList());
+        assertEquals(45, l.get(0).width(), 1e-9);
+        // A hyphenated line splits its word too.
+        assertEquals(List.of(true, true, false),
+                lines(TEXT, 70, "Hyphenate: true").stream().map(TextLine::splitsWord).toList());
+    }
+
+    @Test
+    void preformattedTextIsNotSplitAfterAWrittenHyphen() {
+        // Preformatted: wrap breaks its lines between words only: "REF-2026-009812" (75) goes whole to its line.
+        assertEquals(List.of("ref", "REF-2026-009812"),
+                texts(lines("ref REF-2026-009812", 80, "Preformatted: wrap")));
+    }
+
+    @Test
+    void breakLongWordsCutsTheWordWiderThanItsBox() {
+        // Width 50 = 10 characters, and the IBAN has 24.
+        List<TextLine> l = lines("ES7620770024003102575766", 50, "Break long words: true");
+        assertEquals(List.of("ES76207700", "2400310257", "5766"), texts(l));
+        assertTrue(l.stream().noneMatch(TextLine::hyphenated));
+        assertEquals(List.of(true, true, false), l.stream().map(TextLine::splitsWord).toList());
+        assertEquals(List.of("ES76207700", "2400310257", "5766"),
+                texts(lines("ES7620770024003102575766", 50, "Break long words: true", "Line breaking: optimal")));
+        // A word that fits in a line of its own is not cut: it goes to the next line.
+        assertEquals(List.of("IBAN", "ES76207700"), texts(lines("IBAN ES76207700", 50, "Break long words: true")));
+    }
+
+    @Test
+    void breakLongWordsIsInherited() {
+        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: true",
+                "\t\tText: ABCDEFGHIJKLMNOP", "\t\t\tId: T", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\t\tText: ABCDEFGHIJ KLMNOP", "\t\t\tId: OFF", "\t\t\tBox:", "\t\t\t\tWidth: 50",
+                "\t\t\tTypography:", "\t\t\t\tBreak long words: false");
+        assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(f.fragment("T").lines()));
+        assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(f.fragment("OFF").lines()));
+    }
+
+    @Test
+    void breakLongWordsDoesNotChangeTheNarrowestWidth() {
+        // A grid column of the narrowest width is as wide as the word (80) with or without it: it only acts where
+        // the final width is not enough.
+        LayoutFixture f = layOut("\tGrid:", "\t\tColumn sizes: narrowest", "\t\tArea:",
+                "\t\t\tText: ABCDEFGHIJKLMNOP", "\t\t\t\tId: B", "\t\t\t\tTypography:",
+                "\t\t\t\t\tBreak long words: true");
+        assertEquals(80, f.rect("B").width(), 1e-9);
+        assertEquals(List.of("ABCDEFGHIJKLMNOP"), texts(f.fragment("B").lines()));
+        // With a written hyphen, the narrowest width is that of the widest part: "2026-" and "00981" (25).
+        LayoutFixture h = layOut("\tGrid:", "\t\tColumn sizes: narrowest", "\t\tArea:",
+                "\t\t\tText: REF-2026-00981", "\t\t\t\tId: H");
+        assertEquals(25, h.rect("H").width(), 1e-9);
+        assertEquals(List.of("REF-", "2026-", "00981"), texts(h.fragment("H").lines()));
+    }
+
+    @Test
+    void aTextThatBreaksItsLongWordsDoesNotShrinkForItsWidth() {
+        // With Overflow: shrink the text would go down to the Size at which the word fits; cut, it fits at its Size.
+        List<TextLine> l = layOut("\tText: ABCDEFGHIJKLMNOP", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50",
+                "\t\t\tOverflow: shrink", "\t\tTypography:", "\t\t\tBreak long words: true").fragment("T").lines();
+        assertEquals(List.of("ABCDEFGHIJ", "KLMNOP"), texts(l));
+        assertEquals(10, l.get(0).fontSize(), 1e-9);
+    }
+
+    @Test
+    void breakLongWordsWrittenByAPreformattedTextIsAnError() {
+        for (String preformatted : List.of("true", "wrap")) {
+            InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: abc",
+                    "\t\tTypography:", "\t\t\tPreformatted: " + preformatted, "\t\t\tBreak long words: true"));
+            assertEquals(ErrorCode.BREAK_LONG_WORDS_IN_PREFORMATTED, e.errorCode(), preformatted);
+        }
+        // Inherited, it is not checked: the preformatted text of a box that has it is left alone.
+        LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tBreak long words: true",
+                "\t\tText: abc", "\t\t\tId: T", "\t\t\tTypography:", "\t\t\t\tPreformatted: true");
+        assertEquals(List.of("abc"), texts(f.fragment("T").lines()));
+        // Nor is Break long words: false, which changes nothing.
+        layOut("\tText: abc", "\t\tTypography:", "\t\t\tPreformatted: true", "\t\t\tBreak long words: false");
     }
 }

@@ -388,6 +388,11 @@ public enum ErrorCode {
      * {@code Hyphenate}).
      */
     HYPHENATION_LANGUAGE_UNSUPPORTED,
+    /**
+     * {@code Break long words: true} written by a preformatted text, whose lines are not broken inside a word (line
+     * of the {@code Break long words}).
+     */
+    BREAK_LONG_WORDS_IN_PREFORMATTED,
 
     // --- Accessibility (during conversion) ---------------------------------------------------
     /** The text has low contrast with what is under it; the check can be disabled when converting. */

@@ -34,6 +34,7 @@ Styles:
 | `Color` | color | `#000000` | The color of the text |
 | `Line breaking` | `simple`, `optimal` | `simple` | How the text is broken into lines |
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
+| `Break long words` | `true`, `false` | `false` | Whether a word that does not fit in a whole line is cut, with no hyphen ([below](#long-words)) |
 | `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
@@ -98,9 +99,10 @@ except the last one of each paragraph, those with a single word and preformatted
 
 ## Line breaking
 
-The text is broken into lines of the width of its box, always between words. With `Line breaking: simple`, each line is
+The text is broken into lines of the width of its box, between words or after a hyphen written inside a word
+(`REF-2026-` and `009812`). With `Line breaking: simple`, each line is
 filled as much as it can be. With `Line breaking: optimal`, the engine looks at the whole paragraph and chooses the
-breaks that leave the most even lines, which shows above all in justified text. By default words are not split: a word
+breaks that leave the most even lines, which shows above all in justified text. By default words are not split anywhere else: a word
 wider than the line is an error.
 
 Consecutive spaces and single line breaks are a single space. A blank line is an error: each text is a single paragraph,
@@ -138,6 +140,27 @@ Document (dev.stxt.pdf):
 A soft hyphen (U+00AD) written inside a word says where that word may be split, with or without `Hyphenate`, and is
 not seen if it is not split. The text that is copied from the PDF, and the one a screen reader reads, does not carry
 the hyphens the engine added.
+
+A word with a hyphen written between letters or digits (`socio-economic`, `REF-2026-009812`) may be split after
+that hyphen, also without `Hyphenate`, and no other is added. To keep it from being split there, the hyphen is
+written as the non-breaking hyphen (U+2011).
+
+## Long words
+
+An IBAN, an email address or a URL have no place to be split at, and they do not fit in a narrow cell: they are an
+error. With `Break long words: true`, a word wider than a whole line of its box is cut at the last letter that
+fits, with no hyphen, and goes on in the next line:
+
+```
+Styles:
+    For element: Cell
+        Typography:
+            Break long words: true
+```
+
+Only what fits in no other way is cut: a word that fits in a line of its own goes whole to the next line, and one
+that has hyphens is split at them first. The text that is copied from the PDF is the whole word. It has no effect
+in a text with `Preformatted`.
 
 ## Kerning
 

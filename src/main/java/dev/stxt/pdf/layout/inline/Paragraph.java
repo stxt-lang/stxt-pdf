@@ -6,19 +6,36 @@ import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 import dev.stxt.pdf.model.Tolerance;
 
+import java.text.BreakIterator;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static dev.stxt.pdf.model.Tolerance.fits;
 
 /**
  * The words of a text with their measures and the positions where a line may end: the start of each word, each
- * of its break points and the end of the text, in order. A line goes from one position to a later one; if it
- * ends at a break point, it ends with a hyphen. Advances are sums of those of the whole words, the spaces and the
- * parts of a split word, each one measured once ({@link LinePlacer#advance}). Both algorithms of {@link LineBreaker}
- * choose among the same positions.
+ * of its break points and the end of the text, in order. A line goes from one position to a later one. Advances are
+ * sums of those of the whole words, the spaces and the parts of a split word, each one measured once
+ * ({@link LinePlacer#advance}). Both algorithms of {@link LineBreaker} choose among the same positions.
+ *
+ * <p>A line that ends at a break point ends inside a word ({@link #inside}), in one of three ways
+ * (reference/common/typography.md): with a hyphen that the line breaking adds, at a soft hyphen or where the patterns
+ * of the language allow it ({@link #hyphen}); with the hyphen written in the word, after which nothing is added; or,
+ * with {@code Break long words}, at a cut of last resort ({@link #lastResort}), with no hyphen at all.</p>
+ *
+ * <p><strong>Cuts of last resort.</strong> A part of a word that cannot be split further and is wider than
+ * {@code longWord}, the width of a whole line of the box, gets a break point between each two of its characters
+ * ({@link #cutLongParts}), so that the line breaking can end a line at the last one that fits. A word that fits in a
+ * whole line has none: it goes to the next line, as always.</p>
  */
 final class Paragraph {
+    /** How a line that ends at a position ends: between words, or inside a word in one of its three ways. */
+    private static final byte BETWEEN_WORDS = 0;
+    private static final byte HYPHENATED = 1;
+    private static final byte WRITTEN_HYPHEN = 2;
+    private static final byte LAST_RESORT = 3;
+
     private final List<Words.Word> words;
     private final TextMeasurer measurer;
     private final FontFace font;
@@ -31,13 +48,28 @@ final class Paragraph {
     /** The word of each position and the characters of it before the position (0 = its start). */
     private final int[] posWord;
     private final int[] posOffset;
+    /** How a line that ends at each position ends. */
+    private final byte[] posKind;
     /** start[w]: the position of the start of word w; start[n], the end of the text. */
     private final int[] start;
-    /** Memorized advances of the part of the word before a break position, with its hyphen, and after it. */
+    /**
+     * Memorized advances of the part of the word before a break position, with its hyphen if the line breaking adds
+     * one, and after it.
+     */
     private final double[] head;
     private final double[] tail;
 
     Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing) {
+        this(words, measurer, font, fontSize, letterSpacing, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * @param longWord the width from which a part of a word that cannot be split further is cut between any two of
+     *                 its characters ({@code Break long words}): that of a whole line of the box; infinite to never
+     *                 cut one
+     */
+    Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing,
+              double longWord) {
         this.words = words;
         this.measurer = measurer;
         this.font = font;
@@ -47,26 +79,41 @@ final class Paragraph {
         wholeWords = new double[n + 1];
         gaps = new double[n + 1];
         start = new int[n + 1];
+        // The break points of each word and how a line ends at each one: those of the word and, in its long parts,
+        // the cuts of last resort.
+        int[][] breaks = new int[n][];
+        byte[][] kinds = new byte[n][];
         int positions = 1;
         for (int w = 0; w < n; w++) {
             Words.Word word = words.get(w);
-            wholeWords[w + 1] = wholeWords[w]
-                    + LinePlacer.advance(word.parts(), measurer, font, fontSize, letterSpacing);
+            double advance = LinePlacer.advance(word.parts(), measurer, font, fontSize, letterSpacing);
+            wholeWords[w + 1] = wholeWords[w] + advance;
             gaps[w + 1] = gaps[w]
                     + (w + 1 < n ? LinePlacer.advance(" ", word.gap(), measurer, font, fontSize, letterSpacing) : 0);
+            breaks[w] = word.breaks();
+            kinds[w] = kinds(word);
+            // A word that fits whole in a line has no part that does not.
+            if (longWord < Double.POSITIVE_INFINITY
+                    && !fits(advance - lastPart(word).format().letterSpacing(letterSpacing), longWord)) {
+                Cuts cuts = cutLongParts(word, kinds[w], longWord);
+                breaks[w] = cuts.offsets();
+                kinds[w] = cuts.kinds();
+            }
             start[w] = positions - 1;
-            positions += 1 + word.breaks().length;
+            positions += 1 + breaks[w].length;
         }
         start[n] = positions - 1;
         posWord = new int[positions];
         posOffset = new int[positions];
+        posKind = new byte[positions];
         int p = 0;
         for (int w = 0; w < n; w++) {
             posWord[p] = w;
             posOffset[p++] = 0;
-            for (int b : words.get(w).breaks()) {
+            for (int k = 0; k < breaks[w].length; k++) {
                 posWord[p] = w;
-                posOffset[p++] = b;
+                posKind[p] = kinds[w][k];
+                posOffset[p++] = breaks[w][k];
             }
         }
         posWord[p] = n;
@@ -75,6 +122,64 @@ final class Paragraph {
         tail = new double[positions];
         Arrays.fill(head, Double.NaN);
         Arrays.fill(tail, Double.NaN);
+    }
+
+    /** How a line ends at each break point of a word: with an added hyphen or with the one written before it. */
+    private static byte[] kinds(Words.Word word) {
+        byte[] kinds = new byte[word.breaks().length];
+        for (int k = 0; k < kinds.length; k++) {
+            kinds[k] = word.written(k) ? WRITTEN_HYPHEN : HYPHENATED;
+        }
+        return kinds;
+    }
+
+    /** The break points of a word, with how a line ends at each one. */
+    private record Cuts(int[] offsets, byte[] kinds) {
+    }
+
+    /**
+     * The break points of a word with the cuts of last resort of its long parts ({@code Break long words},
+     * reference/common/typography.md): each part between two of its break points that, as a line of its own (with
+     * its hyphen, if the line breaking adds one), is wider than {@code longWord} gets a break point between each two
+     * of its characters. A character is what the reader takes for one: a letter is not separated from its combining
+     * marks, nor are the two halves of a surrogate pair. A word with a brace, which may hold {@code {page}} or a
+     * reference, gets none, like with the patterns ({@link Words#breaks}).
+     */
+    private Cuts cutLongParts(Words.Word word, byte[] kinds, double longWord) {
+        int[] breaks = word.breaks();
+        String text = word.text();
+        if (text.indexOf('{') >= 0 || text.indexOf('}') >= 0) {
+            return new Cuts(breaks, kinds);
+        }
+        int[] offsets = new int[text.length()];
+        byte[] cut = new byte[text.length()];
+        int n = 0;
+        BreakIterator characters = null;
+        int from = 0;
+        for (int k = 0; k <= breaks.length; k++) {
+            int to = k < breaks.length ? breaks[k] : text.length();
+            boolean whole = from == 0 && to == text.length();
+            List<TextRun> part = whole ? word.parts() : Words.slice(word.parts(), from, to);
+            if (k < breaks.length && kinds[k] == HYPHENATED) {
+                part = Words.hyphenated(part, word.parts(), to);
+            }
+            if (!fits(LinePlacer.width(part, measurer, font, fontSize, letterSpacing), longWord)) {
+                if (characters == null) {
+                    characters = BreakIterator.getCharacterInstance(Locale.ROOT);
+                    characters.setText(text);
+                }
+                for (int c = characters.following(from); c != BreakIterator.DONE && c < to; c = characters.next()) {
+                    offsets[n] = c;
+                    cut[n++] = LAST_RESORT;
+                }
+            }
+            if (k < breaks.length) {
+                offsets[n] = to;
+                cut[n++] = kinds[k];
+            }
+            from = to;
+        }
+        return new Cuts(Arrays.copyOf(offsets, n), Arrays.copyOf(cut, n));
     }
 
     /**
@@ -86,8 +191,21 @@ final class Paragraph {
      */
     static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                         double letterSpacing, Hyphenator hyphenator) {
+        return of(runs, measurer, font, fontSize, letterSpacing, hyphenator, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * The words of the text with their measures and positions, with the cuts of last resort of the parts of its
+     * words wider than {@code longWord} ({@code Break long words}); {@code null} if the text has no words.
+     *
+     * @param hyphenator the patterns of the language of the text; {@code null} splits words only at their soft hyphens
+     * @param longWord   the width of a whole line of the box; infinite to never cut a part of a word that cannot be
+     *                   split further
+     */
+    static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
+                        double letterSpacing, Hyphenator hyphenator, double longWord) {
         List<Words.Word> words = Words.words(runs, hyphenator);
-        return words.isEmpty() ? null : new Paragraph(words, measurer, font, fontSize, letterSpacing);
+        return words.isEmpty() ? null : new Paragraph(words, measurer, font, fontSize, letterSpacing, longWord);
     }
 
     int words() {
@@ -108,9 +226,27 @@ final class Paragraph {
         return posWord[p];
     }
 
-    /** Whether position {@code p} is inside a word: a line that ends there ends with a hyphen. */
-    boolean hyphen(int p) {
+    /** Whether position {@code p} is inside a word: a line that ends there splits the word. */
+    boolean inside(int p) {
         return posOffset[p] > 0;
+    }
+
+    /** Whether a line that ends at position {@code p} ends with a hyphen that the line breaking adds. */
+    boolean hyphen(int p) {
+        return posKind[p] == HYPHENATED;
+    }
+
+    /** Whether a line that ends at position {@code p} ends inside a word with a hyphen, added or written. */
+    boolean endsWithHyphen(int p) {
+        return posKind[p] == HYPHENATED || posKind[p] == WRITTEN_HYPHEN;
+    }
+
+    /**
+     * Whether position {@code p} is a cut of last resort ({@code Break long words}): a line ends there only if it
+     * cannot hold one character more.
+     */
+    boolean lastResort(int p) {
+        return posKind[p] == LAST_RESORT;
     }
 
     /** Whether a forced line break comes right before position {@code p}: a line has to end there. */
@@ -121,16 +257,19 @@ final class Paragraph {
 
     /** The last word of a line that ends at {@code b}, and how many of its characters the line has. */
     private int lastWord(int b) {
-        return hyphen(b) ? posWord[b] : posWord[b] - 1;
+        return inside(b) ? posWord[b] : posWord[b] - 1;
     }
 
     private int lastOffset(int b) {
-        return hyphen(b) ? posOffset[b] : words.get(posWord[b] - 1).length();
+        return inside(b) ? posOffset[b] : words.get(posWord[b] - 1).length();
     }
 
-    /** Whether the line from {@code a} to {@code b} is a single part of a single word, which may overflow. */
+    /**
+     * Whether the line from {@code a} to {@code b} is a single piece of the text, between two consecutive positions:
+     * a word or a part of a word that cannot be split further, which may overflow.
+     */
     boolean single(int a, int b) {
-        return posWord[a] == lastWord(b);
+        return b == a + 1;
     }
 
     /** Advance of the spaces of the line from {@code a} to {@code b}. */
@@ -153,7 +292,7 @@ final class Paragraph {
         double sum = posOffset[a] == 0 ? wholeWords[first + 1] - wholeWords[first] : tail(a);
         sum += wholeWords[last] - wholeWords[first + 1];
         sum += gaps[last] - gaps[first];
-        sum += hyphen(b) ? head(b) : wholeWords[last + 1] - wholeWords[last];
+        sum += inside(b) ? head(b) : wholeWords[last + 1] - wholeWords[last];
         return sum;
     }
 
@@ -164,11 +303,17 @@ final class Paragraph {
 
     /**
      * The letter spacing of the last character of a line that ends at {@code b}: that of the run of the hyphen, if
-     * it ends with one, or of the last part of its last word.
+     * the line breaking adds one, or of the last character of the line.
      */
     private double trailing(int b) {
-        TextFormat last = hyphen(b) ? Words.hyphenFormat(words.get(posWord[b]).parts(), posOffset[b])
-                : lastPart(words.get(posWord[b] - 1)).format();
+        TextFormat last;
+        if (hyphen(b)) {
+            last = Words.hyphenFormat(words.get(posWord[b]).parts(), posOffset[b]);
+        } else if (inside(b)) {
+            last = Words.formatBefore(words.get(posWord[b]).parts(), posOffset[b]);
+        } else {
+            last = lastPart(words.get(posWord[b] - 1)).format();
+        }
         return last.letterSpacing(letterSpacing);
     }
 
@@ -181,17 +326,31 @@ final class Paragraph {
      * {@link Tolerance#MODEL} of the width.
      */
     boolean fitsMeasured(int a, int b, double available) {
-        double width = width(a, b);
+        return fitsMeasured(a, b, width(a, b), available);
+    }
+
+    /** {@link #fitsMeasured(int, int, double)} for a line whose {@link #width} is already known. */
+    boolean fitsMeasured(int a, int b, double width, double available) {
         if (Math.abs(width - available) <= Tolerance.MODEL) {
             width = LinePlacer.width(line(a, b).runs(), measurer, font, fontSize, letterSpacing);
         }
         return fits(width, available);
     }
 
-    /** Advance of the part of its word before break position {@code b}, with its hyphen. */
+    /**
+     * How much a line may be wider than another that ends later in the same word: the width of a line grows with the
+     * position where it ends, except for the hyphen that only some positions add and for the kerning with it, which
+     * together are less than the size of the text. A line this much wider than the available width tells that no
+     * later position of the word fits either.
+     */
+    double hyphenMargin() {
+        return fontSize;
+    }
+
+    /** Advance of the part of its word before break position {@code b}, with its hyphen if a line that ends there has one. */
     private double head(int b) {
         if (Double.isNaN(head[b])) {
-            head[b] = withHyphen(posWord[b], 0, posOffset[b]);
+            head[b] = hyphen(b) ? withHyphen(posWord[b], 0, posOffset[b]) : piece(posWord[b], 0, posOffset[b]);
         }
         return head[b];
     }
@@ -222,7 +381,10 @@ final class Paragraph {
                 letterSpacing);
     }
 
-    /** The line from {@code a} to {@code b}: its words separated by a space with the format of the previous one. */
+    /**
+     * The line from {@code a} to {@code b}: its words separated by a space with the format of the previous one and,
+     * if it ends where the line breaking adds a hyphen, the hyphen.
+     */
     LineBreaker.Line line(int a, int b) {
         int first = posWord[a];
         int last = lastWord(b);
@@ -241,6 +403,6 @@ final class Paragraph {
         if (hyphen(b)) {
             runs.add(LineBreaker.HYPHEN, Words.hyphenFormat(words.get(last).parts(), posOffset[b]));
         }
-        return new LineBreaker.Line(runs.build(), hyphen(b), a, forced(b));
+        return new LineBreaker.Line(runs.build(), hyphen(b), a, forced(b), inside(b));
     }
 }

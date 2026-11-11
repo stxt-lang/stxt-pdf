@@ -37,10 +37,12 @@ final class LinePlacer {
      * @param justify    whether the line can be justified: it is not the last one of the text (when numbering
      *                   the pages, whether it was already justified)
      * @param hyphenated whether the line ends inside a word, with a hyphen ({@link LineBreaker.Line#hyphenated()})
+     * @param splitsWord whether the line ends inside a word, with that hyphen, with one written in the word or with
+     *                   none ({@link LineBreaker.Line#splitsWord()})
      */
     static TextLine place(List<TextRun> runs, TextMeasurer measurer, Style s, double fontSize, double left,
                           double right, double available, boolean justify, double y, double height,
-                          boolean hyphenated) {
+                          boolean hyphenated, boolean splitsWord) {
         FontFace font = s.typography().fontFace();
         double letterSpacing = s.typography().letterSpacing();
         double[] widths = new double[runs.size()];
@@ -65,7 +67,7 @@ final class LinePlacer {
             at += w;
         }
         return new TextLine(left + x, y, natural + spacing * spaces(text), height, fontSize, text, spacing, placed,
-                hyphenated, left, right);
+                hyphenated, left, right, splitsWord);
     }
 
     /** Horizontal offset of a line according to the alignment. */

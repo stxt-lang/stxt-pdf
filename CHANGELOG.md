@@ -7,8 +7,35 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+### Added
+
+- **`Break long words`** (`true`, `false`), in `Typography`, inherited and `false` by default: the part of a word
+  that cannot be split further and is wider than a whole line of its box is cut at the last character that fits,
+  with no hyphen, as many times as needed. It is for the data that has no place to be split at (an IBAN, an email
+  address, a URL in a narrow cell), which until now was `TEXT_OVERFLOW`. It is a last resort: a word that fits in a
+  line of its own goes to the next line and is never cut, and written hyphens, soft hyphens and the patterns of
+  `Hyphenate` come first. A letter is not separated from its combining marks. It does not change the narrowest
+  width of a text, so an `auto` column does not get narrower for having it, and with it `Overflow: shrink` only
+  shrinks a text whose lines do not fit in the height. The text that is copied or read is the whole word. "Long
+  words" in the reference of `Typography`.
+- The error code **`BREAK_LONG_WORDS_IN_PREFORMATTED`**: `Break long words: true` written by a text with
+  `Preformatted: true` or `wrap`, where it has no effect. Inherited or from a rule it is not checked.
+- `TextLine.splitsWord()`: whether the line ends inside a word, which goes on in the next line, with the hyphen of
+  `hyphenated()`, with a hyphen written in the word or, with `Break long words`, with none.
+
 ### Changed
 
+- **A word is split after a hyphen written in it**, with no property: a `-` (U+002D) with a letter or a digit on
+  each side is a break point, and the line ends with that hyphen and no other (`REF-2026-` and `009812`, `socio-`
+  and `economic`). **A document may break its lines differently**: a line that left such a word whole for the next
+  one may now end after its hyphen, and the narrowest width of the word is that of its widest part, so an `auto`
+  column or a box sized to its content with such words may be narrower. A document that was `TEXT_OVERFLOW` for a
+  word with hyphens may now convert. The non-breaking hyphen (U+2011) keeps the word whole. With
+  `Line breaking: optimal` the break has the penalty of a hyphen. It does not apply to a preformatted text. A line
+  that ends this way has no invisible space after it in the PDF, like one that ends with an added hyphen, so the
+  word is read whole. "Hyphenation" in the reference of `Typography`.
+- `fragment.TextLine` has a twelfth component, `splitsWord`, so its canonical constructor takes one argument more.
+  The other constructors do not change: in them it is the value of `hyphenated`.
 - **Twelve names of the `dev.stxt.pdf` namespace**, reviewed before 1.0 so that each one says what it is when it is read
   alone in a rule of `Styles`, and so that no two names are nearly the same. A document written for 0.14.0 that uses
   them has to be updated; the old names are not accepted.

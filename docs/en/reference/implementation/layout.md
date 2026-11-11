@@ -283,6 +283,25 @@ penalty per hyphen (50²) and per two consecutive hyphens (10,000). Widths are s
 the spaces and the parts of a split word, each one measured once. `Hyphenations.validate` checks before the layout,
 like the fonts, that every box with text and `Hyphenate: true` is in a language with patterns.
 
+**Written hyphens and long words.** A line that ends at a break point ends inside a word (`Paragraph.inside`) in
+one of three ways, which `Paragraph` keeps per position: with the hyphen the line breaking adds (`hyphen`), after a
+hyphen written in the word, or at a cut of last resort (`lastResort`). `Words` adds to the break points of each word
+those of its written hyphens (`afterWrittenHyphens`, `Word.written`), with or without a `Hyphenator`: there the line
+carries no other hyphen, and its width and the narrowest width are measured without one. With `Break long words`,
+`InlineLayout` gives `Paragraph` the width of the content box, and `cutLongParts` adds a position between each two
+characters (a character `BreakIterator`, which does not separate a letter from its marks) of each part that, as a
+line of its own, does not fit in it; a whole word that fits is not even looked at. Both algorithms still choose
+among positions. The greedy one tries those of the word that does not fit from the first one on and keeps the last
+one that fits; it stops trying when the line exceeds the available width by more than the font size
+(`hyphenMargin`: what an added hyphen can make an earlier position measure more than a later one), so a word of
+thousands of characters costs, per line, what the line reaches. Knuth-Plass charges the penalty of a hyphen to
+every line that ends inside a word, and that of two consecutive ones only to those that end with a hyphen, added or
+written; a line that ends at a cut of last resort is discarded if the next position fits in it, and has no
+badness. It looks at the width before checking whether the starting position is reachable, to stop as soon as the
+line does not fit: in a word cut at any character almost no position is. `Paragraph.single` is a single piece
+between two consecutive positions, which is the only thing that may overflow. The `Line` and the `TextLine` say
+with `splitsWord` that the line ends inside a word, whether or not it carries the hyphen of `hyphenated`.
+
 **Forced line breaks.** The break of a Markdown (`\` at the end of the line) reaches the text as the character U+2028
 (`TextRun.LINE_SEPARATOR`), which `MarkdownBuilder` writes in its place. `Words.words` treats it as a space that
 separates words and marks the word before it (`Word.forced`); the position where the next one starts is a mandatory end
@@ -293,6 +312,11 @@ justify it. The natural width of the text is that of its widest line between bre
 
 > **Decision:** the language is checked when the layout starts and not when the tree is built, like the fonts:
 > `tree` does not depend on `layout`, where the patterns live. *Rejected alternative:* the patterns in `model`.
+
+> **Decision:** the cuts of `Break long words` are positions of `Paragraph`, computed with the width of the box when
+> the text is measured, and not a separate step after the line breaking: this way both algorithms, the side boxes
+> and `Overflow: shrink` handle them without knowing about them. *Rejected alternative:* splitting afterwards the
+> lines that overflow, which does not let the line breaking fill the current line or Knuth-Plass count on the cut.
 
 > **Decision:** both line breakings share the positions and the sums of `Paragraph`, instead of a breaking over atoms
 > (parts of words) with prefix sums: with ligatures a whole word does not measure what its parts add up to, and this

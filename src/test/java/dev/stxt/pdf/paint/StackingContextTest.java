@@ -463,6 +463,22 @@ class StackingContextTest {
                 "(actual 'ción extraor\u00AD'", "'ción extraor-'", ")", "'dinaria'", "]"), r.sequences);
     }
 
+    /**
+     * A line split after a hyphen written in the word, or cut with {@code Break long words}, has no invisible space
+     * either, and it is read as it is painted: the hyphen is that of the text, so no sequence carries another text.
+     * Width 50 = 10 characters: REF-2026- / 009812 pagado, and ABCDEFGHIJ / KLMNOP.
+     */
+    @Test
+    void linesSplitWithoutAnAddedHyphenCarryNoTrailingSpaceAndNoActualText() {
+        Recorder r = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: ver REF-2026-009812", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 65");
+        assertEquals(List.of("[text", "'ver REF-2026-'", "'009812'", "]"), r.sequences);
+        Recorder cut = record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",
+                "\tText: ABCDEFGHIJKLMNOP y más", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 50",
+                "\t\tTypography:", "\t\t\tBreak long words: true");
+        assertEquals(List.of("[text", "'ABCDEFGHIJ'", "'KLMNOP y '", "'más'", "]"), cut.sequences);
+    }
+
     @Test
     void noLinkMeansNoZone() {
         assertEquals(List.of(), record("\tStyles:", "\t\tFor element: Document", "\t\t\tTypography:", "\t\t\t\tFont: IBM Plex Sans", "\t\t\t\tSize: 10",

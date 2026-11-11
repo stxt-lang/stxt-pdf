@@ -224,7 +224,9 @@ Un salto de línea al final del texto no añade una línea vacía.
 
 - **`true`** no parte las líneas: una más ancha que la caja es `TEXT_OVERFLOW`, con la línea del documento donde está.
 - **`wrap`** parte las líneas demasiado anchas **entre palabras**, con el reparto voraz. La sangría se conserva y los
-  espacios del corte se pierden. Una palabra más ancha que la caja sigue siendo un error.
+  espacios del corte se pierden. Una palabra más ancha que la caja sigue siendo un error: en un texto preformateado
+  una palabra no se parte tras un guion escrito ni se corta con `Break long words`
+  ([Tipografía](typography.md#palabras-largas-break-long-words)).
 - **Tabulaciones (`Tab size`).** Cada tabulación lleva a la siguiente columna múltiplo de `Tab size`, contando desde el
   principio de la línea (con `Tab size: 4`, `a⇥b` es `a   b`, y `abcd⇥e`, `abcd    e`). Un valor menor que 1 es
   `VALUE_NOT_ALLOWED`.

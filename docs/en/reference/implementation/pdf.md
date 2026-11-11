@@ -101,6 +101,11 @@ soft hyphen U+00AD: it is how a tagged PDF says that the hyphen was added by the
 text does not see the hyphen and can join the two parts. PDFBox drops it when extracting and gives each part on its
 line; Acrobat copies the soft hyphen, which is not seen.
 
+A line that ends after a hyphen written in the word (`REF-2026-`) or at a cut of `Break long words`
+([Typography](../common/typography.md#long-words-break-long-words)) does not carry the invisible space either, and
+it carries no `ActualText`: the line breaking added nothing, and what is read is what is painted
+(`TextLine.splitsWord` without `hyphenated`).
+
 > **Decision:** `ActualText` with the soft hyphen in the sequence that ends the line, and neither an empty
 > `ActualText` nor the whole word in both parts: the first would lose the signal of the break and the second would
 > duplicate it when extracting.

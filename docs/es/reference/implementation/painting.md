@@ -43,7 +43,8 @@ esquina de cada caja con nombre, también la de una nota en el área de notas.
 cada línea en secuencias (`Sequence`: los tramos seguidos que son un mismo contenido marcado, con el mismo destino, la
 llamada o el número de una nota, o una imagen en línea, que va sola) y pinta cada una; dos secuencias de texto seguidas
 del mismo tipo y destino, también de una línea a la siguiente, comparten su contenido marcado. Añade el espacio
-invisible al final de las líneas partidas y el `ActualText` de las que acaban en guion o llevan interletraje; la llamada
+invisible al final de las líneas que acaban entre palabras (no de las que parten una, `TextLine.splitsWord`) y el
+`ActualText` de las que acaban en un guion añadido por el reparto o llevan interletraje; la llamada
 y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un tramo en
 superíndice se pinta elevado `TextFormat.rise()` del cuerpo.
 

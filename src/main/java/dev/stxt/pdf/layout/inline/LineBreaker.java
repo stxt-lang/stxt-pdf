@@ -37,6 +37,17 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * algorithms choose among them. The greedy one adds whole words while they fit and, when one does not, takes the
  * longest part of it that fits with its hyphen; Knuth-Plass charges each hyphen the penalty of TeX
  * ({@value #HYPHEN_PENALTY}, squared) and two consecutive hyphenated lines {@value #DOUBLE_HYPHEN_DEMERITS} more.</p>
+ *
+ * <p><strong>Written hyphens.</strong> A word is also split after a hyphen written in it between two letters or
+ * digits ({@link Words#afterWrittenHyphens}), with or without {@code Hyphenate}: the line ends with that hyphen and
+ * no other is added ({@link Line#splitsWord()} without {@link Line#hyphenated()}). For both algorithms it is one more
+ * position, and for Knuth-Plass a line that ends there ends with a hyphen, with the same penalties.</p>
+ *
+ * <p><strong>Cuts of last resort</strong> ({@code Break long words}). A part of a word wider than a whole line of the
+ * box has a position between each two of its characters ({@link Paragraph}), where a line ends with no hyphen. A line
+ * ends at one only if it cannot hold one character more: the greedy algorithm takes the longest part that fits, as
+ * always, and Knuth-Plass discards the others; such a line is full, so it has no badness, and it is charged the
+ * penalty of a hyphen, but not that of two consecutive ones.</p>
  */
 public final class LineBreaker {
 
@@ -60,12 +71,19 @@ public final class LineBreaker {
      * inside a word, with a hyphen (its last run ends with {@link #HYPHEN}), the position of the text where it
      * starts ({@link Paragraph}), from which the rest of the text can be broken again
      * (reference/components/block.md), and whether a forced line break ends it. A line without runs is an empty one:
-     * a line beside a side box where no word fits, which is left blank.
+     * a line beside a side box where no word fits, which is left blank. {@code splitsWord} says whether it ends inside
+     * a word, which goes on in the next line: with the hyphen the line breaking adds ({@code hyphenated}), with a
+     * hyphen written in the word or, with {@code Break long words}, with none.
      */
-    public record Line(List<TextRun> runs, boolean hyphenated, int start, boolean forced) {
+    public record Line(List<TextRun> runs, boolean hyphenated, int start, boolean forced, boolean splitsWord) {
 
         public Line {
             runs = List.copyOf(runs);
+        }
+
+        /** A line that, if it ends inside a word, ends with the hyphen the line breaking adds. */
+        public Line(List<TextRun> runs, boolean hyphenated, int start, boolean forced) {
+            this(runs, hyphenated, start, forced, hyphenated);
         }
 
         /** A line that ends between words, at the start of the text. */
@@ -142,11 +160,16 @@ public final class LineBreaker {
                 }
                 continue;
             }
-            // The word does not fit whole: the longest part of it that fits with its hyphen.
+            // The word does not fit whole: the longest part of it that fits, with its hyphen if it adds one. Its
+            // positions are tried from the first one until a line is so much wider than the available width that no
+            // later one can fit (Paragraph.hyphenMargin): a long word cut at any character has as many positions as
+            // characters, and each line only looks at the ones it can reach.
             int cut = -1;
-            for (int q = whole - 1; q > a && p.word(q) == w; q--) {
-                if (p.fitsMeasured(a, q, available)) {
+            for (int q = Math.max(a + 1, p.start(w)); q < whole; q++) {
+                double width = p.width(a, q);
+                if (p.fitsMeasured(a, q, width, available)) {
                     cut = q;
+                } else if (width > available + p.hyphenMargin()) {
                     break;
                 }
             }
@@ -232,24 +255,31 @@ public final class LineBreaker {
                             // Starting earlier, the line would go past a forced line break.
                             break;
                         }
-                        if (best[i][k] == Double.POSITIVE_INFINITY) {
-                            continue;
-                        }
                         double width = p.width(i, j);
                         boolean single = p.single(i, j);
                         if (!single && !fits(width, available)) {
                             // Starting earlier it would be even wider; a single piece of a word may overflow.
                             break;
                         }
+                        if (best[i][k] == Double.POSITIVE_INFINITY) {
+                            // No line ends here (in a long word cut at any character, most positions): the width is
+                            // looked at first so that the search stops where the line no longer fits.
+                            continue;
+                        }
                         if (single && !fits(width, available) && widths.widerLater(k)) {
                             // Beside a side box, the piece goes to a wider line instead of overflowing.
                             continue;
                         }
+                        boolean lastResort = p.lastResort(j);
+                        if (lastResort && fits(p.width(i, j + 1), available)) {
+                            // A cut of last resort only where the line cannot hold one character more.
+                            continue;
+                        }
                         double d = best[i][k] + demerits(available - width, p.spaces(i, j) * STRETCH,
-                                j == end || p.forced(j));
-                        if (p.hyphen(j)) {
+                                j == end || p.forced(j) || lastResort);
+                        if (p.inside(j)) {
                             d += HYPHEN_PENALTY * HYPHEN_PENALTY;
-                            if (p.hyphen(i)) {
+                            if (p.endsWithHyphen(j) && p.endsWithHyphen(i)) {
                                 d += DOUBLE_HYPHEN_DEMERITS;
                             }
                         }
@@ -323,9 +353,10 @@ public final class LineBreaker {
     }
 
     /**
-     * Narrowest width (the widest word or, hyphenating, the widest part of a word that cannot be split further, with
-     * its hyphen if it is not the last part) and natural width (the whole text unbroken, or, with forced line breaks,
-     * its widest line).
+     * Narrowest width (the widest word or, for a word with break points, the widest of its parts, with its hyphen if
+     * the line breaking adds one after it) and natural width (the whole text unbroken, or, with forced line breaks,
+     * its widest line). {@code Break long words} does not count: a box does not get narrower than a part of a word
+     * for having it (reference/common/typography.md).
      *
      * @param hyphenator the patterns of the language of the text; {@code null} splits words only at their soft hyphens
      */
@@ -345,7 +376,8 @@ public final class LineBreaker {
             for (int k = 0; k <= word.breaks().length; k++) {
                 int to = k < word.breaks().length ? word.breaks()[k] : word.length();
                 List<TextRun> part = Words.slice(word.parts(), from, to);
-                List<TextRun> measured = k < word.breaks().length ? Words.hyphenated(part, word.parts(), to) : part;
+                List<TextRun> measured = k < word.breaks().length && !word.written(k)
+                        ? Words.hyphenated(part, word.parts(), to) : part;
                 min = Math.max(min, LinePlacer.width(measured, measurer, font, fontSize, letterSpacing));
                 from = to;
             }

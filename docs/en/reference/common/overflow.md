@@ -5,7 +5,9 @@ already paginated result and gives an error with the first of these
 situations:
 
 - **a word wider than its line, or a line of a text with `Preformatted: true` wider than its box**
-  (`TEXT_OVERFLOW`), at the line of the document where the word is;
+  (`TEXT_OVERFLOW`), at the line of the document where the word is. A word is here what cannot be split: each part
+  between its break points ([Typography](typography.md#hyphenation-hyphenate)) and, with `Break long words`, a
+  single character;
 - **a box that does not fit horizontally in the content box of its parent**, counting its horizontal margins
   (`BOX_OVERFLOW`), at the line of its `Width` (or `Min width`) if it declares one;
 - **content that exceeds the height of its box**: lines or children that do not fit in the height set by its `Height`, its
@@ -71,6 +73,11 @@ inherited.
 | `error` | The above: the first overflow stops the conversion. It is the default. | In any box |
 | `shrink` | Reduces the `Size` of the text until it fits, without going below `Min size` ([shrinking](#shrinking-the-text-shrink)). | In a box with text: `Text`, `Paragraph` and a `Cell` with a value |
 | `clip` | Paints what sticks out of the padding box clipped and does not check it ([clipping](#clipping-clip)). | In a box without text inside |
+
+A word that does not fit in the width has another way out, which does not belong to `Overflow` but to `Typography`,
+because it is inherited: `Break long words` cuts it at the last character that fits
+([Typography](typography.md#long-words-break-long-words)). With it, `shrink` only shrinks a text whose lines do not
+fit in the height.
 
 ### Shrinking the text: `shrink`
 

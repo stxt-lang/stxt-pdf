@@ -252,8 +252,10 @@ public final class InlineLayout implements LayoutAlgorithm {
                 }
             }
         }
+        // With Break long words, a part of a word wider than a whole line of the box is cut at any character.
+        double longWord = s.typography().breakLongWords() ? available : Double.POSITIVE_INFINITY;
         Paragraph paragraph = Paragraph.of(runs, measurer(), s.typography().fontFace(), fontSize,
-                s.typography().letterSpacing(), hyphenator(s));
+                s.typography().letterSpacing(), hyphenator(s), longWord);
         if (paragraph == null) {
             return new Broken(List.of(), fontSize, widths, dropCap);
         }
@@ -419,7 +421,7 @@ public final class InlineLayout implements LayoutAlgorithm {
             // Preformatted lines are not justified, nor is the one a forced line break ends.
             boolean justify = !s.typography().preformatted().enabled() && j != texts.size() - 1 && !text.forced();
             lines.add(LinePlacer.place(text.runs(), measurer(), s, fontSize, left, right, b.widths().width(j), justify,
-                    y, lineHeight, text.hyphenated()));
+                    y, lineHeight, text.hyphenated(), text.splitsWord()));
         }
 
         int placed = end - start;

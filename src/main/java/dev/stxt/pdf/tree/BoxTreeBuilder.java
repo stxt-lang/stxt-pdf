@@ -8,6 +8,7 @@ import static dev.stxt.pdf.tree.ModelValidator.definiteHeight;
 import static dev.stxt.pdf.tree.ModelValidator.validateBox;
 import static dev.stxt.pdf.tree.ModelValidator.validateBelowSideBoxes;
 import static dev.stxt.pdf.tree.ModelValidator.validateClip;
+import static dev.stxt.pdf.tree.ModelValidator.validateBreakLongWords;
 import static dev.stxt.pdf.tree.ModelValidator.validateDropCap;
 import static dev.stxt.pdf.tree.ModelValidator.validateOverflow;
 import static dev.stxt.pdf.tree.ModelValidator.validateMergeBorders;
@@ -313,6 +314,7 @@ public final class BoxTreeBuilder {
         ctx.inside(StyleRules.ancestor(n, kind), () -> ctx.within(ctx.scope().element(s, kind.headingLevel() > 0),
                 () -> reader.content(this, ctx, n, box)));
         validateShrink(n, box);
+        validateBreakLongWords(n, box);
         validateMergeBorders(n, box);
         if (kind.headingLevel() > 0) {
             // The texts of the heading are already read: the number is written before the first one.

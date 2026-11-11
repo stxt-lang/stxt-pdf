@@ -1,0 +1,60 @@
+# Words split after a written hyphen and Break long words (reference/common/typography.md). Page area of 260 × 160
+# from (20, 20). Each character measures 5 and each line, 12. A Table of 60 + 100 + 100 whose cells get
+# Break long words from a rule, and two texts 100 wide.
+#
+# Row 1, 24 tall (two lines in every cell):
+#   c1: "REF-2026-009812" (75) in 60: split after its second hyphen, "REF-2026-" (45) and "009812".
+#   c2: an IBAN of 24 characters (120) in 100: no part of it fits, so it is cut at 20 characters, and the other 4.
+#   c3: an address of 22 characters (110) in 100: cut at 20, and the other 2.
+# Row 2, 24 tall:
+#   d1: "IBAN ES762077" (65) in 60: the word after the space (40) fits in a line, so it moves to the next one whole
+#       and is not cut.
+#   d2 and d3: one line each, stretched to the row.
+# hyphens: without Break long words. "físico-químico-matemático" (125) in 100: "físico-químico-" (75) and
+#   "matemático" (50). Two lines: 24.
+# optimal: Break long words with Line breaking: optimal: 30 characters (150) in 100: 20 and 10. Two lines: 24.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For element: Cell
+			Typography:
+				Break long words: true
+		For element: Text
+			Box:
+				Width: 100
+				Background: #EEF2F7
+	Section:
+		Table:
+			Id: table
+			Column sizes: 60 100 100
+			Body rows:
+				Row:
+					Cell: REF-2026-009812
+						Id: c1
+					Cell: ES7620770024003102575766
+						Id: c2
+					Cell: ana.garcia@example.com
+						Id: c3
+				Row:
+					Cell: IBAN ES762077
+						Id: d1
+					Cell: Transferencia
+						Id: d2
+					Cell: Pagado
+						Id: d3
+		Text: físico-químico-matemático
+			Id: hyphens
+		Text: 0123456789ABCDEFGHIJ0123456789
+			Id: optimal
+			Typography:
+				Line breaking: optimal
+				Break long words: true

@@ -4,7 +4,9 @@
 resultado ya paginado y da un error con la primera de estas situaciones:
 
 - **una palabra más ancha que su línea, o una línea de un texto con `Preformatted: true` más ancha que su caja**
-  (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra;
+  (`TEXT_OVERFLOW`), en la línea del documento donde está la palabra. Una palabra es aquí lo que no se puede partir:
+  cada parte entre sus puntos de corte ([Tipografía](typography.md#guiones-hyphenate)) y, con `Break long words`, un
+  solo carácter;
 - **una caja que no cabe a lo ancho en la caja de contenido de su padre**, contando sus márgenes horizontales
   (`BOX_OVERFLOW`), en la línea de su `Width` (o `Min width`) si lo declara;
 - **contenido que pasa del alto de su caja**: líneas o hijos que no caben en el alto que fija su `Height`, su `Max height`,
@@ -67,6 +69,11 @@ sale a lo ancho de la girada.
 | `error` | Lo de arriba: el primer desbordamiento para la conversión. Es el valor por defecto. | En cualquier caja |
 | `shrink` | Reduce el `Size` del texto hasta que cabe, sin bajar de `Min size` ([encoger](#encoger-el-texto-shrink)). | En una caja con texto: `Text`, `Paragraph` y `Cell` con valor |
 | `clip` | Pinta recortado lo que se sale de la caja de relleno y no lo comprueba ([recortar](#recortar-clip)). | En una caja sin texto dentro |
+
+Una palabra que no cabe a lo ancho tiene otra salida, que no es de `Overflow` sino de `Typography`, porque se
+hereda: `Break long words` la corta por el último carácter que cabe
+([Tipografía](typography.md#palabras-largas-break-long-words)). Con ella, `shrink` solo encoge un texto cuyas líneas
+no caben a lo alto.
 
 ### Encoger el texto: `shrink`
 

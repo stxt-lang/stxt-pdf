@@ -34,6 +34,7 @@ Styles:
 | `Color` | color | `#000000` | El color del texto |
 | `Line breaking` | `simple`, `optimal` | `simple` | Cómo se reparte el texto en líneas |
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
+| `Break long words` | `true`, `false` | `false` | Si se corta, sin guion, una palabra que no cabe en una línea entera ([abajo](#palabras-largas)) |
 | `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
@@ -98,9 +99,10 @@ salvo la última de cada párrafo, las de una sola palabra y las líneas preform
 
 ## Reparto en líneas
 
-El texto se parte en líneas del ancho de su caja, siempre entre palabras. Con `Line breaking: simple`, cada línea se llena todo lo
+El texto se parte en líneas del ancho de su caja, entre palabras o tras un guion escrito dentro de una palabra
+(`REF-2026-` y `009812`). Con `Line breaking: simple`, cada línea se llena todo lo
 que puede. Con `Line breaking: optimal`, el motor mira el párrafo entero y elige los cortes que dejan las líneas más parejas, que
-se nota sobre todo en texto justificado. Por defecto no se parten palabras: una palabra más ancha que la línea es un error.
+se nota sobre todo en texto justificado. Por defecto las palabras no se parten por ningún otro sitio: una palabra más ancha que la línea es un error.
 
 Los espacios seguidos y los saltos de línea simples son un solo espacio. Una línea en blanco es un error: cada texto es
 un solo párrafo, y para varios se escriben varios `Paragraph`.
@@ -137,6 +139,27 @@ Document (dev.stxt.pdf):
 Un guion blando (U+00AD) escrito dentro de una palabra dice dónde puede partirse esa palabra, con o sin `Hyphenate`, y
 no se ve si no se parte. El texto que se copia del PDF, y el que lee un lector de pantalla, no lleva los guiones que puso
 el motor.
+
+Una palabra con un guion escrito entre letras o cifras (`físico-químico`, `REF-2026-009812`) se puede partir detrás
+de ese guion, también sin `Hyphenate`, y no se le añade otro. Para que no se parta ahí, el guion se escribe con el
+guion de no separación (U+2011).
+
+## Palabras largas
+
+Un IBAN, una dirección de correo o una URL no tienen por dónde partirse, y en una celda estrecha no caben: son un
+error. Con `Break long words: true`, una palabra más ancha que una línea entera de su caja se corta por la última
+letra que cabe, sin guion, y sigue en la línea siguiente:
+
+```
+Styles:
+    For element: Cell
+        Typography:
+            Break long words: true
+```
+
+Solo se corta lo que no cabe de ninguna otra forma: una palabra que cabe en una línea propia pasa entera a la línea
+siguiente, y una que tiene guiones se parte antes por ellos. El texto que se copia del PDF es la palabra entera. No
+tiene efecto en un texto con `Preformatted`.
 
 ## Kerning
 

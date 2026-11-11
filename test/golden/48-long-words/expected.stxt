@@ -1,0 +1,22 @@
+# The table: two rows of two lines (24), with columns of 60, 100 and 100 from x = 20; the cells of a row are as
+# tall as the row. Then the two texts, 100 wide and two lines tall, one after the other from y = 68 (see input.stxt).
+Result:
+	Page: 1
+		Fragment: table
+			Rect: 20 20 260 48
+			Fragment: c1
+				Rect: 20 20 60 24
+			Fragment: c2
+				Rect: 80 20 100 24
+			Fragment: c3
+				Rect: 180 20 100 24
+			Fragment: d1
+				Rect: 20 44 60 24
+			Fragment: d2
+				Rect: 80 44 100 24
+			Fragment: d3
+				Rect: 180 44 100 24
+		Fragment: hyphens
+			Rect: 20 68 100 24
+		Fragment: optimal
+			Rect: 20 92 100 24

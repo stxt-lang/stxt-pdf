@@ -21,7 +21,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `FONT_UNKNOWN` | The font is not in `fonts/` | Checking the name of the family. The message lists the available ones |
 | `GLYPH_MISSING` | A character that the font does not have | Using another font or removing the character |
 | `CONTRAST_LOW` | A text that barely stands out from its background: a light gray on white | Darkening its `Color` or changing the background ([Box](box.md#contrast)) |
-| `TEXT_OVERFLOW` | A word wider than its line | Widening the box, reducing the size, splitting the word or shrinking the text with `Overflow: shrink` ([Box](box.md#what-does-not-fit)) |
+| `TEXT_OVERFLOW` | A word wider than its line | Widening the box, reducing the size, splitting the word, cutting it with `Break long words` ([Typography](typography.md#long-words)) or shrinking the text with `Overflow: shrink` ([Box](box.md#what-does-not-fit)) |
 | `BOX_OVERFLOW` | A box does not fit in its place: wider than its parent, content taller than its `Height`, or something that goes off the page | Checking the `Width`, the `Height`, the `Offset` or the `Margin` the message names; in a fixed-height text, `Overflow: shrink` |
 | `PAGE_OVERFLOW` | Something that cannot be split does not fit even on an empty page | Making it smaller or allowing it to be split |
 | `INDEFINITE_PERCENTAGE` | A percentage of a height that is not known | Giving the container a `Height` in points or millimeters ([Values](values.md#percentages)) |

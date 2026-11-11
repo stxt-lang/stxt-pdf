@@ -5,6 +5,7 @@ import dev.stxt.pdf.model.TextFormat;
 import dev.stxt.pdf.model.TextRun;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,28 +20,38 @@ import java.util.List;
  *
  * <p>Each word carries its break points ({@link Word#breaks()}): where a soft hyphen ({@link LineBreaker#SOFT_HYPHEN})
  * was written, which is removed from the word, or, with a {@link Hyphenator}, where the patterns of the language allow
- * it ({@link #breaks}).</p>
+ * it ({@link #breaks}); and, always, after each hyphen written between two letters or digits
+ * ({@link #afterWrittenHyphens}), where the line ends with the hyphen of the text and no other is added
+ * ({@link Word#written(int)}).</p>
  */
 final class Words {
 
     /** A forced line break of the text ({@link TextRun#LINE_SEPARATOR}). */
     private static final char LINE_SEPARATOR = TextRun.LINE_SEPARATOR;
     private static final int[] NO_BREAKS = new int[0];
+    /** The hyphen written in a word that a line may end with: U+002D, the one {@link LineBreaker#HYPHEN} paints. */
+    private static final char WRITTEN_HYPHEN = '-';
 
     /**
      * A word: its parts, with consecutive runs of the same format joined, the format
      * of the space that separates it from the next one, the positions (characters before them) where it may be
-     * split with a hyphen, in order, never at its start or its end (empty if it cannot be split), and whether a
-     * forced line break follows it ({@link TextRun#LINE_SEPARATOR}).
+     * split, in order, never at its start or its end (empty if it cannot be split), which of them come after a hyphen
+     * written in the word, where the line ends without another hyphen ({@code null} if none; at the others the line
+     * breaking adds one), and whether a forced line break follows it ({@link TextRun#LINE_SEPARATOR}).
      */
-    record Word(List<TextRun> parts, TextFormat gap, int[] breaks, boolean forced) {
+    record Word(List<TextRun> parts, TextFormat gap, int[] breaks, boolean[] written, boolean forced) {
 
         Word(List<TextRun> parts, TextFormat gap) {
             this(parts, gap, NO_BREAKS);
         }
 
         Word(List<TextRun> parts, TextFormat gap, int[] breaks) {
-            this(parts, gap, breaks, false);
+            this(parts, gap, breaks, null, false);
+        }
+
+        /** Whether break point {@code k} comes after a hyphen written in the word: the line needs no other. */
+        boolean written(int k) {
+            return written != null && written[k];
         }
 
         String text() {
@@ -59,7 +70,8 @@ final class Words {
      * The words of the text (see the class description): what lies between the white-space characters
      * ({@link #isSpace}, the {@code \s} of regular expressions, and the {@link TextRun#LINE_SEPARATOR}), with one pass
      * over the text, each one with its break points: those of its soft hyphens, which are removed from it, or, if it
-     * has none and there is a {@code hyphenator}, those of the patterns of the language ({@link #breaks}). A word with
+     * has none and there is a {@code hyphenator}, those of the patterns of the language ({@link #breaks}), and those
+     * after its written hyphens ({@link #afterWrittenHyphens}). A word with
      * a line separator in the white space after it, and a word after it, is {@linkplain Word#forced() forced}.
      *
      * @param hyphenator the patterns of the language of the text; {@code null} splits words only at their soft hyphens
@@ -91,7 +103,8 @@ final class Words {
                 i++;
             }
             if (previous != null) {
-                result.add(new Word(previous.parts(), cursor.format(previousEnd), previous.breaks(), forced));
+                result.add(new Word(previous.parts(), cursor.format(previousEnd), previous.breaks(),
+                        previous.written(), forced));
             }
             previous = word(cursor.parts(text, start, i), hyphenator);
             previousEnd = i;
@@ -105,13 +118,65 @@ final class Words {
     /** A word from its parts, with its break points and without its soft hyphens; its gap is not known yet. */
     private static Word word(List<TextRun> parts, Hyphenator hyphenator) {
         String text = TextRun.text(parts);
+        Word word;
         if (text.indexOf(LineBreaker.SOFT_HYPHEN) >= 0) {
-            return softHyphenated(parts);
+            word = softHyphenated(parts);
+        } else if (hyphenator == null) {
+            word = new Word(parts, TextFormat.PLAIN);
+        } else {
+            word = new Word(parts, TextFormat.PLAIN, breaks(text, hyphenator));
         }
-        if (hyphenator == null) {
-            return new Word(parts, TextFormat.PLAIN);
+        return text.indexOf(WRITTEN_HYPHEN) < 0 ? word : withWrittenHyphens(word);
+    }
+
+    /**
+     * The word with the break points after its written hyphens ({@link #afterWrittenHyphens}) added to the ones it
+     * has, which can only be those of its soft hyphens: the patterns do not split a word with a hyphen among its
+     * letters. Where a soft hyphen follows a written one, the written one counts: the line already ends with a hyphen.
+     */
+    private static Word withWrittenHyphens(Word word) {
+        int[] after = afterWrittenHyphens(word.text());
+        if (after.length == 0) {
+            return word;
         }
-        return new Word(parts, TextFormat.PLAIN, breaks(text, hyphenator));
+        int[] soft = word.breaks();
+        int[] breaks = new int[soft.length + after.length];
+        boolean[] written = new boolean[breaks.length];
+        int n = 0;
+        for (int i = 0, j = 0; i < soft.length || j < after.length; ) {
+            if (j == after.length || i < soft.length && soft[i] < after[j]) {
+                breaks[n++] = soft[i++];
+                continue;
+            }
+            if (i < soft.length && soft[i] == after[j]) {
+                i++;
+            }
+            written[n] = true;
+            breaks[n++] = after[j++];
+        }
+        return new Word(word.parts(), word.gap(), Arrays.copyOf(breaks, n), Arrays.copyOf(written, n), false);
+    }
+
+    /**
+     * The break points of a word after its written hyphens (reference/common/typography.md): the position after each
+     * {@code -} (U+002D) with a letter or a digit on each side ({@code REF-2026-009812}, {@code socio-economic}), in
+     * order. A hyphen at the start or the end of the word, or beside another hyphen or punctuation, adds none, nor
+     * does any other hyphen of Unicode: the non-breaking hyphen (U+2011) is how a text keeps the word whole.
+     */
+    static int[] afterWrittenHyphens(String text) {
+        int[] found = NO_BREAKS;
+        int n = 0;
+        for (int i = text.indexOf(WRITTEN_HYPHEN, 1); i > 0 && i < text.length() - 1;
+             i = text.indexOf(WRITTEN_HYPHEN, i + 1)) {
+            if (Character.isLetterOrDigit(text.codePointBefore(i))
+                    && Character.isLetterOrDigit(text.codePointAt(i + 1))) {
+                if (n == found.length) {
+                    found = Arrays.copyOf(found, Math.max(4, n * 2));
+                }
+                found[n++] = i + 1;
+            }
+        }
+        return n == found.length ? found : Arrays.copyOf(found, n);
     }
 
     /**
@@ -215,14 +280,19 @@ final class Words {
      * it, without small caps (a hyphen has no case and is painted at the size of the box).
      */
     static TextFormat hyphenFormat(List<TextRun> parts, int offset) {
+        return formatBefore(parts, offset).withSmallCaps(false);
+    }
+
+    /** The format of the character before position {@code offset} of a word: the last one of a line that ends there. */
+    static TextFormat formatBefore(List<TextRun> parts, int offset) {
         int at = 0;
         for (TextRun part : parts) {
             at += part.text().length();
             if (offset <= at) {
-                return part.format().withSmallCaps(false);
+                return part.format();
             }
         }
-        return parts.get(parts.size() - 1).format().withSmallCaps(false);
+        return parts.get(parts.size() - 1).format();
     }
 
     /**

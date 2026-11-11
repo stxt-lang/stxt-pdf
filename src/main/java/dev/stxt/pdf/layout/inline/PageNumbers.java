@@ -115,7 +115,7 @@ public final class PageNumbers {
                     .map(r -> new TextRun(apply(r.text(), page, pages), r.format())).toList();
             lines.add(LinePlacer.place(runs, measurer, s, l.fontSize(), l.left(), l.right(),
                     Math.max(0, contentWidth - l.left() - l.right()), l.wordSpacing() > 0, l.y(), l.height(),
-                    l.hyphenated()));
+                    l.hyphenated(), l.splitsWord()));
         }
         if (!changed) {
             return f;

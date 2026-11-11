@@ -247,6 +247,24 @@ final class ModelValidator {
     }
 
     /**
+     * {@code Break long words: true} written by the element itself needs a text whose words the line breaking may
+     * split (reference/common/typography.md): a preformatted text keeps its lines as they are written
+     * ({@code Preformatted: true}) or breaks them only between words ({@code wrap}). Inherited or from a rule it is
+     * not checked, like the rest of {@code Typography}: a {@code Code block} inside a box that has it is left alone.
+     */
+    static void validateBreakLongWords(InlineNode n, Box box) {
+        TypographyStyle t = box.style().typography();
+        if (!box.hasText() || !t.breakLongWords() || !t.preformatted().enabled()) {
+            return;
+        }
+        child(n, "typography").map(Nodes::inline).flatMap(g -> child(g, "break-long-words")).ifPresent(p -> {
+            throw error(p, ErrorCode.BREAK_LONG_WORDS_IN_PREFORMATTED, "Break long words has no effect on a "
+                    + "preformatted text (Preformatted: true or wrap), whose lines are not broken inside a word: it "
+                    + "is not needed");
+        });
+    }
+
+    /**
      * {@code Merge borders} written by the element itself only has an effect on a {@code Table}
      * (reference/components/table.md#merged-borders); from a rule it is not checked, so that a rule that also reaches
      * other boxes ({@code For style}) leaves them alone.

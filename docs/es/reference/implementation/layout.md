@@ -278,6 +278,25 @@ guiones seguidos (10 000). Los anchos siguen siendo sumas: los de las palabras e
 palabra partida, cada uno medido una vez. `Hyphenations.validate` comprueba antes del layout, como las fuentes, que cada
 caja con texto y `Hyphenate: true` está en un idioma con patrones.
 
+**Guiones escritos y palabras largas.** Una línea que acaba en un punto de corte acaba dentro de una palabra
+(`Paragraph.inside`) de una de tres formas, que `Paragraph` guarda por posición: con el guion que añade el reparto
+(`hyphen`), tras un guion escrito en la palabra o en un corte de último recurso (`lastResort`). `Words` añade a los
+puntos de corte de cada palabra los de sus guiones escritos (`afterWrittenHyphens`, `Word.written`), con o sin
+`Hyphenator`: ahí la línea no lleva otro guion, y su ancho y el ancho más estrecho se miden sin él. Con
+`Break long words`, `InlineLayout` da a `Paragraph` el ancho de la caja de contenido, y `cutLongParts` añade una
+posición entre cada dos caracteres (`BreakIterator` de caracteres, que no separa una letra de sus marcas) de cada
+parte que, como línea propia, no cabe en él; una palabra entera que cabe ni se mira. Los dos repartos siguen
+eligiendo entre posiciones. El voraz prueba las de la palabra que no cabe de la primera en adelante y se queda con la
+última que cabe; deja de probar cuando la línea pasa del ancho disponible en más del cuerpo (`hyphenMargin`: lo que
+un guion añadido puede hacer que una posición anterior mida más que una posterior), así que una palabra de miles de
+caracteres cuesta por línea lo que la línea alcanza. Knuth-Plass cobra la penalización de un guion a toda línea que
+acaba dentro de una palabra y la de dos seguidas solo a las que acaban en un guion, añadido o escrito; una línea que
+acaba en un corte de último recurso se descarta si le cabe la posición siguiente, y no tiene maldad. Mira el ancho
+antes que si la posición de partida es alcanzable, para parar en cuanto la línea no cabe: en una palabra cortada por
+cualquier carácter casi ninguna posición lo es. `Paragraph.single` es una sola pieza entre dos posiciones seguidas,
+que es lo único que puede desbordar. La `Line` y la `TextLine` dicen con `splitsWord` que la línea acaba dentro de
+una palabra, lleve o no el guion de `hyphenated`.
+
 **Saltos de línea forzados.** El salto de un Markdown (`\` al final de la línea) llega al texto como el carácter U+2028
 (`TextRun.LINE_SEPARATOR`), que `MarkdownBuilder` escribe en su lugar. `Words.words` lo trata como un espacio que
 separa palabras y marca la palabra de antes (`Word.forced`); la posición donde empieza la siguiente es un final
@@ -288,6 +307,11 @@ justifica. El ancho natural del texto es el de su línea más ancha entre saltos
 
 > **Decisión:** el idioma se comprueba al empezar el layout y no al construir el árbol, como las fuentes: `tree` no
 > depende de `layout`, donde viven los patrones. *Alternativa descartada:* los patrones en `model`.
+
+> **Decisión:** los cortes de `Break long words` son posiciones de `Paragraph`, calculadas con el ancho de la caja al
+> medir el texto, y no un paso aparte tras el reparto: así los dos repartos, las cajas laterales y `Overflow: shrink`
+> los tratan sin saber de ellos. *Alternativa descartada:* partir después las líneas que desbordan, que no deja al
+> reparto llenar la línea en curso ni a Knuth-Plass contar con el corte.
 
 > **Decisión:** los dos repartos comparten las posiciones y las sumas de `Paragraph`, en lugar de un reparto por
 > átomos (partes de palabra) con sumas de prefijos: con ligaduras una palabra entera no mide lo que suman sus partes,
