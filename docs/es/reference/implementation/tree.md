@@ -187,6 +187,10 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
 (`Box.runStyle`) para los errores que salen después con la línea de la regla: `FONT_UNKNOWN` en `PdfMetrics` y
 `CONTRAST_LOW` en `ContrastCheck`. Fuera de `tree` nadie mira el nombre: `TextFormat.face`, `color`, `letterSpacing`,
 `textCase` y `smallCaps` dan el valor del tramo o, si su estilo no lo declara, el de la caja que se les pasa.
+`Position` solo existe en ese `Style` (`Style.ofRun`, el único con `isRun()`): `PropertyReader.position` lo rechaza en
+el de una caja (`POSITION_OUTSIDE_RUN`), y por eso la lectura de comprobación de una regla `For style` usa también un
+`Style.ofRun`. `RunStyle.position` es el `model.TextPosition` del tramo, y `TextFormat.superscript()` y `subscript()` lo
+leen.
 
 > **Decisión:** el texto de la caja sigue siendo una cadena y los tramos son una partición suya: las líneas del documento,
 > los mensajes, los marcadores del PDF y `{page}` trabajan sobre el texto entero, y un texto sin formato se mide y se pinta

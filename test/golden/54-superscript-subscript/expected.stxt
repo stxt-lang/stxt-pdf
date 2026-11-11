@@ -1,0 +1,16 @@
+# Five texts one after the other from y = 20, the second with two lines (see input.stxt). The note, 15 high, in an area
+# of 19.5 (0.5 + 4 + 15) that starts at 140 − 19.5 = 120.5: the note at 125.
+Result:
+	Page: 1
+		Fragment: units
+			Rect: 20 20 200 15
+		Fragment: plain
+			Rect: 20 35 40 30
+		Fragment: raised
+			Rect: 20 65 40 15
+		Fragment: marks
+			Rect: 20 80 200 15
+		Fragment: notes
+			Rect: 20 95 200 15
+		Fragment: a
+			Rect: 20 125 200 15

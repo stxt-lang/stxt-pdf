@@ -108,6 +108,8 @@ public final class Style extends StyleGroup {
     private int dropCap;
     /** The names of {@code Named color} with which its colors are read; all the boxes share those of the root. */
     private NamedColors namedColors = NamedColors.NONE;
+    /** Whether it is the style of a styled run ({@link #ofRun}). */
+    private boolean run;
 
     /** Only {@code tree} creates it: the style of each box comes from {@link BoxTreeBuilder}. */
     Style() {
@@ -116,6 +118,21 @@ public final class Style extends StyleGroup {
     /** A style whose colors can be the names of {@code Named color} (reference/common/styles.md). */
     Style(NamedColors namedColors) {
         this.namedColors = namedColors;
+    }
+
+    /**
+     * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): it inherits nothing and
+     * is the only one that can declare {@code Position}.
+     */
+    static Style ofRun(NamedColors namedColors) {
+        Style s = new Style(namedColors);
+        s.run = true;
+        return s;
+    }
+
+    /** {@return whether it is the style of a styled run and not that of a box} */
+    boolean isRun() {
+        return run;
     }
 
     /** The names of {@code Named color} that its color properties can write. */

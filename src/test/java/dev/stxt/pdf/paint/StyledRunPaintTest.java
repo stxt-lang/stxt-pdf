@@ -86,4 +86,69 @@ class StyledRunPaintTest {
             assertEquals("Total 12,50 €, en letra y APARTE.", new PDFTextStripper().getText(pdf).strip());
         }
     }
+
+    private static final String SCRIPTS = """
+            Document (dev.stxt.pdf):
+            	Language: es
+            	Title: Prueba
+            	Page:
+            		Width: 300
+            		Height: 100
+            		Margin: 20
+            	Styles:
+            		For element: Document
+            			Typography:
+            				Font: IBM Plex Sans
+            				Size: 10
+            				Line height: 15
+            				Markup: markdown
+            		For style: sup
+            			Typography:
+            				Position: superscript
+            		For style: sub
+            			Typography:
+            				Position: subscript
+            	Section:
+            		Text: Son m[2]{sup} y CO[2]{sub}.
+            		Text: Son m2 y CO2.
+            """;
+
+    private static double attribute(String element, String name) {
+        Matcher m = Pattern.compile(" " + name + "=\"([-0-9.]+)\"").matcher(element);
+        assertTrue(m.find(), element);
+        return Double.parseDouble(m.group(1));
+    }
+
+    /**
+     * A superscript and a subscript are painted at 70 % of the size, raised 0.33 or lowered 0.15 of the size of the box
+     * from the baseline of their line, and the line is as tall as without them.
+     */
+    @Test
+    void aSuperscriptAndASubscriptArePaintedSmallerAndOffTheBaseline() {
+        LaidOutDocument laidOut = new Engine().layOutDocument(new DocumentReader().read(SCRIPTS));
+        String svg = SvgCanvas.page(laidOut.pages().get(0), laidOut.pageSetup(), false);
+        String plain = element(svg, "Son m");
+        String sup = element(svg, "2");
+        String sub = svg.substring(svg.indexOf(element(svg, " y CO")));
+        sub = element(sub, "2");
+        double baseline = attribute(plain, "y");
+        assertEquals(10, attribute(plain, "font-size"), 0.001);
+        assertEquals(7, attribute(sup, "font-size"), 0.001);
+        assertEquals(baseline - 3.3, attribute(sup, "y"), 0.011);
+        assertEquals(7, attribute(sub, "font-size"), 0.001);
+        assertEquals(baseline + 1.5, attribute(sub, "y"), 0.011);
+        // The second text starts one line below: the first is 15 tall.
+        assertEquals(baseline + 15, attribute(element(svg, "Son m2 y CO2."), "y"), 0.011);
+    }
+
+    /** What is copied is the text, with the superscript and the subscript in their place. */
+    @Test
+    void thePdfKeepsTheTextOfASuperscript() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Converter.create().toPdf(new DocumentReader().read(SCRIPTS), out);
+        try (PDDocument pdf = Loader.loadPDF(out.toByteArray())) {
+            String text = new PDFTextStripper().getText(pdf);
+            assertTrue(text.contains("Son m2 y CO2."), text);
+        }
+    }
 }

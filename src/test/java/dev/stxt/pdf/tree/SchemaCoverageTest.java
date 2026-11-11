@@ -109,6 +109,7 @@ class SchemaCoverageTest {
             Map.entry("Case", "Case: uppercase"),
             Map.entry("Letter spacing", "Letter spacing: 1.5"),
             Map.entry("Small caps", "Small caps: true"),
+            Map.entry("Position", "Position: superscript"),
             Map.entry("Ligatures", "Ligatures: true"),
             Map.entry("Kerning", "Kerning: true"),
             Map.entry("Code font", "Code font: IBM Plex Mono"),
@@ -270,6 +271,9 @@ class SchemaCoverageTest {
         t.put("Box > Merge borders", new Template(HEADER + "\tTable:\n\t\tColumn sizes: *\n\t\tBox:\n\t\t\t{}\n"
                 + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: a"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
+        // Position is only of a styled run: in the Typography of the rule that a run takes.
+        t.put("Typography > Position", new Template(HEADER + "\t\tFor style: sup\n\t\t\tTypography:\n\t\t\t\t{}\n"
+                + "\tText: m[2]{sup}\n\t\tTypography:\n\t\t\tMarkup: markdown"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
         // Below side boxes needs a side box before the element: the template of each element, with one in front.
         String side = "\tImage: test/square.png\n\t\tSide: left\n";

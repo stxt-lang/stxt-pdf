@@ -268,7 +268,10 @@ final class StyleRules {
             }
             default -> throw unread(rule);
         }
-        read(rule, new Style(namedColors), null, null);
+        // Position is only of a styled run, which takes a For style: there it is read, and applied to a box it is an
+        // error.
+        read(rule, rule.getCanonicalName().equals("for-style") ? Style.ofRun(namedColors) : new Style(namedColors),
+                null, null);
         checkElementProperties(rule, type, source);
         nested(rule, outer, source);
     }
@@ -647,10 +650,10 @@ final class StyleRules {
      * change how its letters look and not the height of the line.
      */
     static final List<String> RUN_PROPERTIES = List.of("font", "code-font", "bold", "weight", "italic", "color",
-            "case", "small-caps", "letter-spacing");
+            "case", "small-caps", "letter-spacing", "position");
 
-    private static final String RUN_ALLOWED = "Font, Code font, Bold, Weight, Italic, Color, Case, Small caps and "
-            + "Letter spacing";
+    private static final String RUN_ALLOWED = "Font, Code font, Bold, Weight, Italic, Color, Case, Small caps, "
+            + "Letter spacing and Position";
 
     /**
      * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}
@@ -664,7 +667,7 @@ final class StyleRules {
      */
     Style runStyle(String name, int line, List<Ancestor> ancestors) {
         checkStyle(name, line, ancestors, "The style " + name + " of the styled run [...]{" + name + "}");
-        Style s = new Style(namedColors);
+        Style s = Style.ofRun(namedColors);
         List<InlineNode> rules = new ArrayList<>();
         select(classRules.stream().filter(r -> r.name().equals(name)).toList(), ancestors, rules);
         for (InlineNode rule : rules) {

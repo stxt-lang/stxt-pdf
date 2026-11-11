@@ -1,7 +1,7 @@
 # Formato del texto
 
 Lo que cambia cómo se ve el texto de una caja sin cambiar su caja: tramos con formato, formato en línea, tramos con
-estilo, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado y rayas. Todas son propiedades de
+estilo, superíndices y subíndices, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado y rayas. Todas son propiedades de
 [`Typography`](typography.md): **se heredan** y valen en las reglas de `Styles`.
 
 ## Tramos
@@ -15,6 +15,8 @@ combinables. Cada parte es un **tramo**. Se escriben con `Markup: markdown` (aba
   un texto de peso 300 la negrita es el 700, y en uno de 900 sigue en 900.
 - El tamaño y `Line height` son los de la caja, así que las líneas no cambian de alto. El color y la familia también,
   salvo en el código, que usa `Code font` ([abajo](#código-en-línea)), y en un [tramo con estilo](#tramos-con-estilo).
+  Un superíndice y un subíndice se pintan más pequeños dentro de su línea
+  ([abajo](#superíndice-y-subíndice-position)).
 - Una palabra con partes de varios tramos (**neg**rita) es una sola palabra: no se parte entre ellos y mide lo que suman
   sus partes.
 - El espacio entre dos palabras tiene el formato del tramo de su primer espacio en blanco: un subrayado cubre los espacios
@@ -78,6 +80,7 @@ entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regl
 | `Color` | el color de sus letras y de sus rayas |
 | `Case`, `Small caps` | cómo se pintan sus letras ([Mayúsculas](#mayúsculas-case), [Versalitas](#versalitas-small-caps)) |
 | `Letter spacing` | el interletraje de sus caracteres, también de sus espacios ([Interletraje](#interletraje-letter-spacing)) |
+| `Position` | el tramo en superíndice o en subíndice ([abajo](#superíndice-y-subíndice-position)) |
 
 - Lo que la regla declara **sustituye** a lo de la caja, y lo que no declara es lo de la caja. Si dos reglas
   `For style` con ese nombre (una del documento de estilos aparte y otra del documento) declaran lo mismo, gana la del
@@ -113,6 +116,58 @@ entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regl
 > **Decisión:** las marcas de Markdown se suman al estilo del tramo dondequiera que se escriban, como se suman a la caja.
 > *Alternativa descartada:* que el tramo gane a las marcas de fuera (`**[x]{ligero}**` en peso 300), que obliga a mirar el
 > anidamiento para saber cómo se ve una palabra.
+
+## Superíndice y subíndice (`Position`)
+
+`Position: superscript` o `subscript`, en la regla `For style` de un [tramo con estilo](#tramos-con-estilo), pone el
+tramo en superíndice o en subíndice: `m[2]{sup}`, `CO[2]{sub}`, `1[er]{sup}`, `Marca[TM]{sup}`.
+
+```stxt
+Styles:
+    For style: sup
+        Typography:
+            Position: superscript
+    For style: sub
+        Typography:
+            Position: subscript
+Paragraph: Emite 120 g de CO[2]{sub} por m[2]{sup}.
+    Typography:
+        Markup: markdown
+```
+
+| `Position` | Tamaño | Línea base |
+|---|---|---|
+| `normal` (por defecto) | el de la caja | la de la línea |
+| `superscript` | 70 % del de la caja | elevada 0,33 del tamaño de la caja |
+| `subscript` | 70 % del de la caja | bajada 0,15 del tamaño de la caja |
+
+- **No cambia el alto de la línea**, como la llamada de una nota al pie ([Footnote](../components/footnote.md#la-llamada)), que
+  tiene el tamaño y la altura de un superíndice. El tramo se mide con su tamaño, así que ocupa menos ancho.
+- Las letras son las de la fuente, reducidas: no se usan los glifos de superíndice de la fuente ni los caracteres de
+  Unicode (`²`, `₂`), que se pueden seguir escribiendo si la fuente los tiene. El texto que se lee y se copia es el
+  escrito (`m2`).
+- La regla puede declarar además lo que admite un tramo (`Color`, `Font`, `Weight`...), y las marcas se suman: `**[2]{sub}**`
+  es un subíndice en negrita.
+- **El tachado va con las letras** del tramo, a su altura y con su grosor. **El subrayado se queda en la línea**, para que
+  no se rompa bajo una palabra con un superíndice.
+- Las versalitas no reducen más el tramo: una letra de un superíndice mide el 70 % con `Small caps` y sin él.
+- La llamada de una nota al pie dentro de un subíndice sigue en superíndice.
+- **Solo vale en un tramo.** `Position` en una caja, con cualquier valor, es `POSITION_OUTSIDE_RUN`, con la línea de la
+  propiedad: en el `Typography` de un elemento, en una regla `For element` o `For id` (al leer la regla), y en una regla
+  `For style` que se da a una caja con `Style`. `normal` sirve en una regla anidada, para que un nombre de tramo no sea
+  superíndice dentro de un elemento ([Reglas anidadas](styles.md#reglas-anidadas)).
+
+> **Decisión:** el superíndice y el subíndice son una propiedad de la regla de un tramo con estilo y no una marca nueva
+> del texto: Markdown no tiene ninguna, y el documento ya pone nombre a sus tramos. *Alternativa descartada:* una sintaxis
+> propia (`^2^`, `~2~`), que choca con el tachado y habría que escapar en los textos que usan esos caracteres.
+
+> **Decisión:** el tamaño y el desplazamiento son fijos, los de la llamada de una nota al pie, y el subíndice baja 0,15
+> para quedar dentro de la línea. *Alternativa descartada:* dos propiedades más (tamaño y desplazamiento), o `Size` en un
+> tramo, que abriría los tramos con cualquier tamaño y con ellos el alto de la línea.
+
+> **Decisión:** `Position` en una caja es un error y no se ignora ni se hereda: una caja entera en superíndice no tiene
+> una línea respecto a la que subir. *Alternativa descartada:* que la herede el texto de la caja, que la mezclaría con
+> `Overflow: shrink` y con la letra capitular sin ningún uso.
 
 ## Código en línea
 
@@ -259,8 +314,9 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
 
 ## Lo que no hay
 
-- Tramos con otro tamaño (salvo el superíndice de una nota al pie y la letra capitular de un `Paragraph`,
-  [Text](../components/text.md#letra-capitular-drop-cap)) o con otro interlineado, tramos con estilo dentro de otros y
+- Tramos con otro tamaño (salvo el [superíndice y el subíndice](#superíndice-y-subíndice-position), la llamada de una
+  nota al pie y la letra capitular de un `Paragraph`, [Text](../components/text.md#letra-capitular-drop-cap)) o con otro
+  interlineado, superíndices y subíndices con otro tamaño u otro desplazamiento o con los glifos propios de la fuente, tramos con estilo dentro de otros y
   marcas que quiten la negrita o la cursiva (un tramo con estilo sí puede, con `Weight` o `Italic: false`).
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.

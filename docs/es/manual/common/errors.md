@@ -28,6 +28,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `MARGIN_AUTO_WITHOUT_EFFECT` | Un `Margin: auto` que no puede centrar | Dar un `Width` a la caja, o quitar el `auto` |
 | `STYLE_WITHOUT_RULE` | Un estilo, de una caja o de una parte de un texto (`[x]{nombre}`), sin su regla `For style` | Añadir la regla o corregir la errata |
 | `STYLE_NOT_ALLOWED_IN_RUN` | La regla de una parte con estilo declara algo que cambiaría la línea, como `Size` o un `Box` ([Formato del texto](text-formatting.md#partes-con-otro-color-u-otra-fuente)) | Usar una regla aparte para la parte, solo con el color, la fuente, las mayúsculas o el interletraje |
+| `POSITION_OUTSIDE_RUN` | `Position` (superíndice o subíndice) en una caja y no en una parte de un texto ([Formato del texto](text-formatting.md#superíndices-y-subíndices-position)) | Declararlo en una regla `For style` y dar la regla a la parte: `m[2]{sup}` |
 | `HEADING_LEVEL` | Un salto de nivel (`Heading 3` después de `Heading 1`) | Usar el nivel siguiente |
 | `TABLE_ROW_CELLS` | Una fila con celdas de más o de menos | Añadir `Cell:` vacías o usar `Span` |
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | La imagen no existe o no es PNG, JPEG, PDF ni un SVG admitido | Revisar la ruta o convertir el fichero |

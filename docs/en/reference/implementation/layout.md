@@ -241,7 +241,8 @@ The text of a box is always a single paragraph (blank lines are an error when re
 where they are content): `BreakRules.cutLines` applies widows and orphans to all its lines and only the last one is not justified.
 `InlineLayout.runs` replaces the references with their value (the one the `Paginator` left in `TextValues`) and applies `TextTransform` to the runs **before** breaking them into lines,
 with the `Case` and the `Small caps` of each styled run (`TextFormat.textCase`, `smallCaps`). `LinePlacer` measures each
-character with the letter spacing of its run (`TextFormat.letterSpacing`, in `advance`) and takes from a line that of its
+character at the size of its run (`TextFormat.scale()`: 0.8 in a small cap and 0.7 in a superscript or a subscript)
+and with its letter spacing (`TextFormat.letterSpacing`, in `advance`) and takes from a line that of its
 last character (`trailing`, `Paragraph.width`), which is that of its run. A run that is an image (`TextFormat.image`,
 with the text `TextRun.IMAGE`, U+FFFC) measures in `advance` what `TextMeasurer.imageWidth` gives: as tall as the size of
 the line and as wide as its proportion, which `TextValues.WithImages` reads from the file through

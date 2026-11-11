@@ -4,7 +4,8 @@ package dev.stxt.pdf.model;
  * Format of a run of text (reference/common/text-formatting.md): what changes within a line. Bold
  * and italic add to those of the box (a bold run has weight 700, or that of the box if it is already 700 or more,
  * {@link FontWeight#bolder()}); the size and {@code Line height} are always those of the box, and so are the color and
- * the family unless a styled run ({@code style}) or code ({@code family}) changes them.
+ * the family unless a styled run ({@code style}) or code ({@code family}) changes them. A superscript or a subscript
+ * is painted smaller and off the baseline, within the line of the box.
  *
  * <p>{@code smallCaps} marks the lowercase letters painted as small caps (reference/common/text-formatting.md): the
  * text of the run is already in upper case and is measured and painted at {@link #SMALL_CAPS_SCALE} of the size. The
@@ -27,7 +28,8 @@ package dev.stxt.pdf.model;
  *
  * <p>{@code style} is that of a styled run, {@code [text]{name}} ({@link RunStyle}), or {@code null}: its color, its
  * weight, its style, its letter spacing, its case and its small caps replace those of the box, and its family (or that
- * of its code) is in {@code family}. The marks of the run (bold, italic) add to the style as they add to the box,
+ * of its code) is in {@code family}. Its {@code Position} makes it a superscript ({@link #superscript()}) or a
+ * subscript ({@link #subscript()}), lowered {@link #SUBSCRIPT_DROP} of the size. The marks of the run (bold, italic) add to the style as they add to the box,
  * wherever they are written.</p>
  *
  * <p>{@code image} marks a run that is an image ({@link InlineImage}, reference/common/text-formatting.md), whose
@@ -55,11 +57,17 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
     /** Size of the small caps relative to that of the box. */
     public static final double SMALL_CAPS_SCALE = 0.8;
 
-    /** Size of a superscript (the call and the label of a footnote) relative to that of the box. */
+    /**
+     * Size of a superscript (the call and the label of a footnote, a run with {@code Position: superscript}) and of a
+     * subscript, relative to that of the box.
+     */
     public static final double SUPERSCRIPT_SCALE = 0.7;
 
     /** How much a superscript is raised above the baseline, relative to the size of the box. */
     public static final double SUPERSCRIPT_RISE = 0.33;
+
+    /** How much a subscript is lowered below the baseline, relative to the size of the box. */
+    public static final double SUBSCRIPT_DROP = 0.15;
 
     /** No format: the text as the box declares it. */
     public static final TextFormat PLAIN = new TextFormat(false, false, false, false);
@@ -233,17 +241,28 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
                 inlineImage);
     }
 
-    /** {@return whether the run is a superscript: the call or the label of a footnote} */
+    /**
+     * {@return whether the run is a superscript: the call or the label of a footnote, or a styled run with
+     * {@code Position: superscript}}
+     */
     public boolean superscript() {
-        return footnote != null || label;
+        return footnote != null || label || style != null && style.position() == TextPosition.SUPERSCRIPT;
     }
 
     /**
-     * {@return the factor applied to the size of the box to paint the run: {@link #SUPERSCRIPT_SCALE},
-     * {@link #SMALL_CAPS_SCALE} or 1}
+     * {@return whether the run is a subscript: a styled run with {@code Position: subscript}} The call of a footnote
+     * inside it is still a superscript.
+     */
+    public boolean subscript() {
+        return footnote == null && !label && style != null && style.position() == TextPosition.SUBSCRIPT;
+    }
+
+    /**
+     * {@return the factor applied to the size of the box to paint the run: {@link #SUPERSCRIPT_SCALE} in a superscript
+     * and in a subscript, {@link #SMALL_CAPS_SCALE} or 1}
      */
     public double scale() {
-        if (superscript()) {
+        if (superscript() || subscript()) {
             return SUPERSCRIPT_SCALE;
         }
         return smallCaps ? SMALL_CAPS_SCALE : 1;
@@ -251,9 +270,12 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
 
     /**
      * {@return how much the run is raised above the baseline of the line, as a factor of the size of the box:
-     * {@link #SUPERSCRIPT_RISE} or 0}
+     * {@link #SUPERSCRIPT_RISE}, minus {@link #SUBSCRIPT_DROP} in a subscript, which is lowered, or 0}
      */
     public double rise() {
-        return superscript() ? SUPERSCRIPT_RISE : 0;
+        if (superscript()) {
+            return SUPERSCRIPT_RISE;
+        }
+        return subscript() ? -SUBSCRIPT_DROP : 0;
     }
 }

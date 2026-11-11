@@ -238,7 +238,8 @@ El texto de una caja es siempre un solo párrafo (las líneas en blanco son un e
 donde son contenido): `BreakRules.cutLines` aplica viudas y huérfanas a todas sus líneas y solo la última no se justifica.
 `InlineLayout.runs` sustituye las referencias por su valor (el que el `Paginator` dejó en `TextValues`) y aplica `TextTransform` a los tramos **antes** de repartirlos,
 con el `Case` y el `Small caps` de cada tramo con estilo (`TextFormat.textCase`, `smallCaps`). `LinePlacer` mide cada
-carácter con el interletraje de su tramo (`TextFormat.letterSpacing`, en `advance`) y quita a una línea el del último
+carácter con el tamaño de su tramo (`TextFormat.scale()`: 0,8 en una versalita y 0,7 en un superíndice o un subíndice)
+y con su interletraje (`TextFormat.letterSpacing`, en `advance`) y quita a una línea el del último
 carácter (`trailing`, `Paragraph.width`), que es el de su tramo. Un tramo que es una imagen (`TextFormat.image`, con el
 texto `TextRun.IMAGE`, U+FFFC) mide en `advance` lo que da `TextMeasurer.imageWidth`: tan alto como el tamaño de la línea
 y tan ancho como su proporción, que `TextValues.WithImages` lee del fichero a través de `LayoutContext.imageRatio`

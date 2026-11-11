@@ -34,9 +34,9 @@ class TextTransformTest {
     @Test
     void aStyledRunUsesItsOwnCaseAndSmallCaps() {
         TextFormat upper = TextFormat.PLAIN.withStyle(
-                new RunStyle("upper", null, null, null, null, null, null, TextCase.UPPERCASE, null));
+                new RunStyle("upper", null, null, null, null, null, null, TextCase.UPPERCASE, null, null));
         TextFormat none = TextFormat.PLAIN.withStyle(
-                new RunStyle("none", null, null, null, null, null, null, TextCase.NONE, false));
+                new RunStyle("none", null, null, null, null, null, null, TextCase.NONE, false, null));
         List<TextRun> runs = List.of(run("uno "), new TextRun("dos", upper));
         // Without anything in the box, only the styled run changes: the runs have to be transformed.
         assertEquals(List.of(run("uno "), new TextRun("DOS", upper)), TextTransform.apply(runs, new StyleEditor().style()));

@@ -318,6 +318,7 @@ Son errores:
   (`STYLE_WITHOUT_RULE`);
 - la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size`, un `Box` o una propiedad de
   elemento (`STYLE_NOT_ALLOWED_IN_RUN`);
+- `Position` en una regla que llega a una caja y no a un tramo (`POSITION_OUTSIDE_RUN`);
 - dos `Named color` con el mismo nombre en el mismo origen (`COLOR_DUPLICATE`);
 - un color con forma de nombre que ningún `Named color` declara (`COLOR_UNKNOWN`);
 - un `Named color` sin nombre y color separados por un espacio, con un nombre mal escrito o con un color que no es

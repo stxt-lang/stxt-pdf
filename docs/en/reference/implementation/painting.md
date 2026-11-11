@@ -47,7 +47,7 @@ kind and destination, also from one line to the next, share their marked content
 end of the lines that end between words (not of those that split one, `TextLine.splitsWord`) and the `ActualText` of
 those that end in a hyphen added by the line breaking or have letter spacing; the call and the
 number of a footnote are sequences of their own (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), and a superscript
-run is painted raised `TextFormat.rise()` of the size.
+run is painted raised `TextFormat.rise()` of the size, and a subscript one, lowered (a negative `rise()`).
 
 `Canvas` only draws and each canvas gives its `Tagging` with `Canvas.tagging()` (`PdfTagging` in the PDF and `Tagging.NONE` in the
 SVG): the marked text of the tagged PDF and the links. The methods of `Tagging` do nothing by default: `NONE` overrides
@@ -133,7 +133,9 @@ measured is the glyphs that are written.
 
 Underline and strikethrough use the metrics of the variant of the run: `underlinePosition` and `underlineThickness` of the
 `post` table, and `yStrikeoutPosition` and `yStrikeoutSize` of `OS/2`, measured from the baseline to the top of
-the line, which is what the OpenType specification says. They are painted as *artifacts*.
+the line, which is what the OpenType specification says. They are painted as *artifacts*. The strikethrough of a
+superscript or a subscript is painted from the baseline of the run and at its size; the underline, from that of the
+line.
 
 > **Decision:** the ligatures and kerning options travel in `FontFace` (its fourth and fifth components, and `base()` is
 > the font without them): this way `TextMeasurer`, `Canvas.text` and the font cache of the PDF use them without changes,

@@ -69,7 +69,7 @@ Las constantes de un enum entran siempre. De una excepción se promete lo que se
 | `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat`, `model.FootnoteNumberFormat` | Todo |
 | `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
 | `model.Reference` | `escape(...)`, `shown(...)`, `LITERAL_BRACE` |
-| `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | Todo |
+| `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.TextPosition`, `model.RunStyle`, `model.InlineImage` | Todo |
 | `output.StxtDump` | Todo |
 | `paint.PdfPainter` | Todo |
 

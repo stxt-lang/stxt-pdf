@@ -29,6 +29,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
+| `Position` | `normal`, `superscript`, `subscript` | `normal` | Superíndice o subíndice; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#superíndice-y-subíndice-position)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
 | `Kerning` | `true`, `false` | `false` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
@@ -421,6 +422,6 @@ no la admite (`STYLE_NOT_ALLOWED`): el idioma del documento es el `Language` de 
 - Puntos de corte tras otros caracteres que el guion (`/`, `.`, `_`, `@`), impedir el corte tras un guion escrito de
   otra forma que con el guion de no separación, y cortar las palabras largas de un texto preformateado.
 - Sangría de primera línea en porcentaje, y sangrar la línea que sigue a un salto de línea forzado.
-- Tamaño distinto dentro de una línea (salvo la letra capitular y el superíndice de una nota al pie): un tramo cambia
-  la familia, el peso, el estilo, el color, las mayúsculas y el interletraje
-  ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.
+- Tamaño distinto dentro de una línea (salvo la letra capitular, la llamada de una nota al pie y un tramo en
+  superíndice o en subíndice): un tramo cambia la familia, el peso, el estilo, el color, las mayúsculas y el
+  interletraje ([Formato del texto](text-formatting.md#tramos-con-estilo)), pero no el tamaño.

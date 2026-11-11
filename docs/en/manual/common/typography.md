@@ -42,7 +42,7 @@ Styles:
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md)); figures carry one unless they say `false` ([Figure](../components/figure.md)) |
 | `Number format`, `Number label` | | | How that number is written and what goes before the title, or before the caption of a figure ([Headings](../components/heading.md)) |
 
-The rest (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Preformatted` and `Tab size`) is in
+The rest (`Markup`, `Case`, `Small caps`, `Position`, `Letter spacing`, `Ligatures`, `Preformatted` and `Tab size`) is in
 [Text formatting](text-formatting.md).
 
 ## Font and size

@@ -43,7 +43,7 @@ class TextFormatTest {
     @Test
     void theStyleOfARunReplacesTheBoxAndTheMarksAddToIt() {
         RunStyle light = new RunStyle("light", "#B3261E", null, null, new FontWeight(300), FontStyle.NORMAL, 1.5,
-                TextCase.UPPERCASE, true);
+                TextCase.UPPERCASE, true, null);
         TextFormat f = TextFormat.PLAIN.withStyle(light);
         FontFace boldItalic = new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC);
         assertEquals(new FontFace("F", new FontWeight(300), FontStyle.NORMAL), f.face(boldItalic));
@@ -66,10 +66,10 @@ class TextFormatTest {
     void aRunWithLetterSpacingHasNoLigatures() {
         FontFace ligatures = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL, true, false);
         TextFormat spaced = TextFormat.PLAIN.withStyle(
-                new RunStyle("wide", null, null, null, null, null, 1.0, null, null));
+                new RunStyle("wide", null, null, null, null, null, 1.0, null, null, null));
         assertFalse(spaced.face(ligatures).ligatures());
         TextFormat unspaced = TextFormat.PLAIN.withStyle(
-                new RunStyle("tight", null, null, null, null, null, 0.0, null, null));
+                new RunStyle("tight", null, null, null, null, null, 0.0, null, null, null));
         assertTrue(unspaced.face(ligatures).ligatures());
     }
 
@@ -161,5 +161,37 @@ class TextFormatTest {
         assertEquals(0, TextFormat.PLAIN.rise());
         assertFalse(TextFormat.PLAIN.superscript());
         assertNotEquals(call, label);
+    }
+
+    /** A styled run with Position is a superscript or a subscript: smaller, and raised or lowered from the baseline. */
+    @Test
+    void aStyledRunWithPositionIsASuperscriptOrASubscript() {
+        TextFormat sup = TextFormat.PLAIN.withStyle(position("sup", TextPosition.SUPERSCRIPT));
+        assertTrue(sup.superscript());
+        assertFalse(sup.subscript());
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, sup.scale());
+        assertEquals(TextFormat.SUPERSCRIPT_RISE, sup.rise());
+        TextFormat sub = TextFormat.PLAIN.withStyle(position("sub", TextPosition.SUBSCRIPT));
+        assertTrue(sub.subscript());
+        assertFalse(sub.superscript());
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, sub.scale());
+        assertEquals(-TextFormat.SUBSCRIPT_DROP, sub.rise());
+        // Small caps do not make it smaller still, and the marks are kept.
+        assertEquals(TextFormat.SUPERSCRIPT_SCALE, sub.withSmallCaps(true).scale());
+        assertTrue(sub.withMarks(true, false, false, false).subscript());
+        // Position: normal, or a style without Position, changes nothing.
+        TextFormat normal = TextFormat.PLAIN.withStyle(position("normal", TextPosition.NORMAL));
+        assertEquals(1, normal.scale());
+        assertEquals(0, normal.rise());
+        assertEquals(0, TextFormat.PLAIN.withStyle(RunStyle.named("plain")).rise());
+        // The call of a footnote inside a subscript is still a superscript.
+        TextFormat call = sub.withFootnote("a");
+        assertTrue(call.superscript());
+        assertFalse(call.subscript());
+        assertEquals(TextFormat.SUPERSCRIPT_RISE, call.rise());
+    }
+
+    private static RunStyle position(String name, TextPosition position) {
+        return new RunStyle(name, null, null, null, null, null, null, null, null, position);
     }
 }

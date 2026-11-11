@@ -146,7 +146,8 @@ final class TextPainter {
             for (int i = seq.from(); i < seq.to(); i++) {
                 TextLine.Run r = l.runs().get(i);
                 String shown = spaceAfter && i == l.runs().size() - 1 ? r.text() + " " : r.text();
-                // A superscript (the call or the label of a footnote) is raised above the baseline.
+                // A superscript (the call or the label of a footnote, a styled run) is raised above the baseline, and
+                // a subscript is lowered.
                 canvas.text(content.x() + l.x() + r.x(), baseline - r.format().rise() * l.fontSize(), shown,
                         r.format().face(font), l.fontSize() * r.format().scale(),
                         r.format().color(style.typography().color()), l.wordSpacing(),
@@ -285,8 +286,14 @@ final class TextPainter {
                 }
                 DecorationMetrics d = canvas.decoration(r.format().face(font));
                 double x = content.x() + l.x() + r.x();
+                // The underline stays on the line; the strikethrough of a superscript or a subscript goes with its
+                // letters, at their baseline and their size.
+                double rise = r.format().rise();
                 canvas.background(underline ? d.underline(x, baseline, r.width(), l.fontSize())
-                        : d.strikeout(x, baseline, r.width(), l.fontSize()), r.format().color(style.typography().color()));
+                        : rise == 0 ? d.strikeout(x, baseline, r.width(), l.fontSize())
+                        : d.strikeout(x, baseline - rise * l.fontSize(), r.width(),
+                                l.fontSize() * r.format().scale()),
+                        r.format().color(style.typography().color()));
             }
         }
     }

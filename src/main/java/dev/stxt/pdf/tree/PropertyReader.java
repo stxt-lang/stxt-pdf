@@ -31,6 +31,7 @@ import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
+import dev.stxt.pdf.model.TextPosition;
 import dev.stxt.pdf.model.TrimMargins;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.ValueParser;
@@ -124,6 +125,7 @@ final class PropertyReader {
             entry("case", (p, s) -> s.typography().setTextCase(enumValue(TextCase.class, p))),
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
+            entry("position", PropertyReader::position),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
             entry("kerning", (p, s) -> s.typography().setKerning(bool(p))),
             entry("preformatted", (p, s) -> s.typography().setPreformatted(enumValue(Preformatted.class, p))),
@@ -222,6 +224,20 @@ final class PropertyReader {
             s.declared(PropertyKey.internal(name), p.getLine());
             read(TYPOGRAPHY, p, s);
         }
+    }
+
+    /**
+     * {@code Position} (reference/common/text-formatting.md): the superscript or subscript of a styled run. Only the
+     * {@code For style} rule of a run gives it: in the style of a box it is an error, whatever its value.
+     */
+    private static void position(Node p, Style s) {
+        TextPosition position = enumValue(TextPosition.class, p);
+        if (!s.isRun()) {
+            throw error(p, ErrorCode.POSITION_OUTSIDE_RUN, "Position is of a styled run and here it reaches a box, "
+                    + "which has no line to be raised or lowered on: it is declared in the Typography of a For style "
+                    + "rule, and the rule is given to a part of a text with Markup: markdown, as in m[2]{sup}");
+        }
+        s.typography().setPosition(position);
     }
 
     /**

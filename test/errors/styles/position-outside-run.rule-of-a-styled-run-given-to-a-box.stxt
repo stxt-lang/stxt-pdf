@@ -1,0 +1,22 @@
+# Case: A For style rule with Position, which a styled run takes, is given to a Text with Style
+# Code: POSITION_OUTSIDE_RUN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For style: sub
+			Typography:
+				Position: subscript
+	Section:
+		Text: CO[2]{sub}
+		Text: 2
+			Style: sub

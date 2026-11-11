@@ -9,11 +9,20 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 **From 0.16.0**: `tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of
 four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
-`model.FootnoteNumberFormat` instead of a `model.NumberFormat`. A second call to a footnote is no longer an error, and
-the code `FOOTNOTE_CALL_DUPLICATE` is gone. No document that was valid changes.
+`model.FootnoteNumberFormat` instead of a `model.NumberFormat`. `model.RunStyle` has a tenth component, `position`. A
+second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUPLICATE` is gone. No document that was
+valid changes.
 
 ### Added
 
+- **Superscripts and subscripts.** `Position` in `Typography`: `normal` (the default), `superscript` or `subscript`. It
+  goes in the `For style` rule of a styled run, as in `m[2]{sup}` and `CO[2]{sub}`: the run is measured and painted at
+  70 % of the size of the box, raised 0.33 of it or lowered 0.15, without changing the height of the line, like the call
+  of a footnote. Its strikethrough goes with its letters and its underline stays on the line. `Position` in a box (in
+  the `Typography` of an element, in a `For element` or `For id` rule, or by a `For style` rule given with `Style`) is
+  the new error `POSITION_OUTSIDE_RUN`, with the line of the property. `model.RunStyle` has one more component,
+  `position`, of the new enum `model.TextPosition`; `TextFormat` gains `subscript()` and `SUBSCRIPT_DROP`, and its
+  `rise()` is negative in a subscript. "Superscript and subscript" in the reference of the text formatting.
 - **Figures numbered by chapter.** `Figure numbering` in `Section` (optional): `continue`, the default, follows the
   counters of the document (`1`, `2`, `3`), and `chapter` starts the figures and the tables again in each chapter and
   writes its number first, with a period (`2.3`). The chapter is the last numbered heading with no numbered heading

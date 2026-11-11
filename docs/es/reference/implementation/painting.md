@@ -46,7 +46,7 @@ del mismo tipo y destino, también de una línea a la siguiente, comparten su co
 invisible al final de las líneas que acaban entre palabras (no de las que parten una, `TextLine.splitsWord`) y el
 `ActualText` de las que acaban en un guion añadido por el reparto o llevan interletraje; la llamada
 y el número de una nota al pie son secuencias propias (`Tagging.beginFootnoteCall`, `beginFootnoteLabel`), y un tramo en
-superíndice se pinta elevado `TextFormat.rise()` del cuerpo.
+superíndice se pinta elevado `TextFormat.rise()` del cuerpo, y uno en subíndice, bajado (`rise()` negativo).
 
 `Canvas` solo dibuja y cada lienzo da su `Tagging` con `Canvas.tagging()` (`PdfTagging` en el PDF y `Tagging.NONE` en el
 SVG): el texto marcado del PDF etiquetado y los enlaces. Los métodos de `Tagging` no hacen nada por defecto: `NONE` no
@@ -132,7 +132,8 @@ medido son los glifos que se escriben.
 
 El subrayado y el tachado usan las métricas de la variante del tramo: `underlinePosition` y `underlineThickness` de la
 tabla `post`, y `yStrikeoutPosition` y `yStrikeoutSize` de `OS/2`, medidos desde la línea base hasta la parte de arriba de
-la raya, que es lo que dice la especificación OpenType. Se pintan como *artifacts*.
+la raya, que es lo que dice la especificación OpenType. Se pintan como *artifacts*. El tachado de un superíndice o de
+un subíndice se pinta desde la línea base del tramo y con su tamaño; el subrayado, desde la de la línea.
 
 > **Decisión:** las opciones de las ligaduras y del kerning viajan en `FontFace` (sus componentes cuarto y quinto, y
 > `base()` es la fuente sin ellas): así las usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del

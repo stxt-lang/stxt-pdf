@@ -88,12 +88,16 @@ public final class PropertyKey {
     /** The placement of a grid item: the value of its {@code Area}, or the one a {@code Table} computes. */
     public static final String ITEM_AREA = "item.area";
 
+    /** {@code Position} of {@code Typography}: the superscript or subscript of a styled run. */
+    public static final String TEXT_POSITION = "text-position";
+
     /**
      * Internal name of each property of {@code Typography} and {@code Break} whose name in the document is short.
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "bold", FONT_WEIGHT, "weight", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE,
-            "min-size", MIN_FONT_SIZE, "align", "text-align", "before", BREAK_BEFORE, "after", BREAK_AFTER);
+            "min-size", MIN_FONT_SIZE, "align", "text-align", "position", TEXT_POSITION, "before", BREAK_BEFORE,
+            "after", BREAK_AFTER);
 
     private PropertyKey() {
     }

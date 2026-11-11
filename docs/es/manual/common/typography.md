@@ -42,7 +42,7 @@ Styles:
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)); las figuras lo llevan salvo que digan `false` ([Figure](../components/figure.md)) |
 | `Number format`, `Number label` | | | Cómo se escribe ese número y lo que va delante del título, o del pie de una figura ([Encabezados](../components/heading.md)) |
 
-El resto (`Markup`, `Case`, `Small caps`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
+El resto (`Markup`, `Case`, `Small caps`, `Position`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
 [Formato del texto](text-formatting.md).
 
 ## Fuente y tamaño

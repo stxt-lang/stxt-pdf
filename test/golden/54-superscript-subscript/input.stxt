@@ -1,0 +1,50 @@
+# Superscripts and subscripts, Position in the rule of a styled run (reference/common/text-formatting.md): page of
+# 240 × 160 with margins of 20, page area of 200 × 120 from (20, 20). Size 10 with Line height 15; with the test metrics
+# each character measures 5 pt, and one of a superscript or a subscript, at 70 % of the size, 3.5. They do not change
+# the height of the lines. The image shows them raised and lowered.
+#   units:  a superscript and a subscript in one line. y = 20.
+#   plain:  "aaaa bbbb", 45 in a box of 40: two lines. y = 35.
+#   raised: the same text with "bbbb" as a superscript: 20 + 5 + 4 × 3.5 = 39 fits in the 40. One line, y = 65.
+#   marks:  a subscript in bold, a struck superscript, whose line goes with its letters, and an underlined one, whose
+#           line stays on that of the text. y = 80.
+#   notes:  a superscript next to the call of a footnote, which is at the same height. y = 95.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 240
+		Height: 160
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Line height: 15
+				Markup: markdown
+		For style: sup
+			Typography:
+				Position: superscript
+		For style: sub
+			Typography:
+				Position: subscript
+				Color: #B3261E
+		For style: narrow
+			Box:
+				Width: 40
+	Section:
+		Text: Son 10 m[2]{sup} de CO[2]{sub}.
+			Id: units
+		Text: aaaa bbbb
+			Id: plain
+			Style: narrow
+		Text: aaaa [bbbb]{sup}
+			Id: raised
+			Style: narrow
+		Text: H**[2]{sub}**O, ~~x[2]{sup}~~ y ++x[2]{sup}++.
+			Id: marks
+		Text: El 1[er]{sup} día[^a].
+			Id: notes
+		Footnote:
+			Id: a
+			Paragraph: Una nota.

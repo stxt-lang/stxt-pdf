@@ -36,7 +36,7 @@ public final class TextRuns {
     /** A run with the letter spacing of a styled run (reference/common/text-formatting.md). */
     public static TextRun spaced(String text, double letterSpacing) {
         return new TextRun(text, TextFormat.PLAIN.withStyle(
-                new RunStyle("wide", null, null, null, null, null, letterSpacing, null, null)));
+                new RunStyle("wide", null, null, null, null, null, letterSpacing, null, null, null)));
     }
 
     /** Builds the document tree and sets the runs of each text box by its {@code Id}. */

@@ -9,6 +9,7 @@ import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
+import dev.stxt.pdf.model.TextPosition;
 import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.model.Preformatted;
 
@@ -60,6 +61,8 @@ public final class TypographyStyle extends StyleGroup {
     /** Spacing between letters, in points; it can be negative. */
     private double letterSpacing;
     private boolean smallCaps;
+    /** {@code Position}: only the style of a styled run has it, so it is not inherited. */
+    private TextPosition position = TextPosition.NORMAL;
     /**
      * {@code Ligatures}: whether the text is measured and painted with the ligatures of the font
      * (reference/common/text-formatting.md). Inherited.
@@ -272,6 +275,16 @@ public final class TypographyStyle extends StyleGroup {
     void setSmallCaps(boolean v) {
         writable();
         smallCaps = v;
+    }
+
+    /** {@return {@code Position}, which only the style of a styled run declares} */
+    public TextPosition position() {
+        return position;
+    }
+
+    void setPosition(TextPosition v) {
+        writable();
+        position = v;
     }
 
     public boolean ligatures() {

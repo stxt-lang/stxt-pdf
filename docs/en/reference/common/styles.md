@@ -318,6 +318,7 @@ These are errors:
   context (`STYLE_WITHOUT_RULE`);
 - the rule of a styled run that declares something a run does not accept, such as `Size`, a `Box` or an element
   property (`STYLE_NOT_ALLOWED_IN_RUN`);
+- `Position` in a rule that reaches a box and not a run (`POSITION_OUTSIDE_RUN`);
 - two `Named color` with the same name in the same source (`COLOR_DUPLICATE`);
 - a color with the form of a name that no `Named color` declares (`COLOR_UNKNOWN`);
 - a `Named color` without a name and a color separated by a space, with a misspelled name or with a color that is not

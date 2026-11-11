@@ -1,0 +1,20 @@
+# Case: A For element rule declares Position, and it only reaches boxes
+# Code: POSITION_OUTSIDE_RUN
+# Line: 18
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+		For element: Heading 1
+			Typography:
+				Position: superscript
+	Section:
+		Text: m2

@@ -188,7 +188,10 @@ The family of `Font` also goes in `TextFormat.family`, like that of code. The bo
 (`Box.runStyle`) for the errors that come later with the line of the rule: `FONT_UNKNOWN` in `PdfMetrics` and
 `CONTRAST_LOW` in `ContrastCheck`. Outside `tree` nobody looks at the name: `TextFormat.face`, `color`,
 `letterSpacing`, `textCase` and `smallCaps` give the value of the run or, if its style does not declare it, that of the
-box that is passed to them.
+box that is passed to them. `Position` only exists in that `Style` (`Style.ofRun`, the only one with `isRun()`):
+`PropertyReader.position` rejects it in that of a box (`POSITION_OUTSIDE_RUN`), which is why the checking read of a
+`For style` rule also uses a `Style.ofRun`. `RunStyle.position` is the `model.TextPosition` of the run, and
+`TextFormat.superscript()` and `subscript()` read it.
 
 > **Decision:** the text of the box is still a string and the runs are a partition of it: the lines of the document,
 > the messages, the PDF bookmarks and `{page}` work on the whole text, and a text without formatting is measured and painted

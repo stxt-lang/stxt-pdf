@@ -1,7 +1,7 @@
 # Text formatting
 
 What changes how the text of a box looks without changing its box: formatted runs, inline formatting, styled runs,
-capitalization, small caps, letter spacing, ligatures, preformatted text and underline and strikethrough lines. All of them are properties of
+superscripts and subscripts, capitalization, small caps, letter spacing, ligatures, preformatted text and underline and strikethrough lines. All of them are properties of
 [`Typography`](typography.md): **they are inherited** and they are valid in `Styles` rules.
 
 ## Runs
@@ -14,7 +14,8 @@ which can be combined. Each part is a **run**. They are written with `Markup: ma
   has weight 700, or that of the box if it is already 700 or more (`Weight`, [Typography](typography.md#weights-weight)):
   in a text of weight 300 bold is 700, and in one of 900 it stays 900.
 - Size and `Line height` are those of the box, so lines do not change height. Color and family too, except in code,
-  which uses `Code font` ([below](#inline-code)), and in a [styled run](#styled-runs).
+  which uses `Code font` ([below](#inline-code)), and in a [styled run](#styled-runs). A superscript and a subscript
+  are painted smaller within their line ([below](#superscript-and-subscript-position)).
 - A word with parts from several runs (**bo**ld) is a single word: it is not split between them and it measures the sum of
   its parts.
 - The space between two words has the formatting of the run of its first white space character: an underline covers the spaces
@@ -78,6 +79,7 @@ in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For styl
 | `Color` | the color of its letters and of its lines |
 | `Case`, `Small caps` | how its letters are painted ([Capitalization](#capitalization-case), [Small caps](#small-caps-small-caps)) |
 | `Letter spacing` | the letter spacing of its characters, also of its spaces ([Letter spacing](#letter-spacing-letter-spacing)) |
+| `Position` | the run as a superscript or a subscript ([below](#superscript-and-subscript-position)) |
 
 - What the rule declares **replaces** what the box has, and what it does not declare is that of the box. If two
   `For style` rules with that name (one of the separate styles document and one of the document) declare the same thing,
@@ -112,6 +114,58 @@ in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For styl
 > **Decision:** the Markdown marks add to the style of the run wherever they are written, as they add to the box.
 > *Rejected alternative:* the run winning over the marks outside it (`**[x]{light}**` at weight 300), which forces looking
 > at the nesting to know how a word looks.
+
+## Superscript and subscript (`Position`)
+
+`Position: superscript` or `subscript`, in the `For style` rule of a [styled run](#styled-runs), makes the run a
+superscript or a subscript: `m[2]{sup}`, `CO[2]{sub}`, `1[st]{sup}`, `Brand[TM]{sup}`.
+
+```stxt
+Styles:
+    For style: sup
+        Typography:
+            Position: superscript
+    For style: sub
+        Typography:
+            Position: subscript
+Paragraph: It emits 120 g of CO[2]{sub} per m[2]{sup}.
+    Typography:
+        Markup: markdown
+```
+
+| `Position` | Size | Baseline |
+|---|---|---|
+| `normal` (by default) | that of the box | that of the line |
+| `superscript` | 70 % of that of the box | raised 0.33 of the size of the box |
+| `subscript` | 70 % of that of the box | lowered 0.15 of the size of the box |
+
+- **It does not change the height of the line**, like the call of a footnote ([Footnote](../components/footnote.md#the-call)),
+  which has the size and the height of a superscript. The run is measured at its size, so it takes up less width.
+- The letters are those of the font, reduced: neither the superscript glyphs of the font nor the Unicode characters
+  (`²`, `₂`) are used, and these can still be written if the font has them. The text that is read and copied is the
+  one written (`m2`).
+- The rule can also declare what a run allows (`Color`, `Font`, `Weight`...), and the marks add to it: `**[2]{sub}**`
+  is a subscript in bold.
+- **The strikethrough goes with the letters** of the run, at their height and with their thickness. **The underline stays
+  on the line**, so that it does not break under a word with a superscript.
+- Small caps do not reduce the run further: a letter of a superscript measures 70 % with `Small caps` and without it.
+- The call of a footnote inside a subscript is still a superscript.
+- **It is only valid in a run.** `Position` in a box, with any value, is `POSITION_OUTSIDE_RUN`, with the line of the
+  property: in the `Typography` of an element, in a `For element` or `For id` rule (when the rule is read), and in a
+  `For style` rule given to a box with `Style`. `normal` is for a nested rule, so that a run name is not a superscript
+  inside an element ([Nested rules](styles.md#nested-rules)).
+
+> **Decision:** the superscript and the subscript are a property of the rule of a styled run and not a new mark of the
+> text: Markdown has none, and the document already names its runs. *Alternative discarded:* a syntax of its own
+> (`^2^`, `~2~`), which clashes with the strikethrough and would have to be escaped in the texts that use those characters.
+
+> **Decision:** the size and the shift are fixed, those of the call of a footnote, and the subscript goes down 0.15 to
+> stay inside the line. *Alternative discarded:* two more properties (size and shift), or `Size` in a run, which would
+> open the runs to any size and with them the height of the line.
+
+> **Decision:** `Position` in a box is an error and is neither ignored nor inherited: a whole box as a superscript has no
+> line to be raised on. *Alternative discarded:* that the text of the box inherits it, which would mix it with
+> `Overflow: shrink` and with the drop cap for no use.
 
 ## Inline code
 
@@ -256,8 +310,9 @@ underline goes below the text and the strikethrough, over it. A screen reader do
 
 ## What is not supported
 
-- Runs with another size (except the superscript of a footnote and the drop cap of a `Paragraph`,
-  [Text](../components/text.md#drop-cap-drop-cap)) or another line height, styled runs inside others, and marks that
+- Runs with another size (except the [superscript and the subscript](#superscript-and-subscript-position), the call of
+  a footnote and the drop cap of a `Paragraph`, [Text](../components/text.md#drop-cap-drop-cap)) or another line
+  height, superscripts and subscripts with another size or another shift or with the glyphs of the font for them, styled runs inside others, and marks that
   remove bold or italic (a styled run can, with `Weight` or `Italic: false`).
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.

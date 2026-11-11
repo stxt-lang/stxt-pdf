@@ -29,6 +29,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
+| `Position` | `normal`, `superscript`, `subscript` | `normal` | Superscript or subscript; only in the rule of a styled run, and not inherited ([Text formatting](text-formatting.md#superscript-and-subscript-position)). |
 | `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
 | `Kerning` | `true`, `false` | `false` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
@@ -424,6 +425,6 @@ does not accept it (`STYLE_NOT_ALLOWED`): the language of the document is the `L
 - Break points after characters other than the hyphen (`/`, `.`, `_`, `@`), preventing the break after a written
   hyphen in any other way than with the non-breaking hyphen, and cutting the long words of a preformatted text.
 - A first line indent in percentage, and indenting the line after a forced line break.
-- A different size within a line (except the drop cap and the superscript of a footnote): a run changes the family,
-  the weight, the style, the color, the capitalization and the letter spacing
+- A different size within a line (except the drop cap, the call of a footnote and a superscript or subscript run): a
+  run changes the family, the weight, the style, the color, the capitalization and the letter spacing
   ([Text formatting](text-formatting.md#styled-runs)), but not the size.

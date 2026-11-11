@@ -6,7 +6,8 @@ import java.util.Objects;
  * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}
  * rule of that name declares of the properties a run allows. Each value is that of the rule, or {@code null} if the
  * rule does not declare it and the run keeps that of its box. The size, the line height and the alignment are always
- * those of the box, so the lines do not change their height.
+ * those of the box, so the lines do not change their height; a superscript or a subscript ({@code Position}) is
+ * painted smaller within its line.
  *
  * <p>The Markdown of the text only knows the name ({@link #named}); the box, which knows the rules, gives it its
  * values when it is built. The family of the run ({@code Font}) and that of its code ({@code Code font}) go in
@@ -21,9 +22,11 @@ import java.util.Objects;
  * @param letterSpacing {@code Letter spacing}, in points
  * @param textCase      {@code Case}
  * @param smallCaps     {@code Small caps}
+ * @param position      {@code Position}: superscript, subscript or normal
  */
 public record RunStyle(String name, String color, String family, String codeFamily, FontWeight weight,
-                       FontStyle style, Double letterSpacing, TextCase textCase, Boolean smallCaps) {
+                       FontStyle style, Double letterSpacing, TextCase textCase, Boolean smallCaps,
+                       TextPosition position) {
 
     /**
      * A style of a run: each value is that of the rule, or {@code null} for that of the box.
@@ -37,6 +40,7 @@ public record RunStyle(String name, String color, String family, String codeFami
      * @param letterSpacing {@code Letter spacing}, in points
      * @param textCase      {@code Case}
      * @param smallCaps     {@code Small caps}
+     * @param position      {@code Position}
      * @throws NullPointerException if the name is {@code null}
      */
     public RunStyle {
@@ -50,6 +54,6 @@ public record RunStyle(String name, String color, String family, String codeFami
      * @return a style with every value {@code null}
      */
     public static RunStyle named(String name) {
-        return new RunStyle(name, null, null, null, null, null, null, null, null);
+        return new RunStyle(name, null, null, null, null, null, null, null, null, null);
     }
 }
