@@ -298,7 +298,7 @@ public final class BoxTreeBuilder {
         Integer number = kind == Element.LIST_ITEM ? itemNumber(ctx, n, s, parent) : null;
         validateBox(ctx, s, parent);
         validateBelowSideBoxes(s, parent);
-        validateDropCap(s);
+        validateDropCap(n, s);
         if (kind.headingLevel() > 0) {
             // The engine avoids breaking inside the heading and after it (reference/components/heading.md); it is not
             // declared.

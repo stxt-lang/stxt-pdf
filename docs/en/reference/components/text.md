@@ -62,8 +62,9 @@ The text that is read and copied is the same: the letter is still the first one 
 the font (its `OS/2` table) or, without it, 70 % of the size. It is the first character as it is: with `Case: uppercase`
 it is capitalized like the rest, and if the paragraph starts with a quotation mark, the drop cap is the quotation mark.
 It does not go in a preformatted paragraph (`DROP_CAP_NOT_ALLOWED`) nor outside 2 to 5 (`VALUE_NOT_ALLOWED`), nor
-in a paragraph with a first line indent other than 0, its own, inherited or from a rule
-(`FIRST_LINE_INDENT_WITH_DROP_CAP`, [Typography](../common/typography.md#first-line-indent-first-line-indent)). Beside a
+in a paragraph that writes a first line indent other than 0 (`FIRST_LINE_INDENT_WITH_DROP_CAP`); the one it inherits
+or gets from a rule is not applied to it
+([Typography](../common/typography.md#first-line-indent-first-line-indent)). Beside a
 side box ([Block](block.md#side-boxes-side)), the drop cap goes after what the box takes from the lines.
 
 | Property | Values | Default | Notes |

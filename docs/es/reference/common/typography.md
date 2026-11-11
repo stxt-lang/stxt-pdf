@@ -280,9 +280,9 @@ Styles:
 - **Junto a una caja lateral** ([Block](../components/block.md#cajas-laterales-side)), la sangría se suma a lo que
   la caja quita a la primera línea. El resto de un párrafo que se vuelve a repartir en la página siguiente no se
   sangra.
-- **Con `Drop cap`** en el mismo párrafo es un error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), con la línea del
-  `Drop cap`: las dos mueven el principio del párrafo. Cuenta también la sangría que el párrafo hereda o recibe de
-  una regla; el párrafo con capitular declara `First line indent: 0`.
+- **Con `Drop cap`**, el párrafo no se sangra: la sangría que hereda o recibe de una regla no se le aplica, y su
+  primera línea empieza tras la capitular. Una sangría distinta de 0 escrita en el propio párrafo es un error
+  (`FIRST_LINE_INDENT_WITH_DROP_CAP`), con la línea del `Drop cap`: las dos mueven el principio del párrafo.
 - **Con `Preformatted: true` o `wrap`** se aplica igual, a la primera línea del texto; con `wrap`, esa línea se
   parte en lo que deja la sangría.
 - **Lo que no cabe.** Una sangría que no deja sitio a la primera palabra es `TEXT_OVERFLOW`: la palabra no pasa a
@@ -300,9 +300,10 @@ Styles:
 > porcentaje. *Alternativa descartada:* dejar que la línea salga de la caja, y comprobarlo al leer el documento, que
 > no alcanza a un `Padding` en porcentaje.
 
-> **Decisión:** con `Drop cap` es un error también cuando la sangría se hereda o viene de una regla: las dos mueven
-> el principio del párrafo y el motor no elige entre ellas. *Alternativa descartada:* que la capitular anule la
-> sangría sin decirlo, y comprobar solo la que escribe el propio párrafo.
+> **Decisión:** la capitular anula la sangría que el párrafo hereda o recibe de una regla, y solo es un error la que
+> escribe él, como `Break long words` en un texto preformateado: un párrafo con capitular no se sangra, y la sangría
+> suele llegar de `For element: Paragraph`. *Alternativa descartada:* que la heredada también sea un error, que
+> obliga a escribir `First line indent: 0` en cada párrafo con capitular de un documento con los párrafos sangrados.
 
 > **Decisión:** una primera palabra que no cabe tras la sangría desborda. *Alternativa descartada:* dejar vacía la
 > primera línea y bajar la palabra, como junto a una caja lateral, que daría un párrafo sin sangría detrás de una

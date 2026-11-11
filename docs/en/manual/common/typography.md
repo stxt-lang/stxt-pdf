@@ -197,8 +197,7 @@ Text: FIRST.— The landlord grants the tenant the use of the dwelling, which th
     Style: clause
 ```
 
-A paragraph with a drop cap (`Drop cap`) has no indent: if it gets one from a rule, it declares
-`First line indent: 0`.
+A paragraph with a drop cap (`Drop cap`) is not indented: the indent it gets from a rule is not applied to it.
 
 ## Kerning
 

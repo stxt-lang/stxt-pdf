@@ -161,8 +161,8 @@ public enum ErrorCode {
     /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
     DROP_CAP_NOT_ALLOWED,
     /**
-     * {@code First line indent} other than 0, its own or inherited, in a {@code Paragraph} with {@code Drop cap}: both
-     * move the start of the paragraph (line of the {@code Drop cap}).
+     * {@code First line indent} other than 0 written by a {@code Paragraph} with {@code Drop cap}: both move the
+     * start of the paragraph (line of the {@code Drop cap}). The one it inherits or gets from a rule is not applied.
      */
     FIRST_LINE_INDENT_WITH_DROP_CAP,
 

@@ -284,9 +284,9 @@ Styles:
   measures.
 - **Beside a side box** ([Block](../components/block.md#side-boxes-side)), the indent is added to what the box takes
   from the first line. The rest of a paragraph that is broken again on the next page is not indented.
-- **With `Drop cap`** in the same paragraph it is an error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), at the line of the
-  `Drop cap`: both move the start of the paragraph. The indent the paragraph inherits or gets from a rule counts
-  too; the paragraph with the drop cap declares `First line indent: 0`.
+- **With `Drop cap`**, the paragraph is not indented: the indent it inherits or gets from a rule is not applied to
+  it, and its first line starts after the drop cap. An indent other than 0 written in the paragraph itself is an
+  error (`FIRST_LINE_INDENT_WITH_DROP_CAP`), at the line of the `Drop cap`: both move the start of the paragraph.
 - **With `Preformatted: true` or `wrap`** it applies the same way, to the first line of the text; with `wrap`,
   that line is broken at what the indent leaves.
 - **What does not fit.** An indent that leaves no room for the first word is `TEXT_OVERFLOW`: the word does not go
@@ -303,9 +303,11 @@ Styles:
 > percentage. *Rejected alternative:* letting the line leave the box, and checking it when the document is read,
 > which does not reach a `Padding` in percentage.
 
-> **Decision:** with `Drop cap` it is an error also when the indent is inherited or comes from a rule: both move
-> the start of the paragraph and the engine does not choose between them. *Rejected alternative:* the drop cap
-> cancelling the indent without saying so, and checking only the one the paragraph itself writes.
+> **Decision:** the drop cap cancels the indent the paragraph inherits or gets from a rule, and only the one it
+> writes is an error, like `Break long words` in a preformatted text: a paragraph with a drop cap is not indented,
+> and the indent usually comes from `For element: Paragraph`. *Rejected alternative:* the inherited one being an
+> error too, which means writing `First line indent: 0` in each paragraph with a drop cap of a document with
+> indented paragraphs.
 
 > **Decision:** a first word that does not fit after the indent overflows. *Rejected alternative:* leaving the first
 > line empty and moving the word down, as beside a side box, which would give a paragraph with no indent after a

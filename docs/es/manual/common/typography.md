@@ -196,8 +196,7 @@ Text: PRIMERO.— El arrendador cede al arrendatario el uso de la vivienda, que 
     Style: clause
 ```
 
-Un párrafo con letra capitular (`Drop cap`) no lleva sangría: si la recibe de una regla, declara
-`First line indent: 0`.
+Un párrafo con letra capitular (`Drop cap`) no se sangra: la sangría que recibe de una regla no se le aplica.
 
 ## Kerning
 

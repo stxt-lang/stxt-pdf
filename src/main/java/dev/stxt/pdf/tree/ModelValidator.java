@@ -408,10 +408,11 @@ final class ModelValidator {
     /**
      * A drop cap ({@code Drop cap}, reference/components/text.md) takes the first letter out of a text that is broken
      * into lines: a preformatted {@code Paragraph} keeps its lines as they are written, so it has no effect there.
-     * And it does not go with a {@code First line indent} other than 0 (reference/common/typography.md), the
-     * paragraph's own, inherited or from a rule: both move the start of the paragraph.
+     * And it takes the place of the {@code First line indent} (reference/common/typography.md): the one the paragraph
+     * inherits or gets from a rule is left at 0, and one other than 0 written by the paragraph itself is an error,
+     * as both move the start of the paragraph.
      */
-    static void validateDropCap(Style s) {
+    static void validateDropCap(InlineNode n, Style s) {
         if (s.dropCap() == 0) {
             return;
         }
@@ -420,12 +421,18 @@ final class ModelValidator {
                     + "Paragraph (Preformatted: true or wrap), whose lines are the ones written: it is not needed");
         }
         double indent = s.typography().firstLineIndent();
-        if (indent != 0) {
-            String where = s.isDeclared(FIRST_LINE_INDENT) ? ", " + s.line(FIRST_LINE_INDENT) : "";
-            throw error(s.line(DROP_CAP), ErrorCode.FIRST_LINE_INDENT_WITH_DROP_CAP, "Drop cap and First line indent ("
-                    + pt(indent) + where + ") both move the start of the paragraph: the Paragraph with the drop cap "
-                    + "needs First line indent: 0 in its Typography");
+        if (indent == 0) {
+            return;
         }
+        boolean own = child(n, "typography").map(Nodes::inline).flatMap(g -> child(g, "first-line-indent"))
+                .isPresent();
+        if (own) {
+            throw error(s.line(DROP_CAP), ErrorCode.FIRST_LINE_INDENT_WITH_DROP_CAP, "Drop cap and First line indent ("
+                    + pt(indent) + ", " + s.line(FIRST_LINE_INDENT) + ") both move the start of the paragraph: the "
+                    + "First line indent of a Paragraph with a drop cap is not needed");
+        }
+        // The first line starts with the drop cap: the indent that reaches the paragraph from outside is not its own.
+        s.typography().setFirstLineIndent(0);
     }
 
     /**

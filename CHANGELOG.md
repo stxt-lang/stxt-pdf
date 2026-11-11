@@ -22,8 +22,9 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `Typography`.
 - The error codes **`FIRST_LINE_INDENT_OVERFLOW`**, a negative `First line indent` greater than the left `Padding` of
   the box of the text, checked on the laid out box, so a `Padding` in percentage counts for what it measures (line of
-  the `First line indent`), and **`FIRST_LINE_INDENT_WITH_DROP_CAP`**, a `First line indent` other than 0, its own,
-  inherited or from a rule, in a `Paragraph` with `Drop cap` (line of the `Drop cap`).
+  the `First line indent`), and **`FIRST_LINE_INDENT_WITH_DROP_CAP`**, a `First line indent` other than 0 written
+  by a `Paragraph` with `Drop cap` (line of the `Drop cap`). The indent such a paragraph inherits or gets from a rule
+  is not applied to it: its first line starts after the drop cap.
 - `TypographyStyle.firstLineIndent()`. `TextLine.left()` includes the indent in the first line of a paragraph, and
   is negative there with a negative indent that no side box makes up for.
 - **Block quotes and horizontal rules in a `Markdown`**: `> ...` and `---`, `***` or `___`, which were

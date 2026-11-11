@@ -1,6 +1,6 @@
-# Case: Indent inherited by a Paragraph with Drop cap
+# Case: Indent in a Paragraph with Drop cap
 # Code: FIRST_LINE_INDENT_WITH_DROP_CAP
-# Line: 20
+# Line: 17
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -12,9 +12,8 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-		For element: Paragraph
-			Typography:
-				First line indent: 14
 	Section:
 		Paragraph: Hola
 			Drop cap: 3
+			Typography:
+				First line indent: 14

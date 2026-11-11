@@ -290,8 +290,8 @@ un texto preformateado, `PreformattedText` parte la primera línea de `wrap` con
 `LineBreaker.intrinsics` y `PreformattedText.intrinsics` la suman a la primera línea. `Overflow` admite que una
 línea empiece antes de la caja de contenido hasta su `TextLine.left`, si es negativo, y comprueba en cada fragmento
 con texto que una sangría negativa cabe en su relleno izquierdo (`FIRST_LINE_INDENT_OVERFLOW`): ahí el relleno está
-en puntos, lo haya escrito el documento en puntos o en porcentaje. La combinación con `Drop cap` la rechaza
-`ModelValidator.validateDropCap` al leer el párrafo.
+en puntos, lo haya escrito el documento en puntos o en porcentaje. Un párrafo con `Drop cap` llega sin sangría:
+`ModelValidator.validateDropCap` deja en 0 la que hereda o recibe de una regla y rechaza la que escribe él.
 
 **Guiones.** Con `Hyphenate: true`, `InlineLayout` pasa a `LineBreaker` el `Hyphenator` del idioma de la caja
 (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): el algoritmo de Liang sobre un trie con los patrones

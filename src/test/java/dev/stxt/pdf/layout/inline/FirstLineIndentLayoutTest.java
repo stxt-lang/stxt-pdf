@@ -202,17 +202,23 @@ class FirstLineIndentLayoutTest {
     }
 
     @Test
-    void withADropCapItIsAnError() {
+    void aParagraphWithADropCapIsNotIndented() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tParagraph: " + words(40),
                 "\t\tDrop cap: 2", "\t\tTypography:", "\t\t\tFirst line indent: 20"));
         assertEquals(ErrorCode.FIRST_LINE_INDENT_WITH_DROP_CAP, e.errorCode());
-        // Inherited too; the paragraph with the drop cap takes it back with 0.
-        e = assertThrows(InvalidModelException.class, () -> layOut("\tBlock:", "\t\tTypography:",
-                "\t\t\tFirst line indent: 20", "\t\tParagraph: " + words(40), "\t\t\tDrop cap: 2"));
-        assertEquals(ErrorCode.FIRST_LINE_INDENT_WITH_DROP_CAP, e.errorCode());
+        // The one it inherits is not applied: its lines are the ones of the same paragraph with no indent around,
+        // and the paragraph after it, with no drop cap, is still indented.
+        LayoutFixture plain = layOut("\tBlock:", "\t\tParagraph: " + words(40), "\t\t\tId: P",
+                "\t\t\tDrop cap: 2");
         LayoutFixture f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tFirst line indent: 20",
+                "\t\tParagraph: " + words(40), "\t\t\tId: P", "\t\t\tDrop cap: 2",
+                "\t\tParagraph: " + words(40), "\t\t\tId: Q");
+        assertEquals(plain.fragment("P").lines(), f.fragment("P").lines());
+        assertEquals(20, f.fragment("Q").lines().get(0).x(), 1e-9);
+        // Written as 0 by the paragraph, it is not an error.
+        f = layOut("\tBlock:", "\t\tTypography:", "\t\t\tFirst line indent: 20",
                 "\t\tParagraph: " + words(40), "\t\t\tId: P", "\t\t\tDrop cap: 2", "\t\t\tTypography:",
                 "\t\t\t\tFirst line indent: 0");
-        assertEquals(0, f.fragment("P").lines().get(0).x(), 1e-9);
+        assertEquals(plain.fragment("P").lines(), f.fragment("P").lines());
     }
 }

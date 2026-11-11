@@ -295,8 +295,8 @@ broken again. In a preformatted text, `PreformattedText` breaks the first line o
 `LineBreaker.intrinsics` and `PreformattedText.intrinsics` add it to the first line. `Overflow` lets a line start
 before the content box as far as its `TextLine.left`, if it is negative, and checks in each fragment with text that
 a negative indent fits in its left padding (`FIRST_LINE_INDENT_OVERFLOW`): there the padding is in points, whether
-the document wrote it in points or as a percentage. The combination with `Drop cap` is rejected by
-`ModelValidator.validateDropCap` when the paragraph is read.
+the document wrote it in points or as a percentage. A paragraph with `Drop cap` arrives with no indent:
+`ModelValidator.validateDropCap` leaves at 0 the one it inherits or gets from a rule and rejects the one it writes.
 
 **Hyphenation.** With `Hyphenate: true`, `InlineLayout` gives `LineBreaker` the `Hyphenator` of the language of the
 box (`Hyphenations.forLocale`, package `layout.inline.hyphenation`): Liang's algorithm over a trie with the patterns
