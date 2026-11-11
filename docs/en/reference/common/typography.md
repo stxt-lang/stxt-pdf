@@ -212,6 +212,9 @@ Styles:
 - **In the line breaking**, with `optimal`, a line ends at such a cut only if one more character does not fit in
   it. That line has no badness, because it is full, and it has the penalty of a hyphen, but not that of two
   consecutive lines that end with a hyphen.
+- **With `First line indent`**, the first word of the paragraph is measured against its line, the indented one: if
+  its first part does not fit in it, it is cut there, even if it fits in a whole line
+  ([below](#first-line-indent-first-line-indent)).
 - **What is not cut.** A word with `{page}`, `{pages}` or a reference. If not even one character fits in the line,
   it is `TEXT_OVERFLOW`.
 - **Intrinsic sizes**: they do not change ([below](#intrinsic-sizes)).
@@ -228,8 +231,9 @@ Styles:
 
 > **Decision:** the threshold is the whole line of the box and not what is left of the current line: a word that
 > fits in a line of its own is never cut, not beside a side box either, where it leaves the short lines empty like
-> any other. *Rejected alternative:* cutting every word that does not fit in what is left of the line, which would
-> split ordinary words.
+> any other. The exception is the first word of an indented paragraph, which has no line before it to leave a gap
+> in: its threshold is the indented line. *Rejected alternative:* cutting every word that does not fit in what is
+> left of the line, which would split ordinary words.
 
 > **Decision:** the long part starts in the current line, after the words before it, like a word split with a
 > hyphen. *Rejected alternative:* always starting it in a line of its own, which leaves an almost empty line before
@@ -290,7 +294,8 @@ Styles:
 - **With `Preformatted: true` or `wrap`** it applies the same way, to the first line of the text; with `wrap`,
   that line is broken at what the indent leaves.
 - **What does not fit.** An indent that leaves no room for the first word is `TEXT_OVERFLOW`: the word does not go
-  to the next line. `Break long words` still measures against the whole line of the box.
+  to the next line. With `Break long words: true`, that word is cut at the last character that fits after the
+  indent and goes on in the next line; if not even one character fits, it is `TEXT_OVERFLOW`.
 - **Intrinsic sizes**: the natural width adds the indent to the first line, and the narrowest width is the greater
   of the widest word and the first word plus the indent ([below](#intrinsic-sizes)).
 
@@ -309,9 +314,11 @@ Styles:
 > error too, which means writing `First line indent: 0` in each paragraph with a drop cap of a document with
 > indented paragraphs.
 
-> **Decision:** a first word that does not fit after the indent overflows. *Rejected alternative:* leaving the first
-> line empty and moving the word down, as beside a side box, which would give a paragraph with no indent after a
-> blank line.
+> **Decision:** a first word that does not fit after the indent overflows, and with `Break long words` it is cut in
+> the indented line. *Rejected alternatives:* leaving the first line empty and moving the word down, as beside a
+> side box, which would give a paragraph with no indent after a blank line; and `Break long words` measuring that
+> word against the whole line too, with which an indented paragraph that starts with a URL would be an error with
+> the property set.
 
 ## Kerning (`Kerning`)
 

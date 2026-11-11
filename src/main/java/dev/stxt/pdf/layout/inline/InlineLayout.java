@@ -262,10 +262,13 @@ public final class InlineLayout implements LayoutAlgorithm {
                 }
             }
         }
-        // With Break long words, a part of a word wider than a whole line of the box is cut at any character.
+        // With Break long words, a part of a word wider than a whole line of the box is cut at any character; the
+        // first one of the paragraph, wider than its indented line, which has no line before it to leave it for. The
+        // positions are the same from any position the text is broken from.
         double longWord = s.typography().breakLongWords() ? available : Double.POSITIVE_INFINITY;
+        double firstPart = longWord - Math.max(0, s.typography().firstLineIndent());
         Paragraph paragraph = Paragraph.of(runs, measurer(), s.typography().fontFace(), fontSize,
-                s.typography().letterSpacing(), hyphenator(s), longWord);
+                s.typography().letterSpacing(), hyphenator(s), longWord, firstPart);
         if (paragraph == null) {
             return new Broken(List.of(), fontSize, widths, dropCap);
         }

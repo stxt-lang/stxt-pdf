@@ -318,7 +318,9 @@ those of its written hyphens (`afterWrittenHyphens`, `Word.written`), with or wi
 carries no other hyphen, and its width and the narrowest width are measured without one. With `Break long words`,
 `InlineLayout` gives `Paragraph` the width of the content box, and `cutLongParts` adds a position between each two
 characters (a character `BreakIterator`, which does not separate a letter from its marks) of each part that, as a
-line of its own, does not fit in it; a whole word that fits is not even looked at. Both algorithms still choose
+line of its own, does not fit in it; a whole word that fits is not even looked at. The first part of the first word
+is measured against that width minus the positive `First line indent` of the box, wherever the text is broken from,
+so that the positions are always the same. Both algorithms still choose
 among positions. The greedy one tries those of the word that does not fit from the first one on and keeps the last
 one that fits; it stops trying when the line exceeds the available width by more than the font size
 (`hyphenMargin`: what an added hyphen can make an earlier position measure more than a later one), so a word of

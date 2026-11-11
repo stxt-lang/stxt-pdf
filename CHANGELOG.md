@@ -18,7 +18,8 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   a hanging indent (clauses, bibliographies, glossaries): the first line starts in the padding of its box. Beside a
   side box it is added to what the box takes, and a preformatted text indents its first line too. The natural width
   of the text adds it, and the narrowest width is the greater of the widest word and the first word plus the indent.
-  An indent that leaves no room for the first word is `TEXT_OVERFLOW`. "First line indent" in the reference of
+  An indent that leaves no room for the first word is `TEXT_OVERFLOW`; with `Break long words: true`, that word is
+  cut at the last character that fits after the indent. "First line indent" in the reference of
   `Typography`.
 - The error codes **`FIRST_LINE_INDENT_OVERFLOW`**, a negative `First line indent` greater than the left `Padding` of
   the box of the text, checked on the laid out box, so a `Padding` in percentage counts for what it measures (line of

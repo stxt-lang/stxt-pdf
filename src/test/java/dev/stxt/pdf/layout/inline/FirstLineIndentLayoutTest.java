@@ -202,6 +202,33 @@ class FirstLineIndentLayoutTest {
     }
 
     @Test
+    void breakLongWordsCutsTheFirstWordAtTheIndentedLine() {
+        // The word (20) fits in a line of the box (30), not in the indented one (15): three characters and the rest.
+        for (String breaking : List.of("simple", "optimal")) {
+            LayoutFixture f = layOut("\tText: aaaa aaaa", "\t\tId: T", "\t\tBox:", "\t\t\tWidth: 30",
+                    "\t\tTypography:", "\t\t\tFirst line indent: 15", "\t\t\tBreak long words: true",
+                    "\t\t\tLine breaking: " + breaking);
+            List<TextLine> lines = f.fragment("T").lines();
+            assertEquals(List.of("aaa", "a aaaa"), texts(lines), breaking);
+            assertTrue(lines.get(0).splitsWord(), breaking);
+            assertEquals(15, lines.get(0).x(), 1e-9, breaking);
+        }
+        // Only the first word: a later one that does not fit in what is left of the first line goes whole to the next.
+        assertEquals(List.of("aa", "aaaaa"), texts(layOut("\tText: aa aaaaa", "\t\tId: T", "\t\tBox:",
+                "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 15",
+                "\t\t\tBreak long words: true").fragment("T").lines()));
+        // And a first word that fits after the indent is not cut.
+        assertEquals(List.of("aaa", "aaaa"), texts(layOut("\tText: aaa aaaa", "\t\tId: T", "\t\tBox:",
+                "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 15",
+                "\t\t\tBreak long words: true").fragment("T").lines()));
+        // An indent that leaves no room for a character still overflows.
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tText: aaaa aaaa",
+                "\t\tBox:", "\t\t\tWidth: 30", "\t\tTypography:", "\t\t\tFirst line indent: 28",
+                "\t\t\tBreak long words: true"));
+        assertEquals(ErrorCode.TEXT_OVERFLOW, e.errorCode());
+    }
+
+    @Test
     void aParagraphWithADropCapIsNotIndented() {
         InvalidModelException e = assertThrows(InvalidModelException.class, () -> layOut("\tParagraph: " + words(40),
                 "\t\tDrop cap: 2", "\t\tTypography:", "\t\t\tFirst line indent: 20"));

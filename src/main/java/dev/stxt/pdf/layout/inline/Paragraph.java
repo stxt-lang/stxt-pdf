@@ -27,7 +27,9 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * <p><strong>Cuts of last resort.</strong> A part of a word that cannot be split further and is wider than
  * {@code longWord}, the width of a whole line of the box, gets a break point between each two of its characters
  * ({@link #cutLongParts}), so that the line breaking can end a line at the last one that fits. A word that fits in a
- * whole line has none: it goes to the next line, as always.</p>
+ * whole line has none: it goes to the next line, as always. The first part of the first word has no line before the
+ * one it starts in, the first one of the paragraph, which a {@code First line indent} makes shorter: it is cut from
+ * {@code firstPart}, the width of that line.</p>
  */
 final class Paragraph {
     /** How a line that ends at a position ends: between words, or inside a word in one of its three ways. */
@@ -60,16 +62,18 @@ final class Paragraph {
     private final double[] tail;
 
     Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing) {
-        this(words, measurer, font, fontSize, letterSpacing, Double.POSITIVE_INFINITY);
+        this(words, measurer, font, fontSize, letterSpacing, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
     /**
      * @param longWord the width from which a part of a word that cannot be split further is cut between any two of
      *                 its characters ({@code Break long words}): that of a whole line of the box; infinite to never
      *                 cut one
+     * @param firstPart the same width for the first part of the first word: that of the first line of the paragraph,
+     *                  with its {@code First line indent}; never greater than {@code longWord}
      */
     Paragraph(List<Words.Word> words, TextMeasurer measurer, FontFace font, double fontSize, double letterSpacing,
-              double longWord) {
+              double longWord, double firstPart) {
         this.words = words;
         this.measurer = measurer;
         this.font = font;
@@ -93,9 +97,10 @@ final class Paragraph {
             breaks[w] = word.breaks();
             kinds[w] = kinds(word);
             // A word that fits whole in a line has no part that does not.
-            if (longWord < Double.POSITIVE_INFINITY
-                    && !fits(advance - lastPart(word).format().letterSpacing(letterSpacing), longWord)) {
-                Cuts cuts = cutLongParts(word, kinds[w], longWord);
+            double first = w == 0 ? firstPart : longWord;
+            if (first < Double.POSITIVE_INFINITY
+                    && !fits(advance - lastPart(word).format().letterSpacing(letterSpacing), first)) {
+                Cuts cuts = cutLongParts(word, kinds[w], longWord, first);
                 breaks[w] = cuts.offsets();
                 kinds[w] = cuts.kinds();
             }
@@ -140,12 +145,12 @@ final class Paragraph {
     /**
      * The break points of a word with the cuts of last resort of its long parts ({@code Break long words},
      * reference/common/typography.md): each part between two of its break points that, as a line of its own (with
-     * its hyphen, if the line breaking adds one), is wider than {@code longWord} gets a break point between each two
-     * of its characters. A character is what the reader takes for one: a letter is not separated from its combining
+     * its hyphen, if the line breaking adds one), is wider than {@code longWord} ({@code first}, the first one) gets
+     * a break point between each two of its characters. A character is what the reader takes for one: a letter is not separated from its combining
      * marks, nor are the two halves of a surrogate pair. A word with a brace, which may hold {@code {page}} or a
      * reference, gets none, like with the patterns ({@link Words#breaks}).
      */
-    private Cuts cutLongParts(Words.Word word, byte[] kinds, double longWord) {
+    private Cuts cutLongParts(Words.Word word, byte[] kinds, double longWord, double first) {
         int[] breaks = word.breaks();
         String text = word.text();
         if (text.indexOf('{') >= 0 || text.indexOf('}') >= 0) {
@@ -163,7 +168,7 @@ final class Paragraph {
             if (k < breaks.length && kinds[k] == HYPHENATED) {
                 part = Words.hyphenated(part, word.parts(), to);
             }
-            if (!fits(LinePlacer.width(part, measurer, font, fontSize, letterSpacing), longWord)) {
+            if (!fits(LinePlacer.width(part, measurer, font, fontSize, letterSpacing), k == 0 ? first : longWord)) {
                 if (characters == null) {
                     characters = BreakIterator.getCharacterInstance(Locale.ROOT);
                     characters.setText(text);
@@ -204,8 +209,18 @@ final class Paragraph {
      */
     static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
                         double letterSpacing, Hyphenator hyphenator, double longWord) {
+        return of(runs, measurer, font, fontSize, letterSpacing, hyphenator, longWord, longWord);
+    }
+
+    /**
+     * The same, with the first line of the paragraph shorter than the rest ({@code First line indent}): the first
+     * part of the first word is cut from {@code firstPart}, the width of that line.
+     */
+    static Paragraph of(List<TextRun> runs, TextMeasurer measurer, FontFace font, double fontSize,
+                        double letterSpacing, Hyphenator hyphenator, double longWord, double firstPart) {
         List<Words.Word> words = Words.words(runs, hyphenator);
-        return words.isEmpty() ? null : new Paragraph(words, measurer, font, fontSize, letterSpacing, longWord);
+        return words.isEmpty() ? null
+                : new Paragraph(words, measurer, font, fontSize, letterSpacing, longWord, firstPart);
     }
 
     int words() {

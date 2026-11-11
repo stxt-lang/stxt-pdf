@@ -209,6 +209,9 @@ Styles:
 - **En el reparto**, con `optimal`, una línea solo acaba en un corte así si no le cabe un carácter más. Esa línea no
   tiene maldad, porque está llena, y lleva la penalización de un guion, pero no la de dos líneas seguidas acabadas en
   guion.
+- **Con `First line indent`**, la primera palabra del párrafo se mide contra su línea, la sangrada: si su primera
+  parte no cabe en ella, se corta ahí, aunque quepa en una línea entera
+  ([abajo](#sangría-de-primera-línea-first-line-indent)).
 - **Lo que no se corta.** Una palabra con `{page}`, `{pages}` o una referencia. Si en la línea no cabe ni un carácter,
   es `TEXT_OVERFLOW`.
 - **Tamaños intrínsecos**: no cambian ([abajo](#tamaños-intrínsecos)).
@@ -224,8 +227,9 @@ Styles:
 
 > **Decisión:** el umbral es la línea entera de la caja y no lo que queda de la línea en curso: una palabra que cabe
 > en una línea propia nunca se corta, tampoco junto a una caja lateral, donde deja vacías las líneas cortas como
-> cualquier otra. *Alternativa descartada:* cortar toda palabra que no quepa en lo que queda de línea, que partiría
-> palabras corrientes.
+> cualquier otra. La excepción es la primera palabra de un párrafo sangrado, que no tiene una línea anterior en la
+> que dejar un hueco: su umbral es la línea sangrada. *Alternativa descartada:* cortar toda palabra que no quepa en
+> lo que queda de línea, que partiría palabras corrientes.
 
 > **Decisión:** la parte larga empieza en la línea en curso, tras las palabras anteriores, como una palabra partida
 > con guion. *Alternativa descartada:* empezarla siempre en una línea propia, que deja una línea casi vacía delante
@@ -286,7 +290,8 @@ Styles:
 - **Con `Preformatted: true` o `wrap`** se aplica igual, a la primera línea del texto; con `wrap`, esa línea se
   parte en lo que deja la sangría.
 - **Lo que no cabe.** Una sangría que no deja sitio a la primera palabra es `TEXT_OVERFLOW`: la palabra no pasa a
-  la línea siguiente. `Break long words` sigue midiendo contra la línea entera de la caja.
+  la línea siguiente. Con `Break long words: true`, esa palabra se corta por el último carácter que cabe tras la
+  sangría y sigue en la línea siguiente; si no cabe ni un carácter, es `TEXT_OVERFLOW`.
 - **Tamaños intrínsecos**: el ancho natural suma la sangría a la primera línea, y el más estrecho es el mayor entre
   la palabra más ancha y la primera palabra más la sangría ([abajo](#tamaños-intrínsecos)).
 
@@ -305,9 +310,11 @@ Styles:
 > suele llegar de `For element: Paragraph`. *Alternativa descartada:* que la heredada también sea un error, que
 > obliga a escribir `First line indent: 0` en cada párrafo con capitular de un documento con los párrafos sangrados.
 
-> **Decisión:** una primera palabra que no cabe tras la sangría desborda. *Alternativa descartada:* dejar vacía la
-> primera línea y bajar la palabra, como junto a una caja lateral, que daría un párrafo sin sangría detrás de una
-> línea en blanco.
+> **Decisión:** una primera palabra que no cabe tras la sangría desborda, y con `Break long words` se corta en la
+> línea sangrada. *Alternativas descartadas:* dejar vacía la primera línea y bajar la palabra, como junto a una caja
+> lateral, que daría un párrafo sin sangría detrás de una línea en blanco; y que `Break long words` midiera también
+> esa palabra contra la línea entera, con lo que un párrafo sangrado que empieza por una URL sería un error con la
+> propiedad puesta.
 
 ## Kerning (`Kerning`)
 

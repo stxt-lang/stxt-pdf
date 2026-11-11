@@ -313,7 +313,9 @@ puntos de corte de cada palabra los de sus guiones escritos (`afterWrittenHyphen
 `Hyphenator`: ahí la línea no lleva otro guion, y su ancho y el ancho más estrecho se miden sin él. Con
 `Break long words`, `InlineLayout` da a `Paragraph` el ancho de la caja de contenido, y `cutLongParts` añade una
 posición entre cada dos caracteres (`BreakIterator` de caracteres, que no separa una letra de sus marcas) de cada
-parte que, como línea propia, no cabe en él; una palabra entera que cabe ni se mira. Los dos repartos siguen
+parte que, como línea propia, no cabe en él; una palabra entera que cabe ni se mira. La primera parte de la primera
+palabra se mide contra ese ancho menos la `First line indent` positiva de la caja, se reparta el texto desde donde
+se reparta, para que las posiciones sean siempre las mismas. Los dos repartos siguen
 eligiendo entre posiciones. El voraz prueba las de la palabra que no cabe de la primera en adelante y se queda con la
 última que cabe; deja de probar cuando la línea pasa del ancho disponible en más del cuerpo (`hyphenMargin`: lo que
 un guion añadido puede hacer que una posición anterior mida más que una posterior), así que una palabra de miles de
