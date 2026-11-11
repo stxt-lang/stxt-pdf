@@ -191,7 +191,7 @@ once, and the elements, as many times as needed.
 | Node | Children |
 |---|---|
 | `Document` | `Page`, `Title` and `Language` (exactly one of each), `Subject`, `Author`, `Keywords`, `Styles`; `Page overlay`, `Section` (at least one) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elements |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering`, `Trim margins`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` and the element properties of appearance and distribution ([Styles](styles.md#element-properties)), at most one of each |

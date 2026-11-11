@@ -1,6 +1,6 @@
-# Case: A footnote called twice
-# Code: FOOTNOTE_CALL_DUPLICATE
-# Line: 19
+# Case: A second call to a footnote from another section
+# Code: FOOTNOTE_UNKNOWN
+# Line: 23
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -16,7 +16,8 @@ Document (dev.stxt.pdf):
 				Markup: markdown
 	Section:
 		Paragraph: Una afirmación[^fuente].
-		Paragraph: Y otra[^fuente] con la misma nota.
 		Footnote:
 			Id: fuente
 			Paragraph: La fuente.
+	Section:
+		Paragraph: Otra sección con la misma nota[^fuente].

@@ -128,4 +128,23 @@ class FootnoteLayoutTest {
         assertEquals(new Rect(40, 148, 515, 12), f.rect("b"));
         assertTrue(f.rect("a").y() > f.rect("cols").y() + f.rect("cols").height());
     }
+
+    /**
+     * A note called several times goes once, on the page of its first call: a second call on the same page does not
+     * repeat it, and one on a later page brings nothing to the bottom of that page.
+     */
+    @Test
+    void aNoteCalledSeveralTimesGoesOnThePageOfItsFirstCall() {
+        LayoutFixture f = LayoutFixture.layOutPaged(200, join(new String[] {MARKDOWN,
+                "\tParagraph: aaaa[^n] bbbb[^n]", "\t\tId: p",
+                "\tBlock:", "\t\tId: filler", "\t\tBox:", "\t\t\tHeight: 80"},
+                text("q", 3, "[^n]"), note("n", 1)));
+        assertEquals(2, f.pages());
+        assertEquals(new Rect(40, 40, 515, 12), f.rect(1, "p"));
+        // One note, 12 tall, under the two calls of the first page.
+        assertEquals(new Rect(40, 148, 515, 12), f.rect(1, "n"));
+        // The third call is on page 2, whose text takes the whole page area: the note is not there.
+        assertEquals(new Rect(40, 40, 515, 36), f.rect(2, "q"));
+        f.assertAbsent(2, "n");
+    }
 }

@@ -14,6 +14,12 @@ import java.util.List;
  * counts nor carries a number. The number of a heading of level N is the counters of the levels
  * 1 to N that are numbered, each one written with the {@code Number format} of its heading: under a title without a
  * number (a {@code Heading 1}), the numbered {@code Heading 2} are 1, 2, 3...</p>
+ *
+ * <p>It also says in which <strong>chapter</strong> the document is, for the figures numbered by chapter
+ * ({@code Figure numbering: chapter}, reference/components/figure.md): the chapter is the last numbered heading with
+ * no numbered heading above it, the one whose number has a single part. A heading without a number of the level of
+ * the chapters or above ({@code Heading 1} while there has been no chapter) ends it: what follows is in no chapter
+ * until the next one.</p>
  */
 final class HeadingNumbers {
 
@@ -29,6 +35,25 @@ final class HeadingNumbers {
     private final boolean[] numbered = new boolean[LEVELS + 1];
     /** How the number of each level is written: the {@code Number format} of its last heading. */
     private final NumberFormat[] styles = new NumberFormat[LEVELS + 1];
+    /** The number of the chapter the document is in; {@code null} outside any chapter. */
+    private String chapter;
+    /** The level of the headings that are chapters: that of the last one, and 1 before the first. */
+    private int chapterLevel = 1;
+    /** How many stretches there have been: it goes up when a chapter starts and when one ends. */
+    private int stretch;
+
+    /** The number of the chapter the document is in ({@code "2"}, {@code "B"}); {@code null} outside any chapter. */
+    String chapter() {
+        return chapter;
+    }
+
+    /**
+     * The stretch of the document the reader is in: it changes with each chapter and with each heading that ends one,
+     * which is when a counter by chapter starts again.
+     */
+    int stretch() {
+        return stretch;
+    }
 
     /**
      * Records a heading in document order and returns its number ({@code "4.2"}, {@code "II.a"}), or
@@ -41,6 +66,10 @@ final class HeadingNumbers {
         numbered[level] = number;
         styles[level] = style;
         if (!number) {
+            if (level <= chapterLevel) {
+                chapter = null;
+                stretch++;
+            }
             return null;
         }
         counters[level]++;
@@ -50,6 +79,11 @@ final class HeadingNumbers {
             if (l == level || numbered[l]) {
                 parts.add(styles[l].format(counters[l]));
             }
+        }
+        if (parts.size() == 1) {
+            chapter = parts.get(0);
+            chapterLevel = level;
+            stretch++;
         }
         return String.join(".", parts);
     }

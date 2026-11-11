@@ -1,8 +1,8 @@
 # `Footnote`
 
 Una `Footnote` es una **nota al pie**. En el texto se escribe la llamada, `[^id]`, pegada a la palabra, y en cualquier
-sitio de la sección, la nota con ese `Id`. El motor numera las llamadas en orden, las pinta en superíndice y coloca
-cada nota al pie de la página donde cae su llamada, bajo un filete.
+sitio de la sección, la nota con ese `Id`. El motor numera las notas en el orden de sus llamadas, pinta las llamadas en superíndice y
+coloca cada nota al pie de la página donde cae su primera llamada, bajo un filete.
 
 ```
 Document (dev.stxt.pdf):
@@ -52,13 +52,17 @@ Document (dev.stxt.pdf):
 
 Admite además `Style`, `Box` y `Typography`. La llamada necesita `Markup: markdown` en el texto (o en una regla, como
 arriba), o estar en un `Markdown`. En la `Section`, `Footnote numbering: restart` vuelve a empezar la numeración en 1, y
-`Footnote number format` la escribe en letras o en romanos (`lower-alpha`, `upper-roman`...).
+`Footnote number format` la escribe en letras o en romanos (`lower-alpha`, `upper-roman`...) o con símbolos (`symbols`:
+`*`, `†`, `‡`, `§`, y después doblados).
 
 ## Cómo se comporta
 
 - La nota empieza con un `Paragraph`, un `Text` o un `Markdown`, que recibe el número en superíndice; después puede
   llevar más párrafos, listas o tablas. Sin encabezados ni imágenes.
-- Cada nota se llama una vez, y toda llamada tiene su nota en la misma sección; si no, es un error.
+- Toda llamada tiene su nota en la misma sección; si no, es un error.
+- Una nota puede llamarse varias veces: todas sus llamadas llevan el mismo número, y la nota va una vez, al pie de la
+  página de la primera. Con `Footnote number format: symbols`, `49 €[^iva]` y `20 €[^iva]` dan «49 €*» y «20 €*», y la
+  nota, «* IVA no incluido».
 - Las notas de una página van juntas al pie, bajo un filete, con el aspecto de `For element: Footnote area` (el filete es su
   borde superior; su tipografía es la de todas las notas) y el de `For element: Footnote` (cada nota).
 - Una línea solo entra en la página si su nota cabe debajo; si no, pasa a la página siguiente con la nota. Una nota

@@ -440,4 +440,26 @@ class PdfStructureTest {
             assertEquals(List.of("Lbl", "P"), kids(note));
         }
     }
+
+    /** A note called several times is one {@code Note}, after the text of its first call, and each call is a {@code Reference}. */
+    private static final String FOOTNOTE_TWICE = DOCUMENT + "\t\t\t\tMarkup: markdown\n"
+            + "\tParagraph: Uno[^n] dos[^n].\n\tParagraph: Tres[^n].\n\tFootnote:\n\t\tId: n\n\t\tParagraph: La nota.\n";
+
+    @Test
+    void aNoteCalledSeveralTimesIsOneNoteWithAReferencePerCall() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(Pdfs.of(FOOTNOTE_TWICE, 1))) {
+            PDStructureElement section = section(pdf);
+            assertEquals(List.of("P", "Note", "P"), kids(section));
+            PDStructureElement first = (PDStructureElement) section.getKids().get(0);
+            assertEquals(List.of("MCR", "Reference", "MCR", "Reference", "MCR"), kids(first));
+            PDStructureElement second = (PDStructureElement) section.getKids().get(2);
+            assertEquals(List.of("MCR", "Reference", "MCR"), kids(second));
+            PDStructureElement note = (PDStructureElement) section.getKids().get(1);
+            COSArray back = note.getCOSObject().getCOSArray(COSName.getPDFName("Ref"));
+            assertEquals(3, back.size());
+            assertSame(((PDStructureElement) second.getKids().get(1)).getCOSObject(), back.getObject(2));
+        }
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(FOOTNOTE_TWICE, 1), 1));
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(FOOTNOTE_TWICE, 2), 2));
+    }
 }

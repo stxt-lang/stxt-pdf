@@ -112,10 +112,10 @@ Las piezas:
 | `ListBuilder`, `ListMarkers` | Las listas: la numeración y la caja del marcador |
 | `MarkdownBuilder`, `RunMarks` | Traduce un `Markdown` (y el texto con `Markup: markdown`) a nodos STXT; `RunMarks` marca antes sus tramos con estilo |
 | `TableOfContentsBuilder` | Las entradas de los índices (de encabezados, de figuras o de tablas), al final de la construcción |
-| `HeadingNumbers` | Los números de los encabezados, y la escritura del número delante del título o del pie |
-| `Figures` | Las figuras: los dos contadores, si una `Figure` va numerada, dónde va su pie, con qué contador cuenta y su `Alt` |
+| `HeadingNumbers` | Los números de los encabezados, el capítulo en que está el documento (para las figuras numeradas por capítulo) y la escritura del número delante del título o del pie |
+| `Figures` | Las figuras: los dos contadores, seguidos o por capítulo según el `Figure numbering` de la sección, si una `Figure` va numerada, dónde va su pie, con qué contador cuenta y su `Alt` |
 | `References`, `LinkTargets` | Comprueban las referencias y los enlaces `#id` del árbol entero |
-| `Footnotes` | Las notas al pie: el área de cada sección, las llamadas `[^id]` numeradas al leerlas y, al final, que cada llamada tiene su nota y cada nota su llamada, y el número delante del primer texto de cada nota |
+| `Footnotes` | Las notas al pie: el área de cada sección, las llamadas `[^id]` numeradas al leerlas (una segunda llamada a una nota repite su número) y, al final, que cada llamada tiene su nota y cada nota su llamada, y el número delante del primer texto de cada nota |
 | `ModelValidator` | Las reglas que miran la caja ya leída (como los márgenes, los mínimos y máximos, el alto definido o el giro) |
 | `Nodes` | El acceso a los nodos y los errores |
 
@@ -158,7 +158,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
-`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` y el área de
+`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` y el área de
 notas, `footnotes()`). La **caja de cada sección es hija de la raíz del documento** (`Element.SECTION`, añadida tras los
 `Page overlay` del documento para que estos la precedan en el recorrido en preorden) y es la **raíz de su layout**
 (`Box.isLayoutRoot()`): los recorridos de todo el árbol (referencias, enlaces, índices, fuentes, imágenes, `Id`, estructura PDF)

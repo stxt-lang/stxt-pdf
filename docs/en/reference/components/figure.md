@@ -70,15 +70,16 @@ numbers its figures. A figure without a number does not count: the next one cont
 
 - **Two counters.** Figures and tables are numbered apart: `Figure counter: figures` or `tables`. Without declaring it, a
   `Figure` with a `Table` counts among the tables, and the rest, among the figures. Each counter goes up in document
-  order, across the sections, and never starts again.
+  order, across the sections, and never starts again, except in a section that numbers by chapter
+  ([below](#by-chapter-figure-numbering)).
 - **The format and the label.** `Number format` writes the number in digits, letters or Roman numerals, and
   `Number label` sets what goes before the caption, with `{number}` where the number goes:
   `Number label: Figure {number}.` gives "Figure 3. Diagram". They belong to `Typography`, are inherited and are given in
   `For element: Figure` (or in a rule for the tables, with `For style`). Without `Number label`, the caption starts with
   the number and a space, like a heading.
-- **It can be referred to.** `{number of: id}` of a numbered figure gives its number, without the label: "figure
-  {number of: wiring}" writes "figure 3" ([References](../common/references.md#number-of-id)). That of a figure without a
-  number is `REFERENCE_NOT_NUMBERED`.
+- **It can be referred to.** `{number of: id}` of a numbered figure gives its number, without the label and with that
+  of the chapter if it carries it: "figure {number of: wiring}" writes "figure 3", or "figure 2.3"
+  ([References](../common/references.md#number-of-id)). That of a figure without a number is `REFERENCE_NOT_NUMBERED`.
 
 ```
 Styles:
@@ -116,6 +117,67 @@ Figure:
 > **Decision:** the content decides the counter, and `Figure counter` only forces it (a `Block` with a drawn table that
 > counts among the tables, a table that counts as a figure). *Rejected alternative:* a single counter, or one that is
 > always declared.
+
+### By chapter (`Figure numbering`)
+
+`Figure numbering` is a property of `Section` ([Document](document.md#section)): with `chapter`, the figures and the
+tables of the section start again in each chapter and carry its number first, with a period: `2.3` is the third figure
+of chapter 2.
+
+```
+Styles:
+    For element: Heading 1
+        Typography:
+            Numbered: true
+    For element: Figure
+        Typography:
+            Number label: Figure {number}.
+Section:
+    Figure numbering: chapter
+    Heading 1:
+        Text: Installation             # "1 Installation"
+    Figure:
+        Caption: Front view            # "Figure 1.1. Front view"
+        Image: examples/manual/en/thermostat.svg
+            Alt: The thermostat seen from the front
+    Heading 1:
+        Text: Wiring                   # "2 Wiring"
+    Figure:
+        Id: wiring
+        Caption: The four terminals    # "Figure 2.1. The four terminals"
+        Image: examples/manual/en/wiring.svg
+            Alt: Wiring diagram of the terminals L, N, C and NO with the colours of the wires
+    Paragraph: The wires are connected as figure {number of: wiring} shows.     # "... as figure 2.1 shows."
+```
+
+| Property | Values | Default | Notes |
+|---|---|---|---|
+| `Figure numbering` | `continue`, `chapter` | `continue` | `continue` follows the counters of the document (`1`, `2`, `3`) and `chapter` starts again in each chapter and writes its number first (`2.3`). It applies to both counters. |
+
+- **The chapter** is the last numbered heading with no numbered heading above it: the one whose number has a single
+  part ([Headings](heading.md#numbering-numbered)). With every level numbered it is the `Heading 1`; with the title of
+  the document in a `Heading 1` without a number and the chapters in numbered `Heading 2` (`1`, `2`, `3`), the
+  `Heading 2`. The number of the chapter is written as in its heading, with its `Number format`: the figures of an
+  annex `A` are `A.1`, `A.2`. The part of the figure takes the `Number format` of the figure.
+- **Outside a chapter**, the figure carries its number alone (`1`, `2`). A heading without a number of the level of the
+  chapters or above ends the chapter and starts the count again: an introduction or credits without a number have
+  their figures `1`, `2`. Before the first chapter, that level is that of `Heading 1`.
+- **Both counters** start again at the same time: the tables of chapter 2 are `2.1`, `2.2`, like its figures.
+- **It belongs to each section.** The sections with `continue` follow the counters of the document, which the figures
+  numbered by chapter do not advance: three figures in a preliminary section and those of the chapters give `1`, `2`,
+  `3`, `1.1`, `1.2`, `2.1`.
+- The full number is the one the caption writes, the one `{number of: id}` gives and the one listed in the tables of
+  contents of figures and of tables, and `{number}` of `Number label` is that number: `Figure {number}.` gives
+  "Figure 2.3.".
+
+> **Decision:** the chapter is the highest numbered heading, whatever its level, and not always the `Heading 1`: a
+> document with its title in a `Heading 1` without a number numbers its chapters in `Heading 2`, and its figures have
+> to be able to follow them. *Rejected alternative:* the numbered `Heading 1`, shorter to explain, which leaves those
+> documents without numbering by chapter.
+
+> **Decision:** `Figure numbering` belongs to the `Section`, like `Page numbering` and `Footnote numbering`, and applies
+> to the figures and the tables at once. *Rejected alternative:* a property of `Typography`, inherited like `Numbered`,
+> which allows mixing figures by chapter and in a row in one document, with no use.
 
 ## The content
 
@@ -179,7 +241,8 @@ have no PDF bookmark.
 
 ## What is not supported
 
-- Restarting the numbering per chapter (`2.3`) and counters of the author's own (listings, equations).
+- Counters of the author's own (listings, equations), and choosing the heading level that restarts the numbering by
+  chapter or the separator.
 - A default label by language: it is declared with `Number label`.
 - Subfigures (`1a`, `1b`) with a caption each under a common caption.
 - A caption on the images of a `Markdown`, which remain `Image` elements without a caption.

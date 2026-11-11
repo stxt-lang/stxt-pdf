@@ -123,11 +123,11 @@ class MarkdownBuilderTest {
                 MarkdownBuilder.inline("Tres[^c]", 5, footnotes));
         assertEquals(List.of(new TextRun("2", TextFormat.PLAIN.withFootnote("d")), run(" cuatro")),
                 MarkdownBuilder.inline("[^d] cuatro", 6, footnotes));
-        // A second call to the same note is an error, with the line of the text.
-        InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> MarkdownBuilder.inline("Otra[^c]", 9, footnotes));
-        assertEquals(ErrorCode.FOOTNOTE_CALL_DUPLICATE, e.errorCode());
-        assertEquals(9, e.line());
+        // A second call to the same note repeats its number, and the next note follows the counter.
+        assertEquals(List.of(run("Otra"), new TextRun("1", TextFormat.PLAIN.withFootnote("c"))),
+                MarkdownBuilder.inline("Otra[^c]", 9, footnotes));
+        assertEquals(List.of(new TextRun("3", TextFormat.PLAIN.withFootnote("e"))),
+                MarkdownBuilder.inline("[^e]", 10, footnotes));
     }
 
     @Test

@@ -72,6 +72,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Footnote number format
 				Max: 1
+			Child: Figure numbering
+				Max: 1
 			Child: Trim margins
 				Max: 1
 			Child: Block
@@ -1520,15 +1522,22 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Values:
 			Value: continue
 			Value: restart
+	Node: Figure numbering
+		Type: ENUM
+		Description: How a Section numbers its figures and its tables with a caption: continue (by default) follows the counters of the document (1, 2, 3) and chapter starts again in each chapter and writes its number first (2.3).
+		Values:
+			Value: continue
+			Value: chapter
 	Node: Footnote number format
 		Type: ENUM
-		Description: How the footnotes of a Section are numbered, in the call and in the note: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i) or upper-roman (I).
+		Description: How the footnotes of a Section are numbered, in the call and in the note: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i), upper-roman (I) or symbols (*, †, ‡, §, and then doubled).
 		Values:
 			Value: decimal
 			Value: lower-alpha
 			Value: upper-alpha
 			Value: lower-roman
 			Value: upper-roman
+			Value: symbols
 	Node: Rotate
 		Type: NUMBER
 		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.

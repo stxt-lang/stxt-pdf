@@ -453,7 +453,8 @@ por caja con el resto de la clave), así que olvidar cuesta lo que las cajas olv
 
 **Notas al pie.** `FootnoteLayout` maqueta cada página de una sección con notas ([Footnote](../components/footnote.md)):
 el flujo con `ConstraintSpace.forPage(pageSetup, reserva)`, que quita a la raíz la altura reservada al pie, y las notas de
-las llamadas que caen en sus líneas (`TextFormat.footnote` en los tramos de las `TextLine`) apiladas en el área de notas
+las llamadas que caen en sus líneas (`TextFormat.footnote` en los tramos de las `TextLine`; las de una nota ya colocada
+en una página anterior no cuentan, porque la nota va con su primera llamada) apiladas en el área de notas
 de la sección (`Section.footnotes()`, la caja generada `Footnote area`, hija de la sección fuera de su flujo). Como el cuerpo
 es función de la reserva y las notas dependen del cuerpo, la reserva se busca por sondas: sin reserva; si las notas no
 caben, la altura entera de esas notas (en la que las de cualquier reserva mayor caben, porque menos sitio es menos

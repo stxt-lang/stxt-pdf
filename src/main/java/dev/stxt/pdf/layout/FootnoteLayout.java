@@ -14,6 +14,7 @@ import dev.stxt.pdf.tree.InvalidModelException;
 import dev.stxt.pdf.tree.Section;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,8 @@ import static dev.stxt.pdf.model.Tolerance.fits;
  * <p>The notes take room from the flow, and which notes there are depends on how much flow fits: the page is laid out
  * reserving a height {@code R} for the notes, the calls that fall in it are looked up in its lines, and the reservation
  * is adjusted until it is the <strong>smallest</strong> height in which the notes of those calls fit
- * ({@link #reserve}). A line enters the page only if its note starts under it: a note may continue on the next page,
+ * ({@link #reserve}). A note goes on the page of its first call: the calls to a note of a previous page count for
+ * nothing. A line enters the page only if its note starts under it: a note may continue on the next page,
  * before the notes of that page, if the break respects its widows, orphans and keeps; what does not fit otherwise
  * moves to the next page with the line that calls it. The remaining room, if the notes are shorter than the
  * reservation, stays between the text and the notes.</p>
@@ -109,6 +111,11 @@ final class FootnoteLayout {
     private final Section section;
     private final Box area;
     private final Map<String, Box> notes;
+    /**
+     * The notes already placed on the previous pages: a later call to one of them repeats its number and brings
+     * nothing to the bottom of its page.
+     */
+    private final Set<String> placed = new HashSet<>();
     /** Probes of the page being laid out, against {@link #MAX_PROBES}. */
     private int probes;
 
@@ -133,6 +140,7 @@ final class FootnoteLayout {
                 pageArea.width(), OptionalDouble.of(pageArea.height()), true), context);
         probes = 0;
         Probe p = reserve(from, carry, model, pageArea.height());
+        placed.addAll(p.calls());
         if (p.stacked().fragments().isEmpty()) {
             return new Result(p.body(), null, null);
         }
@@ -221,6 +229,7 @@ final class FootnoteLayout {
         }
         LayoutResult body = context.layout(section.box(), ConstraintSpace.forPage(section.pageSetup(), reserved), from);
         List<String> calls = new ArrayList<>(calls(body.fragment(), new LinkedHashSet<>()));
+        calls.removeAll(placed);
         boolean overflows = overflows(body.fragment(), pageHeight - reserved);
         if (overflows) {
             return new Probe(reserved, body, calls, true, null);
@@ -338,7 +347,7 @@ final class FootnoteLayout {
         return model.margin().vertical() + model.border().vertical() + model.padding().vertical() + stack.cursor();
     }
 
-    /** The {@code Id}s of the footnotes called in the lines of a fragment and its descendants, in order. */
+    /** The {@code Id}s of the footnotes called in the lines of a fragment and its descendants, in order, each once. */
     static Set<String> calls(Fragment f, Set<String> found) {
         for (TextLine l : f.lines()) {
             for (TextLine.Run r : l.runs()) {

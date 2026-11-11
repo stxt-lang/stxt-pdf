@@ -174,7 +174,8 @@ Una `Footnote` ([Footnote](../components/footnote.md)) es un `Note` (con PDF/UA-
 del elemento del texto que la llama** (hermana de su `P` o, si la llama una celda, dentro de su `TD`), y no al final de
 la página donde se pinta: el orden de lectura pone la nota tras su párrafo. La llamada es un `Reference` dentro del
 elemento del texto, con el número como contenido marcado, que señala la nota con `Ref`; la nota señala la llamada con
-el suyo.
+el suyo. Una nota llamada varias veces es un solo `Note`, tras el texto de su primera llamada: cada llamada es un
+`Reference` que la señala, y el `Ref` de la nota las lista todas.
 
 > **Decisión:** la nota cuelga tras el texto que la llama y no del `Sect` al final de la página: el árbol de estructura
 > es el orden de lectura, no el de pintado. *Alternativa descartada:* un `Div` con las notas al final de cada página.

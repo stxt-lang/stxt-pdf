@@ -1,0 +1,46 @@
+# Footnotes with symbols and several calls to the same note (reference/components/footnote.md). Pages of 300 × 200
+# with margins of 20: page area of 260 × 160 from (20, 20), which ends at y = 180. Lines of 12 (Size 10). The footnote
+# area has, by default, a top margin of 8, a rule of 0.5 and a padding of 4 above its notes: 12.5 more than the notes.
+#
+# p1 calls iva (*) and plazo (†), and p2 calls iva again, with the same asterisk: the page has two notes, not three
+# (24 + 12.5 = 36.5), and leaves 123.5 for the text. tall (90) fits after p1 and p2, up to 134; p3, which calls iva a
+# third time and entrega (‡), would end at 146 and its new note needs 12 more, so it moves to page 2 with it.
+# Page 1: the area, 28.5 high, at 151.5; iva at 156 and plazo at 168.
+# Page 2: p3 at 20 and only entrega below, because iva is on the page of its first call: area of 16.5 at 163.5,
+# entrega at 168.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 300
+		Height: 200
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Markup: markdown
+	Section:
+		Footnote number format: symbols
+		Paragraph: Precio[^iva] y plazo[^plazo].
+			Id: p1
+		Paragraph: Portes[^iva] aparte.
+			Id: p2
+		Footnote:
+			Id: iva
+			Paragraph: IVA no incluido.
+		Footnote:
+			Id: plazo
+			Paragraph: En días laborables.
+		Block:
+			Id: tall
+			Box:
+				Height: 90
+			Break:
+				Keep together: true
+		Paragraph: Total[^iva] y entrega[^entrega].
+			Id: p3
+		Footnote:
+			Id: entrega
+			Paragraph: En la península.

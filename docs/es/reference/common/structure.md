@@ -191,7 +191,7 @@ vez, y los elementos, las veces que se quiera.
 | Nodo | Hijos |
 |---|---|
 | `Document` | `Page`, `Title` y `Language` (exactamente uno de cada), `Subject`, `Author`, `Keywords`, `Styles`; `Page overlay`, `Section` (al menos una) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Trim margins`; elementos |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering`, `Trim margins`; elementos |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` y las propiedades de elemento de aspecto y de reparto ([Styles](styles.md#propiedades-de-elemento)), como mucho una de cada |

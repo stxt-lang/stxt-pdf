@@ -2,7 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.pdf.model.Layout;
-import dev.stxt.pdf.model.NumberFormat;
+import dev.stxt.pdf.model.FootnoteNumberFormat;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextFormat;
@@ -26,11 +26,12 @@ import static dev.stxt.pdf.tree.PropertyKey.ROTATE;
  * The footnotes of a document while its tree is built (reference/components/footnote.md): the calls
  * ({@code [^id]}, which {@link MarkdownBuilder} finds in the texts), the {@code Footnote} boxes and their numbering.
  *
- * <p>The calls are numbered in document order, as they are read, with the {@code Footnote numbering} and the
- * {@code Footnote number format} of their section: the number is the text of the call run, so the text measures what
- * is painted. The notes hang from the footnote area of their section ({@link Element#FOOTNOTES}), whatever box of the
+ * <p>The notes are numbered in document order of their first call, as the calls are read, with the
+ * {@code Footnote numbering} and the {@code Footnote number format} of their section: the number is the text of the
+ * call run, so the text measures what is painted. A note may be called several times: the later calls repeat its
+ * number. The notes hang from the footnote area of their section ({@link Element#FOOTNOTES}), whatever box of the
  * document holds them. When the whole tree is read ({@link #finish}), every call has its note in the same section,
- * every note is called once, and each note gets its number as a superscript before its first text.</p>
+ * every note is called, and each note gets its number as a superscript before its first text.</p>
  */
 final class Footnotes {
 
@@ -41,7 +42,7 @@ final class Footnotes {
     /** Space between the rule and the first note, by default, in points. */
     static final double DEFAULT_PADDING = 4;
 
-    /** A call: its line, its section and its number as it is written. */
+    /** The first call to a note: its line, its section and the number of the note as it is written. */
     private record Call(int line, int section, String label) {
     }
 
@@ -55,7 +56,7 @@ final class Footnotes {
     private Box area;
     private int section = -1;
     private int next = 1;
-    private NumberFormat format = NumberFormat.DECIMAL;
+    private FootnoteNumberFormat format = FootnoteNumberFormat.DECIMAL;
     /**
      * Why a call is not allowed where the text being read is ({@code a Page overlay}, {@code a heading},
      * {@code a Footnote}); {@code null} if it is allowed.
@@ -73,7 +74,7 @@ final class Footnotes {
      * {@value #DEFAULT_PADDING} pt below), and its numbering.
      */
     Box beginSection(BuildContext ctx, InlineNode n, Box sectionBox, Section.FootnoteNumbering numbering,
-                     NumberFormat numberFormat) {
+                     FootnoteNumberFormat numberFormat) {
         section++;
         if (numbering == Section.FootnoteNumbering.RESTART) {
             next = 1;
@@ -108,8 +109,9 @@ final class Footnotes {
     }
 
     /**
-     * A call {@code [^id]} read at {@code line}: its number, written with the format of the section. A second call to
-     * the same note, or a call where none is allowed, is an error.
+     * A call {@code [^id]} read at {@code line}: the number of its note, written with the format of the section. The
+     * first call to a note numbers it, and the later ones repeat its number. A call where none is allowed, or in
+     * another section than the first one, is an error.
      */
     String call(String id, int line) {
         if (noCalls != null) {
@@ -118,8 +120,12 @@ final class Footnotes {
         }
         Call previous = calls.get(id);
         if (previous != null) {
-            throw error(line, ErrorCode.FOOTNOTE_CALL_DUPLICATE, "The footnote " + id + " is already called on line "
-                    + previous.line() + ": a footnote is called once, and a second note needs its own Footnote");
+            if (previous.section() != section) {
+                throw error(line, ErrorCode.FOOTNOTE_UNKNOWN, "The footnote call [^" + id + "] is in another section "
+                        + "than the first call to that note (line " + previous.line() + "): a note and its calls go "
+                        + "in the same section");
+            }
+            return previous.label();
         }
         String label = format.format(next++);
         calls.put(id, new Call(line, section, label));

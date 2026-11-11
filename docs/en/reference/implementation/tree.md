@@ -112,10 +112,10 @@ The pieces:
 | `ListBuilder`, `ListMarkers` | Lists: the numbering and the box of the marker |
 | `MarkdownBuilder`, `RunMarks` | Translates a `Markdown` (and text with `Markup: markdown`) into STXT nodes; `RunMarks` marks its styled runs first |
 | `TableOfContentsBuilder` | The entries of the tables of contents (of headings, figures or tables), at the end of the construction |
-| `HeadingNumbers` | The numbers of the headings, and the writing of the number before the title or the caption |
-| `Figures` | The figures: the two counters, whether a `Figure` is numbered, where its caption goes, which counter it counts in and its `Alt` |
+| `HeadingNumbers` | The numbers of the headings, the chapter the document is in (for the figures numbered by chapter) and the writing of the number before the title or the caption |
+| `Figures` | The figures: the two counters, in a row or by chapter according to the `Figure numbering` of the section, whether a `Figure` is numbered, where its caption goes, which counter it counts in and its `Alt` |
 | `References`, `LinkTargets` | Check the references and the `#id` links of the whole tree |
-| `Footnotes` | The footnotes: the area of each section, the calls `[^id]` numbered as they are read and, at the end, that each call has its note and each note its call, and the number before the first text of each note |
+| `Footnotes` | The footnotes: the area of each section, the calls `[^id]` numbered as they are read (a second call to a note repeats its number) and, at the end, that each call has its note and each note its call, and the number before the first text of each note |
 | `ModelValidator` | The rules that look at the box already read (such as margins, minimums and maximums, definite height or rotation) |
 | `Nodes` | Access to the nodes and the errors |
 
@@ -158,7 +158,7 @@ list, those in flow are computed once, and writing to a closed box or style is a
 ## The sections and the root
 
 `BoxTreeBuilder.Result` gives the root of the document and the list of `Section` (`tree/Section`: box, `PageSetup`, `Page numbering`,
-`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format` and the
+`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` and the
 footnote area, `footnotes()`). The **box of each section is a child of the root of the document** (`Element.SECTION`, added after
 the `Page overlay` elements of the document so that they precede it in preorder traversal) and is the **root of its layout**
 (`Box.isLayoutRoot()`): the traversals of the whole tree (references, links, tables of contents, fonts, images, `Id`, PDF

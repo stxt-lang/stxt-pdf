@@ -8,9 +8,33 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 ## [Unreleased]
 
 **From 0.16.0**: `tree.Metadata` has a fifth component, `keywords`, so its constructor takes five arguments instead of
-four. No document changes.
+four. `tree.Section` has one more component, `figureNumbering`, and its `footnoteNumberFormat` is a
+`model.FootnoteNumberFormat` instead of a `model.NumberFormat`. A second call to a footnote is no longer an error, and
+the code `FOOTNOTE_CALL_DUPLICATE` is gone. No document that was valid changes.
 
 ### Added
+
+- **Figures numbered by chapter.** `Figure numbering` in `Section` (optional): `continue`, the default, follows the
+  counters of the document (`1`, `2`, `3`), and `chapter` starts the figures and the tables again in each chapter and
+  writes its number first, with a period (`2.3`). The chapter is the last numbered heading with no numbered heading
+  above it, written with its `Number format`: the `Heading 1` when every level is numbered, the `Heading 2` under a
+  title without a number, and `A.1` in an annex numbered in letters. A heading without a number of the level of the
+  chapters or above ends the chapter: its figures carry their number alone and start again. The full number is what the
+  caption writes (in `{number}` of `Number label`), what `{number of: id}` gives and what the tables of contents of
+  figures and of tables list. The sections with `continue` keep the counters of the document, which the figures by
+  chapter do not advance. `Section` gains `figureNumbering()` and the enum `Section.FigureNumbering`. "By chapter" in
+  the reference of `Figure`.
+- **Footnotes with symbols.** `Footnote number format` takes `symbols`: the notes are marked with `*`, `†`, `‡` and
+  `§`, in that order, and then doubled (`**`, `††`), tripled, and so on, in the call and in the note, as superscripts.
+  They follow the counter of the section, so `Footnote numbering: restart` starts each section with the asterisk. The
+  new enum `model.FootnoteNumberFormat` has the five formats of `NumberFormat` and `SYMBOLS`. "Numbering" in the
+  reference of `Footnote`.
+- **Several calls to the same footnote.** A second `[^id]` to a note already called repeats its number instead of being
+  an error: the cells of a table that refer to the same note carry the same mark. The note is one: it goes at the
+  bottom of the page of its first call, and the later calls, on that page or on another, bring nothing to the bottom.
+  In the tagged PDF it is a single `Note`, after the text of its first call, and each call is a `Reference` that points
+  to it. All the calls to a note go in its section: one from another section is `FOOTNOTE_UNKNOWN`. Golden
+  `53-footnote-symbols`.
 
 - **The suffix of the markers of a numbered list.** `Marker suffix` in `List` (optional) says what follows the number:
   `period`, the default (`1.`, `a.`), or `parenthesis` (`1)`, `a)`), the usual form of the clauses of a contract. It can

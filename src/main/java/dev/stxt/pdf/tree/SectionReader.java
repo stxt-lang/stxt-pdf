@@ -2,6 +2,7 @@ package dev.stxt.pdf.tree;
 
 import dev.stxt.InlineNode;
 import dev.stxt.Node;
+import dev.stxt.pdf.model.FootnoteNumberFormat;
 import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.TrimMargins;
 
@@ -14,7 +15,7 @@ import static dev.stxt.pdf.tree.ValueReader.positiveInteger;
 /**
  * What a {@code Section} says about its pages (reference/components/document.md): its {@code Id}, its medium, its
  * page numbering, whether it carries the {@code Page overlay} elements of the document, on which page it begins and
- * how it numbers its footnotes (reference/components/footnote.md), with the rules of those properties. Its box and its
+ * how it numbers its footnotes (reference/components/footnote.md) and its figures (reference/components/figure.md), with the rules of those properties. Its box and its
  * content are built by {@link BoxTreeBuilder}, as for any element.
  */
 final class SectionReader {
@@ -28,8 +29,8 @@ final class SectionReader {
      */
     record Properties(String id, PageSetup pageSetup, Section.PageNumbering numbering, NumberFormat pageNumberFormat,
                       int firstNumber, boolean inheritPageOverlays, Section.BeginOn beginOn,
-                      Section.FootnoteNumbering footnoteNumbering, NumberFormat footnoteNumberFormat,
-                      TrimMargins trimMargins) {
+                      Section.FootnoteNumbering footnoteNumbering, FootnoteNumberFormat footnoteNumberFormat,
+                      Section.FigureNumbering figureNumbering, TrimMargins trimMargins) {
     }
 
     /**
@@ -47,13 +48,15 @@ final class SectionReader {
         boolean inheritPageOverlays = true;
         Section.BeginOn beginOn = Section.BeginOn.ANY;
         Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
-        NumberFormat footnoteNumberFormat = NumberFormat.DECIMAL;
+        FootnoteNumberFormat footnoteNumberFormat = FootnoteNumberFormat.DECIMAL;
+        Section.FigureNumbering figureNumbering = Section.FigureNumbering.CONTINUE;
         TrimMargins trimMargins = TrimMargins.NONE;
         for (Node p : n.getChildren()) {
             switch (p.getCanonicalName()) {
                 case "id" -> id = ctx.id(p);
                 case "footnote-numbering" -> footnoteNumbering = enumValue(Section.FootnoteNumbering.class, p);
-                case "footnote-number-format" -> footnoteNumberFormat = enumValue(NumberFormat.class, p);
+                case "footnote-number-format" -> footnoteNumberFormat = enumValue(FootnoteNumberFormat.class, p);
+                case "figure-numbering" -> figureNumbering = enumValue(Section.FigureNumbering.class, p);
                 case "page" -> pageSetup = PageSetupReader.pageSetup(inline(p), documentPageSetup);
                 case "page-numbering" -> numbering = enumValue(Section.PageNumbering.class, p);
                 case "page-number-format" -> {
@@ -88,6 +91,6 @@ final class SectionReader {
                     + "effect with Page numbering: none, because the pages of the section have no number: it is not needed");
         }
         return new Properties(id, pageSetup.pageSetup(), numbering, pageNumberFormat, firstNumber, inheritPageOverlays,
-                beginOn, footnoteNumbering, footnoteNumberFormat, trimMargins);
+                beginOn, footnoteNumbering, footnoteNumberFormat, figureNumbering, trimMargins);
     }
 }

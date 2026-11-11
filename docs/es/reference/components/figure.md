@@ -69,14 +69,15 @@ Una figura sin número no cuenta: la siguiente sigue el contador.
 
 - **Dos contadores.** Las figuras y las tablas se numeran aparte: `Figure counter: figures` o `tables`. Sin declararlo,
   una `Figure` con una `Table` cuenta entre las tablas, y las demás, entre las figuras. Cada contador sube en orden del
-  documento, a través de las secciones, y no vuelve a empezar.
+  documento, a través de las secciones, y no vuelve a empezar, salvo en una sección que numera por capítulo
+  ([abajo](#por-capítulo-figure-numbering)).
 - **El formato y la etiqueta.** `Number format` escribe el número en cifras, letras o romanos, y `Number label` pone lo
   que va delante del pie, con `{number}` donde va el número: `Number label: Figura {number}.` da «Figura 3. Esquema».
   Son de `Typography`, se heredan y se dan en `For element: Figure` (o en una regla de las tablas, con `For style`). Sin
   `Number label`, el pie empieza por el número y un espacio, como un encabezado.
-- **Se puede referir.** `{number of: id}` de una figura numerada da su número, sin la etiqueta: «la figura
-  {number of: wiring}» escribe «la figura 3» ([Referencias](../common/references.md#number-of-id)). El de una figura sin
-  número es `REFERENCE_NOT_NUMBERED`.
+- **Se puede referir.** `{number of: id}` de una figura numerada da su número, sin la etiqueta y con el del capítulo
+  si lo lleva: «la figura {number of: wiring}» escribe «la figura 3», o «la figura 2.3»
+  ([Referencias](../common/references.md#number-of-id)). El de una figura sin número es `REFERENCE_NOT_NUMBERED`.
 
 ```
 Styles:
@@ -113,6 +114,66 @@ Figure:
 > **Decisión:** el contador lo decide el contenido, y `Figure counter` solo lo fuerza (un `Block` con una tabla dibujada
 > que cuenta entre las tablas, una tabla que cuenta como figura). *Alternativa descartada:* un único contador, o uno
 > declarado siempre.
+
+### Por capítulo (`Figure numbering`)
+
+`Figure numbering` es una propiedad de `Section` ([Document](document.md#section)): con `chapter`, las figuras y las
+tablas de la sección vuelven a empezar en cada capítulo y llevan su número delante, con un punto: `2.3` es la tercera
+figura del capítulo 2.
+
+```
+Styles:
+    For element: Heading 1
+        Typography:
+            Numbered: true
+    For element: Figure
+        Typography:
+            Number label: Figura {number}.
+Section:
+    Figure numbering: chapter
+    Heading 1:
+        Text: Instalación              # «1 Instalación»
+    Figure:
+        Caption: Vista frontal         # «Figura 1.1. Vista frontal»
+        Image: examples/manual/es/thermostat.svg
+            Alt: El termostato visto de frente
+    Heading 1:
+        Text: Conexión                 # «2 Conexión»
+    Figure:
+        Id: wiring
+        Caption: Los cuatro bornes     # «Figura 2.1. Los cuatro bornes»
+        Image: examples/manual/es/wiring.svg
+            Alt: Esquema de conexión de los bornes L, N, C y NO con los colores de los cables
+    Paragraph: Los cables se conectan como muestra la figura {number of: wiring}.     # «... la figura 2.1.»
+```
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Figure numbering` | `continue`, `chapter` | `continue` | `continue` sigue los contadores del documento (`1`, `2`, `3`) y `chapter` vuelve a empezar en cada capítulo y escribe su número delante (`2.3`). Vale para los dos contadores. |
+
+- **El capítulo** es el último encabezado numerado que no tiene otro numerado por encima: aquel cuyo número tiene una
+  sola parte ([Encabezados](heading.md#numeración-numbered)). Con todos los niveles numerados es el `Heading 1`; con el
+  título del documento en un `Heading 1` sin número y los capítulos en `Heading 2` numerados (`1`, `2`, `3`), el
+  `Heading 2`. El número del capítulo se escribe como en su encabezado, con su `Number format`: las figuras de un anexo
+  `A` son `A.1`, `A.2`. La parte de la figura lleva el `Number format` de la figura.
+- **Fuera de un capítulo**, la figura lleva su número solo (`1`, `2`). Un encabezado sin número del nivel de los
+  capítulos o superior acaba el capítulo y vuelve a empezar la cuenta: una introducción o unos créditos sin numerar
+  tienen sus figuras `1`, `2`. Antes del primer capítulo, ese nivel es el del `Heading 1`.
+- **Los dos contadores** vuelven a empezar a la vez: las tablas del capítulo 2 son `2.1`, `2.2`, como sus figuras.
+- **Es de cada sección.** Las secciones con `continue` siguen los contadores del documento, que las figuras numeradas
+  por capítulo no hacen subir: tres figuras en una sección preliminar y las de los capítulos dan `1`, `2`, `3`, `1.1`,
+  `1.2`, `2.1`.
+- El número completo es el que escribe el pie, el que da `{number of: id}` y el que sale en los índices de figuras y de
+  tablas, y `{number}` de `Number label` es ese número: `Figura {number}.` da «Figura 2.3.».
+
+> **Decisión:** el capítulo es el encabezado numerado más alto, sea del nivel que sea, y no siempre el `Heading 1`: un
+> documento con el título en un `Heading 1` sin número numera sus capítulos en `Heading 2`, y sus figuras tienen que
+> poder seguirlos. *Alternativa descartada:* el `Heading 1` numerado, más corto de explicar, que deja sin numeración
+> por capítulo a esos documentos.
+
+> **Decisión:** `Figure numbering` es de la `Section`, como `Page numbering` y `Footnote numbering`, y vale para las
+> figuras y las tablas a la vez. *Alternativa descartada:* una propiedad de `Typography`, heredada como `Numbered`, que
+> permite mezclar en un documento figuras por capítulo y seguidas, sin uso.
 
 ## El contenido
 
@@ -175,7 +236,8 @@ no tienen marcador del PDF.
 
 ## Lo que no hay
 
-- Reiniciar la numeración por capítulo (`2.3`) y contadores propios del autor (listados, ecuaciones).
+- Contadores propios del autor (listados, ecuaciones), y elegir el nivel de encabezado que reinicia la numeración
+  por capítulo o el separador.
 - Una etiqueta por defecto según el idioma: se declara con `Number label`.
 - Subfiguras (`1a`, `1b`) con un pie cada una bajo un pie común.
 - Pie en las imágenes de un `Markdown`, que siguen siendo `Image` sin pie.

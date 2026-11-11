@@ -83,7 +83,8 @@ Document (dev.stxt.pdf):
 
 It also accepts `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` and `Below side boxes`. `Numbered: false` (in its `Typography` or in
 a rule) leaves it without a number; `Number label` and `Number format` write the number as in the headings
-([Headings](heading.md#numbering-numbered)).
+([Headings](heading.md#numbering-numbered)). In the `Section`, `Figure numbering: chapter` numbers the figures and the
+tables by chapter.
 
 ## How it behaves
 
@@ -94,6 +95,9 @@ a rule) leaves it without a number; `Number label` and `Number format` write the
 - The number goes before the caption, with a space: "1 Diagram". With `Number label: Figure {number}.` in
   `For element: Figure`, "Figure 1. Diagram". Tables count apart: the first `Figure` with a `Table` is table 1.
 - `{number of: id}` writes the number of a figure with `Id`, without the label: "figure 2".
+- With `Figure numbering: chapter` in the `Section`, the count starts again in each chapter and its number goes first:
+  "Figure 2.3." is the third figure of chapter 2. The chapter is the numbered heading of the highest level: the
+  `Heading 1`, or the `Heading 2` if the `Heading 1` is a title without a number.
 - The figure **is not split** between pages: if it does not fit, it goes whole to the next one. A table inside is split,
   and the caption stays with its first part (or with the last, if it goes below).
 - A `Table of contents` with `Entries: figures` lists the figures, and with `Entries: tables`, the tables, with the text of their

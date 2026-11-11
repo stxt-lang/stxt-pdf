@@ -132,13 +132,47 @@ class FootnotesTest {
         assertEquals(3, note.style().box().margin().bottom().resolve(0).orElseThrow());
     }
 
+    /** A note may be called several times: the later calls repeat its number, and the note is one. */
+    @Test
+    void aSecondCallRepeatsTheNumberOfItsNote() {
+        Section section = build("\tSection:", "\t\tParagraph: Uno[^a], dos[^b] y otra vez[^a].",
+                "\t\tParagraph: Tres[^c] y la primera[^a].",
+                "\t\tFootnote:", "\t\t\tId: a", "\t\t\tParagraph: A.", "\t\tFootnote:", "\t\t\tId: b",
+                "\t\t\tParagraph: B.", "\t\tFootnote:", "\t\t\tId: c", "\t\t\tParagraph: C.").sections().get(0);
+        List<Box> texts = section.box().inFlowChildren();
+        assertEquals(List.of(run("Uno"), call("1", "a"), run(", dos"), call("2", "b"), run(" y otra vez"),
+                call("1", "a"), run(".")), texts.get(0).runs());
+        assertEquals(List.of(run("Tres"), call("3", "c"), run(" y la primera"), call("1", "a"), run(".")),
+                texts.get(1).runs());
+        assertEquals(List.of(label("1"), run(" "), run("A.")), section.footnotes().children().get(0).children().get(0).runs());
+        assertEquals(3, section.footnotes().children().size());
+    }
+
+    /** {@code Footnote number format: symbols}: the asterisk, the dagger, the double dagger, the section sign, and doubled. */
+    @Test
+    void theNotesCanBeMarkedWithSymbols() {
+        assertEquals(List.of("*", "\u2020", "\u2021", "\u00a7", "**", "\u2020\u2020", "\u2021\u2021", "\u00a7\u00a7", "***"),
+                java.util.stream.IntStream.rangeClosed(1, 9)
+                        .mapToObj(dev.stxt.pdf.model.FootnoteNumberFormat.SYMBOLS::format).toList());
+        assertEquals("iv", dev.stxt.pdf.model.FootnoteNumberFormat.LOWER_ROMAN.format(4));
+        Section section = build("\tSection:", "\t\tFootnote number format: symbols",
+                "\t\tParagraph: Precio[^iva] y plazo[^plazo].",
+                "\t\tFootnote:", "\t\t\tId: iva", "\t\t\tParagraph: IVA no incluido.",
+                "\t\tFootnote:", "\t\t\tId: plazo", "\t\t\tParagraph: En días.").sections().get(0);
+        assertEquals(List.of(run("Precio"), call("*", "iva"), run(" y plazo"), call("\u2020", "plazo"), run(".")),
+                section.box().inFlowChildren().get(0).runs());
+        assertEquals(List.of(label("\u2020"), run(" "), run("En días.")),
+                section.footnotes().children().get(1).children().get(0).runs());
+    }
+
     @Test
     void whatIsNotAllowed() {
         assertEquals(ErrorCode.FOOTNOTE_UNKNOWN, error("\tSection:", "\t\tParagraph: Uno[^a]."));
         assertEquals(ErrorCode.FOOTNOTE_NOT_CALLED, error("\tSection:", "\t\tParagraph: Uno.", "\t\tFootnote:",
                 "\t\t\tId: a", "\t\t\tParagraph: A."));
-        assertEquals(ErrorCode.FOOTNOTE_CALL_DUPLICATE, error("\tSection:", "\t\tParagraph: Uno[^a] y [^a].",
-                "\t\tFootnote:", "\t\t\tId: a", "\t\t\tParagraph: A."));
+        // A second call to a note in another section than the first one.
+        assertEquals(ErrorCode.FOOTNOTE_UNKNOWN, error("\tSection:", "\t\tParagraph: Uno[^a].",
+                "\t\tFootnote:", "\t\t\tId: a", "\t\t\tParagraph: A.", "\tSection:", "\t\tParagraph: Dos[^a]."));
         assertEquals(ErrorCode.FOOTNOTE_CALL_NOT_ALLOWED, error("\tSection:", "\t\tParagraph: Uno[^a].",
                 "\t\tFootnote:", "\t\t\tId: a", "\t\t\tParagraph: A[^b].", "\t\tFootnote:", "\t\t\tId: b",
                 "\t\t\tParagraph: B."));

@@ -158,7 +158,8 @@ contenido está en alguna.
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Descarta el margen de arriba de su primer elemento (`top`), el de abajo del último (`bottom`) o los dos: con `both` o `top`, el contenido empieza arriba del área útil ([Block](block.md#recortar-los-márgenes-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | En qué página física empieza ([doble cara](#empezar-en-página-impar)). En la primera sección, `odd` es `BEGIN_ON_FIRST_SECTION`. |
 | `Footnote numbering` | `continue`, `restart` | `continue` | Si sus notas al pie siguen el contador del documento o vuelven a empezar en 1 ([Footnote](footnote.md#numeración)). |
-| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se numeran sus notas al pie, en la llamada y en la nota. |
+| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`, `symbols` | `decimal` | Cómo se numeran sus notas al pie, en la llamada y en la nota; `symbols` las marca con `*`, `†`, `‡` y `§` ([Footnote](footnote.md#numeración)). |
+| `Figure numbering` | `continue`, `chapter` | `continue` | Si sus figuras y sus tablas con pie siguen los contadores del documento o vuelven a empezar en cada capítulo, con su número delante (`2.3`) ([Figure](figure.md#por-capítulo-figure-numbering)). |
 
 Su contenido son elementos en flujo, `Frame`, `Overlay`, `Page overlay` y `Footnote` ([Footnote](footnote.md)), que no ocupa
 sitio donde se escribe.
@@ -248,7 +249,7 @@ Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_
 que no tendría efecto porque la sección sigue la cuenta de la anterior, es `FIRST_NUMBER_WITHOUT_RESTART`.
 
 > **Decisión:** el estilo es de la sección y no del contador: una sección `continue` en romanos sigue la cuenta de la
-> anterior y la escribe en romanos. Los formatos son los cinco de `Number format` y de `Footnote number format`.
+> anterior y la escribe en romanos. Los formatos son los cinco de `Number format`.
 > *Alternativa descartada:* solo cifras y romanos, que obligaba a recordar qué propiedad admite qué formato.
 
 > **Decisión:** las páginas en letras siguen tras la `z` como los números de una lista: `aa`, `ab`, `ac`. Las etiquetas

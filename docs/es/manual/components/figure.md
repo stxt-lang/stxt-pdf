@@ -83,7 +83,8 @@ Document (dev.stxt.pdf):
 
 Admite además `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` y `Below side boxes`. `Numbered: false` (en su `Typography` o en una
 regla) la deja sin número; `Number label` y `Number format` escriben el número como en los encabezados
-([Encabezados](heading.md#numeración-numbered)).
+([Encabezados](heading.md#numeración-numbered)). En la `Section`, `Figure numbering: chapter` numera las figuras y las
+tablas por capítulo.
 
 ## Cómo se comporta
 
@@ -95,6 +96,9 @@ regla) la deja sin número; `Number label` y `Number format` escriben el número
 - El número va delante del pie, con un espacio: «1 Esquema». Con `Number label: Figura {number}.` en
   `For element: Figure`, «Figura 1. Esquema». Las tablas cuentan aparte: la primera `Figure` con una `Table` es la tabla 1.
 - `{number of: id}` escribe el número de una figura con `Id`, sin la etiqueta: «la figura 2».
+- Con `Figure numbering: chapter` en la `Section`, la cuenta vuelve a empezar en cada capítulo y su número va delante:
+  «Figura 2.3.» es la tercera figura del capítulo 2. El capítulo es el encabezado numerado de nivel más alto: el
+  `Heading 1`, o el `Heading 2` si el `Heading 1` es un título sin número.
 - La figura **no se parte** entre páginas: si no cabe, pasa entera a la siguiente. Una tabla dentro sí se parte, y el pie
   se queda con su primera parte (o con la última, si va debajo).
 - Un `Table of contents` con `Entries: figures` lista las figuras, y con `Entries: tables`, las tablas, con el texto de su pie y su

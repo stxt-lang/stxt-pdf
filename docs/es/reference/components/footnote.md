@@ -1,7 +1,7 @@
 # `Footnote`
 
 Una `Footnote` es una **nota al pie**: el contenido de una nota que el motor coloca al pie de la página donde el texto
-la llama, bajo un filete, numerada en el orden de las llamadas. La llamada se escribe en el texto como `[^id]`, con
+la llama por primera vez, bajo un filete, numerada en el orden de las llamadas. La llamada se escribe en el texto como `[^id]`, con
 `Markup: markdown` o dentro de un `Markdown` ([Formato del texto](../common/text-formatting.md#formato-en-línea-markup)), y
 se pinta en superíndice; la nota empieza con el mismo número. Una `Footnote` admite `Id` (obligatorio: es el nombre que
 usa la llamada), `Style`, `Box` y `Typography`, y su contenido son `Paragraph`, `Text`, `Markdown`, `List`, `Table` y
@@ -33,11 +33,13 @@ No admite `Break`: no se parte donde se escribe, sino al pie de la página ([col
 - La llamada es un **tramo en superíndice** con el número de la nota: se mide y se pinta al 70 % del cuerpo, elevado un
   tercio del cuerpo, con la fuente, el color y la negrita o cursiva del texto que la rodea. No cambia el alto de la
   línea. Va pegada a la palabra anterior, como se escribe: `semanas[^plazo]`.
-- **Las llamadas se numeran en el orden del documento**, con el formato de la sección ([numeración](#numeración)). El
-  número es texto: mide lo que se pinta y lo lee un lector de pantalla.
-- **Cada nota se llama una vez** (`FOOTNOTE_CALL_DUPLICATE`): una segunda nota, aunque diga lo mismo, es otra `Footnote`.
-  Una llamada sin `Footnote` con ese `Id` en su sección es `FOOTNOTE_UNKNOWN`, y una `Footnote` que nadie llama,
-  `FOOTNOTE_NOT_CALLED`.
+- **Las notas se numeran en el orden de su primera llamada**, con el formato de la sección
+  ([numeración](#numeración)). El número es texto: mide lo que se pinta y lo lee un lector de pantalla.
+- **Una nota puede llamarse varias veces.** La primera llamada le da el número, y las siguientes lo repiten: las
+  celdas de una tabla que remiten a la misma nota llevan todas el mismo asterisco. La nota es una, y va al pie de la
+  página de su primera llamada ([colocación](#colocación)).
+- Una llamada sin `Footnote` con ese `Id` en su sección es `FOOTNOTE_UNKNOWN`, también una segunda llamada desde otra
+  sección, y una `Footnote` que nadie llama, `FOOTNOTE_NOT_CALLED`.
 - **Dónde no va una llamada** (`FOOTNOTE_CALL_NOT_ALLOWED`): en un `Page overlay`, que se repite en cada página; en un
   encabezado, cuyo texto copian los índices y los marcadores; y dentro de otra nota.
 
@@ -46,8 +48,11 @@ No admite `Break`: no se parte donde se escribe, sino al pie de la página ([col
 > contenido, y se escribe también desde un `Paragraph` suelto. *Alternativa descartada:* un marcador propio
 > (`{note: id}`) en cualquier texto, que no sería un tramo y no podría ir en superíndice.
 
-> **Decisión:** una nota se llama una vez. Dos llamadas a la misma nota la pondrían en dos páginas, o en una sola con una
-> llamada huérfana en la otra. *Alternativa descartada:* repetir la nota o numerar las llamadas con el mismo número.
+> **Decisión:** una nota llamada varias veces se coloca una vez, en la página de su primera llamada, y las demás
+> llamadas repiten su número aunque caigan en otra página, como `\footnotemark` de LaTeX. El uso corriente es una tabla
+> o un párrafo, en una página. *Alternativa descartada:* repetir la nota al pie de cada página que la llama, que duplica
+> la nota en el PDF etiquetado, donde un `Note` tiene un identificador único. Hasta la 0.16.0 una segunda llamada era
+> un error (`FOOTNOTE_CALL_DUPLICATE`).
 
 ## La nota
 
@@ -112,6 +117,8 @@ Styles:
 
 Las notas quitan sitio al texto de la página, y qué notas hay depende de cuánto texto cabe. La regla es esta:
 
+- **Una nota va en la página de su primera llamada.** Las llamadas siguientes a esa nota, en la misma página o en
+  otra, no traen nada al pie.
 - **Una línea entra en la página solo si su nota cabe debajo**, entera o al menos su principio. Si no cabe, la línea pasa
   a la página siguiente con su nota, y con ella lo que la sigue. Lo que decide es la línea: una tabla o un `Block` con
   `Keep together` que no se parte se mueve entero con su nota.
@@ -134,25 +141,45 @@ Las notas quitan sitio al texto de la página, y qué notas hay depende de cuán
 
 ## Numeración
 
-Las notas se numeran por documento, en el orden de las llamadas, con dos propiedades de `Section`:
+Las notas se numeran por documento, en el orden de su primera llamada, con dos propiedades de `Section`:
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Footnote numbering` | `continue`, `restart` | `continue` | `continue` sigue el contador del documento y `restart` vuelve a empezar en 1 en esta sección. |
-| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben los números de las notas de la sección, en la llamada y en la nota: `1`, `a`, `A`, `i`, `I`. |
+| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`, `symbols` | `decimal` | Cómo se escriben los números de las notas de la sección, en la llamada y en la nota: `1`, `a`, `A`, `i`, `I`, `*`. |
+
+Con `symbols`, las notas llevan un símbolo en lugar de un número: `*`, `†`, `‡` y `§`, en ese orden, y después
+doblados (`**`, `††`, `‡‡`, `§§`), triplicados, etc. Es la nota de un documento comercial, con una o dos por sección:
+
+```
+Section:
+    Footnote number format: symbols
+    Paragraph: Cuota mensual: 49 €[^iva]. Alta: 20 €[^iva].       # «49 €*» y «20 €*»
+        Typography:
+            Markup: markdown
+    Footnote:
+        Id: iva
+        Paragraph: IVA no incluido.                               # «* IVA no incluido.»
+```
+
+El símbolo va en superíndice, como el número, y la fuente tiene que tenerlo (`GLYPH_MISSING` si no). Con
+`Footnote numbering: restart`, cada sección vuelve a empezar por el asterisco.
+
+> **Decisión:** los símbolos son cuatro (`*`, `†`, `‡`, `§`) y después se doblan, como en Word, y siguen el contador de
+> la sección. *Alternativa descartada:* reiniciarlos en cada página (`Footnote numbering: page`), que es como se usan en
+> un texto largo y hace depender el símbolo de la paginación.
 
 ## Referencias y enlaces
 
-Una `Footnote` tiene `Id`, así que `{page of: id}` da la página donde está (la de su llamada) y `Link: #id` lleva a
+Una `Footnote` tiene `Id`, así que `{page of: id}` da la página donde está (la de su primera llamada) y `Link: #id` lleva a
 ella ([Referencias](../common/references.md), [Enlaces](../common/links.md)).
 
 ## Errores
 
 | Código | Cuándo |
 |---|---|
-| `FOOTNOTE_UNKNOWN` | Una llamada sin `Footnote` con ese `Id` en su sección |
+| `FOOTNOTE_UNKNOWN` | Una llamada sin `Footnote` con ese `Id` en su sección, o en otra sección que la primera llamada a esa nota |
 | `FOOTNOTE_NOT_CALLED` | Una `Footnote` que ningún texto llama |
-| `FOOTNOTE_CALL_DUPLICATE` | Una segunda llamada a la misma nota |
 | `FOOTNOTE_CALL_NOT_ALLOWED` | Una llamada en un `Page overlay`, en un encabezado o dentro de una nota |
 | `FOOTNOTE_NOT_ALLOWED` | Una `Footnote` dentro de un `Page overlay` o de otra `Footnote` |
 | `FOOTNOTE_CONTENT` | Una nota que no empieza por un párrafo, o cuyo `Markdown` genera encabezados, imágenes o bloques de código |
@@ -162,15 +189,16 @@ ella ([Referencias](../common/references.md), [Enlaces](../common/links.md)).
 ## Accesibilidad
 
 En el PDF etiquetado, la nota es un `Note` (PDF/UA-1) o un `FENote` (PDF/UA-2), con el número en un `Lbl`, y va **justo
-después del párrafo que la llama**, no al final de la página: un lector de pantalla la lee tras su párrafo. La llamada
-es un `Reference` dentro del párrafo, que señala la nota con `Ref`, y la nota señala la llamada
+después del párrafo que la llama** por primera vez, no al final de la página: un lector de pantalla la lee tras su
+párrafo. Cada llamada es un `Reference` dentro de su párrafo, que señala la nota con `Ref`, y la nota señala todas sus
+llamadas
 ([El PDF por dentro](../implementation/pdf.md#árbol-de-estructura)).
 
 ## Lo que no hay
 
 - **Numerar por página** (`Footnote numbering: page`): el número dependería de la paginación, como `{page}`.
-- Símbolos en lugar de números (`*`, `†`, `‡`), y un estilo propio de la llamada y del número de la nota (`For element:
-  Footnote mark`): la llamada toma el formato del texto que la rodea.
-- Varias llamadas a la misma nota, notas al final del documento o de la sección (notas finales) y notas en las
-  tablas.
+- Un estilo propio de la llamada y del número de la nota (`For element: Footnote mark`): la llamada toma el formato
+  del texto que la rodea. Tampoco otra lista de símbolos que la de `symbols`.
+- Repetir una nota al pie de cada página que la llama, notas al final del documento o de la sección (notas finales) y
+  notas al pie de una tabla.
 - La llamada en un texto literal (sin `Markup: markdown`), en un `Page overlay` o en un encabezado.

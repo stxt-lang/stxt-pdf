@@ -178,7 +178,8 @@ the `IDTree` of the structure tree collects), the number that opens it in a `Lbl
 after the element of the text that calls it** (a sibling of its `P` or, if a cell calls it, inside its `TD`), and not at
 the end of the page where it is painted: the reading order puts the note after its paragraph. The call is a
 `Reference` inside the element of the text, with the number as marked content, which points to the note with `Ref`;
-the note points to the call with its own.
+the note points to the call with its own. A note called several times is a single `Note`, after the text of its first
+call: each call is a `Reference` that points to it, and the `Ref` of the note lists them all.
 
 > **Decision:** the note hangs after the text that calls it and not from the `Sect` at the end of the page: the
 > structure tree is the reading order, not the painting order. *Rejected alternative:* a `Div` with the notes at the

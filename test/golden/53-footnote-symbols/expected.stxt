@@ -1,0 +1,19 @@
+# Page 1: two notes (24) + 12.5 = 36.5 reserved; the area, 28.5 high (0.5 + 4 + 24), starts at 180 − 28.5 = 151.5 and
+# its first note at 156. Page 2: one note, area of 16.5 at 163.5, the note at 168.
+Result:
+	Page: 1
+		Fragment: p1
+			Rect: 20 20 260 12
+		Fragment: p2
+			Rect: 20 32 260 12
+		Fragment: tall
+			Rect: 20 44 260 90
+		Fragment: iva
+			Rect: 20 156 260 12
+		Fragment: plazo
+			Rect: 20 168 260 12
+	Page: 2
+		Fragment: p3
+			Rect: 20 20 260 12
+		Fragment: entrega
+			Rect: 20 168 260 12

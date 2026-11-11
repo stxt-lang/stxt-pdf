@@ -65,7 +65,7 @@ are always included. Of an exception, what is read from it is promised, not its 
 | `tree.Box` | `id()`, `element()`, `role()`, `line()`, `anonymous()`, `parent()`, `children()`, `text()` |
 | `tree.Element` | Its constants, `canonicalName()`, `label()`, `role()`, `headingLevel()` |
 | `tree.Element.Role` | All |
-| `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat` | All |
+| `model.Insets`, `model.Rect`, `model.Sides`, `model.Value`, `model.Value.Points`, `model.Value.Keyword`, `model.Value.Percentage`, `model.Value.Between`, `model.Value.Fraction`, `model.NumberFormat`, `model.FootnoteNumberFormat` | All |
 | `model.TextRun` | `text()`, `format()`, `LINE_SEPARATOR`, `OBJECT_REPLACEMENT`, `IMAGE`, `plain(...)`, `text(...)`, `formatted(...)` |
 | `model.Reference` | `escape(...)`, `shown(...)`, `LITERAL_BRACE` |
 | `model.TextFormat`, `model.FontFace`, `model.FontWeight`, `model.FontStyle`, `model.TextCase`, `model.RunStyle`, `model.InlineImage` | All |

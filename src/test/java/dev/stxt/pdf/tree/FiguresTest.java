@@ -206,4 +206,78 @@ class FiguresTest {
                 "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"), "\t\tText: La figura {number of: f}.");
         assertEquals(ErrorCode.REFERENCE_NOT_NUMBERED, e.errorCode());
     }
+
+    /** A figure with an image, or with a table, as a child of a {@code Section}. */
+    private static String[] figure(String caption, boolean table) {
+        return new String[] {"\t\tFigure:", "\t\t\tCaption: " + caption, "\t" + (table ? TABLE : IMAGE).replace("\n", "\n\t")};
+    }
+
+    private static String[] lines(Object... parts) {
+        List<String> out = new ArrayList<>();
+        for (Object p : parts) {
+            out.addAll(p instanceof String[] a ? List.of(a) : List.of((String) p));
+        }
+        return out.toArray(String[]::new);
+    }
+
+    private static String numbered(int level) {
+        return "\t\tFor element: Heading " + level + "\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n";
+    }
+
+    private static final String NUMBERED_HEADINGS = "\tStyles:\n" + numbered(1) + numbered(2) + numbered(3);
+    private static final String UNNUMBERED = "\t\t\tTypography:\n\t\t\t\tNumbered: false";
+
+    /**
+     * {@code Figure numbering: chapter}: the counters of the figures and of the tables start again in each chapter,
+     * and the number of the chapter goes first.
+     */
+    @Test
+    void figuresAreNumberedByChapter() {
+        BoxTreeBuilder.Result tree = build(lines(NUMBERED_HEADINGS, "\tSection:", "\t\tFigure numbering: chapter",
+                "\t\tHeading 1:", "\t\t\tText: Uno", figure("a", false), figure("b", false), figure("t", true),
+                "\t\tHeading 2:", "\t\t\tText: Apartado", figure("c", false),
+                "\t\tHeading 1:", "\t\t\tText: Dos", figure("d", false), figure("u", true),
+                "\t\tText: Véase la figura {number of: f}.",
+                "\t\tFigure:", "\t\t\tId: f", "\t\t\tCaption: e", "\t" + IMAGE.replace("\n", "\n\t")));
+        assertEquals(List.of("1.1", "1.2", "1.1", "1.3", "2.1", "2.1", "2.2"),
+                figures(tree).stream().map(Box::number).toList());
+        assertEquals("2.2 e", figures(tree).get(6).caption().text());
+    }
+
+    /**
+     * The chapter is the numbered heading with no numbered heading above it: under a title without a number, the
+     * numbered {@code Heading 2}, each written with its {@code Number format}. A heading without a number of the level
+     * of the chapters or above ends the chapter: its figures carry their number alone, and start again.
+     */
+    @Test
+    void theChapterIsTheNumberedHeadingWithNoneAbove() {
+        BoxTreeBuilder.Result tree = build(lines(NUMBERED_HEADINGS,
+                "\t\tFor style: annex", "\t\t\tTypography:", "\t\t\t\tNumber format: upper-alpha",
+                "\t\tFor element: Figure", "\t\t\tTypography:", "\t\t\t\tNumber label: Figura {number}.",
+                "\tSection:", "\t\tFigure numbering: chapter",
+                figure("antes", false),
+                "\t\tHeading 1:", "\t\t\tText: Manual", UNNUMBERED, figure("portada", false),
+                "\t\tHeading 2:", "\t\t\tText: Instalación", figure("a", false),
+                "\t\tHeading 3:", "\t\t\tText: Bornes", figure("b", false),
+                "\t\tHeading 2:", "\t\t\tText: Uso", figure("c", false),
+                "\t\tHeading 2:", "\t\t\tText: Créditos", UNNUMBERED, figure("d", false), figure("e", false),
+                "\t\tHeading 1:", "\t\t\tText: Anexos", UNNUMBERED, figure("f", false),
+                "\t\tHeading 2:", "\t\t\tText: Tarifas", "\t\t\tStyle: annex", figure("g", false), figure("h", false)));
+        assertEquals(List.of("1", "1", "1.1", "1.2", "2.1", "1", "2", "1", "A.1", "A.2"),
+                figures(tree).stream().map(Box::number).toList());
+        assertEquals("Figura A.2. h", figures(tree).get(9).caption().text());
+    }
+
+    /**
+     * {@code Figure numbering} is of each section: the sections that number in a row follow the counters of the
+     * document, which the figures numbered by chapter do not advance.
+     */
+    @Test
+    void figureNumberingIsOfEachSection() {
+        BoxTreeBuilder.Result tree = build(lines(NUMBERED_HEADINGS,
+                "\tSection:", figure("a", false), figure("b", false),
+                "\tSection:", "\t\tFigure numbering: chapter", "\t\tHeading 1:", "\t\t\tText: Uno", figure("c", false), figure("d", false),
+                "\tSection:", "\t\tFigure numbering: continue", figure("e", false)));
+        assertEquals(List.of("1", "2", "1.1", "1.2", "3"), figures(tree).stream().map(Box::number).toList());
+    }
 }

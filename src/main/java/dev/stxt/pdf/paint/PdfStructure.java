@@ -268,9 +268,18 @@ final class PdfStructure {
     /** The footnotes called from the caption of a figure (reference/components/footnote.md): after the figure. */
     private void captionNotes(Box caption, PDStructureNode after) {
         for (TextRun run : caption.runs()) {
-            if (run.format().footnote() != null && notes.containsKey(run.format().footnote())) {
-                build(notes.get(run.format().footnote()), after);
-            }
+            note(run, after);
+        }
+    }
+
+    /**
+     * The footnote a run calls, if it calls one, as a child of {@code parent}: once, after the text of its first
+     * call (reference/components/footnote.md).
+     */
+    private void note(TextRun run, PDStructureNode parent) {
+        Box note = run.format().footnote() == null ? null : notes.get(run.format().footnote());
+        if (note != null && !elements.containsKey(note)) {
+            build(note, parent);
         }
     }
 
@@ -288,9 +297,7 @@ final class PdfStructure {
                 if (child.hasText()) {
                     PDStructureNode parent = child.role() == Role.CELL ? elements.get(child) : content;
                     for (TextRun run : child.runs()) {
-                        if (run.format().footnote() != null && notes.containsKey(run.format().footnote())) {
-                            build(notes.get(run.format().footnote()), parent);
-                        }
+                        note(run, parent);
                     }
                 }
             }

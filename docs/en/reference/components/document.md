@@ -158,7 +158,8 @@ content is in one of them.
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Drops the top margin of its first element (`top`), the bottom margin of its last one (`bottom`) or both: with `both` or `top`, the content starts at the top of the page area ([Block](block.md#trimming-the-margins-trim-margins)). |
 | `Begin on` | `any`, `odd` | `any` | On which physical page it begins ([double-sided](#beginning-on-an-odd-page)). In the first section, `odd` is `BEGIN_ON_FIRST_SECTION`. |
 | `Footnote numbering` | `continue`, `restart` | `continue` | Whether its footnotes follow the counter of the document or start again at 1 ([Footnote](footnote.md#numbering)). |
-| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How its footnotes are numbered, in the call and in the note. |
+| `Footnote number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`, `symbols` | `decimal` | How its footnotes are numbered, in the call and in the note; `symbols` marks them with `*`, `†`, `‡` and `§` ([Footnote](footnote.md#numbering)). |
+| `Figure numbering` | `continue`, `chapter` | `continue` | Whether its figures and its tables with a caption follow the counters of the document or start again in each chapter, with its number first (`2.3`) ([Figure](figure.md#by-chapter-figure-numbering)). |
 
 Its content is in-flow elements, `Frame`, `Overlay`, `Page overlay` and `Footnote` ([Footnote](footnote.md)), which takes no
 room where it is written.
@@ -248,7 +249,7 @@ A `Page number format` in a `none` section, which has no numbers, is `PAGE_NUMBE
 which would have no effect because the section continues the count of the previous one, is `FIRST_NUMBER_WITHOUT_RESTART`.
 
 > **Decision:** the style belongs to the section and not to the counter: a `continue` section in Roman numerals continues the count of the
-> previous one and writes it in Roman numerals. The formats are the five of `Number format` and of `Footnote number format`.
+> previous one and writes it in Roman numerals. The formats are the five of `Number format`.
 > *Rejected alternative:* only digits and Roman numerals, which required remembering which property allows which format.
 
 > **Decision:** pages in letters continue after `z` like the numbers of a list: `aa`, `ab`, `ac`. The page labels of the

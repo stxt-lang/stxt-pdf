@@ -218,12 +218,11 @@ public enum ErrorCode {
     HEADING_REFERENCE_OUTSIDE_PAGE_OVERLAY,
 
     // --- Footnotes -----------------------------------------------------------------------------
-    /** A call {@code [^id]} with no {@code Footnote} with that {@code Id} in its section. */
+    /** A call {@code [^id]} with no {@code Footnote} with that {@code Id} in its section, or in another section than
+     * the first call to that note. */
     FOOTNOTE_UNKNOWN,
     /** A {@code Footnote} that no text of its section calls. */
     FOOTNOTE_NOT_CALLED,
-    /** A second call to the same {@code Footnote}: a note is called once. */
-    FOOTNOTE_CALL_DUPLICATE,
     /** A call {@code [^id]} inside a {@code Page overlay}, a heading or another footnote. */
     FOOTNOTE_CALL_NOT_ALLOWED,
     /** A {@code Footnote} inside a {@code Page overlay} or inside another {@code Footnote}. */

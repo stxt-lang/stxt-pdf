@@ -1,5 +1,6 @@
 package dev.stxt.pdf.tree;
 
+import dev.stxt.pdf.model.FootnoteNumberFormat;
 import dev.stxt.pdf.model.NumberFormat;
 
 /**
@@ -17,12 +18,14 @@ import dev.stxt.pdf.model.NumberFormat;
  * @param footnoteNumbering   whether its footnotes continue the numbering of the document or start again at 1
  *                            ({@code Footnote numbering}, reference/components/footnote.md)
  * @param footnoteNumberFormat how its footnotes are numbered ({@code Footnote number format})
+ * @param figureNumbering how its figures and its tables with a caption are numbered ({@code Figure numbering},
+ *                     reference/components/figure.md)
  * @param footnotes    its footnote area ({@link Element#FOOTNOTES}): a child of the box, out of its flow, with its
  *                     {@code Footnote} boxes as children in document order
  */
 public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, NumberFormat pageNumberFormat, int firstNumber,
                       boolean inheritPageOverlays, BeginOn beginOn, FootnoteNumbering footnoteNumbering,
-                      NumberFormat footnoteNumberFormat, Box footnotes) {
+                      FootnoteNumberFormat footnoteNumberFormat, FigureNumbering figureNumbering, Box footnotes) {
 
     /** {@code Footnote numbering} (reference/components/footnote.md): what the section does with the footnote counter. */
     public enum FootnoteNumbering {
@@ -30,6 +33,14 @@ public record Section(Box box, PageSetup pageSetup, PageNumbering numbering, Num
         CONTINUE,
         /** Its first footnote is number 1 again. */
         RESTART
+    }
+
+    /** {@code Figure numbering} (reference/components/figure.md): how the section numbers its figures and tables. */
+    public enum FigureNumbering {
+        /** Its figures follow the counters of the document: {@code 1}, {@code 2}, {@code 3}. */
+        CONTINUE,
+        /** Its figures start again in each chapter, with the number of the chapter first: {@code 2.3}. */
+        CHAPTER
     }
 
     /** Whether the section has footnotes. */

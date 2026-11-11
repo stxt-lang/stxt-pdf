@@ -458,7 +458,8 @@ per box with the rest of the key), so forgetting costs what the forgotten boxes 
 
 **Footnotes.** `FootnoteLayout` lays out each page of a section with footnotes ([Footnote](../components/footnote.md)):
 the flow with `ConstraintSpace.forPage(pageSetup, reserved)`, which takes from the root the height reserved at the
-bottom, and the notes of the calls that fall in its lines (`TextFormat.footnote` in the runs of the `TextLine`s) stacked
+bottom, and the notes of the calls that fall in its lines (`TextFormat.footnote` in the runs of the `TextLine`s; those of a note
+already placed on a previous page do not count, because the note goes with its first call) stacked
 in the footnote area of the section (`Section.footnotes()`, the generated box `Footnote area`, a child of the section out of
 its flow). Since the body is a function of the reservation and the notes depend on the body, the reservation is found
 by probes: no reservation; if the notes do not fit, the full height of those notes (in which those of any larger

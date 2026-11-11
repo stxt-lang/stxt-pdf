@@ -279,7 +279,7 @@ enum ElementReader {
                 s.breaks().setKeepTogether(true);
             }
             String number = ctx.figureNumbers.next(s.figure().counter(), Figures.numbered(s),
-                    s.typography().numberFormat());
+                    s.typography().numberFormat(), ctx.headingNumbers);
             if (number != null) {
                 HeadingNumbers.prefix(box, caption, number);
             }

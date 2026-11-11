@@ -1,8 +1,8 @@
 # `Footnote`
 
 A `Footnote` is a **footnote**. The call, `[^id]`, is written in the text, attached to the word, and the note with that
-`Id` anywhere in the section. The engine numbers the calls in order, paints them as superscripts and places each note
-at the bottom of the page where its call falls, under a rule.
+`Id` anywhere in the section. The engine numbers the notes in the order of their calls, paints the calls as superscripts
+and places each note at the bottom of the page where its first call falls, under a rule.
 
 ```
 Document (dev.stxt.pdf):
@@ -52,13 +52,17 @@ Document (dev.stxt.pdf):
 
 It also accepts `Style`, `Box` and `Typography`. The call needs `Markup: markdown` in the text (or in a rule, as above),
 or to be inside a `Markdown`. In the `Section`, `Footnote numbering: restart` starts the numbering again at 1, and
-`Footnote number format` writes it in letters or Roman numerals (`lower-alpha`, `upper-roman`...).
+`Footnote number format` writes it in letters or Roman numerals (`lower-alpha`, `upper-roman`...) or with symbols
+(`symbols`: `*`, `†`, `‡`, `§`, and then doubled).
 
 ## How it behaves
 
 - The note starts with a `Paragraph`, a `Text` or a `Markdown`, which gets the number as a superscript; after it, more
   paragraphs, lists or tables may follow. No headings or images.
-- Each note is called once, and every call has its note in the same section; otherwise it is an error.
+- Every call has its note in the same section; otherwise it is an error.
+- A note may be called several times: all its calls carry the same number, and the note goes once, at the bottom of
+  the page of the first one. With `Footnote number format: symbols`, `€49[^vat]` and `€20[^vat]` give "€49*" and
+  "€20*", and the note, "* VAT not included".
 - The notes of a page go together at the bottom, under a rule, with the look of `For element: Footnote area` (the rule is
   its top border; its typography is that of all the notes) and that of `For element: Footnote` (each note).
 - A line enters the page only if its note fits under it; otherwise it moves to the next page with the note. A long note

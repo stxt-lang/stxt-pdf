@@ -216,6 +216,7 @@ public final class BoxTreeBuilder {
         ctx.definiteHeight.put(box, true);
         // The footnote area of the section (reference/components/footnote.md): its notes hang from it, not from the
         // boxes that hold them.
+        ctx.figureNumbers.beginSection(p.figureNumbering());
         Box footnotes = ctx.footnotes.beginSection(ctx, n, box, p.footnoteNumbering(), p.footnoteNumberFormat());
         ctx.inside(StyleRules.ancestor(n, Element.SECTION), () -> buildContent(ctx, n, box));
         // After the content, so that the children of the section are its elements in order, and then the area.
@@ -226,7 +227,7 @@ public final class BoxTreeBuilder {
                     + "count, they take no space) it has no page");
         }
         return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.firstNumber(), p.inheritPageOverlays(),
-                p.beginOn(), p.footnoteNumbering(), p.footnoteNumberFormat(), footnotes);
+                p.beginOn(), p.footnoteNumbering(), p.footnoteNumberFormat(), p.figureNumbering(), footnotes);
     }
 
     /** Child elements in order: each one is a box; {@code Item} and {@code Area} wrap theirs. */

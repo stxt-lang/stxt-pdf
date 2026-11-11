@@ -47,6 +47,7 @@ class SchemaCoverageTest {
             Map.entry("Mirror margins", "Mirror margins: false"),
             Map.entry("Footnote numbering", "Footnote numbering: restart"),
             Map.entry("Footnote number format", "Footnote number format: lower-alpha"),
+            Map.entry("Figure numbering", "Figure numbering: chapter"),
             // Elements
             Map.entry("Id", "Id: x"),
             Map.entry("Style", "Style: c"),
