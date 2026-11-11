@@ -23,9 +23,10 @@ import java.util.List;
  *       justification. The line breaks do not change.</li>
  * </ol>
  *
- * <p>If some printed number is wider than the probe one (more digits, or Roman numerals), the {@link
+ * <p>If some printed number is wider than the probe one (more digits, letters or Roman numerals), the {@link
  * dev.stxt.pdf.layout.Paginator} paginates again with a probe number that covers it, until it is enough: as many
- * characters as the longest one, with the widest letter of its style ({@code M} in Roman numerals).</p>
+ * characters as the longest one, with the widest letter of its style ({@code M} in Roman numerals, {@code W} in
+ * uppercase letters).</p>
  */
 public final class PageNumbers {
 
@@ -51,9 +52,12 @@ public final class PageNumbers {
         return "0".repeat(DIGITS);
     }
 
-    /** The wider of two of the characters that make up a probe number: {@code 0} &lt; {@code m} &lt; {@code M}. */
+    /**
+     * The wider of two of the characters that make up a probe number: {@code 0} &lt; {@code m} &lt; {@code M} &lt;
+     * {@code W}.
+     */
     public static char wider(char a, char b) {
-        String order = "0mM";
+        String order = "0mMW";
         return order.indexOf(a) >= order.indexOf(b) ? a : b;
     }
 

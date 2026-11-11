@@ -200,6 +200,31 @@ class SectionsTest {
         assertEquals("El cuerpo empieza en la 5 y el prefacio en la i.", text(d.pages().get(0), "ref"));
     }
 
+    /**
+     * Pages in letters are written like the numbers of a list: after {@code z} comes {@code aa}, and then {@code ab}.
+     * The probe number of {@code {page}} and {@code {pages}} is made of the widest letter.
+     */
+    @Test
+    void pagesInLettersContinueAfterZ() {
+        String[][] parts = new String[29][];
+        parts[0] = new String[] {"\tSection:", "\t\tPage number format: lower-alpha"};
+        for (int i = 1; i < parts.length; i++) {
+            parts[i] = fullPage("p" + i);
+        }
+        LaidOutDocument d = lay(
+                "\tPage overlay:", "\t\tId: num", "\t\tOffset: auto 0 0 0", "\t\tText: {page} de {pages}",
+                join(parts),
+                join(new String[] {"\tSection:", "\t\tPage numbering: restart", "\t\tPage number format: upper-alpha"},
+                        fullPage("b1")));
+        assertEquals(29, d.pages().size());
+        assertEquals("a de ab", text(d.pages().get(0), "num"));
+        assertEquals("z de ab", text(d.pages().get(25), "num"));
+        assertEquals("aa de ab", text(d.pages().get(26), "num"));
+        assertEquals("ab de ab", text(d.pages().get(27), "num"));
+        assertEquals("A de A", text(d.pages().get(28), "num"));
+        assertEquals(NumberFormat.UPPER_ALPHA, d.pages().get(28).style());
+    }
+
     @Test
     void aSectionThatContinuesFollowsTheCounterOfTheOnesBefore() {
         LaidOutDocument d = lay(

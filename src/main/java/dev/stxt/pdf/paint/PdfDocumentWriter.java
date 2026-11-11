@@ -245,9 +245,11 @@ public final class PdfDocumentWriter {
                 PDPageLabelRange range = new PDPageLabelRange();
                 if (p.numbered()) {
                     range.setStyle(switch (p.style()) {
+                        case DECIMAL -> PDPageLabelRange.STYLE_DECIMAL;
+                        case LOWER_ALPHA -> PDPageLabelRange.STYLE_LETTERS_LOWER;
+                        case UPPER_ALPHA -> PDPageLabelRange.STYLE_LETTERS_UPPER;
                         case LOWER_ROMAN -> PDPageLabelRange.STYLE_ROMAN_LOWER;
                         case UPPER_ROMAN -> PDPageLabelRange.STYLE_ROMAN_UPPER;
-                        default -> PDPageLabelRange.STYLE_DECIMAL;
                     });
                     range.setStart(p.printed());
                 }

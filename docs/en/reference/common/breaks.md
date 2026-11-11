@@ -202,8 +202,8 @@ split. Tables also repeat their header and their footer ([Table](../components/t
 `{page}` and `{pages}` in a text are replaced with the printed number of the page and the last number of its page
 sequence, according to the `Page numbering` and the `Page number format` of each section
 ([Document](../components/document.md#page-numbering)). Line breaking and page breaking are done with the
-width of a two-digit number (`00`), or of as many digits as the longest one has if there are more (in Roman numerals, as
-many `M` as letters in the longest one). The real number is then put in that space, and the line is realigned without
+width of a two-digit number (`00`), or of as many digits as the longest one has if there are more (in letters and in Roman
+numerals, as many `m`, `M` or `W` as letters in the longest one). The real number is then put in that space, and the line is realigned without
 changing its breaks.
 
 The width a box takes from its text (the fit to the content, `fit`) counts that space too, and it does not change when

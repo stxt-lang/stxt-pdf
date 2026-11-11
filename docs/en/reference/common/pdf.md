@@ -6,8 +6,9 @@ is in [The PDF inside](../implementation/pdf.md).
 ## Pages
 
 Each page has the size of the `Page` of its section ([Document](../components/document.md#page)). The viewer shows the
-printed number of each page (that of `{page}`, also in Roman numerals) instead of its position in the file, and none on
-pages without a number. A blank page from `Begin on: odd` shows the number it would have, even though it does not print
+printed number of each page (that of `{page}`, also in letters or in Roman numerals) instead of its position in the file,
+and none on pages without a number. In letters, after `z` the viewer repeats the letter (`aa`, `bb`, `cc`) and the printed
+number continues with `aa`, `ab`, `ac` ([Document](../components/document.md#page-numbering)). A blank page from `Begin on: odd` shows the number it would have, even though it does not print
 it.
 
 ## Fonts

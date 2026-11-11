@@ -19,6 +19,12 @@ four. No document changes.
   PDF/A requires, and one by one in `dc:subject`. Without `Keywords`, the PDF has no keywords, as before. `Metadata`
   gains the `keywords` component (a list, empty if there are none). "`Keywords`" in the reference of `Document` and
   "Title, subject, author, keywords and producer" in "The PDF".
+- **Page numbers in letters.** `Page number format` takes `lower-alpha` (`a`, `b`, `c`) and `upper-alpha` (`A`, `B`,
+  `C`) as well, the same five values as `Number format` and `Footnote number format`. `{page}`, `{pages}`,
+  `{page of: id}` and the tables of contents write them, and the page labels of the PDF carry the letter styles. After
+  `z` the printed number continues with `aa`, `ab`, like the numbers of a list, and the viewer, which follows the PDF
+  rule, shows `aa`, `bb`: they differ from page 28 of a numbering in letters. "How it is written" in the reference of
+  `Document`.
 
 ## [0.16.0] - 2026-11-11
 

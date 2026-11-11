@@ -1487,9 +1487,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: none
 	Node: Page number format
 		Type: ENUM
-		Description: How the page numbers of a Section are written: decimal (1, by default), lower-roman (i) or upper-roman (I), in {page}, {pages}, {page of: id}, the tables of contents and the viewer. Not valid with Page numbering: none.
+		Description: How the page numbers of a Section are written: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i) or upper-roman (I), in {page}, {pages}, {page of: id}, the tables of contents and the viewer. Not valid with Page numbering: none.
 		Values:
 			Value: decimal
+			Value: lower-alpha
+			Value: upper-alpha
 			Value: lower-roman
 			Value: upper-roman
 	Node: Inherit page overlays

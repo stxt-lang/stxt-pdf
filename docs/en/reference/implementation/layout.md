@@ -420,7 +420,7 @@ link) passes it through `Reference.shown`.
 `TextValues`) and the lines keep them. When pagination finishes, the `Paginator` calls `Engine.number`
 (`PageNumbers.number`, with the real measurer), which redoes only those lines with the values of each page already
 written. If some printed number does not fit in the trial one (`Numbering.probe`:
-as many characters as the longest, with `M` or `m` if there are Roman numerals), pagination is done again with one that covers it
+as many characters as the longest, with `m`, `M` or `W` if there are letters or Roman numerals), pagination is done again with one that covers it
 (`PageNumbers.cover`), which only grows.
 
 **References.** `Engine.assume` sets the assumed pages in `TextValues` (the first time, `00`), pagination is done, the page on which the
@@ -437,9 +437,10 @@ they only grow. With an additive measurer pagination always converges: the error
 > (`REFERENCE_NOT_PLACEABLE`) are detected when building the tree (`References`), because they depend only on its structure. That
 > of a box that falls on a page without a number is detected when paginating. `{number of: id}` comes from the tree and does not depend on pagination.
 
-> **Decision:** with `{pages}` and 100 pages or more, or with Roman numerals, pagination is done again reserving the width of the
+> **Decision:** with `{pages}` and 100 pages or more, or with numbers in letters or in Roman numerals, pagination is done again reserving the width of the
 > longest number, instead of letting the real number stick out of the reserved slot. In Roman numerals an `M` is reserved per
-> letter, the widest of those that write a Roman numeral. *Rejected alternative:* measuring each real number on its line, which
+> letter, the widest of those that write a Roman numeral; in uppercase letters, a `W`, and in lowercase, in letters and in
+> Roman numerals, an `m`. *Rejected alternative:* measuring each real number on its line, which
 > would change the line breaks from one page to another.
 
 **Paginating again does not empty the cache.** When the trial number grows (`Engine.reservePageNumbers`) or

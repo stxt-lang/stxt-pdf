@@ -5,8 +5,8 @@ import java.util.Locale;
 /**
  * How a number is written: in digits, in letters or in Roman numerals. It is the format of list numberings
  * ({@code Marker}, reference/components/list.md), of a heading level ({@code Number format},
- * reference/components/heading.md) and of the pages of a section ({@code Page number format},
- * reference/components/document.md), which only allows digits and Roman numerals.
+ * reference/components/heading.md), of the footnotes of a section ({@code Footnote number format}) and of its pages
+ * ({@code Page number format}, reference/components/document.md).
  */
 public enum NumberFormat {
     /** {@code decimal}: in digits ({@code 1}, {@code 2}, {@code 3}). */

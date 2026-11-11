@@ -152,7 +152,7 @@ content is in one of them.
 | `Style` | names separated by spaces | none | The `For style` rules with those names apply to it. Like `For id` and `For element: Section`, they can only give `Typography`, which all of its content inherits (`STYLE_NOT_ALLOWED` with `Box` or `Break`). |
 | `Page` | like the document's | the document's | See [below](#the-page-of-a-section). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | How it numbers its pages ([numbering](#page-numbering)). |
-| `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | How its page numbers are written: `1`, `i`, `I`. With `none` it is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
+| `Page number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How its page numbers are written: `1`, `a`, `A`, `i`, `I`. With `none` it is `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `First number` | integer ≥ 1 | `1` | With `restart`, the number of its first page. Without `restart` it is `FIRST_NUMBER_WITHOUT_RESTART`. |
 | `Inherit page overlays` | boolean | `true` | Whether it carries the `Page overlay` elements of the document. With `false`, only its own appear. |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Drops the top margin of its first element (`top`), the bottom margin of its last one (`bottom`) or both: with `both` or `top`, the content starts at the top of the page area ([Block](block.md#trimming-the-margins-trim-margins)). |
@@ -228,8 +228,9 @@ Since the counter does not advance in a `none` section, a `continue` section aft
 `Page numbering: restart`, `First number` gives the number of the first page of the section (`First number: 5`: a document split
 across several files). The viewer also shows the printed number ([The PDF](../common/pdf.md#pages)).
 
-**How it is written.** `Page number format` writes the page numbers of the section in digits (`decimal`), in lowercase Roman
-numerals (`lower-roman`: `i`, `ii`, `iv`) or in uppercase (`upper-roman`). What is printed still rules: `{page}` and
+**How it is written.** `Page number format` writes the page numbers of the section in digits (`decimal`), in letters
+(`lower-alpha`: `a`, `b`, `c`; `upper-alpha`), in lowercase Roman numerals (`lower-roman`: `i`, `ii`, `iv`) or in uppercase
+(`upper-roman`). Letters continue after `z` with `aa`, `ab`. What is printed still rules: `{page}` and
 `{pages}` are written in the style of the page where they appear, and `{page of: id}` and the entries of a table of contents, in that of
 the page they refer to. A preface in Roman numerals and a body that starts again at 1:
 
@@ -247,8 +248,14 @@ A `Page number format` in a `none` section, which has no numbers, is `PAGE_NUMBE
 which would have no effect because the section continues the count of the previous one, is `FIRST_NUMBER_WITHOUT_RESTART`.
 
 > **Decision:** the style belongs to the section and not to the counter: a `continue` section in Roman numerals continues the count of the
-> previous one and writes it in Roman numerals. Only digits and Roman numerals, which are the ones of book pages. *Rejected
-> alternative:* letters (`a`, `b`), which are not used to number pages.
+> previous one and writes it in Roman numerals. The formats are the five of `Number format` and of `Footnote number format`.
+> *Rejected alternative:* only digits and Roman numerals, which required remembering which property allows which format.
+
+> **Decision:** pages in letters continue after `z` like the numbers of a list: `aa`, `ab`, `ac`. The page labels of the
+> PDF repeat the letter (`aa`, `bb`, `cc`), so from page 28 of a numbering in letters the viewer shows a label different
+> from the printed number ([The PDF](../common/pdf.md#pages)). *Rejected alternatives:* printing `bb`, which would
+> separate pages from lists, headings and footnotes; and an error above 26 pages, a limit for a case that hardly ever
+> occurs.
 
 > **Decision:** what is printed rules, so that the table of contents and the footer match. What has no number is an error and never
 > an empty gap. *Rejected alternative:* leaving the gap empty.

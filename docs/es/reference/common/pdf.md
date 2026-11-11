@@ -6,8 +6,9 @@ está en [El PDF por dentro](../implementation/pdf.md).
 ## Páginas
 
 Cada página tiene el tamaño del `Page` de su sección ([Document](../components/document.md#page)). El visor muestra el
-número impreso de cada página (el de `{page}`, también en romanos) en lugar de su posición en el fichero, y ninguno en las
-páginas sin número. Una página en blanco de `Begin on: odd` muestra el número que le toca, aunque no lo imprima.
+número impreso de cada página (el de `{page}`, también en letras o en romanos) en lugar de su posición en el fichero, y
+ninguno en las páginas sin número. En letras, tras la `z` el visor repite la letra (`aa`, `bb`, `cc`) y el número impreso
+sigue con `aa`, `ab`, `ac` ([Document](../components/document.md#numeración-de-las-páginas)). Una página en blanco de `Begin on: odd` muestra el número que le toca, aunque no lo imprima.
 
 ## Fuentes
 

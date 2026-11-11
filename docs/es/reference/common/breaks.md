@@ -200,8 +200,8 @@ Un `Stack` vertical con `Wrap items` no se parte. Las tablas repiten además su 
 `{page}` y `{pages}` en un texto se sustituyen por el número impreso de la página y el último número de su tanda, según
 el `Page numbering` y el `Page number format` de cada sección
 ([Document](../components/document.md#numeración-de-las-páginas)). El reparto en líneas y en páginas se hace con el
-ancho de un número de dos cifras (`00`), o de tantas como tenga el más largo si son más (en romanos, tantas `M` como
-letras tenga el más largo). El número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus
+ancho de un número de dos cifras (`00`), o de tantas como tenga el más largo si son más (en letras y en romanos, tantas `m`, `M` o `W`
+como letras tenga el más largo). El número real se pone después en ese hueco, y la línea se vuelve a alinear sin cambiar sus
 saltos.
 
 El ancho que una caja toma de su texto (el ajuste al contenido, `fit`) cuenta también ese hueco, y no cambia cuando se

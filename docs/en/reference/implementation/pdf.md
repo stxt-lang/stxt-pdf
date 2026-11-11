@@ -7,7 +7,7 @@ code writes it is in [Painting](painting.md#the-pdf).
 ## Pages, fonts and metadata
 
 - Each page has the size of the `Page` of its section. The page labels (`PageLabels`) carry the printed number
-  with its style (`D`, `r` or `R`), or none on the pages without a number, and are only written if some page is not its
+  with its style (`D`, `a`, `A`, `r` or `R`), or none on the pages without a number, and are only written if some page is not its
   physical number in digits: a document numbered in the usual way does not have them.
 - The fonts are those of the resources folder, in Type 0 with Identity-H. Those with TrueType outlines (the `.ttf` and
   the `.otf` that carry them) are embedded as a subset, with the glyphs that are used, in a `CIDFontType2` with the file in

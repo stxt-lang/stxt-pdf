@@ -80,8 +80,8 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
 
     /**
      * The probe number that measures at least as much as any printed number of the numbered pages: as many characters
-     * as the longest, in digits ({@code 0}) or, if there are Roman numerals, with the widest letter ({@code M} or
-     * {@code m}).
+     * as the longest, in digits ({@code 0}) or, if there are letters or Roman numerals, with the widest letter
+     * ({@code m} in lowercase; in uppercase, {@code M} in Roman numerals and {@code W} in letters).
      */
     String probe() {
         int length = 0;
@@ -92,9 +92,10 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
             }
             length = Math.max(length, Math.max(label(n).length(), totalLabel(n).length()));
             widest = PageNumbers.wider(widest, switch (style(n)) {
+                case DECIMAL -> '0';
+                case LOWER_ALPHA, LOWER_ROMAN -> 'm';
                 case UPPER_ROMAN -> 'M';
-                case LOWER_ROMAN -> 'm';
-                default -> '0';
+                case UPPER_ALPHA -> 'W';
             });
         }
         return String.valueOf(widest).repeat(length);

@@ -415,7 +415,7 @@ quien lo lee para escribirlo (los marcadores del PDF, el texto de reemplazo, el 
 **`{page}` y `{pages}`.** `InlineLayout` mide los marcadores como un número de prueba (`00` al principio, el medidor de
 `TextValues`) y las líneas los conservan. Al terminar de paginar, el `Paginator` llama a `Engine.number`
 (`PageNumbers.number`, con el medidor real), que rehace solo esas líneas con los valores de cada página ya escritos. Si algún número impreso no cabe en el de prueba (`Numbering.probe`:
-tantos caracteres como el más largo, con `M` o `m` si hay romanos), se vuelve a paginar con uno que lo cubre
+tantos caracteres como el más largo, con `m`, `M` o `W` si hay letras o romanos), se vuelve a paginar con uno que lo cubre
 (`PageNumbers.cover`), que solo crece.
 
 **Referencias.** `Engine.assume` fija las páginas supuestas en `TextValues` (la primera vez, `00`), se pagina, se mira en qué página ha
@@ -432,9 +432,10 @@ solo crecen. Con un medidor aditivo la paginación converge siempre: el error es
 > (`REFERENCE_NOT_PLACEABLE`) se detectan al construir el árbol (`References`), porque dependen solo de su estructura. La
 > de una caja que cae en una página sin número se detecta al paginar. `{number of: id}` sale del árbol y no depende de la paginación.
 
-> **Decisión:** con `{pages}` y 100 páginas o más, o con números romanos, se vuelve a paginar reservando el ancho del
+> **Decisión:** con `{pages}` y 100 páginas o más, o con números en letras o en romanos, se vuelve a paginar reservando el ancho del
 > número más largo, en lugar de dejar que el número real se salga del hueco reservado. En romanos se reserva una `M` por
-> letra, la más ancha de las que escriben un romano. *Alternativa descartada:* medir cada número real en su línea, que
+> letra, la más ancha de las que escriben un romano; en letras mayúsculas, una `W`, y en minúscula, en letras y en
+> romanos, una `m`. *Alternativa descartada:* medir cada número real en su línea, que
 > cambiaría los saltos de línea de una página a otra.
 
 **Volver a paginar no vacía la caché.** Cuando el número de prueba crece (`Engine.reservePageNumbers`) o cambia

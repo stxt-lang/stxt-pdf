@@ -46,13 +46,16 @@ class PageNumbersTest {
                 PageNumbers.probing(new FixedMetrics(1), "000").width("Página {page}", F, 1), 1e-9);
     }
 
-    /** The trial number only grows: the longer of the two, with the widest letter ({@code 0}, {@code m}, {@code M}). */
+    /** The trial number only grows: the longer of the two, with the widest letter ({@code 0}, {@code m}, {@code M},
+     * {@code W}). */
     @Test
     void theProbeCoversTheWidestNumber() {
         assertEquals("000", PageNumbers.cover("00", "000"));
         assertEquals("00", PageNumbers.cover("00", "0"));
         assertEquals("mmmm", PageNumbers.cover("00", "mmmm"));
         assertEquals("MMM", PageNumbers.cover("mmm", "M"));
+        assertEquals("WW", PageNumbers.cover("MM", "W"));
+        assertEquals("WW", PageNumbers.cover("WW", "m"));
         assertEquals("00", PageNumbers.cover("00", ""));
     }
 

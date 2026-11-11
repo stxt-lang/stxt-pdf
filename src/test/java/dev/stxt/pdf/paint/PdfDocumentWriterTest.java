@@ -119,6 +119,18 @@ class PdfDocumentWriterTest {
         }
     }
 
+    /** Pages numbered with letters carry the letter styles of the PDF: {@code /S /a} and {@code /S /A}. */
+    @Test
+    void pageLabelsInLetters() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(Pdfs.of(SECTIONS_HEAD
+                + "\tSection:\n\t\tPage number format: lower-alpha\n\t\tText: Anexo\n"
+                + "\tSection:\n\t\tPage number format: upper-alpha\n\t\tText: Otro\n"))) {
+            PDPageLabels labels = pdf.getDocumentCatalog().getPageLabels();
+            assertEquals("a:1", labels.getPageLabelRange(0).getStyle() + ":" + labels.getPageLabelRange(0).getStart());
+            assertEquals("A:2", labels.getPageLabelRange(1).getStyle() + ":" + labels.getPageLabelRange(1).getStart());
+        }
+    }
+
     /** Each PDF page has the size of its section, and each section is a {@code Sect} with its language. */
     @Test
     void eachSectionIsASectWithItsOwnPageSizeAndLanguage() throws Exception {

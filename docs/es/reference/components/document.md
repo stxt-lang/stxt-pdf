@@ -152,7 +152,7 @@ contenido está en alguna.
 | `Style` | nombres separados por espacios | sin valor | Le aplican las reglas `For style` con esos nombres. Como `For id` y `For element: Section`, solo pueden dar `Typography`, que hereda todo su contenido (`STYLE_NOT_ALLOWED` con `Box` o `Break`). |
 | `Page` | como el del documento | el del documento | Ver [abajo](#el-page-de-una-sección). |
 | `Page numbering` | `continue`, `restart`, `none` | `continue` | Cómo numera sus páginas ([numeración](#numeración-de-las-páginas)). |
-| `Page number format` | `decimal`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
+| `Page number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escriben sus números de página: `1`, `a`, `A`, `i`, `I`. Con `none` es `PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS`. |
 | `First number` | entero ≥ 1 | `1` | Con `restart`, el número de su primera página. Sin `restart` es `FIRST_NUMBER_WITHOUT_RESTART`. |
 | `Inherit page overlays` | booleano | `true` | Si lleva los `Page overlay` del documento. Con `false`, solo salen los suyos. |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | Descarta el margen de arriba de su primer elemento (`top`), el de abajo del último (`bottom`) o los dos: con `both` o `top`, el contenido empieza arriba del área útil ([Block](block.md#recortar-los-márgenes-trim-margins)). |
@@ -228,8 +228,9 @@ Como el contador no avanza en una sección `none`, una sección `continue` detr�
 `Page numbering: restart`, `First number` da el número de la primera página de la sección (`First number: 5`: un documento repartido
 en varios ficheros). El visor muestra también el número impreso ([El PDF](../common/pdf.md#páginas)).
 
-**Cómo se escribe.** `Page number format` escribe los números de las páginas de la sección en cifras (`decimal`), en romanos en
-minúscula (`lower-roman`: `i`, `ii`, `iv`) o en mayúscula (`upper-roman`). Lo que se imprime sigue mandando: `{page}` y
+**Cómo se escribe.** `Page number format` escribe los números de las páginas de la sección en cifras (`decimal`), en letras
+(`lower-alpha`: `a`, `b`, `c`; `upper-alpha`), en romanos en minúscula (`lower-roman`: `i`, `ii`, `iv`) o en mayúscula
+(`upper-roman`). Las letras siguen tras la `z` con `aa`, `ab`. Lo que se imprime sigue mandando: `{page}` y
 `{pages}` se escriben con el estilo de la página donde salen, y `{page of: id}` y las entradas de un índice, con el de
 la página a la que se refieren. Un prefacio en romanos y un cuerpo que vuelve a empezar en 1:
 
@@ -247,8 +248,14 @@ Un `Page number format` en una sección `none`, que no tiene números, es `PAGE_
 que no tendría efecto porque la sección sigue la cuenta de la anterior, es `FIRST_NUMBER_WITHOUT_RESTART`.
 
 > **Decisión:** el estilo es de la sección y no del contador: una sección `continue` en romanos sigue la cuenta de la
-> anterior y la escribe en romanos. Solo cifras y romanos, que son los de las páginas de los libros. *Alternativa
-> descartada:* letras (`a`, `b`), que no se usan para numerar páginas.
+> anterior y la escribe en romanos. Los formatos son los cinco de `Number format` y de `Footnote number format`.
+> *Alternativa descartada:* solo cifras y romanos, que obligaba a recordar qué propiedad admite qué formato.
+
+> **Decisión:** las páginas en letras siguen tras la `z` como los números de una lista: `aa`, `ab`, `ac`. Las etiquetas
+> de página del PDF repiten la letra (`aa`, `bb`, `cc`), así que desde la página 28 de una numeración en letras el visor
+> muestra una etiqueta distinta del número impreso ([El PDF](../common/pdf.md#páginas)). *Alternativas descartadas:*
+> imprimir `bb`, que separaría las páginas de las listas, los encabezados y las notas al pie; y un error por encima de
+> 26 páginas, un límite para un caso que casi no se da.
 
 > **Decisión:** lo que se imprime manda, para que el índice y el pie coincidan. Lo que no tiene número es un error y nunca
 > un hueco vacío. *Alternativa descartada:* dejar el hueco vacío.

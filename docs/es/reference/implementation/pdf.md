@@ -7,7 +7,7 @@ escribe el código está en [El pintado](painting.md#el-pdf).
 ## Páginas, fuentes y metadatos
 
 - Cada página tiene el tamaño del `Page` de su sección. Las etiquetas de página (`PageLabels`) llevan el número impreso
-  con su estilo (`D`, `r` o `R`), o ninguno en las páginas sin número, y solo se escriben si alguna página no es su
+  con su estilo (`D`, `a`, `A`, `r` o `R`), o ninguno en las páginas sin número, y solo se escriben si alguna página no es su
   número físico en cifras: un documento que numera como siempre no las lleva.
 - Las fuentes son las de la carpeta de recursos, en Type 0 con Identity-H. Las de contornos TrueType (los `.ttf` y los
   `.otf` que los llevan) se incrustan como subconjunto, con los glifos que se usan, en un `CIDFontType2` con el fichero en
