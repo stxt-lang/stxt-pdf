@@ -66,7 +66,7 @@ margins and the `Id` go on the element inside.
 | `Gap` | `0` | The gap between cells (with two values: between rows and between columns) |
 | `Area map` | none | A drawing of the grid with names: one line per row, one name per cell, `.` for an empty cell |
 | `Fill order` | `rows` | Whether the items without a fixed position are placed by rows (`rows`) or by columns (`columns`) |
-| `Horizontal`, `Vertical` | `stretch` | The alignment of the items in their cell: `start`, `end`, `center` or `stretch` (taking up the whole cell) |
+| `Horizontal`, `Vertical` | `stretch` | The alignment of the items in their cell: `left` or `top`, `right` or `bottom`, `center` or `stretch` (taking up the whole cell) |
 
 Each name in `Area map` must form a rectangle. If an item falls outside the declared rows, new rows are added.
 
@@ -88,7 +88,7 @@ measure as much as their tallest item, except with `Row sizes`. Percentage rows 
 
 ## How it behaves
 
-- By default, each item is stretched to its whole cell or area. With `start`, `end` or `center`, it takes its own size and
+- By default, each item is stretched to its whole cell or area. With a side (`left`, `right`, `top`, `bottom`) or `center`, it takes its own size and
   is aligned.
 - The items do not accept `Margin: auto`: they are aligned with `Horizontal` and `Vertical`.
 - Across pages, a `Grid` is broken between rows. A row that does not fit on a whole page is split together with its items.

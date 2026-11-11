@@ -22,8 +22,8 @@ Grid:
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`. |
 | `Area map` | bloque de texto | sin valor | Una fila por línea, con los nombres separados por espacios y `.` para una celda vacía. |
 | `Fill order` | `rows`, `columns` | `rows` | Orden de la colocación automática: `rows` llena las filas una a una, y `columns`, las columnas. |
-| `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
-| `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
+| `Horizontal` | `left`, `right`, `center`, `stretch` | `stretch` | Alineación horizontal de los ítems en su área. |
+| `Vertical` | `top`, `bottom`, `center`, `stretch` | `stretch` | Alineación vertical de los ítems en su área. |
 | `Split rows` | booleano | `true` | Una fila que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). |
 
 Todas pueden venir también de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
@@ -111,7 +111,7 @@ cuando todavía no hay ancho. Los márgenes `auto` de un ítem son un error: la 
 ## Alineación en el área
 
 Cada ítem ocupa un área formada por sus pistas y los huecos internos. Con `stretch` (por defecto) y sin `Width`/`Height`
-declarado, ocupa toda el área y se repite su layout. Con `start`, `end` o `center`, conserva su tamaño de contenido y se
+declarado, ocupa toda el área y se repite su layout. Con un lado (`left`, `right`, `top`, `bottom`) o `center`, conserva su tamaño de contenido y se
 desplaza. Los porcentajes de alto de un ítem se resuelven contra el alto de su área en el layout final. Al dimensionar las
 filas, todavía sin área, cuentan como `auto`. Un ítem estirado en vertical tiene un alto definido
 ([Valores](../common/values.md#alto-definido)).

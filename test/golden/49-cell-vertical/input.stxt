@@ -6,7 +6,7 @@
 #   their block, 20 high.
 # t2: s1 takes up the two rows (20 and 30, plus the border) and centers its line in the height of both.
 # t3: its row does not fit in what is left of page 1 and is split. p1 measures 100 (60 + 40) and k1, with
-#   Vertical: end, 80 (60 + 20): on page 1 their content reaches the end of the page and does not move; on page 2 the
+#   Vertical: bottom, 80 (60 + 20): on page 1 their content reaches the end of the page and does not move; on page 2 the
 #   row measures what is left of p1, and what is left of k1, 20 shorter, goes to its bottom.
 Document (dev.stxt.pdf):
 	Language: es
@@ -28,7 +28,7 @@ Document (dev.stxt.pdf):
 				Border: 0.5
 				Border color: #333333
 		For style: bottom
-			Vertical: end
+			Vertical: bottom
 		For style: tall
 			Box:
 				Height: 59
@@ -52,7 +52,7 @@ Document (dev.stxt.pdf):
 						Vertical: center
 					Cell: Abajo
 						Id: v3
-						Vertical: end
+						Vertical: bottom
 					Cell:
 						Id: e4
 						Vertical: center
@@ -102,7 +102,7 @@ Document (dev.stxt.pdf):
 								Background: #F0E8E1
 					Cell:
 						Id: k1
-						Vertical: end
+						Vertical: bottom
 						Block:
 							Id: k1a
 							Box:

@@ -342,8 +342,8 @@ final class PropertyReader {
                 List<Value> gap = gap(p);
                 s.stack().setGap(gap.get(0), gap.get(gap.size() - 1), gap.size() == 2);
             }
-            case "horizontal" -> s.stack().setHorizontal(enumValue(Distribution.class, p));
-            case "vertical" -> s.stack().setVertical(enumValue(Distribution.class, p));
+            case "horizontal" -> s.stack().setHorizontal(axis(p));
+            case "vertical" -> s.stack().setVertical(axis(p));
             case "line-distribution" -> s.stack().setLineDistribution(enumValue(Distribution.class, p));
             case "split-items" -> s.stack().setSplitItems(bool(p));
             default -> throw unread(p);
@@ -371,7 +371,7 @@ final class PropertyReader {
 
     /**
      * {@code Vertical} of a {@code Cell} (reference/components/table.md): where its content goes in the height its row
-     * leaves over, {@code start}, {@code center} or {@code end}. The cell stays stretched to its row, so
+     * leaves over, {@code top}, {@code center} or {@code bottom}. The cell stays stretched to its row, so
      * {@code stretch} does not apply, and there is one content to place, so neither do the values that distribute
      * several. Its line is kept with a prefix ({@code cell.vertical}).
      */
@@ -379,10 +379,10 @@ final class PropertyReader {
         s.declared("cell." + p.getCanonicalName(), p.getLine());
         switch (p.getCanonicalName()) {
             case "vertical" -> {
-                Distribution d = enumValue(Distribution.class, p);
+                Distribution d = axis(p);
                 if (d != Distribution.START && d != Distribution.CENTER && d != Distribution.END) {
                     throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Vertical of a Cell says where its content goes in "
-                            + "the height its row leaves over: it allows start, center or end, and "
+                            + "the height its row leaves over: it allows top, center or bottom, and "
                             + p.getText().trim() + " is not valid there (the cell is always stretched to its row)");
                 }
                 s.setCellVertical(Alignment.valueOf(d.name()));
@@ -452,14 +452,44 @@ final class PropertyReader {
     }
 
     /**
+     * The value of {@code Horizontal} or {@code Vertical}, which name the two ends of their axis by their side of the
+     * page: {@code left} and {@code right}, {@code top} and {@code bottom}. They are the {@code START} and the
+     * {@code END} of {@link Distribution}, which {@code Line distribution} writes as {@code start} and {@code end},
+     * because its axis depends on the {@code Direction} of the {@code Stack}. The sides of the other axis, and
+     * {@code start} and {@code end}, are not values of the property.
+     */
+    static Distribution axis(Node p) {
+        boolean horizontal = p.getCanonicalName().equals("horizontal");
+        String text = p.getText().trim().toLowerCase(Locale.ROOT);
+        if (text.equals(horizontal ? "left" : "top")) {
+            return Distribution.START;
+        }
+        if (text.equals(horizontal ? "right" : "bottom")) {
+            return Distribution.END;
+        }
+        Distribution d = enumValue(Distribution.class, p);
+        if (d == Distribution.START || d == Distribution.END) {
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + p.getName() + ": " + p.getText().trim()
+                    + " (the ends of its axis are " + axisEnds(horizontal) + ")");
+        }
+        return d;
+    }
+
+    /** The names of the two ends of an axis, for a message: {@code left, right} or {@code top, bottom}. */
+    static String axisEnds(boolean horizontal) {
+        return horizontal ? "left, right" : "top, bottom";
+    }
+
+    /**
      * {@code Horizontal} or {@code Vertical} of a {@code Grid}, an {@code Area} or an {@code Item}: an alignment.
      * {@code justify}, {@code around} and {@code distribute} distribute the main axis of a {@code Stack} and are only
      * valid there.
      */
     private static Alignment alignment(Node p) {
-        Distribution d = enumValue(Distribution.class, p);
+        Distribution d = axis(p);
         if (d == Distribution.JUSTIFY || d == Distribution.AROUND || d == Distribution.DISTRIBUTE) {
-            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " aligns in place: it allows start, end, center or "
+            throw error(p, ErrorCode.VALUE_NOT_ALLOWED, p.getName() + " aligns in place: it allows "
+                    + axisEnds(p.getCanonicalName().equals("horizontal")) + ", center or "
                     + "stretch, and " + p.getText().trim() + " distributes the main axis of a Stack and is only valid there");
         }
         return Alignment.valueOf(d.name());

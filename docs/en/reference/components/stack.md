@@ -31,8 +31,8 @@ Stack:
 | `Direction` | `horizontal`, `vertical` | `horizontal` | The main axis: in `horizontal` the items go side by side, and in `vertical`, one below another. |
 | `Wrap` | boolean | `false` | Allows the items to be distributed over several lines. |
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`, only with `Wrap: true` (`GAP_WITHOUT_WRAP`). |
-| `Horizontal` | on the main axis: `start`, `end`, `center`, `justify`, `around`, `distribute`; on the cross axis: `start`, `end`, `center`, `stretch` | `start` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
-| `Vertical` | as `Horizontal` | as `Horizontal` | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
+| `Horizontal` | on the main axis: `left`, `right`, `center`, `justify`, `around`, `distribute`; on the cross axis: `left`, `right`, `center`, `stretch` | `left` on the main axis; `stretch` on the cross axis | With `Direction: horizontal`, the distribution of the leftover space. With `vertical`, the alignment of the items within their line. |
+| `Vertical` | as `Horizontal`, with `top` and `bottom` instead of `left` and `right` | `top` on the main one; `stretch` on the cross one | With `Direction: vertical`, the distribution of the leftover space. With `horizontal`, the alignment of the items within their line. |
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Distribution of the lines in the container. Only with `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | boolean | `true` | A line (in vertical, an item) that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). In a vertical `Stack` with `Wrap`, which is never split, it is an error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
@@ -62,7 +62,7 @@ other properties go on that element. The `Item` only adds how it takes part in t
 | `Grow` | number ≥ 0 | `0` | Share of the leftover space it receives. |
 | `Shrink` | number ≥ 0 | `1` | Share of the deficit it gives up, weighted by `Base size`. |
 | `Base size` | number, %, `auto` | `auto` | Starting size on the main axis. |
-| `Horizontal`, `Vertical` | `start`, `end`, `center`, `stretch` | that of the container | The alignment of the item on the cross axis, which overrides that of the container: `Vertical` in a horizontal `Stack`, `Horizontal` in a vertical one. The one on the main axis is an error (`ITEM_MAIN_AXIS`): there the `Stack` distributes, and the item grows or shrinks with `Grow` and `Shrink`. |
+| `Horizontal`, `Vertical` | `left` or `top`, `right` or `bottom`, `center`, `stretch` | that of the container | The alignment of the item on the cross axis, which overrides that of the container: `Vertical` in a horizontal `Stack`, `Horizontal` in a vertical one. The one on the main axis is an error (`ITEM_MAIN_AXIS`): there the `Stack` distributes, and the item grows or shrinks with `Grow` and `Shrink`. |
 | `Layer` | integer | `auto` | Stacking order of the item ([Layers and rotation](../common/layers-and-rotation.md)). |
 
 `Grow`, `Shrink` and `Base size` can also come from a rule of `Styles` of the element the `Item` wraps, and what the
@@ -102,14 +102,21 @@ Free space = available − sum of hypothetical sizes − gaps.
 > **Decision:** margins do not count when shrinking: two items with `Base size: 300`, one with a margin of 10 on each side, in 515,
 > give up the same (52.5 each). *Rejected alternative:* weighting with the base plus the margins.
 
+> **Decision:** `Horizontal` and `Vertical` name the ends of their axis by the side of the page, `left` and
+> `right`, `top` and `bottom`, like `Align`, `Side` and `Caption position`. `Line distribution` calls them `start`
+> and `end`, because its axis depends on `Direction`: in a horizontal `Stack` the lines are stacked from top to
+> bottom, and in a vertical one, from left to right. *Rejected alternative:* `start` and `end` in all three, which
+> say nothing the name of the property does not say already and make the author remember which one is the start:
+> there is no right-to-left writing.
+
 ### Alignment on the main axis
 
 With a leftover space `L` and `n` items (it only acts if nothing grows):
 
 | Main axis (`Horizontal` or `Vertical`) | Before the first | Between items | After the last |
 |---|---|---|---|
-| `start` | 0 | gap | L |
-| `end` | L | gap | 0 |
+| `left` or `top` | 0 | gap | L |
+| `right` or `bottom` | L | gap | 0 |
 | `center` | L/2 | gap | L/2 |
 | `justify` | 0 | gap + L/(n−1) | 0 |
 | `around` | L/2n | gap + L/n | L/2n |

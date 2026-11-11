@@ -22,8 +22,8 @@ Grid:
 | `Gap` | 1 or 2 values (number, %) | `0` | One value for both axes, or `rows columns`. |
 | `Area map` | text block | none | One row per line, with the names separated by spaces and `.` for an empty cell. |
 | `Fill order` | `rows`, `columns` | `rows` | Order of automatic placement: `rows` fills the rows one by one, and `columns`, the columns. |
-| `Horizontal` | `start`, `end`, `center`, `stretch` | `stretch` | Horizontal alignment of the items in their area. |
-| `Vertical` | `start`, `end`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
+| `Horizontal` | `left`, `right`, `center`, `stretch` | `stretch` | Horizontal alignment of the items in their area. |
+| `Vertical` | `top`, `bottom`, `center`, `stretch` | `stretch` | Vertical alignment of the items in their area. |
 | `Split rows` | boolean | `true` | A row that does not fit in what is left of the page is split in parallel on that page; with `false`, it moves whole to the next one and is only split if it does not fit on a whole page either ([Breaks](#breaks)). |
 
 All of them can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)).
@@ -112,7 +112,7 @@ when there is no width yet. The `auto` margins of an item are an error: alignmen
 ## Alignment in the area
 
 Each item occupies an area formed by its tracks and the internal gaps. With `stretch` (the default) and without a declared `Width`/`Height`,
-it occupies the whole area and its layout is repeated. With `start`, `end` or `center`, it keeps its content size and is
+it occupies the whole area and its layout is repeated. With a side (`left`, `right`, `top`, `bottom`) or `center`, it keeps its content size and is
 shifted. The height percentages of an item are resolved against the height of its area in the final layout. When the
 rows are sized, still without an area, they count as `auto`. An item stretched vertically has a definite height
 ([Values](../common/values.md#definite-height)).

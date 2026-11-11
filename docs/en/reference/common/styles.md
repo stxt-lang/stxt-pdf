@@ -100,8 +100,8 @@ They are those of appearance and distribution. The rule that applies to an eleme
   the `Column align` of a rule has one alignment per column of each table it reaches (`TABLE_COLUMN_ALIGN`).
 - **`Horizontal` and `Vertical`** are those of the `Stack` or the `Grid`, never those of the `Item` or the `Area` that
   wraps the element: the alignment of an item is written in its `Item` or its `Area`. `Vertical` is also that of a
-  `Cell` ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)), with its values: `start`,
-  `center` or `end`.
+  `Cell` ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)), with its values: `top`,
+  `center` or `bottom`.
 - **`Grow`, `Shrink` and `Base size`** are of the `Item` ([Stack](../components/stack.md#item)), which is not a box: the
   rule of the element the `Item` wraps gives them, and what the `Item` declares wins over the rule. To an element that is
   not in an `Item` (also that of an `Area`) they are `STYLE_NOT_ALLOWED`.

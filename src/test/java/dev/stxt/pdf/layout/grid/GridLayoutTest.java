@@ -72,9 +72,9 @@ class GridLayoutTest {
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: S",
-                "\t\tArea:", "\t\t\tHorizontal: end", "\t\t\tVertical: center",
+                "\t\tArea:", "\t\t\tHorizontal: right", "\t\t\tVertical: center",
                 "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
-                "\tGrid:", "\t\tColumn sizes: 200", "\t\tHorizontal: start",
+                "\tGrid:", "\t\tColumn sizes: 200", "\t\tHorizontal: left",
                 "\t\tArea:", "\t\t\tText: aaa", "\t\t\t\tId: T");
         assertRect(40, 40, 200, 100, l.rect("S"));
         assertRect(390, 80, 50, 20, l.rect("E"));
@@ -230,7 +230,7 @@ class GridLayoutTest {
         // S, without a size, stretches inside its margins: 180 × 80 from (250, 50).
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",
-                "\t\tArea:", "\t\t\tHorizontal: end", "\t\t\tVertical: center",
+                "\t\tArea:", "\t\t\tHorizontal: right", "\t\t\tVertical: center",
                 "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
                 "\t\t\t\t\tMargin: 10",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10");
@@ -240,9 +240,9 @@ class GridLayoutTest {
 
     @Test
     void notStretchedItemsFitTheirContentInsideTheirMargins() {
-        // Horizontal: start: the text (15) in an area of 200 with a margin of 10 on each side.
+        // Horizontal: left: the text (15) in an area of 200 with a margin of 10 on each side.
         LayoutFixture l = layOut(
-                "\tGrid:", "\t\tColumn sizes: 200", "\t\tHorizontal: start",
+                "\tGrid:", "\t\tColumn sizes: 200", "\t\tHorizontal: left",
                 "\t\tArea:", "\t\t\tText: aaa", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tMargin: 10");
         assertRect(50, 50, 15, 12, l.rect("T"));
     }
@@ -261,9 +261,9 @@ class GridLayoutTest {
         // Areas of 200 × 100 unstretched: Min height: 50% gives 50 to M, and Max height: 50% leaves X at 50 (not 80).
         LayoutFixture l = layOut(
                 "\tGrid:", "\t\tColumn sizes: 200 200", "\t\tRow sizes: 100",
-                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:",
+                "\t\tArea:", "\t\t\tVertical: top", "\t\t\tBlock:", "\t\t\t\tId: M", "\t\t\t\tBox:",
                 "\t\t\t\t\tMin height: 50%",
-                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tBlock:", "\t\t\t\tId: X", "\t\t\t\tBox:",
+                "\t\tArea:", "\t\t\tVertical: top", "\t\t\tBlock:", "\t\t\t\tId: X", "\t\t\t\tBox:",
                 "\t\t\t\t\tHeight: 80", "\t\t\t\t\tMax height: 50%");
         assertRect(40, 40, 200, 50, l.rect("M"));
         assertRect(240, 40, 200, 50, l.rect("X"));

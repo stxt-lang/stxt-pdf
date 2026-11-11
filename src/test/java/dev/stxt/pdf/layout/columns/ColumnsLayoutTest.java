@@ -206,7 +206,7 @@ class ColumnsLayoutTest {
     /** In a stack item there is no page to fill: it is balanced. The width is the natural width: 2 × 50 + 10. */
     @Test
     void stackItemIsBalancedAndSizedByItsColumns() {
-        List<String> lines = new ArrayList<>(List.of("\tStack:", "\t\tVertical: start", "\t\tItem:"));
+        List<String> lines = new ArrayList<>(List.of("\tStack:", "\t\tVertical: top", "\t\tItem:"));
         for (String line : columnsElement(List.of("Column count: 2", "Gap: 10", "Balance: false"),
                 sized("A", true, "Height: 30", "Width: 50"), block("B", 30, true),
                 block("C", 30, true), block("D", 30, true))) {

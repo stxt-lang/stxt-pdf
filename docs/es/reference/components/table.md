@@ -39,7 +39,7 @@ Table:
 | `Split rows` | `true`, `false` | `true` | `Table` | Una fila que no cabe en lo que queda de página se parte en esa página, con sus celdas en paralelo; con `false`, pasa entera a la siguiente ([Cortes](#cortes)). |
 | `Span` | `filas columnas`, dos enteros positivos | `1 1` | `Cell` | Filas y columnas que ocupa la celda. |
 | `Row header` | `true`, `false` | `false` | `Cell` | La celda es la cabecera de su fila ([accesibilidad](#accesibilidad)). No vale en `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
-| `Vertical` | `start`, `center`, `end` | `start` | `Cell` | Dónde va el contenido de la celda en el alto que le sobra ([Alineación vertical del contenido](#alineación-vertical-del-contenido-vertical)). |
+| `Vertical` | `top`, `center`, `bottom` | `top` | `Cell` | Dónde va el contenido de la celda en el alto que le sobra ([Alineación vertical del contenido](#alineación-vertical-del-contenido-vertical)). |
 | `Id` | texto | sin valor | `Row` | Destino de enlaces y de `{page of: id}`. Su regla `For id` da estilo a las celdas de la fila ([Filas](#filas)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
@@ -107,7 +107,7 @@ fila es más alta que él:
 ```
 Styles:
     For element: Header cell
-        Vertical: end
+        Vertical: bottom
 Table:
     Column sizes: * 60
     Header rows:
@@ -123,12 +123,12 @@ Table:
                 Vertical: center
 ```
 
-- **Valores.** `start` (por defecto) deja el contenido arriba, `center` lo centra y `end` lo lleva abajo. Los demás
+- **Valores.** `top` (por defecto) deja el contenido arriba, `center` lo centra y `bottom` lo lleva abajo. Los demás
   valores de `Vertical` (`stretch`, `justify`, `around`, `distribute`) son `VALUE_NOT_ALLOWED` en una celda, que
   está siempre estirada y tiene un solo contenido que colocar.
 - **Qué se mueve.** La caja de la celda sigue estirada a su fila, con su `Background` y su `Border` enteros. Se mueve
   su contenido dentro de su caja de contenido: la línea de una celda con valor, o todos sus elementos juntos. Lo que
-  sobra es el alto de la caja de contenido menos el del contenido: con `center` va la mitad encima, y con `end`, todo.
+  sobra es el alto de la caja de contenido menos el del contenido: con `center` va la mitad encima, y con `bottom`, todo.
   Un contenido tan alto como la celda, o más, no se mueve.
 - **Es el `Vertical` de un `Stack` vertical**, que dice dónde va lo que sobra ([Stack](stack.md)), y no el de un
   `Area` de `Grid`, con el que la caja deja de estirarse ([Grid](grid.md)).
@@ -146,7 +146,7 @@ Table:
   página anterior se queda donde está: si la fila sigue por otra celda, lo que la celda mide en la página siguiente
   queda vacío.
 
-> **Decisión:** `Vertical` en `Cell`, con `start`, `center` y `end`: el nombre y los valores que ya tiene la
+> **Decisión:** `Vertical` en `Cell`, con `top`, `center` y `bottom`: el nombre y los valores que ya tiene la
 > alineación vertical en `Stack`, `Grid`, `Item` y `Area`. *Alternativa descartada:* una propiedad nueva
 > (`Vertical align: top | middle | bottom`), otro nombre para lo mismo y con valores que no son los del namespace.
 

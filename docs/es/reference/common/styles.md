@@ -101,8 +101,8 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
   `Column align` de una regla tiene una alineación por columna de cada tabla a la que llega (`TABLE_COLUMN_ALIGN`).
 - **`Horizontal` y `Vertical`** son las del `Stack` o el `Grid`, nunca las del `Item` o el `Area` que envuelve el
   elemento: la alineación de un ítem se escribe en su `Item` o su `Area`. `Vertical` es también la de una `Cell`
-  ([Table](../components/table.md#alineación-vertical-del-contenido-vertical)), con sus valores: `start`, `center` o
-  `end`.
+  ([Table](../components/table.md#alineación-vertical-del-contenido-vertical)), con sus valores: `top`, `center` o
+  `bottom`.
 - **`Grow`, `Shrink` y `Base size`** son del `Item` ([Stack](../components/stack.md#item)), que no es una caja: los da la
   regla del elemento que el `Item` envuelve, y lo que declara el `Item` gana a la regla. A un elemento que no está en un
   `Item` (también al de un `Area`) son `STYLE_NOT_ALLOWED`.

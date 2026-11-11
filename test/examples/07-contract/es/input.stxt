@@ -29,7 +29,7 @@ Document (dev.stxt.pdf):
 				Border color: indigo
 			Stack:
 				Horizontal: justify
-				Vertical: end
+				Vertical: bottom
 				Item:
 					Image: examples/contract/lumen.svg
 						Alt: Lumen, estudio de diseño
@@ -46,10 +46,10 @@ Document (dev.stxt.pdf):
 				Border color: rule
 			Stack:
 				Horizontal: justify
-				Vertical: end
+				Vertical: bottom
 				Item:
 					Stack:
-						Vertical: end
+						Vertical: bottom
 						Item:
 							Text: Rúbricas:
 						Item:

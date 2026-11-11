@@ -31,8 +31,8 @@ Stack:
 | `Direction` | `horizontal`, `vertical` | `horizontal` | El eje principal: en `horizontal` los ítems van uno al lado de otro, y en `vertical`, uno debajo de otro. |
 | `Wrap` | booleano | `false` | Permite repartir los ítems en varias líneas. |
 | `Gap` | 1 o 2 valores (número, %) | `0` | Un valor para ambos ejes, o `filas columnas`, solo con `Wrap: true` (`GAP_WITHOUT_WRAP`). |
-| `Horizontal` | en el eje principal: `start`, `end`, `center`, `justify`, `around`, `distribute`; en el cruzado: `start`, `end`, `center`, `stretch` | `start` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
-| `Vertical` | como `Horizontal` | como `Horizontal` | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
+| `Horizontal` | en el eje principal: `left`, `right`, `center`, `justify`, `around`, `distribute`; en el cruzado: `left`, `right`, `center`, `stretch` | `left` en el principal; `stretch` en el cruzado | Con `Direction: horizontal`, el reparto del sobrante. Con `vertical`, la alineación de los ítems dentro de su línea. |
+| `Vertical` | como `Horizontal`, con `top` y `bottom` en lugar de `left` y `right` | `top` en el principal; `stretch` en el cruzado | Con `Direction: vertical`, el reparto del sobrante. Con `horizontal`, la alineación de los ítems dentro de su línea. |
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Reparto de las líneas en el contenedor. Solo con `Wrap: true` (`LINE_DISTRIBUTION_WITHOUT_WRAP`). |
 | `Split items` | booleano | `true` | Una línea (en vertical, un ítem) que no cabe en lo que queda de página se parte en paralelo en esa página; con `false`, pasa entera a la siguiente y solo se parte si tampoco cabe en una página entera ([Cortes](#cortes)). En un `Stack` vertical con `Wrap`, que no se parte nunca, es un error (`SPLIT_ITEMS_WITHOUT_EFFECT`). |
 
@@ -62,7 +62,7 @@ demás propiedades van en ese elemento. El `Item` solo añade cómo participa en
 | `Grow` | número ≥ 0 | `0` | Parte del espacio sobrante que recibe. |
 | `Shrink` | número ≥ 0 | `1` | Parte del déficit que cede, ponderada por `Base size`. |
 | `Base size` | número, %, `auto` | `auto` | Tamaño de partida en el eje principal. |
-| `Horizontal`, `Vertical` | `start`, `end`, `center`, `stretch` | el del contenedor | La alineación del ítem en el eje cruzado, que sobrescribe la del contenedor: `Vertical` en un `Stack` horizontal, `Horizontal` en uno vertical. La del eje principal es un error (`ITEM_MAIN_AXIS`): ahí reparte el `Stack`, y el ítem crece o encoge con `Grow` y `Shrink`. |
+| `Horizontal`, `Vertical` | `left` o `top`, `right` o `bottom`, `center`, `stretch` | el del contenedor | La alineación del ítem en el eje cruzado, que sobrescribe la del contenedor: `Vertical` en un `Stack` horizontal, `Horizontal` en uno vertical. La del eje principal es un error (`ITEM_MAIN_AXIS`): ahí reparte el `Stack`, y el ítem crece o encoge con `Grow` y `Shrink`. |
 | `Layer` | entero | `auto` | Orden de apilamiento del ítem ([Capas y giro](../common/layers-and-rotation.md)). |
 
 `Grow`, `Shrink` y `Base size` también pueden venir de una regla de `Styles` del elemento que el `Item` envuelve, y lo
@@ -103,14 +103,20 @@ Espacio libre = disponible − suma de tamaños hipotéticos − huecos.
 > **Decisión:** los márgenes no cuentan al encoger: dos ítems con `Base size: 300`, uno con 10 de margen a cada lado, en 515,
 > ceden lo mismo (52,5 cada uno). *Alternativa descartada:* ponderar con la base más los márgenes.
 
+> **Decisión:** `Horizontal` y `Vertical` nombran los extremos de su eje por el lado de la página, `left` y `right`,
+> `top` y `bottom`, como `Align`, `Side` y `Caption position`. `Line distribution` los llama `start` y `end`, porque
+> su eje depende de `Direction`: en un `Stack` horizontal las líneas se apilan de arriba abajo, y en uno vertical, de
+> izquierda a derecha. *Alternativa descartada:* `start` y `end` en las tres, que no dicen nada que el nombre de la
+> propiedad no diga ya y obligan a recordar cuál es el principio: no hay escritura de derecha a izquierda.
+
 ### Alineación en el eje principal
 
 Con un sobrante `L` y `n` ítems (solo actúa si nadie crece):
 
 | Eje principal (`Horizontal` o `Vertical`) | Antes del primero | Entre ítems | Después del último |
 |---|---|---|---|
-| `start` | 0 | hueco | L |
-| `end` | L | hueco | 0 |
+| `left` o `top` | 0 | hueco | L |
+| `right` o `bottom` | L | hueco | 0 |
 | `center` | L/2 | hueco | L/2 |
 | `justify` | 0 | hueco + L/(n−1) | 0 |
 | `around` | L/2n | hueco + L/n | L/2n |

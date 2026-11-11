@@ -88,14 +88,14 @@ separa las celdas.
 **`Row header: true`** marca una celda como la cabecera de su fila (el concepto de una factura, la hora de un horario): un lector
 de pantalla la lee con cada celda de la fila. Las celdas de `Header rows` ya son cabeceras de columna.
 
-**`Vertical`** coloca el contenido de una celda más baja que su fila: `center` lo centra y `end` lo lleva abajo. Por
-defecto es `start`, arriba. La celda sigue ocupando el alto de la fila, con su fondo y su borde. Se escribe en la celda
+**`Vertical`** coloca el contenido de una celda más baja que su fila: `center` lo centra y `bottom` lo lleva abajo. Por
+defecto es `top`, arriba. La celda sigue ocupando el alto de la fila, con su fondo y su borde. Se escribe en la celda
 o, para varias, en una regla:
 
 ```
 Styles:
     For element: Header cell
-        Vertical: end
+        Vertical: bottom
     For column: 2 4
         Vertical: center
 ```

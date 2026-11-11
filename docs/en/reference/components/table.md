@@ -39,7 +39,7 @@ Table:
 | `Split rows` | `true`, `false` | `true` | `Table` | A row that does not fit in what is left of the page is split on that page, with its cells in parallel; with `false`, it moves whole to the next one ([Breaks](#breaks)). |
 | `Span` | `rows columns`, two positive integers | `1 1` | `Cell` | Rows and columns that the cell takes up. |
 | `Row header` | `true`, `false` | `false` | `Cell` | The cell is the header of its row ([accessibility](#accessibility)). Not valid in `Header rows` (`ROW_HEADER_IN_HEADER_ROWS`). |
-| `Vertical` | `start`, `center`, `end` | `start` | `Cell` | Where the content of the cell goes in the height it has left over ([Vertical alignment of the content](#vertical-alignment-of-the-content-vertical)). |
+| `Vertical` | `top`, `center`, `bottom` | `top` | `Cell` | Where the content of the cell goes in the height it has left over ([Vertical alignment of the content](#vertical-alignment-of-the-content-vertical)). |
 | `Id` | text | none | `Row` | Target of links and of `{page of: id}`. Its `For id` rule styles the cells of the row ([Rows](#rows)). |
 | `Box` | `Background`, `Border`, `Border color`, `Corner radius` | none | `Row` | The look of the band of the row ([Rows](#rows)). Nothing else (`ROW_BOX`). |
 
@@ -109,7 +109,7 @@ when the row is taller than it:
 ```
 Styles:
     For element: Header cell
-        Vertical: end
+        Vertical: bottom
 Table:
     Column sizes: * 60
     Header rows:
@@ -125,13 +125,13 @@ Table:
                 Vertical: center
 ```
 
-- **Values.** `start` (the default) leaves the content at the top, `center` centers it and `end` takes it to the
+- **Values.** `top` (the default) leaves the content at the top, `center` centers it and `bottom` takes it to the
   bottom. The other values of `Vertical` (`stretch`, `justify`, `around`, `distribute`) are `VALUE_NOT_ALLOWED` in a
   cell, which is always stretched and has a single content to place.
 - **What moves.** The box of the cell stays stretched to its row, with its whole `Background` and `Border`. Its
   content moves inside its content box: the line of a cell with a value, or all its elements together. What is left
   over is the height of the content box minus that of the content: with `center` half of it goes above, and with
-  `end`, all of it. A content as tall as the cell, or taller, does not move.
+  `bottom`, all of it. A content as tall as the cell, or taller, does not move.
 - **It is the `Vertical` of a vertical `Stack`**, which says where the leftover goes ([Stack](stack.md)), and not that
   of an `Area` of a `Grid`, with which the box stops being stretched ([Grid](grid.md)).
 - **The margins** of the elements of the cell that stay inside it count as content: the top one of the first and the
@@ -146,7 +146,7 @@ Table:
   fragments the content reaches the break and does not move. The content that ended on a previous page stays where it
   is: if the row goes on because of another cell, what the cell measures on the next page is empty.
 
-> **Decision:** `Vertical` in `Cell`, with `start`, `center` and `end`: the name and the values the vertical
+> **Decision:** `Vertical` in `Cell`, with `top`, `center` and `bottom`: the name and the values the vertical
 > alignment already has in `Stack`, `Grid`, `Item` and `Area`. *Rejected alternative:* a new property
 > (`Vertical align: top | middle | bottom`), another name for the same thing and with values that are not those of the
 > namespace.

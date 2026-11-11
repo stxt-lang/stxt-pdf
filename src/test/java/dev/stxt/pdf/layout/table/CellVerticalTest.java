@@ -63,7 +63,7 @@ class CellVerticalTest {
         LayoutFixture l = row();
         assertRect(140, 40, 100, 100, l.rect("K"));
         assertRect(140, 40, 100, 30, l.rect("C"));
-        assertRect(140, 40, 100, 30, row("\t\t\t\t\tVertical: start").rect("C"));
+        assertRect(140, 40, 100, 30, row("\t\t\t\t\tVertical: top").rect("C"));
     }
 
     @Test
@@ -76,7 +76,7 @@ class CellVerticalTest {
 
     @Test
     void endPutsTheContentAtTheBottom() {
-        LayoutFixture l = row("\t\t\t\t\tVertical: end");
+        LayoutFixture l = row("\t\t\t\t\tVertical: bottom");
         assertRect(140, 40, 100, 100, l.rect("K"));
         assertRect(140, 110, 100, 30, l.rect("C"));
     }
@@ -84,7 +84,7 @@ class CellVerticalTest {
     @Test
     void theContentMovesInsideTheContentBoxOfTheCell() {
         // Padding 5 and border 1 on each side leave a content box of 88: 58 left over.
-        LayoutFixture l = row("\t\t\t\t\tVertical: end", "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 5",
+        LayoutFixture l = row("\t\t\t\t\tVertical: bottom", "\t\t\t\t\tBox:", "\t\t\t\t\t\tPadding: 5",
                 "\t\t\t\t\t\tBorder: 1");
         assertRect(140, 40, 100, 100, l.rect("K"));
         assertRect(146, 104, 88, 30, l.rect("C"));
@@ -94,7 +94,7 @@ class CellVerticalTest {
     void theMarginsTheCellContainsCountAsContent() {
         // The margins of C stay inside the cell (10 above and 20 below): the content is 60 high, and 40 is left over.
         LayoutFixture l = layOut(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
-                lines("\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: end",
+                lines("\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: bottom",
                         "\t\t\t\t\tBlock:", "\t\t\t\t\t\tId: C", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30",
                         "\t\t\t\t\t\t\tMargin: 10 0 20 0")));
         assertRect(140, 90, 100, 30, l.rect("C"));
@@ -117,7 +117,7 @@ class CellVerticalTest {
         LayoutFixture center = layOut(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
                 lines("\t\t\t\tCell: Total", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: center")));
         LayoutFixture end = layOut(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
-                lines("\t\t\t\tCell: Total", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: end")));
+                lines("\t\t\t\tCell: Total", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: bottom")));
         Fragment k = top.fragment("K");
         double line = k.lines().get(0).height();
         assertEquals(100, k.height(), 1e-6);
@@ -142,7 +142,7 @@ class CellVerticalTest {
     @Test
     void aCellWithAHeightOfItsOwnHasNoSpecialCase() {
         LayoutFixture l = layOut(concat(TABLE, lines("\t\t\tRow:"), tall("A", 20),
-                lines("\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: end", "\t\t\t\t\tBox:",
+                lines("\t\t\t\tCell:", "\t\t\t\t\tId: K", "\t\t\t\t\tVertical: bottom", "\t\t\t\t\tBox:",
                         "\t\t\t\t\t\tHeight: 80",
                         "\t\t\t\t\tBlock:", "\t\t\t\t\t\tId: C", "\t\t\t\t\t\tBox:", "\t\t\t\t\t\t\tHeight: 30")));
         assertRect(140, 40, 100, 80, l.rect("K"));
@@ -163,7 +163,7 @@ class CellVerticalTest {
         // Page area of 100. A places 100 on page 1 and 60 on page 2; K, 100 and 30: on page 1 its content reaches the
         // break and does not move, and on page 2 the row is 60 high and its 30 go to the bottom.
         LayoutFixture l = layOutPaged(180, concat(TABLE, lines("\t\t\tRow:"), two("A", 100, 60),
-                two("K", 100, 30, "\t\t\t\t\tVertical: end")));
+                two("K", 100, 30, "\t\t\t\t\tVertical: bottom")));
         assertEquals(2, l.pages());
         assertRect(140, 40, 100, 100, l.rect(1, "K1"));
         assertRect(140, 40, 100, 60, l.rect(2, "K"));
@@ -175,7 +175,7 @@ class CellVerticalTest {
         // K fits whole on page 1, but its row goes on with A: its content is not moved to another page, and what the
         // cell measures on page 2 is empty.
         LayoutFixture l = layOutPaged(180, concat(TABLE, lines("\t\t\tRow:"), two("A", 60, 60),
-                cell("\t\t\t\t\tVertical: end")));
+                cell("\t\t\t\t\tVertical: bottom")));
         assertEquals(2, l.pages());
         assertRect(140, 40, 100, 30, l.rect(1, "C"));
         l.assertAbsent(2, "C");
@@ -185,9 +185,9 @@ class CellVerticalTest {
     void aRuleGivesItToTheCellsItReaches() {
         String[] content = concat(TABLE, lines("\t\t\tRow:"), tall("A", 100), cell());
         assertRect(140, 110, 100, 30, layOut(concat(lines("\tStyles:", "\t\tFor element: Cell",
-                "\t\t\tVertical: end"), content)).rect("C"));
+                "\t\t\tVertical: bottom"), content)).rect("C"));
         assertRect(140, 110, 100, 30, layOut(concat(lines("\tStyles:", "\t\tFor element: Body cell",
-                "\t\t\tVertical: end"), content)).rect("C"));
+                "\t\t\tVertical: bottom"), content)).rect("C"));
         assertRect(140, 75, 100, 30, layOut(concat(lines("\tStyles:", "\t\tFor column: 2",
                 "\t\t\tVertical: center"), content)).rect("C"));
         // The style of the Row reaches its cells.
@@ -196,17 +196,17 @@ class CellVerticalTest {
                 cell())).rect("C"));
         // Inside the rule of a table, only its cells.
         assertRect(140, 110, 100, 30, layOut(concat(lines("\tStyles:", "\t\tFor element: Table",
-                "\t\t\tFor element: Cell", "\t\t\t\tVertical: end"), content)).rect("C"));
+                "\t\t\tFor element: Cell", "\t\t\t\tVertical: bottom"), content)).rect("C"));
     }
 
     @Test
     void whatTheCellDeclaresWinsOverTheRules() {
-        LayoutFixture l = layOut(concat(lines("\tStyles:", "\t\tFor element: Cell", "\t\t\tVertical: end",
+        LayoutFixture l = layOut(concat(lines("\tStyles:", "\t\tFor element: Cell", "\t\t\tVertical: bottom",
                 "\t\tFor column: 2", "\t\t\tVertical: center"), TABLE, lines("\t\t\tRow:"), tall("A", 100),
-                cell("\t\t\t\t\tVertical: start")));
+                cell("\t\t\t\t\tVertical: top")));
         assertRect(140, 40, 100, 30, l.rect("C"));
         // And the column wins over the element.
-        LayoutFixture rules = layOut(concat(lines("\tStyles:", "\t\tFor element: Cell", "\t\t\tVertical: end",
+        LayoutFixture rules = layOut(concat(lines("\tStyles:", "\t\tFor element: Cell", "\t\t\tVertical: bottom",
                 "\t\tFor column: 2", "\t\t\tVertical: center"), TABLE, lines("\t\t\tRow:"), tall("A", 100), cell()));
         assertRect(140, 75, 100, 30, rules.rect("C"));
     }
@@ -216,12 +216,20 @@ class CellVerticalTest {
     }
 
     @Test
+    void startAndEndAndTheSidesOfTheOtherAxisAreNotValues() {
+        for (String value : new String[]{"start", "end", "left", "right"}) {
+            assertThrows(RuntimeException.class, () -> layOut(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
+                    cell("\t\t\t\t\tVertical: " + value))), value);
+        }
+    }
+
+    @Test
     void theValuesThatStretchOrDistributeAreNotAllowed() {
         for (String value : new String[]{"stretch", "justify", "around", "distribute"}) {
             InvalidModelException e = error(concat(TABLE, lines("\t\t\tRow:"), tall("A", 100),
                     cell("\t\t\t\t\tVertical: " + value)));
             assertEquals(ErrorCode.VALUE_NOT_ALLOWED.name(), e.code(), value);
-            assertTrue(e.getMessage().contains("start, center or end"), e.getMessage());
+            assertTrue(e.getMessage().contains("top, center or bottom"), e.getMessage());
         }
     }
 

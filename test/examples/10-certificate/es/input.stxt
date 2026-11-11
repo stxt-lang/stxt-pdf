@@ -109,7 +109,7 @@ Document (dev.stxt.pdf):
 		Stack:
 			Id: signatures
 			Horizontal: justify
-			Vertical: end
+			Vertical: bottom
 			Item:
 				Block:
 					Box:

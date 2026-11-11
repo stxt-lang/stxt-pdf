@@ -1783,10 +1783,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Only in a Table (from a rule of Styles, the other boxes ignore it): with true, the border between two cells is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it. False by default.
 	Node: Horizontal
 		Type: ENUM
-		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (start, end, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (start, end, center, justify, around or distribute); if not, the alignment of all the items (start, end, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
+		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (left, right, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (left, right, center, justify, around or distribute); if not, the alignment of all the items (left, right, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
 		Values:
-			Value: start
-			Value: end
+			Value: left
+			Value: right
 			Value: center
 			Value: stretch
 			Value: justify
@@ -1794,10 +1794,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: start (by default), center or end; the box of the cell stays stretched to its row.
+		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: top (by default), center or bottom; the box of the cell stays stretched to its row.
 		Values:
-			Value: start
-			Value: end
+			Value: top
+			Value: bottom
 			Value: center
 			Value: stretch
 			Value: justify

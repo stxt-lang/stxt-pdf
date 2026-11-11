@@ -222,7 +222,7 @@ class ImageLayoutTest {
                 "\t\t\tImage: test/wide.png",
                 "\t\t\t\tId: I",
                 "\t\tItem:",
-                "\t\t\tHorizontal: start",
+                "\t\t\tHorizontal: left",
                 "\t\t\tImage: test/wide.png",
                 "\t\t\t\tId: J");
         assertRect(40, 40, 515, 257.5, f.rect("I"));
@@ -242,7 +242,7 @@ class ImageLayoutTest {
                 "\t\t\tImage: test/tall.jpg",
                 "\t\t\t\tId: T",
                 "\t\tArea:",
-                "\t\t\tHorizontal: start",
+                "\t\t\tHorizontal: left",
                 "\t\t\tImage: test/square.png",
                 "\t\t\t\tId: S");
         assertRect(40, 40, 200, 100, f.rect("I"));

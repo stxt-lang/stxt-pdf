@@ -72,8 +72,8 @@ Cada hijo de un `Stack` va dentro de un `Item`, que envuelve **exactamente un el
 | `Direction` | `horizontal`, `vertical` | `horizontal` | En fila (`horizontal`) o en columna (`vertical`) |
 | `Gap` | 1 o 2 medidas | `0` | El hueco entre ítems, y entre líneas si hay varias. Con `Wrap`, puede tener dos: entre filas y entre columnas |
 | `Wrap` | `true`, `false` | `false` | Si los ítems que no caben pasan a otra línea |
-| `Horizontal` | `start`, `end`, `center`, `justify`, `around`, `distribute`. En columna: `start`, `end`, `center`, `stretch` | `start`. En columna: `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados o entre los ítems (`justify`). En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Stack` |
-| `Vertical` | `start`, `end`, `center`, `stretch`. En columna: `start`, `end`, `center`, `justify`, `around`, `distribute` | `stretch`. En columna: `start` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila). En columna, dónde va lo que sobra |
+| `Horizontal` | `left`, `right`, `center`, `justify`, `around`, `distribute`. En columna: `left`, `right`, `center`, `stretch` | `left`. En columna: `stretch` | En fila, dónde va lo que sobra: al principio, al final, a los dos lados o entre los ítems (`justify`). En columna, cómo se alinean los ítems: `stretch` los estira al ancho del `Stack` |
+| `Vertical` | `top`, `bottom`, `center`, `stretch`. En columna: `top`, `bottom`, `center`, `justify`, `around`, `distribute` | `stretch`. En columna: `top` | Al revés que `Horizontal`. En fila, cómo se alinean los ítems (`stretch` los estira al alto de la fila). En columna, dónde va lo que sobra |
 | `Line distribution` | `start`, `end`, `center`, `justify`, `around`, `stretch` | `stretch` | Con `Wrap`, cómo se reparten las líneas |
 
 ## Cómo se reparte el espacio

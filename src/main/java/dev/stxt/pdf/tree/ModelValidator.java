@@ -89,7 +89,8 @@ final class ModelValidator {
         String spread = crossSpread(s);
         if (spread != null) {
             throw error(s.line(s.stack().crossAxisKey()), ErrorCode.VALUE_NOT_ALLOWED, cross + " is the cross axis of "
-                    + "this Stack (" + direction + ") and aligns the items: it allows start, end, center or stretch and not "
+                    + "this Stack (" + direction + ") and aligns the items: it allows "
+                    + PropertyReader.axisEnds(!s.stack().isHorizontal()) + ", center or stretch and not "
                     + spread + ", which distributes the main axis (" + main + ")");
         }
         if (s.isDeclared(STACK_LINE_DISTRIBUTION) && !s.stack().wrap()) {

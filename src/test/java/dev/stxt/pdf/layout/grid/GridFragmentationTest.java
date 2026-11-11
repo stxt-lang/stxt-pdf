@@ -198,7 +198,7 @@ class GridFragmentationTest {
     void frameOffsetDoesNotChangeTheParallelBreak() {
         String text = String.join(" ", java.util.Collections.nCopies(40, "aaaaa"));
         LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 100 100",
-                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tFrame:", "\t\t\t\tId: F",
+                "\t\tArea:", "\t\t\tVertical: top", "\t\t\tFrame:", "\t\t\t\tId: F",
                 "\t\t\t\tOffset: 10 auto auto auto", "\t\t\t\tText: " + text,
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 150");
         assertEquals(2, l.pages());
@@ -220,7 +220,7 @@ class GridFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE, "\tGrid:", "\t\tColumn sizes: 30 100", "\t\tSplit rows: false",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 30",
-                "\t\tArea:", "\t\t\tVertical: start", "\t\t\tText: " + text, "\t\t\t\tId: T",
+                "\t\tArea:", "\t\t\tVertical: top", "\t\t\tText: " + text, "\t\t\t\tId: T",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: B");
         assertEquals(4, l.pages());
         l.assertAbsent(1, "T");
@@ -244,7 +244,7 @@ class GridFragmentationTest {
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: A", "\t\t\t\tBox:", "\t\t\t\t\tHeight: 100",
                 "\t\tArea:", "\t\t\tBlock:", "\t\t\t\tId: C",
                 "\t\t\t\tGrid:", "\t\t\t\t\tColumn sizes: 20 30",
-                "\t\t\t\t\tArea:", "\t\t\t\t\t\tVertical: start", "\t\t\t\t\t\tBlock:", "\t\t\t\t\t\t\tBox:",
+                "\t\t\t\t\tArea:", "\t\t\t\t\t\tVertical: top", "\t\t\t\t\t\tBlock:", "\t\t\t\t\t\t\tBox:",
                 "\t\t\t\t\t\t\t\tHeight: 10",
                 "\t\t\t\t\tArea:", "\t\t\t\t\t\tText: " + text, "\t\t\t\t\t\t\tId: T");
         assertEquals(2, l.pages());
@@ -423,7 +423,7 @@ class GridFragmentationTest {
         LayoutFixture l = layOutPaged(PAGE, "	Grid:", "		Column sizes: *",
                 "		Area:", "			Block:", "				Id: C",
                 "				Grid:", "					Column sizes: 100 30",
-                "					Area:", "						Vertical: start", "						Block:", "							Id: B",
+                "					Area:", "						Vertical: top", "						Block:", "							Id: B",
                 "							Box:", "								Height: 99",
                 "					Area:", "						Text: " + text, "							Id: T");
         assertEquals(3, l.pages());

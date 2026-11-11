@@ -65,7 +65,7 @@ El `Area` admite además `Horizontal` y `Vertical` (la alineación del ítem en 
 | `Gap` | `0` | El hueco entre celdas (con dos valores: entre filas y entre columnas) |
 | `Area map` | sin valor | Un dibujo de la rejilla con nombres: una línea por fila, un nombre por celda, `.` para una celda vacía |
 | `Fill order` | `rows` | Si los ítems sin sitio fijo se colocan por filas (`rows`) o por columnas (`columns`) |
-| `Horizontal`, `Vertical` | `stretch` | La alineación de los ítems en su celda: `start`, `end`, `center` o `stretch` (ocupar toda la celda) |
+| `Horizontal`, `Vertical` | `stretch` | La alineación de los ítems en su celda: `left` o `top`, `right` o `bottom`, `center` o `stretch` (ocupar toda la celda) |
 
 Cada nombre de `Area map` tiene que formar un rectángulo. Si un ítem cae fuera de las filas declaradas, se añaden filas nuevas.
 
@@ -87,7 +87,7 @@ Primero se colocan las columnas fijas y las `auto`, y lo que sobra se reparte en
 
 ## Cómo se comporta
 
-- Por defecto, cada ítem se estira a toda su celda o su área. Con `start`, `end` o `center`, mide lo suyo y se alinea.
+- Por defecto, cada ítem se estira a toda su celda o su área. Con un lado (`left`, `right`, `top`, `bottom`) o `center`, mide lo suyo y se alinea.
 - Los ítems no admiten `Margin: auto`: se alinean con `Horizontal` y `Vertical`.
 - Entre páginas, un `Grid` se corta entre filas. Una fila que no cabe en una página entera se parte con sus ítems a la vez.
 - Una fila de tamaño fijo cuyo contenido no cabe es un error.

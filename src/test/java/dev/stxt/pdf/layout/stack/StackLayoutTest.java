@@ -148,11 +148,11 @@ class StackLayoutTest {
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tBox:", "\t\t\tHeight: 100",
                 "\t\tItem:", "\t\t\tBlock:", "\t\t\t\tId: S", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50",
-                "\t\tItem:", "\t\t\tVertical: start",
+                "\t\tItem:", "\t\t\tVertical: top",
                 "\t\t\tBlock:", "\t\t\t\tId: T", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
                 "\t\tItem:", "\t\t\tVertical: center",
                 "\t\t\tBlock:", "\t\t\t\tId: C", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20",
-                "\t\tItem:", "\t\t\tVertical: end",
+                "\t\tItem:", "\t\t\tVertical: bottom",
                 "\t\t\tBlock:", "\t\t\t\tId: E", "\t\t\t\tBox:", "\t\t\t\t\tWidth: 50", "\t\t\t\t\tHeight: 20");
         assertRect(40, 40, 50, 100, l.rect("S"));
         assertRect(90, 40, 50, 20, l.rect("T"));
@@ -493,7 +493,7 @@ class StackLayoutTest {
     void columnItemsThatDoNotStretchFitTheirContentInsideTheirMargins() {
         LayoutFixture l = layOut(
                 "\tStack:", "\t\tDirection: vertical",
-                "\t\tItem:", "\t\t\tHorizontal: start", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
+                "\t\tItem:", "\t\t\tHorizontal: left", "\t\t\tText: aaa", "\t\t\t\tId: A", "\t\t\t\tBox:",
                 "\t\t\t\t\tMargin: 0 10");
         assertRect(50, 40, 15, 12, l.rect("A"));
     }

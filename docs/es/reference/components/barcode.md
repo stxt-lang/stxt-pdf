@@ -21,7 +21,7 @@ Document (dev.stxt.pdf):
     Section:
         Stack:
             Horizontal: justify
-            Vertical: end
+            Vertical: bottom
             Item:
                 Block:
                     Text: Albarán AL-2025-0388
