@@ -89,7 +89,9 @@ Instead of the hexadecimal value, the **name** of a color declared in `Styles` w
 ([Styles](styles.md#named-colors)). A value that starts with `#` and is not a hexadecimal color is `VALUE_SYNTAX`; one
 with the form of a name that is not declared is `COLOR_UNKNOWN`.
 
-> **Decision:** opacity goes in each color. There is no `Opacity` of the box, which would affect everything it contains.
+The opacity of a color is that of what is painted with it. That of a whole box, with everything it contains, is
+`Opacity`, which `Image`, `Frame`, `Overlay` and `Page overlay` allow
+([Layers and rotation](layers-and-rotation.md#opacity-opacity)).
 
 The background also accepts a **linear gradient**: `linear(angle, color, color, ...)`, with the angle in degrees (`0` points
 up, `90` to the right, `180` down) and at least two colors, spread evenly:

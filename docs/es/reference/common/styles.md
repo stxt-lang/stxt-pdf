@@ -74,14 +74,15 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Side`, `Below side boxes` |
+| `Image` | `Fit`, `Opacity`, `Side`, `Below side boxes` |
 | `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side`, `Below side boxes` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes` |
 | `Heading 1` a `Heading 6` | `In table of contents`, `Below side boxes` |
 | `Paragraph` | `Drop cap`, `Below side boxes` |
 | `Text` | `Below side boxes` |
 | `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
-| `Frame` | `Isolate margins`, `Trim margins` |
+| `Frame` | `Isolate margins`, `Trim margins`, `Opacity` |
+| `Overlay`, `Page overlay` | `Opacity` |
 | `Cell` | `Trim margins`, `Vertical` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
 | `Table of contents` | `Levels`, `Leader` |

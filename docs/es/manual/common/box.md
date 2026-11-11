@@ -85,7 +85,7 @@ el texto grande (`Size` de 18 o más, o de 14 en negrita). Como referencia, el g
 4,5:1, y el negro sobre blanco tiene 21:1.
 
 Lo que cuenta es lo que hay de verdad debajo del texto: el fondo de su caja, el de las de fuera o el de una caja que tenga
-detrás, mezclados si tienen opacidad. De un degradado cuenta el peor de sus colores. El texto encima de una imagen no se
+detrás, mezclados si tienen opacidad, la suya o la de una caja con `Opacity` que los contenga. De un degradado cuenta el peor de sus colores. El texto encima de una imagen no se
 comprueba, porque no se sabe qué hay debajo. Quien convierte puede desactivar la comprobación
 ([Uso desde Java](java-usage.md)).
 

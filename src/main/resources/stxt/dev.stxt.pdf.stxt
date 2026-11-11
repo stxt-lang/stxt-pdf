@@ -545,6 +545,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate origin
 				Max: 1
+			Child: Opacity
+				Max: 1
 			Child: Block
 			Child: Stack
 			Child: Grid
@@ -589,6 +591,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate
 				Max: 1
 			Child: Rotate origin
+				Max: 1
+			Child: Opacity
 				Max: 1
 			Child: Block
 			Child: Stack
@@ -635,6 +639,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Rotate
 				Max: 1
 			Child: Rotate origin
+				Max: 1
+			Child: Opacity
 				Max: 1
 			Child: Block
 			Child: Stack
@@ -974,6 +980,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
+			Child: Opacity
+				Max: 1
 			Child: PDF page
 				Max: 1
 			Child: Rotate
@@ -1087,6 +1095,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
+			Child: Opacity
+				Max: 1
 			Child: Barcode format
 				Max: 1
 			Child: Error correction
@@ -1186,6 +1196,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Fit
 				Max: 1
+			Child: Opacity
+				Max: 1
 			Child: Barcode format
 				Max: 1
 			Child: Error correction
@@ -1284,6 +1296,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Marker image
 				Max: 1
 			Child: Fit
+				Max: 1
+			Child: Opacity
 				Max: 1
 			Child: Barcode format
 				Max: 1
@@ -1563,6 +1577,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
 		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
+	Node: Opacity
+		Description: How opaque the box is painted, with everything it contains, as a percentage from 0% to 100% (Opacity: 15%): what lies beneath shows through it. With 100% the box is opaque, as without it, and with 0% nothing of it is seen. In an Image, the image with the background and the border of its box; in a Frame, an Overlay and a Page overlay, the box with its content, painted as a whole: what overlaps inside does not show through. Painting only: it does not change the layout. Without it, the box is opaque; the opacity of a single color goes in the color (#RRGGBBAA).
 	Node: Side
 		Type: ENUM
 		Description: Side box: an Image, a Barcode or a Block (with Width or Max width) in block flow that goes to the left or to the right of its container, at its place in the flow, and the text of the siblings that follow it shortens its lines beside it; its Margin is the separation. A sibling that is not text (a Table, a Stack, a List) goes below it. It is not split across pages: if it does not fit, it moves to the next page with the first line that runs beside it. Not on an item of a Stack or a Grid, nor on a cell.

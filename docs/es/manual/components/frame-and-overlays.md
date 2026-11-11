@@ -83,6 +83,7 @@ ocupar los márgenes de la página, pero no salirse de ella.
 | `Offset` | Los tres | El desplazamiento |
 | `Layer` | Los tres | Qué se pinta encima ([Capas y giro](../common/layers-and-rotation.md)) |
 | `Rotate`, `Rotate origin` | Los tres | Girar la caja ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
+| `Opacity` | Los tres | Atenuar la caja con todo lo que contiene ([Capas y giro](../common/layers-and-rotation.md#atenuar-una-caja-opacity)) |
 | `Pages` | `Page overlay` | En qué páginas sale |
 
 Admiten además `Id`, `Style`, `Link`, `Box` y `Typography`. `Frame` admite también `Break` y `Isolate margins`. `Overlay` y

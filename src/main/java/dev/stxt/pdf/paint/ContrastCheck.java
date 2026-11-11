@@ -30,7 +30,9 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,6 +46,11 @@ import java.util.Locale;
  * with their opacity over the white of the page; for a gradient each color counts, and the worst one applies. An image
  * under the text, if nothing opaque covers it, is an unknown background: that text is not checked. Borders do not
  * count.</p>
+ *
+ * <p>What is painted inside a box with {@code Opacity} (reference/common/layers-and-rotation.md) counts with the
+ * opacity of its colors multiplied by that of the box, the backgrounds and the text alike; an image with
+ * {@code Opacity} is still an unknown background, and the text of a box with {@code Opacity: 0%}, which is not seen, is
+ * not checked.</p>
  */
 public final class ContrastCheck implements Canvas {
 
@@ -62,6 +69,8 @@ public final class ContrastCheck implements Canvas {
 
     private final List<Layer> layers = new ArrayList<>();
     private final Turns turns = new Turns();
+    /** The opacities within which it is painted ({@link #beginOpacity}), each one already multiplied by the outer ones. */
+    private final Deque<Float> opacities = new ArrayDeque<>();
     /** The box whose text is being painted ({@link Tagging#beginText}); {@code null} outside a text. */
     private Box current;
 
@@ -95,14 +104,14 @@ public final class ContrastCheck implements Canvas {
 
     @Override
     public void background(Rect r, String color) {
-        add(r, List.of(Colors.rgba(color)));
+        add(r, List.of(faded(Colors.rgba(color))));
     }
 
     @Override
     public void fill(Rect paddingBox, Radii radii, Paint paint) {
         List<String> colors = paint instanceof Paint.Linear linear ? linear.stops()
                 : List.of(((Paint.Solid) paint).color());
-        add(paddingBox, colors.stream().map(Colors::rgba).toList());
+        add(paddingBox, colors.stream().map(Colors::rgba).map(this::faded).toList());
     }
 
     @Override
@@ -149,6 +158,24 @@ public final class ContrastCheck implements Canvas {
         turns.pop();
     }
 
+    @Override
+    public void beginOpacity(double opacity) {
+        opacities.push((float) opacity * (opacities.isEmpty() ? 1 : opacities.peek()));
+    }
+
+    @Override
+    public void endOpacity() {
+        opacities.pop();
+    }
+
+    /** The color with its opacity multiplied by those of the boxes with {@code Opacity} it is painted in. */
+    private float[] faded(float[] color) {
+        if (opacities.isEmpty()) {
+            return color;
+        }
+        return new float[]{color[0], color[1], color[2], color[3] * opacities.peek()};
+    }
+
     /** A clip only removes what lies outside it: what lies under the text, which is inside, does not change. */
     @Override
     public void beginClip(Rect r, Radii radii) {
@@ -171,7 +198,8 @@ public final class ContrastCheck implements Canvas {
     @Override
     public void text(double x, double baselineY, String text, FontFace font, double fontSize, String color,
                      double wordSpacing, double letterSpacing) {
-        if (current == null || text.isBlank()) {
+        // Inside a box with Opacity: 0%, the text is not seen.
+        if (current == null || text.isBlank() || !opacities.isEmpty() && opacities.peek() == 0) {
             return;
         }
         // The middle of the first letter: above the baseline, where the underline does not reach.
@@ -183,12 +211,12 @@ public final class ContrastCheck implements Canvas {
         boolean large = Tolerance.fits(LARGE_SIZE, fontSize)
                 || font.weight().bold() && Tolerance.fits(LARGE_BOLD_SIZE, fontSize);
         double needed = large ? LARGE : NORMAL;
-        float[] ink = Colors.rgba(color);
+        float[] ink = faded(Colors.rgba(color));
         for (float[] backdrop : backdrops) {
             float[] seen = over(ink, backdrop);
             double ratio = ratio(seen, backdrop);
             if (ratio < needed) {
-                throw error(current, color, ratio, needed, seen, backdrop);
+                throw error(current, color, ratio, needed, seen, backdrop, !opacities.isEmpty());
             }
         }
     }
@@ -246,13 +274,15 @@ public final class ContrastCheck implements Canvas {
         return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
     }
 
+    /** @param faded whether the text is inside a box with {@code Opacity}, which is then one more thing to change */
     private static InvalidModelException error(Box box, String color, double ratio, double needed, float[] ink,
-                                               float[] backdrop) {
+                                               float[] backdrop, boolean faded) {
         SourceLine line = colorLine(box, color);
         return new InvalidModelException(line, ErrorCode.CONTRAST_LOW, "The text of box " + box.describe()
                 + " has a contrast of " + decimal(ratio) + ":1 with its background (" + hex(ink) + " on "
                 + hex(backdrop) + ") and needs " + decimal(needed) + ":1 (3:1 for large text: Size of 18 or more, "
-                + "or 14 in bold): its Color or the background has to be changed");
+                + "or 14 in bold): its Color" + (faded ? ", the background or the Opacity of the box it is in"
+                : " or the background") + " has to be changed");
     }
 
     /**

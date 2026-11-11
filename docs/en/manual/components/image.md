@@ -49,6 +49,7 @@ Document (dev.stxt.pdf):
 | `Alt` | The alternative text, for those who cannot see the image. Without `Alt`, the image is decorative and the screen reader skips it |
 | `Fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `crop` (fills the box and crops what is left over) or `stretch` (it is distorted) |
 | `PDF page` | The page of a PDF that is drawn, from 1. Without `PDF page`, the first one. Only in a PDF |
+| `Opacity` | Making the image faint, with a percentage (`10%`): a watermark ([Layers and rotation](../common/layers-and-rotation.md#making-a-box-faint-opacity)) |
 | `Rotate` | Rotating the image around its center. It takes up the rectangle that encloses it rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
 | `Side` | `left` or `right`: the image is placed at that side and the text that follows it runs beside it ([Block](block.md#a-box-at-one-side-with-the-text-around-it-side)) |
 | `Below side boxes` | `true` moves the image below the side boxes before it |

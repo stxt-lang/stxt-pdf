@@ -49,6 +49,7 @@ Document (dev.stxt.pdf):
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
 | `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `inside` (entera, con espacio a los lados), `crop` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `PDF page` | La página de un PDF que se dibuja, desde 1. Sin `PDF page`, la primera. Solo en un PDF |
+| `Opacity` | Atenuar la imagen, con un porcentaje (`10%`): una marca de agua ([Capas y giro](../common/layers-and-rotation.md#atenuar-una-caja-opacity)) |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
 | `Side` | `left` o `right`: la imagen se coloca a ese lado y el texto que la sigue corre a su lado ([Block](block.md#una-caja-a-un-lado-y-el-texto-alrededor-side)) |
 | `Below side boxes` | `true` baja la imagen por debajo de las cajas laterales que hay antes |

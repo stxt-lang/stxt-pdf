@@ -111,6 +111,17 @@ public final class SvgCanvas implements Canvas {
         svg.append("</g>\n");
     }
 
+    /** A {@code <g>} group with its {@code opacity}, closed in {@link #endOpacity()}. */
+    @Override
+    public void beginOpacity(double opacity) {
+        svg.append("<g opacity=\"").append(number(opacity)).append("\">\n");
+    }
+
+    @Override
+    public void endOpacity() {
+        svg.append("</g>\n");
+    }
+
     /** A {@code <g>} group with a {@code clipPath}, closed in {@link #endClip()}. */
     @Override
     public void beginClip(Rect r, Radii radii) {

@@ -18,10 +18,13 @@ import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.util.Matrix;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 import static dev.stxt.pdf.paint.PdfContent.io;
@@ -52,7 +55,6 @@ public final class PdfCanvas implements Canvas {
     private final PDDocument doc;
     /** The content of the page: the stream, the paths, the color and the rotations. */
     private final PdfContent page;
-    private final PDPageContentStream out;
     private final double pageHeight;
     private final Resources resources;
     /** Fonts embedded in the document, shared by all its pages. */
@@ -61,12 +63,21 @@ public final class PdfCanvas implements Canvas {
     private final PdfImages images;
     private final PdfTagging tagging;
     private final boolean debug;
+    /** The opacities of the transparency groups being painted ({@link #beginOpacity}), the innermost first. */
+    private final Deque<Double> opacities = new ArrayDeque<>();
 
-    /** The canvas of a page of {@code document}, which is written to {@code out} and has its top at {@code pageHeight}. */
-    PdfCanvas(PdfPageWriter document, PDPageContentStream out, double pageHeight, boolean debug) {
+    /** The stream being written: that of the page or that of the transparency group being painted. */
+    private PDPageContentStream out() {
+        return page.out();
+    }
+
+    /**
+     * The canvas of a page of {@code document}, which is written to {@code out}, takes the rectangle {@code paper} in
+     * PDF coordinates and has its top at {@code pageHeight}.
+     */
+    PdfCanvas(PdfPageWriter document, PDPageContentStream out, PDRectangle paper, double pageHeight, boolean debug) {
         this.doc = document.doc();
-        this.page = new PdfContent(out, pageHeight);
-        this.out = out;
+        this.page = new PdfContent(doc, out, paper, pageHeight);
         this.pageHeight = pageHeight;
         this.resources = document.resources();
         this.fonts = document.fonts();
@@ -88,12 +99,12 @@ public final class PdfCanvas implements Canvas {
         }
         io(() -> {
             // Backgrounds and borders are not content: artifacts of the tagged PDF.
-            out.beginMarkedContent(COSName.ARTIFACT);
+            out().beginMarkedContent(COSName.ARTIFACT);
             page.painting(color, () -> {
-                out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
-                out.fill();
+                out().addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
+                out().fill();
             });
-            out.endMarkedContent();
+            out().endMarkedContent();
         });
     }
 
@@ -111,30 +122,30 @@ public final class PdfCanvas implements Canvas {
             return;
         }
         io(() -> {
-            out.beginMarkedContent(COSName.ARTIFACT);
+            out().beginMarkedContent(COSName.ARTIFACT);
             if (paint instanceof Paint.Solid solid) {
                 page.painting(solid.color(), () -> {
                     Shapes.roundedRect(page.path(), r, radii);
-                    out.fill();
+                    out().fill();
                 });
             } else {
                 gradient((Paint.Linear) paint, r, radii);
             }
-            out.endMarkedContent();
+            out().endMarkedContent();
         });
     }
 
     private void gradient(Paint.Linear linear, Rect r, Radii radii) throws IOException {
         double[] line = linear.line(r);
         double[] pdfLine = {line[0], pageHeight - line[1], line[2], pageHeight - line[3]};
-        out.saveGraphicsState();
+        out().saveGraphicsState();
         Shapes.roundedRect(page.path(), r, radii);
-        out.clip();
+        out().clip();
         if (linear.isTranslucent()) {
-            out.setGraphicsStateParameters(PdfGradients.opacityMask(doc, linear, page.pdfRect(r), pdfLine));
+            out().setGraphicsStateParameters(PdfGradients.opacityMask(doc, linear, page.pdfRect(r), pdfLine));
         }
-        out.shadingFill(PdfGradients.axial(PDDeviceRGB.INSTANCE, pdfLine, linear.stops(), false));
-        out.restoreGraphicsState();
+        out().shadingFill(PdfGradients.axial(PDDeviceRGB.INSTANCE, pdfLine, linear.stops(), false));
+        out().restoreGraphicsState();
     }
 
     /**
@@ -164,9 +175,9 @@ public final class PdfCanvas implements Canvas {
             background(r, color);
         } else if (r.width() > 0 && r.height() > 0) {
             io(() -> {
-                out.beginMarkedContent(COSName.ARTIFACT);
+                out().beginMarkedContent(COSName.ARTIFACT);
                 stroke(Dashes.segment(r, vertical, style, 0, 0), color);
-                out.endMarkedContent();
+                out().endMarkedContent();
             });
         }
     }
@@ -178,7 +189,7 @@ public final class PdfCanvas implements Canvas {
      */
     private void patternBorder(Rect r, Insets w, Radii radii, String color, Sides<String> colors, LineStyle style)
             throws IOException {
-        out.beginMarkedContent(COSName.ARTIFACT);
+        out().beginMarkedContent(COSName.ARTIFACT);
         if (radii.isSquare()) {
             for (Dashes.SideSegment side : Dashes.border(r, w, style)) {
                 stroke(side.segment(), side.side().of(colors));
@@ -188,15 +199,15 @@ public final class PdfCanvas implements Canvas {
         } else {
             for (Shapes.Side side : Shapes.Side.values()) {
                 if (side.of(w) > 0) {
-                    out.saveGraphicsState();
+                    out().saveGraphicsState();
                     Shapes.sidePolygon(page.path(), side, r, w, radii.inset(w));
-                    out.clip();
+                    out().clip();
                     stroke(r, w, radii, side.of(colors), style);
-                    out.restoreGraphicsState();
+                    out().restoreGraphicsState();
                 }
             }
         }
-        out.endMarkedContent();
+        out().endMarkedContent();
     }
 
     /** Strokes the lines along the middle of a border with rounded corners, each with its pattern fitted to it. */
@@ -209,7 +220,7 @@ public final class PdfCanvas implements Canvas {
             page.stroking(color, () -> {
                 pen(width, pattern);
                 run.path().accept(page.path());
-                out.stroke();
+                out().stroke();
             });
         }
     }
@@ -219,22 +230,22 @@ public final class PdfCanvas implements Canvas {
         if (s != null) {
             page.stroking(color, () -> {
                 pen(s.width(), s.pattern());
-                out.moveTo((float) s.x1(), (float) (pageHeight - s.y1()));
-                out.lineTo((float) s.x2(), (float) (pageHeight - s.y2()));
-                out.stroke();
+                out().moveTo((float) s.x1(), (float) (pageHeight - s.y1()));
+                out().lineTo((float) s.x2(), (float) (pageHeight - s.y2()));
+                out().stroke();
             });
         }
     }
 
     /** The width, the dash pattern and the ends of what is stroked next; without a pattern, a solid line. */
     private void pen(double width, Dashes.Pattern pattern) throws IOException {
-        out.setLineWidth((float) width);
+        out().setLineWidth((float) width);
         if (pattern == null) {
-            out.setLineDashPattern(new float[0], 0);
+            out().setLineDashPattern(new float[0], 0);
         } else {
-            out.setLineDashPattern(new float[]{(float) pattern.on(), (float) pattern.off()}, (float) pattern.phase());
+            out().setLineDashPattern(new float[]{(float) pattern.on(), (float) pattern.off()}, (float) pattern.phase());
         }
-        out.setLineCapStyle(pattern != null && pattern.round() ? 1 : 0);
+        out().setLineCapStyle(pattern != null && pattern.round() ? 1 : 0);
     }
 
     /**
@@ -242,21 +253,21 @@ public final class PdfCanvas implements Canvas {
      * clipped to its trapezoid and with its color.
      */
     private void ringBorder(Rect r, Insets w, Radii radii, String color, Sides<String> colors) throws IOException {
-        out.beginMarkedContent(COSName.ARTIFACT);
+        out().beginMarkedContent(COSName.ARTIFACT);
         if (color != null) {
             page.painting(color, () -> ring(r, w, radii));
         } else {
             for (Shapes.Side side : Shapes.Side.values()) {
                 if (side.of(w) > 0) {
-                    out.saveGraphicsState();
+                    out().saveGraphicsState();
                     Shapes.sidePolygon(page.path(), side, r, w, radii.inset(w));
-                    out.clip();
+                    out().clip();
                     page.painting(side.of(colors), () -> ring(r, w, radii));
-                    out.restoreGraphicsState();
+                    out().restoreGraphicsState();
                 }
             }
         }
-        out.endMarkedContent();
+        out().endMarkedContent();
     }
 
     /**
@@ -283,7 +294,7 @@ public final class PdfCanvas implements Canvas {
     /** Fills the ring of the border: the border box minus the padding box, not subtracted if nothing is left of it. */
     private void ring(Rect r, Insets w, Radii radii) throws IOException {
         Shapes.ring(page.path(), r, w, radii);
-        out.fillEvenOdd();
+        out().fillEvenOdd();
     }
 
     /**
@@ -308,22 +319,22 @@ public final class PdfCanvas implements Canvas {
             double height = file.height(number);
             Rect target = ImageFit.place(box.style().image().fit(), content, width, height);
             tagging.beginImage(box, content);
-            out.saveGraphicsState();
+            out().saveGraphicsState();
             Shapes.roundedRect(page.path(), content, radii);
-            out.clip();
+            out().clip();
             if (file.isVector()) {
                 // The drawing has the size of the SVG or the page: it is scaled to its place (Fit) and stays vector.
-                out.transform(new Matrix((float) (target.width() / width), 0, 0, (float) (target.height() / height),
+                out().transform(new Matrix((float) (target.width() / width), 0, 0, (float) (target.height() / height),
                         (float) target.x(), (float) (pageHeight - target.bottom())));
                 // A form inherits the graphics state and the drawing does not set the dashes: no dashes.
-                out.setLineDashPattern(new float[0], 0);
-                out.drawForm(file.format() == ImageFile.Format.PDF ? images.page(file, number) : images.drawing(file));
+                out().setLineDashPattern(new float[0], 0);
+                out().drawForm(file.format() == ImageFile.Format.PDF ? images.page(file, number) : images.drawing(file));
             } else {
-                out.drawImage(images.bitmap(file), (float) target.x(), (float) (pageHeight - target.bottom()),
+                out().drawImage(images.bitmap(file), (float) target.x(), (float) (pageHeight - target.bottom()),
                         (float) target.width(), (float) target.height());
             }
-            out.restoreGraphicsState();
-            out.endMarkedContent();
+            out().restoreGraphicsState();
+            out().endMarkedContent();
         });
     }
 
@@ -341,19 +352,19 @@ public final class PdfCanvas implements Canvas {
         io(() -> {
             ImageFile file = resources.images().find(image.path());
             tagging.beginInlineImage(box, image, link, area);
-            out.saveGraphicsState();
+            out().saveGraphicsState();
             if (file.isVector()) {
-                out.transform(new Matrix((float) (area.width() / file.width()), 0, 0,
+                out().transform(new Matrix((float) (area.width() / file.width()), 0, 0,
                         (float) (area.height() / file.height()), (float) area.x(),
                         (float) (pageHeight - area.bottom())));
-                out.setLineDashPattern(new float[0], 0);
-                out.drawForm(images.drawing(file));
+                out().setLineDashPattern(new float[0], 0);
+                out().drawForm(images.drawing(file));
             } else {
-                out.drawImage(images.bitmap(file), (float) area.x(), (float) (pageHeight - area.bottom()),
+                out().drawImage(images.bitmap(file), (float) area.x(), (float) (pageHeight - area.bottom()),
                         (float) area.width(), (float) area.height());
             }
-            out.restoreGraphicsState();
-            out.endMarkedContent();
+            out().restoreGraphicsState();
+            out().endMarkedContent();
         });
     }
 
@@ -380,18 +391,18 @@ public final class PdfCanvas implements Canvas {
         List<Rect> modules = ImageFit.modules(box.modules(), content, text);
         io(() -> {
             tagging.beginImage(box, content);
-            out.saveGraphicsState();
+            out().saveGraphicsState();
             Shapes.roundedRect(page.path(), content, radii);
-            out.clip();
+            out().clip();
             page.painting(box.style().typography().color(), () -> {
                 for (Rect m : modules) {
-                    out.addRect((float) m.x(), (float) (pageHeight - m.bottom()), (float) m.width(), (float) m.height());
+                    out().addRect((float) m.x(), (float) (pageHeight - m.bottom()), (float) m.width(), (float) m.height());
                 }
-                out.fill();
+                out().fill();
             });
             readableText(box, content, text);
-            out.restoreGraphicsState();
-            out.endMarkedContent();
+            out().restoreGraphicsState();
+            out().endMarkedContent();
         });
     }
 
@@ -411,19 +422,42 @@ public final class PdfCanvas implements Canvas {
         io(page::unrotate);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>A transparency group: a form with what is painted until {@link #endOpacity()}, marked content included, which
+     * is then painted with its opacity ({@link PdfContent#beginGroup}).</p>
+     */
+    @Override
+    public void beginOpacity(double opacity) {
+        io(() -> tagging.beginGroup(page.beginGroup()));
+        opacities.push(opacity);
+    }
+
+    @Override
+    public void endOpacity() {
+        tagging.endGroup();
+        io(() -> page.endGroup(opacities.pop()));
+    }
+
+    /** Closes what a failure while painting left open ({@link PdfContent#abandonGroups}). */
+    void abandon() {
+        page.abandonGroups();
+    }
+
     /** A clip inside its own graphics state ({@code q}/{@code Q}), with the path of the shape ({@code W n}). */
     @Override
     public void beginClip(Rect r, Radii radii) {
         io(() -> {
-            out.saveGraphicsState();
+            out().saveGraphicsState();
             Shapes.roundedRect(page.path(), r, radii);
-            out.clip();
+            out().clip();
         });
     }
 
     @Override
     public void endClip() {
-        io(out::restoreGraphicsState);
+        io(out()::restoreGraphicsState);
     }
 
     @Override
@@ -435,13 +469,13 @@ public final class PdfCanvas implements Canvas {
     public void outline(Rect r) {
         if (debug) {
             io(() -> {
-                out.beginMarkedContent(COSName.ARTIFACT);
-                out.setStrokingColor(0xDD / 255f, 0x33 / 255f, 0x33 / 255f);
-                out.setLineWidth(0.3f);
-                out.setLineDashPattern(new float[]{2, 2}, 0);
-                out.addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
-                out.stroke();
-                out.endMarkedContent();
+                out().beginMarkedContent(COSName.ARTIFACT);
+                out().setStrokingColor(0xDD / 255f, 0x33 / 255f, 0x33 / 255f);
+                out().setLineWidth(0.3f);
+                out().setLineDashPattern(new float[]{2, 2}, 0);
+                out().addRect((float) r.x(), (float) (pageHeight - r.bottom()), (float) r.width(), (float) r.height());
+                out().stroke();
+                out().endMarkedContent();
             });
         }
     }
@@ -451,16 +485,16 @@ public final class PdfCanvas implements Canvas {
                      double wordSpacing, double letterSpacing) {
         io(() -> {
             page.painting(color, () -> {
-                out.beginText();
-                out.setFont(fonts.font(font), (float) fontSize);
-                out.newLineAtOffset((float) x, (float) (pageHeight - baselineY));
+                out().beginText();
+                out().setFont(fonts.font(font), (float) fontSize);
+                out().newLineAtOffset((float) x, (float) (pageHeight - baselineY));
                 int[] kerning = font.kerning() ? resources.fonts().find(font).kerning(text, font.ligatures()) : null;
                 if (wordSpacing == 0 && letterSpacing == 0 && kerning == null) {
-                    out.showText(text);
+                    out().showText(text);
                 } else {
-                    out.showTextWithPositioning(PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize, kerning));
+                    out().showTextWithPositioning(PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize, kerning));
                 }
-                out.endText();
+                out().endText();
             });
         });
     }

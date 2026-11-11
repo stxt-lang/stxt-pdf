@@ -36,6 +36,12 @@ table) are one more in-flow `Piece` (`rules`), after all the descendants of the 
 fragment contains. A cell with merged borders (`Box.mergedBorder()`) does not paint its border, which is only the room
 for those lines.
 
+A box with `Opacity` ([Layers and rotation](../common/layers-and-rotation.md#opacity-opacity)) is painted between
+`Canvas.beginOpacity` and `endOpacity`. A `Frame`, an `Overlay` and a `Page overlay` are the root of their context, which
+is already painted whole: `paint` wraps all of it, with the rotations and the clips of each step inside. An in-flow
+`Image` is not a context: its background and its border are not painted in the step of the backgrounds, but with the
+image, inside its opacity (`translucent`). The debugging outline goes outside.
+
 `StackingContext` is the only one that computes where each fragment lies on the page. Whoever needs those positions
 outside painting takes them from its traversal, `visit(FragmentVisitor)`: the fragments of the flow and of the footnote
 area in document order, each one with its unrotated border box and the rotations within which it is painted (a
@@ -71,7 +77,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `PdfPainter` | A laid-out page on a page of another document, untagged ([Using from Java](api.md#integration-with-pdfbox)) |
 | `PdfPageWriter` | What the pages of a document share (the fonts, the images, the structure and the links) and the painting of one of them, used by `PdfDocumentWriter` and `PdfPainter` |
 | `PdfCanvas` | The drawing of a page |
-| `PdfContent` | The stream of a page with the origin at the bottom: paths, color, rotations and `io`, the only point that converts the `IOException` |
+| `PdfContent` | The stream of a page with the origin at the bottom: paths, color, rotations, transparency groups and `io`, the only point that converts the `IOException` |
 | `PdfTagging` | The marked content and the annotations of a page |
 | `PdfFonts` | The embedded fonts and the arguments of `TJ` |
 | `PdfGradients` | The shadings of the gradients and their soft masks |
@@ -80,7 +86,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `SvgFonts` | The fonts of `fonts/` with which the text of an SVG is drawn |
 | `PdfStructure` | The tagged PDF: the structure tree and the marked content of each page |
 | `PdfStructureLinks` | The `Link` elements and the annotations that hang from them |
-| `PdfParentTree` | The parent tree: from each page and each annotation to its element |
+| `PdfParentTree` | The parent tree: from each page, each transparency group and each annotation to its element |
 | `UaProfile` | What PDF/UA-2 does differently from PDF/UA-1 in the structure tree |
 | `PdfOutline` | The bookmarks of the headings |
 | `PdfMetadata` | The title, the language, the XMP packet (PDF/UA, PDF/A and the XMP of the attachments) and the output intent of PDF/A |
@@ -192,6 +198,24 @@ clockwise (in the PDF, with the origin at the bottom, the angle changes sign).
 > `QuadPoints` the rotated area. The `BBox` of a rotated figure and the destination of a rotated box are those of the rectangle that
 > encloses it. *Rejected alternative:* only the enclosing rectangle, without `QuadPoints`.
 
+### Opacity
+
+`PdfCanvas.beginOpacity` opens a **transparency group** (`PdfContent.beginGroup`): a form (*XObject*) with a `Group` of
+type `Transparency`, isolated, with the `BBox` of the paper and the identity matrix, so what is inside is written with
+the same coordinates as on the page. While it is open, `PdfContent.out()` is the stream of the form, which is why
+neither `PdfCanvas` nor `PdfTagging` keeps the stream. `endOpacity` closes it and paints it on the outer stream with a
+graphics state with `ca` and `CA`, inside a `q`/`Q`. Groups nest, and a failure while painting closes those left open
+(`PdfContent.abandonGroups`). The marked content inside belongs to the stream of the form
+([The PDF inside](pdf.md#marked-content-in-a-transparency-group)). In the SVG it is a `<g opacity>`.
+
+> **Decision:** one transparency group per box with `Opacity`. *Discarded alternative:* multiplying the opacity of
+> each painting operation, which needs no forms and does not touch the tagging, but lets the background of the box be
+> seen through its text and does not match the SVG.
+
+> **Decision:** the form is a `PDAppearanceStream`, which is the form that `PDPageContentStream` can write to: the
+> canvases keep a single type of stream. *Discarded alternative:* `PDFormContentStream`, whose common type with that of
+> the page is not public in PDFBox.
+
 ### Images
 
 `PdfImages` embeds the PNG and the JPEG with PDFBox and the SVG with JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) drawing on a
@@ -283,8 +307,8 @@ the `Caption` inside the `Table`), `children` hangs each footnote after the text
 the figure whose caption calls it, `markFootnoteCall` and `markFootnoteLabel` mark the call (a `Reference` with `Ref`
 both ways) and the number of the note (its `Lbl`), `goTo` gives the action with the structure destination of PDF/UA-2,
 and `PdfStructure.none()` is the untagged structure that `PdfPainter` paints with. `PdfParentTree` is the parent tree,
-shared by the tree and its links: the key of each page with the elements of its `MCID`s, and that of each annotation
-with its `Link`. `UaProfile` gathers what PDF/UA-2 does differently from PDF/UA-1 (the namespace, `FENote`, the
+shared by the tree and its links: the key of each page with the elements of its `MCID`s, that of each transparency group
+with marked content (`beginForm`, `endForm`) and that of each annotation with its `Link`. `UaProfile` gathers what PDF/UA-2 does differently from PDF/UA-1 (the namespace, `FENote`, the
 `Reference` of a `TOCI`, the `ListNumbering`, the `Contents` of a link with `Alt` and the structure destinations):
 `PdfStructure` and `PdfStructureLinks` ask it and do not know which part they write. `PdfOutline` writes the bookmarks
 with the headings that `PdfStructure` collected when building the tree (`headings()`). What each one writes is in
@@ -302,7 +326,8 @@ area is a rectangle, and with one, a path, which costs much more to ask whether 
 the point of the first letter (a quarter of the font size to the right and a third above the baseline, where the
 underline does not reach) and goes through what has been recorded that contains it: an opaque color replaces what is underneath, a translucent one is mixed with each
 possible color underneath and an image leaves it unknown until an opaque color covers it. It knows the box of the text through its
-`Tagging` (`beginText`). The color of a styled run comes in the `text`, and the error reports the `Color` of its rule
+`Tagging` (`beginText`). Between `beginOpacity` and `endOpacity`, the opacity of each recorded color and that of the text
+are multiplied by that of the box and those of the outer ones (`faded`). The color of a styled run comes in the `text`, and the error reports the `Color` of its rule
 (`Box.runStyle`). Borders are not recorded and rounded corners count as square. It is used by
 `Converter.layOut`, on the pages already laid out ([The PDF](../common/pdf.md#contrast)).
 

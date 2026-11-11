@@ -118,9 +118,68 @@ es `VALUE_NOT_ALLOWED`.
 > **Decisión:** `Rotate` es una propiedad del elemento, como `Offset`: no va en `Styles` ni se hereda (aunque lo que
 > contiene la caja gira con ella). *Alternativa descartada:* `Rotate` en `Box`, para poder darlo con un estilo.
 
+## Opacidad (`Opacity`)
+
+`Opacity` es una propiedad del elemento en `Image`, `Frame`, `Overlay` y `Page overlay`:
+
+| Propiedad | Valores | Por defecto | Notas |
+|---|---|---|---|
+| `Opacity` | porcentaje de `0%` a `100%` | sin valor (opaca) | Cuánto tapa la caja lo que tiene debajo, con todo lo que contiene. |
+
+Una caja con `Opacity` deja ver lo que tiene debajo. Es la forma de poner un logotipo como marca de agua o de atenuar el
+fondo de un certificado:
+
+```
+Page overlay:
+    Layer: -1
+    Offset: 250 auto auto 150
+    Image: logos/acme.svg
+        Opacity: 10%
+        Box:
+            Width: 300
+```
+
+- **Se atenúa la caja entera, como una sola cosa.** La caja se pinta completa (fondo, borde, texto, imágenes y sus
+  descendientes, también los `Overlay` que cuelgan de ella y los contextos con `Layer` de dentro) y el resultado se pinta
+  con esa opacidad. Lo que se solapa dentro no se transparenta: un texto sobre el fondo de su caja no deja ver ese fondo.
+  En una `Image`, la caja es la imagen con el fondo y el borde de su `Box`.
+- **Solo cambia el pintado.** El layout, el orden de pintado y los contextos de apilamiento son los mismos que sin ella.
+  Una `Image` en flujo con `Opacity` pinta su fondo y su borde junto a la imagen, en el paso del texto y las imágenes.
+- **No se hereda, y se acumula.** Una caja con `Opacity` dentro de otra se atenúa dos veces: `50%` dentro de `50%` se ve
+  al 25 %. La opacidad de un color (`#12315A80`) se aplica dentro de la caja, antes de atenuarla.
+- **El valor es un porcentaje**, de `0%` a `100%`: `15%` o `12.5%`. Un número sin `%` es `VALUE_SYNTAX`, y uno
+  negativo o mayor que `100%`, `VALUE_NOT_ALLOWED`.
+- **Los extremos valen.** Con `100%` la caja es opaca, como sin `Opacity`. Con `0%` no se ve nada de ella, pero sigue en
+  el PDF: ocupa su sitio, su texto se selecciona y se lee, y sus enlaces se pulsan.
+- **Puede venir de una regla de `Styles`** ([Propiedades de elemento](styles.md#propiedades-de-elemento)), a diferencia
+  de `Rotate`: `For style: watermark` con `Opacity: 10%`.
+- **El texto sigue siendo texto**, seleccionable y con su sitio en el PDF etiquetado, y los enlaces de dentro se pulsan
+  igual.
+- **Contraste.** El texto y los fondos de dentro cuentan con su opacidad multiplicada por la de la caja
+  ([Contraste](pdf.md#contraste)): un texto atenuado que no llega al contraste es `CONTRAST_LOW`, como uno con un color
+  con opacidad. Una imagen atenuada sigue siendo un fondo desconocido, y el texto de una caja con `0%`, que no se ve, no
+  se comprueba.
+- **PDF/A.** Vale en todas las partes que se pueden pedir ([PDF](pdf.md#pdfa)).
+- Los contornos de depuración de una caja con `Opacity` no se atenúan.
+
+> **Decisión:** la caja se atenúa entera, como una sola cosa. *Alternativa descartada:* multiplicar la opacidad de cada
+> cosa que se pinta, que deja ver el fondo de la caja a través de su texto y cada forma de un SVG a través de las demás.
+
+> **Decisión:** `Opacity` solo existe en `Image`, `Frame`, `Overlay` y `Page overlay`, que es donde se usa: una marca de
+> agua, un sello, un fondo. Los posicionados ya se pintan como una unidad. Para atenuar otra caja en su sitio se envuelve
+> en un `Frame`. *Alternativa descartada:* `Opacity` en `Box`, en cualquier caja: una caja en flujo pinta sus fondos y su
+> texto en dos pasos, entre los de sus vecinas, y atenuarla entera cambiaría el orden de pintado.
+
+> **Decisión:** `0%` y `100%` valen, aunque el primero no deja ver nada y el segundo no cambia nada: el valor puede
+> venir de los datos que rellenan el documento. *Alternativa descartada:* que fueran `VALUE_NOT_ALLOWED`, como
+> `Rotate: 0`, que obligaba a quien rellena a quitar la propiedad en esos dos casos.
+
+> **Decisión:** el valor es un porcentaje, que no se confunde con una medida. *Alternativa descartada:* un número de 0 a
+> 1, que sería el único valor del namespace escrito como fracción.
+
 ## Lo que no hay
 
-- Opacidad de una caja entera (solo de los colores, [Valores](values.md#colores)), otras transformaciones que el giro
-  (escala, inclinación) y cajas que floten a un lado del texto.
+- Opacidad de una caja en flujo que no sea una `Image` (se envuelve en un `Frame`), modos de fusión, otras
+  transformaciones que el giro (escala, inclinación) y cajas que floten a un lado del texto.
 - Girar los demás elementos en flujo (una tabla, una lista, un `Stack`) directamente: se gira un `Block` que los contiene.
 - Que un `Frame` girado se parta entre páginas.

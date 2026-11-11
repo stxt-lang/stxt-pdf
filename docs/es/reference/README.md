@@ -24,7 +24,7 @@ Si difiere del resumen de [la estructura](common/structure.md#schema), manda el 
 | [Tipografía: `Typography`](common/typography.md) | La herencia, la fuente, el interlineado y la línea base, el reparto en líneas, la alineación y el idioma |
 | [Formato del texto](common/text-formatting.md) | Tramos con formato, `Markup: markdown`, mayúsculas, versalitas, interletraje, ligaduras, texto preformateado, subrayado y tachado |
 | [Páginas y cortes: `Break`](common/breaks.md) | La fragmentación: oportunidades y elección del corte, viudas y huérfanas, cortes forzados, bordes en los cortes, `{page}` y `{pages}` |
-| [Capas y giro](common/layers-and-rotation.md) | Los contextos de apilamiento, `Layer`, el orden de pintado y `Rotate` |
+| [Capas y giro](common/layers-and-rotation.md) | Los contextos de apilamiento, `Layer`, el orden de pintado, `Rotate` y `Opacity` |
 | [Reglas reutilizables: `Styles`](common/styles.md) | `For element`, `For style`, `For id` y `For column`, la prioridad y el documento de estilos aparte |
 | [Referencias](common/references.md) | `{page of: id}` y `{number of: id}`, y cómo converge la paginación |
 | [Enlaces](common/links.md) | `Link` y los enlaces de Markdown: destinos, zonas y PDF etiquetado |

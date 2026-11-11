@@ -185,6 +185,21 @@ el suyo. Una nota llamada varias veces es un solo `Note`, tras el texto de su pr
 Cada entrada es un `TOCI` con el título y el número en dos `Span`, y la guía es un *artifact*. El `Link` de la entrada
 envuelve los dos `Span`.
 
+### Contenido marcado en un grupo de transparencia
+
+Una caja con `Opacity` ([Capas y giro](../common/layers-and-rotation.md#opacidad-opacity)) se pinta en un formulario
+(*XObject*) con un grupo de transparencia, que la página dibuja una sola vez. Su texto y sus imágenes siguen en el árbol
+de estructura, en su sitio: el contenido marcado está en el flujo del formulario y no en el de la página
+(ISO 32000-1, 14.7.4.2).
+
+- **Los `MCID` empiezan en 0** en cada formulario.
+- **La referencia** de cada uno (`MCR`) lleva la página en `Pg` y el formulario en `Stm`.
+- **El formulario tiene su clave** en el árbol padre (`StructParents`), con los elementos de sus `MCID`. Un grupo sin
+  contenido de la estructura (el de un `Page overlay`, que es un *artifact*) no tiene clave.
+- Las anotaciones de los enlaces de dentro son de la página, como las demás.
+
+veraPDF lo valida con PDF/UA-1, PDF/UA-2 y los cuatro perfiles de PDF/A en `PdfOpacityTest`.
+
 ## *Artifacts*
 
 No forman parte del contenido: los fondos, los bordes, los degradados, las rayas del texto (subrayado y tachado), las guías
@@ -284,7 +299,8 @@ además de PDF/UA-1. `PdfMetadata` escribe lo que la norma pide, y el resto del 
   [Recursos](../common/resources.md#perfil-de-color)) como `DestOutputProfile` y `sRGB IEC61966-2.1` como condición.
   Todo color del PDF es `DeviceRGB` o `DeviceGray`, y con un perfil RGB de salida los dos están permitidos.
 - **Lo que ya cumplía:** las fuentes incrustadas (las de subconjunto, con `CIDSet`) y con `ToUnicode`; la transparencia
-  declarada con `ca` en un estado gráfico y las máscaras suaves de los degradados, permitidas desde PDF/A-2; las
+  declarada con `ca` en un estado gráfico, los grupos de transparencia de las cajas con `Opacity` y las máscaras suaves
+  de los degradados, permitidos desde PDF/A-2; las
   anotaciones de enlace con la marca de impresión y sin apariencia, que PDF/A-2 no exige a un `Link`; y nada de
   JavaScript, cifrado ni formularios. Un SVG y la página de un PDF usados como imagen se dibujan con lo mismo.
 - **Lo que no se comprueba:** la página de un PDF usada como imagen se copia tal cual, con sus colores

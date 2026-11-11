@@ -76,6 +76,42 @@ class RuleElementPropertiesTest {
         assertEquals(Fit.CROP, root.children().get(1).style().image().fit());
     }
 
+    /**
+     * {@code Opacity} (reference/common/layers-and-rotation.md) is of an {@code Image}, a {@code Frame}, an
+     * {@code Overlay} and a {@code Page overlay}: a rule gives it to them, and the element wins.
+     */
+    @Test
+    void aRuleGivesOpacityToTheElementsThatAllowIt() {
+        Box root = root(
+                "For style: faint", "\tOpacity: 15%",
+                "For element: Image", "\tOpacity: 12.5%",
+                "---",
+                "Image: test/wide.png",
+                "Image: test/wide.png", "\tOpacity: 80%",
+                "Frame:", "\tStyle: faint", "\tText: a",
+                "Overlay:", "\tStyle: faint", "\tText: a",
+                "Page overlay:", "\tStyle: faint", "\tText: a",
+                "Frame:", "\tText: a",
+                "Frame:", "\tStyle: faint", "\tOpacity: 100%", "\tText: a",
+                "Frame:", "\tOpacity: 0%", "\tText: a");
+        // The boxes of the section in document order, each with its element.
+        assertEquals(List.of("IMAGE 0.125", "IMAGE 0.8", "FRAME 0.15", "OVERLAY 0.15", "PAGE_OVERLAY 0.15", "FRAME null",
+                "FRAME 1.0", "FRAME 0.0"),
+                root.children().stream().filter(b -> b.element() != Element.FOOTNOTES)
+                        .map(b -> b.element() + " " + b.style().opacity()).toList());
+        assertEquals(13, root.children().get(2).style().line(PropertyKey.OPACITY).number());
+    }
+
+    @Test
+    void opacityToAnElementThatDoesNotAllowItIsAnError() {
+        InvalidModelException e = error(
+                "For style: faint", "\tOpacity: 15%",
+                "---",
+                "Text: a", "\tStyle: faint");
+        assertEquals(13, e.line());
+        assertTrue(e.getMessage().contains("Opacity"), e.getMessage());
+    }
+
     @Test
     void theElementWinsOverItsRulesAndTheRulesKeepTheirPriority() {
         Box root = root(

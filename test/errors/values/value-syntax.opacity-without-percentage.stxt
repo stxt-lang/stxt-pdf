@@ -1,0 +1,14 @@
+# Case: Opacity as a fraction: it is a percentage
+# Code: VALUE_SYNTAX
+# Line: 12
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Section:
+		Frame:
+			Opacity: 0.3
+			Box:
+				Height: 10

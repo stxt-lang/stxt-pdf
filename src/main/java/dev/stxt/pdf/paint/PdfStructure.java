@@ -24,6 +24,7 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDListAttributeObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDTableAttributeObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination;
@@ -459,6 +460,23 @@ final class PdfStructure {
             return;
         }
         parentTree.startPage(page);
+    }
+
+    /**
+     * Starts the content of a form painted once on the current page ({@link PdfParentTree#beginForm}): the marked
+     * content recorded until {@link #endForm()} is in its stream.
+     */
+    void beginForm(PDFormXObject form) {
+        if (!untagged) {
+            parentTree.beginForm(form);
+        }
+    }
+
+    /** Ends the content of the form started with {@link #beginForm}. */
+    void endForm() {
+        if (!untagged) {
+            parentTree.endForm();
+        }
     }
 
     /** Where the own content of the box hangs: its {@code Link} if it has one, or its element. */

@@ -190,6 +190,21 @@ call: each call is a `Reference` that points to it, and the `Ref` of the note li
 Each entry is a `TOCI` with the title and the number in two `Span`, and the leader is an *artifact*. The `Link` of the entry
 wraps the two `Span`.
 
+### Marked content in a transparency group
+
+A box with `Opacity` ([Layers and rotation](../common/layers-and-rotation.md#opacity-opacity)) is painted in a form
+(*XObject*) with a transparency group, which the page draws only once. Its text and its images are still in the
+structure tree, in their place: the marked content is in the stream of the form and not in that of the page
+(ISO 32000-1, 14.7.4.2).
+
+- **The `MCID`s start at 0** in each form.
+- **The reference** of each one (`MCR`) carries the page in `Pg` and the form in `Stm`.
+- **The form has its key** in the parent tree (`StructParents`), with the elements of its `MCID`s. A group without
+  content of the structure (that of a `Page overlay`, which is an *artifact*) has no key.
+- The annotations of the links inside belong to the page, like the others.
+
+veraPDF validates it with PDF/UA-1, PDF/UA-2 and the four profiles of PDF/A in `PdfOpacityTest`.
+
 ## *Artifacts*
 
 They are not part of the content: backgrounds, borders, gradients, text lines (underline and strikethrough), the leaders
@@ -289,7 +304,8 @@ ISO 19005 besides PDF/UA-1. `PdfMetadata` writes what the standard asks for, and
   [Resources](../common/resources.md#color-profile)) as `DestOutputProfile` and `sRGB IEC61966-2.1` as the condition.
   Every color of the PDF is `DeviceRGB` or `DeviceGray`, and with an RGB output profile both are allowed.
 - **What it already met:** the fonts embedded (the subset ones, with `CIDSet`) and with `ToUnicode`; the transparency
-  declared with `ca` in a graphics state and the soft masks of the gradients, allowed since PDF/A-2; the link
+  declared with `ca` in a graphics state, the transparency groups of the boxes with `Opacity` and the soft masks of the
+  gradients, allowed since PDF/A-2; the link
   annotations with the print flag and without an appearance, which PDF/A-2 does not require of a `Link`; and no
   JavaScript, encryption or forms. An SVG and the page of a PDF used as images are drawn with the same.
 - **What is not checked:** the page of a PDF used as an image is copied as it is, with its colors

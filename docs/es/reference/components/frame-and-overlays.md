@@ -10,8 +10,10 @@ un `Stack` o un `Grid`, se pone dentro de uno de ellos. Admiten `Id`, `Style`, `
 | `Layer` | entero | `auto` | Los tres | Orden de apilamiento ([Capas y giro](../common/layers-and-rotation.md)). También en `Item` y `Area`. |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Page overlay` | Las páginas en que sale ([Pages](#pages)). |
 | `Rotate`, `Rotate origin` | ver [Capas y giro](../common/layers-and-rotation.md#giro-rotate) | sin valor | Los tres | Gira la caja al pintarla. También en `Image` y `Barcode`. |
+| `Opacity` | porcentaje de `0%` a `100%` | sin valor (opaca) | Los tres | Atenúa la caja con todo lo que contiene ([Capas y giro](../common/layers-and-rotation.md#opacidad-opacity)). También en `Image`. |
 
-`Offset`, `Layer`, `Pages` y `Rotate` son propiedades del elemento: no van en `Styles` ni se heredan.
+`Offset`, `Layer`, `Pages` y `Rotate` son propiedades del elemento: no van en `Styles` ni se heredan. `Opacity` tampoco
+se hereda, y puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
 
 > **Decisión:** `Frame` es un elemento y no una propiedad de cualquier caja: así `Offset` y `Layer` solo existen en los
 > elementos posicionados y en `Item`/`Area`, y el schema detecta su mal uso sin reglas propias. Un `Frame` sin `Offset`

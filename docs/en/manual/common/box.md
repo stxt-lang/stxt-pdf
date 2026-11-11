@@ -88,7 +88,7 @@ contrast is an error (`CONTRAST_LOW`) that says how much it has and how much it 
 exactly 4.5:1, and black on white has 21:1.
 
 What counts is what is really underneath the text: the background of its box, that of the boxes outside it or that of a
-box behind it, blended if they have opacity. For a gradient, the worst of its colors counts. Text on top of an image is
+box behind it, blended if they have opacity, their own or that of a box with `Opacity` that contains them. For a gradient, the worst of its colors counts. Text on top of an image is
 not checked, because what is underneath is not known. The caller can turn the check off
 ([Using from Java](java-usage.md)).
 

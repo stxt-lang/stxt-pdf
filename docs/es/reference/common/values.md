@@ -88,7 +88,8 @@ En lugar del valor hexadecimal se puede escribir el **nombre** de un color decla
 ([Styles](styles.md#colores-con-nombre)). Un valor que empieza por `#` y no es un color hexadecimal es `VALUE_SYNTAX`; uno
 con forma de nombre que no está declarado es `COLOR_UNKNOWN`.
 
-> **Decisión:** la opacidad va en cada color. No hay `Opacity` de la caja, que afectaría a todo lo que contiene.
+La opacidad de un color es la de lo que se pinta con él. La de una caja entera, con todo lo que contiene, es `Opacity`,
+que admiten `Image`, `Frame`, `Overlay` y `Page overlay` ([Capas y giro](layers-and-rotation.md#opacidad-opacity)).
 
 El fondo también admite un **degradado lineal**: `linear(ángulo, color, color, ...)`, con el ángulo en grados (`0` va hacia
 arriba, `90` hacia la derecha, `180` hacia abajo) y al menos dos colores, repartidos a partes iguales:

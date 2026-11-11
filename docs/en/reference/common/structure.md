@@ -213,11 +213,11 @@ once, and the elements, as many times as needed.
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
 | `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `PDF page`, `Rotate`, `Side`, `Below side boxes` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Opacity`, `PDF page`, `Rotate`, `Side`, `Below side boxes` |
 | `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`; with `Readable text`, also the font), `Break`, `Alt` (required), `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Rotate`, `Side`, `Below side boxes`, `Content` |
-| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
-| `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`; elements |
-| `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`; elements |
+| `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elements |
+| `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elements |
+| `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`, `Opacity`; elements |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Border style`, `Corner radius`, `Background`, `Overflow`, `Merge borders` |

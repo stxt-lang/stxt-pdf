@@ -48,6 +48,7 @@ public final class PropertyKey {
     public static final String LAYER = "layer";
     public static final String ROTATE = "rotate";
     public static final String ROTATE_ORIGIN = "rotate-origin";
+    public static final String OPACITY = "opacity";
     public static final String FIRST_NUMBER = "first-number";
     public static final String NUMBER = "number";
     public static final String MARKER_IMAGE = "marker-image";

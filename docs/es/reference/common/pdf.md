@@ -54,6 +54,9 @@ de siempre, la línea de la caja).
   no están debajo de ese punto no cuentan, ni los bordes.
 - **Un degradado:** cuenta cada uno de sus colores, y vale el peor.
 - **Un texto con opacidad** (`Color: #00000080`) se mezcla con lo que tiene debajo antes de comparar.
+- **Dentro de una caja con `Opacity`** ([Capas y giro](layers-and-rotation.md#opacidad-opacity)), la opacidad del texto y
+  la de los fondos se multiplican por la de la caja, y la de las cajas con `Opacity` que la contienen. El mensaje nombra
+  entonces también la `Opacity`.
 - **Encima de una imagen** no se sabe qué hay debajo, así que ese texto no se comprueba, salvo que un fondo opaco tape la
   imagen.
 - Se comprueba todo el texto que se pinta, también el de un `Page overlay` y el de las entradas de un índice.

@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.Matrix;
 
@@ -45,10 +46,16 @@ record PdfPageWriter(PDDocument doc, Resources resources, PdfFonts fonts, PdfIma
             if (left != 0) {
                 out.transform(Matrix.getTranslateInstance((float) left, 0));
             }
-            canvas = new PdfCanvas(this, out, top, debug);
+            PDRectangle paper = new PDRectangle(0, (float) (top - page.pageSetup().height()),
+                    (float) page.pageSetup().width(), (float) page.pageSetup().height());
+            canvas = new PdfCanvas(this, out, paper, top, debug);
             Rect area = page.pageSetup().pageArea();
-            StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())
-                    .paint(canvas);
+            try {
+                StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())
+                        .paint(canvas);
+            } finally {
+                canvas.abandon();
+            }
         }
         return canvas.tagging().annotations();
     }

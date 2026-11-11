@@ -124,9 +124,71 @@ nor the other, is `VALUE_NOT_ALLOWED`.
 > **Decision:** `Rotate` is an element property, like `Offset`: it does not go in `Styles` and is not inherited (although
 > what the box contains rotates with it). *Rejected alternative:* `Rotate` in `Box`, so that it can be given with a style.
 
+## Opacity (`Opacity`)
+
+`Opacity` is a property of the element in `Image`, `Frame`, `Overlay` and `Page overlay`:
+
+| Property | Values | Default | Notes |
+|---|---|---|---|
+| `Opacity` | percentage from `0%` to `100%` | none (opaque) | How much the box covers what lies beneath it, with everything it contains. |
+
+A box with `Opacity` lets what lies beneath it show through. It is how a logo is set as a watermark, or the background
+of a certificate is made faint:
+
+```
+Page overlay:
+    Layer: -1
+    Offset: 250 auto auto 150
+    Image: logos/acme.svg
+        Opacity: 10%
+        Box:
+            Width: 300
+```
+
+- **The whole box is made faint, as a single thing.** The box is painted complete (background, border, text, images and
+  its descendants, also the `Overlay` boxes that hang from it and the contexts with `Layer` inside) and the result is
+  painted with that opacity. What overlaps inside does not show through: a text on the background of its box does not
+  let that background be seen. In an `Image`, the box is the image with the background and the border of its `Box`.
+- **Only the painting changes.** The layout, the painting order and the stacking contexts are the same as without it.
+  An in-flow `Image` with `Opacity` paints its background and its border together with the image, in the step of the
+  text and the images.
+- **It is not inherited, and it accumulates.** A box with `Opacity` inside another is made faint twice: `50%` inside
+  `50%` is seen at 25 %. The opacity of a color (`#12315A80`) is applied inside the box, before the box is made faint.
+- **The value is a percentage**, from `0%` to `100%`: `15%` or `12.5%`. A number without `%` is `VALUE_SYNTAX`, and a
+  negative one or one above `100%`, `VALUE_NOT_ALLOWED`.
+- **The ends are allowed.** With `100%` the box is opaque, as without `Opacity`. With `0%` nothing of it is seen, but it
+  is still in the PDF: it takes up its place, its text is selected and read, and its links are clicked.
+- **It can come from a rule of `Styles`** ([Element properties](styles.md#element-properties)), unlike `Rotate`:
+  `For style: watermark` with `Opacity: 10%`.
+- **Text is still text**, selectable and with its place in the tagged PDF, and the links inside are clicked the same
+  way.
+- **Contrast.** The text and the backgrounds inside count with their opacity multiplied by that of the box
+  ([Contrast](pdf.md#contrast)): a faint text that does not reach the contrast is `CONTRAST_LOW`, like one with a color
+  with opacity. A faint image is still an unknown background, and the text of a box with `0%`, which is not seen, is not
+  checked.
+- **PDF/A.** It is allowed in every part that can be requested ([PDF](pdf.md#pdfa)).
+- The debugging outlines of a box with `Opacity` are not made faint.
+
+> **Decision:** the whole box is made faint, as a single thing. *Discarded alternative:* multiplying the opacity of each
+> thing that is painted, which lets the background of the box be seen through its text and each shape of an SVG through
+> the others.
+
+> **Decision:** `Opacity` only exists in `Image`, `Frame`, `Overlay` and `Page overlay`, which is where it is used: a
+> watermark, a stamp, a background. The positioned boxes are already painted as a unit. To make another box faint in
+> its place, it is wrapped in a `Frame`. *Discarded alternative:* `Opacity` in `Box`, in any box: an in-flow box paints
+> its backgrounds and its text in two steps, among those of its neighbors, and making it faint as a whole would change
+> the painting order.
+
+> **Decision:** `0%` and `100%` are allowed, although the first shows nothing and the second changes nothing: the value
+> may come from the data that fills the document. *Discarded alternative:* making them `VALUE_NOT_ALLOWED`, like
+> `Rotate: 0`, which forced whoever fills the document to remove the property in those two cases.
+
+> **Decision:** the value is a percentage, which is not mistaken for a length. *Discarded alternative:* a number from 0
+> to 1, which would be the only value of the namespace written as a fraction.
+
 ## What is not supported
 
-- Opacity of a whole box (only of colors, [Values](values.md#colors)), transformations other than rotation (scale, skew)
-  and boxes that float to one side of the text.
+- Opacity of an in-flow box that is not an `Image` (it is wrapped in a `Frame`), blend modes, transformations other than
+  rotation (scale, skew) and boxes that float to one side of the text.
 - Rotating the other in-flow elements (a table, a list, a `Stack`) directly: a `Block` that contains them is rotated.
 - A rotated `Frame` being split across pages.

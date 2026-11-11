@@ -144,6 +144,7 @@ final class PropertyReader {
             entry("offset", (p, s) -> s.setOffset(sides(p, LENGTH_OR_AUTO, true))),
             entry("layer", (p, s) -> s.setLayer(integer(p))),
             entry("pages", (p, s) -> s.setPages(enumValue(Pages.class, p))),
+            entry("opacity", (p, s) -> s.setOpacity(ValueReader.opacity(p))),
             entry("marker", (p, s) -> s.list().setMarker(enumValue(Marker.class, p))),
             entry("marker-suffix", (p, s) -> s.list().setMarkerSuffix(enumValue(MarkerSuffix.class, p))),
             entry("marker-image", PropertyReader::markerImage),

@@ -121,4 +121,28 @@ Overlay:
   around that corner, and `Rotate origin: 20 50%`, around the point 20 pt to its right and at half height.
 - A vertical text in the margin of the page is a rotated `Page overlay` that contains it.
 
+## Making a box faint (`Opacity`)
+
+`Opacity` lets what lies beneath a box show through: a percentage from `0%` (nothing is seen) to `100%` (opaque). `Image`, `Frame`,
+`Overlay` and `Page overlay` allow it. A logo as a watermark on every page, behind the content:
+
+```
+Page overlay:
+    Layer: -1
+    Offset: 250 auto auto 150
+    Image: logos/acme.svg
+        Opacity: 10%
+        Box:
+            Width: 300
+```
+
+- **The whole box is made faint**, with its background, its border and everything it contains, as a single thing: a
+  stamp with a background and text looks the same as when opaque, only fainter.
+- **It does not change the layout** or what is painted on top of what.
+- **A box of the flow that is not an `Image`** is made faint inside a `Frame`, which without `Offset` stays in its place.
+- **It can go in a rule of `Styles`**: `For style: watermark` with `Opacity: 10%`.
+- **A faint text may not reach the contrast** that is checked when converting ([Box](box.md#contrast)). For the text of
+  a watermark, whoever converts turns that check off.
+- The opacity of a single color goes in the color: `#12315A80` ([Values](values.md#colors)).
+
 More detail in the [reference](../../reference/common/layers-and-rotation.md).

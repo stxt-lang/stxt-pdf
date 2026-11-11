@@ -47,12 +47,13 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 | *(value)* | path relative to `images/` | required | The PNG, JPEG, SVG or PDF file: `Image: logos/acme.png`. |
 | `Alt` | non-empty text | none | Alternative text: with it, the image is a figure that is read ([accessibility](#accessibility)). Without it, it is decorative. |
 | `Fit` | `inside`, `crop`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
+| `Opacity` | percentage from `0%` to `100%` | none (opaque) | Makes the image faint, with the background and the border of its box: a watermark ([Layers and rotation](../common/layers-and-rotation.md#opacity-opacity)). |
 | `PDF page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates the image around its center (a seal) and takes up the rectangle that encloses it rotated. |
 | `Side` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
 | `Below side boxes` | boolean | `false` | Moves the image below the side boxes before it ([Block](block.md#side-boxes-side)). |
 
-`Fit`, `Side` and `Below side boxes` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `PDF page` and `Rotate` cannot.
+`Fit`, `Opacity`, `Side` and `Below side boxes` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `PDF page` and `Rotate` cannot.
 
 ## File
 

@@ -126,6 +126,35 @@ class ContrastCheckTest {
                 "\t\t\tText: hola", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #FFFFFF");
     }
 
+    /**
+     * Inside a box with {@code Opacity} (reference/common/layers-and-rotation.md), the text and the backgrounds count
+     * with their opacity multiplied by that of the box: black at 30% over white is #B3B3B3, which does not reach;
+     * at 80% it is #333333, which does. An image with {@code Opacity} is still an unknown background.
+     */
+    @Test
+    void theOpacityOfABoxFadesItsTextAndItsBackgrounds() {
+        InvalidModelException e = error("\tFrame:", "\t\tOpacity: 30%", "\t\tText: hola");
+        assertEquals(16, e.line());
+        assertTrue(e.getMessage().contains("(#B3B3B3 on #FFFFFF)"), e.getMessage());
+        assertTrue(e.getMessage().contains("its Color, the background or the Opacity of the box it is in has to be "
+                + "changed"), e.getMessage());
+        assertDoesNotThrow(() -> layOut("\tFrame:", "\t\tOpacity: 80%", "\t\tText: hola"));
+        // A black background at 10% is #E6E6E6 under white text; the text of the Overlay inside fades twice.
+        e = error("\tFrame:", "\t\tOpacity: 10%", "\t\tBox:", "\t\t\tBackground: #000000",
+                "\t\t\tHeight: 40", "\t\tOverlay:", "\t\t\tOpacity: 50%", "\t\t\tOffset: 0 auto auto 0",
+                "\t\t\tText: hola", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #FFFFFF");
+        assertTrue(e.getMessage().contains(" on #E6E6E6)"), e.getMessage());
+        // With 100% the box is opaque, and with 0% its text is not seen: it is not checked.
+        assertDoesNotThrow(() -> layOut("\tFrame:", "\t\tOpacity: 100%", "\t\tText: hola"));
+        assertDoesNotThrow(() -> layOut("\tFrame:", "\t\tOpacity: 0%", "\t\tText: hola"));
+        // After the box, nothing fades.
+        assertDoesNotThrow(() -> layOut("\tFrame:", "\t\tOpacity: 10%", "\t\tBox:", "\t\t\tHeight: 10",
+                "\tText: hola"));
+        assertDoesNotThrow(() -> layOut("\tBlock:", "\t\tImage: test/wide.png", "\t\t\tOpacity: 10%",
+                "\t\t\tBox:", "\t\t\t\tWidth: 300", "\t\tOverlay:", "\t\t\tOffset: 0 auto auto 0",
+                "\t\t\tText: hola", "\t\t\t\tTypography:", "\t\t\t\t\tColor: #FFFFFF"));
+    }
+
     @Test
     void theCheckCanBeTurnedOff() {
         assertDoesNotThrow(() -> Converter.builder().exclude(Check.CONTRAST).build()

@@ -119,4 +119,28 @@ Overlay:
   sobre esa esquina, y `Rotate origin: 20 50%`, sobre el punto 20 pt a la derecha de ella y a media altura.
 - Un texto en vertical en el margen de la página es un `Page overlay` girado que lo contiene.
 
+## Atenuar una caja (`Opacity`)
+
+`Opacity` deja ver lo que hay debajo de una caja: un porcentaje de `0%` (no se ve nada) a `100%` (opaca). Lo admiten `Image`,
+`Frame`, `Overlay` y `Page overlay`. Un logotipo como marca de agua en todas las páginas, detrás del contenido:
+
+```
+Page overlay:
+    Layer: -1
+    Offset: 250 auto auto 150
+    Image: logos/acme.svg
+        Opacity: 10%
+        Box:
+            Width: 300
+```
+
+- **La caja se atenúa entera**, con su fondo, su borde y todo lo que contiene, como una sola cosa: un sello con fondo y
+  texto se ve igual que opaco, pero más tenue.
+- **No cambia el layout** ni lo que se pinta encima de qué.
+- **Una caja del flujo que no es una `Image`** se atenúa dentro de un `Frame`, que sin `Offset` se queda en su sitio.
+- **Puede ir en una regla de `Styles`**: `For style: watermark` con `Opacity: 10%`.
+- **Un texto atenuado puede no llegar al contraste** que se comprueba al convertir
+  ([Box](box.md#contraste)). Para el texto de una marca de agua, quien convierte desactiva esa comprobación.
+- La opacidad de un solo color va en el color: `#12315A80` ([Valores](values.md#colores)).
+
 Más detalle en la [referencia](../../reference/common/layers-and-rotation.md).

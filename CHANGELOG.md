@@ -14,10 +14,22 @@ second call to a footnote is no longer an error, and the code `FOOTNOTE_CALL_DUP
 a sixth component, `style` (a `model.LineStyle`); its constructor with five arguments still makes a solid line.
 `paint.Canvas.image` takes a fourth argument, the lines of the readable text of a barcode (empty in any other image),
 and `model.Modules` has a seventh component, `text` (a `model.BarcodeText`, or `null`); its constructors with five and
-six arguments still make a drawing without text. No document that was valid changes.
+six arguments still make a drawing without text. `paint.Canvas` has two more methods, `beginOpacity` and `endOpacity`,
+which a canvas of its own has to implement. No document that was valid changes.
 
 ### Added
 
+- **`Opacity` of a box.** `Image`, `Frame`, `Overlay` and `Page overlay` take `Opacity`, a percentage from `0%` to
+  `100%` (`Opacity: 10%`): the box is painted whole, with its background, its border and everything it contains,
+  and then shown with that opacity, so that what overlaps inside does not show through. It is how a logo is set as a
+  watermark or the background of a certificate is made faint, which the opacity of a color could not do. It only
+  changes the painting, it is not inherited, one inside another accumulates, and it can come from a rule of `Styles`.
+  With `100%` the box is opaque, as without it, and with `0%` nothing of it is seen, so that the value can come from
+  data. A number without `%` is `VALUE_SYNTAX`, and one outside that range, `VALUE_NOT_ALLOWED`. In the PDF it is a transparency
+  group, a form painted once: the text and the images inside keep their place in the structure tree, with their marked
+  content in the stream of the form, and the document is still PDF/UA-1, PDF/UA-2 and PDF/A-2 or PDF/A-3. For the
+  contrast check, the text and the backgrounds inside count with their opacity multiplied by that of the box, and the
+  message of `CONTRAST_LOW` then names the `Opacity` too.
 - **More barcode formats and the text under the bars.** `Barcode format` gains `data-matrix` (a square Data Matrix
   ECC 200), `pdf417`, and the two GS1 symbologies, `gs1-128` and `gs1-data-matrix`. GS1 data is written as on the
   label, with each application identifier in parentheses before its value, `(01)09501101530003(17)261231(10)AB-123`:

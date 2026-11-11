@@ -23,6 +23,7 @@
 | **Figura** (`Figure`) | Elemento con exactamente un `Image`, `Barcode`, `Table` o `Block` y su pie (`Caption`), numerada con el contador de las figuras o el de las tablas ([Figure](../components/figure.md)). |
 | **Formato en línea** | Los tramos de un texto escritos en Markdown dentro de un `Text`, un `Paragraph`, un `Caption` o una `Cell`, con `Markup: markdown` ([Formato del texto](text-formatting.md#formato-en-línea-markup)). |
 | **Fragmento** | Parte de una caja que cae en un contenedor de fragmentos. |
+| **Opacidad** (`Opacity`) | Una `Image` o una caja posicionada que se pinta entera y deja ver lo que tiene debajo ([Capas y giro](layers-and-rotation.md#opacidad-opacity)). La de un solo color va en el color. |
 | **Giro** (`Rotate`) | Una caja que se pinta girada: en flujo, sobre su centro y ocupando el rectángulo que la envuelve, y posicionada, alrededor de su `Rotate origin` y sin que cambie el layout. Lo girado tiene que caber en la página ([Capas y giro](layers-and-rotation.md#giro-rotate)). |
 | **Huérfana** (`Orphans`) | Línea de un párrafo que queda sola al final de una página. |
 | **Imagen** | Elemento `Image`: una caja sin hijos con un PNG, un JPEG, un SVG o una página de un PDF de la carpeta de recursos, su tamaño natural y su proporción ([Image](../components/image.md)). |

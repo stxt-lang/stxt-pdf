@@ -83,6 +83,7 @@ a `Frame` can take up the margins of the page, but not go outside it.
 | `Offset` | All three | The offset |
 | `Layer` | All three | What is painted on top ([Layers and rotation](../common/layers-and-rotation.md)) |
 | `Rotate`, `Rotate origin` | All three | Rotating the box ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
+| `Opacity` | All three | Making the box faint with everything it contains ([Layers and rotation](../common/layers-and-rotation.md#making-a-box-faint-opacity)) |
 | `Pages` | `Page overlay` | Which pages it appears on |
 
 They also accept `Id`, `Style`, `Link`, `Box` and `Typography`. `Frame` also accepts `Break` and `Isolate margins`.

@@ -123,6 +123,17 @@ public interface Canvas {
     void endClip();
 
     /**
+     * Starts painting translucent (reference/common/layers-and-rotation.md, {@code Opacity}): everything painted until
+     * {@link #endOpacity()} is painted as a whole and then shown with the opacity {@code opacity}, from 0 (nothing is seen) to
+     * below 1. What overlaps inside does not show through; what lies beneath the whole does. Opacities nest, and the
+     * rotations and clips started inside one end inside it.
+     */
+    void beginOpacity(double opacity);
+
+    /** Ends the opacity started with {@link #beginOpacity}. */
+    void endOpacity();
+
+    /**
      * Ascent and descent with which the font is painted, to place the baseline
      * (reference/common/typography.md); without the font, {@link VerticalMetrics#APPROXIMATE}.
      */

@@ -35,6 +35,12 @@ flujo (`rules`), detrás de todos los descendientes del fragmento: se pintan con
 las celdas y debajo de su texto, con los giros y los recortes de lo que contiene el fragmento. Una celda con bordes
 fusionados (`Box.mergedBorder()`) no pinta su borde, que es solo el sitio de esas líneas.
 
+Una caja con `Opacity` ([Capas y giro](../common/layers-and-rotation.md#opacidad-opacity)) se pinta entre
+`Canvas.beginOpacity` y `endOpacity`. Un `Frame`, un `Overlay` y un `Page overlay` son la raíz de su contexto, que ya se
+pinta entero: `paint` lo envuelve todo, con los giros y los recortes de cada paso dentro. Una `Image` en flujo no es un
+contexto: su fondo y su borde no se pintan en el paso de los fondos, sino con la imagen, dentro de su opacidad
+(`translucent`). El contorno de depuración va fuera.
+
 `StackingContext` es el único que calcula dónde queda cada fragmento en la página. Quien necesita esas posiciones fuera
 del pintado las toma de su recorrido, `visit(FragmentVisitor)`: los fragmentos del flujo y del área de notas en orden del
 documento, cada uno con su caja de borde sin girar y los giros dentro de los que se pinta (un `Turns`, los de sus
@@ -70,7 +76,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `PdfPainter` | Una página maquetada sobre una página de un documento ajeno, sin etiquetar ([Uso desde Java](api.md#integración-con-pdfbox)) |
 | `PdfPageWriter` | Lo que comparten las páginas de un documento (las fuentes, las imágenes, la estructura y los enlaces) y el pintado de una de ellas, que usan `PdfDocumentWriter` y `PdfPainter` |
 | `PdfCanvas` | El dibujo de una página |
-| `PdfContent` | El flujo de una página con el origen abajo: caminos, color, giros y `io`, el único punto que convierte las `IOException` |
+| `PdfContent` | El flujo de una página con el origen abajo: caminos, color, giros, grupos de transparencia y `io`, el único punto que convierte las `IOException` |
 | `PdfTagging` | El contenido marcado y las anotaciones de una página |
 | `PdfFonts` | Las fuentes incrustadas y los argumentos de `TJ` |
 | `PdfGradients` | Los sombreados de los degradados y sus máscaras suaves |
@@ -79,7 +85,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `SvgFonts` | Las fuentes de `fonts/` con que se dibuja el texto de un SVG |
 | `PdfStructure` | El PDF etiquetado: el árbol de estructura y el contenido marcado de cada página |
 | `PdfStructureLinks` | Los elementos `Link` y las anotaciones que cuelgan de ellos |
-| `PdfParentTree` | El árbol padre: de cada página y cada anotación a su elemento |
+| `PdfParentTree` | El árbol padre: de cada página, cada grupo de transparencia y cada anotación a su elemento |
 | `UaProfile` | Lo que PDF/UA-2 hace distinto de PDF/UA-1 en el árbol de estructura |
 | `PdfOutline` | Los marcadores de los encabezados |
 | `PdfMetadata` | El título, el idioma, el paquete XMP (PDF/UA, PDF/A y el XMP de los adjuntos) y el perfil de salida de PDF/A |
@@ -189,6 +195,24 @@ de las agujas del reloj (en el PDF, con el origen abajo, el ángulo cambia de si
 > `QuadPoints` la zona girada. El `BBox` de una figura girada y el destino de una caja girada son los del rectángulo que la
 > envuelve. *Alternativa descartada:* solo el envolvente, sin `QuadPoints`.
 
+### Opacidad
+
+`PdfCanvas.beginOpacity` abre un **grupo de transparencia** (`PdfContent.beginGroup`): un formulario (*XObject*) con
+`Group` de tipo `Transparency`, aislado, con el `BBox` del papel y la matriz identidad, así que lo de dentro se escribe
+con las mismas coordenadas que en la página. Mientras está abierto, `PdfContent.out()` es el flujo del formulario, y por
+eso ni `PdfCanvas` ni `PdfTagging` guardan el flujo. `endOpacity` lo cierra y lo pinta en el flujo de fuera con un estado
+gráfico con `ca` y `CA`, dentro de un `q`/`Q`. Los grupos se anidan, y un fallo al pintar cierra los que queden abiertos
+(`PdfContent.abandonGroups`). El contenido marcado de dentro es del flujo del formulario
+([El PDF por dentro](pdf.md#contenido-marcado-en-un-grupo-de-transparencia)). En el SVG es un `<g opacity>`.
+
+> **Decisión:** un grupo de transparencia por caja con `Opacity`. *Alternativa descartada:* multiplicar la opacidad de
+> cada operación de pintado, que no pide formularios ni toca el etiquetado, pero deja ver el fondo de la caja a través
+> de su texto y no coincide con el SVG.
+
+> **Decisión:** el formulario es un `PDAppearanceStream`, que es el formulario en el que `PDPageContentStream` sabe
+> escribir: los lienzos siguen con un solo tipo de flujo. *Alternativa descartada:* `PDFormContentStream`, cuyo tipo
+> común con el de la página no es público en PDFBox.
+
 ### Imágenes
 
 `PdfImages` incrusta el PNG y el JPEG con PDFBox y el SVG con JSVG 2.2.0 (`ResourcePolicy.DENY_ALL`) dibujando en un
@@ -279,7 +303,8 @@ piezas de `PdfStructure`: `figure` construye la `Figure` con su `Caption` (o la 
 `markFootnoteCall` y `markFootnoteLabel` marcan la llamada (un `Reference` con `Ref` en los dos sentidos) y el número
 de la nota (su `Lbl`), `goTo` da la acción con destino de estructura de PDF/UA-2, y `PdfStructure.none()` es la
 estructura sin etiquetar con la que pinta `PdfPainter`. `PdfParentTree` es el árbol padre, que comparten el árbol y sus
-enlaces: la clave de cada página con los elementos de sus `MCID`, y la de cada anotación con su `Link`. `UaProfile`
+enlaces: la clave de cada página con los elementos de sus `MCID`, la de cada grupo de transparencia con contenido marcado
+(`beginForm`, `endForm`) y la de cada anotación con su `Link`. `UaProfile`
 reúne lo que PDF/UA-2 hace distinto de PDF/UA-1 (el espacio de nombres, `FENote`, el `Reference` de un `TOCI`, el
 `ListNumbering`, el `Contents` de un enlace con `Alt` y los destinos de estructura): `PdfStructure` y
 `PdfStructureLinks` le preguntan y no saben qué parte escriben. `PdfOutline` escribe los marcadores con los encabezados
@@ -298,7 +323,8 @@ rectángulo, y con giro, un camino, que cuesta mucho más preguntar si contiene 
 el punto de la primera letra (un cuarto del cuerpo a la derecha y un tercio por encima de la línea base, donde no llega el
 subrayado) y recorre lo apuntado que lo contiene: un color opaco sustituye lo de debajo, uno translúcido se mezcla con cada
 color posible de debajo y una imagen lo deja sin conocer hasta que un color opaco la tapa. La caja del texto la sabe por su
-`Tagging` (`beginText`). El color de un tramo con estilo llega en el `text`, y el error señala el `Color` de su regla
+`Tagging` (`beginText`). Entre `beginOpacity` y `endOpacity`, la opacidad de cada color apuntado y la del texto se
+multiplican por la de la caja y las de fuera (`faded`). El color de un tramo con estilo llega en el `text`, y el error señala el `Color` de su regla
 (`Box.runStyle`). Los bordes no se apuntan y las esquinas redondeadas cuentan como rectas. Lo usa
 `Converter.layOut`, sobre las páginas ya maquetadas ([El PDF](../common/pdf.md#contraste)).
 

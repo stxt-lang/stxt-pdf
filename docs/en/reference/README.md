@@ -24,7 +24,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | [Typography: `Typography`](common/typography.md) | Inheritance, the font, line height and baseline, line breaking, alignment and language |
 | [Text formatting](common/text-formatting.md) | Formatted runs, `Markup: markdown`, case, small caps, letter spacing, ligatures, preformatted text, underline and strikethrough |
 | [Pages and breaks: `Break`](common/breaks.md) | Fragmentation: break opportunities and the choice of break, widows and orphans, forced breaks, borders at breaks, `{page}` and `{pages}` |
-| [Layers and rotation](common/layers-and-rotation.md) | Stacking contexts, `Layer`, the painting order and `Rotate` |
+| [Layers and rotation](common/layers-and-rotation.md) | Stacking contexts, `Layer`, the painting order, `Rotate` and `Opacity` |
 | [Reusable rules: `Styles`](common/styles.md) | `For element`, `For style`, `For id` and `For column`, priority and the separate styles document |
 | [References](common/references.md) | `{page of: id}` and `{number of: id}`, and how pagination converges |
 | [Links](common/links.md) | `Link` and Markdown links: targets, areas and tagged PDF |

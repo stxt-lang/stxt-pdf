@@ -73,6 +73,17 @@ class SvgCanvasTest {
         assertTrue(svg.contains("</g>"), svg);
     }
 
+    /** A box with {@code Opacity} is a group with its {@code opacity} (reference/common/layers-and-rotation.md). */
+    @Test
+    void opacityIsAGroupWithItsOpacity() {
+        LaidOutDocument faint = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(
+                "Document (dev.stxt.pdf):\n\tLanguage: es\n\tTitle: Prueba\n\tPage:\n\t\tWidth: 300\n\t\tHeight: 300\n"
+                + "\t\tMargin: 20\n\tOverlay:\n\t\tOffset: 100 auto auto 100\n\t\tOpacity: 12.5%\n"
+                + "\t\tBox:\n\t\t\tWidth: 40\n\t\t\tHeight: 10\n\t\t\tBackground: #F00\n")));
+        String svg = SvgCanvas.page(faint.pages().get(0), faint.pageSetup(), false);
+        assertTrue(svg.contains("<g opacity=\"0.125\">\n<rect x=\"120.00\" y=\"120.00\""), svg);
+    }
+
     /** The SVG only draws: it does not tag the text or create links, and says so with {@link Tagging#NONE}. */
     @Test
     void theSvgCanvasOnlyDraws() {

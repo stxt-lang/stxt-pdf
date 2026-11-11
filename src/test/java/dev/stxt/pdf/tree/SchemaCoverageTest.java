@@ -60,6 +60,7 @@ class SchemaCoverageTest {
             Map.entry("Pages", "Pages: not-first"),
             Map.entry("Rotate", "Rotate: -8"),
             Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
+            Map.entry("Opacity", "Opacity: 15%"),
             // A Block with Side needs a width; an image does not mind it.
             Map.entry("Side", "Side: left\nBox:\n\tWidth: 100"),
             Map.entry("Below side boxes", "Below side boxes: true"),

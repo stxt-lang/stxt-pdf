@@ -46,6 +46,11 @@ import java.util.List;
  * step applies it: background, border and image, the whole chain; text, the rotations and the clips of
  * {@code Overflow: clip}.</p>
  *
+ * <p>A box with {@code Opacity} (reference/common/layers-and-rotation.md) is painted as a whole, with everything it
+ * contains, and then shown translucent ({@link Canvas#beginOpacity}). A {@code Frame}, an {@code Overlay} and a
+ * {@code Page overlay} are already painted complete, as the root of their context; an {@code Image} in flow is
+ * painted complete, with its background and its border, in the step of the text and the images.</p>
+ *
  * <p>The "tree order" is that of the document, not that of the fragments: {@code Overlay}
  * boxes hang from the fragment of their reference container, after its in-flow children, and
  * {@code Page overlay} boxes are added at the end, so contexts are sorted by their box.</p>
@@ -328,14 +333,56 @@ public final class StackingContext {
      * a box with {@code Overflow: clip} clips everything it contains (reference/common/overflow.md).
      */
     public void paint(Canvas canvas) {
+        Double opacity = opacity(root);
+        if (opacity != null) {
+            canvas.beginOpacity(opacity);
+        }
         box(canvas, root);
+        if (opacity == null) {
+            outline(canvas, root);
+        }
         negative.forEach(s -> s.paint(canvas));
-        inFlow.forEach(p -> box(canvas, p));
+        for (Piece p : inFlow) {
+            if (!translucent(p)) {
+                box(canvas, p);
+            }
+            outline(canvas, p);
+        }
         framed(canvas, root, contentClips(root), () -> paintContent(canvas, root));
-        inFlow.stream().filter(p -> !p.rules())
-                .forEach(p -> framed(canvas, p, contentClips(p), () -> paintContent(canvas, p)));
+        for (Piece p : inFlow) {
+            if (p.rules()) {
+                continue;
+            }
+            if (translucent(p)) {
+                canvas.beginOpacity(opacity(p));
+                box(canvas, p);
+            }
+            framed(canvas, p, contentClips(p), () -> paintContent(canvas, p));
+            if (translucent(p)) {
+                canvas.endOpacity();
+            }
+        }
         positionedZero.forEach(s -> s.paint(canvas));
         positive.forEach(s -> s.paint(canvas));
+        if (opacity != null) {
+            canvas.endOpacity();
+            // Outside its opacity, so that the outline of a faint box is seen.
+            outline(canvas, root);
+        }
+    }
+
+    /**
+     * Whether the piece is an in-flow box with {@code Opacity}, an {@code Image}: its background and its border are
+     * painted with its image, inside its opacity, and not in the step of the backgrounds.
+     */
+    private static boolean translucent(Piece p) {
+        return !p.rules() && opacity(p) != null;
+    }
+
+    /** The {@code Opacity} with which the box of the piece is painted; {@code null} if it is opaque, also with 100%. */
+    private static Double opacity(Piece p) {
+        Double opacity = p.f().box().style().opacity();
+        return opacity == null || opacity >= 1 ? null : opacity;
     }
 
     /**
@@ -349,14 +396,18 @@ public final class StackingContext {
         return p.f().lines().isEmpty() && p.f().box().role() != Role.LEADER ? Clips.NONE : Clips.WINDOWS;
     }
 
-    /** The background and the border of the piece, with its clips, and its debugging outline, without them. */
+    /** The background and the border of the piece, with its clips. */
     private static void box(Canvas canvas, Piece p) {
         if (p.rules()) {
             framed(canvas, p, Clips.ALL, () -> paintFragmentRules(canvas, p));
             return;
         }
         framed(canvas, p, paintsBox(p) ? Clips.ALL : Clips.NONE, () -> paintBackgroundAndBorder(canvas, p));
-        if (canvas.outlines()) {
+    }
+
+    /** The debugging outline of the piece, without its clips, so that the whole box is visible. */
+    private static void outline(Canvas canvas, Piece p) {
+        if (!p.rules() && canvas.outlines()) {
             framed(canvas, p, Clips.NONE, () -> canvas.outline(p.borderBox()));
         }
     }

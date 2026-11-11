@@ -182,6 +182,24 @@ final class ValueReader {
     }
 
     /**
+     * {@code Opacity} (reference/common/layers-and-rotation.md): a percentage from 0% to 100%, as a fraction.
+     * {@code 100%} is the box without the property and {@code 0%} shows nothing of it: both are allowed, since the value
+     * may come from data that fills the document.
+     */
+    static double opacity(Node n) {
+        String text = n.getText().trim();
+        if (!text.endsWith("%")) {
+            throw error(n, ErrorCode.VALUE_SYNTAX, "Expected a percentage, as in 15% or 12.5%: " + text);
+        }
+        double v = number(n, text.substring(0, text.length() - 1),
+                "Expected a percentage, as in 15% or 12.5%: " + text);
+        if (v < 0 || v > 100) {
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Opacity allows a percentage from 0% to 100%: " + text);
+        }
+        return v / 100;
+    }
+
+    /**
      * {@code Rotate origin} (reference/common/layers-and-rotation.md): the horizontal and the vertical origin, from the
      * top left corner of the border box.
      */

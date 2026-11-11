@@ -186,6 +186,16 @@ class StackingContextTest {
         public void endClip() {
             events.add("end clip");
         }
+
+        @Override
+        public void beginOpacity(double opacity) {
+            events.add(String.format(java.util.Locale.ROOT, "opacity %.2f", opacity));
+        }
+
+        @Override
+        public void endOpacity() {
+            events.add("end opacity");
+        }
     }
 
     private static String corners(Radii r) {
@@ -607,6 +617,38 @@ class StackingContextTest {
                 "rotate 45 61.2 161.2", "image", "end rotate",
                 turn, "background #000", "end rotate", turn, "background #111", "end rotate", turn, "end rotate",
                 turn, "end rotate", turn, "background #222", "end rotate", turn, "end rotate"), r.events);
+    }
+
+    /**
+     * A positioned element with {@code Opacity} is painted whole inside its opacity, with what it contains, also an
+     * {@code Overlay} with its own (reference/common/layers-and-rotation.md); an in-flow {@code Image}, with its
+     * background in the step of the images, and not in that of the backgrounds.
+     */
+    @Test
+    void boxesWithOpacityArePaintedWholeInsideIt() {
+        Recorder r = record(
+                "\tFrame:", "\t\tOpacity: 30%", "\t\tRotate: 8", "\t\tRotate origin: top left", "\t\tBox:",
+                "\t\t\tHeight: 100", "\t\t\tBackground: #000",
+                "\t\tBlock:", "\t\t\tBox:", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #111",
+                "\t\tOverlay:", "\t\t\tOpacity: 50%", "\t\t\tOffset: 0 0 auto auto", "\t\t\tBox:",
+                "\t\t\t\tWidth: 10", "\t\t\t\tHeight: 10", "\t\t\t\tBackground: #222",
+                "\tImage: test/square.png", "\t\tOpacity: 12.5%", "\t\tBox:", "\t\t\tBackground: #333",
+                "\tBlock:", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #444");
+        String turn = "rotate 8 40.0 40.0";
+        assertEquals(List.of("background #444", "opacity 0.13", "background #333", "image", "end opacity",
+                "opacity 0.30", turn, "background #000", "end rotate", turn, "background #111", "end rotate",
+                turn, "end rotate", turn, "end rotate",
+                "opacity 0.50", turn, "background #222", "end rotate", turn, "end rotate", "end opacity",
+                "end opacity"), r.events);
+    }
+
+    /** {@code Opacity: 100%} is the opaque box, painted as without it; {@code 0%} is painted, inside an opacity of 0. */
+    @Test
+    void fullOpacityIsNoOpacityAndZeroIsStillPainted() {
+        Recorder r = record(
+                "\tFrame:", "\t\tOpacity: 100%", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #000",
+                "\tFrame:", "\t\tOpacity: 0%", "\t\tBox:", "\t\t\tHeight: 10", "\t\t\tBackground: #111");
+        assertEquals(List.of("background #000", "opacity 0.00", "background #111", "end opacity"), r.events);
     }
 
     /**

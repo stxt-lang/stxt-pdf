@@ -10,8 +10,11 @@ a `Stack` or a `Grid`, it is put inside one of them. They accept `Id`, `Style`, 
 | `Layer` | integer | `auto` | All three | Stacking order ([Layers and rotation](../common/layers-and-rotation.md)). Also in `Item` and `Area`. |
 | `Pages` | `all`, `first`, `not-first`, `odd`, `even`, `last` | `all` | `Page overlay` | The pages on which it appears ([Pages](#pages)). |
 | `Rotate`, `Rotate origin` | described in [Layers and rotation](../common/layers-and-rotation.md#rotation-rotate) | none | All three | Rotates the box when it is painted. Also in `Image` and `Barcode`. |
+| `Opacity` | percentage from `0%` to `100%` | none (opaque) | All three | Makes the box faint with everything it contains ([Layers and rotation](../common/layers-and-rotation.md#opacity-opacity)). Also in `Image`. |
 
 `Offset`, `Layer`, `Pages` and `Rotate` are properties of the element: they do not go in `Styles` and are not inherited.
+`Opacity` is not inherited either, and it can come from a rule of `Styles`
+([Element properties](../common/styles.md#element-properties)).
 
 > **Decision:** `Frame` is an element and not a property of any box: this way `Offset` and `Layer` exist only in the
 > positioned elements and in `Item`/`Area`, and the schema detects their misuse without rules of its own. A `Frame` without `Offset`

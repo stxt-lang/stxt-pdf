@@ -26,7 +26,7 @@ First, [getting started](common/getting-started.md), which writes a document fro
 | [Typography](common/typography.md) | Font, size, line height, alignment, color and language of the text (`Typography`) |
 | [Text formatting](common/text-formatting.md) | Bold and italic within a sentence, uppercase, small caps, letter spacing, ligatures and preformatted text |
 | [Pages and breaks](common/pages-and-breaks.md) | How the content is split into pages, how to control the breaks (`Break`) and page numbers |
-| [Layers and rotation](common/layers-and-rotation.md) | What is painted on top of what and how to rotate a box |
+| [Layers and rotation](common/layers-and-rotation.md) | What is painted on top of what, how to rotate a box and how to make it faint |
 | [Styles](common/styles.md) | Reusable rules (`Styles`) and styles in a separate file |
 | [References and links](common/references-and-links.md) | "See page 12", section numbers and clickable links |
 | [Resources](common/resources.md) | Where fonts and images go |

@@ -6,7 +6,7 @@ import dev.stxt.pdf.model.Rotation;
 import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.documentinterchange.markedcontent.PDPropertyList;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
@@ -24,7 +24,6 @@ import static dev.stxt.pdf.paint.PdfContent.io;
 final class PdfTagging implements Tagging {
 
     private final PdfContent content;
-    private final PDPageContentStream out;
     /** Structure tree of the document, shared by all its pages. */
     private final PdfStructure structure;
     /** Link annotations of the document, shared by all its pages. */
@@ -36,7 +35,6 @@ final class PdfTagging implements Tagging {
 
     PdfTagging(PdfContent content, PdfStructure structure, PdfLinks links) {
         this.content = content;
-        this.out = content.out();
         this.structure = structure;
         this.links = links;
     }
@@ -44,6 +42,19 @@ final class PdfTagging implements Tagging {
     /** The link annotations of the page, which {@link PdfDocumentWriter} sets on it when its painting ends. */
     List<PDAnnotation> annotations() {
         return annotations;
+    }
+
+    /**
+     * Starts the transparency group of a box with {@code Opacity}: the marked content that follows, until
+     * {@link #endGroup()}, is in the stream of {@code form} ({@link PdfStructure#beginForm}).
+     */
+    void beginGroup(PDFormXObject form) {
+        structure.beginForm(form);
+    }
+
+    /** Ends the group started with {@link #beginGroup}. */
+    void endGroup() {
+        structure.endForm();
     }
 
     @Override
@@ -128,9 +139,9 @@ final class PdfTagging implements Tagging {
     private void begin(int mcid, String type) {
         io(() -> {
             if (mcid < 0) {
-                out.beginMarkedContent(COSName.ARTIFACT);
+                content.out().beginMarkedContent(COSName.ARTIFACT);
             } else {
-                out.beginMarkedContent(COSName.getPDFName(type), mcid);
+                content.out().beginMarkedContent(COSName.getPDFName(type), mcid);
             }
         });
     }
@@ -138,18 +149,18 @@ final class PdfTagging implements Tagging {
     @Override
     public void endText() {
         linkText = false;
-        io(out::endMarkedContent);
+        io(() -> content.out().endMarkedContent());
     }
 
     @Override
     public void beginActualText(String text) {
         COSDictionary properties = new COSDictionary();
         properties.setString(COSName.ACTUAL_TEXT, text);
-        io(() -> out.beginMarkedContent(COSName.getPDFName("Span"), PDPropertyList.create(properties)));
+        io(() -> content.out().beginMarkedContent(COSName.getPDFName("Span"), PDPropertyList.create(properties)));
     }
 
     @Override
     public void endActualText() {
-        io(out::endMarkedContent);
+        io(() -> content.out().endMarkedContent());
     }
 }

@@ -26,7 +26,7 @@ import dev.stxt.pdf.model.Value;
  * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
  * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
  * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
- * rotation, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Below side boxes} and
+ * rotation, {@code Opacity}, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Below side boxes} and
  * {@code Drop cap}) and the line where each property was declared, with its document ({@link SourceLine}).</p>
  *
  * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
@@ -77,6 +77,12 @@ public final class Style extends StyleGroup {
      * {@code null} = no rotation. Not inherited.
      */
     private Rotation rotation;
+    /**
+     * {@code Opacity} (reference/common/layers-and-rotation.md), in {@code Image}, {@code Frame}, {@code Overlay} and
+     * {@code Page overlay}: how opaque the box is painted with everything it contains, from 0 to 1;
+     * {@code null} = not declared, which is opaque like 1. Not inherited.
+     */
+    private Double opacity;
     /**
      * Target of the {@code Link} of the box ({@link dev.stxt.pdf.model.Links}, reference/common/links.md);
      * {@code null} = no link. Not inherited: what is inside a box with a link is clickable through it, but does not
@@ -297,6 +303,16 @@ public final class Style extends StyleGroup {
     void setRotation(Rotation v) {
         writable();
         rotation = v;
+    }
+
+    /** {@code Opacity}: from 0 to 1, or {@code null} if the box does not declare it, which is opaque like 1. */
+    public Double opacity() {
+        return opacity;
+    }
+
+    void setOpacity(Double v) {
+        writable();
+        opacity = v;
     }
 
     public String link() {

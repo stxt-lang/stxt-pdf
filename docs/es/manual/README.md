@@ -26,7 +26,7 @@ Primero, [primeros pasos](common/getting-started.md), que escribe un documento d
 | [Tipografía](common/typography.md) | Fuente, tamaño, interlineado, alineación, color e idioma del texto (`Typography`) |
 | [Formato del texto](common/text-formatting.md) | Negrita y cursiva dentro de una frase, mayúsculas, versalitas, interletraje, ligaduras y texto preformateado |
 | [Páginas y cortes](common/pages-and-breaks.md) | Cómo se reparte el contenido en páginas, cómo controlar los cortes (`Break`) y los números de página |
-| [Capas y giro](common/layers-and-rotation.md) | Qué se pinta encima de qué y cómo girar una caja |
+| [Capas y giro](common/layers-and-rotation.md) | Qué se pinta encima de qué, cómo girar una caja y cómo atenuarla |
 | [Estilos](common/styles.md) | Reglas reutilizables (`Styles`) y estilos en un fichero aparte |
 | [Referencias y enlaces](common/references-and-links.md) | «Véase la página 12», números de apartado y enlaces clicables |
 | [Recursos](common/resources.md) | Dónde van las fuentes y las imágenes |
