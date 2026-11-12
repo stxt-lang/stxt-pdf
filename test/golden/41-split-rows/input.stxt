@@ -1,7 +1,7 @@
 # Split rows and Split items (reference/common/breaks.md#breaks-in-stack-grid-and-table). Page area of 260 × 160
 # from (20, 20); grid columns of (260 − 10) / 2 = 125 at x = 20 and 155.
 #
-# Page 1: head (100) leaves 60. The first row of g (g1 200, g2 30) does not fit in them and, with Split rows by
+# Page 1: head (100) leaves 60. The first row of g (g1 120, g2 30) does not fit in them and, with Split rows by
 #   default, is split on this page: g1 places 60 and g2 fits whole.
 # Page 2: g1 continues from the top (60) and the second row (g3) goes after it, with the gap of 10: at 70.
 #   g ends at 90 and leaves 70 to h, whose first row (100) does not fit: with Split rows: false it moves whole.

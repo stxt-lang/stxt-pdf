@@ -1,6 +1,6 @@
 # t1 at y = 20: one row, 60 high (the block of a1, 59, plus the border, 0.5 above and below). The content box of e4
 #   and e5 is 59 high from 20.5, and their block, 20: 39 are left over. m4 (center) goes 19.5 down, at 40, and m5
-#   (end), 39 down, at 59.5. The lines of v2 and v3 move the same way and are not in this dump.
+#   (bottom), 39 down, at 59.5. The lines of v2 and v3 move the same way and are not in this dump.
 # t2 at y = 90, after the margin of 10: rows of 20 and 30; s1 takes up both, 50.
 # t3 at y = 150, with 30 left on page 1: the row is split. p1a and k1a place 29.5 under the top border and do not
 #   move: the cells go on. On page 2 p1 places the 30.5 left of p1a and p1b (40): 70.5 plus the bottom border, 71, and

@@ -2,8 +2,8 @@
 # 260 × 160 from (20, 20). Every cell has Border: 0.5 and stays stretched to its row: what moves is its content.
 #
 # t1: five columns of 52 and one row, 60 high (the block of a1, 59 plus the border). The cells with a value (v2
-#   center, v3 end) move their line; the cells with elements (e4 center, e5 end from the rule For style: bottom) move
-#   their block, 20 high.
+#   center, v3 bottom) move their line; the cells with elements (e4 center, e5 bottom from the rule For style: bottom)
+#   move their block, 20 high.
 # t2: s1 takes up the two rows (20 and 30, plus the border) and centers its line in the height of both.
 # t3: its row does not fit in what is left of page 1 and is split. p1 measures 100 (60 + 40) and k1, with
 #   Vertical: bottom, 80 (60 + 20): on page 1 their content reaches the end of the page and does not move; on page 2 the
