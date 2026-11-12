@@ -254,7 +254,7 @@ public final class Paginator {
      * inside another comes out in its result and is placed afterwards.
      */
     private List<Fragment> placePageOverlays(List<Queued> queue, Section section, boolean numbered, int printed, String page,
-                                      String tanda) {
+                                      String pages) {
         Rect area = section.pageSetup().pageArea();
         List<Fragment> fragments = new ArrayList<>();
         for (int q = 0; q < queue.size(); q++) {
@@ -266,7 +266,7 @@ public final class Paginator {
                 unavailable(item.pending().box());
             }
             LayoutResult f = engine.overlays().layOut(item.pending(), area.width(), area.height(), Insets.ZERO);
-            fragments.add(numbered ? engine.number(f.fragment(), page, tanda) : f.fragment());
+            fragments.add(numbered ? engine.number(f.fragment(), page, pages) : f.fragment());
             f.pending().forEach(p -> queue.add(new Queued(p, item.number(), item.total())));
         }
         return fragments;

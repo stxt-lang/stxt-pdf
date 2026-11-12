@@ -448,7 +448,9 @@ public final class FontFile {
     /** The GSUB worker of the font, or {@code null} if it has no GSUB table. */
     private GsubWorker ligatureWorker() {
         if (!gsubRead) {
-            synchronized (this) {
+            // fontbox reads the GSUB table from the file on demand, like the kerning and the widths: with the same
+            // lock, so that it does not move the stream under another thread reading one of them.
+            synchronized (ttf) {
                 if (!gsubRead) {
                     try {
                         GsubData data = ttf.getGsubData();

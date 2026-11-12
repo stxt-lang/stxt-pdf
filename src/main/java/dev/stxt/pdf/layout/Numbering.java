@@ -29,15 +29,15 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
         int[] totals = new int[pages];
         NumberFormat[] styles = new NumberFormat[pages];
         int counter = 0;
-        int tandaFirst = 0;
+        int runStart = 0;
         int i = 0;
         for (int k = 0; k < sections.size(); k++) {
             Section section = sections.get(k);
             Section.PageNumbering mode = section.numbering();
             if (mode == Section.PageNumbering.RESTART) {
-                Arrays.fill(totals, tandaFirst, i, counter);
+                Arrays.fill(totals, runStart, i, counter);
                 counter = section.firstNumber() - 1;
-                tandaFirst = i;
+                runStart = i;
             }
             int own = results.get(k).size() + (blankAfter[k] ? 1 : 0);
             for (int j = 0; j < own; j++) {
@@ -45,7 +45,7 @@ record Numbering(int[] printed, int[] totals, NumberFormat[] styles) {
                 printed[i++] = mode == Section.PageNumbering.NONE ? 0 : ++counter;
             }
         }
-        Arrays.fill(totals, tandaFirst, i, counter);
+        Arrays.fill(totals, runStart, i, counter);
         return new Numbering(printed, totals, styles);
     }
 

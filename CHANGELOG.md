@@ -5,6 +5,15 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Fixed
+
+- Two conversions at once that used a font for the first time could read its tables at the same time: the `GSUB`
+  table (the ligatures) was read with a lock of its own, and fontbox reads the tables on demand from a single stream,
+  which the kerning and the widths of the glyphs were reading with another. The three now share the same lock, so a
+  table is never read while the stream is moved by another thread.
+
 ## [0.17.0] - 2026-11-11
 
 What the documents of today were missing, added before 1.0: the opacity of a box, dashed and dotted borders, baseline
