@@ -23,6 +23,12 @@ Result:
 				Rect: 44 302 507.28 165
 			Fragment: agenda
 				Rect: 44 497 507.28 141
+				Rule: 44 520 507.28 0.5 #CFC8C0
+				Rule: 44 543.5 507.28 0.5 #CFC8C0
+				Rule: 44 567 507.28 0.5 #CFC8C0
+				Rule: 44 590.5 507.28 0.5 #CFC8C0
+				Rule: 44 614 507.28 0.5 #CFC8C0
+				Rule: 44 637.5 507.28 0.5 #CFC8C0
 			Fragment: classifieds
 				Rect: 44 668 507.28 92.5
 		Fragment: running

@@ -31,6 +31,8 @@ Document (dev.stxt.pdf):
 			Box:
 				Height: 40
 		Table:
+			Box:
+				Merge borders: false
 			Id: t
 			Column sizes: 100 *
 			Gap: 0 10

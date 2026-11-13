@@ -14,6 +14,7 @@ Document (dev.stxt.pdf):
 		Paper: A4
 		Margin: 56 56 70 56
 	Title: Informe anual 2025 · Cooperativa Solvent
+	Keywords: informe anual, 2025, cooperativa, energía renovable, cuentas
 	Language: es
 	Page overlay:
 		Id: footer
@@ -140,6 +141,7 @@ Document (dev.stxt.pdf):
 				Box:
 					Margin: 120 56 0 56
 	Section:
+		Footnote number format: symbols
 		Id: body
 		Block:
 			Id: contents
@@ -360,11 +362,16 @@ Document (dev.stxt.pdf):
 				Footer rows:
 					Row:
 						Style: total
-						Cell: Resultado del ejercicio
+						Cell: Resultado del ejercicio[^audit]
 							Row header: true
+							Typography:
+								Markup: markdown
 						Cell: 312
 						Cell: 233
 						Cell: +33,9 %
+			Footnote:
+				Id: audit
+				Paragraph: Cuentas auditadas por Auditors de la Garrotxa, S.L.P., con opinión favorable y sin salvedades.
 			Heading 2:
 				Text: Dónde ha ido la inversión
 			Markdown:
@@ -400,6 +407,7 @@ Document (dev.stxt.pdf):
 				Text: Compromisos para 2026
 			List:
 				Marker: decimal
+				Marker suffix: parenthesis
 				List item:
 					Paragraph: Superar los 2.700 MWh de producción con el cuarto aerogenerador y la ampliación de Les Preses.
 				List item:

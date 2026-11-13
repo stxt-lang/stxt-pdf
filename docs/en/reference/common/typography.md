@@ -31,7 +31,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
 | `Position` | `normal`, `superscript`, `subscript` | `normal` | Superscript or subscript; only in the rule of a styled run, and not inherited ([Text formatting](text-formatting.md#superscript-and-subscript-position)). |
 | `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
-| `Kerning` | `true`, `false` | `false` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
+| `Kerning` | `true`, `false` | `true` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
 | `Tab size` | integer ≥ 1 | `4` | With `Preformatted: keep` or `wrap`, the columns of a tab. |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). A `Figure` is numbered unless it, or a rule of its own, declares otherwise ([Figure](../components/figure.md#numbering)). |
@@ -346,9 +346,9 @@ Styles:
 
 ## Kerning (`Kerning`)
 
-With `Kerning: true` the text is measured and painted with the kerning pairs of the font, which bring two specific
-letters closer or move them apart according to their shape (`AV`, `To`, `P.`). It belongs to `Typography`, is inherited
-and is `false` by default: it is declared once in `For element: Document`.
+The text is measured and painted with the kerning pairs of the font, which bring two specific letters closer or move
+them apart according to their shape (`AV`, `To`, `P.`). `Kerning` belongs to `Typography`, is inherited and is `true`
+by default: `Kerning: false` removes it, in a text or, in `For element: Document`, in the whole document.
 
 - **The pairs are those of the font**: those of the `kern` feature of its `GPOS` table (that of the default script,
   `DFLT`, or, if it has none, that of Latin, `latn`) or, in a font without it, those of its `kern` table. A font without
@@ -367,8 +367,9 @@ and is `false` by default: it is declared once in `For element: Document`.
 > fonts, IBM Plex included, only have them there; the `kern` table is left for old fonts. *Rejected alternative:* only
 > the `kern` table, with which `Kerning` would do nothing with the fonts of the repository.
 
-> **Decision:** `false` by default, so that no existing document changes, and a single property, without choosing tables
-> or pairs. *Rejected alternative:* kerning always, which would move the lines of every document.
+> **Decision:** `true` by default, because a well-set text has the pairs of its font, and a single property, without
+> choosing tables or pairs. *Rejected alternative:* `false` by default, which was the rule up to 0.17.0 so as not to
+> move the lines of the documents that already existed: nearly all of them ended up declaring `Kerning: true`.
 
 > **Decision:** of `GPOS` only horizontal kerning is applied: the advance of the first glyph of each pair, without
 > skipping the marks that separate two letters or the pairs specific to a language. *Rejected alternative:* a complete

@@ -72,7 +72,7 @@ public final class TypographyStyle extends StyleGroup {
      * {@code Kerning}: whether the text is measured and painted with the kerning pairs of the font
      * (reference/common/typography.md). Inherited.
      */
-    private boolean kerning;
+    private boolean kerning = true;
     private Preformatted preformatted = Preformatted.NONE;
     /** Columns of a tab in preformatted text ({@code Tab size}). */
     private int tabSize = 4;

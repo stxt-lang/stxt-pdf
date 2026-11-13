@@ -36,7 +36,7 @@ Styles:
 | `Hyphenate` | `true`, `false` | `false` | Whether words are split with a hyphen at the end of the line |
 | `Break long words` | `never`, `new-line`, `same-line` | `never` | Whether a word that does not fit in a whole line is cut, with no hyphen, and where it starts ([below](#long-words)) |
 | `First line indent` | length | `0` | How much the first line of each paragraph is indented ([below](#first-line-indent)) |
-| `Kerning` | `true`, `false` | `false` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
+| `Kerning` | `true`, `false` | `true` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
 | `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md)); figures carry one unless they say `false` ([Figure](../components/figure.md)) |
@@ -205,9 +205,8 @@ A paragraph with a drop cap (`Drop cap`) is not indented: the indent it gets fro
 ## Kerning
 
 Some pairs of letters leave a visible gap between them because of their shape: `AV`, `To`, `P.`. Fonts have a list of
-those pairs with how much to bring them closer, or move them apart: the **kerning**. By default it is not applied; with
-`Kerning: true`, it is. It shows above all in large titles, and the usual thing is to declare it once, in
-`For element: Document`:
+those pairs with how much to bring them closer, or move them apart: the **kerning**. It is applied by default, and it
+shows above all in large titles. `Kerning: false` removes it, in a text or in the whole document:
 
 ```
 Document (dev.stxt.pdf):
@@ -221,12 +220,16 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 11
-                Kerning: true
     Section:
         Text: TECHNICAL ADVANCE
             Typography:
                 Size: 36
                 Bold: true
+        Text: TECHNICAL ADVANCE
+            Typography:
+                Size: 36
+                Bold: true
+                Kerning: false
         Paragraph: Torre Vall, October 2025.
 ```
 

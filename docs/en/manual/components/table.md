@@ -175,10 +175,11 @@ Document (dev.stxt.pdf):
 
 ## Merged borders
 
-With a `Border` on each cell, two neighboring cells draw two lines side by side. With **`Merge borders: true`** in the
-`Box` of the `Table`, the border between two cells is drawn once, centered between the two, and the outer border of the
-table stays inside it. It is the way to draw a full grid. Since it goes in the `Box`, it is also written in a rule of
-`Styles`: `For element: Table` merges the borders of every table of the document, also those of a `Markdown`.
+With a `Border` on each cell, the border between two neighboring cells is drawn once, centered between the two, and the
+outer border of the table stays inside it: that is how a full grid is drawn. With **`Merge borders: false`** in the
+`Box` of the `Table`, each cell draws its own, and between two cells there are two lines side by side. Since it goes in
+the `Box`, it is also written in a rule of `Styles`: `For element: Table` separates the borders of every table of the
+document, also those of a `Markdown`.
 
 ```
 Document (dev.stxt.pdf):
@@ -192,9 +193,6 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 10
-        For element: Table
-            Box:
-                Merge borders: true
         For element: Cell
             Box:
                 Padding: 3 5
@@ -234,9 +232,9 @@ Document (dev.stxt.pdf):
   that of the header (1.5). With the same width and a different color, that of the cell above or that of the one on the
   left wins.
 - A cell without border draws nothing: the line that separates it from its neighbor is that of the neighbor.
-- The table does not accept `Gap`, nor its cells `Corner radius`: the border between two cells would not be one line. A
-  table that needs `Gap` in a document that merges the borders of all of them carries `Merge borders: false` in its
-  `Box`.
+- A table with borders does not accept `Gap`, nor its cells `Corner radius`: the border between two cells would not be
+  one line. The one that needs them carries `Merge borders: false` in its `Box`. A table with no border at all has
+  nothing to merge and accepts them as they are.
 - When the table goes on to another page, the line between the two rows of the break is drawn on both pages.
 
 ## Across pages

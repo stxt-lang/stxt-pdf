@@ -176,10 +176,11 @@ Document (dev.stxt.pdf):
 
 ## Bordes fusionados
 
-Con un `Border` en cada celda, dos celdas vecinas dibujan dos líneas juntas. Con **`Merge borders: true`** en el `Box` de
-la `Table`, el borde entre dos celdas se dibuja una sola vez, centrado entre las dos, y el borde exterior de la tabla queda
-dentro de ella. Es la forma de dibujar una rejilla completa. Como va en el `Box`, también se escribe en una regla de
-`Styles`: `For element: Table` fusiona los bordes de todas las tablas del documento, también las de un `Markdown`.
+Con un `Border` en cada celda, el borde entre dos celdas vecinas se dibuja una sola vez, centrado entre las dos, y el
+borde exterior de la tabla queda dentro de ella: así se dibuja una rejilla completa. Con **`Merge borders: false`** en
+el `Box` de la `Table`, cada celda dibuja el suyo, y entre dos celdas hay dos líneas juntas. Como va en el `Box`, también
+se escribe en una regla de `Styles`: `For element: Table` separa los bordes de todas las tablas del documento, también
+las de un `Markdown`.
 
 ```
 Document (dev.stxt.pdf):
@@ -193,9 +194,6 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 10
-        For element: Table
-            Box:
-                Merge borders: true
         For element: Cell
             Box:
                 Padding: 3 5
@@ -234,8 +232,9 @@ Document (dev.stxt.pdf):
 - Entre dos celdas con bordes de distinto ancho, gana el más ancho, con su color y su estilo (`Border style`): la línea bajo la cabecera es la de la
   cabecera (1,5). Con el mismo ancho y distinto color, gana el de la celda de arriba o el de la izquierda.
 - Una celda sin borde no dibuja nada: la línea que la separa de su vecina es la de la vecina.
-- La tabla no admite `Gap`, ni sus celdas `Corner radius`: el borde entre dos celdas no sería una línea. Una tabla que
-  necesita `Gap` en un documento que fusiona los bordes de todas lleva `Merge borders: false` en su `Box`.
+- Una tabla con bordes no admite `Gap`, ni sus celdas `Corner radius`: el borde entre dos celdas no sería una línea. La
+  que los necesita lleva `Merge borders: false` en su `Box`. Una tabla sin ningún borde no tiene nada que fusionar y
+  los admite sin más.
 - Cuando la tabla pasa de página, la línea entre las dos filas del corte se dibuja en las dos páginas.
 
 ## Entre páginas

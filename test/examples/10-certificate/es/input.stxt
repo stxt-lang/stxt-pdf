@@ -13,6 +13,7 @@ Document (dev.stxt.pdf):
 		Orientation: landscape
 		Margin: 64 80 56 80
 	Title: Certificado de finalización · Cerámica a mano
+	Keywords: certificado, cerámica, curso
 	Language: es
 	Section:
 		Page overlay:
@@ -129,6 +130,7 @@ Document (dev.stxt.pdf):
 				Block:
 					Image: examples/certificate/es/seal.svg
 						Id: seal
+						Opacity: 85%
 						Alt: Sello de excelencia de la escuela
 						Rotate: -8
 						Box:

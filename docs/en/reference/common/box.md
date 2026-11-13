@@ -39,7 +39,7 @@ The box model. It is not inherited.
 | `Corner radius` | 1 to 4 values (number ≥ 0, % ≥ 0) | `0` | Rounded corners of the border box: top left, top right, bottom right, bottom left ([corners](#corners)). It does not affect the layout. |
 | `Background` | color or `linear(...)` | transparent | It is painted in the padding box ([background](#background-border-and-corners)). It does not affect the layout. |
 | `Overflow` | `error`, `shrink`, `clip` | `error` | What is done with what does not fit in the box ([Overflow](overflow.md#policy-per-box-overflow)). |
-| `Merge borders` | `true`, `false` | `false` | Only in a `Table`: the border between two cells is drawn once ([Merged borders](../components/table.md#merged-borders)). In the `Box` of another element it is an error; from a rule, the other boxes do nothing with it. |
+| `Merge borders` | `true`, `false` | `true` | Only in a `Table`: the border between two cells is drawn once ([Merged borders](../components/table.md#merged-borders)). In the `Box` of another element it is an error; from a rule, the other boxes do nothing with it. |
 
 > **Decision:** `narrowest`, `natural` and `fit` are valid only in `Width` (and in the tracks of `Grid` and `Table`): an `auto`
 > height is already that of its content, and in `Height` they would be another way of writing `auto`. *Rejected alternative:*

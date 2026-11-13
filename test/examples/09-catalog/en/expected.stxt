@@ -29,12 +29,17 @@ Result:
 			Rect: 50 797.89 495.28 20
 	Page: 5
 		Fragment: woods
-			Rect: 50 54 495.28 517
+			Rect: 50 54 495.28 518.25
 			Fragment: wood-table
-				Rect: 50 125 495.28 157
+				Rect: 50 125 495.28 158.25
+				Rule: 50 150.5 495.28 0.75 #DCCFB8 dotted
+				Rule: 50 190.25 495.28 0.75 #DCCFB8 dotted
+				Rule: 50 216.5 495.28 0.75 #DCCFB8 dotted
+				Rule: 50 242.75 495.28 0.75 #DCCFB8 dotted
+				Rule: 50 282.5 495.28 0.75 #DCCFB8 dotted
 			Fragment: steps
-				Rect: 50 336 495.28 109
+				Rect: 50 337.25 495.28 109
 			Fragment: contact
-				Rect: 50 471 495.28 100
+				Rect: 50 472.25 495.28 100
 		Fragment: footer
 			Rect: 50 797.89 495.28 20

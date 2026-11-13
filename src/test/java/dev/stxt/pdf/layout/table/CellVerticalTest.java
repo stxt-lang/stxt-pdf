@@ -41,7 +41,8 @@ class CellVerticalTest {
         return lines;
     }
 
-    private static final String[] TABLE = {"\tTable:", "\t\tId: T", "\t\tColumn sizes: 100 100", "\t\tBody rows:"};
+    private static final String[] TABLE = {"\tTable:", "\t\tId: T", "\t\tColumn sizes: 100 100", "\t\tBox:",
+            "\t\t\tMerge borders: false", "\t\tBody rows:"};
 
     /** A cell with a block as high as {@code height}: the one that gives the row its height. */
     private static String[] tall(String id, int height) {

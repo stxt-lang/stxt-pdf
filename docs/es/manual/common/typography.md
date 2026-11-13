@@ -36,7 +36,7 @@ Styles:
 | `Hyphenate` | `true`, `false` | `false` | Si se parten las palabras con guion al final de la línea |
 | `Break long words` | `never`, `new-line`, `same-line` | `never` | Si se corta, sin guion, una palabra que no cabe en una línea entera, y dónde empieza ([abajo](#palabras-largas)) |
 | `First line indent` | medida | `0` | Lo que se sangra la primera línea de cada párrafo ([abajo](#sangría-de-primera-línea)) |
-| `Kerning` | `true`, `false` | `false` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
+| `Kerning` | `true`, `false` | `true` | Si se ajusta el espacio de las parejas de letras que lo piden (`AV`, `To`) |
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md)); las figuras lo llevan salvo que digan `false` ([Figure](../components/figure.md)) |
@@ -204,9 +204,8 @@ Un párrafo con letra capitular (`Drop cap`) no se sangra: la sangría que recib
 ## Kerning
 
 Algunas parejas de letras dejan un hueco visible entre ellas por su forma: `AV`, `To`, `P.`. Las fuentes traen una lista
-de esas parejas con lo que hay que acercarlas, o separarlas: el **kerning**. Por defecto no se aplica; con
-`Kerning: true`, sí. Se nota sobre todo en los títulos grandes, y lo normal es declararlo una vez, en
-`For element: Document`:
+de esas parejas con lo que hay que acercarlas, o separarlas: el **kerning**. Se aplica por defecto, y se nota sobre todo
+en los títulos grandes. `Kerning: false` lo quita, en un texto o en todo el documento:
 
 ```
 Document (dev.stxt.pdf):
@@ -220,12 +219,16 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 11
-                Kerning: true
     Section:
         Text: AVANCE TÉCNICO
             Typography:
                 Size: 36
                 Bold: true
+        Text: AVANCE TÉCNICO
+            Typography:
+                Size: 36
+                Bold: true
+                Kerning: false
         Paragraph: Torre Vall, octubre de 2025.
 ```
 

@@ -17,6 +17,6 @@ Result:
 		Fragment: footer
 			Rect: 80 513.28 681.89 48
 			Fragment: verification
-				Rect: 310.05 513.28 48 48
+				Rect: 310.27 513.28 48 48
 		Fragment: serial
 			Rect: 49 427.5 260 16

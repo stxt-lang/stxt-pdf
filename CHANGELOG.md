@@ -7,6 +7,25 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
+Two defaults change, so that a document is well set without asking for it. **A document may change:** its lines, with
+the kerning, and its tables with borders, with the borders merged. `Kerning: false` and `Merge borders: false` give
+what there was.
+
+### Changed
+
+- `Kerning` is `true` by default: the text is measured and painted with the kerning pairs of the font. It was `false`
+  so that no document changed, and nearly every document declared it. `Kerning: false` turns it off, in a text or, in
+  `For element: Document`, in the whole document.
+- `Merge borders` is `true` by default: in a table, the border between two cells is drawn once. A table with borders
+  and a `Gap`, or with a `Corner radius` in a cell, is now `MERGE_BORDERS_CONFLICT` unless it has
+  `Merge borders: false`; the message says that the borders are merged by default. A table none of whose cells has a
+  border has nothing to merge and stays as it was, with its `Gap` and its `Corner radius`.
+  `MERGE_BORDERS_WITHOUT_EFFECT` is now for `Merge borders` written, with either value, in the `Box` of such a table.
+- The examples of `test/examples/` use what was added in 0.17.0: `Keywords` in the eleven, a footnote with a symbol
+  (`Footnote number format: symbols`) in the accounts of the annual report and `Marker suffix: parenthesis` in its
+  commitments, `Separator style: dotted` in the briefs of the newsletter, `Border style: dotted` in the rows of the
+  catalog and `Opacity` in the seal of the certificate. Their PDFs and first pages change.
+
 ### Fixed
 
 - Two conversions at once that used a font for the first time could read its tables at the same time: the `GSUB`

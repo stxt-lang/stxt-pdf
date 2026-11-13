@@ -29,6 +29,11 @@ Result:
 				Rect: 54 617.91 487.28 143.5
 				Fragment: terminals
 					Rect: 54 636.41 487.28 125
+					Rule: 54 660.91 487.28 0.5 #CFE0DF
+					Rule: 54 685.91 487.28 0.5 #CFE0DF
+					Rule: 54 710.91 487.28 0.5 #CFE0DF
+					Rule: 54 735.91 487.28 0.5 #CFE0DF
+					Rule: 54 760.91 487.28 0.5 #CFE0DF
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer
@@ -44,6 +49,11 @@ Result:
 				Rect: 54 422 487.28 143.5
 				Fragment: schedule
 					Rect: 54 440.5 487.28 125
+					Rule: 54 465 487.28 0.5 #CFE0DF
+					Rule: 54 490 487.28 0.5 #CFE0DF
+					Rule: 54 515 487.28 0.5 #CFE0DF
+					Rule: 54 540 487.28 0.5 #CFE0DF
+					Rule: 54 565 487.28 0.5 #CFE0DF
 		Fragment: header
 			Rect: 54 30 487.28 14.5
 		Fragment: footer
@@ -57,6 +67,11 @@ Result:
 				Rect: 54 97 487.28 143.5
 				Fragment: specs
 					Rect: 54 115.5 487.28 125
+					Rule: 54 140 487.28 0.5 #CFE0DF
+					Rule: 54 165 487.28 0.5 #CFE0DF
+					Rule: 54 190 487.28 0.5 #CFE0DF
+					Rule: 54 215 487.28 0.5 #CFE0DF
+					Rule: 54 240 487.28 0.5 #CFE0DF
 		Fragment: support
 			Rect: 54 260.5 487.28 214
 			Fragment: contact

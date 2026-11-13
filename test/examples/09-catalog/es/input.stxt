@@ -12,6 +12,7 @@ Document (dev.stxt.pdf):
 		Paper: A4
 		Margin: 54 50 64 50
 	Title: Catálogo 2026 · Taller Nogal
+	Keywords: catálogo, 2026, mobiliario, Taller Nogal
 	Language: es
 	Page overlay:
 		Id: footer

@@ -3,6 +3,8 @@ package dev.stxt.pdf.tree;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -230,12 +232,34 @@ class TablesTest {
 
     @Test
     void withoutMergeBordersTheCellsKeepTheirBorder() {
-        Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody rows:",
+        Box table = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBox:", "\t\t\tMerge borders: false", "\t\tBody rows:",
                 "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 1", "\t\t\t\tCell: b")
                 .children().get(0);
         assertFalse(table.style().box().mergeBorders());
         assertNull(table.children().get(0).mergedBorder());
         assertEquals(Sides.all(Value.pt(1)), table.children().get(0).style().box().border());
+    }
+
+    /** By default the borders are merged, and a table none of whose cells has a border has nothing to merge. */
+    @Test
+    void byDefaultTheBordersAreMergedIfSomeCellHasOne() {
+        Box merged = root("\tTable:", "\t\tColumn sizes: * *", "\t\tBody rows:",
+                "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 1", "\t\t\t\tCell: b")
+                .children().get(0);
+        assertTrue(merged.style().box().mergeBorders());
+        assertNotNull(merged.children().get(0).mergedBorder());
+        // With no border in any cell, a Gap and a Corner radius are not a conflict.
+        Box plain = root("\tTable:", "\t\tColumn sizes: * *", "\t\tGap: 4", "\t\tBody rows:",
+                "\t\t\tRow:", "\t\t\t\tCell: a", "\t\t\t\t\tBox:", "\t\t\t\t\t\tCorner radius: 2", "\t\t\t\tCell: b")
+                .children().get(0);
+        assertFalse(plain.style().box().mergeBorders());
+        assertNull(plain.children().get(0).mergedBorder());
+        // With a border, the Gap needs Merge borders: false, and the message says that it is the default.
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> root("\tTable:",
+                "\t\tColumn sizes: * *", "\t\tGap: 4", "\t\tBody rows:", "\t\t\tRow:", "\t\t\t\tCell: a",
+                "\t\t\t\t\tBox:", "\t\t\t\t\t\tBorder: 1", "\t\t\t\tCell: b"));
+        assertEquals(ErrorCode.MERGE_BORDERS_CONFLICT, e.errorCode());
+        assertTrue(e.getMessage().contains("(true by default)"), e.getMessage());
     }
 
     /**

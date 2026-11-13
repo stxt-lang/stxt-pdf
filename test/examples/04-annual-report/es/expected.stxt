@@ -37,9 +37,17 @@ Result:
 			Rect: 56 792.89 483.28 21
 	Page: 5
 		Fragment: results
-			Rect: 56 56 483.28 492.5
+			Rect: 56 56 483.28 492
 			Fragment: accounts
-				Rect: 56 161 483.28 190
+				Rect: 56 161 483.28 189.5
+				Rule: 56 187.5 483.28 0.5 #D5DEE9
+				Rule: 56 214.5 483.28 0.5 #D5DEE9
+				Rule: 56 241.5 483.28 0.5 #D5DEE9
+				Rule: 56 268.5 483.28 0.5 #D5DEE9
+				Rule: 56 295.5 483.28 0.5 #D5DEE9
+				Rule: 56 322.5 483.28 1.5 #12315A
+		Fragment: audit
+			Rect: 56 761.39 483.28 10.5
 		Fragment: footer
 			Rect: 56 792.89 483.28 21
 	Page: 6
@@ -49,6 +57,11 @@ Result:
 				Rect: 56 111 483.28 220.93
 			Fragment: indicators
 				Rect: 56 556.43 483.28 135
+				Rule: 56 582.93 483.28 0.5 #D5DEE9
+				Rule: 56 609.93 483.28 0.5 #D5DEE9
+				Rule: 56 636.93 483.28 0.5 #D5DEE9
+				Rule: 56 663.93 483.28 0.5 #D5DEE9
+				Rule: 56 690.93 483.28 0.5 #D5DEE9
 		Fragment: footer
 			Rect: 56 792.89 483.28 21
 	Page: 7
@@ -56,7 +69,18 @@ Result:
 			Rect: 56 56 483.28 619
 			Fragment: board
 				Rect: 56 161 483.28 162
+				Rule: 56 187.5 483.28 0.5 #D5DEE9
+				Rule: 56 214.5 483.28 0.5 #D5DEE9
+				Rule: 56 241.5 483.28 0.5 #D5DEE9
+				Rule: 56 268.5 483.28 0.5 #D5DEE9
+				Rule: 56 295.5 483.28 0.5 #D5DEE9
+				Rule: 56 322.5 483.28 0.5 #D5DEE9
 			Fragment: calendar
 				Rect: 56 503.5 483.28 135
+				Rule: 56 530 483.28 0.5 #D5DEE9
+				Rule: 56 557 483.28 0.5 #D5DEE9
+				Rule: 56 584 483.28 0.5 #D5DEE9
+				Rule: 56 611 483.28 0.5 #D5DEE9
+				Rule: 56 638 483.28 0.5 #D5DEE9
 		Fragment: footer
 			Rect: 56 792.89 483.28 21

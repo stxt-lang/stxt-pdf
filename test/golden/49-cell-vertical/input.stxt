@@ -39,6 +39,8 @@ Document (dev.stxt.pdf):
 				Background: #B5D4F4
 	Section:
 		Table:
+			Box:
+				Merge borders: false
 			Id: t1
 			Column sizes: 52 52 52 52 52
 			Body rows:
@@ -66,6 +68,8 @@ Document (dev.stxt.pdf):
 							Id: m5
 							Style: mark
 		Table:
+			Box:
+				Merge borders: false
 			Id: t2
 			Column sizes: 130 130
 			Body rows:
@@ -84,6 +88,8 @@ Document (dev.stxt.pdf):
 						Box:
 							Height: 30
 		Table:
+			Box:
+				Merge borders: false
 			Id: t3
 			Column sizes: 130 130
 			Body rows:

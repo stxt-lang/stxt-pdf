@@ -31,7 +31,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
 | `Position` | `normal`, `superscript`, `subscript` | `normal` | Superíndice o subíndice; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#superíndice-y-subíndice-position)). |
 | `Ligatures` | `true`, `false` | `false` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
-| `Kerning` | `true`, `false` | `false` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
+| `Kerning` | `true`, `false` | `true` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: keep` o `wrap`, las columnas de una tabulación. |
 | `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). Una `Figure` va numerada salvo que lo declare ella o una regla suya ([Figure](../components/figure.md#numeración)). |
@@ -342,9 +342,9 @@ Styles:
 
 ## Kerning (`Kerning`)
 
-Con `Kerning: true` el texto se mide y se pinta con los pares de kerning de la fuente, que acercan o separan dos letras
-concretas según su forma (`AV`, `To`, `P.`). Es de `Typography`, se hereda y vale `false` por defecto: se declara una vez
-en `For element: Document`.
+El texto se mide y se pinta con los pares de kerning de la fuente, que acercan o separan dos letras concretas según su
+forma (`AV`, `To`, `P.`). `Kerning` es de `Typography`, se hereda y vale `true` por defecto: `Kerning: false` lo quita,
+en un texto o, en `For element: Document`, en todo el documento.
 
 - **Los pares son los de la fuente**: los de la característica `kern` de su tabla `GPOS` (la del sistema de escritura por
   defecto, `DFLT`, o, si no la tiene, la del latino, `latn`) o, en una fuente sin ella, los de su tabla `kern`. Una fuente
@@ -362,8 +362,9 @@ en `For element: Document`.
 > actuales, IBM Plex incluida, solo los traen ahí; la tabla `kern` queda para las fuentes antiguas. *Alternativa
 > descartada:* solo la tabla `kern`, con la que `Kerning` no haría nada con las fuentes del repositorio.
 
-> **Decisión:** `false` por defecto, para que ningún documento existente cambie, y una sola propiedad, sin elegir tablas
-> ni pares. *Alternativa descartada:* kerning siempre, que movería las líneas de todos los documentos.
+> **Decisión:** `true` por defecto, porque un texto bien compuesto lleva los pares de su fuente, y una sola propiedad,
+> sin elegir tablas ni pares. *Alternativa descartada:* `false` por defecto, que fue la regla hasta la 0.17.0 para no
+> mover las líneas de los documentos que ya existían: casi todos acababan declarando `Kerning: true`.
 
 > **Decisión:** de `GPOS` solo se aplica el kerning horizontal: el avance del primer glifo de cada par, sin saltar las
 > marcas que separen dos letras ni los pares propios de un idioma. *Alternativa descartada:* un motor de composición

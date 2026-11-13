@@ -241,14 +241,12 @@ El `Id` de una fila es un `Id` del documento, único como cualquier otro: es des
 
 ## Bordes fusionados
 
-Sin más, cada celda pinta su borde, y dos celdas vecinas con `Border: 0.5` dibujan dos líneas juntas, de 1 en total. Con
-`Merge borders: true` en el `Box` de la `Table`, el borde entre dos celdas se dibuja **una sola vez**:
+En una tabla, el borde entre dos celdas se dibuja **una sola vez**: `Merge borders` vale `true` por defecto. Con
+`Merge borders: false` en el `Box` de la `Table`, cada celda pinta su borde, y dos celdas vecinas con `Border: 0.5`
+dibujan dos líneas juntas, de 1 en total:
 
 ```
 Styles:
-    For element: Table
-        Box:
-            Merge borders: true
     For element: Cell
         Box:
             Padding: 3 5
@@ -273,9 +271,9 @@ Table:
 ```
 
 - **Dónde se escribe.** `Merge borders` es del grupo `Box`, junto a `Border`: se escribe en el `Box` de la `Table` o en
-  una regla de `Styles` ([Styles](../common/styles.md)), que también llega a las tablas de un `Markdown`. En el ejemplo,
-  `For element: Table` fusiona los bordes de todas las tablas del documento, y una tabla los separa con
-  `Merge borders: false` en su `Box`. Solo tiene efecto en una `Table`: escrito en el `Box` de otro elemento es
+  una regla de `Styles` ([Styles](../common/styles.md)), que también llega a las tablas de un `Markdown`. Con
+  `For element: Table` y `Merge borders: false` se separan los bordes de todas las tablas del documento, y una tabla
+  los fusiona con `Merge borders: true` en su `Box`. Solo tiene efecto en una `Table`: escrito en el `Box` de otro elemento es
   `MERGE_BORDERS_WITHOUT_EFFECT`, y si llega de una regla a otra caja (un `For style` que usan una tabla y un `Block`),
   esa caja no hace nada con él.
 - **La línea.** Entre dos celdas vecinas, la línea es el más ancho de los dos lados que se tocan, con su color
@@ -295,9 +293,12 @@ Table:
   El relleno y el contenido empiezan después, así que el alto de las filas y el ancho de las columnas cuentan con él.
 - **Qué tapa a qué.** Las líneas se pintan encima de los fondos de las celdas y de lo que contienen, y debajo de su
   texto. La franja de una fila (su `Box`, [Filas](#filas)) no se fusiona: se pinta debajo de las celdas, como siempre.
-- **Lo que no admite.** `Gap` en la tabla o `Corner radius` en una de sus celdas, también si `Merge borders` o el
-  `Corner radius` llegan de una regla, son `MERGE_BORDERS_CONFLICT`: el borde entre dos celdas no sería una línea.
-  `Merge borders: true` en el `Box` de una tabla ninguna de cuyas celdas tiene borde es `MERGE_BORDERS_WITHOUT_EFFECT`;
+- **Lo que no admite.** `Gap` en la tabla o `Corner radius` en una de sus celdas, también si el `Corner radius` llega
+  de una regla, son `MERGE_BORDERS_CONFLICT`: el borde entre dos celdas no sería una línea. La tabla que los quiere
+  lleva `Merge borders: false`.
+- **Sin bordes no hay nada que fusionar.** Una tabla ninguna de cuyas celdas tiene borde, si nadie declara
+  `Merge borders`, queda como está, con su `Gap` y su `Corner radius` si los tiene.
+  `Merge borders` escrito en el `Box` de esa tabla es `MERGE_BORDERS_WITHOUT_EFFECT`;
   desde una regla, esa tabla queda como está.
 
 Los cortes de página tienen sus reglas en [Cortes](#cortes).
@@ -311,9 +312,14 @@ Los cortes de página tienen sus reglas en [Cortes](#cortes).
 > sitio entra en el relleno de la celda lo que le falta. *Alternativa descartada:* reservar en cada lado la línea más
 > ancha posible en cualquier página, que ensancharía todas las filas por una línea que solo sale en algunas.
 
-> **Decisión:** `Merge borders` es un booleano, `false` por defecto: sin él, ninguna tabla cambia. *Alternativa
-> descartada:* `Borders: separate | collapse`, con un término que no es de maquetación, y fusionar los bordes siempre,
-> como un procesador de textos, que movería todas las tablas con bordes.
+> **Decisión:** `Merge borders` es un booleano, `true` por defecto, como en un procesador de textos: dos líneas juntas
+> entre dos celdas no es lo que nadie busca al dar borde a las celdas. *Alternativas descartadas:* `false` por defecto,
+> que fue la regla hasta la 0.17.0 para no mover las tablas que ya existían; `Borders: separate | collapse`, con un
+> término que no es de maquetación; y fusionar siempre, sin propiedad, que deja sin `Gap` a las tablas con borde.
+
+> **Decisión:** por defecto, una tabla sin ningún borde no se fusiona, y su `Gap` o su `Corner radius` no son un
+> conflicto: no hay línea que no pueda dibujarse. *Alternativa descartada:* pedirle `Merge borders: false`, una
+> propiedad para decir que no se fusiona lo que no existe.
 
 > **Decisión:** `Merge borders` va en el grupo `Box`, aunque solo tenga efecto en una tabla, para que una regla de
 > `Styles` lo dé a todas las tablas de un documento o de un documento de estilos aparte, también a las de un `Markdown`.

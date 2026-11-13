@@ -30,7 +30,9 @@ final class TableBorders {
     }
 
     /**
-     * Merges the borders of the cells of {@code table} ({@code n}), of {@code rows} rows and {@code columns} columns. A
+     * Merges the borders of the cells of {@code table} ({@code n}), of {@code rows} rows and {@code columns} columns.
+     * With {@code Merge borders} by default (nobody declares it) and no cell with a border there is nothing to merge:
+     * the table is left as it is, with its {@code Gap} and its {@code Corner radius} if it has them. Otherwise, a
      * table with {@code Gap} or a cell with {@code Corner radius} is {@link ErrorCode#MERGE_BORDERS_CONFLICT}, also
      * when {@code Merge borders} comes from a rule; a table none of whose cells has a border is
      * {@link ErrorCode#MERGE_BORDERS_WITHOUT_EFFECT} only if the table declares it in its own {@code Box}: from a rule
@@ -38,15 +40,23 @@ final class TableBorders {
      */
     static void merge(InlineNode n, Box table, int rows, int columns) {
         Style s = table.style();
+        List<Box> cells = table.children().stream().filter(c -> c.role() == Element.Role.CELL).toList();
+        boolean declared = s.isDeclared(MERGE_BORDERS);
+        boolean any = cells.stream()
+                .anyMatch(cell -> declared(cell.style()).asList().stream().anyMatch(stroke -> !stroke.isNone()));
+        if (!any && !declared) {
+            // Merged by default, and no cell has a border: there is nothing to merge, and nothing it conflicts with.
+            s.box().setMergeBorders(false);
+            return;
+        }
+        String merged = declared ? "(" + s.line(MERGE_BORDERS) + ")" : "(true by default)";
         if (!zero(s.grid().rowGap()) || !zero(s.grid().columnGap())) {
             throw error(s.line(GRID_GAP), ErrorCode.MERGE_BORDERS_CONFLICT, "The Gap of the table separates its cells, "
-                    + "and with Merge borders (" + s.line(MERGE_BORDERS) + ") the border between two cells is a single "
+                    + "and with Merge borders " + merged + " the border between two cells is a single "
                     + "line: the Gap is not possible with Merge borders, which Merge borders: false in the Box of the "
                     + "table turns off");
         }
-        List<Box> cells = table.children().stream().filter(c -> c.role() == Element.Role.CELL).toList();
         Box[][] at = new Box[rows][columns];
-        boolean any = false;
         for (Box cell : cells) {
             Cell a = cell.style().item().area();
             for (int r = a.row() - 1; r < a.row() - 1 + a.rows(); r++) {
@@ -58,12 +68,10 @@ final class TableBorders {
             if (cs.box().cornerRadius().asList().stream().anyMatch(v -> !zero(v))) {
                 throw error(cs.line(CORNER_RADIUS), ErrorCode.MERGE_BORDERS_CONFLICT, "Corner radius rounds the "
                         + "corners of a cell, and with Merge borders the borders of the cells are the straight lines "
-                        + "of the table (" + s.line(MERGE_BORDERS) + "): Corner radius is not possible in its "
-                        + "cells");
+                        + "of the table " + merged + ": Corner radius is not possible in its "
+                        + "cells, unless Merge borders: false in the Box of the table turns it off");
             }
-            Sides<Stroke> own = declared(cs);
-            cell.setMergedBorder(own);
-            any |= own.asList().stream().anyMatch(stroke -> !stroke.isNone());
+            cell.setMergedBorder(declared(cs));
         }
         if (!any) {
             child(n, "box").map(Nodes::inline).flatMap(b -> child(b, "merge-borders")).ifPresent(p -> {

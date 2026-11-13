@@ -39,9 +39,10 @@ public final class BoxStyle extends StyleGroup {
     private Overflow overflow = Overflow.ERROR;
     /**
      * {@code Merge borders}: in a {@code Table}, the border between two cells is drawn once, the wider of the two
-     * (reference/components/table.md#merged-borders); the other boxes ignore it if it comes from a rule.
+     * (reference/components/table.md#merged-borders); the other boxes ignore it if it comes from a rule. By default,
+     * {@code true}; a table with nothing to merge has it {@code false} once it is built ({@link TableBorders#merge}).
      */
-    private boolean mergeBorders;
+    private boolean mergeBorders = true;
 
     BoxStyle() {
     }

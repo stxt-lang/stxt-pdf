@@ -45,6 +45,8 @@ Document (dev.stxt.pdf):
 				Padding: 2 4 2 24
 	Section:
 		Table:
+			Box:
+				Merge borders: false
 			Id: t
 			Column sizes: 100 100 60
 			Column align: left left right
