@@ -5,11 +5,16 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.18.0] - 2026-11-13
 
-Three defaults change, so that a document is well set without asking for it. **A document may change:** its lines,
-with the kerning and the ligatures, and its tables with borders, with the borders merged. `Kerning: false`,
-`Ligatures: false` and `Merge borders: false` give what there was.
+Kerning, ligatures and merged table borders by default, so that a document is well set without asking for it; the
+ligatures written five times faster and copied as their letters; and five fixes found while writing the documents of
+`stxt-press`. **From 0.17.0**, a document that was valid may change: its lines, with the kerning and the ligatures
+(`Kerning: false` and `Ligatures: false` give what there was); its tables with borders, now merged, and a table with
+borders and a `Gap`, or with a `Corner radius` in a cell, is `MERGE_BORDERS_CONFLICT` until it has
+`Merge borders: false`; the lines of a justified text with `Line breaking: optimal` in a narrow box; and asterisks
+between a letter and a styled run, which no longer open or close (`H**[2]{sub}**O` is written `H[**2**]{sub}O`). The
+Java API does not change.
 
 ### Changed
 
@@ -28,7 +33,6 @@ with the kerning and the ligatures, and its tables with borders, with the border
   (`Footnote number format: symbols`) in the accounts of the annual report and `Marker suffix: parenthesis` in its
   commitments, `Separator style: dotted` in the briefs of the newsletter, `Border style: dotted` in the rows of the
   catalog and `Opacity` in the seal of the certificate. Their PDFs and first pages change.
-
 - A text with `Ligatures: true` is written much faster: five times faster in a running text of 55 pages (194 ms
   instead of 994), and as fast as without ligatures in the examples. PDFBox applied the `GSUB` table of the font to
   every word of every text again; the engine now writes that text itself, each word worked out once per document. The
