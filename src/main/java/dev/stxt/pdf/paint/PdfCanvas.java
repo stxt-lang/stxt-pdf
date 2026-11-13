@@ -18,6 +18,8 @@ import dev.stxt.pdf.tree.Box;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.util.Matrix;
@@ -71,9 +73,10 @@ public final class PdfCanvas implements Canvas {
      * The canvas of a page of {@code document}, which is written to {@code out}, takes the rectangle {@code paper} in
      * PDF coordinates and has its top at {@code pageHeight}.
      */
-    PdfCanvas(PdfPageWriter document, PDPageContentStream out, PDRectangle paper, double pageHeight, boolean debug) {
+    PdfCanvas(PdfPageWriter document, PDPageContentStream out, PDResources pageResources, PDRectangle paper,
+              double pageHeight, boolean debug) {
         this.doc = document.doc();
-        this.page = new PdfContent(doc, out, paper, pageHeight);
+        this.page = new PdfContent(doc, out, pageResources, paper, pageHeight);
         this.pageHeight = pageHeight;
         this.resources = document.resources();
         this.fonts = document.fonts();
@@ -468,13 +471,20 @@ public final class PdfCanvas implements Canvas {
         io(() -> {
             page.painting(color, () -> {
                 out().beginText();
-                out().setFont(fonts.font(font), (float) fontSize);
+                PDFont embedded = fonts.font(font);
+                fonts.select(out(), page.resources(), embedded, (float) fontSize);
                 out().newLineAtOffset((float) x, (float) (pageHeight - baselineY));
                 int[] kerning = font.kerning() ? resources.fonts().find(font).kerning(text, font.ligatures()) : null;
                 if (wordSpacing == 0 && letterSpacing == 0 && kerning == null) {
-                    out().showText(text);
+                    // With ligatures the engine writes the text itself: PDFBox is much slower (PdfFonts.show).
+                    if (!fonts.show(out(), embedded, text)) {
+                        out().showText(text);
+                    }
                 } else {
-                    out().showTextWithPositioning(PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize, kerning));
+                    Object[] parts = PdfFonts.spaced(text, wordSpacing, letterSpacing, fontSize, kerning);
+                    if (!fonts.show(out(), embedded, parts)) {
+                        out().showTextWithPositioning(parts);
+                    }
                 }
                 out().endText();
             });

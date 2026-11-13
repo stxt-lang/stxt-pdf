@@ -39,6 +39,8 @@ final class PdfContent {
     private final PDDocument doc;
     /** The stream being written: that of the page or, inside a transparency group, that of its form. */
     private PDPageContentStream out;
+    /** The resources of the page: where its fonts are named. */
+    private final PDResources pageResources;
     /** The paper in PDF coordinates: the {@code BBox} of the transparency groups. */
     private final PDRectangle paper;
     private final double pageHeight;
@@ -66,12 +68,14 @@ final class PdfContent {
     /**
      * @param doc        the document of the page
      * @param out        the content stream of the page
+     * @param resources  the resources of the page
      * @param paper      the paper in PDF coordinates
      * @param pageHeight the height at which the top of the paper is, in PDF coordinates
      */
-    PdfContent(PDDocument doc, PDPageContentStream out, PDRectangle paper, double pageHeight) {
+    PdfContent(PDDocument doc, PDPageContentStream out, PDResources resources, PDRectangle paper, double pageHeight) {
         this.doc = doc;
         this.out = out;
+        this.pageResources = resources;
         this.paper = paper;
         this.pageHeight = pageHeight;
     }
@@ -81,6 +85,11 @@ final class PdfContent {
      */
     PDPageContentStream out() {
         return out;
+    }
+
+    /** The resources of the stream being written: those of the page or those of the form of the current group. */
+    PDResources resources() {
+        return groups.isEmpty() ? pageResources : groups.peek().form().getResources();
     }
 
     double pageHeight() {

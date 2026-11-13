@@ -220,6 +220,7 @@ public final class PdfDocumentWriter {
             Map<Box, PDPageXYZDestination> destinations = PdfDestinations.find(pages, pdfPages);
             links.resolve(destinations, structure);
             structure.finish();
+            fonts.finish();
             PdfOutline.write(doc, structure.headings(), destinations, structure::goTo);
             PdfAttachments.write(doc, options.attachments());
         }

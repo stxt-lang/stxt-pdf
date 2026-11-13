@@ -22,7 +22,7 @@ class PdfContentTest {
             PDPage page = new PDPage(PDRectangle.A4);
             doc.addPage(page);
             try (PDPageContentStream out = new PDPageContentStream(doc, page)) {
-                PdfContent content = new PdfContent(doc, out, PDRectangle.A4, PDRectangle.A4.getHeight());
+                PdfContent content = new PdfContent(doc, out, page.getResources(), PDRectangle.A4, PDRectangle.A4.getHeight());
                 content.beginGroup(0.5);
                 PDPageContentStream outer = content.out();
                 assertNotSame(out, outer);
@@ -47,7 +47,7 @@ class PdfContentTest {
             PDPage page = new PDPage(PDRectangle.A4);
             doc.addPage(page);
             try (PDPageContentStream out = new PDPageContentStream(doc, page)) {
-                PdfContent content = new PdfContent(doc, out, PDRectangle.A4, PDRectangle.A4.getHeight());
+                PdfContent content = new PdfContent(doc, out, page.getResources(), PDRectangle.A4, PDRectangle.A4.getHeight());
                 content.beginGroup(0.5);
                 content.beginGroup(0.2);
                 content.abandonGroups();

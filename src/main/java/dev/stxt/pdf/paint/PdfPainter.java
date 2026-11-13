@@ -160,6 +160,8 @@ public final class PdfPainter implements Closeable {
                     }
                 }
             }
+            // The subsets of the fonts with ligatures, which PDFBox does not make when the document is saved.
+            pages.fonts().finish();
         } finally {
             pages.images().close();
         }

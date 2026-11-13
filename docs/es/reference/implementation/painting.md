@@ -103,8 +103,32 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 
 Las fuentes son Type 0 Identity-H (cada carácter ocupa dos bytes), así que `justify`, el interletraje y el kerning se
 escriben con ajustes de `TJ` entre los caracteres y no con `Tw` ni `Tc`. `PdfFonts.font` incrusta una fuente por combinación con
-`TrueTypeFont.setEnableGsub(font.ligatures())`: sin ligaduras PDFBox no aplica `GSUB` (un glifo por carácter, de 17 a 30
-veces más rápido) y lo medido es lo pintado.
+`TrueTypeFont.setEnableGsub(font.ligatures())`: sin ligaduras PDFBox no aplica `GSUB` (un glifo por carácter) y lo medido
+es lo pintado.
+
+Con ligaduras, el texto lo escribe el motor (`PdfFonts.show`) y no `showText` de PDFBox, que aplica `GSUB` a cada palabra
+de cada texto que escribe y construye cada vez la expresión regular de todas las sustituciones de la fuente. El motor
+sigue los mismos pasos (parte el texto por los espacios, aplica `GSUB` a cada palabra con el mismo procesador, codifica
+sus glifos y los apunta para el subconjunto de la fuente), pero cada palabra de cada fuente se resuelve una sola vez por
+documento. Los bytes escritos son los mismos, y un test lo comprueba contra PDFBox.
+
+La fuente con ligaduras la nombra el motor en la página (`PdfFonts.select` escribe su `Tf`), y no `setFont`: así PDFBox
+no la apunta para hacer su subconjunto al guardar, y lo hace el motor cuando todas las páginas están pintadas
+(`PdfFonts.finish`). Después reescribe su `ToUnicode` (`ToUnicode.replace`): PDFBox da a cada glifo un solo carácter, y
+al de una ligadura, el que la fuente tiene para él (U+FB01 para `fi`); el motor le da las letras que junta, que es lo
+que se copia del PDF y lo que una búsqueda encuentra. Las letras de cada glifo sustituido salen al aplicar `GSUB` a la
+palabra: el tramo de caracteres más corto que `GSUB` convierte en ese glifo solo.
+
+> **Decisión:** el `ToUnicode` de una fuente con ligaduras lo reescribe el motor entero, con una entrada por glifo.
+> Para eso tiene que hacer él el subconjunto de la fuente: PDFBox escribe el `ToUnicode` al hacerlo, al guardar, y no
+> deja quitar una fuente de las que va a recortar. *Alternativas descartadas:* guardar el documento dos veces, que
+> duplica el coste; y marcar cada ligadura con `ActualText`, que parte el texto en un `TJ` por ligadura.
+
+> **Decisión:** el motor escribe el texto con ligaduras con `appendRawCommands`, un método de PDFBox marcado como
+> obsoleto, porque `PDPageContentStream` es final y no deja escribir de otro modo lo que `showText` escribiría. Un texto
+> corrido de 55 páginas tarda en escribirse 194 ms en lugar de 994 (71 ms sin ligaduras), y los ejemplos, lo mismo con
+> ligaduras que sin ellas. *Alternativa descartada:* dejarlo en `showText`, catorce veces más lento en una página de
+> texto.
 
 El ancho de cada glifo se redondea a milésimas del cuerpo, que es lo que el PDF escribe en la tabla de anchos de la fuente
 incrustada: así maquetar y pintar miden lo mismo con fuentes de cualquier `unitsPerEm`. La línea base sale del ascendente y

@@ -3,20 +3,33 @@ package dev.stxt.pdf.paint;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.resources.FontFile;
 import dev.stxt.pdf.resources.Resources;
+import org.apache.fontbox.ttf.CmapLookup;
 import org.apache.fontbox.ttf.TrueTypeFont;
+import org.apache.fontbox.ttf.gsub.GsubWorker;
+import org.apache.fontbox.ttf.gsub.GsubWorkerFactory;
+import org.apache.fontbox.ttf.model.GsubData;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSStream;
+import org.apache.pdfbox.pdfwriter.COSWriter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.util.StringUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * The fonts of a PDF and how text is written with them. Each font of the resources folder
@@ -32,6 +45,25 @@ final class PdfFonts {
     private final Resources resources;
     /** Fonts embedded in the document, shared by all its pages. */
     private final Map<FontFace, PDFont> fonts = new HashMap<>();
+    /** What applies the {@code GSUB} table of each font with ligatures: the same PDFBox would use ({@link #show}). */
+    private final Map<PDType0Font, GsubWorker> workers = new HashMap<>();
+    /** The words already written with each font with ligatures: their bytes and the glyphs {@code GSUB} leaves. */
+    private final Map<PDType0Font, Map<String, Shaped>> shaped = new HashMap<>();
+
+    /**
+     * The fonts with ligatures a text has been written with: the engine names them in the page itself ({@link #select})
+     * and makes their subset ({@link #finish}), so that PDFBox does not make it again when the document is saved.
+     */
+    private final Set<PDType0Font> own = new LinkedHashSet<>();
+    /**
+     * The text of the glyphs that {@code GSUB} puts in place of others, by font: {@code fi} for the glyph of that
+     * ligature. It is what is copied from the PDF ({@link #finish}).
+     */
+    private final Map<PDType0Font, Map<Integer, String>> substituted = new HashMap<>();
+
+    /** A word as it is written with ligatures: the codes of its glyphs and those glyphs, for the subset. */
+    private record Shaped(byte[] bytes, Set<Integer> glyphs) {
+    }
 
     PdfFonts(PDDocument doc, Resources resources) {
         this.doc = doc;
@@ -118,5 +150,175 @@ final class PdfFonts {
         }
         parts.add(text.substring(start));
         return parts.toArray();
+    }
+
+    /**
+     * Writes a text with the font it was set with, if the font has ligatures: {@code text}, a {@code String} (shown
+     * with {@code Tj}) or the argument of {@code TJ} ({@link #spaced}). PDFBox applies the {@code GSUB} table to each
+     * word of each text it shows, and each time it builds the regular expression of all the substitutions of the
+     * font: a page of running text took fourteen times longer to write with {@code Ligatures: true}. Here each word
+     * of each font is worked out once per document, with the same steps ({@code PDAbstractContentStream}:
+     * {@code showTextInternal}, {@code encodeForGsub} and {@code applyGSUBRules}), and the bytes written and the
+     * glyphs marked for the subset are the same.
+     *
+     * @return {@code false} if the font has no {@code GSUB} to apply: nothing is written, and the text is shown as
+     *         always
+     */
+    @SuppressWarnings("deprecation") // appendRawCommands: the only way to write what showText would, without it.
+    boolean show(PDPageContentStream out, PDFont font, Object text) throws IOException {
+        if (!(font instanceof PDType0Font type0) || type0.getGsubData() == GsubData.NO_DATA_FOUND) {
+            return false;
+        }
+        if (text instanceof String s) {
+            out.appendRawCommands(string(type0, s));
+            out.appendRawCommands(" Tj\n");
+            return true;
+        }
+        out.appendRawCommands("[");
+        for (Object part : (Object[]) text) {
+            if (part instanceof String s) {
+                out.appendRawCommands(string(type0, s));
+            } else {
+                out.appendRawCommands((float) (Float) part);
+            }
+        }
+        out.appendRawCommands("] TJ\n");
+        return true;
+    }
+
+    /** The string of a text with ligatures, as the content stream has it, with its glyphs marked for the subset. */
+    private byte[] string(PDType0Font font, String text) throws IOException {
+        GsubWorker worker = workers.get(font);
+        if (worker == null) {
+            worker = new GsubWorkerFactory().getGsubWorker(font.getCmapLookup(), font.getGsubData());
+            workers.put(font, worker);
+        }
+        Map<String, Shaped> known = shaped.computeIfAbsent(font, f -> new HashMap<>());
+        ByteArrayOutputStream codes = new ByteArrayOutputStream(2 * text.length());
+        Set<Integer> glyphs = new HashSet<>();
+        for (String word : StringUtil.tokenizeOnSpace(text)) {
+            if (word == null) {
+                continue;
+            }
+            if (word.length() == 1 && Character.isWhitespace(word.charAt(0))) {
+                codes.write(font.encode(word));
+                continue;
+            }
+            Shaped w = known.get(word);
+            if (w == null) {
+                w = shape(font, worker, word, substituted.computeIfAbsent(font, f -> new TreeMap<>()));
+                known.put(word, w);
+            }
+            codes.write(w.bytes());
+            glyphs.addAll(w.glyphs());
+        }
+        if (font.willBeSubset()) {
+            font.addGlyphsToSubset(glyphs);
+            for (int i = 0; i < text.length(); ) {
+                int codePoint = text.codePointAt(i);
+                font.addToSubset(codePoint);
+                i += Character.charCount(codePoint);
+            }
+        }
+        ByteArrayOutputStream string = new ByteArrayOutputStream(2 * codes.size() + 2);
+        COSWriter.writeString(codes.toByteArray(), string);
+        return string.toByteArray();
+    }
+
+    /**
+     * The glyphs of a word after {@code GSUB}, encoded. The glyphs that are not those of its characters are added
+     * to {@code substituted} with the characters they stand for.
+     */
+    private static Shaped shape(PDType0Font font, GsubWorker worker, String word, Map<Integer, String> substituted)
+            throws IOException {
+        CmapLookup cmap = font.getCmapLookup();
+        List<Integer> original = new ArrayList<>(word.length());
+        int[] codePoints = word.codePoints().toArray();
+        for (int codePoint : codePoints) {
+            int glyph = cmap.getGlyphId(codePoint);
+            if (glyph <= 0) {
+                // What PDFBox does: the text was measured with this font, so the glyph exists (GLYPH_MISSING).
+                throw new IllegalStateException(String.format("could not find the glyphId for the character, "
+                        + "codePoint: %d (0x%X)", codePoint, codePoint));
+            }
+            original.add(glyph);
+        }
+        List<Integer> glyphs = worker.applyTransforms(original);
+        if (!glyphs.equals(original)) {
+            sources(worker, original, glyphs, codePoints, substituted);
+        }
+        ByteArrayOutputStream codes = new ByteArrayOutputStream(2 * glyphs.size());
+        for (Integer glyph : glyphs) {
+            codes.write(font.encodeGlyphId(glyph));
+        }
+        return new Shaped(codes.toByteArray(), Set.copyOf(glyphs));
+    }
+
+    /**
+     * The characters each glyph of {@code glyphs} stands for, for those that are not the glyph of a character of the
+     * word: the shortest run of characters, from where the previous glyph ends, that {@code GSUB} turns into that
+     * glyph alone. If a glyph has none (a substitution that depends on its neighbors), the rest of the word is left
+     * as PDFBox has it.
+     */
+    private static void sources(GsubWorker worker, List<Integer> original, List<Integer> glyphs, int[] codePoints,
+                                Map<Integer, String> substituted) {
+        int at = 0;
+        for (Integer glyph : glyphs) {
+            if (at < original.size() && original.get(at).equals(glyph)) {
+                at++;
+                continue;
+            }
+            int length = 0;
+            for (int k = 1; at + k <= original.size() && length == 0; k++) {
+                if (worker.applyTransforms(original.subList(at, at + k)).equals(List.of(glyph))) {
+                    length = k;
+                }
+            }
+            if (length == 0) {
+                return;
+            }
+            substituted.putIfAbsent(glyph, new String(codePoints, at, length));
+            at += length;
+        }
+    }
+
+    /**
+     * Sets the font of the text that follows. A font with ligatures is named in the resources and set by the engine
+     * ({@code Tf}), with what {@code setFont} would write: PDFBox then does not know that the document uses it, and
+     * leaves its subset to {@link #finish}.
+     */
+    @SuppressWarnings("deprecation") // appendRawCommands, as in show.
+    void select(PDPageContentStream out, PDResources resources, PDFont font, float size) throws IOException {
+        if (!(font instanceof PDType0Font type0) || type0.getGsubData() == GsubData.NO_DATA_FOUND) {
+            out.setFont(font, size);
+            return;
+        }
+        own.add(type0);
+        ByteArrayOutputStream name = new ByteArrayOutputStream();
+        resources.add(font).writePDF(name);
+        name.write(' ');
+        out.appendRawCommands(name.toByteArray());
+        out.appendRawCommands(size);
+        out.appendRawCommands("Tf\n");
+    }
+
+    /**
+     * Ends the fonts with ligatures, once every page is painted: makes their subsets, which PDFBox would make when
+     * saving, and gives the glyphs of their ligatures the text they stand for. PDFBox gives each glyph one character,
+     * the one of the font for that glyph ({@code U+FB01} for the {@code fi} ligature), and that is what would be
+     * copied from the PDF and what a search would have to find; with the letters ({@code fi}), the text of the PDF is
+     * the text of the document (reference/common/text-formatting.md).
+     */
+    void finish() throws IOException {
+        for (PDType0Font font : own) {
+            if (font.willBeSubset()) {
+                font.subset();
+            }
+            Map<Integer, String> texts = substituted.getOrDefault(font, Map.of());
+            if (!texts.isEmpty()) {
+                ToUnicode.replace(doc, font, texts);
+            }
+        }
+        own.clear();
     }
 }

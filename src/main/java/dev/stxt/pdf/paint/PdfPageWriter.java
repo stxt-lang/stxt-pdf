@@ -48,7 +48,7 @@ record PdfPageWriter(PDDocument doc, Resources resources, PdfFonts fonts, PdfIma
             }
             PDRectangle paper = new PDRectangle(0, (float) (top - page.pageSetup().height()),
                     (float) page.pageSetup().width(), (float) page.pageSetup().height());
-            canvas = new PdfCanvas(this, out, paper, top, debug);
+            canvas = new PdfCanvas(this, out, target.getResources(), paper, top, debug);
             Rect area = page.pageSetup().pageArea();
             try {
                 StackingContext.build(page.content(), page.footnotes(), page.pageOverlays(), area.x(), area.y())

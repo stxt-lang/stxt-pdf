@@ -267,12 +267,14 @@ El texto que se copia o se extrae del PDF es el de la línea, sin espacios entre
 ## Ligaduras (`Ligatures`)
 
 Por defecto cada carácter es un glifo: `fi` son dos. Con `Ligatures: true` se aplican las ligaduras de la fuente, que
-juntan algunos pares en un glifo de otro ancho (en IBM Plex Sans y Serif, `fi`, `fl`, `ffi` y `ffl`, y ninguna en IBM Plex
+juntan algunos pares en un glifo de otro ancho (en IBM Plex Sans, `fi`; en IBM Plex Serif, `fi` y `fl`; y ninguna en IBM Plex
 Mono). Lo que se mide es lo que se pinta. Una ligadura no cruza un espacio ni el límite entre dos tramos. Con
 `Letter spacing` distinto de 0, el de la caja o el de un tramo con estilo, no hay ligaduras. No cambia el texto que se lee
-ni el que se copia.
+ni el que se copia: en el PDF, el glifo de una ligadura es las letras que junta (`fi`), y no el carácter que la fuente
+tiene para ese glifo (U+FB01), que una búsqueda de `oficina` no encontraría en todos los visores.
 
-> **Decisión:** `false` por defecto: sin ligaduras el texto se pinta mucho más rápido (de 17 a 30 veces). *Alternativa
+> **Decisión:** `false` por defecto: sin ligaduras un texto corrido se escribe más rápido (unas 2,7 veces; los
+> documentos con poco texto por página, igual). *Alternativa
 > descartada:* ligaduras siempre, o nunca.
 
 ## Texto preformateado

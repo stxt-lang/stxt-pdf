@@ -24,6 +24,8 @@ import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -35,6 +37,9 @@ import dev.stxt.pdf.Docs;
 import dev.stxt.pdf.Pdfs;
 import dev.stxt.pdf.convert.Converter;
 import dev.stxt.pdf.golden.PdfUa;
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.resources.Resources;
 import dev.stxt.pdf.stxt.DocumentReader;
 
@@ -47,6 +52,71 @@ class PdfFontsTest {
     private static final String DOCUMENT = Docs.header(300, 200, 20) + Docs.TYPOGRAPHY;
 
     private final DocumentReader reader = new DocumentReader();
+
+    /**
+     * A text with ligatures is written by the engine and not by PDFBox, which applies the {@code GSUB} table of the
+     * font to every word again (reference/implementation/painting.md). What is written is what PDFBox would write:
+     * the same content stream, with {@code Tj} and with {@code TJ}, and, once saved, the same PDF, so the same
+     * glyphs in the subset of the font. If a new version of PDFBox writes the text in another way, this fails.
+     */
+    @Test
+    void aTextWithLigaturesIsWrittenAsPdfBoxWritesIt() throws Exception {
+        FontFace face = new FontFace("IBM Plex Sans", FontWeight.NORMAL, FontStyle.NORMAL).withLigatures(true);
+        List<Object> texts = List.of("Office affairs: final figures", "fi", "a  b c ﬁx", "",
+                new Object[] {"The of", -41f, "fice ", -250.5f, "staff", 12f, " fi", 0f, "led"},
+                new Object[] {"fluffy"}, "Office affairs: final figures");
+        byte[][] pdfs = new byte[2][];
+        byte[][] streams = new byte[2][];
+        for (int own = 0; own < 2; own++) {
+            try (PDDocument doc = new PDDocument()) {
+                // The same identifier in both, so that the two files can be compared whole.
+                doc.setDocumentId(1L);
+                PdfFonts fonts = new PdfFonts(doc, new Resources());
+                PDFont font = fonts.font(face);
+                PDPage page = new PDPage();
+                doc.addPage(page);
+                try (PDPageContentStream out = new PDPageContentStream(doc, page, AppendMode.OVERWRITE, false)) {
+                    out.beginText();
+                    out.setFont(font, 10);
+                    for (Object text : texts) {
+                        if (own == 1) {
+                            assertTrue(fonts.show(out, font, text));
+                        } else if (text instanceof String string) {
+                            out.showText(string);
+                        } else {
+                            out.showTextWithPositioning((Object[]) text);
+                        }
+                    }
+                    out.endText();
+                }
+                try (java.io.InputStream content = page.getContents()) {
+                    streams[own] = content.readAllBytes();
+                }
+                ByteArrayOutputStream saved = new ByteArrayOutputStream();
+                doc.save(saved);
+                pdfs[own] = saved.toByteArray();
+            }
+        }
+        assertEquals(new String(streams[0], java.nio.charset.StandardCharsets.ISO_8859_1),
+                new String(streams[1], java.nio.charset.StandardCharsets.ISO_8859_1));
+        assertEquals(pdfs[0].length, pdfs[1].length);
+        // A font without GSUB to apply is left to PDFBox: nothing is written.
+        try (PDDocument doc = new PDDocument()) {
+            PdfFonts fonts = new PdfFonts(doc, new Resources());
+            PDFont plain = fonts.font(face.withLigatures(false));
+            PDPage page = new PDPage();
+            doc.addPage(page);
+            try (PDPageContentStream out = new PDPageContentStream(doc, page, AppendMode.OVERWRITE, false)) {
+                out.beginText();
+                out.setFont(plain, 10);
+                assertTrue(!fonts.show(out, plain, "fi"));
+                out.endText();
+            }
+            try (java.io.InputStream content = page.getContents()) {
+                assertTrue(!new String(content.readAllBytes(), java.nio.charset.StandardCharsets.ISO_8859_1).contains("Tj"));
+            }
+        }
+    }
 
     @Test
     void embedsTheFontsAsSubsets() throws Exception {
@@ -150,6 +220,44 @@ class PdfFontsTest {
         assertArrayEquals(new Object[]{"A", 41f, "V ", -500f, "a"}, PdfFonts.spaced("AV a", 5, 0, 10, kerning));
         assertArrayEquals(new Object[]{"A", -109f, "V", -150f, " ", -650f, "a"},
                 PdfFonts.spaced("AV a", 5, 1.5, 10, kerning));
+    }
+
+    /**
+     * The glyph of a ligature is, in the PDF, the letters it stands for (reference/common/text-formatting.md): what
+     * is copied and what a search finds is {@code fi}, not the character the font has for that glyph, U+FB01. PDFBox
+     * writes that character in the {@code ToUnicode} of the font; the engine writes the letters. The text stripper
+     * of PDFBox normalizes the ligature characters, so it is the {@code ToUnicode} that is read here. The font
+     * without ligatures of the same document keeps the one PDFBox writes, and the PDF is still PDF/UA.
+     */
+    @Test
+    void theGlyphOfALigatureIsCopiedAsItsLetters() throws Exception {
+        byte[] bytes = Pdfs.of(DOCUMENT + "\tParagraph: La oficina final\n"
+                + "\tParagraph: La oficina final y el flan\n\t\tTypography:\n\t\t\tLigatures: true\n");
+        try (PDDocument pdf = Loader.loadPDF(bytes)) {
+            List<List<String>> texts = new ArrayList<>();
+            PDResources resources = pdf.getPage(0).getResources();
+            for (COSName name : resources.getFontNames()) {
+                PDFont font = resources.getFont(name);
+                List<String> glyphs = new ArrayList<>();
+                for (int code = 0; code < 0x10000; code++) {
+                    String text = font.toUnicode(code);
+                    if (text != null) {
+                        glyphs.add(text);
+                    }
+                }
+                texts.add(glyphs);
+            }
+            assertEquals(2, texts.size());
+            List<String> ligatures = texts.get(0).contains("fi") ? texts.get(0) : texts.get(1);
+            List<String> plain = ligatures == texts.get(0) ? texts.get(1) : texts.get(0);
+            assertTrue(ligatures.contains("fi"), ligatures.toString());
+            assertTrue(ligatures.stream().noneMatch(t -> t.equals("\uFB01") || t.equals("\uFB02")), ligatures.toString());
+            // Without ligatures, one glyph per letter, each with its letter.
+            assertTrue(plain.contains("f") && plain.contains("i") && !plain.contains("fi"), plain.toString());
+            assertEquals(List.of("La oficina final", "La oficina final y el flan"),
+                    new PDFTextStripper().getText(pdf).strip().lines().map(String::stripTrailing).toList());
+        }
+        assertEquals(Map.of(), PdfUa.failedRules(bytes));
     }
 
     /**

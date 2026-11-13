@@ -104,8 +104,33 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 
 The fonts are Type 0 Identity-H (each character takes two bytes), so `justify`, letter spacing and kerning are written
 with `TJ` adjustments between the characters and not with `Tw` or `Tc`. `PdfFonts.font` embeds one font per combination with
-`TrueTypeFont.setEnableGsub(font.ligatures())`: without ligatures PDFBox does not apply `GSUB` (one glyph per character, 17 to 30
-times faster) and what is measured is what is painted.
+`TrueTypeFont.setEnableGsub(font.ligatures())`: without ligatures PDFBox does not apply `GSUB` (one glyph per character) and
+what is measured is what is painted.
+
+With ligatures, the text is written by the engine (`PdfFonts.show`) and not by `showText` of PDFBox, which applies `GSUB`
+to each word of each text it writes and builds each time the regular expression of all the substitutions of the font. The
+engine follows the same steps (it splits the text at the spaces, applies `GSUB` to each word with the same processor,
+encodes its glyphs and marks them for the subset of the font), but each word of each font is worked out once per
+document. The bytes written are the same, and a test checks it against PDFBox.
+
+The font with ligatures is named in the page by the engine (`PdfFonts.select` writes its `Tf`), and not by `setFont`:
+that way PDFBox does not note it down to make its subset when saving, and the engine makes it once every page is
+painted (`PdfFonts.finish`). It then writes its `ToUnicode` again (`ToUnicode.replace`): PDFBox gives each glyph a
+single character, and that of a ligature, the one the font has for it (U+FB01 for `fi`); the engine gives it the
+letters it joins, which is what is copied from the PDF and what a search finds. The letters of each substituted glyph
+come from applying `GSUB` to the word: the shortest run of characters that `GSUB` turns into that glyph alone.
+
+> **Decision:** the `ToUnicode` of a font with ligatures is written again whole by the engine, with one entry per
+> glyph. For that it has to make the subset of the font itself: PDFBox writes the `ToUnicode` when it makes it, when
+> saving, and does not let a font be taken out of those it is going to subset. *Rejected alternatives:* saving the
+> document twice, which doubles the cost; and marking each ligature with `ActualText`, which splits the text into a
+> `TJ` per ligature.
+
+> **Decision:** the engine writes the text with ligatures with `appendRawCommands`, a method of PDFBox marked as
+> deprecated, because `PDPageContentStream` is final and leaves no other way to write what `showText` would write. A
+> running text of 55 pages takes 194 ms to write instead of 994 (71 ms without ligatures), and the examples, the same
+> with ligatures as without them. *Rejected alternative:* leaving it to `showText`, fourteen times slower on a page of
+> text.
 
 The width of each glyph is rounded to thousandths of the font size, which is what the PDF writes in the widths table of the embedded
 font: this way layout and painting measure the same with fonts of any `unitsPerEm`. The baseline comes from the ascender and

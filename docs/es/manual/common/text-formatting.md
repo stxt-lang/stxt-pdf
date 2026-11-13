@@ -178,7 +178,7 @@ lleva, así que un texto alineado a la derecha acaba justo en la última letra.
 ## Ligaduras (`Ligatures`)
 
 Algunas fuentes tienen glifos especiales para pares de letras (`fi`, `fl`): las **ligaduras**. Por defecto no se usan y cada
-letra es la suya. Con `Ligatures: true` se usan las de la fuente (IBM Plex Sans y Serif tienen `fi`, `fl`, `ffi` y `ffl`).
+letra es la suya. Con `Ligatures: true` se usan las de la fuente (IBM Plex Sans tiene `fi`, e IBM Plex Serif, `fi` y `fl`).
 No cambian lo que se lee ni lo que se copia, y no se aplican con interletraje.
 
 ## Texto preformateado

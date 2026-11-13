@@ -26,8 +26,18 @@ what there was.
   commitments, `Separator style: dotted` in the briefs of the newsletter, `Border style: dotted` in the rows of the
   catalog and `Opacity` in the seal of the certificate. Their PDFs and first pages change.
 
+- A text with `Ligatures: true` is written much faster: five times faster in a running text of 55 pages (194 ms
+  instead of 994), and as fast as without ligatures in the examples. PDFBox applied the `GSUB` table of the font to
+  every word of every text again; the engine now writes that text itself, each word worked out once per document. The
+  PDF is the same, byte by byte.
+
 ### Fixed
 
+- With `Ligatures: true`, the text copied from the PDF, and the one a search looks in, has the letters of each
+  ligature (`office`) and not the character the font has for its glyph (`ofﬁce`, with U+FB01). The reference said so,
+  and the PDF did not do it. A ligature character written in the document (`ﬁ`) is copied as its letters too.
+- The reference and the manual said that IBM Plex Sans and Serif have the ligatures `fi`, `fl`, `ffi` and `ffl`. The
+  engine applies `fi` in IBM Plex Sans, and `fi` and `fl` in IBM Plex Serif.
 - Two conversions at once that used a font for the first time could read its tables at the same time: the `GSUB`
   table (the ligatures) was read with a lock of its own, and fontbox reads the tables on demand from a single stream,
   which the kerning and the widths of the glyphs were reading with another. The three now share the same lock, so a
