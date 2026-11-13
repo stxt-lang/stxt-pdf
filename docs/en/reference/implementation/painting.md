@@ -161,9 +161,10 @@ with distinct colors. The gradient is an axial shading (type 2 function, or type
 to the box, with a luminosity soft mask if some color is not opaque, because a PDF shading has no opacity per
 color. The opacity of a plain color is a graphics state `ca` inside a `q`/`Q` of its own.
 
-> **Decision:** a plain, opaque border with square corners is painted as four rectangles and not as a ring, because the
-> even-odd ring leaves a different antialiasing on the edge of the box and would change the reference images. The ring is
-> used with rounded corners, with opacity and with distinct colors.
+> **Decision:** a plain, opaque border with square corners is painted as four rectangles, one per side, which overlap
+> at the corners, and not as a ring: the rectangles leave no seams in the pixels of the edge of the box, and the even-odd
+> ring does. The ring is used where the rectangles do not work: with rounded corners, with opacity, where the overlap of
+> the corners would look darker, and with different colors per side.
 
 > **Decision:** `Canvas.border` receives one color per side, already resolved, `Canvas.fill` paints the background of a box with its
 > radii and `image` receives the corners to clip with. `background(Rect, String)` remains for plain rectangles.

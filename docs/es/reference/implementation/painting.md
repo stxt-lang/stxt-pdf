@@ -159,9 +159,10 @@ con colores distintos. El degradado es un sombreado axial (función de tipo 2, o
 a la caja, con una máscara suave de luminosidad si algún color no es opaco, porque un sombreado de PDF no tiene opacidad por
 color. La opacidad de un color liso es un estado gráfico `ca` dentro de un `q`/`Q` propio.
 
-> **Decisión:** un borde liso, opaco y de esquinas cuadradas se pinta como cuatro rectángulos y no como un anillo, porque el
-> anillo par-impar deja un antialiasing distinto en el borde de la caja y cambiaría las imágenes de referencia. El anillo se
-> usa con esquinas redondas, con opacidad y con colores distintos.
+> **Decisión:** un borde liso, opaco y de esquinas cuadradas se pinta como cuatro rectángulos, uno por lado, que se
+> solapan en las esquinas, y no como un anillo: los rectángulos no dejan costuras en los píxeles del borde de la caja, y
+> el anillo par-impar sí. El anillo se usa donde los rectángulos no sirven: con esquinas redondas, con opacidad, donde el
+> solape de las esquinas se vería más oscuro, y con colores distintos por lado.
 
 > **Decisión:** `Canvas.border` recibe un color por lado, ya resuelto, `Canvas.fill` pinta el fondo de una caja con sus
 > radios e `image` recibe las esquinas con que recortar. `background(Rect, String)` queda para los rectángulos lisos.
