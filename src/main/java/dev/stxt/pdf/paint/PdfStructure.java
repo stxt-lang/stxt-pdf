@@ -150,7 +150,8 @@ final class PdfStructure {
      */
     private void build(Box box, PDStructureNode parent) {
         if (box.role() == Role.FLOW) {
-            box.children().forEach(child -> build(child, parent));
+            // With children, and not build for each: the notes its texts call hang after them too.
+            children(box, parent);
             return;
         }
         if (box.isImage() && box.style().image().alt() == null || box.role() == Role.LEADER

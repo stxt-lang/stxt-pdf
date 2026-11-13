@@ -51,7 +51,9 @@ final del contenido de su padre. Una caja puede salirse hasta 0,01 pt sin que se
 medidas de las fuentes en milésimas.
 
 Una caja que declara su ancho es la culpable de sus hijos que solo la llenan: no se baja a un hijo salvo que se salga
-también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido. Una caja cuyo alto impone el
+también de ella. En una caja de ancho `auto` sí se baja, porque su ancho sale de su contenido: si varios hijos se salen,
+al que no puede ser más estrecho (el que declara su ancho, una imagen o el texto con una palabra más ancha que el
+contenedor) y, si no hay ninguno, al primero. Una caja cuyo alto impone el
 padre (un ítem estirado a una fila fija) se señala a sí misma y no las `Row sizes` del `Grid`.
 
 Lo girado se comprueba como se ve: el rectángulo que envuelve la caja girada, con el `Offset` de un `Frame` incluido.

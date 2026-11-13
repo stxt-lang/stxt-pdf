@@ -251,7 +251,8 @@ public final class Overflow {
     // ------------------------------------------------------------------------------------------
 
     /**
-     * A child sticks out at the sides: the culprit is the innermost thing that sticks out. If the box
+     * A child sticks out at the sides: the culprit is the innermost thing that sticks out and, among several that
+     * stick out of the same box, the one that cannot be narrower ({@link #rigid}). If the box
      * declares its width ({@code Width} or {@code Min width}), its children that only fill it are not
      * culprits: it only goes down to a child that also sticks out of it. Only the horizontal position counts:
      * {@code x} is that of the border box of {@code c} in the coordinates of {@code left} and {@code right}.
@@ -288,9 +289,16 @@ public final class Overflow {
                 boolean outsideParent = dx - d.margin().left() < cx - TOLERANCE
                         || dx + d.width() + d.margin().right() > cx + c.contentWidth() + TOLERANCE;
                 if (outside && (!sized || outsideParent)) {
-                    inner = d;
-                    x = dx;
-                    break;
+                    // Children that only fill a box widened by one of them stick out as much as it: the culprit is
+                    // the one that cannot be narrower; if none is found, the first.
+                    boolean rigid = rigid(d, right - left);
+                    if (inner == null || rigid) {
+                        inner = d;
+                        x = dx;
+                    }
+                    if (rigid) {
+                        break;
+                    }
                 }
             }
             if (inner == null) {
@@ -302,6 +310,31 @@ public final class Overflow {
             }
             c = inner;
         }
+    }
+
+    /**
+     * Whether {@code f} cannot be narrower than {@code room}, for what its fragment shows: it declares its width, it
+     * is an image, one of its lines is a single word wider than {@code room}, or a descendant of it is so.
+     */
+    private static boolean rigid(Fragment f, double room) {
+        if (f.width() <= room + TOLERANCE) {
+            return false;
+        }
+        Style s = f.box().style();
+        if (s.isDeclared(WIDTH) || s.isDeclared(MIN_WIDTH) || f.box().isImage()) {
+            return true;
+        }
+        for (TextLine l : f.lines()) {
+            if (l.width() > room + TOLERANCE && l.text().strip().indexOf(' ') < 0) {
+                return true;
+            }
+        }
+        for (Fragment d : f.children()) {
+            if (!d.box().style().isOutOfFlow() && !d.box().isMarker() && rigid(d, room)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

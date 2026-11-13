@@ -70,7 +70,12 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
 - **`Line breaking: simple`**, algoritmo voraz: las palabras se añaden a la línea mientras quepan.
 - **`Line breaking: optimal`**, **Knuth-Plass**: se eligen los saltos del párrafo que minimizan la suma de los deméritos de sus
   líneas, de modo que las líneas quedan más parejas. Los espacios se estiran hasta la mitad de su ancho y no se encogen,
-  y la última línea no cuenta.
+  y la última línea no cuenta. La maldad de una línea es `100 × r³`, con `r` lo que le sobra entre lo que se estiran sus
+  espacios, sin tope; una línea de una sola palabra cuenta como si tuviera un espacio.
+
+> **Decisión:** la maldad no tiene tope. *Alternativa descartada:* el tope de TeX (10 000), con el que todas las líneas
+> que lo pasan cuestan lo mismo: en una columna estrecha, donde ningún reparto las evita, lo que sobraba de varias líneas
+> acababa en una sola, con dos palabras estiradas de lado a lado (hasta la 0.17.0).
 
 Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-laterales-side)) o a una letra capitular
 ([Text](../components/text.md#letra-capitular-drop-cap)) son más cortas que la caja de contenido: los dos repartos trabajan

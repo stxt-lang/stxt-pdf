@@ -80,14 +80,14 @@ class InlineLayoutTest {
     @Test
     void lineBreakingOptimalIsInheritedAndUsesKnuthPlass() {
         // The example of LineBreakerTest.prettyMinimizesTheDemerits at scale 5: width 50.
-        String text = "a bbb c ddddd e fff";
+        String text = "a b cc ddd eeeee fffff";
         LayoutFixture l = layOut("\tBlock:", "\t\tTypography:", "\t\t\tLine breaking: optimal",
                 "\t\tText: " + text, "\t\t\tId: P", "\t\t\tBox:", "\t\t\t\tWidth: 50",
                 "\t\tText: " + text, "\t\t\tId: G", "\t\t\tBox:", "\t\t\t\tWidth: 50", "\t\t\tTypography:",
                 "\t\t\t\tLine breaking: simple");
-        assertEquals(List.of("a bbb", "c ddddd e", "fff"),
+        assertEquals(List.of("a b cc", "ddd eeeee", "fffff"),
                 l.fragment("P").lines().stream().map(TextLine::text).toList());
-        assertEquals(List.of("a bbb c", "ddddd e", "fff"),
+        assertEquals(List.of("a b cc ddd", "eeeee", "fffff"),
                 l.fragment("G").lines().stream().map(TextLine::text).toList());
     }
 

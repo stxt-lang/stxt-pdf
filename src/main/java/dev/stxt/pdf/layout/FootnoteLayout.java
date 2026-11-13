@@ -136,7 +136,10 @@ final class FootnoteLayout {
                     null);
         }
         Rect pageArea = section.pageSetup().pageArea();
-        BoxModel model = BoxModel.resolve(area, ConstraintSpace.fixed(pageArea.width(), OptionalDouble.empty(),
+        // As wide as the page area leaves between its side margins, like a block with no Width.
+        Insets margin = Insets.resolve(area.style().box().margin(), pageArea.width());
+        BoxModel model = BoxModel.resolve(area, ConstraintSpace.fixed(
+                Math.max(0, pageArea.width() - margin.horizontal()), OptionalDouble.empty(),
                 pageArea.width(), OptionalDouble.of(pageArea.height()), true), context);
         probes = 0;
         Probe p = reserve(from, carry, model, pageArea.height());

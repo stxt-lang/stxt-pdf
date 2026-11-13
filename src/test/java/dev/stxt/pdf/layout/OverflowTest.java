@@ -70,6 +70,21 @@ class OverflowTest {
         assertContains("measures 600 pt and the content of its container measures 515 pt", e);
     }
 
+    /**
+     * An item as wide as its widest word makes its other children as wide: all of them stick out, and the culprit is
+     * the one with the word, not the first. Until the 2026-11-13 it was the first one (A).
+     */
+    @Test
+    void tooWideNamesTheChildThatCannotBeNarrowerAmongThoseThatStickOut() {
+        InvalidModelException e = overflow(ErrorCode.BOX_OVERFLOW, assertThrows(InvalidModelException.class, () -> layOut(
+                "\tBlock:", "\t\tBox:", "\t\t\tWidth: 100", "\t\tStack:", "\t\t\tItem:", "\t\t\t\tBlock:",
+                "\t\t\t\t\tText: aaa", "\t\t\t\t\t\tId: A",
+                "\t\t\t\t\tText: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "\t\t\t\t\t\tId: B",
+                "\t\t\t\t\tText: ccc ccc", "\t\t\t\t\t\tId: C")));
+        assertContains("Box B (line", e);
+        assertContains("the content of its container measures 100 pt", e);
+    }
+
     @Test
     void tooTallGivesWhereTheContentEnds() {
         // Two lines (24) in a box of 20.

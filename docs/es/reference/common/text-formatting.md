@@ -86,7 +86,8 @@ entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regl
   `For style` con ese nombre (una del documento de estilos aparte y otra del documento) declaran lo mismo, gana la del
   documento, como en una caja.
 - **Las marcas se suman al estilo**, estén dentro o fuera de los corchetes: `[**x**]{ligero}` y `**[x]{ligero}**` van en
-  negrita aunque la regla diga `Weight: 300`, y la negrita es el peso 700 ([arriba](#tramos)).
+  negrita aunque la regla diga `Weight: 300`, y la negrita es el peso 700 ([arriba](#tramos)). Para las marcas de
+  dentro, los corchetes del tramo son signos de puntuación, como los de un enlace: `[**€12.50**]{precio}` va en negrita.
 - **El nombre** es una sola palabra, sin espacios, la misma que en `For style`. Sin su regla, es `STYLE_WITHOUT_RULE`, con
   la línea donde empieza el texto. Unos corchetes seguidos de otra cosa (`[x] {precio}`, `[x]{a b}`, `[x]{}`) son texto,
   y los números de página y las referencias siguen siendo lo que son: en `[ver]{page}` o `[ver]{page of: id}`, los

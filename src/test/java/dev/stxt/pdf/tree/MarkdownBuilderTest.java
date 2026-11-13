@@ -307,6 +307,31 @@ class MarkdownBuilderTest {
     }
 
     /**
+     * The brackets of a styled run are punctuation for the marks beside them inside it
+     * (reference/common/text-formatting.md): a bold that starts or ends with a sign right inside the brackets is
+     * bold. Until the 2026-11-13 its asterisks were painted.
+     */
+    @Test
+    void aBoldRightInsideTheBracketsOfAStyledRunMayStartOrEndWithASign() {
+        TextFormat s = TextFormat.PLAIN.withStyle(RunStyle.named("price"));
+        TextFormat bold = new TextFormat(true, false, false, false).withStyle(RunStyle.named("price"));
+        TextFormat italic = new TextFormat(false, true, false, false).withStyle(RunStyle.named("price"));
+        assertEquals(List.of(new TextRun("\u20AC12.50", bold)), MarkdownBuilder.inline("[**\u20AC12.50**]{price}", 1));
+        assertEquals(List.of(new TextRun("(12.50)", bold)), MarkdownBuilder.inline("[**(12.50)**]{price}", 1));
+        assertEquals(List.of(new TextRun("12.50\u20AC", bold)), MarkdownBuilder.inline("[**12.50\u20AC**]{price}", 1));
+        assertEquals(List.of(new TextRun("\u20AC12.50", italic)), MarkdownBuilder.inline("[*\u20AC12.50*]{price}", 1));
+        // What already was: letters and digits inside, the bold outside, and a run with no marks.
+        assertEquals(List.of(new TextRun("12.50", bold)), MarkdownBuilder.inline("[**12.50**]{price}", 1));
+        assertEquals(List.of(new TextRun("\u20AC12.50", bold)), MarkdownBuilder.inline("**[\u20AC12.50]{price}**", 1));
+        assertEquals(List.of(run("a "), new TextRun("\u20AC12.50", s), run(" b")),
+                MarkdownBuilder.inline("a [\u20AC12.50]{price} b", 1));
+        // The character of the guard, written by the author beside the brackets, is text.
+        assertEquals(List.of(new TextRun("\u2E31x\u2E31", s)), MarkdownBuilder.inline("[\u2E31x\u2E31]{price}", 1));
+        assertEquals(List.of(run("\u2E31"), new TextRun("x", s), run("\u2E31")),
+                MarkdownBuilder.inline("\u2E31[x]{price}\u2E31", 1));
+    }
+
+    /**
      * An image inside a styled run does not close it, and the style does not apply to the image
      * (reference/common/text-formatting.md): the text before and after it has the style, the image does not.
      */

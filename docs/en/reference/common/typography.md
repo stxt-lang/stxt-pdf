@@ -70,7 +70,12 @@ Text is broken into **lines** as wide as the content box:
 - **`Line breaking: simple`**, greedy algorithm: words are added to the line while they fit.
 - **`Line breaking: optimal`**, **Knuth-Plass**: the breaks of the paragraph that minimize the sum of the demerits of its
   lines are chosen, so that the lines are more even. Spaces stretch up to half their width and do not shrink,
-  and the last line does not count.
+  and the last line does not count. The badness of a line is `100 × r³`, with `r` what it leaves over divided by what
+  its spaces stretch, with no ceiling; a line of a single word counts as if it had one space.
+
+> **Decision:** the badness has no ceiling. *Discarded alternative:* the ceiling of TeX (10 000), with which every line
+> past it costs the same: in a narrow column, where no line breaking avoids them, what several lines left over ended up
+> in a single one, with two words stretched from side to side (up to 0.17.0).
 
 The lines beside a side box ([Block](../components/block.md#side-boxes-side)) or a drop cap
 ([Text](../components/text.md#drop-cap-drop-cap)) are shorter than the content box: both algorithms work with the width

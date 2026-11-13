@@ -61,6 +61,19 @@ class FootnoteLayoutTest {
         assertEquals(new Rect(40, 148, 515, 12), f.rect("b"));
     }
 
+    /**
+     * The side margins of the area narrow it, like those of a block: its notes are as wide as what they leave. Until
+     * the 2026-11-13 the left one moved the area without narrowing it and the right one did nothing.
+     */
+    @Test
+    void theSideMarginsOfTheAreaNarrowIt() {
+        LayoutFixture f = LayoutFixture.layOutPaged(200, MARKDOWN, "\t\tFor element: Footnote area", "\t\t\tBox:",
+                "\t\t\t\tMargin: 8 30 0 20",
+                "\tParagraph: aaaa[^n]", "\t\tId: p", "\tFootnote:", "\t\tId: n", "\t\tParagraph: nnnnnnnnn");
+        assertEquals(1, f.pages());
+        assertEquals(new Rect(60, 148, 465, 12), f.rect("n"));
+    }
+
     /** A line enters the page only if its note fits under it; otherwise it moves to the next page with the note. */
     @Test
     void aLineMovesToTheNextPageWithItsNote() {

@@ -87,7 +87,7 @@ is what the notes inherit:
 
 - its `Typography` is the typography of all the notes (`Size: 8`, for example);
 - its `Box` gives the **rule** (the top `Border`, with its `Border color` and its `Border style`), the separation from the text (the top `Margin`) and the space down to
-  the first note (the top `Padding`), plus the background, the other borders and the side margins.
+  the first note (the top `Padding`), plus the background, the other borders and the side margins, which narrow it as they narrow a block.
 
 By default the area has a top margin of 8 pt, a rule of 0.5 pt in the color of the text across the whole width and a
 top padding of 4 pt. `Height`, `Min height`, `Max height`, `Aspect ratio`, `Rotate` and `Overflow` have no effect on it

@@ -441,6 +441,22 @@ class PdfStructureTest {
         }
     }
 
+    /** The same note called from a paragraph that is a direct child of {@code Columns}. */
+    private static final String FOOTNOTE_IN_COLUMNS = DOCUMENT + "\t\t\t\tMarkup: markdown\n"
+            + "\tColumns:\n\t\tColumn count: 2\n\t\tParagraph: Uno[^n] dos.\n\t\tFootnote:\n\t\t\tId: n\n"
+            + "\t\t\tParagraph: La nota.\n";
+
+    @Test
+    void theNoteOfADirectChildOfColumnsFollowsItsParagraphInTheColumns() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(Pdfs.of(FOOTNOTE_IN_COLUMNS, 1))) {
+            PDStructureElement columns = (PDStructureElement) section(pdf).getKids().get(0);
+            // The column flow has no element: the paragraph and its note hang from the Columns.
+            assertEquals(List.of("P", "Note"), kids(columns));
+            assertEquals(List.of("MCR", "Reference", "MCR"), kids((PDStructureElement) columns.getKids().get(0)));
+            assertEquals(List.of("Lbl", "P"), kids((PDStructureElement) columns.getKids().get(1)));
+        }
+    }
+
     /** A note called several times is one {@code Note}, after the text of its first call, and each call is a {@code Reference}. */
     private static final String FOOTNOTE_TWICE = DOCUMENT + "\t\t\t\tMarkup: markdown\n"
             + "\tParagraph: Uno[^n] dos[^n].\n\tParagraph: Tres[^n].\n\tFootnote:\n\t\tId: n\n\t\tParagraph: La nota.\n";

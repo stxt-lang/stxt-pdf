@@ -13,6 +13,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   table (the ligatures) was read with a lock of its own, and fontbox reads the tables on demand from a single stream,
   which the kerning and the widths of the glyphs were reading with another. The three now share the same lock, so a
   table is never read while the stream is moved by another thread.
+- `Line breaking: optimal` no longer leaves a line of two or three words stretched from side to side, or a word alone
+  on its line, in a narrow column. The badness of a line had the ceiling of TeX (10 000), so every line past it cost
+  the same and the line breaking put what several lines left over in a single one. It has no ceiling now, and a line
+  of a single word counts as one with one space. The lines of a justified text in a narrow box may change.
+- A bold or an italic right inside the brackets of a styled run may start or end with a sign: `[**€12.50**]{price}`,
+  the example of the manual, painted its asterisks, as did `[**(12.50)**]{price}` and `[**12.50€**]{price}`.
+- The side margins of `Footnote area` narrow the area, like those of a block. The left one moved it to the right
+  without narrowing it, out of the page area, and the right one did nothing.
+- A `BOX_OVERFLOW` in width names the box that cannot be narrower. In an item as wide as the widest word of its
+  content, it named the first child of the item, with its line, and not the text with the word.
+- A footnote called from a `Paragraph` (or any text) that is a direct child of `Columns` has its `Note`, and its call
+  its `Reference`, in the structure of the PDF. The note was painted but left out of the structure.
 
 ## [0.17.0] - 2026-11-11
 

@@ -53,7 +53,9 @@ even if its merged margins leave it past the end of its parent's content. A box 
 being an overflow, which is what the font measurements in thousandths accumulate.
 
 A box that declares its width is the culprit for its children that only fill it: the engine does not go down to a child
-unless it also goes outside the box. In a box with `auto` width it does go down, because its width comes from its content.
+unless it also goes outside the box. In a box with `auto` width it does go down, because its width comes from its content:
+if several children go outside, to the one that cannot be narrower (the one that declares its width, an image or the
+text with a word wider than the container) and, if there is none, to the first.
 A box whose height is imposed by the parent (an item stretched to a fixed row) points to itself and not to the
 `Row sizes` of the `Grid`.
 

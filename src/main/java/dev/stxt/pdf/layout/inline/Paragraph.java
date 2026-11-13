@@ -315,6 +315,12 @@ final class Paragraph {
         return b == a + 1;
     }
 
+    /** The advance of a space of the text: the mean of those between its words; 0 if it has a single word. */
+    double space() {
+        int n = words.size();
+        return n > 1 ? gaps[n] / (n - 1) : 0;
+    }
+
     /** Advance of the spaces of the line from {@code a} to {@code b}. */
     double spaces(int a, int b) {
         int last = lastWord(b);

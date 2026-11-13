@@ -39,14 +39,25 @@ class LineBreakerTest {
 
     @Test
     void prettyMinimizesTheDemerits() {
-        // Width 10, spaces of 1 that stretch up to 0.5. The greedy algorithm leaves 3 left over in the
-        // first two lines: badness 100 × (3/1)³ = 2700 and the maximum (3 / 0.5 = 6).
-        // Knuth-Plass prefers one line with the maximum and another with 100 × (1/1)³ = 100.
-        String text = "a bbb c ddddd e fff";
-        assertEquals(List.of("a bbb c", "ddddd e", "fff"),
+        // Width 10, spaces of 1 that stretch up to 0.5. The greedy algorithm fills the first line and leaves the
+        // second with a single word and 5 left over: as a line with one space, badness 100 × (5/0.5)³ = 100 000.
+        // Knuth-Plass prefers 100 × (4/1)³ = 6400 in the first and 100 × (1/0.5)³ = 800 in the second.
+        String text = "a b cc ddd eeeee fffff";
+        assertEquals(List.of("a b cc ddd", "eeeee", "fffff"),
                 Lines.breakLines(text, 10, measurer, F, 1, LineBreaking.SIMPLE));
-        assertEquals(List.of("a bbb", "c ddddd e", "fff"),
+        assertEquals(List.of("a b cc", "ddd eeeee", "fffff"),
                 Lines.breakLines(text, 10, measurer, F, 1, LineBreaking.OPTIMAL));
+    }
+
+    /**
+     * The badness has no ceiling: where every line breaking has very loose lines, the leftover is spread among
+     * them. Until the 2026-11-13, with the ceiling of 10 000, the lines past it cost the same and one line took the
+     * leftover of two: {@code a bbb} (5 left over, with one space) and a nearly full {@code c ddddd e}.
+     */
+    @Test
+    void prettySpreadsTheLeftoverAmongLooseLines() {
+        assertEquals(List.of("a bbb c", "ddddd e", "fff"),
+                Lines.breakLines("a bbb c ddddd e fff", 10, measurer, F, 1, LineBreaking.OPTIMAL));
     }
 
     @Test

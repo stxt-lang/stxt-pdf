@@ -85,7 +85,8 @@ in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For styl
   `For style` rules with that name (one of the separate styles document and one of the document) declare the same thing,
   the one of the document wins, as in a box.
 - **The marks add to the style**, inside or outside the brackets: `[**x**]{light}` and `**[x]{light}**` are bold even
-  if the rule says `Weight: 300`, and bold is weight 700 ([above](#runs)).
+  if the rule says `Weight: 300`, and bold is weight 700 ([above](#runs)). For the marks inside, the brackets of the
+  run are punctuation, like those of a link: `[**€12.50**]{price}` is bold.
 - **The name** is a single word, without spaces, the same as in `For style`. Without its rule, it is `STYLE_WITHOUT_RULE`,
   with the line where the text starts. Brackets followed by something else (`[x] {price}`, `[x]{a b}`, `[x]{}`) are text,
   and page numbers and references stay what they are: in `[see]{page}` or `[see]{page of: id}`, the brackets are

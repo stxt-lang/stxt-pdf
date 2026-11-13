@@ -53,7 +53,7 @@ public final class LineBreaker {
 
     /** Demerits of each line besides those of its badness: it favors line breakings with fewer lines. */
     private static final double LINE_PENALTY = 10;
-    /** Badness of a line that cannot be stretched enough or that overflows. */
+    /** Badness of a line that overflows, or that does not fill the width in a text with no spaces to stretch. */
     private static final double MAX_BADNESS = 10_000;
     /** How much each space can stretch, in proportion to its width (TeX's value). */
     private static final double STRETCH = 0.5;
@@ -214,9 +214,12 @@ public final class LineBreaker {
      *
      * <ul>
      *   <li>{@code badness = 100 × r³}, with {@code r} = leftover / stretch of the line
-     *       (each space stretches up to half its width), up to {@value #MAX_BADNESS}.
-     *       A line without spaces that does not fill the width, or a word that overflows, has the
-     *       maximum badness. The last line has no badness.</li>
+     *       (each space stretches up to half its width). It has no ceiling: a line twice as loose is always worse,
+     *       however loose both are. With one (TeX's 10 000) every line past it costs the same, and in a narrow column,
+     *       where no line breaking avoids them, the leftover of several lines ended up in one, with two words
+     *       stretched from side to side. A line of a single word that does not fill the width stretches like a line
+     *       with one space ({@link Paragraph#space}), so it is worse the more it leaves over too. A word that overflows
+     *       has a badness of {@value #MAX_BADNESS}. The last line has no badness.</li>
      *   <li>{@code demerits = (line penalty + badness)²}, plus {@value #HYPHEN_PENALTY}² if the line ends with a
      *       hyphen and {@value #DOUBLE_HYPHEN_DEMERITS} more if the previous one did too.</li>
      * </ul>
@@ -284,7 +287,10 @@ public final class LineBreaker {
                             // A cut of last resort only where the line cannot hold one character more.
                             continue;
                         }
-                        double d = best[i][k] + demerits(available - width, p.spaces(i, j) * STRETCH,
+                        // A line of a single word stretches like one with one space: looser is still worse.
+                        double spaces = p.spaces(i, j);
+                        double d = best[i][k] + demerits(available - width,
+                                (spaces > 0 ? spaces : p.space()) * STRETCH,
                                 j == end || p.forced(j) || lastResort);
                         if (p.inside(j)) {
                             d += HYPHEN_PENALTY * HYPHEN_PENALTY;
@@ -356,7 +362,7 @@ public final class LineBreaker {
         } else if (stretch <= 0) {
             badness = MAX_BADNESS;
         } else {
-            badness = Math.min(MAX_BADNESS, 100 * Math.pow(slack / stretch, 3));
+            badness = 100 * Math.pow(slack / stretch, 3);
         }
         return (LINE_PENALTY + badness) * (LINE_PENALTY + badness);
     }

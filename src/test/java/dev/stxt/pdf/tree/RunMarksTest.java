@@ -21,8 +21,9 @@ class RunMarksTest {
             if (c == RunMarks.OPEN) {
                 int end = s.indexOf(RunMarks.END, i);
                 out.append('<').append(m.names().get(RunMarks.number(s, i + 1, end))).append('>');
-                i = end;
+                i = RunMarks.afterOpen(s, end) - 1;
             } else if (c == RunMarks.CLOSE) {
+                out.setLength(RunMarks.beforeClose(out, out.length()));
                 out.append("</>");
             } else {
                 out.append(c);
