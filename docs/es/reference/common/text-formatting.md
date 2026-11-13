@@ -86,8 +86,14 @@ entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regl
   `For style` con ese nombre (una del documento de estilos aparte y otra del documento) declaran lo mismo, gana la del
   documento, como en una caja.
 - **Las marcas se suman al estilo**, estén dentro o fuera de los corchetes: `[**x**]{ligero}` y `**[x]{ligero}**` van en
-  negrita aunque la regla diga `Weight: 300`, y la negrita es el peso 700 ([arriba](#tramos)). Para las marcas de
-  dentro, los corchetes del tramo son signos de puntuación, como los de un enlace: `[**€12.50**]{precio}` va en negrita.
+  negrita aunque la regla diga `Weight: 300`, y la negrita es el peso 700 ([arriba](#tramos)). Para las marcas de al
+  lado, los corchetes y las llaves del tramo son signos de puntuación, como los de un enlace, y se sigue la regla de
+  CommonMark: `[**€12.50**]{precio}` va en negrita, y en `H**[2]{sub}**O`, donde los asteriscos van entre una letra y
+  el tramo, no abren ni cierran y son texto. Pegado a una letra, las marcas se escriben dentro: `H[**2**]{sub}O`.
+
+> **Decisión:** los corchetes y las llaves de un tramo cuentan como signos de puntuación para las marcas de al lado,
+> igual que los de un enlace. *Alternativa descartada:* que cuenten como letras (hasta la 0.17.0), con lo que
+> `H**[2]{sub}**O` iba en negrita, pero `[**€12.50**]{precio}` pintaba los asteriscos.
 - **El nombre** es una sola palabra, sin espacios, la misma que en `For style`. Sin su regla, es `STYLE_WITHOUT_RULE`, con
   la línea donde empieza el texto. Unos corchetes seguidos de otra cosa (`[x] {precio}`, `[x]{a b}`, `[x]{}`) son texto,
   y los números de página y las referencias siguen siendo lo que son: en `[ver]{page}` o `[ver]{page of: id}`, los
@@ -147,7 +153,7 @@ Paragraph: Emite 120 g de CO[2]{sub} por m[2]{sup}.
 - Las letras son las de la fuente, reducidas: no se usan los glifos de superíndice de la fuente ni los caracteres de
   Unicode (`²`, `₂`), que se pueden seguir escribiendo si la fuente los tiene. El texto que se lee y se copia es el
   escrito (`m2`).
-- La regla puede declarar además lo que admite un tramo (`Color`, `Font`, `Weight`...), y las marcas se suman: `**[2]{sub}**`
+- La regla puede declarar además lo que admite un tramo (`Color`, `Font`, `Weight`...), y las marcas se suman: `[**2**]{sub}`
   es un subíndice en negrita.
 - **El tachado va con las letras** del tramo, a su altura y con su grosor. **El subrayado se queda en la línea**, para que
   no se rompa bajo una palabra con un superíndice.

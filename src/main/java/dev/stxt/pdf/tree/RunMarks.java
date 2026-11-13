@@ -16,12 +16,11 @@ import static dev.stxt.pdf.tree.Nodes.error;
  * {@code ]{name}}, {@link #CLOSE}, which the parser takes as letters, and the {@link MarkdownBuilder} finds them in the
  * text. The marks are noncharacters of Unicode, which a text never has.
  *
- * <p>A bracket is punctuation, and whether a {@code **} or a {@code *} beside it opens or closes depends on it:
- * {@code [**€12.50**]{price}} is bold because the {@code **} is between a bracket and a sign. So the inside of each
- * mark has a {@link #GUARD}, a punctuation character with no meaning in Markdown: after {@link #END} and before
- * {@link #CLOSE}. It is part of the mark, wherever the text has that character, and it goes away with it. The outside
- * of a mark has none: what follows {@code [x]{name}} or comes before it is read as beside a letter, as it always
- * was.</p>
+ * <p>A bracket and a brace are punctuation, and whether a {@code **} or a {@code *} beside them opens or closes
+ * depends on it, as CommonMark says: {@code [**€12.50**]{price}} is bold because the {@code **} is between a bracket
+ * and a sign, and {@code a**[x]{name}**b} is not, as it is not with a link. So each mark has a {@link #GUARD} on each
+ * side, a punctuation character with no meaning in Markdown: before {@link #OPEN}, after {@link #END} and before and
+ * after {@link #CLOSE}. They are part of the mark, wherever the text has that character, and go away with it.</p>
  *
  * <p>What is not Markdown text keeps its brackets: an escaped bracket ({@code \[}), the inside of inline code, the
  * target of a link ({@code (...)}), the brackets of an image ({@code ![...]}) and those that a blank line separates.
@@ -41,8 +40,8 @@ final class RunMarks {
     /** The end of a styled run. */
     static final char CLOSE = '\uFDD2';
     /**
-     * The punctuation character inside each mark, after {@link #END} and before {@link #CLOSE}: U+2E31, which the
-     * parser takes as punctuation, like the bracket the mark stands for.
+     * The punctuation character on each side of a mark: U+2E31, which the parser takes as punctuation, like the
+     * bracket or the brace the mark stands for.
      */
     static final char GUARD = '\u2E31';
     /** The digit 0 of the number of a name, in base 16: U+FDE0 to U+FDEF. */
@@ -98,12 +97,12 @@ final class RunMarks {
                 nextBrace++;
                 i += 2;
             } else if (nextOpen < spans.size() && spans.get(nextOpen).open() == i) {
-                out.append(OPEN).append(number(names.size())).append(END).append(GUARD);
+                out.append(GUARD).append(OPEN).append(number(names.size())).append(END).append(GUARD);
                 names.add(spans.get(nextOpen).name());
                 nextOpen++;
                 i++;
             } else if (nextClose < closes.size() && closes.get(nextClose)[0] == i) {
-                out.append(GUARD).append(CLOSE);
+                out.append(GUARD).append(CLOSE).append(GUARD);
                 i = closes.get(nextClose)[1];
                 nextClose++;
             } else {
@@ -128,11 +127,13 @@ final class RunMarks {
             if (c == OPEN) {
                 int end = text.indexOf(END, i);
                 open.push(names.get(number(text, i + 1, end)));
+                out.setLength(before(out, out.length()));
                 out.append('[');
-                i = afterOpen(text, end) - 1;
+                i = after(text, end) - 1;
             } else if (c == CLOSE) {
-                out.setLength(beforeClose(out, out.length()));
+                out.setLength(before(out, out.length()));
                 out.append("]{").append(open.isEmpty() ? "" : open.pop()).append('}');
+                i = after(text, i) - 1;
             } else if (c == Reference.LITERAL_BRACE) {
                 out.append("\\{");
             } else {
@@ -142,14 +143,14 @@ final class RunMarks {
         return out.toString();
     }
 
-    /** Where the text of a styled run starts: after the {@link #END} at {@code end} and its {@link #GUARD}. */
-    static int afterOpen(String text, int end) {
-        return end + 1 < text.length() && text.charAt(end + 1) == GUARD ? end + 2 : end + 1;
+    /** Where the text goes on after the {@link #END} or the {@link #CLOSE} at {@code at}: after its {@link #GUARD}. */
+    static int after(CharSequence text, int at) {
+        return at + 1 < text.length() && text.charAt(at + 1) == GUARD ? at + 2 : at + 1;
     }
 
-    /** Where the text before a {@link #CLOSE} at {@code close} ends: before its {@link #GUARD}. */
-    static int beforeClose(CharSequence text, int close) {
-        return close > 0 && text.charAt(close - 1) == GUARD ? close - 1 : close;
+    /** Where the text before the {@link #OPEN} or the {@link #CLOSE} at {@code at} ends: before its {@link #GUARD}. */
+    static int before(CharSequence text, int at) {
+        return at > 0 && text.charAt(at - 1) == GUARD ? at - 1 : at;
     }
 
     /** The number written from {@code from} to {@code to} (exclusive). */

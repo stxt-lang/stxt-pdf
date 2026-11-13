@@ -17,8 +17,11 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   on its line, in a narrow column. The badness of a line had the ceiling of TeX (10 000), so every line past it cost
   the same and the line breaking put what several lines left over in a single one. It has no ceiling now, and a line
   of a single word counts as one with one space. The lines of a justified text in a narrow box may change.
-- A bold or an italic right inside the brackets of a styled run may start or end with a sign: `[**€12.50**]{price}`,
-  the example of the manual, painted its asterisks, as did `[**(12.50)**]{price}` and `[**12.50€**]{price}`.
+- The brackets and the braces of a styled run are punctuation for the marks beside them, like those of a link, so a
+  bold or an italic beside them opens and closes as CommonMark says. `[**€12.50**]{price}`, the example of the manual,
+  painted its asterisks, as did `[**(12.50)**]{price}`, `[**12.50€**]{price}` and `[x]{price}**€5**`. **A text may
+  change:** asterisks between a letter and a run, as in `H**[2]{sub}**O`, no longer open or close and are painted; the
+  marks go inside the brackets, `H[**2**]{sub}O`.
 - The side margins of `Footnote area` narrow the area, like those of a block. The left one moved it to the right
   without narrowing it, out of the page area, and the right one did nothing.
 - A `BOX_OVERFLOW` in width names the box that cannot be narrower. In an item as wide as the widest word of its

@@ -105,7 +105,7 @@ Document (dev.stxt.pdf):
 ```
 
 - The line does not change its height, and what is copied from the PDF is the text as written (`85 m2`).
-- The rule can also carry a color or a font, and the marks add to it: `**[2]{sub}**` is a subscript in bold.
+- The rule can also carry a color or a font, and the marks add to it: `[**2**]{sub}` is a subscript in bold.
 - `Position` is only valid in a part of a text. In a box (in its `Typography`, or with `Style: sup`) it is an error
   (`POSITION_OUTSIDE_RUN`).
 - The number of a [footnote](../components/footnote.md) is already a superscript, with no rule.

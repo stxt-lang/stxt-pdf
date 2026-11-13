@@ -105,7 +105,7 @@ Document (dev.stxt.pdf):
 ```
 
 - La línea no cambia de alto, y lo que se copia del PDF es el texto escrito (`85 m2`).
-- La regla puede llevar también un color o una fuente, y las marcas se suman: `**[2]{sub}**` es un subíndice en negrita.
+- La regla puede llevar también un color o una fuente, y las marcas se suman: `[**2**]{sub}` es un subíndice en negrita.
 - `Position` solo vale en una parte de un texto. En una caja (en su `Typography`, o con `Style: sup`) es un error
   (`POSITION_OUTSIDE_RUN`).
 - El número de una [nota al pie](../components/footnote.md) ya va en superíndice, sin ninguna regla.

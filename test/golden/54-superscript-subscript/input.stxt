@@ -41,7 +41,7 @@ Document (dev.stxt.pdf):
 		Text: aaaa [bbbb]{sup}
 			Id: raised
 			Style: narrow
-		Text: H**[2]{sub}**O, ~~x[2]{sup}~~ y ++x[2]{sup}++.
+		Text: H[**2**]{sub}O, ~~x[2]{sup}~~ y ++x[2]{sup}++.
 			Id: marks
 		Text: El 1[er]{sup} día[^a].
 			Id: notes

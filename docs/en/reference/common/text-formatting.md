@@ -85,8 +85,14 @@ in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For styl
   `For style` rules with that name (one of the separate styles document and one of the document) declare the same thing,
   the one of the document wins, as in a box.
 - **The marks add to the style**, inside or outside the brackets: `[**x**]{light}` and `**[x]{light}**` are bold even
-  if the rule says `Weight: 300`, and bold is weight 700 ([above](#runs)). For the marks inside, the brackets of the
-  run are punctuation, like those of a link: `[**€12.50**]{price}` is bold.
+  if the rule says `Weight: 300`, and bold is weight 700 ([above](#runs)). For the marks beside them, the brackets and
+  the braces of the run are punctuation, like those of a link, and the rule of CommonMark applies:
+  `[**€12.50**]{price}` is bold, and in `H**[2]{sub}**O`, where the asterisks are between a letter and the run, they
+  do not open or close and are text. Next to a letter, the marks are written inside: `H[**2**]{sub}O`.
+
+> **Decision:** the brackets and the braces of a run count as punctuation for the marks beside them, like those of a
+> link. *Discarded alternative:* that they count as letters (up to 0.17.0), with which `H**[2]{sub}**O` was bold, but
+> `[**€12.50**]{price}` painted its asterisks.
 - **The name** is a single word, without spaces, the same as in `For style`. Without its rule, it is `STYLE_WITHOUT_RULE`,
   with the line where the text starts. Brackets followed by something else (`[x] {price}`, `[x]{a b}`, `[x]{}`) are text,
   and page numbers and references stay what they are: in `[see]{page}` or `[see]{page of: id}`, the brackets are
@@ -145,7 +151,7 @@ Paragraph: It emits 120 g of CO[2]{sub} per m[2]{sup}.
 - The letters are those of the font, reduced: neither the superscript glyphs of the font nor the Unicode characters
   (`²`, `₂`) are used, and these can still be written if the font has them. The text that is read and copied is the
   one written (`m2`).
-- The rule can also declare what a run allows (`Color`, `Font`, `Weight`...), and the marks add to it: `**[2]{sub}**`
+- The rule can also declare what a run allows (`Color`, `Font`, `Weight`...), and the marks add to it: `[**2**]{sub}`
   is a subscript in bold.
 - **The strikethrough goes with the letters** of the run, at their height and with their thickness. **The underline stays
   on the line**, so that it does not break under a word with a superscript.

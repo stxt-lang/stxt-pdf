@@ -20,11 +20,13 @@ class RunMarksTest {
             char c = s.charAt(i);
             if (c == RunMarks.OPEN) {
                 int end = s.indexOf(RunMarks.END, i);
+                out.setLength(RunMarks.before(out, out.length()));
                 out.append('<').append(m.names().get(RunMarks.number(s, i + 1, end))).append('>');
-                i = RunMarks.afterOpen(s, end) - 1;
+                i = RunMarks.after(s, end) - 1;
             } else if (c == RunMarks.CLOSE) {
-                out.setLength(RunMarks.beforeClose(out, out.length()));
+                out.setLength(RunMarks.before(out, out.length()));
                 out.append("</>");
+                i = RunMarks.after(s, i) - 1;
             } else {
                 out.append(c);
             }

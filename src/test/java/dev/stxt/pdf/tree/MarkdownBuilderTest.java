@@ -307,9 +307,10 @@ class MarkdownBuilderTest {
     }
 
     /**
-     * The brackets of a styled run are punctuation for the marks beside them inside it
-     * (reference/common/text-formatting.md): a bold that starts or ends with a sign right inside the brackets is
-     * bold. Until the 2026-11-13 its asterisks were painted.
+     * The brackets and the braces of a styled run are punctuation for the marks beside them, as in CommonMark
+     * (reference/common/text-formatting.md): a bold that starts or ends with a sign right inside the brackets, or
+     * right outside the run, is bold, and one between a letter and the run is not. Until the 2026-11-13 the marks
+     * counted as letters.
      */
     @Test
     void aBoldRightInsideTheBracketsOfAStyledRunMayStartOrEndWithASign() {
@@ -325,6 +326,17 @@ class MarkdownBuilderTest {
         assertEquals(List.of(new TextRun("\u20AC12.50", bold)), MarkdownBuilder.inline("**[\u20AC12.50]{price}**", 1));
         assertEquals(List.of(run("a "), new TextRun("\u20AC12.50", s), run(" b")),
                 MarkdownBuilder.inline("a [\u20AC12.50]{price} b", 1));
+        // Outside the run: after its braces a bold may start with a sign, and two runs in a row are two runs.
+        assertEquals(List.of(new TextRun("x", s), new TextRun("\u20AC5", new TextFormat(true, false, false, false))),
+                MarkdownBuilder.inline("[x]{price}**\u20AC5**", 1));
+        assertEquals(List.of(new TextRun("x", s), new TextRun("y", TextFormat.PLAIN.withStyle(RunStyle.named("b")))),
+                MarkdownBuilder.inline("[x]{price}[y]{b}", 1));
+        // Between a letter and the run the asterisks do not open or close, as with a link: they are text.
+        assertEquals(List.of(run("a**"), new TextRun("x", s), run("**b")),
+                MarkdownBuilder.inline("a**[x]{price}**b", 1));
+        assertEquals(List.of(run("a**"), new TextRun(TextRun.text(MarkdownBuilder.inline("[x](https://a.example)", 1)),
+                        MarkdownBuilder.inline("[x](https://a.example)", 1).get(0).format()), run("**b")),
+                MarkdownBuilder.inline("a**[x](https://a.example)**b", 1));
         // The character of the guard, written by the author beside the brackets, is text.
         assertEquals(List.of(new TextRun("\u2E31x\u2E31", s)), MarkdownBuilder.inline("[\u2E31x\u2E31]{price}", 1));
         assertEquals(List.of(run("\u2E31"), new TextRun("x", s), run("\u2E31")),

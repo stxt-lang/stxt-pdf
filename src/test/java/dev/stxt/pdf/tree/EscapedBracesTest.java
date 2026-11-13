@@ -44,7 +44,7 @@ class EscapedBracesTest {
         assertEquals(List.of("price"), m.names());
         assertEquals("12 " + B + "x}", m.text().substring(m.text().indexOf(RunMarks.END) + 2,
                 m.text().indexOf(RunMarks.CLOSE) - 1));
-        assertEquals(" y [z]" + B + "nada}", m.text().substring(m.text().indexOf(RunMarks.CLOSE) + 1));
+        assertEquals(" y [z]" + B + "nada}", m.text().substring(m.text().indexOf(RunMarks.CLOSE) + 2));
     }
 
     @Test

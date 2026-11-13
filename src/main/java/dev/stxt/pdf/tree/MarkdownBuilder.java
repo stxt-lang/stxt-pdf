@@ -675,8 +675,8 @@ final class MarkdownBuilder {
                 if (c != RunMarks.OPEN && c != RunMarks.CLOSE) {
                     continue;
                 }
-                // The guard before a CLOSE is part of the mark.
-                int to = c == RunMarks.CLOSE ? Math.max(at, RunMarks.beforeClose(text, i)) : i;
+                // The guard before a mark is part of it.
+                int to = Math.max(at, RunMarks.before(text, i));
                 if (to > at) {
                     calls(text.substring(at, to), styled(f), out, line);
                 }
@@ -688,11 +688,12 @@ final class MarkdownBuilder {
                                 + "inside the styled run [...]{" + style.name() + "}: a run has a single style");
                     }
                     style = RunStyle.named(name);
-                    i = RunMarks.afterOpen(text, end) - 1;
+                    i = RunMarks.after(text, end) - 1;
                 } else if (style == null) {
                     throw unclosed(line);
                 } else {
                     style = null;
+                    i = RunMarks.after(text, i) - 1;
                 }
                 at = i + 1;
             }
