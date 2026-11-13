@@ -72,9 +72,9 @@ Each file is identified by what its contents declare and not by its name
   weight (such as 450) cannot be requested;
 - **style:** normal or italic.
 
-Variable fonts are not allowed: the static files of each variant are used. Kerning is applied only with
-`Kerning: true` ([Typography](typography.md#kerning-kerning)), and ligatures, only with `Ligatures: true`
-([Text formatting](text-formatting.md#ligatures-ligatures)). `Font` and `Size` have no default
+Variable fonts are not allowed: the static files of each variant are used. The kerning and the ligatures of the font
+are applied by default; `Kerning: false` ([Typography](typography.md#kerning-kerning)) and `Ligatures: false`
+([Text formatting](text-formatting.md#ligatures-ligatures)) turn them off. `Font` and `Size` have no default
 value: they are required in every text ([Typography](typography.md)).
 
 > **Decision:** the weight of the file is taken as it is, and the family is compared exactly. *Rejected alternative:*
