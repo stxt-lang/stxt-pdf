@@ -7,15 +7,18 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ## [Unreleased]
 
-Two defaults change, so that a document is well set without asking for it. **A document may change:** its lines, with
-the kerning, and its tables with borders, with the borders merged. `Kerning: false` and `Merge borders: false` give
-what there was.
+Three defaults change, so that a document is well set without asking for it. **A document may change:** its lines,
+with the kerning and the ligatures, and its tables with borders, with the borders merged. `Kerning: false`,
+`Ligatures: false` and `Merge borders: false` give what there was.
 
 ### Changed
 
 - `Kerning` is `true` by default: the text is measured and painted with the kerning pairs of the font. It was `false`
   so that no document changed, and nearly every document declared it. `Kerning: false` turns it off, in a text or, in
   `For element: Document`, in the whole document.
+- `Ligatures` is `true` by default: the text is measured and painted with the ligatures of the font (`fi` in IBM Plex
+  Sans; `fi` and `fl` in IBM Plex Serif). It was `false` because writing them was slow, which it no longer is.
+  `Ligatures: false` turns them off.
 - `Merge borders` is `true` by default: in a table, the border between two cells is drawn once. A table with borders
   and a `Gap`, or with a `Corner radius` in a cell, is now `MERGE_BORDERS_CONFLICT` unless it has
   `Merge borders: false`; the message says that the borders are merged by default. A table none of whose cells has a

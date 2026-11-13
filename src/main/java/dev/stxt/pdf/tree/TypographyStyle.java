@@ -67,7 +67,7 @@ public final class TypographyStyle extends StyleGroup {
      * {@code Ligatures}: whether the text is measured and painted with the ligatures of the font
      * (reference/common/text-formatting.md). Inherited.
      */
-    private boolean ligatures;
+    private boolean ligatures = true;
     /**
      * {@code Kerning}: whether the text is measured and painted with the kerning pairs of the font
      * (reference/common/typography.md). Inherited.

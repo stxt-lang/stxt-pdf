@@ -231,8 +231,8 @@ class PdfFontsTest {
      */
     @Test
     void theGlyphOfALigatureIsCopiedAsItsLetters() throws Exception {
-        byte[] bytes = Pdfs.of(DOCUMENT + "\tParagraph: La oficina final\n"
-                + "\tParagraph: La oficina final y el flan\n\t\tTypography:\n\t\t\tLigatures: true\n");
+        byte[] bytes = Pdfs.of(DOCUMENT + "\tParagraph: La oficina final\n\t\tTypography:\n\t\t\tLigatures: false\n"
+                + "\tParagraph: La oficina final y el flan\n");
         try (PDDocument pdf = Loader.loadPDF(bytes)) {
             List<List<String>> texts = new ArrayList<>();
             PDResources resources = pdf.getPage(0).getResources();
@@ -261,13 +261,41 @@ class PdfFontsTest {
     }
 
     /**
+     * In many fonts the glyph of a ligature has no character of its own, and PDFBox gives it no text: the engine
+     * gives it its letters too, and keeps the text of the other glyphs. Here, with a glyph of IBM Plex Sans that has
+     * no character.
+     */
+    @Test
+    void aGlyphWithoutACharacterGetsItsLettersToo() throws Exception {
+        try (PDDocument doc = new PDDocument();
+             java.io.InputStream file = Files.newInputStream(
+                     Resources.DEFAULT_ROOT.resolve("fonts/IBM Plex Sans/IBMPlexSans-Regular.ttf"))) {
+            // Embedded whole: its ToUnicode is written when it is loaded.
+            PDType0Font font = PDType0Font.load(doc, file, false);
+            int a = font.getCmapLookup().getGlyphId('a');
+            int unnamed = 1;
+            while (font.toUnicode(unnamed) != null) {
+                unnamed++;
+            }
+            ToUnicode.replace(doc, font, Map.of(unnamed, "fi"));
+            org.apache.fontbox.cmap.CMap written;
+            try (java.io.InputStream in = font.getCOSObject().getCOSStream(COSName.TO_UNICODE).createInputStream()) {
+                written = new org.apache.fontbox.cmap.CMapParser()
+                        .parse(new org.apache.pdfbox.io.RandomAccessReadBuffer(in));
+            }
+            assertEquals("fi", written.toUnicode(unnamed, 2));
+            assertEquals("a", written.toUnicode(a, 2));
+        }
+    }
+
+    /**
      * With {@code Kerning} (reference/common/typography.md), the pairs are shifts of {@code TJ} between the glyphs of
      * the same embedded font as without it; the text is extracted as it is written, and the PDF is still PDF/UA, also
      * with ligatures and with a word split with a hyphen.
      */
     @Test
     void kernedTextIsExtractedWholeWithTheSameFont() throws Exception {
-        byte[] bytes = Pdfs.of(DOCUMENT + "\t\t\t\tKerning: true\n"
+        byte[] bytes = Pdfs.of(DOCUMENT + "\t\t\t\tKerning: true\n\t\t\t\tLigatures: false\n"
                 + "\tParagraph: AVATAR Tofi\n"
                 + "\tParagraph: AVATAR Tofi\n\t\tTypography:\n\t\t\tKerning: false\n"
                 + "\tParagraph: Tofi Tofi\n\t\tTypography:\n\t\t\tLigatures: true\n"

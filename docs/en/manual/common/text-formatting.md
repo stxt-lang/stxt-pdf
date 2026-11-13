@@ -177,9 +177,8 @@ get it, so a right-aligned text ends exactly at the last letter.
 
 ## Ligatures (`Ligatures`)
 
-Some fonts have special glyphs for pairs of letters (`fi`, `fl`): **ligatures**. By default they are not used and each
-letter is its own. With `Ligatures: true` those of the font are used (IBM Plex Sans has `fi`, and IBM Plex Serif, `fi` and
-`fl`). They do not change what is read or what is copied, and they are not applied with letter spacing.
+Some fonts have special glyphs for pairs of letters (`fi`, `fl`): **ligatures**. Those of the font are used (IBM
+Plex Sans has `fi`, and IBM Plex Serif, `fi` and `fl`); with `Ligatures: false`, each letter is its own. They do not change what is read or what is copied, and they are not applied with letter spacing.
 
 ## Preformatted text
 

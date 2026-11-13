@@ -131,23 +131,24 @@ class LigaturesTest {
     }
 
     @Test
-    void theDefaultIsNoLigaturesAndTheLayoutUsesTheOptionInTheDocument() {
-        double plain = width("office");
-        assertEquals(plain, width("office", "Ligatures: false"), 1e-9);
-        assertTrue(width("office", "Ligatures: true") < plain);
+    void theDefaultIsLigaturesAndTheLayoutUsesTheOptionInTheDocument() {
+        double joined = width("office");
+        assertEquals(joined, width("office", "Ligatures: true"), 1e-9);
+        assertTrue(joined < width("office", "Ligatures: false"));
     }
 
     @Test
     void letterSpacingTurnsLigaturesOff() {
-        double spaced = width("office", "Letter spacing: 1");
+        double spaced = width("office", "Letter spacing: 1", "Ligatures: false");
+        assertEquals(spaced, width("office", "Letter spacing: 1"), 1e-9);
         assertEquals(spaced, width("office", "Letter spacing: 1", "Ligatures: true"), 1e-9);
     }
 
     @Test
     void thePdfWritesWhatWasMeasured() throws IOException {
-        assertEquals(6, glyphs(layOut(document("office"))), "one glyph per character");
-        assertTrue(glyphs(layOut(document("office", "Ligatures: true"))) < 6, "ligatures join glyphs");
-        assertEquals(6, glyphs(layOut(document("office", "Ligatures: true", "Letter spacing: 1"))));
-        assertFalse(width("office", "Ligatures: true") == width("office"));
+        assertEquals(6, glyphs(layOut(document("office", "Ligatures: false"))), "one glyph per character");
+        assertTrue(glyphs(layOut(document("office"))) < 6, "ligatures join glyphs");
+        assertEquals(6, glyphs(layOut(document("office", "Letter spacing: 1"))));
+        assertFalse(width("office", "Ligatures: false") == width("office"));
     }
 }

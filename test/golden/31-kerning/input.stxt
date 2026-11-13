@@ -2,7 +2,8 @@
 # Size 24 with Line height 30; with the test metrics each character measures 12 pt with or without kerning, so the
 # kerning does not change the layout: each text is one line of 30, 160 wide, one after the other. The image shows the
 # same words with the pairs of IBM Plex Sans (A-V, V-A, A-T, T-A, T-o and o-f, all of them closer) and without them.
-# Kerning is true by default: only plain turns it off.
+# Kerning is true by default: only plain turns it off. Ligatures are true by default too: the document turns them off
+# and only ligatures has them.
 #   plain:     Kerning false. y = 20.
 #   kerned:    with kerning. y = 50.
 #   ligatures: with kerning and Ligatures true: the pair is o and the fi ligature. y = 80.
@@ -22,6 +23,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 24
 				Line height: 30
+				Ligatures: false
 	Section:
 		Text: AVATAR Tofi
 			Id: plain

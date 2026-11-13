@@ -32,8 +32,8 @@ final class ToUnicode {
     }
 
     /**
-     * Writes the {@code ToUnicode} of {@code font} again, as it is, with the text of the glyphs of {@code texts}: by
-     * glyph, which with Identity-H is the code of the glyph in the text.
+     * Writes the {@code ToUnicode} of {@code font} again, as it is, with the text of the glyphs of {@code texts}, which
+     * are glyphs the font has in the PDF: by glyph, which with Identity-H is the code of the glyph in the text.
      */
     static void replace(PDDocument doc, PDType0Font font, Map<Integer, String> texts) throws IOException {
         COSStream current = font.getCOSObject().getCOSStream(COSName.TO_UNICODE);
@@ -51,8 +51,9 @@ final class ToUnicode {
                 all.put(code, text);
             }
         }
-        // Only the glyphs the font has in the PDF: a glyph that is not in the subset has no entry.
-        texts.forEach((glyph, text) -> all.computeIfPresent(glyph, (g, old) -> text));
+        // Also the glyphs PDFBox gives no text to: in many fonts the glyph of a ligature has no character of its own,
+        // and without an entry its letters would be missing from what is copied.
+        all.putAll(texts);
         byte[] written = write(all).getBytes(StandardCharsets.US_ASCII);
         font.getCOSObject().setItem(COSName.TO_UNICODE,
                 new PDStream(doc, new ByteArrayInputStream(written), COSName.FLATE_DECODE));

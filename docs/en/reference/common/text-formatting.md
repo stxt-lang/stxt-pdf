@@ -263,16 +263,17 @@ The text that is copied or extracted from the PDF is that of the line, without s
 
 ## Ligatures (`Ligatures`)
 
-By default each character is a glyph: `fi` is two. With `Ligatures: true` the ligatures of the font are applied, which
-join some pairs into a glyph of a different width (in IBM Plex Sans, `fi`; in IBM Plex Serif, `fi` and `fl`; and none in IBM Plex
+The ligatures of the font are applied (`Ligatures` is `true` by default), which
+join some pairs into a glyph of a different width: `fi` is one glyph, and with `Ligatures: false`, two. The ligatures are those of the font (in IBM Plex Sans, `fi`; in IBM Plex Serif, `fi` and `fl`; and none in IBM Plex
 Mono). What is measured is what is painted. A ligature does not cross a space or the boundary between two runs. With
 `Letter spacing` other than 0, that of the box or that of a styled run, there are no ligatures. It changes neither the text that is read nor the text that is copied: in the PDF, the glyph of a
 ligature is the letters it joins (`fi`), and not the character the font has for that glyph (U+FB01), which a search for
 `office` would not find in every viewer.
 
-> **Decision:** `false` by default: without ligatures a running text is written faster (about 2.7 times; documents
-> with little text per page, the same). *Rejected
-> alternative:* ligatures always, or never.
+> **Decision:** `true` by default: a well-set text has the ligatures of its font. *Rejected alternatives:* `false` by
+> default, which was the rule up to 0.17.0, when writing a text with ligatures took fourteen times longer (today, 199 ms
+> against 101 in a running text of 55 pages, and the same in a document with little text per page); and ligatures
+> always, with no property.
 
 ## Preformatted text
 

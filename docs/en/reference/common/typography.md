@@ -30,7 +30,7 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
 | `Position` | `normal`, `superscript`, `subscript` | `normal` | Superscript or subscript; only in the rule of a styled run, and not inherited ([Text formatting](text-formatting.md#superscript-and-subscript-position)). |
-| `Ligatures` | `true`, `false` | `false` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
+| `Ligatures` | `true`, `false` | `true` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
 | `Kerning` | `true`, `false` | `true` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
 | `Tab size` | integer ≥ 1 | `4` | With `Preformatted: keep` or `wrap`, the columns of a tab. |

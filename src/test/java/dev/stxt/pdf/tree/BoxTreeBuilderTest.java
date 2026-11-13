@@ -97,7 +97,7 @@ class BoxTreeBuilderTest {
                 "\tBlock:", "\t\tTypography:", "\t\t\tFont: IBM Plex Sans", "\t\t\tBold: true", "\t\t\tItalic: true",
                 "\t\t\tSize: 14", "\t\t\tWidows: 3", "\t\tBox:", "\t\t\tPadding: 10",
                 "\t\tText: x")).sections().get(0).box().children().get(0).children().get(0);
-        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.ITALIC).withKerning(true),
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.ITALIC).withKerning(true).withLigatures(true),
                 child.style().typography().fontFace());
         assertEquals(14, child.style().typography().fontSize(), 1e-9);
         assertEquals(3, child.style().typography().widows());
@@ -228,7 +228,7 @@ class BoxTreeBuilderTest {
                 + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Sans\n\t\t\t\tSize: 12\n\t\t\t\tColor: #333\n\t\t\t\tLine height: 20\n"
                 + "\tBlock:\n\t\tTypography:\n\t\t\tBold: true\n\t\tText: x";
         Box text = build(doc).sections().get(0).box().children().get(0).children().get(0);
-        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL).withKerning(true), text.style().typography().fontFace());
+        assertEquals(new FontFace("IBM Plex Sans", FontWeight.BOLD, FontStyle.NORMAL).withKerning(true).withLigatures(true), text.style().typography().fontFace());
         assertEquals(12, text.style().typography().fontSize(), 1e-9);
         // Document allows all of Typography, not only the font.
         assertEquals("#333", text.style().typography().color());
