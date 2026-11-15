@@ -35,6 +35,17 @@ El PDF lleva:
 aspecto propio: un `Heading 1` no es más grande que un `Paragraph` si un estilo no lo dice. Lo que no tendría efecto, se
 contradice o no cabe es un error con su línea.
 
+## Probarlo
+
+```bash
+docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/stxt-lang/stxt-press
+```
+
+[stxt-press](https://github.com/stxt-lang/stxt-press) es un servicio sobre stxt-pdf, con un editor web, una API HTTP y
+una línea de comandos. Con la orden de arriba, el índice y el editor están en `http://127.0.0.1:8080/`, con plantillas
+y documentos de ejemplo. Sin Docker, se arranca con Java 17 desde su carpeta `server/`
+([cómo](https://github.com/stxt-lang/stxt-press#start)).
+
 ## Documentación
 
 | | Qué hay |
@@ -60,17 +71,6 @@ contradice o no cabe es un error con su línea.
 | [![](test/examples/11-timetable/es/page-1.png)](test/examples/11-timetable/es/output.pdf) | **Horario**: tabla con celdas separadas y redondeadas, colores por estilo | [PDF](test/examples/11-timetable/es/output.pdf) (1 página) | [STXT](test/examples/11-timetable/es/input.stxt)<br>[Estilos](test/examples/11-timetable/styles.stxt) |
 
 La fuente de cada ejemplo son dos documentos: el contenido y la estructura, en su `input.stxt`, y los estilos, en un `styles.stxt` común con su versión en inglés. Lo que enseña cada uno está en el [índice de los ejemplos](test/examples/README.es.md).
-
-## Probarlo
-
-```bash
-docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/stxt-lang/stxt-press
-```
-
-[stxt-press](https://github.com/stxt-lang/stxt-press) es un servicio sobre stxt-pdf, con un editor web, una API HTTP y
-una línea de comandos. Con la orden de arriba, el índice y el editor están en `http://127.0.0.1:8080/`, con plantillas
-y documentos de ejemplo. Sin Docker, se arranca con Java 17 desde su carpeta `server/`
-([cómo](https://github.com/stxt-lang/stxt-press#start)).
 
 ## Uso
 
