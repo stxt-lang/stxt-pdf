@@ -3,7 +3,8 @@
 **English** | [Español](README.es.md)
 
 Layout engine and PDF generator for [STXT](https://stxt.dev) documents. The document describes what goes on each page and
-how it looks. The engine works out where everything goes, splits the content into pages and writes the PDF.
+how it looks. The engine works out where everything goes, splits the content into pages and writes the PDF with
+[Apache PDFBox](https://pdfbox.apache.org).
 
 ```
 Document (dev.stxt.pdf):

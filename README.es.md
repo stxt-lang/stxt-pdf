@@ -3,7 +3,8 @@
 [English](README.md) | **Español**
 
 Motor de layout y generación de PDF a partir de documentos [STXT](https://stxt.dev). El documento describe qué hay en cada
-página y cómo se ve. El motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF.
+página y cómo se ve. El motor calcula dónde va cada cosa, reparte el contenido en páginas y escribe el PDF con
+[Apache PDFBox](https://pdfbox.apache.org).
 
 ```
 Document (dev.stxt.pdf):
