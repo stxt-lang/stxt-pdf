@@ -725,8 +725,8 @@ otras carpetas. JSVG lo dibuja con AWT, así que en un servidor sin pantalla se 
 `-Djava.awt.headless=true`.
 
 > **Decisión:** el contrato de hilos está escrito y no solo observado. El schema compartido de `stxt-core` se apoya en dos
-> hechos de la versión 1.0.3, comprobados en su bytecode: el proveedor del schema solo lee de un mapa y el validador solo
-> escribe campos en su constructor. Un cambio de versión obliga a repasarlo (está anotado en el `pom.xml` y en
+> hechos de la versión 1.0.4 (sus clases son las de la 1.0.3), comprobados en su bytecode: el proveedor del schema
+> solo lee de un mapa y el validador solo escribe campos en su constructor. Un cambio de versión obliga a repasarlo (está anotado en el `pom.xml` y en
 > `DocumentSchema`). *Alternativa descartada:* una copia del schema por hilo.
 
 ## Validación en el editor

@@ -6,7 +6,7 @@
 
     <groupId>dev.stxt</groupId>
     <artifactId>stxt-pdf</artifactId>
-    <version>0.18.0</version>
+    <version>0.18.1</version>
     <packaging>jar</packaging>
 
     <!-- Metadata required by Maven Central (name, description, url, license, developers and scm),
@@ -48,7 +48,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Reproducible build: fixes the dates inside the jar. Updated on each release. -->
-        <project.build.outputTimestamp>2026-11-13T23:00:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-11-15T21:00:00Z</project.build.outputTimestamp>
         <junit.version>5.10.2</junit.version>
         <commonmark.version>0.30.1</commonmark.version>
         <pdfbox.version>3.0.8</pdfbox.version>
@@ -59,11 +59,12 @@
         <!-- Official STXT parser and validator. Used by stxt.DocumentReader, and the engine works with its nodes.
              Latest version at https://central.sonatype.com/artifact/dev.stxt/stxt-core
              When it changes, check again that the shared schema (SchemaProviderMemory, SchemaValidator) is
-             read without writing: see tree/DocumentSchema, and ConcurrentConversionTest. 1.0.3 is the reviewed version. -->
+             read without writing: see tree/DocumentSchema, and ConcurrentConversionTest. 1.0.4 is the reviewed version
+             (its classes are those of 1.0.3, byte for byte). -->
         <dependency>
             <groupId>dev.stxt</groupId>
             <artifactId>stxt-core</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
 
         <!-- PDF output (paint.PdfCanvas) and real font metrics (layout.inline.PdfMetrics). -->

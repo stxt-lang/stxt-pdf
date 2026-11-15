@@ -5,6 +5,14 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [0.18.1] - 2026-11-15
+
+On `stxt-core` 1.0.4, whose classes are those of 1.0.3: the engine, the namespace and the Java API do not change.
+
+### Changed
+
+- `dev.stxt:stxt-core` 1.0.4 instead of 1.0.3, whose `pom.xml` no longer names Jackson 2 among its test dependencies.
+
 ## [0.18.0] - 2026-11-13
 
 Kerning, ligatures and merged table borders by default, so that a document is well set without asking for it; the

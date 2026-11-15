@@ -739,8 +739,8 @@ other folders. JSVG draws it with AWT, so on a server without a display the JVM 
 `-Djava.awt.headless=true`.
 
 > **Decision:** the thread contract is written down and not only observed. The shared schema of `stxt-core` relies on two
-> facts of version 1.0.3, checked in its bytecode: the schema provider only reads from a map and the validator only
-> writes fields in its constructor. A change of version requires reviewing it (it is noted in the `pom.xml` and in
+> facts of version 1.0.4 (its classes are those of 1.0.3), checked in its bytecode: the schema provider only reads from
+> a map and the validator only writes fields in its constructor. A change of version requires reviewing it (it is noted in the `pom.xml` and in
 > `DocumentSchema`). *Rejected alternative:* one copy of the schema per thread.
 
 ## Validation in the editor

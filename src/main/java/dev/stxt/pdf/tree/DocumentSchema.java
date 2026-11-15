@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
  * tree, so a document that has not gone through the reader gives the same errors.
  *
  * <p>Thread-safe: the schema is loaded in a static initializer and does not change afterwards. It relies on
- * two facts of {@code stxt-core} 1.0.3 (the version pinned in the {@code pom.xml}), checked by reading its
- * code: {@code SchemaProviderMemory.getSchema} only reads from its map, and {@code SchemaValidator} only writes
- * its fields in the constructor (each validation creates its own). If the version changes, this has to be
- * checked again; {@code ConcurrentConversionTest} is the safety net.</p>
+ * two facts of {@code stxt-core} 1.0.4 (the version pinned in the {@code pom.xml}, whose classes are those of
+ * 1.0.3), checked by reading its code: {@code SchemaProviderMemory.getSchema} only reads from its map, and
+ * {@code SchemaValidator} only writes its fields in the constructor (each validation creates its own). If the
+ * version changes, this has to be checked again; {@code ConcurrentConversionTest} is the safety net.</p>
  */
 public final class DocumentSchema {
 
