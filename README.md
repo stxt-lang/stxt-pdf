@@ -65,6 +65,17 @@ The source of each example is two documents: the content and the structure, in i
 `styles.stxt` shared with its Spanish version. What each one shows is in the
 [index of the examples](test/examples/README.md).
 
+## Trying it
+
+```bash
+docker run --rm -p 127.0.0.1:8080:8080 ghcr.io/stxt-lang/stxt-press
+```
+
+[stxt-press](https://github.com/stxt-lang/stxt-press) is a service on stxt-pdf, with a web editor, an HTTP API and a
+command line. With the command above, the index and the editor are at `http://127.0.0.1:8080/`, with example templates
+and documents. Without Docker, it starts with Java 17 from its `server/` folder
+([how](https://github.com/stxt-lang/stxt-press#start)).
+
 ## Usage
 
 Java 17 or later.
