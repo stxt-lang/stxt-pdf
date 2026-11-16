@@ -218,7 +218,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Text
 		Type: INLINE
-		Description: Standalone text, not a paragraph of the content: a label, a figure, a line of a header, the pieces of a heading. The text goes in the value (one line) or in Content (a block), without blank lines unless it is preformatted.
+		Description: Standalone text, not a paragraph of the content: a label, an amount, a line of a header, the pieces of a heading. The text goes in the value (one line) or in Content (a block), without blank lines unless it is preformatted.
 		Children:
 			Child: Id
 				Max: 1
@@ -536,7 +536,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Footnote
 	Node: Footnote
 		Type: GROUP
-		Description: A footnote: the content of a note that the engine places at the bottom of the page where the text calls it with [^id] (in a text with Markup: markdown or in a Markdown), under a rule, numbered in the order of the calls. Its Id is the name the call uses; it is written anywhere in its section and takes no space there. It starts with a Paragraph, a Text or a Markdown paragraph, which gets the number; no headings or images. Every note is called exactly once and every call has its note.
+		Description: A footnote: the content of a note that the engine places at the bottom of the page where the text first calls it with [^id] (in a text with Markup: markdown or in a Markdown), under a rule, numbered in the order of the first calls. Its Id is the name the call uses; it is written anywhere in its section and takes no space there. It starts with a Paragraph, a Text or a Markdown paragraph, which gets the number; no headings, images or code blocks. Every call has its note in its section and every note is called at least once; the calls after the first repeat its number.
 		Children:
 			Child: Id
 				Min: 1
@@ -654,7 +654,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Page overlay
 	Node: Page overlay
 		Type: GROUP
-		Description: Block superimposed on the pages, out of flow: it is placed with Offset in the page area and is repeated on the pages that Pages says (all by default). Headers, footers and watermarks.
+		Description: Block superimposed on the pages, out of flow: it is placed with Offset in the page area and is repeated on the pages that Pages says (all by default). Headers, footers and watermarks. What it contains is decoration: a screen reader does not read it, and it has no headings and is not the target of a link or a reference.
 		Children:
 			Child: Id
 				Max: 1
@@ -755,7 +755,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Area
 		Type: INLINE
-		Description: Item of a Grid: the area it takes. The value is the placement: an area name, or 'row column [rows columns]' counting from 1; without a value, it is placed automatically. It contains exactly one element.
+		Description: Item of a Grid: the area it takes. The value is the placement: an area name, or 'row column [rows columns]' counting from 1, where row and column can be auto (Area: auto auto 1 2 is placed automatically and takes two columns); without a value, it is placed automatically. It contains exactly one element.
 		Children:
 			Child: Horizontal
 				Max: 1
@@ -908,7 +908,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Markdown
 		Type: GROUP
-		Description: Content in Markdown (headings, paragraphs, lists, GFM tables, code blocks and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, `code` and [links](target)), which is translated into Heading, Paragraph, List, Table and Text. A block.
+		Description: Content in Markdown: headings (with {#id} at the end, their Id), paragraphs, lists, GFM tables, code blocks, block quotes, horizontal rules and images, and, inline, **bold**, *italic*, ++underline++, ~~strikethrough~~, `code`, [links](target), styled runs ([text]{style}), inline images, footnote calls ([^id]) and a \ at the end of a line as a forced line break. It is translated into Heading, Paragraph, List, Table, Image and Text and into the generated Code block, Block quote and Divider, which the For element rules style; anything else (HTML, a link with a title) is an error. A block.
 		Children:
 			Child: Id
 				Max: 1
@@ -1071,7 +1071,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Styles
 		Type: GROUP
-		Description: Reusable rules: default properties of the elements of a type, with a named style or with an Id, and the colors with a name (Named color). It is a child of Document or the root of a separate styles document, which is passed along with the document and ranks below it.
+		Description: Reusable rules: default properties of the elements of a type, with a named style or with an Id, and of the table cells of a column, and the colors with a name (Named color). It is a child of Document or the root of a separate styles document; one or several are passed along with the document and rank below it, each one above those passed before it.
 		Children:
 			Child: Named color
 			Child: For element
@@ -1080,10 +1080,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: Named color
 		Type: INLINE
-		Description: Color with a name: the name and the color separated by a space (Named color: brand #12315A). The name, in lowercase letters and digits with words joined by hyphens, is then written wherever a color goes (Color, Border color, Background, also inside linear, and Separator color). If the document and the separate styles document declare the same name, the document wins.
+		Description: Color with a name: the name and the color separated by a space (Named color: brand #12315A). The name, in lowercase letters and digits, starting with a letter and with words joined by hyphens (not linear), is then written wherever a color goes (Color, Border color, Background, also inside linear, and Separator color). The color is a hexadecimal one (#RGB, #RGBA, #RRGGBB or #RRGGBBAA), not another name or a gradient. If the document and a separate styles document declare the same name, the document wins.
 	Node: For element
 		Type: INLINE
-		Description: Rule for all the elements of a type; the value is its name (Text, Block, Heading 1...), one generated by the engine (Code block, Block quote and Divider, the code blocks, the block quotes and the horizontal rules of a Markdown; TOC 1 to 6, the entries of a Table of contents; Footnote area, the area of the notes at the bottom of the page), a position within a table (Header cell, Body cell, Footer cell, Odd row cell, Even row cell) or Document, which only accepts Typography and is the typography that all boxes inherit. Besides the groups, it accepts the properties of how an element looks and distributes its content (Gap, Column sizes, Fit, Marker...) that the element of its type can declare; Grow, Shrink and Base size are those of the Item that wraps the element. A For element, For style or For column written inside it is a nested rule: it applies to the elements it names that are inside an element this rule applies to.
+		Description: Rule for all the elements of a type; the value is its name (Text, Block, Heading 1...), one generated by the engine (Code block, Block quote and Divider, the code blocks, the block quotes and the horizontal rules of a Markdown; TOC 1 to 6, the entries of a Table of contents; Footnote area, the area of the notes at the bottom of the page), a position within a table (Header cell, Body cell, Footer cell, Odd row cell, Even row cell), Section, which only accepts Typography, or Document, which only accepts Typography and is the typography that all boxes inherit. Besides the groups, it accepts the properties of how an element looks and distributes its content (Gap, Column sizes, Fit, Marker...) that the element of its type can declare (a position within a table, those of a Cell; a generated element, none); Grow, Shrink and Base size are those of the Item that wraps the element. A For element, For style or For column written inside it is a nested rule: it applies to the elements it names that are inside an element this rule applies to.
 		Children:
 			Child: Box
 				Max: 1
@@ -1190,7 +1190,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: For style
 		Type: INLINE
-		Description: Rule for the elements that have that style in their Style. Besides the groups, it accepts the properties of how an element looks and distributes its content (Gap, Column sizes, Fit, Marker...); applied to an element that cannot declare one of them, it is an error. Grow, Shrink and Base size are those of the Item that wraps the element. A For element, For style or For column written inside it is a nested rule: it applies to the elements it names that are inside an element this rule applies to.
+		Description: Rule for the elements that have that style in their Style, for the cells of a Row that has it and for the styled runs [text]{name} of a text; the value is the name, without spaces. Besides the groups, it accepts the properties of how an element looks and distributes its content (Gap, Column sizes, Fit, Marker...); applied to an element that cannot declare one of them, it is an error. Grow, Shrink and Base size are those of the Item that wraps the element. A For element, For style or For column written inside it is a nested rule: it applies to the elements it names that are inside an element this rule applies to.
 		Children:
 			Child: Box
 				Max: 1
@@ -1404,7 +1404,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: For column
 	Node: For column
 		Type: INLINE
-		Description: Rule for the table cells that start in that column (n) or in any column of a range (n m, both included).
+		Description: Rule for the table cells that start in that column (n) or in any column of a range (n m, both included), counting from 1. It accepts Box, Typography and, of the element properties, only Vertical.
 		Children:
 			Child: Box
 				Max: 1
@@ -1419,7 +1419,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Box
 		Type: GROUP
-		Description: Box model: size, margins, padding, border (with its color and its style) and background, and what is done with what does not fit (Overflow). Not inherited.
+		Description: Box model: size (with its minimums, its maximums and Aspect ratio), margins, padding, border (with its color, its style and Corner radius) and background, what is done with what does not fit (Overflow) and, in a Table, Merge borders. Not inherited.
 		Children:
 			Child: Width
 				Max: 1
@@ -1455,7 +1455,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Font, code font, weight, size (and the minimum it may shrink to), line height, alignment, hyphenation, color and language of the text, and widows and orphans. Inherited.
+		Description: The text and how it is broken into lines: the font (family, code font, weight, italic, size), the color, the line height, the alignment and the first line indent, the line breaking (hyphenation, long words, widows and orphans), the inline formatting (Markup), letter case, small caps, letter spacing, ligatures and kerning, preformatted text and the language. Inherited: what an element declares applies to it and to its descendants that do not change it; only Text position is not.
 		Children:
 			Child: Font
 				Max: 1
@@ -1537,19 +1537,19 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Keywords
 		Description: Keywords of the document, separated by commas: the keywords of the PDF, which the viewer shows in the document properties and which document managers and search engines index. None empty. Optional.
 	Node: Language
-		Description: Language, as a BCP 47 tag (es, en-US, ca...). In Document, the one of the content and of the tagged PDF (required). In Typography, the one of a box whose text is in another language (inherited): a screen reader reads it (Lang of the tagged PDF) and it sets the letter rules of Case. Not valid in For element: Document, which uses the one of Document.
+		Description: Language, as a BCP 47 tag (es, en-US, ca...). In Document, the one of the content and of the tagged PDF (required). In Typography, the one of a box whose text is in another language (inherited): a screen reader reads it (Lang of the tagged PDF) and it sets the letter rules of Case and the hyphenation patterns of Hyphenate. Not valid in For element: Document, which uses the one of Document.
 
 	# Element
 
 	Node: Id
-		Description: Identifier for dumps, tests, messages and For id rules. Unique in the document.
+		Description: Identifier of the element: the target of a Link (#id) and of the references ({page of: id}, {number of: id}), the name a footnote call uses ([^id]) and the one of its For id rule, of the messages and of the dumps. Unique in the document.
 	Node: Style
 		Description: Named styles of the element, separated by spaces: the For style rules with those names apply to it. In a Row, to each of its cells.
 	Node: Link
 		Description: Target the whole box leads to when clicked: https://..., http://..., mailto:... or #id (a box of the document). It does not change its appearance.
 	Node: In table of contents
 		Type: BOOLEAN
-		Description: Whether the heading, or the Figure, has an entry in the tables of contents (Table of contents). By default, true. With false a heading is still a heading (structure, bookmark and hierarchy) but it is not listed: the title of the cover or the one of the table of contents itself; a Figure keeps its number and is not listed.
+		Description: Whether the heading, or the Figure, has an entry in the tables of contents (Table of contents). By default, true. With false a heading is still a heading (structure, bookmark and hierarchy) but it is not listed: the title of the cover or the one of the table of contents itself; a Figure keeps its number and is not listed. Not inherited.
 	Node: Numbered
 		Type: BOOLEAN
 		Description: Whether a heading, or a Figure, carries a number. That of a heading (1, 1.1, 1.1.1...) is written before the title and is given by {number of: id}, the tables of contents and the PDF bookmarks. In a heading, false by default: it is declared in the heading or in a rule (For element: Heading 1 numbers those of that level), and headings whose Numbered is false are neither numbered nor counted. A Figure is numbered by default, and Numbered: false leaves it without a number. Not inherited.
@@ -1563,10 +1563,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: lower-roman
 			Value: upper-roman
 	Node: Number label
-		Description: What is written before the title of a numbered heading, or before the caption of a numbered Figure, with {number} where the number goes (Number label: Annex {number}., Number label: Figure {number}.); without it, the number. Not inherited.
+		Description: What is written before the title of a numbered heading, or before the caption of a numbered Figure, with {number}, exactly once, where the number goes (Number label: Annex {number}., Number label: Figure {number}.); without it, the number. Not inherited.
 	Node: Isolate margins
 		Type: BOOLEAN
-		Description: Whether the box isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false.
+		Description: Whether a Block or a Frame isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false. On an item of a Stack or a Grid, which already isolates them, it is an error.
 	Node: Trim margins
 		Type: ENUM
 		Description: Which of the margins that touch the box from inside it drops: top, the top margin of its first child; bottom, the bottom margin of its last child; both, the two of them; none (by default), neither. With them go those of their own first and last children that would merge with them. A dropped margin is not applied: it neither stays inside the box nor comes out of it.
@@ -1576,10 +1576,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: top
 			Value: bottom
 	Node: Offset
-		Description: Top, right, bottom, left (1 to 4 values). In a Frame, how far the box is shifted from its place in the flow. In an Overlay or a Page overlay, the distance from each edge of its reference container to the box; auto leaves that side free.
+		Description: Top, right, bottom, left (1 to 4 values: lengths, which can be negative, percentages or auto; by default, auto). In a Frame, how far the box is shifted from its place in the flow; not from the top and the bottom at once, nor from the left and the right. In an Overlay or a Page overlay, the distance from each edge of its reference container to the box; auto leaves that side free.
 	Node: Layer
 		Type: INTEGER
-		Description: Stacking order within its context: the lower ones are painted first, the negative ones beneath the content in flow. Without it, the box is painted in document order, like Layer: 0.
+		Description: Stacking order of a Frame, an Overlay, a Page overlay, or an item of a Stack or a Grid (in its Item or Area), within its context: the lower ones are painted first, the negative ones beneath the content in flow. Without it, a Frame, an Overlay and a Page overlay are painted in document order, like Layer: 0, and an item is painted with the content in flow.
 	Node: Pages
 		Type: ENUM
 		Description: Pages on which a Page overlay appears, counting from 1 within its scope (those of the document if it is a Page overlay of Document, those of the section if it is of a Section): all, every page; first, only the first; not-first, all but the first; odd, the odd ones; even, the even ones; last, only the last.
@@ -1608,7 +1608,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: upper-roman
 	Node: First page number
 		Type: INTEGER
-		Description: Number of the first page of a Section with Page numbering: restart, from 1. By default, 1.
+		Description: Number of the first page of a Section with Page numbering: restart, from 1. By default, 1. Without Page numbering: restart, it is an error.
 	Node: Inherit page overlays
 		Type: BOOLEAN
 		Description: Whether the Section carries the Page overlay of the Document. By default, true; with false only its own appear (a cover without a footer).
@@ -1645,14 +1645,14 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: symbols
 	Node: Rotate
 		Type: NUMBER
-		Description: Rotation of the box, in degrees clockwise (from -360 to 360, without 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
+		Description: Rotation of the box, in degrees clockwise (between -360 and 360, both excluded, and not 0). In Block, Text, Paragraph, Image and Barcode, which are in flow, it rotates about its center and the box takes the rectangle that encloses it rotated; without Width, it measures its content without breaking lines; not on an item of a Stack or a Grid. In Frame, Overlay and Page overlay it rotates when painting, around Rotate origin, and does not change the layout. What is rotated must fit on the page and does not break across pages.
 	Node: Rotate origin
-		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
+		Description: Point around which the border box of a Frame, an Overlay or a Page overlay rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center. Without Rotate, it is an error.
 	Node: Opacity
 		Description: How opaque the box is painted, with everything it contains, as a percentage from 0% to 100% (Opacity: 15%): what lies beneath shows through it. With 100% the box is opaque, as without it, and with 0% nothing of it is seen. In an Image, the image with the background and the border of its box; in a Frame, an Overlay and a Page overlay, the box with its content, painted as a whole: what overlaps inside does not show through. Painting only: it does not change the layout. Without it, the box is opaque; the opacity of a single color goes in the color (#RRGGBBAA).
 	Node: Side box
 		Type: ENUM
-		Description: Side box: an Image, a Barcode or a Block (with Width or Max width) in block flow that goes to the left or to the right of its container, at its place in the flow, and the text of the siblings that follow it shortens its lines beside it; its Margin is the separation. A sibling that is not text (a Table, a Stack, a List) goes below it. It is not split across pages: if it does not fit, it moves to the next page with the first line that runs beside it. Not on an item of a Stack or a Grid, nor on a cell.
+		Description: Side box: an Image, a Barcode, or a Block or a Figure (these two with Width or Max width), in block flow, that goes to the left or to the right of its container, at its place in the flow, and the text of the siblings that follow it shortens its lines beside it; its Margin is the separation. A sibling that is not text (a Table, a Stack, a Grid, a Columns, a Frame), one with Background or Border, and a List after a left side box go below it. It is not split across pages: if it does not fit, it moves to the next page with the first line that runs beside it. Not on an item of a Stack or a Grid.
 		Values:
 			Value: left
 			Value: right
@@ -1682,30 +1682,30 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: landscape
 	Node: Content
 		Type: BLOCK
-		Description: Block text. A single line break counts as a space; a blank line is an error, except in a preformatted Text (Preformatted: keep or wrap). In a Barcode, the data, with its lines as they are.
+		Description: Block text. In a Text, a Paragraph and a Caption, a single line break counts as a space and a blank line is an error, except in a preformatted Text (Preformatted: keep or wrap). In a Markdown, the Markdown, where a blank line separates blocks. In a Barcode, the data, with its lines as they are.
 
 	# Box
 
 	Node: Width
-		Description: Width of the border box (in Page, of the page).
+		Description: Width of the border box: a length, a percentage, auto (by default), narrowest, natural or fit. In Page, the width of the page, a positive length.
 	Node: Height
-		Description: Height of the border box (in Page, of the page; in a Marker image, of the image, a positive length).
+		Description: Height of the border box: a length, a percentage or auto (by default), the height of its content. In Page, the height of the page, a positive length; in a Marker image, that of the image, a positive length.
 	Node: Min width
-		Description: Minimum width.
+		Description: Minimum width of the border box: a length, a percentage or auto (by default), which is the narrowest width in an item of a Stack or a Grid and 0 in the rest.
 	Node: Max width
-		Description: Maximum width.
+		Description: Maximum width of the border box: a length or a percentage. By default, none.
 	Node: Min height
-		Description: Minimum height.
+		Description: Minimum height of the border box: a length, a percentage or auto (by default).
 	Node: Max height
-		Description: Maximum height.
+		Description: Maximum height of the border box: a length or a percentage. By default, none.
 	Node: Aspect ratio
-		Description: Width/height ratio (16/9 or a number): derives an auto axis from the other.
+		Description: Width/height ratio (16/9 or a number): derives an auto axis from the other. With Width and Height both declared, it is an error.
 	Node: Margin
-		Description: Margin: top, right, bottom, left (1 to 4 values).
+		Description: Margin: top, right, bottom, left (1 to 4 values: lengths, which can be negative, percentages of the width of the container, or auto, which only centers the box). By default, 0. In Page, the margins of the page: lengths only.
 	Node: Padding
-		Description: Padding: top, right, bottom, left (1 to 4 values).
+		Description: Padding: top, right, bottom, left (1 to 4 values: lengths or percentages of the width of the container, not negative). By default, 0.
 	Node: Border
-		Description: Border width: top, right, bottom, left (1 to 4 values).
+		Description: Border width: top, right, bottom, left (1 to 4 lengths, not negative). By default, 0.
 	Node: Border color
 		Description: Border color: top, right, bottom, left (1 to 4 colors). By default, the Color of the text.
 	Node: Border style
@@ -1716,7 +1716,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: dashed
 			Value: dotted
 	Node: Corner radius
-		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background, the border and the clipping of an Image or a Barcode.
+		Description: Rounded corners: top left, top right, bottom right, bottom left (1 to 4 values, number or %). Painting only: it rounds the background and the border of the box, clips an Image or a Barcode and clips the backgrounds, the borders and the images of what the box contains in its flow; not the text or an Overlay.
 	Node: Background
 		Description: Background, painted in the padding box: a color or a gradient linear(angle, color, color...).
 	Node: Overflow
@@ -1747,17 +1747,17 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Min size
 		Description: The smallest Size that Overflow: shrink may reduce the text to, a length. By default, 6. Inherited. In a box with Overflow: shrink it cannot be greater than Size.
 	Node: Line height
-		Description: Line height: a length, or a percentage (120%) relative to the Size.
+		Description: Line height: a length (15 is 15 pt), or a percentage relative to the Size. By default, 120%.
 	Node: Align
 		Type: ENUM
-		Description: Alignment of the lines.
+		Description: Alignment of the lines: left (by default), right, center or justify, which does not justify the last line of the paragraph.
 		Values:
 			Value: left
 			Value: right
 			Value: center
 			Value: justify
 	Node: Color
-		Description: Color of the text.
+		Description: Color of the text. By default, #000000.
 	Node: Line breaking
 		Type: ENUM
 		Description: Line breaking of the text: simple (greedy, by default: each line is filled as much as it can) or optimal (Knuth-Plass, which chooses the breaks of the whole paragraph at once).
@@ -1778,7 +1778,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: How much later the first line of the text starts, a length (without percentages): that line is that much shorter, and the text is aligned in what is left of it. By default, 0. Inherited: it is usually given with For element: Paragraph, which leaves headings and cells alone. Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one of the part of a paragraph that goes on in another page or column. It can be negative (a hanging indent): the first line starts that much before the others, in the left Padding of its box, which has to be at least as large. It does not go in a Paragraph with Drop cap.
 	Node: Markup
 		Type: ENUM
-		Description: Inline formatting of the text: none (by default; the text is literal) or markdown (interprets **bold**, *italic*, ++underline++, ~~strikethrough~~ and [links](target), with the CommonMark escapes; it does nothing inside a Markdown).
+		Description: Inline formatting of the text: none (by default; the text is literal) or markdown, which interprets **bold**, *italic*, ++underline++, ~~strikethrough~~, `code` (in the Code font), [links](target), styled runs ([text]{style}, with the For style rule of that name), inline images (![alt](path)), footnote calls ([^id]) and a \ at the end of a line as a forced line break, with the CommonMark escapes. Inherited; it does nothing inside a Markdown or in the entries of a Table of contents.
 		Values:
 			Value: none
 			Value: markdown
@@ -1797,7 +1797,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Small caps: lowercase letters are painted as uppercase at 80 % of the size. By default, false.
 	Node: Text position
 		Type: ENUM
-		Description: Position of a styled run on its line: normal (by default), superscript or subscript. A superscript and a subscript are painted at 70 % of the size, raised or lowered from the baseline, without changing the height of the line. Only in the For style rule of a styled run ([text]{name}): in a box it is an error.
+		Description: Position of a styled run on its line: normal (by default), superscript or subscript. A superscript and a subscript are painted at 70 % of the size, raised or lowered from the baseline, without changing the height of the line. Only in the For style rule of a styled run ([text]{name}): in a box it is an error. Not inherited.
 		Values:
 			Value: normal
 			Value: superscript
@@ -1817,13 +1817,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: wrap
 	Node: Tab size
 		Type: INTEGER
-		Description: With Preformatted: keep or wrap, the width of a tab: each one leads to the next column that is a multiple of this number of characters. By default, 4.
+		Description: With Preformatted: keep or wrap, the width of a tab: each one leads to the next column that is a multiple of this number of characters (at least 1). By default, 4.
 	Node: Widows
 		Type: INTEGER
-		Description: Minimum number of lines of a paragraph that move to the next page. By default, 2.
+		Description: Minimum number of lines of a paragraph that move to the next page, at least 1. By default, 2.
 	Node: Orphans
 		Type: INTEGER
-		Description: Minimum number of lines of a paragraph that stay at the end of a page. By default, 2.
+		Description: Minimum number of lines of a paragraph that stay at the end of a page, at least 1. By default, 2.
 
 	# Break
 
@@ -1870,12 +1870,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Whether the items that do not fit in a line go to the next one, so that they are distributed over several lines. By default, false.
 	Node: Split items
 		Type: BOOLEAN
-		Description: With true (by default), a line of a Stack (in vertical, an item) that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
+		Description: With true (by default), a line of a Stack (in vertical, an item) that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either. In a vertical Stack with Wrap items: true, which is never broken across pages, it is an error.
 	Node: Gap
-		Description: Spacing: in Stack and Grid, one value, or two (rows columns); in Columns, one value, the gap between columns.
+		Description: Spacing between items, rows or columns. By default, 0. In Stack and Grid, one value (a length or a percentage) for both axes, or two (rows columns); in a Stack, two only with Wrap items: true. In Table, one or two lengths, the same way; with merged borders (Merge borders) it is an error. In Columns, one length, the gap between columns; with Column count: 1 it is an error.
 	Node: Line distribution
 		Type: ENUM
-		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), distribute (equal gaps, also at the edges) or stretch. Only with Wrap items: true.
+		Description: Distribution of the lines in the container: at one of its sides (top or bottom in a horizontal Stack, whose lines go from top to bottom; left or right in a vertical one, whose lines go from left to right), center, justify (the first and the last at the edges), distribute (equal gaps, also at the edges) or stretch (by default). Only with Wrap items: true.
 		Values:
 			Value: top
 			Value: bottom
@@ -1886,18 +1886,18 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 			Value: stretch
 	Node: Grow
-		Description: Share of the leftover space that the item receives.
+		Description: Share of the leftover space that the item receives: a number, 0 or more, without a unit. By default, 0. In a vertical Stack without a definite height there is no leftover space and it is an error.
 	Node: Shrink
-		Description: Share of the shortfall that the item gives up, weighted by Base size.
+		Description: Share of the shortfall that the item gives up, weighted by Base size: a number, 0 or more, without a unit. By default, 1.
 	Node: Base size
-		Description: Starting size of the item on the main axis.
+		Description: Starting size of the item on the main axis, before it grows or shrinks: a length, a percentage or auto (by default), its declared size on that axis or, without one, that of its content.
 
 	# Grid
 
 	Node: Column sizes
-		Description: Size of each column: one track per column.
+		Description: Size of each column of a Grid or a Table, one track per column, separated by spaces: a length, a percentage, auto, narrowest, natural, a fraction of the leftover space (*, 2*), between(a, b) or repeat(n, tracks); fit is not a track. In a Grid, by default, one auto column; in a Table, required.
 	Node: Row sizes
-		Description: Size of each row: one track per row.
+		Description: Size of each row of a Grid, one track per row, with the tracks of Column sizes. By default, the rows are auto. Rows in percentages need a definite height in the Grid.
 	Node: Area map
 		Type: TEXT
 		Description: One row of the grid per line; names separated by spaces and . for empty cells.
@@ -1912,10 +1912,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: With true (by default), a row of a Grid or a Table that does not fit in what is left of the page is broken on that page, each item on its own; with false it moves whole to the next page, and is only broken if it does not fit on a whole page either.
 	Node: Merge borders
 		Type: BOOLEAN
-		Description: Only in a Table (from a rule of Styles, the other boxes ignore it): with true, the border between two cells is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it; with false, each cell paints its own border. True by default; a table none of whose cells has a border has nothing to merge.
+		Description: Only in a Table: written in the Box of another element it is an error, and from a rule of Styles the other boxes ignore it. With true, the border between two cells is drawn once, centered on the line between them, with the wider of their two borders (and its color); the outer border of the table goes inside it; with false, each cell paints its own border. True by default; a table none of whose cells has a border has nothing to merge. With merged borders, a Gap in the table or a Corner radius in one of its cells is an error.
 	Node: Horizontal
 		Type: ENUM
-		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (left, right, center or stretch). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (left, right, center, justify or distribute); if not, the alignment of all the items (left, right, center or stretch). In an Item, the alignment of one, only if it is the cross axis of its Stack.
+		Description: Horizontal alignment or distribution. In a Grid, the alignment of all the items in their area, and in an Area, that of one (left, right, center or stretch, the default). In a Stack, if its main axis is the horizontal one, the distribution of the leftover space (left, the default, right, center, justify or distribute); if not, the alignment of all the items (left, right, center or stretch, the default). In an Item, the alignment of one, only if it is the cross axis of its Stack. A value that is not one of those of its role is an error.
 		Values:
 			Value: left
 			Value: right
@@ -1925,7 +1925,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: distribute
 	Node: Vertical
 		Type: ENUM
-		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. baseline is only for the cross axis of a Stack with Direction: horizontal and its Item: the items are aligned by the baseline of their first line of text, and an item without text rests its bottom on it. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: top (by default), center or bottom; the box of the cell stays stretched to its row.
+		Description: Vertical alignment or distribution, like Horizontal: in a Grid and in an Area, the alignment in the area; in a Stack, the distribution if its main axis is the vertical one and, if not, the alignment of the items; in an Item, the alignment of one, only if it is the cross axis of its Stack. By default, stretch where it aligns and top where it distributes. baseline is only for the cross axis of a Stack with Direction: horizontal and its Item: the items are aligned by the baseline of their first line of text, and an item without text rests its bottom on it. In a Cell, where its content goes in the height its row leaves over, like the distribution of a vertical Stack: top (by default), center or bottom; the box of the cell stays stretched to its row.
 		Values:
 			Value: top
 			Value: bottom
@@ -1966,10 +1966,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: First number
 		Type: INTEGER
-		Description: Number of the first item of a numbered list. By default, 1.
+		Description: Number of the first item of a numbered List: from 0 with Marker: decimal, from 1 with letters and Roman numerals, which reach 3999. By default, 1. In a List that does not number, it is an error.
 	Node: Item number
 		Type: INTEGER
-		Description: Number of this item of a numbered list; the following ones continue from it.
+		Description: Number of this item of a numbered List, in the same range as First number; the following ones continue from it. In a List that does not number, it is an error.
 
 	# Table
 
@@ -1987,11 +1987,11 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Type: INTEGER
 		Description: Number of columns of a Columns (at least 1); with Min column width, the maximum.
 	Node: Min column width
-		Description: Minimum width of the columns: as many fit as the width allows, up to Column count if it is declared.
+		Description: Minimum width of the columns, a positive length (without percentages): as many fit as the width allows, up to Column count if it is declared.
 	Node: Separator
-		Description: Width of the line between the columns of a Columns, centered in Gap, which must be at least as wide.
+		Description: Width of the line between the columns of a Columns, a positive length, centered in Gap, which must be at least as wide. Without it, there is no line. With Column count: 1 it is an error.
 	Node: Separator color
-		Description: Color of the line between columns. By default, the Color of the text.
+		Description: Color of the line between columns. By default, the Color of the text. Only with Separator.
 	Node: Separator style
 		Type: ENUM
 		Description: How the line between columns is drawn: solid (by default), dashed or dotted, like Border style. Only with Separator.
@@ -2006,7 +2006,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Image
 
 	Node: Alt
-		Description: Alternative text of an Image or a Barcode: with it, the image is a figure (Figure) of the tagged PDF; without it, an Image is decorative. A Barcode requires it, and so does the image of a Figure. In a Figure with a Block, the alternative text of the whole figure, required.
+		Description: Alternative text, not empty, of an Image, a Barcode or a Marker image: with it, the image is a figure (Figure) of the tagged PDF; without it, an Image and a Marker image are decorative. A Barcode requires it, and so does the image of a Figure. In a Figure with a Block, the alternative text of the whole figure, required; in a Figure with an Image, a Barcode or a Table it is an error.
 	Node: Fit
 		Type: ENUM
 		Description: How an Image fills its box if they have different proportions: inside (by default) fits whole and centered; crop fills the box, centered, and crops what is left over; stretch stretches it to the box and distorts it.
@@ -2049,12 +2049,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Markdown
 
 	Node: Bullet markers
-		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none.
+		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none. Required, its own or from a rule of Styles, if the content has bulleted lists.
 	Node: Number markers
-		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman. A list written with 1) has Marker suffix: parenthesis.
+		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman. A list written with 1) has Marker suffix: parenthesis. Required, its own or from a rule of Styles, if the content has numbered lists.
 	Node: Table column sizes
 		Type: ENUM
-		Description: Columns of the tables of a Markdown: equal, all of the same width (repeat(n, *)); auto, each according to its content (repeat(n, auto)).
+		Description: Columns of the tables of a Markdown: equal, all of the same width (repeat(n, *)); auto, each according to its content (repeat(n, auto)). Required, its own or from a rule of Styles, if the content has tables.
 		Values:
 			Value: equal
 			Value: auto

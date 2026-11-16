@@ -31,6 +31,12 @@ accepted. The Java API changes where it follows those names.
   error. To migrate a document, each of the three moves one level up, out of its `Typography`, and the
   `Numbered: true` of `For element: Document` goes to the rule of each heading level. In the Java API,
   `Style.numbered()`, `Style.numberFormat()` and `Style.numberLabel()` replace those of `TypographyStyle`.
+- The descriptions of the schema, which an editor shows when completing, were read against the reference, and 63 of
+  its 170 nodes changed theirs. `Footnote` said that a note is called exactly once, and since 0.16.0 it can be called
+  several times; `Rotate` gave -360 and 360 as valid; `Side box` did not name `Figure`; `Layer` said that an item
+  without it is painted like one with `Layer: 0`. `Markup`, `Markdown`, `Typography` and `Box` list all they cover, and
+  the others gain the values they accept, their default or the case in which they are an error. Nothing else of the
+  schema changes: the same nodes, types, values and children.
 
 ## [0.18.1] - 2026-11-15
 
