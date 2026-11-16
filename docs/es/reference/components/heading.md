@@ -1,7 +1,7 @@
 # Encabezados: `Heading 1` a `Heading 6`
 
 Un `Heading N` es un **bloque** cuyo contenido son uno o varios `Text`, apilados como en un `Block`. Además admite `Id`,
-`Style`, `Link`, `In table of contents`, `Box` y `Typography`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
+`Style`, `Link`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Box`, `Typography` y `Below side boxes`, y nada más. Su `Typography` lo heredan sus `Text`. Se maqueta con el
 flujo de bloque de siempre. Su significado se ve en las reglas `For element`, en los cortes, en la numeración, en los índices,
 en los marcadores del PDF y en lo que anuncia un lector de pantalla.
 

@@ -1,6 +1,6 @@
 # `Block`
 
-A box that stacks its children vertically. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
+A box that stacks its children vertically. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`,
 `Rotate`, `Side box` and `Below side boxes`, and any element as a child. It goes wherever an in-flow element goes. With `Rotate`, it rotates with everything it contains
 and takes up the rectangle that encloses it ([Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image)).
 With `Side box`, it is a [side box](#side-boxes-side-box): the text that follows it runs beside it.

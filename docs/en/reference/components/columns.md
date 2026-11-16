@@ -121,5 +121,4 @@ The content is read in order, column by column, and the line between columns is 
 
 - Content that spans all the columns at once (a full-width title in the middle): the `Columns` is split in two.
 - Balancing all the pages: only the last one is balanced.
-- Lines between columns with a style.
 - `Overlay` and `Page overlay` inside the columns.

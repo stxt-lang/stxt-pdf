@@ -44,7 +44,7 @@ Table:
 | `Box` | `Background`, `Border`, `Border color`, `Border style`, `Corner radius` | sin valor | `Row` | El aspecto de la franja de la fila ([Filas](#filas)). Nada más (`ROW_BOX`). |
 
 `Column sizes`, `Column align`, `Gap`, `Split rows` y el `Vertical` de las celdas también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Span` y
-`Row header`, no. Sin `Column sizes`, propio o de una regla, es un error (`TABLE_COLUMN_SIZES_MISSING`). `Merge borders` (`true` o `false`, por defecto `false`)
+`Row header`, no. Sin `Column sizes`, propio o de una regla, es un error (`TABLE_COLUMN_SIZES_MISSING`). `Merge borders` (`true` o `false`, por defecto `true`)
 va en el `Box` de la `Table`, así que también vale en una regla: el borde entre dos celdas se dibuja una sola vez, el más
 ancho de los dos ([Bordes fusionados](#bordes-fusionados)).
 

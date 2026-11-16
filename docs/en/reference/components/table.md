@@ -46,7 +46,7 @@ Table:
 `Column sizes`, `Column align`, `Gap`, `Split rows` and the `Vertical` of the cells can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Span` and
 `Row header` cannot. Without `Column sizes`, its own or from a rule, it is an error (`TABLE_COLUMN_SIZES_MISSING`).
 `Merge borders` (`true` or `false`, by default
-`false`) goes in the `Box` of the `Table`, so it is also valid in a rule: the border between two cells is drawn once,
+`true`) goes in the `Box` of the `Table`, so it is also valid in a rule: the border between two cells is drawn once,
 the wider of the two ([Merged borders](#merged-borders)).
 
 > **Decision:** the groups of rows that are repeated are called `Header rows` and `Footer rows`, the names of the

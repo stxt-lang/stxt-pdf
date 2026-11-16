@@ -3,7 +3,7 @@
 A `Markdown` is a block whose content is written in Markdown, in its `Content`. That content is **translated into the
 elements that already exist**, and what is generated is treated as if the author had written it: the same `Styles` rules, the
 same errors ([Errors](../common/errors.md)), the bookmarks and the accessibility. The
-`Markdown` is the box that contains it, a block like a `Block`: it accepts `Id`, `Style`, `Box`, `Typography` and `Break`, and what is
+`Markdown` is the box that contains it, a block like a `Block`: it accepts `Id`, `Style`, `Box`, `Typography`, `Break` and `Below side boxes`, and what is
 generated inherits its `Typography`. It does not accept `Link`: its content carries its own links.
 
 ```

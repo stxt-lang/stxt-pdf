@@ -2,7 +2,7 @@
 
 The three **positioned elements** are blocks: they stack their children in block flow ([Block](block.md)). To position
 a `Stack` or a `Grid`, it is put inside one of them. They accept `Id`, `Style`, `Link`, `Box` and `Typography`, and
-`Frame`, also `Break` and `Isolate margins`.
+`Frame`, also `Break`, `Isolate margins` and `Trim margins`.
 
 | Property | Values | Default | Elements | Notes |
 |---|---|---|---|---|

@@ -1,7 +1,7 @@
 # Headings: `Heading 1` to `Heading 6`
 
 A `Heading N` is a **block** whose content is one or more `Text`, stacked as in a `Block`. It also accepts `Id`,
-`Style`, `Link`, `In table of contents`, `Box` and `Typography`, and nothing else. Its `Text` elements inherit its `Typography`. It is laid out with the
+`Style`, `Link`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Box`, `Typography` and `Below side boxes`, and nothing else. Its `Text` elements inherit its `Typography`. It is laid out with the
 usual block flow. Its meaning shows in the `For element` rules, in the breaks, in the numbering, in the tables of contents,
 in the bookmarks of the PDF and in what a screen reader announces.
 

@@ -121,5 +121,4 @@ El contenido se lee en orden, de columna en columna, y la línea entre columnas 
 
 - Contenido que ocupe todas las columnas a la vez (un título a lo ancho en medio): se parte el `Columns` en dos.
 - Equilibrar todas las páginas: solo se equilibra la última.
-- Líneas entre columnas con estilo.
 - `Overlay` y `Page overlay` dentro de las columnas.
