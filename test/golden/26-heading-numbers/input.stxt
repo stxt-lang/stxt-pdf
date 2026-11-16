@@ -6,7 +6,7 @@
 # the table of contents. The numbers come out as: intro is 1, method 1.1, data 1.2, fine has none (level 3) and
 # results is 2.
 #
-# toc lists levels 1 and 2 (Levels: 1 2): intro, method, data and results, four entries of 12 pt
+# toc lists levels 1 and 2 (Heading levels: 1 2): intro, method, data and results, four entries of 12 pt
 # (48 in total) and a margin of 8. cover takes up 20..32, toc 32..80, intro starts at 80 + 8 = 88, method
 # at 100, data at 112, fine at 124 and ref, which writes "Véase la sección 1.2 y el capítulo 2." (37
 # characters, 185 pt, one line), at 136.
@@ -38,7 +38,7 @@ Document (dev.stxt.pdf):
 			Numbered: false
 		Table of contents:
 			Id: toc
-			Levels: 1 2
+			Heading levels: 1 2
 			Box:
 				Margin: 0 0 8 0
 		Heading 1:

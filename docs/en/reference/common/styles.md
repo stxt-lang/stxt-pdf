@@ -19,7 +19,7 @@ type, of a style or with an `Id`, and the element can override them.
 
 Each rule allows the `Box`, `Typography` and `Break` groups, at most one of each, and the
 [element properties](#element-properties) that say how an element looks or how it distributes its content (`Gap`,
-`Column sizes`, `Fit`, `Marker`...), at most one of each. A rule written inside another is a
+`Column sizes`, `Image fit`, `Marker`...), at most one of each. A rule written inside another is a
 [nested rule](#nested-rules): it applies to the elements that are inside an element the outer one applies to.
 
 ```
@@ -52,7 +52,7 @@ Styles:
     For style: dish
         Gap: 12
     For element: Image
-        Fit: crop
+        Image fit: crop
 Stack:
     Style: dish
     Item:
@@ -73,7 +73,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Opacity`, `Side box`, `Below side boxes` |
+| `Image` | `Image fit`, `Opacity`, `Side box`, `Below side boxes` |
 | `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side box`, `Below side boxes` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes` |
 | `Heading 1` to `Heading 6` | `In table of contents`, `Numbered`, `Number format`, `Number label`, `Below side boxes` |
@@ -84,7 +84,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Overlay`, `Page overlay` | `Opacity` |
 | `Cell` | `Trim margins`, `Vertical` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
-| `Table of contents` | `Levels`, `Leader` |
+| `Table of contents` | `Heading levels`, `Leader` |
 | the element of an `Item` | `Grow`, `Shrink`, `Base size` |
 
 - **They apply like the groups**: with the same [priority](#priority), property by property, and without inheritance.
@@ -115,7 +115,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 > **Decision:** rules allow the element properties of appearance and distribution, and the engine checks that the
 > element can declare them, because the schema cannot: the type goes in the value of `For element`, and in `For style`
 > and `For id` it is not known until the rule is applied. *Rejected alternative:* rules that only allowed the groups,
-> which made each element repeat the same `Gap` or the same `Fit`.
+> which made each element repeat the same `Gap` or the same `Image fit`.
 
 > **Decision:** a property that the element cannot declare is an error, also in `For style`. *Rejected alternative:*
 > ignoring it, which would allow using the same style on elements of different types at the cost of not reporting a

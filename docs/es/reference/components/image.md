@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
             Item:
                 Grow: 1
                 Image: test/wide.png
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 60
 ```
@@ -46,14 +46,14 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 |---|---|---|---|
 | *(valor)* | ruta relativa a `images/` | obligatorio | El fichero PNG, JPEG, SVG o PDF: `Image: logos/acme.png`. |
 | `Alt` | texto no vacío | sin valor | Texto alternativo: con él, la imagen es una figura que se lee ([accesibilidad](#accesibilidad)). Sin él, es decorativa. |
-| `Fit` | `inside`, `crop`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
+| `Image fit` | `inside`, `crop`, `stretch` | `inside` | Cómo llena la imagen su caja de contenido si tienen proporciones distintas. |
 | `Opacity` | porcentaje de `0%` a `100%` | sin valor (opaca) | Atenúa la imagen, con el fondo y el borde de su caja: una marca de agua ([Capas y giro](../common/layers-and-rotation.md#opacidad-opacity)). |
 | `PDF page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
 | `Side box` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side-box)). |
 | `Below side boxes` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side-box)). |
 
-`Fit`, `Opacity`, `Side box` y `Below side boxes` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `PDF page` y `Rotate`, no.
+`Image fit`, `Opacity`, `Side box` y `Below side boxes` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `PDF page` y `Rotate`, no.
 
 ## Fichero
 
@@ -89,7 +89,7 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
   Si no cabe, es un desbordamiento (`BOX_OVERFLOW`). Para que ocupe el ancho disponible, se declara `Width: 100%`.
   `Margin: 0 auto` la centra, porque no ocupa todo el ancho.
 - Con un eje declarado, o impuesto por el padre (un ítem de `Stack` con `Grow`, una columna de `Grid` con
-  `Horizontal: stretch`), el otro sale de la proporción. Con los dos, la caja mide lo declarado y `Fit` decide cómo la llena
+  `Horizontal: stretch`), el otro sale de la proporción. Con los dos, la caja mide lo declarado y `Image fit` decide cómo la llena
   la imagen.
 - `Min width`, `Max width`, `Min height` y `Max height` se aplican como en cualquier caja. Si los dos ejes son `auto` y el
   alto choca con su mínimo o su máximo, el ancho se vuelve a deducir del alto limitado: la proporción se conserva.
@@ -99,15 +99,15 @@ sustituye (no es un error). El relleno y el borde van fuera: no la deforman.
   `Height` con una medida, el que sale de él con la proporción. Es un mínimo de verdad: en una pista `*` de grid o en un
   ítem de `Stack` sin `Min width`, la imagen no encoge por debajo de él.
 
-Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Fit` coloca la imagen.
+Si los mínimos y los máximos no se pueden cumplir a la vez con la proporción, gana el ancho y `Image fit` coloca la imagen.
 
-> **Decisión:** el alto de una imagen sale siempre de la proporción. *Alternativa descartada:* estirarla y dejar que `Fit`
+> **Decisión:** el alto de una imagen sale siempre de la proporción. *Alternativa descartada:* estirarla y dejar que `Image fit`
 > la coloque.
 
 > **Decisión:** los tamaños intrínsecos son un mínimo de verdad, también con un `Width` en porcentaje. *Alternativa
 > descartada:* un ancho más estrecho de 0, que deja encoger la imagen.
 
-## `Fit`
+## `Image fit`
 
 Si la caja de contenido y la imagen tienen proporciones distintas:
 
@@ -139,7 +139,7 @@ numerado («Figura 3. ...»), y su `Alt` es obligatorio.
 ## SVG
 
 Un SVG es un dibujo vectorial: el PDF lo lleva como rutas, rellenos, degradados y recortes y no como píxeles, así que se ve
-nítido a cualquier tamaño y pesa poco. Se dimensiona, se coloca (`Fit` incluido) y se corta como cualquier imagen. Es un
+nítido a cualquier tamaño y pesa poco. Se dimensiona, se coloca (`Image fit` incluido) y se corta como cualquier imagen. Es un
 fichero XML en el espacio de nombres de SVG, y se admite un subconjunto cerrado: `svg` (sin otro `svg` dentro), `g`, `defs`,
 `title`, `desc`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `path`, `linearGradient`, `radialGradient`,
 `stop`, `clipPath`, `use`, `text` y `tspan`, con sus atributos de presentación (rellenos y trazos lisos o con degradado,

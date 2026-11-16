@@ -251,12 +251,12 @@ public enum ErrorCode {
 
     // --- Table of contents --------------------------------------------------------------------
     /**
-     * A {@code Table of contents} without any heading in the levels of {@code Levels} or, with {@code Entries: figures} or
+     * A {@code Table of contents} without any heading in the levels of {@code Heading levels} or, with {@code Entries: figures} or
      * {@code tables}, without any figure or table to list.
      */
     TABLE_OF_CONTENTS_EMPTY,
-    /** {@code Levels} in a {@code Table of contents} with {@code Entries: figures} or {@code tables}, which lists no headings. */
-    LEVELS_WITHOUT_HEADINGS,
+    /** {@code Heading levels} in a {@code Table of contents} with {@code Entries: figures} or {@code tables}, which lists no headings. */
+    HEADING_LEVELS_WITHOUT_HEADINGS,
 
     // --- Reusable rules (Styles) ---------------------------------------------------------------
     /** {@code For element} with a name that is not a box element. */

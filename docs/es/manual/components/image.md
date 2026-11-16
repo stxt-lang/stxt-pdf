@@ -28,14 +28,14 @@ Document (dev.stxt.pdf):
             Area:
                 Image: examples/catalog/silla.jpg
                     Alt: Silla de nogal con asiento de lana
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
             Area:
                 Image: examples/catalog/mesa.jpg
                     Alt: Mesa de comedor de nogal
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | *(valor)* | La ruta del fichero dentro de `images/`: `Image: logos/acme.png`. Obligatoria |
 | `Alt` | El texto alternativo, para quien no ve la imagen. Sin `Alt`, la imagen es decorativa y el lector de pantalla la salta |
-| `Fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `inside` (entera, con espacio a los lados), `crop` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
+| `Image fit` | Cómo llena la imagen su caja si no tienen la misma proporción: `inside` (entera, con espacio a los lados), `crop` (llena la caja y recorta lo que sobra) o `stretch` (se deforma) |
 | `PDF page` | La página de un PDF que se dibuja, desde 1. Sin `PDF page`, la primera. Solo en un PDF |
 | `Opacity` | Atenuar la imagen, con un porcentaje (`10%`): una marca de agua ([Capas y giro](../common/layers-and-rotation.md#atenuar-una-caja-opacity)) |
 | `Rotate` | Girar la imagen sobre su centro. Ocupa el rectángulo que la envuelve girada ([Capas y giro](../common/layers-and-rotation.md#girar-una-caja-rotate)) |
@@ -62,7 +62,7 @@ Admite además `Id`, `Style`, `Link`, `Box` y `Break` (sin `Keep together` ni `E
   mide 300 × 225 puntos. Un SVG mide lo que dicen su `width` y su `height` (o su `viewBox`), y la página de un PDF, lo que
   mide la página (un A4, 210 × 297 mm).
 - No se estira sola al ancho de la página: si no cabe, es un error. Para que ocupe todo el ancho, `Width: 100%`.
-- Con `Width` o `Height`, el otro lado sale de la proporción de la imagen. Con los dos, la caja mide eso y `Fit` decide cómo
+- Con `Width` o `Height`, el otro lado sale de la proporción de la imagen. Con los dos, la caja mide eso y `Image fit` decide cómo
   la llena la imagen.
 - `Margin: 0 auto` la centra.
 - El relleno y el borde van alrededor: no deforman la imagen.

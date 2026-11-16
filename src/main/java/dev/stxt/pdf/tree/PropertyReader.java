@@ -159,7 +159,7 @@ final class PropertyReader {
             entry("below-side-boxes", (p, s) -> s.setBelowSideBoxes(bool(p))),
             entry("drop-cap", (p, s) -> s.setDropCap(dropCap(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
-            entry("fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
+            entry("image-fit", (p, s) -> s.image().setFit(enumValue(Fit.class, p))),
             entry("pdf-page", (p, s) -> s.image().setPdfPage(positiveInteger(p))),
             entry("barcode-format", (p, s) -> s.image().setBarcodeFormat(enumValue(BarcodeFormat.class, p))),
             entry("error-correction", (p, s) -> s.image().setErrorCorrection(enumValue(ErrorCorrection.class, p))),
@@ -168,7 +168,7 @@ final class PropertyReader {
             entry("caption-position", (p, s) -> s.figure().setCaptionPosition(enumValue(CaptionPosition.class, p))),
             entry("figure-counter", (p, s) -> s.figure().setCounter(enumValue(FigureCounter.class, p))),
             entry("entries", (p, s) -> s.tableOfContents().setEntries(enumValue(Listing.class, p))),
-            entry("levels", TableOfContentsBuilder::levels),
+            entry("heading-levels", TableOfContentsBuilder::levels),
             entry("leader", (p, s) -> s.tableOfContents().setLeader(enumValue(Leader.class, p))));
 
     private PropertyReader() {

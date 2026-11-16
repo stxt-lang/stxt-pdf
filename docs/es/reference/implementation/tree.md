@@ -26,7 +26,7 @@ En el schema:
   `BOOLEAN`;
 - los enteros (como `Layer`, `Widows`, `Orphans`, `First number`, `Item number`, `Column count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
   y `Rotate`, `NUMBER`;
-- las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
+- las de valores cerrados (como `Image fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
 
 Lo que el schema no puede expresar lo comprueba `BoxTreeBuilder`: que `Page` declare su tamaño de una sola forma, que

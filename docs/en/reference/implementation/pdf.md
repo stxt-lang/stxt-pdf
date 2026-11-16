@@ -151,7 +151,7 @@ has a single `THead` and a single `TFoot`.
 
 ### Figures
 
-The `BBox` of the `Figure` of an image is its content box on the page and not the visible part with `Fit: inside`. That of
+The `BBox` of the `Figure` of an image is its content box on the page and not the visible part with `Image fit: inside`. That of
 a rotated image is the rectangle that encloses it.
 
 An inline image ([Text formatting](../common/text-formatting.md#images-inside-a-text)) is a `Figure` with its `Alt` and
@@ -355,5 +355,5 @@ namespaces it needs; `PdfMetadata` uses it. A fragment that is not XML is an `Il
 
 The PDF embeds each file only once, even if it is used on several pages, with the resolution of the file: the JPEG as
 it is and the PNG lossless and with its transparency. An SVG is a form (*XObject*) of its natural size, drawn once
-per file, which is scaled to its box with `Fit` like a PNG ([Painting](painting.md#images)). The page of a PDF is also
+per file, which is scaled to its box with `Image fit` like a PNG ([Painting](painting.md#images)). The page of a PDF is also
 a form, copied once per page: its content and its resources, without its annotations or its tagging.

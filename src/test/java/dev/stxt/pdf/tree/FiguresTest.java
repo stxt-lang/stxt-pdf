@@ -190,8 +190,8 @@ class FiguresTest {
     @Test
     void aTableOfContentsOfFiguresHasNoLevelsAndNeedsSomeFigure() {
         InvalidModelException levels = error("\tSection:", "\t\tFigure:", "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"),
-                "\t\tTable of contents:", "\t\t\tEntries: figures", "\t\t\tLevels: 1 2");
-        assertEquals(ErrorCode.LEVELS_WITHOUT_HEADINGS, levels.errorCode());
+                "\t\tTable of contents:", "\t\t\tEntries: figures", "\t\t\tHeading levels: 1 2");
+        assertEquals(ErrorCode.HEADING_LEVELS_WITHOUT_HEADINGS, levels.errorCode());
         assertEquals(19, levels.line());
         InvalidModelException empty = error("\tSection:", "\t\tFigure:", "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"),
                 "\t\tTable of contents:", "\t\t\tEntries: tables");

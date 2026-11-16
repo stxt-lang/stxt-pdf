@@ -20,7 +20,7 @@ los elementos de un tipo, de un estilo o con un `Id`, y el elemento los puede so
 
 Cada regla admite los grupos `Box`, `Typography` y `Break`, como mucho uno de cada, y las
 [propiedades de elemento](#propiedades-de-elemento) que dicen cómo se ve un elemento o cómo reparte su contenido (`Gap`,
-`Column sizes`, `Fit`, `Marker`...), como mucho una de cada. Una regla escrita dentro de otra es una
+`Column sizes`, `Image fit`, `Marker`...), como mucho una de cada. Una regla escrita dentro de otra es una
 [regla anidada](#reglas-anidadas): se aplica a los elementos que están dentro de un elemento al que se aplica la de fuera.
 
 ```
@@ -53,7 +53,7 @@ Styles:
     For style: dish
         Gap: 12
     For element: Image
-        Fit: crop
+        Image fit: crop
 Stack:
     Style: dish
     Item:
@@ -74,7 +74,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Opacity`, `Side box`, `Below side boxes` |
+| `Image` | `Image fit`, `Opacity`, `Side box`, `Below side boxes` |
 | `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side box`, `Below side boxes` |
 | `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes` |
 | `Heading 1` a `Heading 6` | `In table of contents`, `Numbered`, `Number format`, `Number label`, `Below side boxes` |
@@ -85,7 +85,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Overlay`, `Page overlay` | `Opacity` |
 | `Cell` | `Trim margins`, `Vertical` |
 | `Markdown` | `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes` |
-| `Table of contents` | `Levels`, `Leader` |
+| `Table of contents` | `Heading levels`, `Leader` |
 | el elemento de un `Item` | `Grow`, `Shrink`, `Base size` |
 
 - **Se aplican como los grupos**: con la misma [prioridad](#prioridad), propiedad a propiedad, y sin herencia. Lo que
@@ -116,7 +116,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 > **Decisión:** las reglas admiten las propiedades de elemento de aspecto y de reparto, y el motor comprueba que el
 > elemento las puede declarar, porque el schema no puede: el tipo va en el valor de `For element`, y en `For style` y
 > `For id` no se conoce hasta aplicar la regla. *Alternativa descartada:* que las reglas solo admitieran los grupos, que
-> obligaba a repetir en cada elemento el mismo `Gap` o el mismo `Fit`.
+> obligaba a repetir en cada elemento el mismo `Gap` o el mismo `Image fit`.
 
 > **Decisión:** una propiedad que el elemento no puede declarar es un error, también en `For style`. *Alternativa
 > descartada:* ignorarla, que permitiría usar el mismo estilo en elementos de tipos distintos a costa de no avisar de una

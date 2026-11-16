@@ -64,7 +64,7 @@ marcador, contando en la jerarquía y siendo destino de `#id`. Es lo normal para
 índice. Es una propiedad del elemento, por defecto `true`, que no se hereda; también puede venir de una regla de `Styles`
 ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)).
 
-> **Decisión:** se elige en cada encabezado. *Alternativa descartada:* que el índice eligiera por nivel (`Levels`) los que
+> **Decisión:** se elige en cada encabezado. *Alternativa descartada:* que el índice eligiera por nivel (`Heading levels`) los que
 > no lista, que no sirve cuando la portada y los capítulos son del mismo nivel.
 
 ## Numeración (`Numbered`)

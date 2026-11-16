@@ -163,10 +163,10 @@ final class StyleRules {
             "column-sizes", "row-sizes", "area-map", "fill-order", "split-rows", "column-align",
             "column-count", "min-column-width", "separator", "separator-color", "separator-style",
             "balance-columns",
-            "marker", "marker-suffix", "marker-image", "fit", "opacity", "barcode-format", "error-correction", "quiet-zone",
+            "marker", "marker-suffix", "marker-image", "image-fit", "opacity", "barcode-format", "error-correction", "quiet-zone",
             "readable-text",
             "caption-position", "figure-counter", "in-table-of-contents", "numbered", "number-format", "number-label",
-            "levels", "leader",
+            "heading-levels", "leader",
             "drop-cap", "side-box", "below-side-boxes", "isolate-margins", "trim-margins",
             "bullet-markers", "number-markers", "table-column-sizes",
             "grow", "shrink", "base-size");

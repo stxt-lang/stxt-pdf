@@ -290,13 +290,13 @@ intrinsic sizes are those of an image.
 The content box does not have to have the aspect ratio of the code. If it does not:
 
 - a **QR code**, a **Data Matrix** and a **PDF417** are drawn whole, as large as they fit and centered, with the
-  proportion of their modules (like `Fit: inside`): square in the first two, and three times as tall as wide in a
+  proportion of their modules (like `Image fit: inside`): square in the first two, and three times as tall as wide in a
   PDF417;
-- a **barcode of one row** (`code-128`, `gs1-128`, `ean-13`) is stretched to the box (like `Fit: stretch`): the bars take
+- a **barcode of one row** (`code-128`, `gs1-128`, `ean-13`) is stretched to the box (like `Image fit: stretch`): the bars take
   up the whole height, minus that of its [readable text](#readable-text) if it has one, and all the modules have the same
   width.
 
-A `Barcode` does not accept `Fit`.
+A `Barcode` does not accept `Image fit`.
 
 > **Decision:** the natural size comes from a fixed module: 0.5 mm in a QR code and a Data Matrix, and the nominal size
 > of EAN-13 (0.33 × 22.85 mm) in the barcodes; in a PDF417, that width and rows three modules high, the minimum of its

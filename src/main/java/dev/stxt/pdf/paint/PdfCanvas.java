@@ -321,7 +321,8 @@ public final class PdfCanvas implements Canvas {
             Shapes.roundedRect(page.path(), content, radii);
             out().clip();
             if (file.isVector()) {
-                // The drawing has the size of the SVG or the page: it is scaled to its place (Fit) and stays vector.
+                // The drawing has the size of the SVG or the page: it is scaled to its place (Image fit) and stays
+                // vector.
                 out().transform(new Matrix((float) (target.width() / width), 0, 0, (float) (target.height() / height),
                         (float) target.x(), (float) (pageHeight - target.bottom())));
                 // A form inherits the graphics state and the drawing does not set the dashes: no dashes.

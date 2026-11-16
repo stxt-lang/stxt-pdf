@@ -23,6 +23,10 @@ accepted. The Java API changes where it follows those names.
   `FIRST_PAGE_NUMBER_WITHOUT_RESTART`. The `First number` of a `List` does not change. In the Java API,
   `Section.firstPageNumber()`.
 - In a `List item`, `Number` is `Item number`. In the Java API, `PropertyKey.ITEM_NUMBER`.
+- In an `Image`, `Fit` is `Image fit` (`Image fit: crop`): alone in a rule of `Styles` it did not say what it fits, and
+  `fit` is also a value of `Width`. The values do not change, and neither does the Java API (`ImageStyle.fit()`).
+- In a `Table of contents`, `Levels` is `Heading levels` (`Heading levels: 1 2`), and `LEVELS_WITHOUT_HEADINGS` is
+  `HEADING_LEVELS_WITHOUT_HEADINGS`. In the Java API, `PropertyKey.HEADING_LEVELS`.
 - `Numbered`, `Number format` and `Number label` are no longer properties of `Typography`: they are declared in the
   heading or in the `Figure`, or in a rule that reaches them (`For element`, `For style` or `For id`), and are not
   inherited. `Numbered: true` in `For element: Document` no longer numbers the headings: each level that is numbered

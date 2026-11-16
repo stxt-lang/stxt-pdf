@@ -42,7 +42,7 @@ that say how it looks or how it distributes its content. A rule can go inside an
 ## Element properties
 
 A rule also gives the properties specific to an element that say how it looks or how it distributes its content: the
-`Gap` of a `Stack`, the `Column sizes` of a `Grid` or a `Table`, the `Fit` of an `Image`, the `Marker` of a `List`... In
+`Gap` of a `Stack`, the `Column sizes` of a `Grid` or a `Table`, the `Image fit` of an `Image`, the `Marker` of a `List`... In
 this menu, each dish is a `Stack` with `Style: dish`, and its `Gap` goes only once, in the rule:
 
 ```

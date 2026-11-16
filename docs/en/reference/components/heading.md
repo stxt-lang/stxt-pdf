@@ -64,7 +64,7 @@ bookmark, counts in the hierarchy and is a target of `#id`. It is the usual thin
 itself. It is a property of the element, `true` by default, which is not inherited; it can also come from a rule of `Styles`
 ([Element properties](../common/styles.md#element-properties)).
 
-> **Decision:** it is chosen on each heading. *Rejected alternative:* the table of contents choosing by level (`Levels`) the ones it
+> **Decision:** it is chosen on each heading. *Rejected alternative:* the table of contents choosing by level (`Heading levels`) the ones it
 > does not list, which does not work when the cover and the chapters are of the same level.
 
 ## Numbering (`Numbered`)

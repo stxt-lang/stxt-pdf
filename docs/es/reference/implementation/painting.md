@@ -93,7 +93,7 @@ sobreescribe ninguno y `ContrastCheck`, solo los que le dicen de qué caja es el
 | `PdfAttachments` | Los ficheros adjuntos (PDF/A-3 o sin PDF/A): las especificaciones de fichero, el árbol `EmbeddedFiles` y el array `AF` |
 | `PdfId` | El identificador del tráiler (`/ID`), calculado del contenido al guardar |
 | `PdfLinks`, `PdfDestinations` | Las anotaciones de enlace y la esquina de cada caja con nombre (para marcadores y enlaces internos) |
-| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Dónde se dibuja una imagen según `Fit`, la guía de un índice, los caminos de las cajas y el patrón de las líneas de trazos y de puntos |
+| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Dónde se dibuja una imagen según `Image fit`, la guía de un índice, los caminos de las cajas y el patrón de las líneas de trazos y de puntos |
 
 > **Decisión:** los destinos internos se resuelven después de pintar todas las páginas, porque un enlace puede ir hacia
 > delante: se crean todas las páginas antes de pintar ninguna y se busca la esquina del primer fragmento de cada caja con

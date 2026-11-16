@@ -1,7 +1,7 @@
 # `Table of contents`
 
 A `Table of contents` is an automatic table of contents: an in-flow block, without children, that generates **one entry per heading** of the
-levels in `Levels` (1 to 3 by default), in document order, also those of a `Markdown` and those that come after the
+levels in `Heading levels` (1 to 3 by default), in document order, also those of a `Markdown` and those that come after the
 table of contents itself, except those that declare `In table of contents: false` ([Headings](heading.md#outside-the-table-of-contents)). With
 `Entries: figures` or `Entries: tables` it is a **table of figures or of tables**: one entry per `Figure` of that counter
 ([below](#what-it-lists-of)). It accepts `Id`, `Style`, `Box`, `Typography` and `Break`, like a `Block`, and goes
@@ -9,17 +9,17 @@ wherever a `Markdown` goes. It does not accept `Link`: its entries already carry
 
 ```
 Table of contents:
-    Levels: 1 2
+    Heading levels: 1 2
     Leader: dots
 ```
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
-| `Entries` | `headings`, `figures`, `tables` | `headings` | What it lists: the headings of `Levels`, the figures or the tables ([below](#what-it-lists-of)). |
-| `Levels` | two integers from 1 to 6: the first and the last level | `1 3` | The headings it lists: `Levels: 1 2` lists the `Heading 1` and `Heading 2` elements. Without any heading at those levels it is an error. Only with `Entries: headings`. |
+| `Entries` | `headings`, `figures`, `tables` | `headings` | What it lists: the headings of `Heading levels`, the figures or the tables ([below](#what-it-lists-of)). |
+| `Heading levels` | two integers from 1 to 6: the first and the last level | `1 3` | The headings it lists: `Heading levels: 1 2` lists the `Heading 1` and `Heading 2` elements. Without any heading at those levels it is an error. Only with `Entries: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | What fills the gap between the title and the page of each entry: dots, a line or nothing. |
 
-`Levels` and `Leader` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Entries` cannot: it says what the table of contents
+`Heading levels` and `Leader` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Entries` cannot: it says what the table of contents
 is.
 
 ## What it lists (`Entries`)
@@ -45,7 +45,7 @@ Table of contents:
     Entries: tables
 ```
 
-`Levels` has no effect with `Entries: figures` or `tables`, and it is an error (`LEVELS_WITHOUT_HEADINGS`). A table of figures
+`Heading levels` has no effect with `Entries: figures` or `tables`, and it is an error (`HEADING_LEVELS_WITHOUT_HEADINGS`). A table of figures
 or of tables without any to list is `TABLE_OF_CONTENTS_EMPTY`.
 
 > **Decision:** a table of contents lists one single thing (`Entries`), and a table of figures and one of tables are two
@@ -95,15 +95,15 @@ These are errors:
 
 - a `Table of contents` without any heading at its levels, or without any figure or table with `Entries: figures` or
   `tables` (`TABLE_OF_CONTENTS_EMPTY`, with the line of the `Table of contents`);
-- a `Levels` that is not two levels from 1 to 6 in order (`VALUE_NOT_ALLOWED`), or a `Levels` with `Entries: figures` or
-  `tables` (`LEVELS_WITHOUT_HEADINGS`);
+- a `Heading levels` that is not two levels from 1 to 6 in order (`VALUE_NOT_ALLOWED`), or a `Heading levels` with `Entries: figures` or
+  `tables` (`HEADING_LEVELS_WITHOUT_HEADINGS`);
 - a `Table of contents` without its own or inherited `Font` or `Size` (`TEXT_WITHOUT_FONT` and `TEXT_WITHOUT_FONT_SIZE`, with
   the line of the `Table of contents`).
 
 A heading of a section without page
 numbers cannot be in a table of contents: it is declared with `In table of contents: false`.
 
-> **Decision:** `Levels` are always two levels, to avoid doubting between "up to 2" and "only 2".
+> **Decision:** `Heading levels` are always two levels, to avoid doubting between "up to 2" and "only 2".
 
 ## Accessibility
 

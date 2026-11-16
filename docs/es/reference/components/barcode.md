@@ -286,13 +286,13 @@ intrínsecos son los de una imagen.
 La caja de contenido no tiene por qué tener la proporción del código. Si no la tiene:
 
 - un **QR**, un **Data Matrix** y un **PDF417** se dibujan enteros, lo más grande que caben y centrados, con la
-  proporción de sus módulos (como `Fit: inside`): cuadrados en los dos primeros, y tres veces más altos que anchos en
+  proporción de sus módulos (como `Image fit: inside`): cuadrados en los dos primeros, y tres veces más altos que anchos en
   un PDF417;
-- un **código de barras de una fila** (`code-128`, `gs1-128`, `ean-13`) se estira a la caja (como `Fit: stretch`): las
+- un **código de barras de una fila** (`code-128`, `gs1-128`, `ean-13`) se estira a la caja (como `Image fit: stretch`): las
   barras ocupan todo el alto, menos el de su [texto legible](#texto-legible) si lo lleva, y todos los módulos tienen el
   mismo ancho.
 
-Un `Barcode` no admite `Fit`.
+Un `Barcode` no admite `Image fit`.
 
 > **Decisión:** el tamaño natural sale de un módulo fijo: 0,5 mm en un QR y un Data Matrix, y el tamaño nominal del
 > EAN-13 (0,33 × 22,85 mm) en los códigos de barras; en un PDF417, ese ancho y filas de tres módulos de alto, el mínimo

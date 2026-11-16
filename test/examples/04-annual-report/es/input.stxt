@@ -150,7 +150,7 @@ Document (dev.stxt.pdf):
 				Numbered: false
 			Table of contents:
 				Id: toc
-				Levels: 1 1
+				Heading levels: 1 1
 		Block:
 			Id: letter
 			Box:

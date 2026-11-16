@@ -60,7 +60,7 @@ public final class PropertyKey {
     public static final String BELOW_SIDE_BOXES = "below-side-boxes";
     public static final String DROP_CAP = "drop-cap";
     public static final String ALT = "alt";
-    public static final String LEVELS = "levels";
+    public static final String HEADING_LEVELS = "heading-levels";
 
     // Columns
     public static final String COLUMN_COUNT = "column-count";

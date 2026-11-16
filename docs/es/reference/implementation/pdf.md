@@ -147,7 +147,7 @@ tiene una sola `THead` y una sola `TFoot`.
 
 ### Figuras
 
-El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Fit: inside`. El de
+El `BBox` de la `Figure` de una imagen es su caja de contenido en la página y no la parte visible con `Image fit: inside`. El de
 una imagen girada es el rectángulo que la envuelve.
 
 Una imagen en línea ([Formato del texto](../common/text-formatting.md#imágenes-en-línea)) es un `Figure` con su `Alt` y
@@ -350,5 +350,5 @@ los `Attachments`, que lo comprueban por su cuenta con el mismo parser y las mis
 
 El PDF incrusta cada fichero una sola vez, aunque se use en varias páginas, con la resolución del fichero: el JPEG tal
 cual y el PNG sin pérdida y con su transparencia. Un SVG es un formulario (*XObject*) de su tamaño natural, dibujado una vez
-por fichero, que se escala a su caja con `Fit` como un PNG ([El pintado](painting.md#imágenes)). La página de un PDF también
+por fichero, que se escala a su caja con `Image fit` como un PNG ([El pintado](painting.md#imágenes)). La página de un PDF también
 es un formulario, copiado una vez por página: su contenido y sus recursos, sin sus anotaciones ni su etiquetado.

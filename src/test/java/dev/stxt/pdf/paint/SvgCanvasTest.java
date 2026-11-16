@@ -16,7 +16,7 @@ import dev.stxt.pdf.stxt.DocumentReader;
 class SvgCanvasTest {
 
     private static final String DOC = Docs.header(300, 300, 20)
-            + "\tImage: test/wide.png\n\t\tFit: crop\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
+            + "\tImage: test/wide.png\n\t\tImage fit: crop\n\t\tBox:\n\t\t\tWidth: 100\n\t\t\tHeight: 100\n";
 
     private final LaidOutDocument document = new Engine().layOutDocument(new DocumentReader().read(Docs.sectioned(DOC)));
 

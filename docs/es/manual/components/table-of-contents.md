@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
             Numbered: false
             Text: Índice
         Table of contents:
-            Levels: 1 2
+            Heading levels: 1 2
     Section:
         Heading 1:
             Text: Resultados
@@ -63,7 +63,7 @@ Document (dev.stxt.pdf):
 | Propiedad | Por defecto | Qué hace |
 |---|---|---|
 | `Entries` | `headings` | Qué lista: `headings`, los encabezados; `figures` o `tables`, las figuras o las tablas con pie ([Figure](figure.md)), con el texto de su pie |
-| `Levels` | `1 3` | Los niveles de encabezado que lista, del primero al último: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Solo con `Entries: headings` |
+| `Heading levels` | `1 3` | Los niveles de encabezado que lista, del primero al último: `Heading levels: 1 2` lista los `Heading 1` y `Heading 2`. Solo con `Entries: headings` |
 | `Leader` | `dots` | Lo que llena el hueco entre el título y la página: `dots` (puntos), `line` (una línea) o `none` |
 
 Admite además `Id`, `Style`, `Box`, `Typography` y `Break`. No tiene hijos: las entradas las genera el motor.

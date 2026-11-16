@@ -269,7 +269,7 @@ class PdfStructureTest {
     @Test
     void contentsIsATocWithOneTociPerEntry() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(Docs.header(300, 300, 40) + Docs.TYPOGRAPHY
-                + "\tTable of contents:\n\t\tLevels: 1 2\n"
+                + "\tTable of contents:\n\t\tHeading levels: 1 2\n"
                 + "\tMarkdown:\n\t\tContent >>\n\t\t\t# Uno\n\n\t\t\tTexto.\n"
                 + "\tBlock:\n\t\tBox:\n\t\t\tHeight: 250\n"
                 + "\tHeading 1:\n\t\tText: Dos\n\tHeading 2:\n\t\tText: Dos punto uno\n"))) {

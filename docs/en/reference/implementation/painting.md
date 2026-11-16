@@ -94,7 +94,7 @@ none of them and `ContrastCheck`, only those that tell it which box the painted 
 | `PdfAttachments` | The embedded files (PDF/A-3 or no PDF/A): the file specifications, the `EmbeddedFiles` tree and the `AF` array |
 | `PdfId` | The identifier of the trailer (`/ID`), computed from the content when saving |
 | `PdfLinks`, `PdfDestinations` | The link annotations and the corner of each named box (for bookmarks and internal links) |
-| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Where an image is drawn according to `Fit`, the leader of a table of contents, the paths of the boxes and the pattern of dashed and dotted lines |
+| `ImageFit`, `Leaders`, `Shapes`, `Dashes` | Where an image is drawn according to `Image fit`, the leader of a table of contents, the paths of the boxes and the pattern of dashed and dotted lines |
 
 > **Decision:** internal destinations are resolved after all the pages have been painted, because a link can point
 > forward: all the pages are created before any is painted and the corner of the first fragment of each named box is looked up,

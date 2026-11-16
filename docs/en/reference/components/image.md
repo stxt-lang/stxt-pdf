@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
             Item:
                 Grow: 1
                 Image: test/wide.png
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 60
 ```
@@ -46,14 +46,14 @@ page, an image across the full width and, below it, a portrait of 45 × 60 and t
 |---|---|---|---|
 | *(value)* | path relative to `images/` | required | The PNG, JPEG, SVG or PDF file: `Image: logos/acme.png`. |
 | `Alt` | non-empty text | none | Alternative text: with it, the image is a figure that is read ([accessibility](#accessibility)). Without it, it is decorative. |
-| `Fit` | `inside`, `crop`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
+| `Image fit` | `inside`, `crop`, `stretch` | `inside` | How the image fills its content box if they have different proportions. |
 | `Opacity` | percentage from `0%` to `100%` | none (opaque) | Makes the image faint, with the background and the border of its box: a watermark ([Layers and rotation](../common/layers-and-rotation.md#opacity-opacity)). |
 | `PDF page` | integer ≥ 1 | `1` | The page of a PDF that is drawn ([PDF](#pdf)). In another format it is an error. |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates the image around its center (a seal) and takes up the rectangle that encloses it rotated. |
 | `Side box` | `left`, `right` | none | The image is a side box: the text that follows it runs beside it ([Block](block.md#side-boxes-side-box)). |
 | `Below side boxes` | boolean | `false` | Moves the image below the side boxes before it ([Block](block.md#side-boxes-side-box)). |
 
-`Fit`, `Opacity`, `Side box` and `Below side boxes` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `PDF page` and `Rotate` cannot.
+`Image fit`, `Opacity`, `Side box` and `Below side boxes` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `Alt`, `PDF page` and `Rotate` cannot.
 
 ## File
 
@@ -89,7 +89,7 @@ replaces it (it is not an error). The padding and the border go outside: they do
   If it does not fit, it is an overflow (`BOX_OVERFLOW`). For it to take up the available width, `Width: 100%` is declared.
   `Margin: 0 auto` centers it, because it does not take up the whole width.
 - With one axis declared, or imposed by the parent (an item of `Stack` with `Grow`, a column of `Grid` with
-  `Horizontal: stretch`), the other comes from the proportion. With both, the box measures what is declared and `Fit` decides how the image
+  `Horizontal: stretch`), the other comes from the proportion. With both, the box measures what is declared and `Image fit` decides how the image
   fills it.
 - `Min width`, `Max width`, `Min height` and `Max height` apply as in any box. If both axes are `auto` and the
   height runs into its minimum or its maximum, the width is deduced again from the limited height: the proportion is kept.
@@ -99,15 +99,15 @@ replaces it (it is not an error). The padding and the border go outside: they do
   declares `Height` with a measurement, the one that comes from it with the proportion. It is a real minimum: in a `*`
   track of a grid or in an item of `Stack` without `Min width`, the image does not shrink below it.
 
-If the minimums and the maximums cannot be met at the same time with the proportion, the width wins and `Fit` places the image.
+If the minimums and the maximums cannot be met at the same time with the proportion, the width wins and `Image fit` places the image.
 
-> **Decision:** the height of an image always comes from the proportion. *Rejected alternative:* stretching it and letting `Fit`
+> **Decision:** the height of an image always comes from the proportion. *Rejected alternative:* stretching it and letting `Image fit`
 > place it.
 
 > **Decision:** the intrinsic sizes are a real minimum, also with a `Width` in percent. *Rejected
 > alternative:* a narrowest width of 0, which lets the image shrink.
 
-## `Fit`
+## `Image fit`
 
 If the content box and the image have different proportions:
 
@@ -139,7 +139,7 @@ caption ("Figure 3. ..."), and its `Alt` is required.
 ## SVG
 
 An SVG is a vector drawing: the PDF carries it as paths, fills, gradients and clips and not as pixels, so it looks
-sharp at any size and is small. It is sized, placed (`Fit` included) and broken like any image. It is an
+sharp at any size and is small. It is sized, placed (`Image fit` included) and broken like any image. It is an
 XML file in the SVG namespace, and a closed subset is accepted: `svg` (without another `svg` inside), `g`, `defs`,
 `title`, `desc`, `rect`, `circle`, `ellipse`, `line`, `polyline`, `polygon`, `path`, `linearGradient`, `radialGradient`,
 `stop`, `clipPath`, `use`, `text` and `tspan`, with their presentation attributes (plain or gradient fills and strokes,

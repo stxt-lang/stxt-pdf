@@ -1,5 +1,5 @@
-# Case: Levels in a table of contents of figures
-# Code: LEVELS_WITHOUT_HEADINGS
+# Case: Heading levels in a table of contents of figures
+# Code: HEADING_LEVELS_WITHOUT_HEADINGS
 # Line: 22
 Document (dev.stxt.pdf):
 	Language: es
@@ -19,4 +19,4 @@ Document (dev.stxt.pdf):
 				Alt: Uno
 		Table of contents:
 			Entries: figures
-			Levels: 1 2
+			Heading levels: 1 2

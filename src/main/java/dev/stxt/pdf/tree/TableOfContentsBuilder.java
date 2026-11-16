@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Locale;
 
 import static dev.stxt.pdf.tree.Nodes.error;
-import static dev.stxt.pdf.tree.PropertyKey.LEVELS;
+import static dev.stxt.pdf.tree.PropertyKey.HEADING_LEVELS;
 
 /**
- * The automatic table of contents (reference/components/table-of-contents.md): reads {@code Levels} and {@code Leader}
+ * The automatic table of contents (reference/components/table-of-contents.md): reads {@code Heading levels} and {@code Leader}
  * of a {@code Table of contents} and, when the tree is built and all the headings and figures are known, generates
  * its entries: one per heading of its levels or, with {@code Entries: figures} or {@code tables}, one per {@code Figure}
  * numbered with that counter (reference/components/figure.md).
@@ -37,7 +37,7 @@ final class TableOfContentsBuilder {
     private TableOfContentsBuilder() {
     }
 
-    /** {@code Levels}: the first and the last level, from 1 to 6. */
+    /** {@code Heading levels}: the first and the last level, from 1 to 6. */
     static void levels(Node n, Style s) {
         String[] parts = n.getText().trim().split("\\s+");
         int[] levels = new int[2];
@@ -49,11 +49,12 @@ final class TableOfContentsBuilder {
                 levels[i] = Integer.parseInt(parts[i]);
             }
         } catch (NumberFormatException e) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Levels needs the first and the last heading "
-                    + "level, as in Levels: 1 3: '" + n.getText().trim() + "'");
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Heading levels needs the first and the last heading "
+                    + "level, as in Heading levels: 1 3: '" + n.getText().trim() + "'");
         }
         if (levels[0] < 1 || levels[1] > 6 || levels[0] > levels[1]) {
-            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Levels goes from one level to an equal or higher one, between 1 and 6: '"
+            throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Heading levels goes from one level to an equal or "
+                    + "higher one, between 1 and 6: '"
                     + n.getText().trim() + "'");
         }
         s.tableOfContents().setFrom(levels[0]);
@@ -110,13 +111,15 @@ final class TableOfContentsBuilder {
                     .filter(h -> h.headingLevel() >= s.tableOfContents().from() && h.headingLevel() <= s.tableOfContents().to()).toList();
             if (listed.isEmpty()) {
                 throw error(contents.line(), ErrorCode.TABLE_OF_CONTENTS_EMPTY, "The table of contents has no heading of levels "
-                        + s.tableOfContents().from() + " to " + s.tableOfContents().to() + " (Levels): it would have no entries");
+                        + s.tableOfContents().from() + " to " + s.tableOfContents().to()
+                        + " (Heading levels): it would have no entries");
             }
         } else {
             String what = entries.name().toLowerCase(Locale.ROOT);
-            if (s.isDeclared(LEVELS)) {
-                throw error(s.line(LEVELS), ErrorCode.LEVELS_WITHOUT_HEADINGS, "Levels has no effect in a table of contents "
-                        + "with Entries: " + what + ", which lists the " + what + " and not the headings: it is not needed");
+            if (s.isDeclared(HEADING_LEVELS)) {
+                throw error(s.line(HEADING_LEVELS), ErrorCode.HEADING_LEVELS_WITHOUT_HEADINGS,
+                        "Heading levels has no effect in a table of contents with Entries: " + what
+                                + ", which lists the " + what + " and not the headings: it is not needed");
             }
             FigureCounter counter = entries == Listing.FIGURES ? FigureCounter.FIGURES : FigureCounter.TABLES;
             listed = ctx.figures.stream()

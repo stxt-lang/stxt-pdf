@@ -64,7 +64,7 @@ class PdfOutlineTest {
     void aHeadingOutOfTheContentsIsStillAHeadingAndABookmark() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
                 + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n"
-                + "\tTable of contents:\n\t\tLevels: 1 1\n"
+                + "\tTable of contents:\n\t\tHeading levels: 1 1\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"))) {
             PDStructureElement document = section(pdf);
             assertEquals(List.of("H1", "TOC", "H1"), types(document));
@@ -86,7 +86,7 @@ class PdfOutlineTest {
                 + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tNumbered: true\n"
                 + "\t\tFor element: Heading 2\n\t\t\tNumbered: true\n"
                 + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n\t\tNumbered: false\n"
-                + "\tTable of contents:\n\t\tLevels: 1 2\n"
+                + "\tTable of contents:\n\t\tHeading levels: 1 2\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tHeading 2:\n\t\tText: Dos\n")))) {
             PDOutlineItem first = pdf.getDocumentCatalog().getDocumentOutline().getFirstChild();

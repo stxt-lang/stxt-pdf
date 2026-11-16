@@ -1,7 +1,7 @@
 # `Table of contents`
 
 Un `Table of contents` es un índice automático: un bloque en flujo, sin hijos, que genera una **entrada por encabezado** de los
-niveles de `Levels` (por defecto 1 a 3), en orden del documento, también los de un `Markdown` y los que están después del
+niveles de `Heading levels` (por defecto 1 a 3), en orden del documento, también los de un `Markdown` y los que están después del
 propio índice, salvo los que declaran `In table of contents: false` ([Encabezados](heading.md#fuera-del-índice)). Con
 `Entries: figures` o `Entries: tables` es un **índice de figuras o de tablas**: una entrada por `Figure` de ese contador
 ([abajo](#qué-lista-of)). Admite `Id`, `Style`, `Box`, `Typography` y `Break`, como un `Block`, y va donde va un
@@ -9,17 +9,17 @@ propio índice, salvo los que declaran `In table of contents: false` ([Encabezad
 
 ```
 Table of contents:
-    Levels: 1 2
+    Heading levels: 1 2
     Leader: dots
 ```
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Entries` | `headings`, `figures`, `tables` | `headings` | Qué lista: los encabezados de `Levels`, las figuras o las tablas ([abajo](#qué-lista-of)). |
-| `Levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. Solo con `Entries: headings`. |
+| `Entries` | `headings`, `figures`, `tables` | `headings` | Qué lista: los encabezados de `Heading levels`, las figuras o las tablas ([abajo](#qué-lista-of)). |
+| `Heading levels` | dos enteros de 1 a 6: el primer y el último nivel | `1 3` | Los encabezados que lista: `Heading levels: 1 2` lista los `Heading 1` y `Heading 2`. Sin ningún encabezado en esos niveles es un error. Solo con `Entries: headings`. |
 | `Leader` | `dots`, `line`, `none` | `dots` | Lo que llena el hueco entre el título y la página de cada entrada: puntos, una línea o nada. |
 
-`Levels` y `Leader` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Entries`, no: dice qué es el índice.
+`Heading levels` y `Leader` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Entries`, no: dice qué es el índice.
 
 ## Qué lista (`Entries`)
 
@@ -43,7 +43,7 @@ Table of contents:
     Entries: tables
 ```
 
-`Levels` no tiene efecto con `Entries: figures` o `tables`, y es un error (`LEVELS_WITHOUT_HEADINGS`). Un índice de figuras o de
+`Heading levels` no tiene efecto con `Entries: figures` o `tables`, y es un error (`HEADING_LEVELS_WITHOUT_HEADINGS`). Un índice de figuras o de
 tablas sin ninguna que listar es `TABLE_OF_CONTENTS_EMPTY`.
 
 > **Decisión:** un índice lista una sola cosa (`Entries`), y un índice de figuras y otro de tablas son dos `Table of contents`.
@@ -92,15 +92,15 @@ Son errores:
 
 - un `Table of contents` sin ningún encabezado en sus niveles, o sin ninguna figura o tabla con `Entries: figures` o
   `tables` (`TABLE_OF_CONTENTS_EMPTY`, con la línea del `Table of contents`);
-- un `Levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`), o un `Levels` con `Entries: figures` o
-  `tables` (`LEVELS_WITHOUT_HEADINGS`);
+- un `Heading levels` que no son dos niveles de 1 a 6 en orden (`VALUE_NOT_ALLOWED`), o un `Heading levels` con `Entries: figures` o
+  `tables` (`HEADING_LEVELS_WITHOUT_HEADINGS`);
 - un `Table of contents` sin `Font` o sin `Size` propios o heredados (`TEXT_WITHOUT_FONT` y `TEXT_WITHOUT_FONT_SIZE`, con
   la línea del `Table of contents`).
 
 Un encabezado de una sección sin números de
 página no puede estar en un índice: se declara con `In table of contents: false`.
 
-> **Decisión:** `Levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2».
+> **Decisión:** `Heading levels` son siempre dos niveles, para no dudar entre «hasta el 2» y «solo el 2».
 
 ## Accesibilidad
 

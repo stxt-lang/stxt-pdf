@@ -45,7 +45,7 @@ class TableOfContentsTest {
      */
     @Test
     void aHeadingWithInTableOfContentsFalseHasNoEntry() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 2",
                 "\tHeading 1:", "\t\tIn table of contents: false", "\t\tText: Portada"));
         List<Fragment> entries = entries(l);
         assertEquals(3, entries.size());
@@ -54,7 +54,7 @@ class TableOfContentsTest {
 
     @Test
     void oneEntryPerHeadingWithItsTitleALeaderAndItsPage() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2"));
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 2"));
         assertEquals(3, l.pages());
         List<Fragment> entries = entries(l);
         assertEquals(3, entries.size());
@@ -84,14 +84,14 @@ class TableOfContentsTest {
 
     @Test
     void theLevelsLimitTheEntries() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 1"));
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 1"));
         assertEquals(List.of("Intro", "Final"),
                 entries(l).stream().map(e -> text(e.children().get(0))).toList());
     }
 
     @Test
     void withoutALeaderTheTitleFillsTheGapAndThePageStaysOnTheRight() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 1\n\t\tLeader: none"));
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 1\n\t\tLeader: none"));
         Fragment entry = entries(l).get(0);
         assertEquals(2, entry.children().size());
         assertEquals(510, entry.children().get(0).width() + entry.children().get(0).x(), 1e-9);
@@ -100,7 +100,7 @@ class TableOfContentsTest {
 
     @Test
     void aHeadingWithoutIdIsReferredWithAGeneratedName() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2"));
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 2"));
         // The last one has an Id (last): its entry uses it; the others, a generated name.
         assertEquals("(heading 1)", l.fragment("toc").box().children().get(0).children().get(2).text()
                 .replace("{page of: ", "").replace("}", ""));
@@ -109,7 +109,7 @@ class TableOfContentsTest {
 
     @Test
     void entryRulesStyleEachLevel() {
-        LayoutFixture l = layOutPaged(PAGE, document("\t\tLevels: 1 2",
+        LayoutFixture l = layOutPaged(PAGE, document("\t\tHeading levels: 1 2",
                 "\tStyles:", "\t\tFor element: TOC 2", "\t\t\tBox:", "\t\t\t\tPadding: 0 0 0 20",
                 "\t\t\tTypography:", "\t\t\t\tSize: 10"));
         List<Fragment> entries = entries(l);

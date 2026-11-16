@@ -157,7 +157,7 @@ class PdfLinksTest {
     @Test
     void contentsEntriesLinkToTheirHeadings() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
-                + "\tTable of contents:\n\t\tLevels: 1 1\n"
+                + "\tTable of contents:\n\t\tHeading levels: 1 1\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tBlock:\n\t\tBreak:\n\t\t\tAfter: page\n"
                 + "\tHeading 1:\n\t\tText: Dos\n"))) {

@@ -213,10 +213,10 @@ vez, y los elementos, las veces que se quiera.
 | `Columns` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns`; elementos en flujo |
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (obligatorio) |
 | `Footnote` | `Id` (obligatorio), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
-| `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
+| `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Heading levels`, `Leader` |
 | `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes`; `Caption` (exactamente uno); `Image`, `Barcode`, `Table` o `Block` (uno) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Opacity`, `PDF page`, `Rotate`, `Side box`, `Below side boxes` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Image fit`, `Opacity`, `PDF page`, `Rotate`, `Side box`, `Below side boxes` |
 | `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (solo `Color`; con `Readable text`, también la fuente), `Break`, `Alt` (obligatorio), `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Rotate`, `Side box`, `Below side boxes`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elementos |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elementos |

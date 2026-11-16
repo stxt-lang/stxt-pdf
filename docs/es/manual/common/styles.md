@@ -42,7 +42,7 @@ que dicen cómo se ve o cómo reparte su contenido. Una regla puede ir dentro de
 ## Propiedades de un elemento
 
 Una regla también da las propiedades propias de un elemento que dicen cómo se ve o cómo reparte su contenido: el `Gap` de
-un `Stack`, las `Column sizes` de un `Grid` o de una `Table`, el `Fit` de una `Image`, el `Marker` de una `List`... En
+un `Stack`, las `Column sizes` de un `Grid` o de una `Table`, el `Image fit` de una `Image`, el `Marker` de una `List`... En
 esta carta, cada plato es un `Stack` con `Style: dish`, y su `Gap` va una sola vez, en la regla:
 
 ```

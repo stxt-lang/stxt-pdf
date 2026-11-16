@@ -8,7 +8,7 @@ import dev.stxt.pdf.model.Rect;
 import java.util.List;
 
 /**
- * Where an image is drawn in its content box according to {@code Fit}
+ * Where an image is drawn in its content box according to {@code Image fit}
  * (reference/components/image.md). With equal proportions, the three modes give the content box.
  */
 final class ImageFit {

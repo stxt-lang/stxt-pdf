@@ -28,14 +28,14 @@ Document (dev.stxt.pdf):
             Area:
                 Image: examples/catalog/silla.jpg
                     Alt: Walnut chair with a wool seat
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
             Area:
                 Image: examples/catalog/mesa.jpg
                     Alt: Walnut dining table
-                    Fit: crop
+                    Image fit: crop
                     Box:
                         Height: 160
                         Corner radius: 6
@@ -47,7 +47,7 @@ Document (dev.stxt.pdf):
 |---|---|
 | *(value)* | The path of the file inside `images/`: `Image: logos/acme.png`. Required |
 | `Alt` | The alternative text, for those who cannot see the image. Without `Alt`, the image is decorative and the screen reader skips it |
-| `Fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `crop` (fills the box and crops what is left over) or `stretch` (it is distorted) |
+| `Image fit` | How the image fills its box if they do not have the same proportions: `inside` (whole, with space at the sides), `crop` (fills the box and crops what is left over) or `stretch` (it is distorted) |
 | `PDF page` | The page of a PDF that is drawn, from 1. Without `PDF page`, the first one. Only in a PDF |
 | `Opacity` | Making the image faint, with a percentage (`10%`): a watermark ([Layers and rotation](../common/layers-and-rotation.md#making-a-box-faint-opacity)) |
 | `Rotate` | Rotating the image around its center. It takes up the rectangle that encloses it rotated ([Layers and rotation](../common/layers-and-rotation.md#rotating-a-box-rotate)) |
@@ -65,7 +65,7 @@ accept `Typography`.
 - It does not stretch to the width of the page on its own: if it does not fit, it is an error. To take up the full width,
   `Width: 100%`.
 - With `Width` or `Height`, the other side comes from the proportions of the image. With both, the box has that size and
-  `Fit` decides how the image fills it.
+  `Image fit` decides how the image fills it.
 - `Margin: 0 auto` centers it.
 - The padding and the border go around it: they do not distort the image.
 - In a `Stack` in a row, an image is not stretched vertically: it keeps its proportions.

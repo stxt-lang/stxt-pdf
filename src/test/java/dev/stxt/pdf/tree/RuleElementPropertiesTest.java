@@ -20,7 +20,7 @@ import dev.stxt.pdf.model.Value;
 import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
- * The element properties in the rules of {@code Styles} (reference/common/styles.md): {@code Gap}, {@code Fit},
+ * The element properties in the rules of {@code Styles} (reference/common/styles.md): {@code Gap}, {@code Image fit},
  * {@code Marker}... are given to the element as if it declared them, with the same priority as the groups, and one that
  * the element could not declare is an error with the line of the rule.
  */
@@ -64,7 +64,7 @@ class RuleElementPropertiesTest {
     void aRuleGivesAnElementPropertyAsIfTheElementDeclaredIt() {
         Box root = root(
                 "For style: dish", "\tGap: 12",
-                "For element: Image", "\tFit: crop",
+                "For element: Image", "\tImage fit: crop",
                 "---",
                 "Stack:", "\tStyle: dish", "\tItem:", "\t\tText: a",
                 "Image: test/wide.png");

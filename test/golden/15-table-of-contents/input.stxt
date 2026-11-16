@@ -1,7 +1,7 @@
 # Page references and table of contents (reference/components/table-of-contents.md). Page area of 260 × 260
 # from (20, 20); with FixedMetrics, each character measures 5 pt at Size: 10 and each line, 12.
 #
-# toc lists the headings of levels 1 and 2 (Levels: 1 2): Introducción, Método, Datos and
+# toc lists the headings of levels 1 and 2 (Heading levels: 1 2): Introducción, Método, Datos and
 # Resultados, four entries of 12 pt, and not Fino, which is level 3. It measures 4 × 12 = 48 and leaves a
 # margin of 8: intro starts at 20 + 48 + 8 = 76, and ref, which writes the page of results, right
 # below, at 88 (with the 3 already written: "Véase la página 3." is 18 characters, 90 pt, one line).
@@ -25,7 +25,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Table of contents:
 			Id: toc
-			Levels: 1 2
+			Heading levels: 1 2
 			Box:
 				Margin: 0 0 8 0
 		Heading 1:

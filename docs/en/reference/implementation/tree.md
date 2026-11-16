@@ -26,7 +26,7 @@ In the schema:
   `BOOLEAN`;
 - the integers (such as `Layer`, `Widows`, `Orphans`, `First number`, `Item number`, `Column count`, `Weight`, `Drop cap` or `Quiet zone`),
   `INTEGER`, and `Rotate`, `NUMBER`;
-- those with closed values (such as `Fit`, `Leader`, `Pages` or `Paper`), `ENUM`;
+- those with closed values (such as `Image fit`, `Leader`, `Pages` or `Paper`), `ENUM`;
 - the rest, `INLINE` without children, whose form `ValueReader` checks.
 
 What the schema cannot express is checked by `BoxTreeBuilder`: that `Page` declares its size in a single way, that

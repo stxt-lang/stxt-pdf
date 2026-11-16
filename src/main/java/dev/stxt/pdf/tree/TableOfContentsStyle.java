@@ -12,7 +12,7 @@ public final class TableOfContentsStyle extends StyleGroup {
 
     /** {@code Entries}: the headings (by default), the figures or the tables. */
     private Listing entries = Listing.HEADINGS;
-    /** First and last heading level listed by a {@code Table of contents} ({@code Levels}). */
+    /** First and last heading level listed by a {@code Table of contents} ({@code Heading levels}). */
     private int from = 1;
     private int to = 3;
     /** {@code Leader} of a {@code Table of contents}; the generated leader of each entry also carries it. */

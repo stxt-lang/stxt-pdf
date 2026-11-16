@@ -170,11 +170,11 @@ class SchemaCoverageTest {
             Map.entry("Figure counter", "Figure counter: tables"),
             // Table of contents
             Map.entry("Entries", "Entries: figures"),
-            Map.entry("Levels", "Levels: 1 2"),
+            Map.entry("Heading levels", "Heading levels: 1 2"),
             Map.entry("Leader", "Leader: line"),
             // Image
             Map.entry("Alt", "Alt: Logotipo"),
-            Map.entry("Fit", "Fit: crop"),
+            Map.entry("Image fit", "Image fit: crop"),
             Map.entry("PDF page", "PDF page: 2"),
             // Barcode
             Map.entry("Barcode format", "Barcode format: qr"),
