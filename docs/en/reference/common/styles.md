@@ -308,7 +308,7 @@ These are errors:
   element) or that names what is never inside an element (`Document`, `Section`, `TOC 1` to `TOC 6`, `Footnote area`)
   (`STYLE_NOT_ALLOWED`);
 - a rule that gives `Break` to an element that does not allow it: `Overlay`, `Page overlay`, a heading, a `Text` of a
-  heading or a cell, also with a position rule, a column rule or a rule of the style of its `Row` (`STYLE_NOT_ALLOWED`);
+  heading or a cell, also with a position rule or a rule of the style of its `Row` (`STYLE_NOT_ALLOWED`); a `For column` rule does not accept `Break` (`CHILD_NOT_DECLARED`);
 - a rule that gives a `Section` something that is not `Typography` (`STYLE_NOT_ALLOWED`);
 - an element property that the element cannot declare: in `For element`, when the rule is read; in `For style` and
   `For id`, when it is applied; also `Grow`, `Shrink` or `Base size` to an element that is not in an `Item`

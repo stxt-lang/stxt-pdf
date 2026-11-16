@@ -308,7 +308,7 @@ Son errores:
   elemento generado) o que nombra lo que nunca está dentro de un elemento (`Document`, `Section`, `TOC 1` a `TOC 6`,
   `Footnote area`) (`STYLE_NOT_ALLOWED`);
 - una regla que da `Break` a un elemento que no lo admite: `Overlay`, `Page overlay`, un encabezado, un `Text` de un encabezado o
-  una celda, también con una regla de posición, de columna o del estilo de su `Row` (`STYLE_NOT_ALLOWED`);
+  una celda, también con una regla de posición o del estilo de su `Row` (`STYLE_NOT_ALLOWED`); una regla `For column` no admite `Break` (`CHILD_NOT_DECLARED`);
 - una regla que da a una `Section` algo que no es `Typography` (`STYLE_NOT_ALLOWED`);
 - una propiedad de elemento que el elemento no puede declarar: en `For element`, al leer la regla; en `For style` y
   `For id`, al aplicarla; también `Grow`, `Shrink` o `Base size` a un elemento que no está en un `Item`

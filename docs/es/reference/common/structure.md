@@ -198,7 +198,7 @@ vez, y los elementos, las veces que se quiera.
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Hijo de `Document` o raíz de un documento de estilos aparte |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` y las propiedades de elemento de aspecto y de reparto ([Styles](styles.md#propiedades-de-elemento)), como mucho una de cada |
-| `For column` | `Box`, `Typography`, `Break` |
+| `For column` | `Box`, `Typography`, `Vertical` |
 | `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side box`, `Below side boxes`; elementos |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap items`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |

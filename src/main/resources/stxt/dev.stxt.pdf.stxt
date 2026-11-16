@@ -683,12 +683,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Grid
 			Child: Text
 			Child: Paragraph
-			Child: Heading 1
-			Child: Heading 2
-			Child: Heading 3
-			Child: Heading 4
-			Child: Heading 5
-			Child: Heading 6
 			Child: List
 			Child: Markdown
 			Child: Table of contents
@@ -738,11 +732,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 				Max: 1
 			Child: List
+				Max: 1
 			Child: Markdown
 				Max: 1
 			Child: Table of contents
 				Max: 1
 			Child: Image
+				Max: 1
 			Child: Barcode
 				Max: 1
 			Child: Figure
@@ -786,11 +782,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Heading 6
 				Max: 1
 			Child: List
+				Max: 1
 			Child: Markdown
 				Max: 1
 			Child: Table of contents
 				Max: 1
 			Child: Image
+				Max: 1
 			Child: Barcode
 				Max: 1
 			Child: Figure
@@ -1410,8 +1408,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Typography
 				Max: 1
-			Child: Break
-				Max: 1
 			Child: Vertical
 				Max: 1
 
@@ -1745,7 +1741,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Size
 		Description: Font size, a length. Required in the text, own or inherited (also from Document).
 	Node: Min size
-		Description: The smallest Size that Overflow: shrink may reduce the text to, a length. By default, 6. Inherited. In a box with Overflow: shrink it cannot be greater than Size.
+		Description: The smallest Size that Overflow: shrink may reduce the text to, a length. By default, 6. In a box with Overflow: shrink it cannot be greater than Size.
 	Node: Line height
 		Description: Line height: a length (15 is 15 pt), or a percentage relative to the Size. By default, 120%.
 	Node: Align
@@ -1766,16 +1762,16 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: optimal
 	Node: Hyphenate
 		Type: BOOLEAN
-		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. Inherited. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split. So is a hyphen written between two letters or digits (REF-2026-0098): the line may end after it, with no other hyphen.
+		Description: Whether the line breaking may split a word at the end of a line with a hyphen, following the hyphenation patterns of the language of Language (the engine has them for es, ca, en-US, en-GB, de, fr, it, nl and pt; any other language is an error). By default, false. A soft hyphen (U+00AD) in the text is always a break point, with or without Hyphenate, and is only painted where the word is split. So is a hyphen written between two letters or digits (REF-2026-0098): the line may end after it, with no other hyphen.
 	Node: Break long words
 		Type: ENUM
-		Description: What is done with a part of a word that cannot be split further (it has no hyphen, written or soft, and Hyphenate does not split it) and is wider than a whole line of its box: never (by default; such a word is an error), new-line (it is cut at the last character that fits, with no hyphen, as many times as needed, and starts a line of its own) or same-line (cut the same way, it starts in the current line, after the words before it). Inherited. It is a last resort: a word that fits in a line of its own moves to the next line and is never cut. It does not change the narrowest width of the text. It has no effect on a preformatted text, where it is an error if the text itself declares it.
+		Description: What is done with a part of a word that cannot be split further (it has no hyphen, written or soft, and Hyphenate does not split it) and is wider than a whole line of its box: never (by default; such a word is an error), new-line (it is cut at the last character that fits, with no hyphen, as many times as needed, and starts a line of its own) or same-line (cut the same way, it starts in the current line, after the words before it). It is a last resort: a word that fits in a line of its own moves to the next line and is never cut. It does not change the narrowest width of the text. It has no effect on a preformatted text, where it is an error if the text itself declares it.
 		Values:
 			Value: never
 			Value: new-line
 			Value: same-line
 	Node: First line indent
-		Description: How much later the first line of the text starts, a length (without percentages): that line is that much shorter, and the text is aligned in what is left of it. By default, 0. Inherited: it is usually given with For element: Paragraph, which leaves headings and cells alone. Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one of the part of a paragraph that goes on in another page or column. It can be negative (a hanging indent): the first line starts that much before the others, in the left Padding of its box, which has to be at least as large. It does not go in a Paragraph with Drop cap.
+		Description: How much later the first line of the text starts, a length (without percentages): that line is that much shorter, and the text is aligned in what is left of it. By default, 0. It is usually given with For element: Paragraph, which leaves headings and cells alone. Only the first line of the paragraph is indented: not the one after a forced line break, nor the first one of the part of a paragraph that goes on in another page or column. It can be negative (a hanging indent): the first line starts that much before the others, in the left Padding of its box, which has to be at least as large. It does not go in a Paragraph with Drop cap.
 	Node: Markup
 		Type: ENUM
 		Description: Inline formatting of the text: none (by default; the text is literal) or markdown, which interprets **bold**, *italic*, ++underline++, ~~strikethrough~~, `code` (in the Code font), [links](target), styled runs ([text]{style}, with the For style rule of that name), inline images (![alt](path)), footnote calls ([^id]) and a \ at the end of a line as a forced line break, with the CommonMark escapes. Inherited; it does nothing inside a Markdown or in the entries of a Table of contents.
@@ -1804,10 +1800,10 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: subscript
 	Node: Ligatures
 		Type: BOOLEAN
-		Description: Whether the text is measured and painted with the ligatures of the font (fi, fl). By default, true; with false, one glyph per character. Inherited. With Letter spacing other than 0 there are no ligatures. It only matters in the fonts that have them (IBM Plex Sans and Serif; Plex Mono does not).
+		Description: Whether the text is measured and painted with the ligatures of the font (fi, fl). By default, true; with false, one glyph per character. With Letter spacing other than 0 there are no ligatures. It only matters in the fonts that have them (IBM Plex Sans and Serif; Plex Mono does not).
 	Node: Kerning
 		Type: BOOLEAN
-		Description: Whether the text is measured and painted with the kerning pairs of the font, which adjust the space between two letters (AV, To). By default, true. Inherited. The pairs come from the kern feature of the GPOS table or, in a font without it, from the kern table; a pair does not cross a space or the boundary between two runs. It does not change the text that is read or copied.
+		Description: Whether the text is measured and painted with the kerning pairs of the font, which adjust the space between two letters (AV, To). By default, true. The pairs come from the kern feature of the GPOS table or, in a font without it, from the kern table; a pair does not cross a space or the boundary between two runs. It does not change the text that is read or copied.
 	Node: Preformatted
 		Type: ENUM
 		Description: Preformatted text: none (by default; spaces and line breaks count as a space), keep (keeps the spaces and line breaks, and does not break lines: one wider than the box is an error) or wrap (like keep, but breaks lines that are too wide between words). Preformatted lines are not justified.

@@ -36,7 +36,12 @@ accepted. The Java API changes where it follows those names.
   several times; `Rotate` gave -360 and 360 as valid; `Side box` did not name `Figure`; `Layer` said that an item
   without it is painted like one with `Layer: 0`. `Markup`, `Markdown`, `Typography` and `Box` list all they cover, and
   the others gain the values they accept, their default or the case in which they are an error. Nothing else of the
-  schema changes: the same nodes, types, values and children.
+  schema changes with them: the same nodes, types and values.
+- The schema no longer declares three things that the engine always rejected, so they are an error of the schema and
+  an editor does not offer them. `Heading 1` to `Heading 6` as children of a `Page overlay` are `CHILD_NOT_DECLARED`,
+  and deeper inside one they are still `HEADING_IN_PAGE_OVERLAY`. `Break` in a `For column` rule is
+  `CHILD_NOT_DECLARED`; it was `STYLE_NOT_ALLOWED` when the rule reached a cell. A second `List` or a second `Image`
+  in an `Item` or an `Area` is `TOO_MANY_CHILDREN`, like a second one of any other element; it was `SINGLE_ELEMENT`.
 
 ## [0.18.1] - 2026-11-15
 

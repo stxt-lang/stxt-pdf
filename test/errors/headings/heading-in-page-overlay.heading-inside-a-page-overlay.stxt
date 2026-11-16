@@ -1,6 +1,6 @@
 # Case: Heading inside a Page overlay
 # Code: HEADING_IN_PAGE_OVERLAY
-# Line: 17
+# Line: 18
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -14,5 +14,6 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Page overlay:
-			Heading 1:
-				Text: Cabecera
+			Block:
+				Heading 1:
+					Text: Cabecera

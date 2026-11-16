@@ -100,7 +100,7 @@ Los `Page overlay` no reservan espacio: el autor debe dejar sitio con el `Margin
 página se usan desplazamientos negativos (`Offset: -30 0 auto 0`). Si un `Page overlay` depende de su posición estática
 (desplazamientos `auto`), se toma la de la primera página en la que aparece el flujo que lo contiene y se repite igual en
 todas en las que sale. Lo que hay dentro de un `Page overlay` es decoración de la página y no contenido: un lector de pantalla no
-lo lee, y no puede tener encabezados (`HEADING_IN_PAGE_OVERLAY`) ni ser el destino de un enlace o una referencia.
+lo lee, y no puede tener encabezados (como hijo suyo, `CHILD_NOT_DECLARED`; más adentro, `HEADING_IN_PAGE_OVERLAY`) ni ser el destino de un enlace o una referencia.
 Si un texto suyo lleva un título corrido (`{heading N}`,
 [Referencias](../common/references.md#heading-n-y-heading-n-first)), el `Page overlay` se maqueta en cada página con el
 encabezado en vigor en ella; los demás se maquetan una vez y se repiten igual.
