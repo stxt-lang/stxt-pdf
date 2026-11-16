@@ -62,7 +62,7 @@ final class Figures {
 
     /** Whether the figure is numbered: unless it declares {@code Numbered: false}, itself or through a rule. */
     static boolean numbered(Style s) {
-        return !s.isDeclared(NUMBERED) || s.typography().numbered();
+        return !s.isDeclared(NUMBERED) || s.numbered();
     }
 
     /** Where the caption goes: as declared or, by default, above a table and below anything else. */

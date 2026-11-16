@@ -65,7 +65,7 @@ It does not go in a preformatted paragraph (`DROP_CAP_NOT_ALLOWED`) nor outside 
 in a paragraph that writes a first line indent other than 0 (`FIRST_LINE_INDENT_WITH_DROP_CAP`); the one it inherits
 or gets from a rule is not applied to it
 ([Typography](../common/typography.md#first-line-indent-first-line-indent)). Beside a
-side box ([Block](block.md#side-boxes-side)), the drop cap goes after what the box takes from the lines.
+side box ([Block](block.md#side-boxes-side-box)), the drop cap goes after what the box takes from the lines.
 
 | Property | Values | Default | Notes |
 |---|---|---|---|

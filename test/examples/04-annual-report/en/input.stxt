@@ -71,8 +71,7 @@ Document (dev.stxt.pdf):
 						Margin: 0 0 14 0
 						Padding: 0
 						Border: 0
-					Typography:
-						Numbered: false
+					Numbered: false
 					Text: A year of sun
 						Typography:
 							Font: IBM Plex Serif
@@ -148,8 +147,7 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				In table of contents: false
 				Text: Contents
-				Typography:
-					Numbered: false
+				Numbered: false
 			Table of contents:
 				Id: toc
 				Levels: 1 1

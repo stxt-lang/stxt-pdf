@@ -16,24 +16,24 @@ Document (dev.stxt.pdf):
                 Font: IBM Plex Sans
                 Size: 10
         For element: Heading 1
+            Numbered: false
             Typography:
                 Size: 20
                 Bold: true
-                Numbered: false
             Box:
                 Margin: 0 0 16 0
         For element: Heading 2
+            Numbered: true
             Typography:
                 Size: 14
                 Bold: true
-                Numbered: true
             Box:
                 Margin: 16 0 8 0
         For element: Heading 3
+            Numbered: true
             Typography:
                 Size: 11
                 Bold: true
-                Numbered: true
             Box:
                 Margin: 10 0 6 0
     Section:
@@ -72,15 +72,15 @@ reader always have a correct tree.
 
 ## Numbering (`Numbered`)
 
-With `Numbered: true` (from `Typography`, it is inherited) a heading has a number: `1`, `1.1`, `1.1.1`. It is declared per
-level in a rule, in the whole document or on a specific heading.
+With `Numbered: true` a heading has a number: `1`, `1.1`, `1.1.1`. It is declared per level, in a
+`For element: Heading N` rule, or on a specific heading; it is not inherited.
 
 - Each level counts in document order, also across sections, and starts again with each heading of a higher level.
 - A level without a number does not contribute to the number of the ones below it: with the title unnumbered, the
   `Heading 2` elements are `1`, `2`, `3`.
 - The number is written before the text, with a space, and also appears in the table of contents and in the bookmarks.
 - `{number of: id}` writes the number of a numbered heading: "section {number of: wiring}" gives "section 2".
-- `Number format` (also from `Typography`) writes the number of a level in letters or in roman numerals: `decimal` (the
+- `Number format` writes the number of a level in letters or in roman numerals: `decimal` (the
   default), `lower-alpha`, `upper-alpha`, `lower-roman` or `upper-roman`. Each level uses its own: chapters in roman
   numerals and sections in digits give `II.1`.
 - `Number label` changes what goes before the title: `Number label: Appendix {number}.` writes "Appendix A. Fees". The
@@ -90,10 +90,9 @@ level in a rule, in the whole document or on a specific heading.
 ```
 Styles:
     For style: annex
-        Typography:
-            Numbered: true
-            Number format: upper-alpha
-            Number label: Appendix {number}.
+        Numbered: true
+        Number format: upper-alpha
+        Number label: Appendix {number}.
 Heading 1:
     Text: Appendices
 Heading 2:

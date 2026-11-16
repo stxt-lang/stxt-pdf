@@ -29,20 +29,17 @@ inherit it). In a `Barcode` it only accepts `Color`, that of its modules ([Barco
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Capitalization when painting ([Text formatting](text-formatting.md#capitalization-case)). |
 | `Letter spacing` | number | `0` | Letter spacing; it can be negative ([Text formatting](text-formatting.md#letter-spacing-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Small caps ([Text formatting](text-formatting.md#small-caps-small-caps)). |
-| `Position` | `normal`, `superscript`, `subscript` | `normal` | Superscript or subscript; only in the rule of a styled run, and not inherited ([Text formatting](text-formatting.md#superscript-and-subscript-position)). |
+| `Text position` | `normal`, `superscript`, `subscript` | `normal` | Superscript or subscript; only in the rule of a styled run, and not inherited ([Text formatting](text-formatting.md#superscript-and-subscript-text-position)). |
 | `Ligatures` | `true`, `false` | `true` | Ligatures of the font ([Text formatting](text-formatting.md#ligatures-ligatures)). |
 | `Kerning` | `true`, `false` | `true` | Kerning pairs of the font ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Preformatted text ([Text formatting](text-formatting.md#preformatted-text)). |
 | `Tab size` | integer ≥ 1 | `4` | With `Preformatted: keep` or `wrap`, the columns of a tab. |
-| `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md#numbering-numbered)). A `Figure` is numbered unless it, or a rule of its own, declares otherwise ([Figure](../components/figure.md#numbering)). |
-| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | How the number of the level of a heading, or that of a figure, is written ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
-| `Number label` | text with `{number}` | the number | What goes in front of the title of a numbered heading, or of the caption of a figure ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
 | `Widows` | integer ≥ 1 | `2` | Minimum number of lines of a paragraph that go to the next page ([Breaks](breaks.md#choosing-the-break)). |
 | `Orphans` | integer ≥ 1 | `2` | Minimum number of lines of a paragraph that stay at the bottom of a page. |
 | `Language` | BCP 47 tag (`es`, `en-GB`, `ca`) | the `Language` of `Document` | Language of the text of the box, when it is not that of the document ([language](#language-language)). |
 
-What has no text ignores what it inherits without an error: a `Block` inherits `Size` for its children, and a `Text` that inherits
-`Numbered: true` does nothing, because only the headings and the figures read it.
+What has no text ignores what it inherits without an error: a `Block` inherits `Size` for its children
+and writes no text itself.
 
 ## Where there is text
 
@@ -77,7 +74,7 @@ Text is broken into **lines** as wide as the content box:
 > past it costs the same: in a narrow column, where no line breaking avoids them, what several lines left over ended up
 > in a single one, with two words stretched from side to side (up to 0.17.0).
 
-The lines beside a side box ([Block](../components/block.md#side-boxes-side)) or a drop cap
+The lines beside a side box ([Block](../components/block.md#side-boxes-side-box)) or a drop cap
 ([Text](../components/text.md#drop-cap-drop-cap)) are shorter than the content box: both algorithms work with the width
 of each line, and a word that does not fit in a short line leaves it empty and goes to the next one. The first line
 of a paragraph with `First line indent` has another width too ([First line indent](#first-line-indent-first-line-indent)).
@@ -305,7 +302,7 @@ Styles:
   is an error (`FIRST_LINE_INDENT_OVERFLOW`), at the line of the `First line indent`, even if it is in an ancestor
   or in a rule. It is compared with the padding of the laid out box, so a `Padding` in percentage counts for what it
   measures.
-- **Beside a side box** ([Block](../components/block.md#side-boxes-side)), the indent is added to what the box takes
+- **Beside a side box** ([Block](../components/block.md#side-boxes-side-box)), the indent is added to what the box takes
   from the first line. The rest of a paragraph that is broken again on the next page is not indented.
 - **With `Drop cap`**, the paragraph is not indented: the indent it inherits or gets from a rule is not applied to
   it, and its first line starts after the drop cap. An indent other than 0 written in the paragraph itself is an

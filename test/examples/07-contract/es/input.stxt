@@ -63,8 +63,7 @@ Document (dev.stxt.pdf):
 					Text: Página {page} de {pages}
 		Heading 1:
 			Text: Contrato de prestación de servicios de diseño
-			Typography:
-				Numbered: false
+			Numbered: false
 		Text: En Olot, a 3 de noviembre de 2025
 			Typography:
 				Align: center
@@ -156,8 +155,7 @@ Document (dev.stxt.pdf):
 			Heading 1:
 				Id: annex-title
 				Style: annex
-				Typography:
-					Number label: Anexo {number} ·
+				Number label: Anexo {number} ·
 				Text: Calendario y honorarios
 			Table:
 				Id: fees

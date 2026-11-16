@@ -1,0 +1,17 @@
+# Case: First page number without Page numbering: restart
+# Code: FIRST_PAGE_NUMBER_WITHOUT_RESTART
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		First page number: 5
+		Paragraph: Uno

@@ -29,20 +29,17 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Case` | `none`, `uppercase`, `lowercase`, `capitalize` | `none` | Mayúsculas al pintar ([Formato del texto](text-formatting.md#mayúsculas-case)). |
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
-| `Position` | `normal`, `superscript`, `subscript` | `normal` | Superíndice o subíndice; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#superíndice-y-subíndice-position)). |
+| `Text position` | `normal`, `superscript`, `subscript` | `normal` | Superíndice o subíndice; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#superíndice-y-subíndice-text-position)). |
 | `Ligatures` | `true`, `false` | `true` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
 | `Kerning` | `true`, `false` | `true` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |
 | `Tab size` | entero ≥ 1 | `4` | Con `Preformatted: keep` o `wrap`, las columnas de una tabulación. |
-| `Numbered` | `true`, `false` | `false` | Si los encabezados llevan número ([Encabezados](../components/heading.md#numeración-numbered)). Una `Figure` va numerada salvo que lo declare ella o una regla suya ([Figure](../components/figure.md#numeración)). |
-| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Cómo se escribe el número del nivel de un encabezado, o el de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
-| `Number label` | texto con `{number}` | el número | Lo que va delante del título de un encabezado numerado, o del pie de una figura ([Encabezados](../components/heading.md#formato-y-etiqueta-number-format-number-label)). |
 | `Widows` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que pasan a la página siguiente ([Cortes](breaks.md#elección-del-corte)). |
 | `Orphans` | entero ≥ 1 | `2` | Mínimo de líneas de un párrafo que quedan al final de una página. |
 | `Language` | etiqueta BCP 47 (`es`, `en-GB`, `ca`) | el `Language` de `Document` | Idioma del texto de la caja, cuando no es el del documento ([idioma](#idioma-language)). |
 
-Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` para sus hijos, y un `Text` que hereda
-`Numbered: true` no hace nada, porque solo lo leen los encabezados y las figuras.
+Lo que no tiene texto ignora lo que hereda sin error: un `Block` hereda `Size` para sus hijos
+y él no escribe texto.
 
 ## Dónde hay texto
 
@@ -77,7 +74,7 @@ El texto se reparte en **líneas** del ancho de la caja de contenido:
 > que lo pasan cuestan lo mismo: en una columna estrecha, donde ningún reparto las evita, lo que sobraba de varias líneas
 > acababa en una sola, con dos palabras estiradas de lado a lado (hasta la 0.17.0).
 
-Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-laterales-side)) o a una letra capitular
+Las líneas junto a una caja lateral ([Block](../components/block.md#cajas-laterales-side-box)) o a una letra capitular
 ([Text](../components/text.md#letra-capitular-drop-cap)) son más cortas que la caja de contenido: los dos repartos trabajan
 con el ancho de cada línea, y una palabra que no cabe en una línea corta la deja vacía y pasa a la siguiente. La
 primera línea de un párrafo con `First line indent` también tiene otro ancho
@@ -300,7 +297,7 @@ Styles:
   error (`FIRST_LINE_INDENT_OVERFLOW`), con la línea del `First line indent`, aunque esté en una antecesora o en una
   regla. Se compara con el relleno de la caja ya maquetada, así que un `Padding` en porcentaje cuenta por lo que
   mide.
-- **Junto a una caja lateral** ([Block](../components/block.md#cajas-laterales-side)), la sangría se suma a lo que
+- **Junto a una caja lateral** ([Block](../components/block.md#cajas-laterales-side-box)), la sangría se suma a lo que
   la caja quita a la primera línea. El resto de un párrafo que se vuelve a repartir en la página siguiente no se
   sangra.
 - **Con `Drop cap`**, el párrafo no se sangra: la sangría que hereda o recibe de una regla no se le aplica, y su

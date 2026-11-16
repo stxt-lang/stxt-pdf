@@ -105,7 +105,7 @@ Espacio libre = disponible − suma de tamaños hipotéticos − huecos.
 > ceden lo mismo (52,5 cada uno). *Alternativa descartada:* ponderar con la base más los márgenes.
 
 > **Decisión:** `Horizontal`, `Vertical` y `Line distribution` nombran los extremos de su eje por el lado de la
-> página, `left` y `right`, `top` y `bottom`, como `Align`, `Side` y `Caption position`. El eje de
+> página, `left` y `right`, `top` y `bottom`, como `Align`, `Side box` y `Caption position`. El eje de
 > `Line distribution` depende de `Direction`: en un `Stack` horizontal las líneas se apilan de arriba abajo, y
 > admite `top` y `bottom`; en uno vertical van de izquierda a derecha, y admite `left` y `right`. El lado del otro
 > eje es `VALUE_NOT_ALLOWED`. *Alternativa descartada:* `start` y `end`, que no dicen nada que el nombre de la

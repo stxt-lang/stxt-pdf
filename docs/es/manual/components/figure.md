@@ -20,8 +20,7 @@ Document (dev.stxt.pdf):
             Box:
                 Margin: 0 0 8 0
         For element: Figure
-            Typography:
-                Number label: Figura {number}.
+            Number label: Figura {number}.
             Box:
                 Margin: 6 0 14 0
         For element: Caption
@@ -81,7 +80,7 @@ Document (dev.stxt.pdf):
 | `Alt` | obligatorio con un `Block` | El texto alternativo de la figura entera, solo cuando contiene un `Block`. Con una imagen, el `Alt` va en la imagen |
 | `In table of contents` | `true` | Con `false`, la figura no sale en los índices, pero sigue numerada |
 
-Admite además `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` y `Below side boxes`. `Numbered: false` (en su `Typography` o en una
+Admite además `Id`, `Style`, `Box`, `Typography`, `Break`, `Side box` y `Below side boxes`. `Numbered: false` (propio o de una
 regla) la deja sin número; `Number label` y `Number format` escriben el número como en los encabezados
 ([Encabezados](heading.md#numeración-numbered)). En la `Section`, `Figure numbering: chapter` numera las figuras y las
 tablas por capítulo.
@@ -105,7 +104,7 @@ tablas por capítulo.
   página. Se estila con `For element: TOC 1`.
 - La imagen o el código de una figura necesitan `Alt`: una figura con pie es contenido y un lector de pantalla la lee con
   su pie.
-- Va donde va un elemento en flujo, también en un `Item` o un `Area` y como caja lateral con `Side` (con `Width`), pero no
+- Va donde va un elemento en flujo, también en un `Item` o un `Area` y como caja lateral con `Side box` (con `Width`), pero no
   en un `Page overlay`.
 
 Más detalle en la [referencia](../../reference/components/figure.md).

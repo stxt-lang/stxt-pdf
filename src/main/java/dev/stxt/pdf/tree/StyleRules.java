@@ -165,8 +165,9 @@ final class StyleRules {
             "balance-columns",
             "marker", "marker-suffix", "marker-image", "fit", "opacity", "barcode-format", "error-correction", "quiet-zone",
             "readable-text",
-            "caption-position", "figure-counter", "in-table-of-contents", "levels", "leader",
-            "drop-cap", "side", "below-side-boxes", "isolate-margins", "trim-margins",
+            "caption-position", "figure-counter", "in-table-of-contents", "numbered", "number-format", "number-label",
+            "levels", "leader",
+            "drop-cap", "side-box", "below-side-boxes", "isolate-margins", "trim-margins",
             "bullet-markers", "number-markers", "table-column-sizes",
             "grow", "shrink", "base-size");
 
@@ -270,7 +271,7 @@ final class StyleRules {
             }
             default -> throw unread(rule);
         }
-        // Position is only of a styled run, which takes a For style: there it is read, and applied to a box it is an
+        // Text position is only of a styled run, which takes a For style: there it is read, and applied to a box it is an
         // error.
         read(rule, rule.getCanonicalName().equals("for-style") ? Style.ofRun(namedColors) : new Style(namedColors),
                 null, null);
@@ -652,10 +653,10 @@ final class StyleRules {
      * change how its letters look and not the height of the line.
      */
     static final List<String> RUN_PROPERTIES = List.of("font", "code-font", "bold", "weight", "italic", "color",
-            "case", "small-caps", "letter-spacing", "position");
+            "case", "small-caps", "letter-spacing", "text-position");
 
     private static final String RUN_ALLOWED = "Font, Code font, Bold, Weight, Italic, Color, Case, Small caps, "
-            + "Letter spacing and Position";
+            + "Letter spacing and Text position";
 
     /**
      * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}

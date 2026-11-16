@@ -104,10 +104,10 @@ class StyledRunPaintTest {
             				Markup: markdown
             		For style: sup
             			Typography:
-            				Position: superscript
+            				Text position: superscript
             		For style: sub
             			Typography:
-            				Position: subscript
+            				Text position: subscript
             	Section:
             		Text: Son m[2]{sup} y CO[2]{sub}.
             		Text: Son m2 y CO2.

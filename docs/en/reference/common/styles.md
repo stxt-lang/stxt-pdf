@@ -73,13 +73,13 @@ They are those of appearance and distribution. The rule that applies to an eleme
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Opacity`, `Side`, `Below side boxes` |
-| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side`, `Below side boxes` |
-| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes` |
-| `Heading 1` to `Heading 6` | `In table of contents`, `Below side boxes` |
+| `Image` | `Fit`, `Opacity`, `Side box`, `Below side boxes` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side box`, `Below side boxes` |
+| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes` |
+| `Heading 1` to `Heading 6` | `In table of contents`, `Numbered`, `Number format`, `Number label`, `Below side boxes` |
 | `Paragraph` | `Drop cap`, `Below side boxes` |
 | `Text` | `Below side boxes` |
-| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
+| `Block` | `Isolate margins`, `Trim margins`, `Side box`, `Below side boxes` |
 | `Frame` | `Isolate margins`, `Trim margins`, `Opacity` |
 | `Overlay`, `Page overlay` | `Opacity` |
 | `Cell` | `Trim margins`, `Vertical` |
@@ -109,7 +109,7 @@ They are those of appearance and distribution. The rule that applies to an eleme
 - **`Marker` and `Column sizes`** are required in a `List` and in a `Table`, and they can come from a rule. Without
   either, the error is `LIST_MARKER_MISSING` or `TABLE_COLUMN_SIZES_MISSING`, with the line of the element.
 - **Not in a rule** are the properties of identity, content, structure and position: `Id`, `Style`, `Link`, `Alt`,
-  `Span`, `Row header`, `First number`, `Number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
+  `Span`, `Row header`, `First number`, `Item number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` and `Rotate origin`,
   those of `Section` and `Page`, and the value or the `Content` of an element. The schema does not allow them.
 
 > **Decision:** rules allow the element properties of appearance and distribution, and the engine checks that the
@@ -319,7 +319,7 @@ These are errors:
   context (`STYLE_WITHOUT_RULE`);
 - the rule of a styled run that declares something a run does not accept, such as `Size`, a `Box` or an element
   property (`STYLE_NOT_ALLOWED_IN_RUN`);
-- `Position` in a rule that reaches a box and not a run (`POSITION_OUTSIDE_RUN`);
+- `Text position` in a rule that reaches a box and not a run (`TEXT_POSITION_OUTSIDE_RUN`);
 - two `Named color` with the same name in the same source (`COLOR_DUPLICATE`);
 - a color with the form of a name that no `Named color` declares (`COLOR_UNKNOWN`);
 - a `Named color` without a name and a color separated by a space, with a misspelled name or with a color that is not

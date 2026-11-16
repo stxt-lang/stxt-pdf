@@ -1,5 +1,5 @@
-# Case: Side on a Block without Width or Max width
-# Code: SIDE_WITHOUT_WIDTH
+# Case: Side box on a Block without Width or Max width
+# Code: SIDE_BOX_WITHOUT_WIDTH
 # Line: 12
 Document (dev.stxt.pdf):
 	Language: es
@@ -9,6 +9,6 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Block:
-			Side: left
+			Side box: left
 			Box:
 				Padding: 10

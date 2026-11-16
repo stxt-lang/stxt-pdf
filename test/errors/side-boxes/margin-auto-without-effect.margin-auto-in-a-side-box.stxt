@@ -1,4 +1,4 @@
-# Case: Margin auto in an Image with Side
+# Case: Margin auto in an Image with Side box
 # Code: MARGIN_AUTO_WITHOUT_EFFECT
 # Line: 14
 Document (dev.stxt.pdf):
@@ -9,6 +9,6 @@ Document (dev.stxt.pdf):
 		Height: 842
 	Section:
 		Image: test/square.png
-			Side: right
+			Side box: right
 			Box:
 				Margin: 0 auto

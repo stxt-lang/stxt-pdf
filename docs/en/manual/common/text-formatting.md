@@ -68,7 +68,7 @@ Document (dev.stxt.pdf):
 
 - The rule is a `For style` rule like the others: the same one can style a box (`Style: price`) and a part of a text. In
   a part only `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps`, `Letter spacing` and
-  `Position` are valid. If the rule declares something else, such as `Size` or a `Box`, and it is used in a part, it is an error
+  `Text position` are valid. If the rule declares something else, such as `Size` or a `Box`, and it is used in a part, it is an error
   (`STYLE_NOT_ALLOWED_IN_RUN`).
 - The marks add to the style: `[**€12.50**]{price}` and `**[€12.50]{price}**` are bold even if the rule says
   `Weight: 300`. A link can have a styled part (`[[see price]{price}](https://...)`) and a styled part can have a link,
@@ -76,9 +76,9 @@ Document (dev.stxt.pdf):
 - A name without its rule is an error (`STYLE_WITHOUT_RULE`). Brackets that are not followed by a name in braces are
   text, and `\[` writes them as they are.
 
-## Superscripts and subscripts (`Position`)
+## Superscripts and subscripts (`Text position`)
 
-A styled part whose rule declares `Position: superscript` or `subscript` is painted smaller (at 70 % of the size) and
+A styled part whose rule declares `Text position: superscript` or `subscript` is painted smaller (at 70 % of the size) and
 above or below the baseline: ordinals, units, formulas and trademarks.
 
 ```
@@ -96,18 +96,18 @@ Document (dev.stxt.pdf):
                 Markup: markdown
         For style: sup
             Typography:
-                Position: superscript
+                Text position: superscript
         For style: sub
             Typography:
-                Position: subscript
+                Text position: subscript
     Section:
         Paragraph: The 1[st]{sup} floor, of 85 m[2]{sup}, emits 12 kg of CO[2]{sub} a year.
 ```
 
 - The line does not change its height, and what is copied from the PDF is the text as written (`85 m2`).
 - The rule can also carry a color or a font, and the marks add to it: `[**2**]{sub}` is a subscript in bold.
-- `Position` is only valid in a part of a text. In a box (in its `Typography`, or with `Style: sup`) it is an error
-  (`POSITION_OUTSIDE_RUN`).
+- `Text position` is only valid in a part of a text. In a box (in its `Typography`, or with `Style: sup`) it is an error
+  (`TEXT_POSITION_OUTSIDE_RUN`).
 - The number of a [footnote](../components/footnote.md) is already a superscript, with no rule.
 
 ## Images in the sentence

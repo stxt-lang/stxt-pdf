@@ -101,7 +101,7 @@ class LeadingMarginsTest {
 
     @Test
     void aSideBoxDoesNotTakePartInTheFlow() {
-        assertEquals(new MarginStrut(6, 0), predicted("\t\tBlock:\n\t\t\tId: B\n\t\t\tBlock:\n\t\t\t\tSide: left\n"
+        assertEquals(new MarginStrut(6, 0), predicted("\t\tBlock:\n\t\t\tId: B\n\t\t\tBlock:\n\t\t\t\tSide box: left\n"
                 + "\t\t\t\tBox:\n\t\t\t\t\tWidth: 100\n\t\t\t\t\tMargin: 20 0 0 0\n\t\t\t\tText: Al lado\n"
                 + "\t\t\tParagraph: Texto\n\t\t\t\tBox:\n\t\t\t\t\tMargin: 6 0 0 0\n"));
     }

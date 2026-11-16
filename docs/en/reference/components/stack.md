@@ -104,7 +104,7 @@ Free space = available − sum of hypothetical sizes − gaps.
 > give up the same (52.5 each). *Rejected alternative:* weighting with the base plus the margins.
 
 > **Decision:** `Horizontal`, `Vertical` and `Line distribution` name the ends of their axis by the side of the
-> page, `left` and `right`, `top` and `bottom`, like `Align`, `Side` and `Caption position`. The axis of
+> page, `left` and `right`, `top` and `bottom`, like `Align`, `Side box` and `Caption position`. The axis of
 > `Line distribution` depends on `Direction`: in a horizontal `Stack` the lines are stacked from top to bottom, and
 > it allows `top` and `bottom`; in a vertical one they go from left to right, and it allows `left` and `right`. The
 > side of the other axis is `VALUE_NOT_ALLOWED`. *Rejected alternative:* `start` and `end`, which say nothing the

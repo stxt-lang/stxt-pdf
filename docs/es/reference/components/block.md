@@ -1,9 +1,9 @@
 # `Block`
 
 Una caja que apila sus hijos en vertical. Admite `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
-`Rotate`, `Side` y `Below side boxes`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
+`Rotate`, `Side box` y `Below side boxes`, y como hijos cualquier elemento. Va donde va un elemento en flujo. Con `Rotate`, gira con todo lo que contiene
 y ocupa el rectángulo que la envuelve ([Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image)).
-Con `Side`, es una [caja lateral](#cajas-laterales-side): el texto que la sigue corre a su lado.
+Con `Side box`, es una [caja lateral](#cajas-laterales-side-box): el texto que la sigue corre a su lado.
 
 ```
 Block:
@@ -61,7 +61,7 @@ de `Stack` y `Grid` (también las celdas de una `Table`), las columnas de un `Co
 |---|---|---|---|
 | `Isolate margins` | booleano | `false` | Aísla los márgenes de la caja: corta la fusión de márgenes con los hijos. Solo en `Block` y `Frame`, y no en un ítem de `Stack` o `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
-`Isolate margins` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)), como `Side` y `Below side boxes`.
+`Isolate margins` también puede venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)), como `Side box` y `Below side boxes`.
 
 > **Decisión:** `Isolate margins` solo está donde puede tener efecto: `Overlay`, `Page overlay` y los ítems ya aíslan, y `Stack`, `Grid`
 > y `Text` no tienen hijos en flujo de bloque. En un `Block` o un `Frame` que es ítem, `Isolate margins: true` es un error.
@@ -116,21 +116,21 @@ principio de una sección, donde los márgenes de dentro no se fusionan con nada
 > mismo margen a todos. *Alternativa descartada:* un margen distinto para el primer y el último hijo (selectores de
 > posición), que no alcanza a los hijos de los hijos.
 
-> **Decisión:** una sola propiedad con el lado como valor (`none`, `both`, `top`, `bottom`), como `Pages` o `Side`.
+> **Decisión:** una sola propiedad con el lado como valor (`none`, `both`, `top`, `bottom`), como `Pages` o `Side box`.
 > *Alternativas descartadas:* un booleano que recorta siempre los dos lados, que no se puede ampliar después sin
 > romper los documentos que lo usan; y dos propiedades (`Trim top margin`, `Trim bottom margin`), dos líneas para el
 > caso habitual, que es los dos.
 
-## Cajas laterales (`Side`)
+## Cajas laterales (`Side box`)
 
-Una `Image`, un `Barcode` o un `Block` en flujo de bloque con `Side: left` o `Side: right` es una **caja lateral**: se
+Una `Image`, un `Barcode` o un `Block` en flujo de bloque con `Side box: left` o `Side box: right` es una **caja lateral**: se
 coloca a ese lado del contenedor, en la posición que tiene el flujo cuando se llega a ella, y no ocupa sitio en vertical.
 Los hermanos que la siguen empiezan donde empezarían sin ella y, mientras solapan con ella en vertical, el texto **acorta
 sus líneas** a su lado. Es la figura junto al texto de un manual, o la foto en una columna de un boletín.
 
 ```
 Image: examples/newsletter/trail.jpg
-    Side: left
+    Side box: left
     Alt: Un sendero entre prados con montañas al fondo
     Box:
         Width: 180
@@ -150,7 +150,7 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
   `Below side boxes: true`.
 - **`Below side boxes`.** `Below side boxes: true` en un `Text`, un `Paragraph`, un `Block`, un encabezado, un `Markdown`, una `Image` o un
   `Barcode` lo baja por debajo de las cajas laterales que hay antes que él, en lugar de rodearlas. Sin una caja lateral
-  antes es un error (`BELOW_SIDE_BOXES_WITHOUT_SIDE`).
+  antes es un error (`BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX`).
 - **Una palabra que no cabe** al lado de la caja deja esa línea vacía y pasa a la siguiente, hasta la primera línea con el
   ancho entero; solo es un desbordamiento si tampoco cabe ahí (`TEXT_OVERFLOW`). Con `Line breaking: optimal`, el reparto
   tiene en cuenta el ancho de cada línea.
@@ -160,7 +160,7 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
   de abajo de su último hijo no sale de él.
 - **Dónde va.** En flujo de bloque: una sección, un `Block`, un `Frame`, un `Overlay`, un `Page overlay`, una `Cell` con
   elementos, un `List item`, una columna de un `Columns`. No en un ítem de `Stack` o `Grid`, que coloca la caja él mismo
-  (`SIDE_NOT_IN_BLOCK_FLOW`). Un `Block` con `Side` necesita `Width` o `Max width` (`SIDE_WITHOUT_WIDTH`).
+  (`SIDE_BOX_NOT_IN_BLOCK_FLOW`). Un `Block` con `Side box` necesita `Width` o `Max width` (`SIDE_BOX_WITHOUT_WIDTH`).
 - **Cortes.** Una caja lateral no se parte: si no cabe en lo que queda de la página pasa a la siguiente, y la primera
   línea que la rodea va con ella (el corte entre la caja y el hijo que la sigue es tan malo como separar dos cajas con
   `Keep with next`). Las cajas laterales acaban con la página: el texto que sigue en la página siguiente tiene el ancho
@@ -169,7 +169,7 @@ Paragraph: El texto de este párrafo, y el de los que siguen mientras la foto ll
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
-| `Side` | `left`, `right` | sin valor | Hace de la caja una caja lateral. En `Image`, `Barcode` y `Block` (con `Width` o `Max width`). |
+| `Side box` | `left`, `right` | sin valor | Hace de la caja una caja lateral. En `Image`, `Barcode` y `Block` (con `Width` o `Max width`). |
 | `Below side boxes` | booleano | `false` | Baja la caja por debajo de las cajas laterales anteriores. En `Text`, `Paragraph`, `Block`, los encabezados, `Markdown`, `Image` y `Barcode`. |
 
 > **Decisión:** la caja lateral es lo único que hace que el texto rodee a otra caja; se coloca en su sitio del flujo y
@@ -200,6 +200,6 @@ Un `Block` agrupa su contenido sin anunciarse: un lector de pantalla lee lo que 
 ## Lo que no hay
 
 - Que una tabla, un `Stack`, un texto con fondo o borde, o una lista junto a una caja lateral izquierda, rodeen la caja:
-  van debajo de ella ([Cajas laterales](#cajas-laterales-side)). Tampoco una caja lateral en un ítem de `Stack` o
+  van debajo de ella ([Cajas laterales](#cajas-laterales-side-box)). Tampoco una caja lateral en un ítem de `Stack` o
   `Grid`.
 - Recorte de lo que se sale (lo que se sale es un [desbordamiento](../common/overflow.md)).

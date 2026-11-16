@@ -226,7 +226,7 @@ public final class BoxTreeBuilder {
             throw error(n, ErrorCode.SECTION_EMPTY, "The section has no content: without elements (Page overlays do not "
                     + "count, they take no space) it has no page");
         }
-        return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.firstNumber(), p.inheritPageOverlays(),
+        return new Section(box, p.pageSetup(), p.numbering(), p.pageNumberFormat(), p.firstPageNumber(), p.inheritPageOverlays(),
                 p.beginOn(), p.footnoteNumbering(), p.footnoteNumberFormat(), p.figureNumbering(), footnotes);
     }
 
@@ -321,8 +321,7 @@ public final class BoxTreeBuilder {
         validateMergeBorders(n, box);
         if (kind.headingLevel() > 0) {
             // The texts of the heading are already read: the number is written before the first one.
-            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.typography().numbered(),
-                    s.typography().numberFormat());
+            String headingNumber = ctx.headingNumbers.next(kind.headingLevel(), s.numbered(), s.numberFormat());
             if (headingNumber != null) {
                 HeadingNumbers.prefix(box, box.children().get(0), headingNumber);
             }

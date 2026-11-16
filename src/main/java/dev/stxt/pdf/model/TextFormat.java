@@ -28,7 +28,7 @@ package dev.stxt.pdf.model;
  *
  * <p>{@code style} is that of a styled run, {@code [text]{name}} ({@link RunStyle}), or {@code null}: its color, its
  * weight, its style, its letter spacing, its case and its small caps replace those of the box, and its family (or that
- * of its code) is in {@code family}. Its {@code Position} makes it a superscript ({@link #superscript()}) or a
+ * of its code) is in {@code family}. Its {@code Text position} makes it a superscript ({@link #superscript()}) or a
  * subscript ({@link #subscript()}), lowered {@link #SUBSCRIPT_DROP} of the size. The marks of the run (bold, italic) add to the style as they add to the box,
  * wherever they are written.</p>
  *
@@ -58,7 +58,7 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
     public static final double SMALL_CAPS_SCALE = 0.8;
 
     /**
-     * Size of a superscript (the call and the label of a footnote, a run with {@code Position: superscript}) and of a
+     * Size of a superscript (the call and the label of a footnote, a run with {@code Text position: superscript}) and of a
      * subscript, relative to that of the box.
      */
     public static final double SUPERSCRIPT_SCALE = 0.7;
@@ -243,14 +243,14 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
 
     /**
      * {@return whether the run is a superscript: the call or the label of a footnote, or a styled run with
-     * {@code Position: superscript}}
+     * {@code Text position: superscript}}
      */
     public boolean superscript() {
         return footnote != null || label || style != null && style.position() == TextPosition.SUPERSCRIPT;
     }
 
     /**
-     * {@return whether the run is a subscript: a styled run with {@code Position: subscript}} The call of a footnote
+     * {@return whether the run is a subscript: a styled run with {@code Text position: subscript}} The call of a footnote
      * inside it is still a superscript.
      */
     public boolean subscript() {

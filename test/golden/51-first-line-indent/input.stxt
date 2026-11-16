@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 			Style: clause
 		Image: test/square.png
 			Id: img
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 60

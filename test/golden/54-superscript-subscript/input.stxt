@@ -24,10 +24,10 @@ Document (dev.stxt.pdf):
 				Markup: markdown
 		For style: sup
 			Typography:
-				Position: superscript
+				Text position: superscript
 		For style: sub
 			Typography:
-				Position: subscript
+				Text position: subscript
 				Color: #B3261E
 		For style: narrow
 			Box:

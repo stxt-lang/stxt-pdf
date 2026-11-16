@@ -107,12 +107,15 @@ Text: Quarterly results
 | `Id` | text | none | Elements and `Section` | Identifier for references, links, `For id` rules and messages. Unique in the document (`DUPLICATE_ID`). |
 | `Style` | names separated by spaces | none | Elements and `Section` | The `For style` rules with those names apply to it ([Styles](styles.md)). Each style needs its rule and is not repeated. |
 | `In table of contents` | `true`, `false` | `true` | Headings, `Figure` | Whether the heading or the figure has an entry in the tables of contents ([Headings](../components/heading.md#outside-the-table-of-contents), [Figure](../components/figure.md#tables-of-contents)). |
+| `Numbered` | `true`, `false` | `false`; `true` in a `Figure` | Headings, `Figure` | Whether the heading or the figure carries a number ([Headings](../components/heading.md#numbering-numbered), [Figure](../components/figure.md#numbering)). |
+| `Number format` | `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | `decimal` | Headings, `Figure` | How the number of the level of a heading, or that of a figure, is written ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
+| `Number label` | text with `{number}` | the number | Headings, `Figure` | What goes in front of the title of a numbered heading, or of the caption of a figure ([Headings](../components/heading.md#format-and-label-number-format-number-label)). |
 | `Link` | `https://...`, `http://...`, `mailto:...` or `#id` | none | Elements except `Markdown` and `Table of contents` | Makes the whole box clickable ([Links](links.md)). It is not inherited and does not change the appearance. |
 | `Isolate margins` | boolean | `false` | `Block`, `Frame` | Stops margin merging with the children ([Block](../components/block.md#margin-merging)). |
 | `Trim margins` | `none`, `both`, `top`, `bottom` | `none` | `Block`, `Frame`, `List item`, `Cell`, `Section` | Drops the margins of the children that touch the top border of the box, the bottom one or both ([Block](../components/block.md#trimming-the-margins-trim-margins)). |
 | `Vertical` | `top`, `center`, `bottom` | `top` | `Cell` | Where the content of the cell goes in the height it has left over ([Table](../components/table.md#vertical-alignment-of-the-content-vertical)). In `Stack`, `Grid`, `Item` and `Area` it is the alignment or the distribution of each one. |
-| `Side` | `left`, `right` | none | `Image`, `Barcode`, `Block`, `Figure` | Side box: the text that follows it runs beside it ([Block](../components/block.md#side-boxes-side)). |
-| `Below side boxes` | boolean | `false` | `Text`, `Paragraph`, `Block`, headings, `Markdown`, `Image`, `Barcode`, `Figure` | Moves the box below the side boxes before it ([Block](../components/block.md#side-boxes-side)). |
+| `Side box` | `left`, `right` | none | `Image`, `Barcode`, `Block`, `Figure` | Side box: the text that follows it runs beside it ([Block](../components/block.md#side-boxes-side-box)). |
+| `Below side boxes` | boolean | `false` | `Text`, `Paragraph`, `Block`, headings, `Markdown`, `Image`, `Barcode`, `Figure` | Moves the box below the side boxes before it ([Block](../components/block.md#side-boxes-side-box)). |
 | `Drop cap` | integer from 2 to 5 | none | `Paragraph` | Drop cap of that many lines ([Text](../components/text.md#drop-cap-drop-cap)). |
 
 ## Order and text
@@ -191,18 +194,18 @@ once, and the elements, as many times as needed.
 | Node | Children |
 |---|---|
 | `Document` | `Page`, `Title` and `Language` (exactly one of each), `Subject`, `Author`, `Keywords`, `Styles`; `Page overlay`, `Section` (at least one) |
-| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering`, `Trim margins`; elements |
+| `Section` | `Id`, `Style`, `Page`, `Page numbering`, `Page number format`, `First page number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering`, `Trim margins`; elements |
 | `Page` | `Paper`, `Orientation`, `Width`, `Height`, `Margin`, `Mirror margins` |
 | `Styles` | `Named color`, `For element`, `For style`, `For id`, `For column`. Child of `Document` or root of a separate styles document |
 | `For element`, `For style`, `For id` | `Box`, `Typography`, `Break` and the element properties of appearance and distribution ([Styles](styles.md#element-properties)), at most one of each |
 | `For column` | `Box`, `Typography`, `Break` |
-| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side`, `Below side boxes`; elements |
+| `Block` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Rotate`, `Side box`, `Below side boxes`; elements |
 | `Stack` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Direction`, `Wrap items`, `Gap`, `Horizontal`, `Vertical`, `Line distribution`, `Split items`; `Item`, `Overlay`, `Page overlay` |
 | `Grid` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes`, `Row sizes`, `Gap`, `Area map`, `Fill order`, `Horizontal`, `Vertical`, `Split rows`; `Area`, `Overlay`, `Page overlay` |
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Below side boxes`; `Paragraph`, besides, `Drop cap` |
-| `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Box`, `Typography`, `Below side boxes`; `Text` (at least one) |
+| `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Box`, `Typography`, `Below side boxes`; `Text` (at least one) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker suffix`, `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
-| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
+| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Item number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (required), `Footer rows` |
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |
@@ -211,17 +214,17 @@ once, and the elements, as many times as needed.
 | `Markdown` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Bullet markers`, `Number markers`, `Table column sizes`, `Below side boxes`, `Content` (required) |
 | `Footnote` | `Id` (required), `Style`, `Box`, `Typography`; `Paragraph`, `Text`, `Markdown`, `List`, `Table`, `Block` |
 | `Table of contents` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Entries`, `Levels`, `Leader` |
-| `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
+| `Figure` | `Id`, `Style`, `Box`, `Typography`, `Break`, `Alt`, `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes`; `Caption` (exactly one); `Image`, `Barcode`, `Table` or `Block` (one) |
 | `Caption` | `Id`, `Style`, `Box`, `Typography`, `Content` |
-| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Opacity`, `PDF page`, `Rotate`, `Side`, `Below side boxes` |
-| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`; with `Readable text`, also the font), `Break`, `Alt` (required), `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Rotate`, `Side`, `Below side boxes`, `Content` |
+| `Image` | `Id`, `Style`, `Link`, `Box`, `Break`, `Alt`, `Fit`, `Opacity`, `PDF page`, `Rotate`, `Side box`, `Below side boxes` |
+| `Barcode` | `Id`, `Style`, `Link`, `Box`, `Typography` (only `Color`; with `Readable text`, also the font), `Break`, `Alt` (required), `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Rotate`, `Side box`, `Below side boxes`, `Content` |
 | `Frame` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`, `Trim margins`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elements |
 | `Overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Rotate`, `Rotate origin`, `Opacity`; elements |
 | `Page overlay` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Offset`, `Layer`, `Pages`, `Rotate`, `Rotate origin`, `Opacity`; elements |
 | `Item` | `Grow`, `Shrink`, `Base size`, `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Area` | `Horizontal`, `Vertical`, `Layer`; one in-flow element |
 | `Box` | `Width`, `Height`, `Min width`, `Max width`, `Min height`, `Max height`, `Aspect ratio`, `Margin`, `Padding`, `Border`, `Border color`, `Border style`, `Corner radius`, `Background`, `Overflow`, `Merge borders` |
-| `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Min size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Break long words`, `First line indent`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Position`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Numbered`, `Number format`, `Number label`, `Widows`, `Orphans`, `Language` |
+| `Typography` | `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Size`, `Min size`, `Line height`, `Align`, `Color`, `Line breaking`, `Hyphenate`, `Break long words`, `First line indent`, `Markup`, `Case`, `Letter spacing`, `Small caps`, `Text position`, `Ligatures`, `Kerning`, `Preformatted`, `Tab size`, `Widows`, `Orphans`, `Language` |
 | `Break` | `Before`, `After`, `Keep with next`, `Keep with previous`, `Keep together`, `Edges` |
 
 *Elements* are `Block`, `Stack`, `Grid`, `Text`, `Paragraph`, the headings, `List`, `Table`, `Columns`, `Markdown`,

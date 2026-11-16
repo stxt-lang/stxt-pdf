@@ -28,7 +28,7 @@ final class SectionReader {
      * {@link Section} except its box and its footnote area.
      */
     record Properties(String id, PageSetup pageSetup, Section.PageNumbering numbering, NumberFormat pageNumberFormat,
-                      int firstNumber, boolean inheritPageOverlays, Section.BeginOn beginOn,
+                      int firstPageNumber, boolean inheritPageOverlays, Section.BeginOn beginOn,
                       Section.FootnoteNumbering footnoteNumbering, FootnoteNumberFormat footnoteNumberFormat,
                       Section.FigureNumbering figureNumbering, TrimMargins trimMargins) {
     }
@@ -44,7 +44,7 @@ final class SectionReader {
         NumberFormat pageNumberFormat = NumberFormat.DECIMAL;
         Node pageNumberFormatNode = null;
         Node startNode = null;
-        int firstNumber = 1;
+        int firstPageNumber = 1;
         boolean inheritPageOverlays = true;
         Section.BeginOn beginOn = Section.BeginOn.ANY;
         Section.FootnoteNumbering footnoteNumbering = Section.FootnoteNumbering.CONTINUE;
@@ -63,8 +63,8 @@ final class SectionReader {
                     pageNumberFormat = enumValue(NumberFormat.class, p);
                     pageNumberFormatNode = p;
                 }
-                case "first-number" -> {
-                    firstNumber = positiveInteger(p);
+                case "first-page-number" -> {
+                    firstPageNumber = positiveInteger(p);
                     startNode = p;
                 }
                 case "inherit-page-overlays" -> inheritPageOverlays = bool(p);
@@ -83,14 +83,14 @@ final class SectionReader {
         }
         // What would have no effect (reference/components/document.md#page-numbering).
         if (startNode != null && numbering != Section.PageNumbering.RESTART) {
-            throw error(startNode, ErrorCode.FIRST_NUMBER_WITHOUT_RESTART, "First number only has an effect with Page numbering: "
-                    + "restart, which is when the numbering starts again: restart is missing or First number is not needed");
+            throw error(startNode, ErrorCode.FIRST_PAGE_NUMBER_WITHOUT_RESTART, "First page number only has an effect with Page numbering: "
+                    + "restart, which is when the numbering starts again: restart is missing or First page number is not needed");
         }
         if (pageNumberFormatNode != null && numbering == Section.PageNumbering.NONE) {
             throw error(pageNumberFormatNode, ErrorCode.PAGE_NUMBER_FORMAT_WITHOUT_NUMBERS, "Page number format has no "
                     + "effect with Page numbering: none, because the pages of the section have no number: it is not needed");
         }
-        return new Properties(id, pageSetup.pageSetup(), numbering, pageNumberFormat, firstNumber, inheritPageOverlays,
+        return new Properties(id, pageSetup.pageSetup(), numbering, pageNumberFormat, firstPageNumber, inheritPageOverlays,
                 beginOn, footnoteNumbering, footnoteNumberFormat, figureNumbering, trimMargins);
     }
 }

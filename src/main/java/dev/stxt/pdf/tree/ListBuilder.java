@@ -11,12 +11,12 @@ import static dev.stxt.pdf.tree.Nodes.error;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_IMAGE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_SUFFIX;
-import static dev.stxt.pdf.tree.PropertyKey.NUMBER;
+import static dev.stxt.pdf.tree.PropertyKey.ITEM_NUMBER;
 import static dev.stxt.pdf.tree.PropertyKey.FIRST_NUMBER;
 
 /**
  * Lists (reference/components/list.md): numbering of the {@code List item}, the generated box of their
- * marker (text, or the image of {@code Marker image}) and the rules of {@code First number}, {@code Number} and
+ * marker (text, or the image of {@code Marker image}) and the rules of {@code First number}, {@code Item number} and
  * {@code Marker image}.
  */
 final class ListBuilder {
@@ -25,14 +25,14 @@ final class ListBuilder {
     }
 
     /**
-     * Number of a {@code List item} (reference/components/list.md): that of its {@code Number} or the one after that of
+     * Number of a {@code List item} (reference/components/list.md): that of its {@code Item number} or the one after that of
      * the previous item, starting with the {@code First number} of the list. In a list without numbering, 0.
      */
     static int itemNumber(BuildContext ctx, InlineNode n, Style s, Box list) {
         Marker marker = list.style().list().marker();
         if (!marker.numbered()) {
-            if (s.isDeclared(NUMBER)) {
-                throw error(s.line(NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Number has no effect: the list "
+            if (s.isDeclared(ITEM_NUMBER)) {
+                throw error(s.line(ITEM_NUMBER), ErrorCode.LIST_NUMBER_NOT_ALLOWED, "Item number has no effect: the list "
                         + "(line " + list.line() + ") has Marker: " + markerName(marker) + ", which does not number its items");
             }
             return 0;
@@ -42,7 +42,7 @@ final class ListBuilder {
                 : previous.isEmpty() ? list.style().list().firstNumber()
                 : ctx.itemNumbers.get(previous.get(previous.size() - 1)) + 1;
         if (!ListMarkers.inRange(marker, number)) {
-            throw error(s.list().number() != null ? s.line(NUMBER) : SourceLine.of(n.getLine()),
+            throw error(s.list().number() != null ? s.line(ITEM_NUMBER) : SourceLine.of(n.getLine()),
                     ErrorCode.LIST_NUMBER_RANGE,
                     "The number " + number + " cannot be written with Marker: " + markerName(marker)
                             + ", which numbers " + ListMarkers.range(marker));

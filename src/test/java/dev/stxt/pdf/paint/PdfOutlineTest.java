@@ -83,9 +83,9 @@ class PdfOutlineTest {
     @Test
     void theNumberOfAHeadingIsPartOfItsBookmarkAndItsContentsEntry() throws Exception {
         try (PDDocument pdf = Loader.loadPDF(Pdfs.of(Docs.mergeStyles(DOCUMENT
-                + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
-                + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
-                + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n\t\tTypography:\n\t\t\tNumbered: false\n"
+                + "\tStyles:\n\t\tFor element: Heading 1\n\t\t\tNumbered: true\n"
+                + "\t\tFor element: Heading 2\n\t\t\tNumbered: true\n"
+                + "\tHeading 1:\n\t\tIn table of contents: false\n\t\tText: Portada\n\t\tNumbered: false\n"
                 + "\tTable of contents:\n\t\tLevels: 1 2\n"
                 + "\tHeading 1:\n\t\tText: Uno\n"
                 + "\tHeading 2:\n\t\tText: Dos\n")))) {

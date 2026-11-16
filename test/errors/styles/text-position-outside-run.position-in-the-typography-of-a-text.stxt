@@ -1,5 +1,5 @@
-# Case: A Text declares Position in its Typography, and only a styled run can be a superscript
-# Code: POSITION_OUTSIDE_RUN
+# Case: A Text declares Text position in its Typography, and only a styled run can be a superscript
+# Code: TEXT_POSITION_OUTSIDE_RUN
 # Line: 19
 Document (dev.stxt.pdf):
 	Language: es
@@ -16,4 +16,4 @@ Document (dev.stxt.pdf):
 	Section:
 		Text: m2
 			Typography:
-				Position: superscript
+				Text position: superscript

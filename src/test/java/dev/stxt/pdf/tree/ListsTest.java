@@ -49,7 +49,7 @@ class ListsTest {
         Box list = root("\tList:", "\t\tMarker: decimal", "\t\tFirst number: 3",
                 "\t\tList item:", "\t\t\tText: a",
                 "\t\tList item:", "\t\t\tText: b",
-                "\t\tList item:", "\t\t\tNumber: 10", "\t\t\tText: c",
+                "\t\tList item:", "\t\t\tItem number: 10", "\t\t\tText: c",
                 "\t\tList item:", "\t\t\tText: d").children().get(0);
         assertEquals(List.of("3. ", "4. ", "10. ", "11. "), markers(list));
     }

@@ -41,7 +41,7 @@ import static dev.stxt.pdf.tree.PropertyKey.ROTATE_ORIGIN;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_COLOR;
 import static dev.stxt.pdf.tree.PropertyKey.SEPARATOR_STYLE;
-import static dev.stxt.pdf.tree.PropertyKey.SIDE;
+import static dev.stxt.pdf.tree.PropertyKey.SIDE_BOX;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_GAP;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_LINE_DISTRIBUTION;
 import static dev.stxt.pdf.tree.PropertyKey.STACK_SPLIT_ITEMS;
@@ -398,7 +398,7 @@ final class ModelValidator {
                     + "its area: it allows top, bottom, center or stretch, and baseline aligns the items of a line of "
                     + "a Stack with Direction: horizontal and is only valid there");
         }
-        validateSide(s, stackItem, gridItem);
+        validateSideBox(s, stackItem, gridItem);
         validateBorderStyle(s);
         validateOffset(s);
         validateMargins(s, parentLayout, stackItem, gridItem);
@@ -434,23 +434,23 @@ final class ModelValidator {
     }
 
     /**
-     * A side box ({@code Side}, reference/components/block.md) only makes sense in block flow, where there is text to
+     * A side box ({@code Side box}, reference/components/block.md) only makes sense in block flow, where there is text to
      * run beside it: not as an item of a {@code Stack} or a {@code Grid}, which place it themselves (inside a cell with
-     * elements, which is block flow, it can go). A {@code Block} with {@code Side} needs a width ({@code Width} or {@code Max width}): with
+     * elements, which is block flow, it can go). A {@code Block} with {@code Side box} needs a width ({@code Width} or {@code Max width}): with
      * {@code auto} it would take the whole width and leave no room for the text. And like an image, it is not split
      * across pages, so {@code Keep together} and {@code Edges} have no effect on it (also from a rule).
      */
-    static void validateSide(Style s, boolean stackItem, boolean gridItem) {
+    static void validateSideBox(Style s, boolean stackItem, boolean gridItem) {
         if (!s.isSideBox()) {
             return;
         }
         if (stackItem || gridItem) {
-            throw error(s.line(SIDE), ErrorCode.SIDE_NOT_IN_BLOCK_FLOW, "Side has no effect on an item of a "
+            throw error(s.line(SIDE_BOX), ErrorCode.SIDE_BOX_NOT_IN_BLOCK_FLOW, "Side box has no effect on an item of a "
                     + (stackItem ? "Stack" : "Grid") + ", which places the box itself: a side box goes in block flow "
                     + "(a Section, a Block, a Columns, a Cell with elements...), followed by the text that runs beside it");
         }
         if (s.layout() != Layout.IMAGE && s.box().width().isAuto() && s.box().maxWidth() == null) {
-            throw error(s.line(SIDE), ErrorCode.SIDE_WITHOUT_WIDTH, "A Block or a Figure with Side needs Width or Max "
+            throw error(s.line(SIDE_BOX), ErrorCode.SIDE_BOX_WITHOUT_WIDTH, "A Block or a Figure with Side box needs Width or Max "
                     + "width: with Width auto it takes up the whole width and leaves no room for the text beside it");
         }
         if (s.layout() == Layout.IMAGE) {
@@ -478,7 +478,7 @@ final class ModelValidator {
                 break;
             }
         }
-        throw error(s.line(BELOW_SIDE_BOXES), ErrorCode.BELOW_SIDE_BOXES_WITHOUT_SIDE, "Below side boxes has no effect without a side box (Side) before "
+        throw error(s.line(BELOW_SIDE_BOXES), ErrorCode.BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX, "Below side boxes has no effect without a side box (Side box) before "
                 + "the box among its siblings: the side box is missing or Below side boxes is not needed");
     }
 
@@ -620,7 +620,7 @@ final class ModelValidator {
                     + "Grid: they are aligned with Horizontal and Vertical");
         }
         if (s.isSideBox()) {
-            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto has no effect on a box with Side, "
+            throw error(line, ErrorCode.MARGIN_AUTO_WITHOUT_EFFECT, "Margin auto has no effect on a box with Side box, "
                     + "which is placed at its side: its margins are the separation from the text, and need a number");
         }
         if (s.isOutOfFlow()) {

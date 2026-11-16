@@ -43,7 +43,7 @@ Document (dev.stxt.pdf):
 						Text: Primera
 					List item:
 						Id: sb
-						Number: 4
+						Item number: 4
 						Text: Cuarta
 		Block:
 			Id: fill

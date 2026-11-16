@@ -1,0 +1,19 @@
+# Case: A For style rule gives Numbered, of a heading or a Figure, to a Paragraph
+# Code: STYLE_NOT_ALLOWED
+# Line: 16
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+		For style: plain
+			Numbered: true
+	Section:
+		Paragraph: Hola
+			Style: plain

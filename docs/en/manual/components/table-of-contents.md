@@ -15,14 +15,15 @@ Document (dev.stxt.pdf):
             Typography:
                 Font: IBM Plex Sans
                 Size: 10
-                Numbered: true
         For element: Heading 1
+            Numbered: true
             Typography:
                 Size: 18
                 Bold: true
             Box:
                 Margin: 0 0 12 0
         For element: Heading 2
+            Numbered: true
             Typography:
                 Size: 12
                 Bold: true
@@ -39,8 +40,7 @@ Document (dev.stxt.pdf):
     Section:
         Heading 1:
             In table of contents: false
-            Typography:
-                Numbered: false
+            Numbered: false
             Text: Contents
         Table of contents:
             Levels: 1 2

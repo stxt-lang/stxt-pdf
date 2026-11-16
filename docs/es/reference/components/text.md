@@ -63,7 +63,7 @@ pone en mayúscula como el resto, y si el párrafo empieza por una comilla, la c
 preformateado (`DROP_CAP_NOT_ALLOWED`) ni fuera de 2 a 5 (`VALUE_NOT_ALLOWED`), ni en un párrafo que escribe una
 sangría de primera línea distinta de 0 (`FIRST_LINE_INDENT_WITH_DROP_CAP`); la que hereda o recibe de una regla no se
 le aplica ([Tipografía](../common/typography.md#sangría-de-primera-línea-first-line-indent)). Junto a una caja lateral
-([Block](block.md#cajas-laterales-side)), la capitular va después de lo que la caja quita a las líneas.
+([Block](block.md#cajas-laterales-side-box)), la capitular va después de lo que la caja quita a las líneas.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|

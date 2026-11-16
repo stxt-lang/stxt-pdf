@@ -138,7 +138,7 @@ class FirstLineIndentLayoutTest {
 
     @Test
     void besideASideBoxTheIndentIsAddedToItsRoom() {
-        LayoutFixture f = layOut("\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
+        LayoutFixture f = layOut("\tImage: test/square.png", "\t\tSide box: left", "\t\tBox:", "\t\t\tWidth: 60",
                 "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(60), "\t\tId: P", "\t\tTypography:", "\t\t\tFirst line indent: 20");
         List<TextLine> lines = f.fragment("P").lines();
@@ -155,7 +155,7 @@ class FirstLineIndentLayoutTest {
         // A page area of 100: a spacer of 40 and the side box, 60 tall; the paragraph has 5 lines beside it (17 and
         // 4 × 18 words) and the rest, 61 words, is broken again on the next page at the whole width, not indented.
         LayoutFixture f = layOutPaged(180, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 40",
-                "\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
+                "\tImage: test/square.png", "\t\tSide box: left", "\t\tBox:", "\t\t\tWidth: 60",
                 "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(150), "\t\tId: P", "\t\tTypography:", "\t\t\tFirst line indent: 20");
         assertEquals(5, f.fragment(1, "P").lines().size());

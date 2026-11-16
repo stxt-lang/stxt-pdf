@@ -255,7 +255,7 @@ en `crossSizes` guarda de cada ítem lo que sube sobre su línea base (`Item.asc
 cada línea la mayor (`CrossSizes.baselines`), con la que crece el alto de la línea, y `arrange` coloca el ítem en la
 diferencia.
 
-**Cajas laterales** ([Block](../components/block.md#cajas-laterales-side)). `BlockLayout` coloca un hijo con `Side` entero,
+**Cajas laterales** ([Block](../components/block.md#cajas-laterales-side-box)). `BlockLayout` coloca un hijo con `Side box` entero,
 a su lado y en la posición del flujo, sin mover el cursor, y lo apunta como un `Beside` (la banda que ocupa y lo que quita
 por cada lado, con sus márgenes). A cada hijo que rodea las cajas (`Box.wrapsBesideSideBoxes`: textos no preformateados,
 `Block`, encabezados, `Markdown`, listas e ítems de lista sin fondo ni borde, que no sean cajas laterales ni lleven `Below side boxes`,
@@ -393,7 +393,7 @@ entera cuando la suma queda a menos de `Tolerance.MODEL` del ancho disponible.
 ## Paginación
 
 `Paginator` hace una pasada de flujo por sección (`flow`) con **una sola convergencia** de las referencias, y calcula con
-`Numbering` el número impreso de cada página (el contador, `restart` con su `First number` y `none`), el último de su tanda
+`Numbering` el número impreso de cada página (el contador, `restart` con su `First page number` y `none`), el último de su tanda
 (`{pages}`) y su `Page number format`, con el que los escribe (`label`, `totalLabel`). `Page` lleva su `PageSetup`, su
 sección, su `printed` (0 = sin número) y su estilo. El `PageSetup` de una página es el de su sección pasado por
 `forPage(número)`: con `Mirror margins`, en las páginas físicas pares lleva el margen izquierdo y el derecho

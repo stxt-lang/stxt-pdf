@@ -38,7 +38,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * cursor = 0; strut = empty
  * for each child:
  *     if Overlay/Page overlay: record PendingOverlay with the static position; continue
- *     if Side: place it whole at its side, at the flow position, below the side boxes of that side; continue
+ *     if Side box: place it whole at its side, at the flow position, below the side boxes of that side; continue
  *     r = context.layout(child, content box as reference container, with what the side boxes take beside it)
  *     strut += top margin of the child + those that come out of it at the top
  *     if nothing yet between the top border of the box and the child: the strut comes out of the box
@@ -54,7 +54,7 @@ import static dev.stxt.pdf.model.Tolerance.same;
  * with the box's own margins. An empty child lets its margins through. The cursor and the margins are kept by
  * {@link Stacking}, which the footnote area uses too.</p>
  *
- * <p><strong>Side boxes</strong> ({@code Side}, reference/components/block.md). A child with {@code Side} does not
+ * <p><strong>Side boxes</strong> ({@code Side box}, reference/components/block.md). A child with {@code Side box} does not
  * take part in the vertical flow: it is placed whole at the left or at the right of the content box, at the position
  * the flow has when it is reached (below a side box of the same side that is still beside the flow), and the cursor
  * does not move. From then on, while a child overlaps it vertically, the child runs beside it or goes below it:
@@ -372,7 +372,7 @@ public final class BlockLayout implements LayoutAlgorithm {
          */
         LayoutResult placeSide(Box child) {
             Insets margin = Insets.resolve(child.style().box().margin(), contentWidth);
-            boolean onLeft = child.style().side() == Side.LEFT;
+            boolean onLeft = child.style().sideBox() == Side.LEFT;
             double y = Math.max(stack.top(MarginStrut.EMPTY), clearance(onLeft));
             if (child.style().belowSideBoxes()) {
                 y = Math.max(y, clearance());

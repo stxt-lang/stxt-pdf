@@ -34,7 +34,7 @@ Document (dev.stxt.pdf):
 	Section:
 		Image: test/square.png
 			Id: img1
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 60
@@ -50,7 +50,7 @@ Document (dev.stxt.pdf):
 			Id: wrap
 			Image: test/square.png
 				Id: img2
-				Side: right
+				Side box: right
 				Box:
 					Width: 60
 					Height: 60
@@ -65,14 +65,14 @@ Document (dev.stxt.pdf):
 	Section:
 		Image: test/square.png
 			Id: l3
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 60
 				Margin: 0 10 0 0
 		Image: test/tall.jpg
 			Id: r3
-			Side: right
+			Side box: right
 			Box:
 				Width: 40
 				Height: 100
@@ -87,7 +87,7 @@ Document (dev.stxt.pdf):
 				Height: 120
 		Image: test/square.png
 			Id: img6
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 60
@@ -101,7 +101,7 @@ Document (dev.stxt.pdf):
 				Height: 90
 		Image: test/wide.png
 			Id: img7
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 8
@@ -116,7 +116,7 @@ Document (dev.stxt.pdf):
 				Height: 100
 		Image: test/square.png
 			Id: img8
-			Side: left
+			Side box: left
 			Box:
 				Width: 60
 				Height: 60

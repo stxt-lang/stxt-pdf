@@ -74,13 +74,13 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 | `Columns` | `Column count`, `Min column width`, `Gap`, `Separator`, `Separator color`, `Separator style`, `Balance columns` |
 | `List` | `Marker`, `Marker suffix`, `Marker image` |
 | `List item` | `Marker image`, `Trim margins` |
-| `Image` | `Fit`, `Opacity`, `Side`, `Below side boxes` |
-| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side`, `Below side boxes` |
-| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Side`, `Below side boxes` |
-| `Heading 1` a `Heading 6` | `In table of contents`, `Below side boxes` |
+| `Image` | `Fit`, `Opacity`, `Side box`, `Below side boxes` |
+| `Barcode` | `Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side box`, `Below side boxes` |
+| `Figure` | `Caption position`, `Figure counter`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Side box`, `Below side boxes` |
+| `Heading 1` a `Heading 6` | `In table of contents`, `Numbered`, `Number format`, `Number label`, `Below side boxes` |
 | `Paragraph` | `Drop cap`, `Below side boxes` |
 | `Text` | `Below side boxes` |
-| `Block` | `Isolate margins`, `Trim margins`, `Side`, `Below side boxes` |
+| `Block` | `Isolate margins`, `Trim margins`, `Side box`, `Below side boxes` |
 | `Frame` | `Isolate margins`, `Trim margins`, `Opacity` |
 | `Overlay`, `Page overlay` | `Opacity` |
 | `Cell` | `Trim margins`, `Vertical` |
@@ -110,7 +110,7 @@ Son las de aspecto y de reparto. Las admite la regla que se aplica a un elemento
 - **`Marker` y `Column sizes`** son obligatorios en una `List` y en una `Table`, y pueden venir de una regla. Sin ninguno
   de los dos, el error es `LIST_MARKER_MISSING` o `TABLE_COLUMN_SIZES_MISSING`, con la línea del elemento.
 - **No van en una regla** las propiedades de identidad, de contenido, de estructura y de posición: `Id`, `Style`,
-  `Link`, `Alt`, `Span`, `Row header`, `First number`, `Number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` y
+  `Link`, `Alt`, `Span`, `Row header`, `First number`, `Item number`, `PDF page`, `Entries`, `Offset`, `Layer`, `Pages`, `Rotate` y
   `Rotate origin`, las de `Section` y `Page`, y el valor o el `Content` de un elemento. El schema no las admite.
 
 > **Decisión:** las reglas admiten las propiedades de elemento de aspecto y de reparto, y el motor comprueba que el
@@ -319,7 +319,7 @@ Son errores:
   (`STYLE_WITHOUT_RULE`);
 - la regla de un tramo con estilo que declara algo que un tramo no admite, como `Size`, un `Box` o una propiedad de
   elemento (`STYLE_NOT_ALLOWED_IN_RUN`);
-- `Position` en una regla que llega a una caja y no a un tramo (`POSITION_OUTSIDE_RUN`);
+- `Text position` en una regla que llega a una caja y no a un tramo (`TEXT_POSITION_OUTSIDE_RUN`);
 - dos `Named color` con el mismo nombre en el mismo origen (`COLOR_DUPLICATE`);
 - un color con forma de nombre que ningún `Named color` declara (`COLOR_UNKNOWN`);
 - un `Named color` sin nombre y color separados por un espacio, con un nombre mal escrito o con un color que no es

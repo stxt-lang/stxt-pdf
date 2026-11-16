@@ -1,5 +1,5 @@
-# Case: A For element rule declares Position, and it only reaches boxes
-# Code: POSITION_OUTSIDE_RUN
+# Case: A For element rule declares Text position, and it only reaches boxes
+# Code: TEXT_POSITION_OUTSIDE_RUN
 # Line: 18
 Document (dev.stxt.pdf):
 	Language: es
@@ -15,6 +15,6 @@ Document (dev.stxt.pdf):
 				Markup: markdown
 		For element: Heading 1
 			Typography:
-				Position: superscript
+				Text position: superscript
 	Section:
 		Text: m2

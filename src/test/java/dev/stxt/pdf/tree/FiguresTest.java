@@ -104,18 +104,17 @@ class FiguresTest {
 
     /**
      * {@code Number label} and {@code Number format} apply as to the headings; {@code Numbered: false} declared in the
-     * figure or in a rule leaves it without a number and it does not count, and what it inherits does not count.
+     * figure or in a rule leaves it without a number and it does not count.
      */
     @Test
     void labelFormatAndNumberedFalse() {
-        // The figures are inside a Block with Numbered: false, which they inherit and which does not count.
         BoxTreeBuilder.Result tree = build("\tStyles:",
-                "\t\tFor element: Figure", "\t\t\tTypography:", "\t\t\t\tNumber label: Figura {number}.", "\t\t\t\tNumber format: upper-alpha",
-                "\t\tFor style: plain", "\t\t\tTypography:", "\t\t\t\tNumbered: false",
-                "\tSection:", "\t\tBlock:", "\t\t\tTypography:", "\t\t\t\tNumbered: false",
+                "\t\tFor element: Figure", "\t\t\tNumber label: Figura {number}.", "\t\t\tNumber format: upper-alpha",
+                "\t\tFor style: plain", "\t\t\tNumbered: false",
+                "\tSection:", "\t\tBlock:",
                 "\t\t\tFigure:", "\t\t\t\tId: a", "\t\t\t\tCaption: Esquema", "\t\t" + IMAGE.replace("\n", "\n\t\t"),
                 "\t\t\tFigure:", "\t\t\t\tStyle: plain", "\t\t\t\tCaption: Sin número", "\t\t" + IMAGE.replace("\n", "\n\t\t"),
-                "\t\t\tFigure:", "\t\t\t\tTypography:", "\t\t\t\t\tNumbered: false", "\t\t\t\tCaption: Tampoco", "\t\t" + IMAGE.replace("\n", "\n\t\t"),
+                "\t\t\tFigure:", "\t\t\t\tNumbered: false", "\t\t\t\tCaption: Tampoco", "\t\t" + IMAGE.replace("\n", "\n\t\t"),
                 "\t\t\tFigure:", "\t\t\t\tId: b", "\t\t\t\tCaption: Detalle", "\t\t" + IMAGE.replace("\n", "\n\t\t"),
                 "\t\tText: Véanse las figuras {number of: a} y {number of: b}.");
         List<Box> figures = figures(tree);
@@ -202,7 +201,7 @@ class FiguresTest {
 
     @Test
     void anUnnumberedFigureHasNoNumberToRefer() {
-        InvalidModelException e = error("\tSection:", "\t\tFigure:", "\t\t\tId: f", "\t\t\tTypography:", "\t\t\t\tNumbered: false",
+        InvalidModelException e = error("\tSection:", "\t\tFigure:", "\t\t\tId: f", "\t\t\tNumbered: false",
                 "\t\t\tCaption: Pie", "\t" + IMAGE.replace("\n", "\n\t"), "\t\tText: La figura {number of: f}.");
         assertEquals(ErrorCode.REFERENCE_NOT_NUMBERED, e.errorCode());
     }
@@ -221,11 +220,11 @@ class FiguresTest {
     }
 
     private static String numbered(int level) {
-        return "\t\tFor element: Heading " + level + "\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n";
+        return "\t\tFor element: Heading " + level + "\n\t\t\tNumbered: true\n";
     }
 
     private static final String NUMBERED_HEADINGS = "\tStyles:\n" + numbered(1) + numbered(2) + numbered(3);
-    private static final String UNNUMBERED = "\t\t\tTypography:\n\t\t\t\tNumbered: false";
+    private static final String UNNUMBERED = "\t\t\tNumbered: false";
 
     /**
      * {@code Figure numbering: chapter}: the counters of the figures and of the tables start again in each chapter,
@@ -252,8 +251,8 @@ class FiguresTest {
     @Test
     void theChapterIsTheNumberedHeadingWithNoneAbove() {
         BoxTreeBuilder.Result tree = build(lines(NUMBERED_HEADINGS,
-                "\t\tFor style: annex", "\t\t\tTypography:", "\t\t\t\tNumber format: upper-alpha",
-                "\t\tFor element: Figure", "\t\t\tTypography:", "\t\t\t\tNumber label: Figura {number}.",
+                "\t\tFor style: annex", "\t\t\tNumber format: upper-alpha",
+                "\t\tFor element: Figure", "\t\t\tNumber label: Figura {number}.",
                 "\tSection:", "\t\tFigure numbering: chapter",
                 figure("antes", false),
                 "\t\tHeading 1:", "\t\t\tText: Manual", UNNUMBERED, figure("portada", false),
@@ -279,5 +278,20 @@ class FiguresTest {
                 "\tSection:", "\t\tFigure numbering: chapter", "\t\tHeading 1:", "\t\t\tText: Uno", figure("c", false), figure("d", false),
                 "\tSection:", "\t\tFigure numbering: continue", figure("e", false)));
         assertEquals(List.of("1", "2", "1.1", "1.2", "3"), figures(tree).stream().map(Box::number).toList());
+    }
+
+    /**
+     * The numbering of the headings does not reach the figures: it is not inherited, and each rule gives it to the
+     * elements it names. A figure is numbered by default, with its own format and without the label of the headings.
+     */
+    @Test
+    void theNumberingOfTheHeadingsDoesNotReachTheFigures() {
+        BoxTreeBuilder.Result tree = build(lines("\tStyles:",
+                "\t\tFor element: Heading 1", "\t\t\tNumbered: true", "\t\t\tNumber format: upper-roman",
+                "\t\t\tNumber label: Capítulo {number}.",
+                "\tSection:", "\t\tHeading 1:", "\t\t\tText: Uno", figure("Esquema", false),
+                "\t\tHeading 2:", "\t\t\tText: Sin número", figure("Detalle", false)));
+        assertEquals(List.of("1", "2"), figures(tree).stream().map(Box::number).toList());
+        assertEquals(List.of("1 Esquema", "2 Detalle"), figures(tree).stream().map(Box::headingText).toList());
     }
 }

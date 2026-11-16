@@ -1,5 +1,5 @@
 # Case: Below side boxes without a side box before the paragraph
-# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE
+# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX
 # Line: 17
 Document (dev.stxt.pdf):
 	Language: es

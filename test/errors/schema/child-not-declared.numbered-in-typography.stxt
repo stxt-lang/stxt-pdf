@@ -1,6 +1,6 @@
-# Case: First number without Page numbering: restart
-# Code: FIRST_NUMBER_WITHOUT_RESTART
-# Line: 16
+# Case: Numbered in the Typography of a heading, which is a property of the heading
+# Code: CHILD_NOT_DECLARED
+# Line: 19
 Document (dev.stxt.pdf):
 	Language: es
 	Title: Prueba
@@ -13,5 +13,7 @@ Document (dev.stxt.pdf):
 				Font: IBM Plex Sans
 				Size: 10
 	Section:
-		First number: 5
-		Paragraph: Uno
+		Heading 1:
+			Text: Uno
+			Typography:
+				Numbered: true

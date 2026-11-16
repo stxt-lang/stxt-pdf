@@ -68,7 +68,7 @@ Document (dev.stxt.pdf):
 
 - La regla es una regla `For style` como las demás: la misma puede dar estilo a una caja (`Style: precio`) y a una parte
   de un texto. En una parte solo valen `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps`,
-  `Letter spacing` y `Position`. Si la regla declara algo más, como `Size` o un `Box`, y se usa en una parte, es un error
+  `Letter spacing` y `Text position`. Si la regla declara algo más, como `Size` o un `Box`, y se usa en una parte, es un error
   (`STYLE_NOT_ALLOWED_IN_RUN`).
 - Las marcas se suman al estilo: `[**12,50 €**]{precio}` y `**[12,50 €]{precio}**` van en negrita aunque la regla diga
   `Weight: 300`. Un enlace puede llevar una parte con estilo (`[[ver precio]{precio}](https://...)`) y una parte con estilo
@@ -76,9 +76,9 @@ Document (dev.stxt.pdf):
 - Un nombre sin su regla es un error (`STYLE_WITHOUT_RULE`). Unos corchetes que no van seguidos de un nombre entre llaves
   son texto, y `\[` los escribe sin más.
 
-## Superíndices y subíndices (`Position`)
+## Superíndices y subíndices (`Text position`)
 
-Una parte con estilo cuya regla declara `Position: superscript` o `subscript` se pinta más pequeña (al 70 % del tamaño)
+Una parte con estilo cuya regla declara `Text position: superscript` o `subscript` se pinta más pequeña (al 70 % del tamaño)
 y por encima o por debajo de la línea base: ordinales, unidades, fórmulas y marcas.
 
 ```
@@ -96,18 +96,18 @@ Document (dev.stxt.pdf):
                 Markup: markdown
         For style: sup
             Typography:
-                Position: superscript
+                Text position: superscript
         For style: sub
             Typography:
-                Position: subscript
+                Text position: subscript
     Section:
         Paragraph: El 1[er]{sup} piso, de 85 m[2]{sup}, emite 12 kg de CO[2]{sub} al año.
 ```
 
 - La línea no cambia de alto, y lo que se copia del PDF es el texto escrito (`85 m2`).
 - La regla puede llevar también un color o una fuente, y las marcas se suman: `[**2**]{sub}` es un subíndice en negrita.
-- `Position` solo vale en una parte de un texto. En una caja (en su `Typography`, o con `Style: sup`) es un error
-  (`POSITION_OUTSIDE_RUN`).
+- `Text position` solo vale en una parte de un texto. En una caja (en su `Typography`, o con `Style: sup`) es un error
+  (`TEXT_POSITION_OUTSIDE_RUN`).
 - El número de una [nota al pie](../components/footnote.md) ya va en superíndice, sin ninguna regla.
 
 ## Imágenes en la frase

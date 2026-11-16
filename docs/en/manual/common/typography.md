@@ -39,10 +39,8 @@ Styles:
 | `Kerning` | `true`, `false` | `true` | Whether the space of the pairs of letters that need it is adjusted (`AV`, `To`) |
 | `Widows`, `Orphans` | integer ≥ 1 | `2` | Lines of a paragraph that are not left alone when the page changes |
 | `Language` | BCP 47 tag: `es`, `en-GB`, `ca` | that of the document | The language of the text, if it is not that of the document |
-| `Numbered` | `true`, `false` | `false` | Whether headings carry a number ([Headings](../components/heading.md)); figures carry one unless they say `false` ([Figure](../components/figure.md)) |
-| `Number format`, `Number label` | | | How that number is written and what goes before the title, or before the caption of a figure ([Headings](../components/heading.md)) |
 
-The rest (`Markup`, `Case`, `Small caps`, `Position`, `Letter spacing`, `Ligatures`, `Preformatted` and `Tab size`) is in
+The rest (`Markup`, `Case`, `Small caps`, `Text position`, `Letter spacing`, `Ligatures`, `Preformatted` and `Tab size`) is in
 [Text formatting](text-formatting.md).
 
 ## Font and size

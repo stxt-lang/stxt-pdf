@@ -1,5 +1,5 @@
-# Case: Side on a Stack item
-# Code: SIDE_NOT_IN_BLOCK_FLOW
+# Case: Side box on a Stack item
+# Code: SIDE_BOX_NOT_IN_BLOCK_FLOW
 # Line: 14
 Document (dev.stxt.pdf):
 	Language: es
@@ -11,4 +11,4 @@ Document (dev.stxt.pdf):
 		Stack:
 			Item:
 				Image: test/square.png
-					Side: left
+					Side box: left

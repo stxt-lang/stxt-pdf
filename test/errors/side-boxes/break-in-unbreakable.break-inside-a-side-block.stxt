@@ -1,4 +1,4 @@
-# Case: Break inside a Block with Side, which is not split
+# Case: Break inside a Block with Side box, which is not split
 # Code: BREAK_IN_UNBREAKABLE
 # Line: 22
 Document (dev.stxt.pdf):
@@ -14,7 +14,7 @@ Document (dev.stxt.pdf):
 				Size: 10
 	Section:
 		Block:
-			Side: left
+			Side box: left
 			Box:
 				Width: 100
 			Paragraph: Hola

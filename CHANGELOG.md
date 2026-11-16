@@ -5,6 +5,33 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+Names of the `dev.stxt.pdf` namespace changed in the review before 1.0, and the numbering of headings and figures taken
+out of `Typography`. **From 0.18.1**, a document that uses any of them has to be rewritten: the old names are not
+accepted. The Java API changes where it follows those names.
+
+### Changed
+
+- `Side` is `Side box` (`Side box: left`), the name that the documentation and `Below side boxes` already used. Its
+  error codes follow it: `SIDE_NOT_IN_BLOCK_FLOW` is `SIDE_BOX_NOT_IN_BLOCK_FLOW`, `SIDE_WITHOUT_WIDTH` is
+  `SIDE_BOX_WITHOUT_WIDTH` and `BELOW_SIDE_BOXES_WITHOUT_SIDE` is `BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX`. In the Java API,
+  `Style.sideBox()` and `PropertyKey.SIDE_BOX`.
+- `Position`, the superscript or subscript of a styled run, is `Text position`, and `POSITION_OUTSIDE_RUN` is
+  `TEXT_POSITION_OUTSIDE_RUN`.
+- In a `Section`, `First number` is `First page number`, and `FIRST_NUMBER_WITHOUT_RESTART` is
+  `FIRST_PAGE_NUMBER_WITHOUT_RESTART`. The `First number` of a `List` does not change. In the Java API,
+  `Section.firstPageNumber()`.
+- In a `List item`, `Number` is `Item number`. In the Java API, `PropertyKey.ITEM_NUMBER`.
+- `Numbered`, `Number format` and `Number label` are no longer properties of `Typography`: they are declared in the
+  heading or in the `Figure`, or in a rule that reaches them (`For element`, `For style` or `For id`), and are not
+  inherited. `Numbered: true` in `For element: Document` no longer numbers the headings: each level that is numbered
+  declares it in its `For element: Heading N` rule. A `Figure` is numbered by default, as before, and the format and
+  the label of the headings no longer reach it. In a `Typography`, or in a rule given to another element, they are an
+  error. To migrate a document, each of the three moves one level up, out of its `Typography`, and the
+  `Numbered: true` of `For element: Document` goes to the rule of each heading level. In the Java API,
+  `Style.numbered()`, `Style.numberFormat()` and `Style.numberLabel()` replace those of `TypographyStyle`.
+
 ## [0.18.1] - 2026-11-15
 
 On `stxt-core` 1.0.4, whose classes are those of 1.0.3: the engine, the namespace and the Java API do not change.

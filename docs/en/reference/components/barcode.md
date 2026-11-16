@@ -61,10 +61,10 @@ dark brown modules inside a frame.)
 | `Readable text` | boolean | `false` | Only in `code-128`, `gs1-128` and `ean-13`: the data, as text, under the bars ([Readable text](#readable-text)). In another format it is an error. |
 | `Alt` | non-empty text | required | What it is and where it leads, for whoever cannot see it ([Accessibility](#accessibility)). |
 | `Rotate` | see [Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image) | none | Rotates it about its center, like an `Image`. |
-| `Side` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side)). |
-| `Below side boxes` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side)). |
+| `Side box` | `left`, `right` | none | Makes it a side box, like an `Image`: the text that follows it runs beside it ([Block](block.md#side-boxes-side-box)). |
+| `Below side boxes` | boolean | `false` | Moves it below the side boxes before it ([Block](block.md#side-boxes-side-box)). |
 
-`Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side` and `Below side boxes` can also come from a rule of `Styles`
+`Barcode format`, `Error correction`, `Quiet zone`, `Readable text`, `Side box` and `Below side boxes` can also come from a rule of `Styles`
 ([Element properties](../common/styles.md#element-properties)); the data, `Alt` and `Rotate` cannot.
 
 ## Formats

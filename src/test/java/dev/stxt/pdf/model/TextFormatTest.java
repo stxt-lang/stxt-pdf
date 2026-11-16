@@ -163,7 +163,7 @@ class TextFormatTest {
         assertNotEquals(call, label);
     }
 
-    /** A styled run with Position is a superscript or a subscript: smaller, and raised or lowered from the baseline. */
+    /** A styled run with Text position is a superscript or a subscript: smaller, and raised or lowered from the baseline. */
     @Test
     void aStyledRunWithPositionIsASuperscriptOrASubscript() {
         TextFormat sup = TextFormat.PLAIN.withStyle(position("sup", TextPosition.SUPERSCRIPT));
@@ -179,7 +179,7 @@ class TextFormatTest {
         // Small caps do not make it smaller still, and the marks are kept.
         assertEquals(TextFormat.SUPERSCRIPT_SCALE, sub.withSmallCaps(true).scale());
         assertTrue(sub.withMarks(true, false, false, false).subscript());
-        // Position: normal, or a style without Position, changes nothing.
+        // Text position: normal, or a style without Position, changes nothing.
         TextFormat normal = TextFormat.PLAIN.withStyle(position("normal", TextPosition.NORMAL));
         assertEquals(1, normal.scale());
         assertEquals(0, normal.rise());

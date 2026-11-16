@@ -24,11 +24,9 @@ Document (dev.stxt.pdf):
 	Language: es
 	Styles:
 		For element: Figure
-			Typography:
-				Number label: Figura {number}.
+			Number label: Figura {number}.
 		For style: table
-			Typography:
-				Number label: Tabla {number}.
+			Number label: Tabla {number}.
 	Section:
 		Page overlay:
 			Id: header
@@ -71,9 +69,9 @@ Document (dev.stxt.pdf):
 					Padding: 0
 					Border: 0
 					Margin: 0
+				Numbered: false
 				Typography:
 					Color: #FFFFFF
-					Numbered: false
 			Text: Instálalo, conéctalo a la aplicación y programa tu casa en menos de media hora.
 				Typography:
 					Size: 11

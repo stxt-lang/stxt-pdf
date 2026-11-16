@@ -22,7 +22,7 @@ import dev.stxt.pdf.model.Rect;
 class SideBoxLayoutTest {
 
     /** A square image of 60 × 60 with a right margin of 10 at the left: it takes 70 from the left. */
-    private static final String[] LEFT = {"\tImage: test/square.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:",
+    private static final String[] LEFT = {"\tImage: test/square.png", "\t\tId: I", "\t\tSide box: left", "\t\tBox:",
             "\t\t\tWidth: 60", "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0"};
 
     private static String words(int n) {
@@ -62,7 +62,7 @@ class SideBoxLayoutTest {
 
     @Test
     void rightSideBoxShortensTheLinesFromTheRight() {
-        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide: right", "\t\tBox:",
+        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide box: right", "\t\tBox:",
                 "\t\t\tWidth: 60", "\t\t\tHeight: 60", "\t\t\tMargin: 0 0 0 10",
                 "\tParagraph: " + words(30), "\t\tId: P");
         assertRect(495, 40, 60, 60, l.rect("I"));
@@ -117,7 +117,7 @@ class SideBoxLayoutTest {
     @Test
     void theBlockReachesTheBottomOfItsSideBoxes() {
         LayoutFixture l = layOut("\tBlock:", "\t\tId: B",
-                "\t\tImage: test/square.png", "\t\t\tSide: left", "\t\t\tBox:", "\t\t\t\tWidth: 60", "\t\t\t\tHeight: 60",
+                "\t\tImage: test/square.png", "\t\t\tSide box: left", "\t\t\tBox:", "\t\t\t\tWidth: 60", "\t\t\t\tHeight: 60",
                 "\t\tParagraph: " + words(5), "\t\t\tId: P",
                 "\tBlock:", "\t\tId: N", "\t\tBox:", "\t\t\tHeight: 10");
         assertRect(40, 40, 515, 60, l.rect("B"));
@@ -127,7 +127,7 @@ class SideBoxLayoutTest {
 
     @Test
     void sideBoxesOfTheSameSideStack() {
-        LayoutFixture l = layOut(join(LEFT, new String[]{"\tImage: test/square.png", "\t\tId: J", "\t\tSide: left",
+        LayoutFixture l = layOut(join(LEFT, new String[]{"\tImage: test/square.png", "\t\tId: J", "\t\tSide box: left",
                 "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(200), "\t\tId: P"}));
         assertRect(40, 40, 60, 60, l.rect("I"));
@@ -139,7 +139,7 @@ class SideBoxLayoutTest {
 
     @Test
     void sideBoxesOnBothSidesLeaveTheMiddle() {
-        LayoutFixture l = layOut(join(LEFT, new String[]{"\tImage: test/square.png", "\t\tId: J", "\t\tSide: right",
+        LayoutFixture l = layOut(join(LEFT, new String[]{"\tImage: test/square.png", "\t\tId: J", "\t\tSide box: right",
                 "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 24", "\t\t\tMargin: 0 0 0 10",
                 "\tParagraph: " + words(60), "\t\tId: P"}));
         assertRect(495, 40, 60, 24, l.rect("J"));
@@ -175,7 +175,7 @@ class SideBoxLayoutTest {
 
     @Test
     void aListRunsBesideASideBoxOnTheRight() {
-        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide: right", "\t\tBox:",
+        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide box: right", "\t\tBox:",
                 "\t\t\tWidth: 60", "\t\t\tHeight: 60", "\t\t\tMargin: 0 0 0 10",
                 "\tList:", "\t\tId: L", "\t\tMarker: bullet", "\t\tBox:", "\t\t\tPadding: 0 0 0 20",
                 "\t\tList item:", "\t\t\tParagraph: " + words(40), "\t\t\t\tId: P");
@@ -201,7 +201,7 @@ class SideBoxLayoutTest {
     void theSideBoxGoesWithTheFirstLineThatRunsBesideIt() {
         // The Block leaves 10: the box of 8 fits, the first line of 12 does not, and both move to page 2.
         LayoutFixture l = layOutPaged(180, "\tBlock:", "\t\tId: B", "\t\tBox:", "\t\t\tHeight: 90",
-                "\tImage: test/wide.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 8",
+                "\tImage: test/wide.png", "\t\tId: I", "\t\tSide box: left", "\t\tBox:", "\t\t\tWidth: 60", "\t\t\tHeight: 8",
                 "\tParagraph: " + words(5), "\t\tId: P");
         assertEquals(2, l.pages());
         l.assertAbsent(1, "I");
@@ -230,7 +230,7 @@ class SideBoxLayoutTest {
     @Test
     void aWordThatDoesNotFitBesideTheBoxLeavesTheLineEmpty() {
         // A box of 480 leaves 35: no word of 40 fits beside it, and the lines beside it stay empty.
-        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:",
+        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tId: I", "\t\tSide box: left", "\t\tBox:",
                 "\t\t\tWidth: 480", "\t\t\tHeight: 24",
                 "\tParagraph: aaaaaaaa aaaaaaaa", "\t\tId: P");
         List<TextLine> lines = l.fragment("P").lines();
@@ -249,7 +249,7 @@ class SideBoxLayoutTest {
      */
     @Test
     void theWidowsOfATextCutBesideASideBoxAreCountedAtTheWholeWidth() {
-        LayoutFixture l = layOutPaged(180, "\tImage: test/square.png", "\t\tId: I", "\t\tSide: left", "\t\tBox:",
+        LayoutFixture l = layOutPaged(180, "\tImage: test/square.png", "\t\tId: I", "\t\tSide box: left", "\t\tBox:",
                 "\t\t\tWidth: 60", "\t\t\tHeight: 96", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(163), "\t\tId: P");
         assertEquals(2, l.pages());
@@ -262,7 +262,7 @@ class SideBoxLayoutTest {
     @Test
     void aSideBoxKeepsItsVerticalMargins() {
         LayoutFixture l = layOut("\tBlock:", "\t\tId: B",
-                "\t\tImage: test/square.png", "\t\t\tId: I", "\t\t\tSide: left", "\t\t\tBox:",
+                "\t\tImage: test/square.png", "\t\t\tId: I", "\t\t\tSide box: left", "\t\t\tBox:",
                 "\t\t\t\tWidth: 60", "\t\t\t\tHeight: 60", "\t\t\t\tMargin: 10 10 10 0",
                 "\t\tParagraph: " + words(30), "\t\t\tId: P");
         assertRect(40, 50, 60, 60, l.rect("I"));

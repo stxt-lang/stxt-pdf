@@ -45,7 +45,7 @@ Document (dev.stxt.pdf):
 | `Marker suffix` | `List` | Lo que sigue al número: `period` (`1.`, `a.`), por defecto, o `parenthesis` (`1)`, `a)`). Solo en las numeradas |
 | `Marker image` | `List`, `List item` | La imagen del marcador con `Marker: image`, de `images/`. La de la lista vale para todos sus ítems; la de un ítem la sustituye. Admite `Alt` y `Height` |
 | `First number` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
-| `Number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
+| `Item number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
 elementos (un `Paragraph`, un `Text`, otra `List`), pero no encabezados.

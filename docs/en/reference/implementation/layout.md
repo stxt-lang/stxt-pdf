@@ -259,7 +259,7 @@ space that separates it from the item as the right padding of the fragment, and 
 text, its whole height) and for each line the greatest (`CrossSizes.baselines`), with which the height of the line
 grows, and `arrange` places the item at the difference.
 
-**Side boxes** ([Block](../components/block.md#side-boxes-side)). `BlockLayout` places a child with `Side` whole, at its
+**Side boxes** ([Block](../components/block.md#side-boxes-side-box)). `BlockLayout` places a child with `Side box` whole, at its
 side and at the position of the flow, without moving the cursor, and records it as a `Beside` (the band it takes up and
 what it takes from each side, margins included). To each child that runs beside the boxes (`Box.wrapsBesideSideBoxes`:
 texts that are not preformatted, `Block`, headings, `Markdown`, lists and list items without background or border that
@@ -397,7 +397,7 @@ line when the sum is within `Tolerance.MODEL` of the available width.
 ## Pagination
 
 `Paginator` makes one flow pass per section (`flow`) with **a single convergence** of the references, and computes with
-`Numbering` the printed number of each page (the counter, `restart` with its `First number` and `none`), the last one of its page sequence
+`Numbering` the printed number of each page (the counter, `restart` with its `First page number` and `none`), the last one of its page sequence
 (`{pages}`) and its `Page number format`, with which it writes them (`label`, `totalLabel`). `Page` carries its `PageSetup`, its
 section, its `printed` (0 = no number) and its style. The `PageSetup` of a page is that of its section passed through
 `forPage(number)`: with `Mirror margins`, on the even physical pages it carries the left and right margins swapped, and

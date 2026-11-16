@@ -16,7 +16,7 @@ List:
     List item:
         Paragraph: First point
     List item:
-        Number: 10
+        Item number: 10
         Paragraph: Second point
         List:
             Marker: bullet
@@ -30,9 +30,9 @@ List:
 | `Marker suffix` | `period`, `parenthesis` | `period` | `List` | What follows the number in a numbering: a period (`1.`, `a.`) or a closing parenthesis (`1)`, `a)`). Only in the numberings. |
 | `Marker image` | path relative to `images/` | none | `List`, `List item` | The image of the marker with `Marker: image` ([Image markers](#image-markers)): that of the list serves all its items, and that of an item replaces it. It accepts `Alt` and `Height`. |
 | `First number` | integer | `1` | `List` | Number of the first item. Only in the numberings. |
-| `Number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
+| `Item number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
 
-`Marker`, `Marker suffix` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number` and `Number` cannot. Without
+`Marker`, `Marker suffix` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number` and `Item number` cannot. Without
 `Marker`, its own or from a rule, it is an error (`LIST_MARKER_MISSING`). The indent of the items is the left `Padding` of
 the `List`.
 
@@ -115,7 +115,7 @@ List:
 - A `Marker image` in a list, or in an item of a list, whose `Marker` is not `image` is an error
   (`LIST_IMAGE_NOT_ALLOWED`), on the line of the `Marker image`. An item of a list with `Marker: image` that has no image,
   neither its own nor the list's, is one too (`LIST_IMAGE_MISSING`), on the line of the item.
-- `First number` and `Number` have no effect (`LIST_NUMBER_NOT_ALLOWED`), and `{number of: id}` does not work for its items: a list
+- `First number` and `Item number` have no effect (`LIST_NUMBER_NOT_ALLOWED`), and `{number of: id}` does not work for its items: a list
   with images does not number.
 - The errors of the file are those of an `Image` (`IMAGE_UNKNOWN`, `IMAGE_FORMAT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX`), with
   the line of the `Marker image`. An empty `Alt` is `VALUE_NOT_ALLOWED`, and so is a `Height` that is not a positive length.
@@ -135,8 +135,8 @@ List:
 ## Numbering
 
 The first item carries the number `First number` (1 if it is not declared). Each one carries the number after the previous one, except the one that sets its own
-with `Number`, from which the rest continue. Letters continue after `z` with two letters (`aa`, `ab`). `decimal`
-writes from 0, and letters and Roman numerals, from 1. Roman numerals go up to 3999 (`LIST_NUMBER_RANGE`). `First number` and `Number`
+with `Item number`, from which the rest continue. Letters continue after `z` with two letters (`aa`, `ab`). `decimal`
+writes from 0, and letters and Roman numerals, from 1. Roman numerals go up to 3999 (`LIST_NUMBER_RANGE`). `First number` and `Item number`
 only have an effect in the numberings (`LIST_NUMBER_NOT_ALLOWED`). Each list numbers its items, and a nested list starts
 again. The number of an item can be referred to with `{number of: id}` ([References](../common/references.md#number-of-id)).
 

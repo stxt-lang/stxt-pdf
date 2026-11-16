@@ -20,8 +20,7 @@ Document (dev.stxt.pdf):
             Box:
                 Margin: 0 0 8 0
         For element: Figure
-            Typography:
-                Number label: Figure {number}.
+            Number label: Figure {number}.
             Box:
                 Margin: 6 0 14 0
         For element: Caption
@@ -81,7 +80,7 @@ Document (dev.stxt.pdf):
 | `Alt` | required with a `Block` | The alternative text of the whole figure, only when it contains a `Block`. With an image, the `Alt` goes in the image |
 | `In table of contents` | `true` | With `false`, the figure is not listed in the tables of contents, but it is still numbered |
 
-It also accepts `Id`, `Style`, `Box`, `Typography`, `Break`, `Side` and `Below side boxes`. `Numbered: false` (in its `Typography` or in
+It also accepts `Id`, `Style`, `Box`, `Typography`, `Break`, `Side box` and `Below side boxes`. `Numbered: false` (its own or from
 a rule) leaves it without a number; `Number label` and `Number format` write the number as in the headings
 ([Headings](heading.md#numbering-numbered)). In the `Section`, `Figure numbering: chapter` numbers the figures and the
 tables by chapter.
@@ -104,7 +103,7 @@ tables by chapter.
   caption and their page. It is styled with `For element: TOC 1`.
 - The image or the code of a figure needs `Alt`: a figure with a caption is content and a screen reader reads it with
   its caption.
-- It goes wherever an in-flow element goes, also in an `Item` or an `Area` and as a side box with `Side` (with `Width`),
+- It goes wherever an in-flow element goes, also in an `Item` or an `Area` and as a side box with `Side box` (with `Width`),
   but not in a `Page overlay`.
 
 More detail in the [reference](../../reference/components/figure.md).

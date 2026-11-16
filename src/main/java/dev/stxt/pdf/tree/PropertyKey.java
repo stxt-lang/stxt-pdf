@@ -50,13 +50,13 @@ public final class PropertyKey {
     public static final String ROTATE_ORIGIN = "rotate-origin";
     public static final String OPACITY = "opacity";
     public static final String FIRST_NUMBER = "first-number";
-    public static final String NUMBER = "number";
+    public static final String ITEM_NUMBER = "item-number";
     public static final String MARKER_IMAGE = "marker-image";
     public static final String MARKER_SUFFIX = "marker-suffix";
     public static final String PDF_PAGE = "pdf-page";
     public static final String ERROR_CORRECTION = "error-correction";
     public static final String READABLE_TEXT = "readable-text";
-    public static final String SIDE = "side";
+    public static final String SIDE_BOX = "side-box";
     public static final String BELOW_SIDE_BOXES = "below-side-boxes";
     public static final String DROP_CAP = "drop-cap";
     public static final String ALT = "alt";
@@ -92,7 +92,7 @@ public final class PropertyKey {
     /** The placement of a grid item: the value of its {@code Area}, or the one a {@code Table} computes. */
     public static final String ITEM_AREA = "item.area";
 
-    /** {@code Position} of {@code Typography}: the superscript or subscript of a styled run. */
+    /** {@code Text position} of {@code Typography}: the superscript or subscript of a styled run. */
     public static final String TEXT_POSITION = "text-position";
 
     /**
@@ -100,7 +100,7 @@ public final class PropertyKey {
      */
     private static final Map<String, String> INTERNAL = Map.of(
             "bold", FONT_WEIGHT, "weight", FONT_WEIGHT, "italic", FONT_STYLE, "size", FONT_SIZE,
-            "min-size", MIN_FONT_SIZE, "align", "text-align", "position", TEXT_POSITION, "before", BREAK_BEFORE,
+            "min-size", MIN_FONT_SIZE, "align", "text-align", "before", BREAK_BEFORE,
             "after", BREAK_AFTER);
 
     private PropertyKey() {

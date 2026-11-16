@@ -1,9 +1,9 @@
 # `Block`
 
 A box that stacks its children vertically. It accepts `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Isolate margins`,
-`Rotate`, `Side` and `Below side boxes`, and any element as a child. It goes wherever an in-flow element goes. With `Rotate`, it rotates with everything it contains
+`Rotate`, `Side box` and `Below side boxes`, and any element as a child. It goes wherever an in-flow element goes. With `Rotate`, it rotates with everything it contains
 and takes up the rectangle that encloses it ([Layers and rotation](../common/layers-and-rotation.md#rotation-in-flow-block-text-paragraph-and-image)).
-With `Side`, it is a [side box](#side-boxes-side): the text that follows it runs beside it.
+With `Side box`, it is a [side box](#side-boxes-side-box): the text that follows it runs beside it.
 
 ```
 Block:
@@ -61,7 +61,7 @@ of `Stack` and `Grid` (also the cells of a `Table`), the columns of a `Columns`,
 |---|---|---|---|
 | `Isolate margins` | boolean | `false` | Isolates the margins of the box: stops margin merging with the children. Only in `Block` and `Frame`, and not in an item of `Stack` or `Grid` (`ISOLATE_MARGINS_IN_ITEM`). |
 
-`Isolate margins` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), like `Side` and `Below side boxes`.
+`Isolate margins` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)), like `Side box` and `Below side boxes`.
 
 > **Decision:** `Isolate margins` exists only where it can have an effect: `Overlay`, `Page overlay` and the items already isolate, and `Stack`, `Grid`
 > and `Text` have no children in block flow. In a `Block` or a `Frame` that is an item, `Isolate margins: true` is an error.
@@ -118,20 +118,20 @@ gap.
 > and the last child (position selectors), which does not reach the children of the children.
 
 > **Decision:** a single property with the side as its value (`none`, `both`, `top`, `bottom`), like `Pages` or
-> `Side`. *Discarded alternatives:* a boolean that always trims both sides, which cannot be widened later without
+> `Side box`. *Discarded alternatives:* a boolean that always trims both sides, which cannot be widened later without
 > breaking the documents that use it; and two properties (`Trim top margin`, `Trim bottom margin`), two lines for the
 > usual case, which is both.
 
-## Side boxes (`Side`)
+## Side boxes (`Side box`)
 
-An `Image`, a `Barcode` or a `Block` in block flow with `Side: left` or `Side: right` is a **side box**: it is placed at
+An `Image`, a `Barcode` or a `Block` in block flow with `Side box: left` or `Side box: right` is a **side box**: it is placed at
 that side of the container, at the position the flow has when it is reached, and takes no vertical room. The siblings
 that follow it start where they would start without it and, while they overlap it vertically, the text **shortens its
 lines** beside it. It is the figure beside the text of a manual, or the photo in a column of a newsletter.
 
 ```
 Image: examples/newsletter/trail.jpg
-    Side: left
+    Side box: left
     Alt: A path between meadows with mountains in the background
     Box:
         Width: 180
@@ -151,7 +151,7 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
   `Below side boxes: true` goes below too.
 - **`Below side boxes`.** `Below side boxes: true` on a `Text`, a `Paragraph`, a `Block`, a heading, a `Markdown`, an `Image` or a `Barcode`
   moves it below the side boxes before it, instead of running beside them. Without a side box before it, it is an
-  error (`BELOW_SIDE_BOXES_WITHOUT_SIDE`).
+  error (`BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX`).
 - **A word that does not fit** beside the box leaves that line empty and goes to the next one, up to the first line
   with the whole width; it is an overflow only if it does not fit there either (`TEXT_OVERFLOW`). With
   `Line breaking: optimal`, the line breaking takes the width of each line into account.
@@ -161,7 +161,7 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
   margin of its last child does not come out of it.
 - **Where it goes.** In block flow: a section, a `Block`, a `Frame`, an `Overlay`, a `Page overlay`, a `Cell` with
   elements, a `List item`, a column of a `Columns`. Not as an item of a `Stack` or a `Grid`, which places the box itself
-  (`SIDE_NOT_IN_BLOCK_FLOW`). A `Block` with `Side` needs `Width` or `Max width` (`SIDE_WITHOUT_WIDTH`).
+  (`SIDE_BOX_NOT_IN_BLOCK_FLOW`). A `Block` with `Side box` needs `Width` or `Max width` (`SIDE_BOX_WITHOUT_WIDTH`).
 - **Breaks.** A side box is not split: if it does not fit in what is left of the page it moves to the next one, and
   the first line that runs beside it goes with it (the break between the box and the child that follows it is as bad
   as separating two boxes with `Keep with next`). Side boxes end with the page: the text that goes on on the next page
@@ -170,7 +170,7 @@ Paragraph: The text of this paragraph, and of the ones that follow while the pho
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
-| `Side` | `left`, `right` | none | Makes the box a side box. In `Image`, `Barcode` and `Block` (with `Width` or `Max width`). |
+| `Side box` | `left`, `right` | none | Makes the box a side box. In `Image`, `Barcode` and `Block` (with `Width` or `Max width`). |
 | `Below side boxes` | boolean | `false` | Moves the box below the side boxes before it. In `Text`, `Paragraph`, `Block`, the headings, `Markdown`, `Image` and `Barcode`. |
 
 > **Decision:** the side box is the only thing that makes text run around another box; it is placed at its place in
@@ -201,5 +201,5 @@ A `Block` groups its content without announcing itself: a screen reader reads wh
 ## What is not supported
 
 - A table, a `Stack`, a text with background or border, or a list beside a side box on the left, running beside the
-  box: they go below it ([Side boxes](#side-boxes-side)). Nor a side box as an item of a `Stack` or a `Grid`.
+  box: they go below it ([Side boxes](#side-boxes-side-box)). Nor a side box as an item of a `Stack` or a `Grid`.
 - Clipping of what sticks out (what sticks out is an [overflow](../common/overflow.md)).

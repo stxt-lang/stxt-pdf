@@ -50,10 +50,10 @@ página, una imagen a todo el ancho y, debajo, un retrato de 45 × 60 y la misma
 | `Opacity` | porcentaje de `0%` a `100%` | sin valor (opaca) | Atenúa la imagen, con el fondo y el borde de su caja: una marca de agua ([Capas y giro](../common/layers-and-rotation.md#opacidad-opacity)). |
 | `PDF page` | entero ≥ 1 | `1` | La página que se dibuja de un PDF ([PDF](#pdf)). En otro formato es un error. |
 | `Rotate` | ver [Capas y giro](../common/layers-and-rotation.md#giro-en-flujo-block-text-paragraph-e-image) | sin valor | Gira la imagen sobre su centro (un sello) y ocupa el rectángulo que la envuelve girada. |
-| `Side` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side)). |
-| `Below side boxes` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side)). |
+| `Side box` | `left`, `right` | sin valor | La imagen es una caja lateral: el texto que la sigue corre a su lado ([Block](block.md#cajas-laterales-side-box)). |
+| `Below side boxes` | booleano | `false` | Baja la imagen por debajo de las cajas laterales que hay antes ([Block](block.md#cajas-laterales-side-box)). |
 
-`Fit`, `Opacity`, `Side` y `Below side boxes` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `PDF page` y `Rotate`, no.
+`Fit`, `Opacity`, `Side box` y `Below side boxes` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, `PDF page` y `Rotate`, no.
 
 ## Fichero
 

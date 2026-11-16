@@ -80,15 +80,15 @@ Con `top` o `bottom` solo se descarta el margen de ese lado; `none`, el valor po
 también en un `Frame`, un `List item`, una `Cell` y una `Section`, donde el primer elemento empieza entonces arriba del
 área útil. Los márgenes entre los hijos no cambian nunca.
 
-## Una caja a un lado y el texto alrededor (`Side`)
+## Una caja a un lado y el texto alrededor (`Side box`)
 
-Con `Side: left` o `Side: right`, una `Image`, un `Barcode` o un `Block` con `Width` se coloca a ese lado y los párrafos
+Con `Side box: left` o `Side box: right`, una `Image`, un `Barcode` o un `Block` con `Width` se coloca a ese lado y los párrafos
 que vienen detrás corren a su lado, con las líneas más cortas, hasta que la caja acaba. Es la foto de una noticia o la
 figura de un manual. El margen de la caja es la separación con el texto.
 
 ```
 Block:
-    Side: right
+    Side box: right
     Box:
         Width: 180
         Margin: 0 0 6 14
@@ -113,6 +113,6 @@ la siguiente con la primera línea que la rodea.
 - **Un recuadro:** un `Block` con `Padding`, `Border` y `Background`.
 - **Que no se parta:** `Break` con `Keep together: true` (el bloque de firmas de un contrato).
 - **Empezar en página nueva:** `Break` con `Before: page`.
-- **Una foto con el texto alrededor:** `Side: left` o `right` en la imagen (o en un `Block` con la foto y su pie).
+- **Una foto con el texto alrededor:** `Side box: left` o `right` en la imagen (o en un `Block` con la foto y su pie).
 
 Más detalle en la [referencia](../../reference/components/block.md).

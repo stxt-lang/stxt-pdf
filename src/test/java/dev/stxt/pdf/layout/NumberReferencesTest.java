@@ -34,7 +34,7 @@ class NumberReferencesTest {
                 "\tText: {number of: x}", "\t\tId: ref",
                 "\tList:", "\t\tBox:", "\t\t\tPadding: 0 0 0 30", "\t\tMarker: decimal",
                 "\t\tList item:", "\t\t\tText: Uno",
-                "\t\tList item:", "\t\t\tNumber: 10", "\t\t\tText: Diez",
+                "\t\tList item:", "\t\t\tItem number: 10", "\t\t\tText: Diez",
                 "\t\tList item:", "\t\t\tId: x", "\t\t\tText: Once");
         assertEquals("11", text(l, "ref"));
     }

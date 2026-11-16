@@ -6,7 +6,7 @@ import java.util.Objects;
  * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}
  * rule of that name declares of the properties a run allows. Each value is that of the rule, or {@code null} if the
  * rule does not declare it and the run keeps that of its box. The size, the line height and the alignment are always
- * those of the box, so the lines do not change their height; a superscript or a subscript ({@code Position}) is
+ * those of the box, so the lines do not change their height; a superscript or a subscript ({@code Text position}) is
  * painted smaller within its line.
  *
  * <p>The Markdown of the text only knows the name ({@link #named}); the box, which knows the rules, gives it its
@@ -22,7 +22,7 @@ import java.util.Objects;
  * @param letterSpacing {@code Letter spacing}, in points
  * @param textCase      {@code Case}
  * @param smallCaps     {@code Small caps}
- * @param position      {@code Position}: superscript, subscript or normal
+ * @param position      {@code Text position}: superscript, subscript or normal
  */
 public record RunStyle(String name, String color, String family, String codeFamily, FontWeight weight,
                        FontStyle style, Double letterSpacing, TextCase textCase, Boolean smallCaps,
@@ -40,7 +40,7 @@ public record RunStyle(String name, String color, String family, String codeFami
      * @param letterSpacing {@code Letter spacing}, in points
      * @param textCase      {@code Case}
      * @param smallCaps     {@code Small caps}
-     * @param position      {@code Position}
+     * @param position      {@code Text position}
      * @throws NullPointerException if the name is {@code null}
      */
     public RunStyle {

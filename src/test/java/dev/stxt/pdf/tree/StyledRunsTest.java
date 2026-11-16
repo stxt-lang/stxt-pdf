@@ -233,10 +233,10 @@ class StyledRunsTest {
     private static final String SCRIPTS = """
             		For style: sup
             			Typography:
-            				Position: superscript
+            				Text position: superscript
             		For style: sub
             			Typography:
-            				Position: subscript
+            				Text position: subscript
             				Color: #333333
             """;
 
@@ -250,7 +250,7 @@ class StyledRunsTest {
         assertEquals(List.of(run("10 m"), new TextRun("2", TextFormat.PLAIN.withStyle(sup)), run(" de CO"),
                 new TextRun("2", TextFormat.PLAIN.withStyle(sub))), text.formattedRuns());
         assertEquals(15, text.runStyle("sup").line("text-position").number());
-        // The box is not a superscript: Position is not inherited by it.
+        // The box is not a superscript: Text position is not inherited by it.
         assertEquals(TextPosition.NORMAL, text.style().typography().position());
     }
 
@@ -258,26 +258,26 @@ class StyledRunsTest {
     void positionInABoxIsAnErrorOnItsLine() {
         // In the Typography of an element.
         InvalidModelException own = assertThrows(InvalidModelException.class,
-                () -> build("", "Text: Uno", "\tTypography:", "\t\tPosition: superscript"));
-        assertEquals(ErrorCode.POSITION_OUTSIDE_RUN, own.errorCode());
+                () -> build("", "Text: Uno", "\tTypography:", "\t\tText position: superscript"));
+        assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, own.errorCode());
         assertEquals(16, own.line());
         // By the rule of a styled run given to a box with Style: the line of the property in the rule.
         InvalidModelException styled = assertThrows(InvalidModelException.class,
                 () -> build(SCRIPTS, "Text: Uno", "\tStyle: sup"));
-        assertEquals(ErrorCode.POSITION_OUTSIDE_RUN, styled.errorCode());
+        assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, styled.errorCode());
         assertEquals(15, styled.line());
         // In a rule that only reaches boxes, when the rule is read, also with normal.
         InvalidModelException element = assertThrows(InvalidModelException.class, () -> build("""
                 		For element: Paragraph
                 			Typography:
-                				Position: normal
+                				Text position: normal
                 """, "Text: Uno"));
-        assertEquals(ErrorCode.POSITION_OUTSIDE_RUN, element.errorCode());
+        assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, element.errorCode());
         assertEquals(15, element.line());
         InvalidModelException document = assertThrows(InvalidModelException.class,
                 () -> new BoxTreeBuilder().build(new DocumentReader().read(
-                        HEADER.replace("Markup: markdown", "Position: subscript") + "\tSection:\n\t\tText: Uno\n")));
-        assertEquals(ErrorCode.POSITION_OUTSIDE_RUN, document.errorCode());
+                        HEADER.replace("Markup: markdown", "Text position: subscript") + "\tSection:\n\t\tText: Uno\n")));
+        assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, document.errorCode());
     }
 
     /** A nested rule takes the superscript away from the runs inside the elements of the outer one. */
@@ -287,7 +287,7 @@ class StyledRunsTest {
                 		For style: flat
                 			For style: sup
                 				Typography:
-                					Position: normal
+                					Text position: normal
                 """, "Text: a[1]{sup}", "Text: b[2]{sup}", "\tStyle: flat");
         assertEquals(TextPosition.SUPERSCRIPT, section.children().get(0).formattedRuns().get(1).format().style().position());
         TextFormat inside = section.children().get(1).formattedRuns().get(1).format();
@@ -297,9 +297,9 @@ class StyledRunsTest {
         InvalidModelException id = assertThrows(InvalidModelException.class, () -> build("""
                 		For id: total
                 			Typography:
-                				Position: superscript
+                				Text position: superscript
                 """, "Text: Uno"));
-        assertEquals(ErrorCode.POSITION_OUTSIDE_RUN, id.errorCode());
+        assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, id.errorCode());
         assertEquals(15, id.line());
     }
 }

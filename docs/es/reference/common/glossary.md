@@ -5,7 +5,7 @@
 | **Ancho más estrecho / ancho natural** | El menor ancho sin que nada se salga / el ancho sin ningún salto de línea ([La caja](box.md#tamaños-intrínsecos)). |
 | **Área útil** | Rectángulo de la página menos sus márgenes. Es el contenedor de referencia de los elementos de primer nivel de una sección y de los `Page overlay`. Cada sección tiene la suya ([Document](../components/document.md#page)). |
 | **Caja de borde / relleno / contenido / margen** | Los cuatro rectángulos concéntricos de una caja ([La caja](box.md#las-cuatro-cajas)). |
-| **Caja lateral** (`Side`) | `Image`, `Barcode` o `Block` colocado a un lado de su contenedor, con el texto de los hermanos que la siguen corriendo a su lado ([Block](../components/block.md#cajas-laterales-side)). |
+| **Caja lateral** (`Side box`) | `Image`, `Barcode` o `Block` colocado a un lado de su contenedor, con el texto de los hermanos que la siguen corriendo a su lado ([Block](../components/block.md#cajas-laterales-side-box)). |
 | **Caja que aísla los márgenes** | Caja de la que no salen los márgenes de sus hijos: corta la fusión de márgenes ([Block](../components/block.md#cajas-que-aíslan-los-márgenes)). |
 | **Carpeta de recursos** | Carpeta de las fuentes y las imágenes. Los recursos se buscan solo hacia abajo ([Recursos](resources.md)). |
 | **Columna** | Cada contenedor de fragmentos en que un `Columns` reparte su contenido en una página ([Columns](../components/columns.md)). |

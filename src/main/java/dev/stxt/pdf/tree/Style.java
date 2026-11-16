@@ -10,6 +10,7 @@ import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Pages;
 import dev.stxt.pdf.model.Position;
 import dev.stxt.pdf.model.Rotation;
+import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.Side;
 import dev.stxt.pdf.model.Sides;
 import dev.stxt.pdf.model.TextAlign;
@@ -26,7 +27,7 @@ import dev.stxt.pdf.model.Value;
  * {@code style.stack().direction()}, {@code style.box().margin()}. {@code Style} itself keeps the properties that
  * define the element (reference/common/structure.md and reference/components/frame-and-overlays.md: the layout and the
  * position, which come from the element, {@code Offset}, {@code Layer}, {@code Pages}, {@code Isolate margins}, the
- * rotation, {@code Opacity}, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side}, {@code Below side boxes} and
+ * rotation, {@code Opacity}, {@code Link}, {@code Row header}, {@code In table of contents}, {@code Side box}, {@code Below side boxes} and
  * {@code Drop cap}) and the line where each property was declared, with its document ({@link SourceLine}).</p>
  *
  * <p>There is no cascade: each box declares its properties. Only {@link TypographyStyle} is
@@ -100,11 +101,24 @@ public final class Style extends StyleGroup {
      */
     private boolean inTableOfContents = true;
     /**
-     * {@code Side} of an {@code Image}, a {@code Barcode} or a {@code Block} in block flow (reference/components/block.md):
+     * {@code Numbered} of a heading or a {@code Figure}: whether it carries a number (reference/components/heading.md,
+     * reference/components/figure.md). False unless it is declared; a {@code Figure} is numbered unless it declares
+     * false ({@code Figures.numbered}). Not inherited.
+     */
+    private boolean numbered;
+    /** {@code Number format}: how the number of the heading level, or that of the figure, is written. Not inherited. */
+    private NumberFormat numberFormat = NumberFormat.DECIMAL;
+    /**
+     * {@code Number label}: what is written before the title or the caption, with {@code {number}}; {@code null} = the
+     * number. Not inherited.
+     */
+    private String numberLabel;
+    /**
+     * {@code Side box} of an {@code Image}, a {@code Barcode} or a {@code Block} in block flow (reference/components/block.md):
      * the box goes to that side and the text of the siblings that follow it runs beside it; {@code null} = in the flow.
      * Not inherited.
      */
-    private Side side;
+    private Side sideBox;
     /** {@code Below side boxes}: the box goes below the side boxes before it (reference/components/block.md). Not inherited. */
     private boolean belowSideBoxes;
     /**
@@ -128,7 +142,7 @@ public final class Style extends StyleGroup {
 
     /**
      * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): it inherits nothing and
-     * is the only one that can declare {@code Position}.
+     * is the only one that can declare {@code Text position}.
      */
     static Style ofRun(NamedColors namedColors) {
         Style s = new Style(namedColors);
@@ -342,19 +356,47 @@ public final class Style extends StyleGroup {
         inTableOfContents = v;
     }
 
-    /** The side the box goes to; {@code null} if it is in the flow. */
-    public Side side() {
-        return side;
+    public boolean numbered() {
+        return numbered;
     }
 
-    void setSide(Side v) {
+    void setNumbered(boolean v) {
         writable();
-        side = v;
+        numbered = v;
+    }
+
+    public NumberFormat numberFormat() {
+        return numberFormat;
+    }
+
+    void setNumberFormat(NumberFormat v) {
+        writable();
+        numberFormat = v;
+    }
+
+    /** The template of {@code Number label}, or {@code null} if it is not declared. */
+    public String numberLabel() {
+        return numberLabel;
+    }
+
+    void setNumberLabel(String v) {
+        writable();
+        numberLabel = v;
+    }
+
+    /** The side the box goes to; {@code null} if it is in the flow. */
+    public Side sideBox() {
+        return sideBox;
+    }
+
+    void setSideBox(Side v) {
+        writable();
+        sideBox = v;
     }
 
     /** Whether the box is a side box: it goes to a side and the text runs beside it. */
     public boolean isSideBox() {
-        return side != null;
+        return sideBox != null;
     }
 
     /**
@@ -367,7 +409,7 @@ public final class Style extends StyleGroup {
         ROTATED_FRAME("a rotated Frame", ErrorCode.BREAK_IN_ROTATED),
         CLIPPED("a box with Overflow: clip", ErrorCode.BREAK_IN_CLIPPED),
         // A side box goes whole to a side of the text (reference/components/block.md).
-        SIDE_BOX("a box with Side", ErrorCode.BREAK_IN_SIDE_BOX),
+        SIDE_BOX("a box with Side box", ErrorCode.BREAK_IN_SIDE_BOX),
         OVERLAY("an Overlay", null),
         PAGE_OVERLAY("a Page overlay", null);
 
@@ -390,7 +432,7 @@ public final class Style extends StyleGroup {
 
     /**
      * Why the box is not split across pages, or {@code null} if it is split. With more than one reason, the first one
-     * in the order of {@link Unsplittable}: the rotation, {@code Overflow: clip}, {@code Side} and the position.
+     * in the order of {@link Unsplittable}: the rotation, {@code Overflow: clip}, {@code Side box} and the position.
      */
     Unsplittable unsplittable() {
         if (rotatesInFlow()) {

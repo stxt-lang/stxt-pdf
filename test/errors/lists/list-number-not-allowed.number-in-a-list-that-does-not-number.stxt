@@ -16,5 +16,5 @@ Document (dev.stxt.pdf):
 		List:
 			Marker: dash
 			List item:
-				Number: 3
+				Item number: 3
 				Text: Uno

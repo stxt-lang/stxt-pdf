@@ -59,7 +59,7 @@ public enum ErrorCode {
     // --- Lists -----------------------------------------------------------------------------------
     /** A {@code List item} without any element. */
     LIST_ITEM_EMPTY,
-    /** {@code First number} or {@code Number} in a list that does not number ({@code bullet}, {@code dash}, {@code none}). */
+    /** {@code First number} or {@code Item number} in a list that does not number ({@code bullet}, {@code dash}, {@code none}). */
     LIST_NUMBER_NOT_ALLOWED,
     /**
      * A number that the numbering cannot write: negative, 0 in letters or Roman numerals, or over 3999 in Roman
@@ -150,16 +150,16 @@ public enum ErrorCode {
 
     // --- Side boxes and drop caps ----------------------------------------------------------------
     /**
-     * {@code Side} on an item of a {@code Stack} or a {@code Grid}: a side box goes in block flow, with the text that
+     * {@code Side box} on an item of a {@code Stack} or a {@code Grid}: a side box goes in block flow, with the text that
      * runs beside it (reference/components/block.md).
      */
-    SIDE_NOT_IN_BLOCK_FLOW,
-    /** {@code Side} on a {@code Block} or a {@code Figure} with {@code Width: auto} and no {@code Max width}: it would take the whole width. */
-    SIDE_WITHOUT_WIDTH,
-    /** {@code Keep together} or {@code Edges} in a {@code Block} with {@code Side}, which is not split. */
+    SIDE_BOX_NOT_IN_BLOCK_FLOW,
+    /** {@code Side box} on a {@code Block} or a {@code Figure} with {@code Width: auto} and no {@code Max width}: it would take the whole width. */
+    SIDE_BOX_WITHOUT_WIDTH,
+    /** {@code Keep together} or {@code Edges} in a {@code Block} with {@code Side box}, which is not split. */
     BREAK_IN_SIDE_BOX,
     /** {@code Below side boxes: true} without a side box before the box. */
-    BELOW_SIDE_BOXES_WITHOUT_SIDE,
+    BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX,
     /** {@code Drop cap} in a preformatted {@code Paragraph}, whose lines are the ones written. */
     DROP_CAP_NOT_ALLOWED,
     /**
@@ -279,10 +279,10 @@ public enum ErrorCode {
      */
     STYLE_NOT_ALLOWED_IN_RUN,
     /**
-     * {@code Position} reaches a box, in its {@code Typography} or by a rule: only the {@code For style} rule of a
+     * {@code Text position} reaches a box, in its {@code Typography} or by a rule: only the {@code For style} rule of a
      * styled run ({@code [text]{name}}) gives it (line of the property).
      */
-    POSITION_OUTSIDE_RUN,
+    TEXT_POSITION_OUTSIDE_RUN,
     /** Two {@code Named color} with the same name in the same source. */
     COLOR_DUPLICATE,
     /** A color written with a name that no {@code Named color} declares (line of the property). */
@@ -297,8 +297,8 @@ public enum ErrorCode {
     OVERCONSTRAINED,
     /** An {@code auto} margin where it neither centers nor absorbs anything. */
     MARGIN_AUTO_WITHOUT_EFFECT,
-    /** {@code First number} in a {@code Section} without {@code Page numbering: restart}. */
-    FIRST_NUMBER_WITHOUT_RESTART,
+    /** {@code First page number} in a {@code Section} without {@code Page numbering: restart}. */
+    FIRST_PAGE_NUMBER_WITHOUT_RESTART,
     /**
      * Something that is not the appearance ({@code Background}, {@code Border}, {@code Border color},
      * {@code Corner radius}) in the {@code Box} of a {@code Row}.

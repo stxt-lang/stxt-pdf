@@ -80,15 +80,15 @@ With `top` or `bottom` only the margin of that side is dropped; `none`, the defa
 `Frame`, a `List item`, a `Cell` and a `Section`, where the first element then starts at the top of the page area. The
 margins between the children never change.
 
-## A box at one side with the text around it (`Side`)
+## A box at one side with the text around it (`Side box`)
 
-With `Side: left` or `Side: right`, an `Image`, a `Barcode` or a `Block` with `Width` is placed at that side and the
+With `Side box: left` or `Side box: right`, an `Image`, a `Barcode` or a `Block` with `Width` is placed at that side and the
 paragraphs that come after it run beside it, with shorter lines, until the box ends. It is the photo of a news story
 or the figure of a manual. The margin of the box is the separation from the text.
 
 ```
 Block:
-    Side: right
+    Side box: right
     Box:
         Width: 180
         Margin: 0 0 6 14
@@ -113,6 +113,6 @@ the next one with the first line that runs beside it.
 - **A boxed panel:** a `Block` with `Padding`, `Border` and `Background`.
 - **Not split:** `Break` with `Keep together: true` (the signature block of a contract).
 - **Start on a new page:** `Break` with `Before: page`.
-- **A photo with the text around it:** `Side: left` or `right` on the image (or on a `Block` with the photo and its caption).
+- **A photo with the text around it:** `Side box: left` or `right` on the image (or on a `Block` with the photo and its caption).
 
 More detail in the [reference](../../reference/components/block.md).

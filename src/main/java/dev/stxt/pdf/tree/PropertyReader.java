@@ -127,14 +127,11 @@ final class PropertyReader {
             entry("case", (p, s) -> s.typography().setTextCase(enumValue(TextCase.class, p))),
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
-            entry("position", PropertyReader::position),
+            entry("text-position", PropertyReader::position),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
             entry("kerning", (p, s) -> s.typography().setKerning(bool(p))),
             entry("preformatted", (p, s) -> s.typography().setPreformatted(enumValue(Preformatted.class, p))),
             entry("tab-size", (p, s) -> s.typography().setTabSize(positiveInteger(p))),
-            entry("numbered", (p, s) -> s.typography().setNumbered(bool(p))),
-            entry("number-format", (p, s) -> s.typography().setNumberFormat(enumValue(NumberFormat.class, p))),
-            entry("number-label", (p, s) -> s.typography().setNumberLabel(numberLabel(p))),
             entry("widows", (p, s) -> s.typography().setWidows(positiveInteger(p))),
             entry("orphans", (p, s) -> s.typography().setOrphans(positiveInteger(p))),
             entry("language", (p, s) -> s.typography().setLocale(Locale.forLanguageTag(language(p)))));
@@ -149,13 +146,16 @@ final class PropertyReader {
             entry("marker-suffix", (p, s) -> s.list().setMarkerSuffix(enumValue(MarkerSuffix.class, p))),
             entry("marker-image", PropertyReader::markerImage),
             entry("first-number", (p, s) -> s.list().setFirstNumber(integer(p))),
-            entry("number", (p, s) -> s.list().setNumber(integer(p))),
+            entry("item-number", (p, s) -> s.list().setNumber(integer(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
             entry("trim-margins", (p, s) -> s.setTrimMargins(enumValue(TrimMargins.class, p))),
             entry("link", (p, s) -> s.setLink(link(p))),
             entry("row-header", (p, s) -> s.setRowHeader(bool(p))),
             entry("in-table-of-contents", (p, s) -> s.setInTableOfContents(bool(p))),
-            entry("side", (p, s) -> s.setSide(enumValue(Side.class, p))),
+            entry("numbered", (p, s) -> s.setNumbered(bool(p))),
+            entry("number-format", (p, s) -> s.setNumberFormat(enumValue(NumberFormat.class, p))),
+            entry("number-label", (p, s) -> s.setNumberLabel(numberLabel(p))),
+            entry("side-box", (p, s) -> s.setSideBox(enumValue(Side.class, p))),
             entry("below-side-boxes", (p, s) -> s.setBelowSideBoxes(bool(p))),
             entry("drop-cap", (p, s) -> s.setDropCap(dropCap(p))),
             entry("alt", (p, s) -> s.image().setAlt(alt(p))),
@@ -232,13 +232,13 @@ final class PropertyReader {
     }
 
     /**
-     * {@code Position} (reference/common/text-formatting.md): the superscript or subscript of a styled run. Only the
+     * {@code Text position} (reference/common/text-formatting.md): the superscript or subscript of a styled run. Only the
      * {@code For style} rule of a run gives it: in the style of a box it is an error, whatever its value.
      */
     private static void position(Node p, Style s) {
         TextPosition position = enumValue(TextPosition.class, p);
         if (!s.isRun()) {
-            throw error(p, ErrorCode.POSITION_OUTSIDE_RUN, "Position is of a styled run and here it reaches a box, "
+            throw error(p, ErrorCode.TEXT_POSITION_OUTSIDE_RUN, "Text position is of a styled run and here it reaches a box, "
                     + "which has no line to be raised or lowered on: it is declared in the Typography of a For style "
                     + "rule, and the rule is given to a part of a text with Markup: markdown, as in m[2]{sup}");
         }

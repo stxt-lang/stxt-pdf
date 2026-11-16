@@ -15,8 +15,10 @@ import dev.stxt.pdf.stxt.DocumentReader;
 /** Heading numbering, {@code Numbered} (reference/components/heading.md), when building the tree. */
 class HeadingNumbersTest {
 
-    /** What {@code For element: Document} adds to number all the headings. */
-    private static final String NUMBERED = "\t\t\t\tNumbered: true\n";
+    /** The rules that number the headings of the six levels. */
+    private static final String NUMBERED = java.util.stream.IntStream.rangeClosed(1, 6)
+            .mapToObj(level -> "\t\tFor element: Heading " + level + "\n\t\t\tNumbered: true\n")
+            .collect(java.util.stream.Collectors.joining());
 
     /**
      * Builds the tree of a document. {@code documentTypography} are extra lines of the rule
@@ -61,7 +63,7 @@ class HeadingNumbersTest {
 
     @Test
     void numbersAreJoinedByLevel() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
                 "\tHeading 2:", "\t\tText: C",
@@ -73,7 +75,7 @@ class HeadingNumbersTest {
 
     @Test
     void theNumberIsWrittenInFrontOfTheTitle() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tHeading 1:", "\t\tText: Resultados", "\t\tText: del trimestre",
                 "\tHeading 2:", "\t\tText: Ventas");
         Box h1 = headings(tree).get(0);
@@ -87,8 +89,8 @@ class HeadingNumbersTest {
     @Test
     void aRuleNumbersOnlyTheLevelsItNames() {
         BoxTreeBuilder.Result tree = build("",
-                "\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n"
-                        + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n",
+                "\t\tFor element: Heading 1\n\t\t\tNumbered: true\n"
+                        + "\t\tFor element: Heading 2\n\t\t\tNumbered: true\n",
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
                 "\tHeading 3:", "\t\tText: C",
@@ -99,8 +101,8 @@ class HeadingNumbersTest {
 
     @Test
     void aHeadingWithNumberedFalseNeitherCountsNorIsNumbered() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
-                "\tHeading 1:", "\t\tText: Portada", "\t\tTypography:", "\t\t\tNumbered: false",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
+                "\tHeading 1:", "\t\tText: Portada", "\t\tNumbered: false",
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 1:", "\t\tText: Dos");
         assertEquals(java.util.Arrays.asList(null, "1", "2"), numbers(tree));
@@ -109,8 +111,8 @@ class HeadingNumbersTest {
 
     @Test
     void aClassRuleCanTurnNumberingOff() {
-        BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+        BoxTreeBuilder.Result tree = build("", NUMBERED
+                        + "\t\tFor style: annex\n\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 1:", "\t\tStyle: annex", "\t\tText: Anexo",
                 "\tHeading 1:", "\t\tText: Dos");
@@ -119,8 +121,8 @@ class HeadingNumbersTest {
 
     @Test
     void anUnnumberedHeadingRestartsTheCountOfTheLevelsBelow() {
-        BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor style: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+        BoxTreeBuilder.Result tree = build("", NUMBERED
+                        + "\t\tFor style: plain\n\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
                 "\tHeading 2:", "\t\tStyle: plain", "\t\tText: C",
@@ -132,7 +134,7 @@ class HeadingNumbersTest {
 
     @Test
     void numberingContinuesAcrossSections() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tSection:", "\t\tHeading 1:", "\t\t\tText: A", "\t\tHeading 2:", "\t\t\tText: B",
                 "\tSection:", "\t\tHeading 2:", "\t\t\tText: C", "\t\tHeading 1:", "\t\t\tText: D");
         assertEquals(List.of("1", "1.1", "1.2", "2"), numbers(tree));
@@ -140,7 +142,7 @@ class HeadingNumbersTest {
 
     @Test
     void markdownHeadingsAreNumberedLikeTheOthers() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tMarkdown:", "\t\tContent >>", "\t\t\t## Alfa", "\t\t\t", "\t\t\tTexto.", "\t\t\t", "\t\t\t## Beta",
                 "\tHeading 1:", "\t\tText: Dos");
@@ -150,7 +152,7 @@ class HeadingNumbersTest {
 
     @Test
     void theNumberIsAPlainRunBeforeTheFormattedOnes() {
-        BoxTreeBuilder.Result tree = build(NUMBERED + "\t\t\t\tMarkup: markdown\n", "",
+        BoxTreeBuilder.Result tree = build("\t\t\t\tMarkup: markdown\n", NUMBERED,
                 "\tHeading 1:", "\t\tText: Un **gran** título");
         Box text = headings(tree).get(0).children().get(0);
         assertEquals("1 Un gran título", text.text());
@@ -163,8 +165,8 @@ class HeadingNumbersTest {
     @Test
     void numberedHeadingsUnderAnUnnumberedTitleCountFromOne() {
         // The usual case: a title (Heading 1) without a number and the sections below it, numbered.
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
-                "\tHeading 1:", "\t\tText: Contrato", "\t\tTypography:", "\t\t\tNumbered: false",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
+                "\tHeading 1:", "\t\tText: Contrato", "\t\tNumbered: false",
                 "\tHeading 2:", "\t\tText: Reunidos",
                 "\tHeading 2:", "\t\tText: Cláusulas",
                 "\tHeading 3:", "\t\tText: Objeto",
@@ -175,8 +177,8 @@ class HeadingNumbersTest {
 
     @Test
     void anUnnumberedLevelInTheMiddleDoesNotAddToTheNumber() {
-        BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor style: plain\n\t\t\tTypography:\n\t\t\t\tNumbered: false\n",
+        BoxTreeBuilder.Result tree = build("", NUMBERED
+                        + "\t\tFor style: plain\n\t\t\tNumbered: false\n",
                 "\tHeading 1:", "\t\tText: A",
                 "\tHeading 2:", "\t\tStyle: plain", "\t\tText: B",
                 "\tHeading 3:", "\t\tText: C",
@@ -189,18 +191,18 @@ class HeadingNumbersTest {
 
     @Test
     void aNewUnnumberedTitleRestartsTheCountBelow() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
-                "\tHeading 1:", "\t\tText: Parte uno", "\t\tTypography:", "\t\t\tNumbered: false",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
+                "\tHeading 1:", "\t\tText: Parte uno", "\t\tNumbered: false",
                 "\tHeading 2:", "\t\tText: A",
                 "\tHeading 2:", "\t\tText: B",
-                "\tHeading 1:", "\t\tText: Parte dos", "\t\tTypography:", "\t\t\tNumbered: false",
+                "\tHeading 1:", "\t\tText: Parte dos", "\t\tNumbered: false",
                 "\tHeading 2:", "\t\tText: C");
         assertEquals(java.util.Arrays.asList(null, "1", "2", null, "1"), numbers(tree));
     }
 
     @Test
     void aHeadingNumberIsAvailableToReferences() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 2:", "\t\tId: ventas", "\t\tText: Ventas",
                 "\tText: Véase la sección {number of: ventas}.");
@@ -210,7 +212,7 @@ class HeadingNumbersTest {
     /** A Markdown heading with {@code {#id}} can be referred to and its {@code Id} belongs to the document. */
     @Test
     void aMarkdownHeadingWithAnIdCanBeReferred() {
-        BoxTreeBuilder.Result tree = build(NUMBERED, "",
+        BoxTreeBuilder.Result tree = build("", NUMBERED,
                 "\tMarkdown:", "\t\tContent >>", "\t\t\t# Uno", "", "\t\t\t## Ventas {#ventas}",
                 "\tParagraph: Véase la sección {number of: ventas}.");
         Box ventas = headings(tree).get(1);
@@ -225,9 +227,10 @@ class HeadingNumbersTest {
     /** Each level of the number is written with the {@code Number format} of its heading. */
     @Test
     void eachLevelIsWrittenWithTheStyleOfItsHeading() {
-        BoxTreeBuilder.Result tree = build(NUMBERED,
-                "\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumber format: upper-roman\n"
-                        + "\t\tFor element: Heading 2\n\t\t\tTypography:\n\t\t\t\tNumber format: lower-alpha\n",
+        BoxTreeBuilder.Result tree = build("",
+                "\t\tFor element: Heading 1\n\t\t\tNumbered: true\n\t\t\tNumber format: upper-roman\n"
+                        + "\t\tFor element: Heading 2\n\t\t\tNumbered: true\n\t\t\tNumber format: lower-alpha\n"
+                        + "\t\tFor element: Heading 3\n\t\t\tNumbered: true\n",
                 "\tHeading 1:", "\t\tText: Uno",
                 "\tHeading 1:", "\t\tText: Dos",
                 "\tHeading 2:", "\t\tText: A",
@@ -244,8 +247,8 @@ class HeadingNumbersTest {
     @Test
     void aLabelGoesInFrontOfTheTitleWithTheNumberInside() {
         BoxTreeBuilder.Result tree = build("",
-                "\t\tFor style: annex\n\t\t\tTypography:\n\t\t\t\tNumbered: true\n\t\t\t\tNumber format: upper-alpha\n"
-                        + "\t\t\t\tNumber label: Anexo {number}.\n",
+                "\t\tFor style: annex\n\t\t\tNumbered: true\n\t\t\tNumber format: upper-alpha\n"
+                        + "\t\t\tNumber label: Anexo {number}.\n",
                 "\tHeading 1:", "\t\tText: Anexos",
                 "\tHeading 2:", "\t\tId: fees", "\t\tStyle: annex", "\t\tText: Honorarios",
                 "\tHeading 2:", "\t\tStyle: annex", "\t\tText: Calendario");
@@ -256,11 +259,45 @@ class HeadingNumbersTest {
     @Test
     void aLabelWithoutItsNumberIsAnError() {
         InvalidModelException e = assertThrows(InvalidModelException.class,
-                () -> build("\t\t\t\tNumber label: Anexo\n", "",
+                () -> build("", "\t\tFor element: Heading 1\n\t\t\tNumber label: Anexo\n",
                         "\tHeading 1:", "\t\tText: Uno"));
         assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
-        assertEquals(12, e.line());
-        assertThrows(InvalidModelException.class, () -> build("\t\t\t\tNumber label: {number}.{number}\n", "",
+        assertEquals(13, e.line());
+        assertThrows(InvalidModelException.class,
+                () -> build("", "\t\tFor element: Heading 1\n\t\t\tNumber label: {number}.{number}\n",
                 "\tHeading 1:", "\t\tText: Uno"));
+    }
+
+    /** The numbering is not of {@code Typography}: there, the schema does not allow it, in a heading or in a rule. */
+    @Test
+    void numberedIsNotAPropertyOfTypography() {
+        assertThrows(DocumentSyntaxException.class, () -> build("\t\t\t\tNumbered: true\n", "",
+                "\tHeading 1:", "\t\tText: Uno"));
+        assertThrows(DocumentSyntaxException.class, () -> build("", "",
+                "\tHeading 1:", "\t\tText: Uno", "\t\tTypography:", "\t\t\tNumbered: true"));
+        assertThrows(DocumentSyntaxException.class,
+                () -> build("", "\t\tFor element: Heading 1\n\t\t\tTypography:\n\t\t\t\tNumber format: upper-roman\n",
+                        "\tHeading 1:", "\t\tText: Uno"));
+    }
+
+    /** It is not inherited: a box that contains headings cannot declare it, and a rule cannot give it to one. */
+    @Test
+    void onlyAHeadingOrAFigureTakesTheNumbering() {
+        assertThrows(DocumentSyntaxException.class, () -> build("", "",
+                "\tBlock:", "\t\tNumbered: true", "\t\tHeading 1:", "\t\t\tText: Uno"));
+        for (String property : List.of("Numbered: true", "Number format: upper-roman", "Number label: Anexo {number}.")) {
+            InvalidModelException e = assertThrows(InvalidModelException.class,
+                    () -> build("", "\t\tFor style: plain\n\t\t\t" + property + "\n",
+                            "\tParagraph: Hola", "\t\tStyle: plain"), property);
+            assertEquals(ErrorCode.STYLE_NOT_ALLOWED, e.errorCode(), property);
+        }
+    }
+
+    /** The headings of a {@code Markdown} take the numbering of the rule of their level, like the written ones. */
+    @Test
+    void aMarkdownHeadingTakesTheNumberingOfTheRuleOfItsLevel() {
+        BoxTreeBuilder.Result tree = build("", "\t\tFor element: Heading 2\n\t\t\tNumbered: true\n",
+                "\tMarkdown:", "\t\tContent >>", "\t\t\t# Título", "\t\t\t", "\t\t\t## Alfa", "\t\t\t", "\t\t\t### Detalle");
+        assertEquals(java.util.Arrays.asList(null, "1", null), numbers(tree));
     }
 }

@@ -41,7 +41,7 @@ If it differs from the summary in [the structure](common/structure.md#schema), t
 | Page | Elements |
 |---|---|
 | [`Document`](components/document.md) | `Document`, `Page`, `Title`, `Language` and `Section` |
-| [`Block`](components/block.md) | `Block`, block flow, shared by all blocks, and the side boxes (`Side`, `Below side boxes`) |
+| [`Block`](components/block.md) | `Block`, block flow, shared by all blocks, and the side boxes (`Side box`, `Below side boxes`) |
 | [`Text`](components/text.md) | `Text` and `Paragraph`, with the drop cap (`Drop cap`) |
 | [Headings](components/heading.md) | `Heading 1` to `Heading 6` and their numbering |
 | [`List`](components/list.md) | `List` and `List item` |

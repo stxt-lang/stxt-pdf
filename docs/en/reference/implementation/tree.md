@@ -24,7 +24,7 @@ In the schema:
 - `Content`, `BLOCK`, and `Area map`, `TEXT`;
 - the switches (such as `Isolate margins`, `Wrap items`, `Row header`, `In table of contents`, `Merge borders` or `Hyphenate`),
   `BOOLEAN`;
-- the integers (such as `Layer`, `Widows`, `Orphans`, `First number`, `Number`, `Column count`, `Weight`, `Drop cap` or `Quiet zone`),
+- the integers (such as `Layer`, `Widows`, `Orphans`, `First number`, `Item number`, `Column count`, `Weight`, `Drop cap` or `Quiet zone`),
   `INTEGER`, and `Rotate`, `NUMBER`;
 - those with closed values (such as `Fit`, `Leader`, `Pages` or `Paper`), `ENUM`;
 - the rest, `INLINE` without children, whose form `ValueReader` checks.
@@ -93,7 +93,7 @@ only nested outside its context, also for the runs (`runStyle` receives the ance
 Inside which boxes each content is built (a `Page overlay`, a heading, a `Columns`, a `Markdown`, a `Footnote` or a box
 that is not split) is said by `BuildContext.Scope`, a `record` that only changes while the content of a box is built
 (`BuildContext.within`) and is restored afterwards. Why a box is not split across pages is said by a single
-classification, `Style.unsplittable()` (the rotation, `Overflow: clip`, `Side` or the position, in that order): it is used
+classification, `Style.unsplittable()` (the rotation, `Overflow: clip`, `Side box` or the position, in that order): it is used
 by `ModelValidator`, to reject `Keep together` and `Edges` on it, and by the `Scope`, to name it in
 `BREAK_IN_UNBREAKABLE`.
 
@@ -158,7 +158,7 @@ list, those in flow are computed once, and writing to a closed box or style is a
 ## The sections and the root
 
 `BoxTreeBuilder.Result` gives the root of the document and the list of `Section` (`tree/Section`: box, `PageSetup`, `Page numbering`,
-`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` and the
+`Page number format`, `First page number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` and the
 footnote area, `footnotes()`). The **box of each section is a child of the root of the document** (`Element.SECTION`, added after
 the `Page overlay` elements of the document so that they precede it in preorder traversal) and is the **root of its layout**
 (`Box.isLayoutRoot()`): the traversals of the whole tree (references, links, tables of contents, fonts, images, `Id`, PDF
@@ -188,8 +188,8 @@ The family of `Font` also goes in `TextFormat.family`, like that of code. The bo
 (`Box.runStyle`) for the errors that come later with the line of the rule: `FONT_UNKNOWN` in `PdfMetrics` and
 `CONTRAST_LOW` in `ContrastCheck`. Outside `tree` nobody looks at the name: `TextFormat.face`, `color`,
 `letterSpacing`, `textCase` and `smallCaps` give the value of the run or, if its style does not declare it, that of the
-box that is passed to them. `Position` only exists in that `Style` (`Style.ofRun`, the only one with `isRun()`):
-`PropertyReader.position` rejects it in that of a box (`POSITION_OUTSIDE_RUN`), which is why the checking read of a
+box that is passed to them. `Text position` only exists in that `Style` (`Style.ofRun`, the only one with `isRun()`):
+`PropertyReader.position` rejects it in that of a box (`TEXT_POSITION_OUTSIDE_RUN`), which is why the checking read of a
 `For style` rule also uses a `Style.ofRun`. `RunStyle.position` is the `model.TextPosition` of the run, and
 `TextFormat.superscript()` and `subscript()` read it.
 

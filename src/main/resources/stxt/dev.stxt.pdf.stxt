@@ -62,7 +62,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Page number format
 				Max: 1
-			Child: First number
+			Child: First page number
 				Max: 1
 			Child: Inherit page overlays
 				Max: 1
@@ -101,7 +101,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Footnote
 	Node: Block
 		Type: GROUP
-		Description: Box that stacks its children vertically (block flow). With Side, a side box: it goes to one side and the text of the siblings that follow it runs beside it.
+		Description: Box that stacks its children vertically (block flow). With Side box, a side box: it goes to one side and the text of the siblings that follow it runs beside it.
 		Children:
 			Child: Id
 				Max: 1
@@ -121,7 +121,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -274,6 +274,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -293,6 +299,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Link
 				Max: 1
 			Child: In table of contents
+				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
 				Max: 1
 			Child: Box
 				Max: 1
@@ -314,6 +326,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -333,6 +351,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Link
 				Max: 1
 			Child: In table of contents
+				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
 				Max: 1
 			Child: Box
 				Max: 1
@@ -354,6 +378,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Box
 				Max: 1
 			Child: Typography
@@ -373,6 +403,12 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Link
 				Max: 1
 			Child: In table of contents
+				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
 				Max: 1
 			Child: Box
 				Max: 1
@@ -424,7 +460,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Break
 				Max: 1
-			Child: Number
+			Child: Item number
 				Max: 1
 			Child: Marker image
 				Max: 1
@@ -917,7 +953,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Figure
 		Type: GROUP
-		Description: A figure with a caption: exactly one element (an Image, a Barcode, a Table or a Block) and its Caption, below it (above a Table) or where Caption position says. A block that is not split across pages (a Table inside is, with the caption on its first or last part). It is numbered with the counter of the figures or, with a Table inside, of the tables (Figure counter changes it): the number, or its Number label, goes before the caption, {number of: id} gives it and a Table of contents with Entries: figures or tables lists it. Numbered: false in its Typography, or in a rule that reaches it, leaves it without a number. The image inside carries its Alt; with a Block, the Figure carries its own.
+		Description: A figure with a caption: exactly one element (an Image, a Barcode, a Table or a Block) and its Caption, below it (above a Table) or where Caption position says. A block that is not split across pages (a Table inside is, with the caption on its first or last part). It is numbered with the counter of the figures or, with a Table inside, of the tables (Figure counter changes it): the number, or its Number label, goes before the caption, {number of: id} gives it and a Table of contents with Entries: figures or tables lists it. Numbered: false, its own or from a rule, leaves it without a number. The image inside carries its Alt; with a Block, the Figure carries its own.
 		Children:
 			Child: Id
 				Max: 1
@@ -937,7 +973,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
-			Child: Side
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -964,7 +1006,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Image
 		Type: INLINE
-		Description: PNG, JPEG, SVG or PDF image from the images/ folder of the resources; the value is its path, relative to images/ (logos/acme.png). A box without children with the size and proportions of the file (of a PDF, of its page); it does not break across pages. With Side, the text that follows it runs beside it.
+		Description: PNG, JPEG, SVG or PDF image from the images/ folder of the resources; the value is its path, relative to images/ (logos/acme.png). A box without children with the size and proportions of the file (of a PDF, of its page); it does not break across pages. With Side box, the text that follows it runs beside it.
 		Children:
 			Child: Id
 				Max: 1
@@ -986,7 +1028,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -1018,7 +1060,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Rotate
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -1111,13 +1153,19 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Levels
 				Max: 1
 			Child: Leader
 				Max: 1
 			Child: Drop cap
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -1212,13 +1260,19 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Levels
 				Max: 1
 			Child: Leader
 				Max: 1
 			Child: Drop cap
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -1313,13 +1367,19 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: In table of contents
 				Max: 1
+			Child: Numbered
+				Max: 1
+			Child: Number format
+				Max: 1
+			Child: Number label
+				Max: 1
 			Child: Levels
 				Max: 1
 			Child: Leader
 				Max: 1
 			Child: Drop cap
 				Max: 1
-			Child: Side
+			Child: Side box
 				Max: 1
 			Child: Below side boxes
 				Max: 1
@@ -1395,7 +1455,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: Font, code font, weight, size (and the minimum it may shrink to), line height, alignment, hyphenation, color and language of the text, heading numbering, and widows and orphans. Inherited.
+		Description: Font, code font, weight, size (and the minimum it may shrink to), line height, alignment, hyphenation, color and language of the text, and widows and orphans. Inherited.
 		Children:
 			Child: Font
 				Max: 1
@@ -1433,7 +1493,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Small caps
 				Max: 1
-			Child: Position
+			Child: Text position
 				Max: 1
 			Child: Ligatures
 				Max: 1
@@ -1448,12 +1508,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Orphans
 				Max: 1
 			Child: Language
-				Max: 1
-			Child: Numbered
-				Max: 1
-			Child: Number format
-				Max: 1
-			Child: Number label
 				Max: 1
 	Node: Break
 		Type: GROUP
@@ -1496,6 +1550,20 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: In table of contents
 		Type: BOOLEAN
 		Description: Whether the heading, or the Figure, has an entry in the tables of contents (Table of contents). By default, true. With false a heading is still a heading (structure, bookmark and hierarchy) but it is not listed: the title of the cover or the one of the table of contents itself; a Figure keeps its number and is not listed.
+	Node: Numbered
+		Type: BOOLEAN
+		Description: Whether a heading, or a Figure, carries a number. That of a heading (1, 1.1, 1.1.1...) is written before the title and is given by {number of: id}, the tables of contents and the PDF bookmarks. In a heading, false by default: it is declared in the heading or in a rule (For element: Heading 1 numbers those of that level), and headings whose Numbered is false are neither numbered nor counted. A Figure is numbered by default, and Numbered: false leaves it without a number. Not inherited.
+	Node: Number format
+		Type: ENUM
+		Description: How the level number of a numbered heading, or the number of a Figure, is written: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i) or upper-roman (I). Each level of the full number is written with the one of its heading (II.a). Not inherited.
+		Values:
+			Value: decimal
+			Value: lower-alpha
+			Value: upper-alpha
+			Value: lower-roman
+			Value: upper-roman
+	Node: Number label
+		Description: What is written before the title of a numbered heading, or before the caption of a numbered Figure, with {number} where the number goes (Number label: Annex {number}., Number label: Figure {number}.); without it, the number. Not inherited.
 	Node: Isolate margins
 		Type: BOOLEAN
 		Description: Whether the box isolates the margins of its children: with true, those of the first and the last stay inside and do not merge with its own. By default, false.
@@ -1538,6 +1606,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: upper-alpha
 			Value: lower-roman
 			Value: upper-roman
+	Node: First page number
+		Type: INTEGER
+		Description: Number of the first page of a Section with Page numbering: restart, from 1. By default, 1.
 	Node: Inherit page overlays
 		Type: BOOLEAN
 		Description: Whether the Section carries the Page overlay of the Document. By default, true; with false only its own appear (a cover without a footer).
@@ -1579,7 +1650,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 		Description: Point around which the border box rotates with Rotate: one or two keywords out of top, bottom, left, right and center (top left, bottom...), or two measures from its top left corner, as lengths or as a percentage of its width and its height (20 50%). By default, center.
 	Node: Opacity
 		Description: How opaque the box is painted, with everything it contains, as a percentage from 0% to 100% (Opacity: 15%): what lies beneath shows through it. With 100% the box is opaque, as without it, and with 0% nothing of it is seen. In an Image, the image with the background and the border of its box; in a Frame, an Overlay and a Page overlay, the box with its content, painted as a whole: what overlaps inside does not show through. Painting only: it does not change the layout. Without it, the box is opaque; the opacity of a single color goes in the color (#RRGGBBAA).
-	Node: Side
+	Node: Side box
 		Type: ENUM
 		Description: Side box: an Image, a Barcode or a Block (with Width or Max width) in block flow that goes to the left or to the right of its container, at its place in the flow, and the text of the siblings that follow it shortens its lines beside it; its Margin is the separation. A sibling that is not text (a Table, a Stack, a List) goes below it. It is not split across pages: if it does not fit, it moves to the next page with the first line that runs beside it. Not on an item of a Stack or a Grid, nor on a cell.
 		Values:
@@ -1587,7 +1658,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: right
 	Node: Below side boxes
 		Type: BOOLEAN
-		Description: Whether the box goes below the side boxes (Side) before it, instead of running beside them. By default, false. Without a side box before it, it is an error.
+		Description: Whether the box goes below the side boxes (Side box) before it, instead of running beside them. By default, false. Without a side box before it, it is an error.
 	Node: Drop cap
 		Type: INTEGER
 		Description: Drop cap of a Paragraph: its first letter is taken out of the text and set, in the font of the paragraph, at the size whose capitals are as tall as this number of lines (from 2 to 5), at the left of them. Not in a preformatted Paragraph.
@@ -1724,7 +1795,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Small caps
 		Type: BOOLEAN
 		Description: Small caps: lowercase letters are painted as uppercase at 80 % of the size. By default, false.
-	Node: Position
+	Node: Text position
 		Type: ENUM
 		Description: Position of a styled run on its line: normal (by default), superscript or subscript. A superscript and a subscript are painted at 70 % of the size, raised or lowered from the baseline, without changing the height of the line. Only in the For style rule of a styled run ([text]{name}): in a box it is an error.
 		Values:
@@ -1747,20 +1818,6 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Tab size
 		Type: INTEGER
 		Description: With Preformatted: keep or wrap, the width of a tab: each one leads to the next column that is a multiple of this number of characters. By default, 4.
-	Node: Numbered
-		Type: BOOLEAN
-		Description: Whether the headings carry a number (1, 1.1, 1.1.1...), which is written before the title and is given by {number of: id}, the tables of contents and the PDF bookmarks. By default, false. Inherited: For element: Document turns it on in all of them, a For element rule in those of one level and, in the Typography of a heading, only in that one. Headings whose Numbered is false are neither numbered nor counted. A Figure is numbered by default, and only Numbered: false declared in it, or in a rule that reaches it, leaves it without a number.
-	Node: Number format
-		Type: ENUM
-		Description: How the level number of a numbered heading, or the number of a Figure, is written: decimal (1, by default), lower-alpha (a), upper-alpha (A), lower-roman (i) or upper-roman (I). Each level of the full number is written with the one of its heading (II.a). Inherited.
-		Values:
-			Value: decimal
-			Value: lower-alpha
-			Value: upper-alpha
-			Value: lower-roman
-			Value: upper-roman
-	Node: Number label
-		Description: What is written before the title of a numbered heading, or before the caption of a numbered Figure, with {number} where the number goes (Number label: Annex {number}., Number label: Figure {number}.); without it, the number. Inherited.
 	Node: Widows
 		Type: INTEGER
 		Description: Minimum number of lines of a paragraph that move to the next page. By default, 2.
@@ -1909,8 +1966,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: First number
 		Type: INTEGER
-		Description: Number a numbering starts with: that of the first item of a numbered list or, in a Section with Page numbering: restart, that of its first page. By default, 1.
-	Node: Number
+		Description: Number of the first item of a numbered list. By default, 1.
+	Node: Item number
 		Type: INTEGER
 		Description: Number of this item of a numbered list; the following ones continue from it.
 

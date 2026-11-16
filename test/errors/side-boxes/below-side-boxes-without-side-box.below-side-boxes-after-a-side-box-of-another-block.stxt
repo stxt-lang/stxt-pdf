@@ -1,5 +1,5 @@
 # Case: Below side boxes in a Block whose side box is inside another Block, with a background, before it
-# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE
+# Code: BELOW_SIDE_BOXES_WITHOUT_SIDE_BOX
 # Line: 22
 Document (dev.stxt.pdf):
 	Language: es
@@ -17,6 +17,6 @@ Document (dev.stxt.pdf):
 			Box:
 				Background: #EEEEEE
 			Image: test/square.png
-				Side: left
+				Side box: left
 		Paragraph: Hola
 			Below side boxes: true

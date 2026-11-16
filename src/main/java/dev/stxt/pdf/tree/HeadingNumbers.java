@@ -97,7 +97,7 @@ final class HeadingNumbers {
      */
     static void prefix(Box numbered, Box text, String number) {
         numbered.setNumber(number);
-        String label = numbered.style().typography().numberLabel();
+        String label = numbered.style().numberLabel();
         text.prependText((label == null ? number : label.replace(NUMBER, number)) + " ");
     }
 }

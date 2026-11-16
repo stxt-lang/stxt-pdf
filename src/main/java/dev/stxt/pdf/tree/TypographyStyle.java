@@ -5,7 +5,6 @@ import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.FontStyle;
 import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Markup;
-import dev.stxt.pdf.model.NumberFormat;
 import dev.stxt.pdf.model.TextAlign;
 import dev.stxt.pdf.model.LineBreaking;
 import dev.stxt.pdf.model.TextCase;
@@ -61,7 +60,7 @@ public final class TypographyStyle extends StyleGroup {
     /** Spacing between letters, in points; it can be negative. */
     private double letterSpacing;
     private boolean smallCaps;
-    /** {@code Position}: only the style of a styled run has it, so it is not inherited. */
+    /** {@code Text position}: only the style of a styled run has it, so it is not inherited. */
     private TextPosition position = TextPosition.NORMAL;
     /**
      * {@code Ligatures}: whether the text is measured and painted with the ligatures of the font
@@ -76,15 +75,6 @@ public final class TypographyStyle extends StyleGroup {
     private Preformatted preformatted = Preformatted.NONE;
     /** Columns of a tab in preformatted text ({@code Tab size}). */
     private int tabSize = 4;
-    /**
-     * {@code Numbered}: whether the headings are numbered (reference/components/heading.md). Inherited: the heading
-     * reads it.
-     */
-    private boolean numbered;
-    /** {@code Number format}: how the number of the heading level is written. */
-    private NumberFormat numberFormat = NumberFormat.DECIMAL;
-    /** {@code Number label}: what is written before the title, with {@code {number}}; {@code null} = the number. */
-    private String numberLabel;
     /**
      * Language and locale of the text: the one of {@code Language} of {@code Document}
      * (reference/components/document.md) at the root and, if a box declares {@code Language} in {@code Typography}
@@ -124,9 +114,6 @@ public final class TypographyStyle extends StyleGroup {
         kerning = parent.kerning;
         preformatted = parent.preformatted;
         tabSize = parent.tabSize;
-        numbered = parent.numbered;
-        numberFormat = parent.numberFormat;
-        numberLabel = parent.numberLabel;
         locale = parent.locale;
         color = parent.color;
         widows = parent.widows;
@@ -277,7 +264,7 @@ public final class TypographyStyle extends StyleGroup {
         smallCaps = v;
     }
 
-    /** {@return {@code Position}, which only the style of a styled run declares} */
+    /** {@return {@code Text position}, which only the style of a styled run declares} */
     public TextPosition position() {
         return position;
     }
@@ -321,34 +308,6 @@ public final class TypographyStyle extends StyleGroup {
     void setTabSize(int v) {
         writable();
         tabSize = v;
-    }
-
-    public boolean numbered() {
-        return numbered;
-    }
-
-    void setNumbered(boolean v) {
-        writable();
-        numbered = v;
-    }
-
-    public NumberFormat numberFormat() {
-        return numberFormat;
-    }
-
-    void setNumberFormat(NumberFormat v) {
-        writable();
-        numberFormat = v;
-    }
-
-    /** The template of {@code Number label}, or {@code null} if it is not declared. */
-    public String numberLabel() {
-        return numberLabel;
-    }
-
-    void setNumberLabel(String v) {
-        writable();
-        numberLabel = v;
     }
 
     public Locale locale() {

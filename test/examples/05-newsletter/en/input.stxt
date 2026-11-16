@@ -124,7 +124,7 @@ Document (dev.stxt.pdf):
 					Margin: 0 0 14 0
 				Block:
 					Id: trail-figure
-					Side: right
+					Side box: right
 					Box:
 						Width: 200
 						Margin: 0 0 4 16

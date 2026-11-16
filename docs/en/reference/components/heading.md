@@ -69,21 +69,21 @@ itself. It is a property of the element, `true` by default, which is not inherit
 
 ## Numbering (`Numbered`)
 
-With `Numbered: true` the heading carries a number: `1`, `1.1`, `1.1.1`. Since no style is implicit, it is declared. It is a
-property of `Typography`, so **it is inherited** and is written wherever it suits: in `For element: Document` it numbers all the
-levels, in a rule `For element: Heading 1` only those of that level, in a `For style` rule those of a style, and in the
-`Typography` of a heading, only in it (`Numbered: false` leaves it without a number).
+With `Numbered: true` the heading carries a number: `1`, `1.1`, `1.1.1`. Since no style is implicit, it is declared: in a
+rule `For element: Heading 1` for those of that level, in a `For style` rule for those of a style, and in a heading,
+only for it (`Numbered: false` leaves it without a number). It is a property of the heading and **it is not inherited**:
+each level that is numbered declares it.
 
 ```
 Styles:
-    For element: Document
-        Typography:
-            Numbered: true
+    For element: Heading 1
+        Numbered: true
+    For element: Heading 2
+        Numbered: true
 Heading 1:
     Id: cover
     Text: Quarterly report
-    Typography:
-        Numbered: false
+    Numbered: false
 Heading 1:
     Text: Results               # "1 Results"
 Heading 2:
@@ -109,8 +109,8 @@ Paragraph: The data in section {number of: sales} confirm it.
 
 ### Format and label (`Number format`, `Number label`)
 
-Two properties of `Typography`, which are inherited and given like `Numbered`: in `For element: Heading N` for a level or in
-`For style` for some headings.
+Two properties of the heading, given like `Numbered`: in `For element: Heading N` for a level or in `For style` for
+some headings.
 
 | Property | Values | Default | Notes |
 |---|---|---|---|
@@ -126,10 +126,9 @@ restarts the counters below: a `Heading 1` "Appendices" and its `Heading 2` with
 ```
 Styles:
     For style: annex
-        Typography:
-            Numbered: true
-            Number format: upper-alpha
-            Number label: Appendix {number}.
+        Numbered: true
+        Number format: upper-alpha
+        Number label: Appendix {number}.
 Heading 1:
     Text: Appendices
 Heading 2:
@@ -139,9 +138,12 @@ Heading 2:
 Paragraph: The amounts in appendix {number of: fees}.
 ```
 
-> **Decision:** `Numbered`, `Number format` and `Number label` go in `Typography` so that they can be given in a rule and
-> inherited. The format belongs to the level of each heading and the label, to the whole number. *Rejected alternative:* a
-> template with the number of each level separately (`{1}.{2}`), harder to write and to read.
+> **Decision:** `Numbered`, `Number format` and `Number label` are properties of the heading (and of the `Figure`),
+> given in the element or in a rule, and are not inherited: numbering is structure and not the look of the text, and
+> each level that is numbered says so. The format belongs to the level of each heading and the label, to the whole
+> number. *Rejected alternatives:* in `Typography` and inherited, which numbered the six levels from
+> `For element: Document` and needed an exception for the figures; and a template with the number of each level
+> separately (`{1}.{2}`), harder to write and to read.
 
 > **Decision:** Roman numerals beyond 3999 are written with more `M` (4000 is `MMMM`), instead of an error that would
 > never occur in a real document. *Rejected alternative:* going back to digits, as other engines do, which mixes

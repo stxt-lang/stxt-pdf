@@ -62,7 +62,7 @@ class SchemaCoverageTest {
             Map.entry("Rotate origin", "Rotate: 15\nRotate origin: top left"),
             Map.entry("Opacity", "Opacity: 15%"),
             // A Block with Side needs a width; an image does not mind it.
-            Map.entry("Side", "Side: left\nBox:\n\tWidth: 100"),
+            Map.entry("Side box", "Side box: left\nBox:\n\tWidth: 100"),
             Map.entry("Below side boxes", "Below side boxes: true"),
             Map.entry("Drop cap", "Drop cap: 3"),
             // Page
@@ -111,7 +111,7 @@ class SchemaCoverageTest {
             Map.entry("Case", "Case: uppercase"),
             Map.entry("Letter spacing", "Letter spacing: 1.5"),
             Map.entry("Small caps", "Small caps: true"),
-            Map.entry("Position", "Position: superscript"),
+            Map.entry("Text position", "Text position: superscript"),
             Map.entry("Ligatures", "Ligatures: true"),
             Map.entry("Kerning", "Kerning: true"),
             Map.entry("Code font", "Code font: IBM Plex Mono"),
@@ -151,7 +151,8 @@ class SchemaCoverageTest {
             Map.entry("Marker", "Marker: decimal"),
             Map.entry("Marker suffix", "Marker suffix: parenthesis"),
             Map.entry("First number", "First number: 3"),
-            Map.entry("Number", "Number: 5"),
+            Map.entry("First page number", "First page number: 3"),
+            Map.entry("Item number", "Item number: 5"),
             // Columns
             Map.entry("Column count", "Column count: 3"),
             Map.entry("Min column width", "Min column width: 100"),
@@ -204,7 +205,7 @@ class SchemaCoverageTest {
     private static Map<String, Template> templates() {
         Map<String, Template> t = new LinkedHashMap<>();
         t.put("Document", new Template(HEADER + "\t{}\n\tSection:\n\t\tBlock:", Set.of("Title", "Language")));
-        // A section: what it allows besides its content. First number needs restart.
+        // A section: what it allows besides its content. First page number needs restart.
         t.put("Section", new Template(HEADER + "\tSection:\n\t\tPage numbering: restart\n\t\t{}\n\t\tBlock:",
                 Set.of("Page numbering")));
         // Paper excludes Width and Height, which all the documents read (the header).
@@ -275,15 +276,15 @@ class SchemaCoverageTest {
         t.put("Box > Merge borders", new Template(HEADER + "\tTable:\n\t\tColumn sizes: *\n\t\tBox:\n\t\t\t{}\n"
                 + "\t\tBody rows:\n\t\t\tRow:\n\t\t\t\tCell: a"));
         t.put("Typography", new Template(HEADER + "\tText: Hola\n\t\tTypography:\n\t\t\t{}"));
-        // Position is only of a styled run: in the Typography of the rule that a run takes.
-        t.put("Typography > Position", new Template(HEADER + "\t\tFor style: sup\n\t\t\tTypography:\n\t\t\t\t{}\n"
+        // Text position is only of a styled run: in the Typography of the rule that a run takes.
+        t.put("Typography > Text position", new Template(HEADER + "\t\tFor style: sup\n\t\t\tTypography:\n\t\t\t\t{}\n"
                 + "\tText: m[2]{sup}\n\t\tTypography:\n\t\t\tMarkup: markdown"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
         // Readable text is only of a barcode of one row.
         t.put("Barcode > Readable text", new Template(HEADER + "\tBarcode: STXT-1\n\t\tAlt: Referencia\n"
                 + "\t\tBarcode format: code-128\n\t\t{}", Set.of("Barcode format")));
         // Below side boxes needs a side box before the element: the template of each element, with one in front.
-        String side = "\tImage: test/square.png\n\t\tSide: left\n";
+        String side = "\tImage: test/square.png\n\t\tSide box: left\n";
         for (String element : List.of("Block", "Text", "Paragraph", "Heading 1", "Heading 2", "Heading 3", "Heading 4",
                 "Heading 5", "Heading 6", "Markdown", "Image", "Barcode", "Figure")) {
             Template base = t.get(element);

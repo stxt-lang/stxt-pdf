@@ -5,14 +5,13 @@ un `Caption`, el pie, que va debajo del contenido o, en una tabla, encima. El mo
 escribe el número delante del pie («1 Esquema de conexión», o «Figura 1. Esquema de conexión» con `Number label`), lo da
 con `{number of: id}` y la lista en un `Table of contents` con `Entries: figures` o `Entries: tables`
 ([Table of contents](table-of-contents.md#qué-lista-of)). Admite `Id`, `Style`, `Box`, `Typography`, `Break`,
-`In table of contents`, `Side` y `Below side boxes`, y las propiedades de abajo. No admite `Link`: el enlace va en el elemento de
+`In table of contents`, `Side box` y `Below side boxes`, y las propiedades de abajo. No admite `Link`: el enlace va en el elemento de
 dentro.
 
 ```
 Styles:
     For element: Figure
-        Typography:
-            Number label: Figura {number}.
+        Number label: Figura {number}.
         Box:
             Margin: 8 0 12 0
     For element: Caption
@@ -41,7 +40,7 @@ Paragraph: Los cables se conectan como muestra la figura {number of: wiring}.
 `Caption position`, `Figure counter` e `In table of contents` también pueden venir de una regla de `Styles`
 ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `Alt`, no.
 
-`Numbered`, `Number format` y `Number label` son de `Typography` y valen también para las figuras ([numeración](#numeración)).
+`Numbered`, `Number format` y `Number label` son los de los encabezados y valen también para las figuras ([numeración](#numeración)).
 
 ## El pie (`Caption`)
 
@@ -62,9 +61,8 @@ El `Caption` es un texto, en el valor (una línea) o en un bloque `Content >>`, 
 
 ## Numeración
 
-Una `Figure` **lleva número por defecto**: una figura con pie casi siempre lo lleva. Lo quita `Numbered: false` declarado
-en su `Typography` o en una regla que le llegue (`For element: Figure`, `For style` o `For id`); lo que hereda de una caja
-de fuera no cuenta, así que un documento con `Numbered: false` en `For element: Document` sigue numerando sus figuras.
+Una `Figure` **lleva número por defecto**: una figura con pie casi siempre lo lleva. Lo quita `Numbered: false`, propio
+o de una regla que le llegue (`For element: Figure`, `For style` o `For id`).
 Una figura sin número no cuenta: la siguiente sigue el contador.
 
 - **Dos contadores.** Las figuras y las tablas se numeran aparte: `Figure counter: figures` o `tables`. Sin declararlo,
@@ -73,7 +71,7 @@ Una figura sin número no cuenta: la siguiente sigue el contador.
   ([abajo](#por-capítulo-figure-numbering)).
 - **El formato y la etiqueta.** `Number format` escribe el número en cifras, letras o romanos, y `Number label` pone lo
   que va delante del pie, con `{number}` donde va el número: `Number label: Figura {number}.` da «Figura 3. Esquema».
-  Son de `Typography`, se heredan y se dan en `For element: Figure` (o en una regla de las tablas, con `For style`). Sin
+  Se dan en la figura o en `For element: Figure` (o en una regla de las tablas, con `For style`). Sin
   `Number label`, el pie empieza por el número y un espacio, como un encabezado.
 - **Se puede referir.** `{number of: id}` de una figura numerada da su número, sin la etiqueta y con el del capítulo
   si lo lleva: «la figura {number of: wiring}» escribe «la figura 3», o «la figura 2.3»
@@ -82,11 +80,9 @@ Una figura sin número no cuenta: la siguiente sigue el contador.
 ```
 Styles:
     For element: Figure
-        Typography:
-            Number label: Figura {number}.
+        Number label: Figura {number}.
     For style: table
-        Typography:
-            Number label: Tabla {number}.
+        Number label: Tabla {number}.
 Figure:
     Caption: Vista frontal                # «Figura 1. Vista frontal»
     Image: examples/manual/es/thermostat.svg
@@ -102,10 +98,9 @@ Figure:
                 Cell: Fase
 ```
 
-> **Decisión:** la figura va numerada por defecto, y solo el `Numbered: false` declarado en ella o en una regla suya la
-> deja sin número; lo heredado no cuenta. `Numbered` se hereda para que una regla numere todos los encabezados de un
-> nivel, y ese mismo valor heredado (falso casi siempre) dejaría sin número todas las figuras. *Alternativa descartada:*
-> `Numbered` heredado como en los encabezados, que obliga a declararlo en cada documento con figuras.
+> **Decisión:** la figura va numerada por defecto, y `Numbered: false` la deja sin número: una figura con pie casi
+> siempre lo lleva. *Alternativa descartada:* falso por defecto, como en los encabezados, que obliga a declararlo en
+> cada documento con figuras.
 
 > **Decisión:** sin `Number label`, el pie empieza por el número a secas, como el título de un encabezado, y la etiqueta
 > («Figura», «Figure», «Tabla») se declara una vez en `For element: Figure`. *Alternativa descartada:* una etiqueta por
@@ -124,11 +119,9 @@ figura del capítulo 2.
 ```
 Styles:
     For element: Heading 1
-        Typography:
-            Numbered: true
+        Numbered: true
     For element: Figure
-        Typography:
-            Number label: Figura {number}.
+        Number label: Figura {number}.
 Section:
     Figure numbering: chapter
     Heading 1:
@@ -172,7 +165,7 @@ Section:
 > por capítulo a esos documentos.
 
 > **Decisión:** `Figure numbering` es de la `Section`, como `Page numbering` y `Footnote numbering`, y vale para las
-> figuras y las tablas a la vez. *Alternativa descartada:* una propiedad de `Typography`, heredada como `Numbered`, que
+> figuras y las tablas a la vez. *Alternativa descartada:* una propiedad de cada `Figure`, como `Numbered`, que
 > permite mezclar en un documento figuras por capítulo y seguidas, sin uso.
 
 ## El contenido
@@ -199,9 +192,9 @@ lo demás: `Before`, `After`, `Keep with next`...
 ## Dónde va
 
 Donde va un elemento en flujo, también como elemento de un `Item` o un `Area`, pero no dentro de un `Page overlay`, que
-se repite en cada página, ni dentro de una `Footnote`. Con `Side` es una caja lateral, como un `Block`: necesita `Width` o
-`Max width` (`SIDE_WITHOUT_WIDTH`) y el texto que la sigue corre a su lado, pie incluido
-([Block](block.md#cajas-laterales-side)). `Below side boxes` la baja por debajo de las cajas laterales anteriores. Una `Figure` no
+se repite en cada página, ni dentro de una `Footnote`. Con `Side box` es una caja lateral, como un `Block`: necesita `Width` o
+`Max width` (`SIDE_BOX_WITHOUT_WIDTH`) y el texto que la sigue corre a su lado, pie incluido
+([Block](block.md#cajas-laterales-side-box)). `Below side boxes` la baja por debajo de las cajas laterales anteriores. Una `Figure` no
 corre al lado de una caja lateral: va debajo de ella, como una tabla.
 
 ## Índices
@@ -223,7 +216,7 @@ ella ([Referencias](../common/references.md), [Enlaces](../common/links.md)).
 | `FIGURE_CONTENT` | Una `Figure` sin exactamente un elemento además de su `Caption` |
 | `FIGURE_WITHOUT_ALT` | La `Image` o el `Barcode` de una `Figure` sin `Alt`, o una `Figure` con un `Block` sin `Alt` propio |
 | `FIGURE_PROPERTY_WITHOUT_EFFECT` | `Alt` en una `Figure` con una imagen (el `Alt` va en la imagen) o con una `Table` (se lee sola) |
-| `SIDE_WITHOUT_WIDTH` | Una `Figure` con `Side` sin `Width` ni `Max width` |
+| `SIDE_BOX_WITHOUT_WIDTH` | Una `Figure` con `Side box` sin `Width` ni `Max width` |
 | `REFERENCE_NOT_NUMBERED` | `{number of: id}` de una `Figure` con `Numbered: false` |
 
 ## Accesibilidad

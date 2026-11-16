@@ -24,7 +24,7 @@ En el schema:
 - `Content`, `BLOCK`, y `Area map`, `TEXT`;
 - los interruptores (como `Isolate margins`, `Wrap items`, `Row header`, `In table of contents`, `Merge borders` o `Hyphenate`),
   `BOOLEAN`;
-- los enteros (como `Layer`, `Widows`, `Orphans`, `First number`, `Number`, `Column count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
+- los enteros (como `Layer`, `Widows`, `Orphans`, `First number`, `Item number`, `Column count`, `Weight`, `Drop cap` o `Quiet zone`), `INTEGER`,
   y `Rotate`, `NUMBER`;
 - las de valores cerrados (como `Fit`, `Leader`, `Pages` o `Paper`), `ENUM`;
 - el resto, `INLINE` sin hijos cuya forma comprueba `ValueReader`.
@@ -93,7 +93,7 @@ anidado fuera de su contexto, también para los tramos (`runStyle` recibe los an
 Dentro de qué cajas se construye cada contenido (un `Page overlay`, un encabezado, un `Columns`, un `Markdown`, una
 `Footnote` o una caja que no se parte) lo dice `BuildContext.Scope`, un `record` que solo cambia mientras se construye el
 contenido de una caja (`BuildContext.within`) y que se recupera después. Por qué una caja no se parte entre páginas lo dice
-una sola clasificación, `Style.unsplittable()` (el giro, `Overflow: clip`, `Side` o la posición, en ese orden): la usan
+una sola clasificación, `Style.unsplittable()` (el giro, `Overflow: clip`, `Side box` o la posición, en ese orden): la usan
 `ModelValidator`, para rechazar `Keep together` y `Edges` en ella, y el `Scope`, para nombrarla en
 `BREAK_IN_UNBREAKABLE`.
 
@@ -158,7 +158,7 @@ inmutable, los que están en flujo se calculan una vez y escribir en una caja o 
 ## Las secciones y la raíz
 
 `BoxTreeBuilder.Result` da la raíz del documento y la lista de `Section` (`tree/Section`: caja, `PageSetup`, `Page numbering`,
-`Page number format`, `First number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` y el área de
+`Page number format`, `First page number`, `Inherit page overlays`, `Begin on`, `Footnote numbering`, `Footnote number format`, `Figure numbering` y el área de
 notas, `footnotes()`). La **caja de cada sección es hija de la raíz del documento** (`Element.SECTION`, añadida tras los
 `Page overlay` del documento para que estos la precedan en el recorrido en preorden) y es la **raíz de su layout**
 (`Box.isLayoutRoot()`): los recorridos de todo el árbol (referencias, enlaces, índices, fuentes, imágenes, `Id`, estructura PDF)
@@ -187,8 +187,8 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
 (`Box.runStyle`) para los errores que salen después con la línea de la regla: `FONT_UNKNOWN` en `PdfMetrics` y
 `CONTRAST_LOW` en `ContrastCheck`. Fuera de `tree` nadie mira el nombre: `TextFormat.face`, `color`, `letterSpacing`,
 `textCase` y `smallCaps` dan el valor del tramo o, si su estilo no lo declara, el de la caja que se les pasa.
-`Position` solo existe en ese `Style` (`Style.ofRun`, el único con `isRun()`): `PropertyReader.position` lo rechaza en
-el de una caja (`POSITION_OUTSIDE_RUN`), y por eso la lectura de comprobación de una regla `For style` usa también un
+`Text position` solo existe en ese `Style` (`Style.ofRun`, el único con `isRun()`): `PropertyReader.position` lo rechaza en
+el de una caja (`TEXT_POSITION_OUTSIDE_RUN`), y por eso la lectura de comprobación de una regla `For style` usa también un
 `Style.ofRun`. `RunStyle.position` es el `model.TextPosition` del tramo, y `TextFormat.superscript()` y `subscript()` lo
 leen.
 

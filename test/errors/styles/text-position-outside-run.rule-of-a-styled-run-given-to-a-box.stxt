@@ -1,5 +1,5 @@
-# Case: A For style rule with Position, which a styled run takes, is given to a Text with Style
-# Code: POSITION_OUTSIDE_RUN
+# Case: A For style rule with Text position, which a styled run takes, is given to a Text with Style
+# Code: TEXT_POSITION_OUTSIDE_RUN
 # Line: 18
 Document (dev.stxt.pdf):
 	Language: es
@@ -15,7 +15,7 @@ Document (dev.stxt.pdf):
 				Markup: markdown
 		For style: sub
 			Typography:
-				Position: subscript
+				Text position: subscript
 	Section:
 		Text: CO[2]{sub}
 		Text: 2

@@ -1,8 +1,8 @@
 # Heading numbering (reference/components/heading.md). Page area of 260 × 260 from (20, 20);
 # with FixedMetrics, each character measures 5 pt at Size: 10 and each line, 12.
 #
-# For element: Document enables Numbered on all the headings and For element: Heading 3 removes it at
-# level 3. cover (Numbered: false) is neither numbered nor counted, and In table of contents: false keeps it out of
+# For element: Heading 1 and For element: Heading 2 enable Numbered on those levels; level 3 does not declare
+# it. cover (Numbered: false) is neither numbered nor counted, and In table of contents: false keeps it out of
 # the table of contents. The numbers come out as: intro is 1, method 1.1, data 1.2, fine has none (level 3) and
 # results is 2.
 #
@@ -26,17 +26,16 @@ Document (dev.stxt.pdf):
 			Typography:
 				Font: IBM Plex Sans
 				Size: 10
-				Numbered: true
-		For element: Heading 3
-			Typography:
-				Numbered: false
+		For element: Heading 1
+			Numbered: true
+		For element: Heading 2
+			Numbered: true
 	Section:
 		Heading 1:
 			Id: cover
 			In table of contents: false
 			Text: Portada
-			Typography:
-				Numbered: false
+			Numbered: false
 		Table of contents:
 			Id: toc
 			Levels: 1 2

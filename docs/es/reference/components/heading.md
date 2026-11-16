@@ -69,21 +69,21 @@ marcador, contando en la jerarquía y siendo destino de `#id`. Es lo normal para
 
 ## Numeración (`Numbered`)
 
-Con `Numbered: true` el encabezado lleva número: `1`, `1.1`, `1.1.1`. Como ningún estilo es implícito, se declara. Es una
-propiedad de `Typography`, así que **se hereda** y se escribe donde convenga: en `For element: Document` numera todos los
-niveles, en una regla `For element: Heading 1` solo los de ese nivel, en una regla `For style` los de un estilo, y en la
-`Typography` de un encabezado, solo en él (`Numbered: false` lo deja sin número).
+Con `Numbered: true` el encabezado lleva número: `1`, `1.1`, `1.1.1`. Como ningún estilo es implícito, se declara: en una
+regla `For element: Heading 1` para los de ese nivel, en una regla `For style` para los de un estilo, y en un encabezado,
+solo para él (`Numbered: false` lo deja sin número). Es una propiedad del encabezado y **no se hereda**: cada nivel que
+se numera lo declara.
 
 ```
 Styles:
-    For element: Document
-        Typography:
-            Numbered: true
+    For element: Heading 1
+        Numbered: true
+    For element: Heading 2
+        Numbered: true
 Heading 1:
     Id: portada
     Text: Informe del trimestre
-    Typography:
-        Numbered: false
+    Numbered: false
 Heading 1:
     Text: Resultados            # «1 Resultados»
 Heading 2:
@@ -109,8 +109,8 @@ Paragraph: Los datos de la sección {number of: ventas} lo confirman.
 
 ### Formato y etiqueta (`Number format`, `Number label`)
 
-Dos propiedades de `Typography`, que se heredan y se dan como `Numbered`: en `For element: Heading N` para un nivel o en
-`For style` para unos encabezados.
+Dos propiedades del encabezado, que se dan como `Numbered`: en `For element: Heading N` para un nivel o en `For style`
+para unos encabezados.
 
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
@@ -126,10 +126,9 @@ reinicia los contadores de debajo: un `Heading 1` «Anexos» y sus `Heading 2` c
 ```
 Styles:
     For style: annex
-        Typography:
-            Numbered: true
-            Number format: upper-alpha
-            Number label: Anexo {number}.
+        Numbered: true
+        Number format: upper-alpha
+        Number label: Anexo {number}.
 Heading 1:
     Text: Anexos
 Heading 2:
@@ -139,9 +138,12 @@ Heading 2:
 Paragraph: Los importes del anexo {number of: fees}.
 ```
 
-> **Decisión:** `Numbered`, `Number format` y `Number label` van en `Typography` para poder darlos en una regla y
-> heredarlos. El formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativa descartada:* una
-> plantilla con el número de cada nivel por separado (`{1}.{2}`), más difícil de escribir y de leer.
+> **Decisión:** `Numbered`, `Number format` y `Number label` son propiedades del encabezado (y de la `Figure`), que se
+> dan en el elemento o en una regla, y no se heredan: numerar es estructura y no aspecto del texto, y cada nivel que se
+> numera lo dice. El formato es del nivel de cada encabezado y la etiqueta, de todo el número. *Alternativas
+> descartadas:* en `Typography` y heredadas, que numeraba los seis niveles desde `For element: Document` y obligaba a
+> una excepción para las figuras; y una plantilla con el número de cada nivel por separado (`{1}.{2}`), más difícil de
+> escribir y de leer.
 
 > **Decisión:** los romanos pasados de 3999 se escriben con más `M` (4000 es `MMMM`), en lugar de un error que no se
 > daría nunca en un documento real. *Alternativa descartada:* volver a cifras, como hacen otros motores, que mezcla

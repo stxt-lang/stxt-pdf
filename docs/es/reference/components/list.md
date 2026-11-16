@@ -16,7 +16,7 @@ List:
     List item:
         Paragraph: Primer punto
     List item:
-        Number: 10
+        Item number: 10
         Paragraph: Segundo punto
         List:
             Marker: bullet
@@ -30,9 +30,9 @@ List:
 | `Marker suffix` | `period`, `parenthesis` | `period` | `List` | Lo que sigue al número en una numeración: un punto (`1.`, `a.`) o un paréntesis de cierre (`1)`, `a)`). Solo en las numeraciones. |
 | `Marker image` | ruta relativa a `images/` | sin valor | `List`, `List item` | La imagen del marcador con `Marker: image` ([Marcadores con imagen](#marcadores-con-imagen)): la de la lista vale para todos sus ítems, y la de un ítem la sustituye. Admite `Alt` y `Height`. |
 | `First number` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
-| `Number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
+| `Item number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
 
-`Marker`, `Marker suffix` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number` y `Number`, no. Sin `Marker`, propio
+`Marker`, `Marker suffix` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number` y `Item number`, no. Sin `Marker`, propio
 o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems es el `Padding` izquierdo de la `List`.
 
 > **Decisión:** un único elemento `List` con `Marker` obligatorio, que no se hereda: cada lista anidada declara el suyo o
@@ -114,7 +114,7 @@ List:
 - Un `Marker image` en una lista, o en un ítem de una lista, cuyo `Marker` no es `image` es un error
   (`LIST_IMAGE_NOT_ALLOWED`), en la línea del `Marker image`. Un ítem de una lista con `Marker: image` que no tiene imagen,
   ni propia ni de la lista, también (`LIST_IMAGE_MISSING`), en la línea del ítem.
-- `First number` y `Number` no tienen efecto (`LIST_NUMBER_NOT_ALLOWED`), y `{number of: id}` no vale para sus ítems: una lista con
+- `First number` y `Item number` no tienen efecto (`LIST_NUMBER_NOT_ALLOWED`), y `{number of: id}` no vale para sus ítems: una lista con
   imágenes no numera.
 - Los errores del fichero son los de una `Image` (`IMAGE_UNKNOWN`, `IMAGE_FORMAT`, `IMAGE_TOO_LARGE`, `SVG_TOO_COMPLEX`), con
   la línea del `Marker image`. Un `Alt` vacío es `VALUE_NOT_ALLOWED`, y un `Height` que no es una longitud positiva, también.
@@ -135,8 +135,8 @@ List:
 ## Numeración
 
 El primer ítem lleva el número `First number` (1 si no se declara). Cada uno lleva el siguiente al anterior, salvo el que fija el suyo
-con `Number`, desde el que continúan los demás. Las letras siguen tras la `z` con dos letras (`aa`, `ab`). `decimal`
-escribe desde 0, y las letras y los romanos, desde 1. Los romanos llegan hasta 3999 (`LIST_NUMBER_RANGE`). `First number` y `Number`
+con `Item number`, desde el que continúan los demás. Las letras siguen tras la `z` con dos letras (`aa`, `ab`). `decimal`
+escribe desde 0, y las letras y los romanos, desde 1. Los romanos llegan hasta 3999 (`LIST_NUMBER_RANGE`). `First number` y `Item number`
 solo tienen efecto en las numeraciones (`LIST_NUMBER_NOT_ALLOWED`). Cada lista numera sus ítems, y una lista anidada empieza
 de nuevo. El número de un ítem se puede referir con `{number of: id}` ([Referencias](../common/references.md#number-of-id)).
 

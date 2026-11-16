@@ -88,9 +88,9 @@ class RunningHeadsTest {
     void aNumberedHeadingIsWrittenWithItsNumber() {
         LayoutFixture l = layOutPaged(PAGE, concat(
                 header("{heading 1}"),
-                new String[]{"\tHeading 1:", "\t\tTypography:", "\t\t\tNumbered: true", "\t\tText: Uno"},
+                new String[]{"\tHeading 1:", "\t\tNumbered: true", "\t\tText: Uno"},
                 block(88),
-                new String[]{"\tHeading 1:", "\t\tTypography:", "\t\t\tNumbered: true", "\t\tText: Dos"}));
+                new String[]{"\tHeading 1:", "\t\tNumbered: true", "\t\tText: Dos"}));
         assertEquals("1 Uno", text(l, 1, "head-text"));
         assertEquals("2 Dos", text(l, 2, "head-text"));
     }

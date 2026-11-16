@@ -81,7 +81,7 @@ class DropCapLayoutTest {
         // A page area of 100: a spacer of 40 and a side box of 60. The paragraph has 5 lines beside it, the first
         // two beside its drop cap too; the rest is broken again on the next page at the whole width, 20 words a line.
         LayoutFixture l = layOutPaged(180, "\tBlock:", "\t\tBox:", "\t\t\tHeight: 40",
-                "\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
+                "\tImage: test/square.png", "\t\tSide box: left", "\t\tBox:", "\t\t\tWidth: 60",
                 "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(150), "\t\tId: P", "\t\tDrop cap: 2");
         assertEquals(2, l.pages());
@@ -96,7 +96,7 @@ class DropCapLayoutTest {
 
     @Test
     void theDropCapGoesAfterASideBox() {
-        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tSide: left", "\t\tBox:", "\t\t\tWidth: 60",
+        LayoutFixture l = layOut("\tImage: test/square.png", "\t\tSide box: left", "\t\tBox:", "\t\t\tWidth: 60",
                 "\t\t\tHeight: 60", "\t\t\tMargin: 0 10 0 0",
                 "\tParagraph: " + words(60), "\t\tId: P", "\t\tDrop cap: 2");
         List<TextLine> lines = l.fragment("P").lines();

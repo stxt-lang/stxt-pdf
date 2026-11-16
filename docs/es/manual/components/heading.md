@@ -16,24 +16,24 @@ Document (dev.stxt.pdf):
                 Font: IBM Plex Sans
                 Size: 10
         For element: Heading 1
+            Numbered: false
             Typography:
                 Size: 20
                 Bold: true
-                Numbered: false
             Box:
                 Margin: 0 0 16 0
         For element: Heading 2
+            Numbered: true
             Typography:
                 Size: 14
                 Bold: true
-                Numbered: true
             Box:
                 Margin: 16 0 8 0
         For element: Heading 3
+            Numbered: true
             Typography:
                 Size: 11
                 Bold: true
-                Numbered: true
             Box:
                 Margin: 10 0 6 0
     Section:
@@ -71,15 +71,15 @@ pantalla tienen siempre un árbol correcto.
 
 ## Numeración (`Numbered`)
 
-Con `Numbered: true` (de `Typography`, se hereda) un encabezado lleva número: `1`, `1.1`, `1.1.1`. Se declara por nivel en
-una regla, en todo el documento o en un encabezado concreto.
+Con `Numbered: true` un encabezado lleva número: `1`, `1.1`, `1.1.1`. Se declara por nivel, en una regla
+`For element: Heading N`, o en un encabezado concreto; no se hereda.
 
 - Cada nivel cuenta en orden del documento, también a través de las secciones, y vuelve a empezar con cada encabezado de un
   nivel superior.
 - Un nivel sin número no aporta al número de los de debajo: con el título sin número, los `Heading 2` son `1`, `2`, `3`.
 - El número se escribe delante del texto, con un espacio, y sale también en el índice y en los marcadores.
 - `{number of: id}` escribe el número de un encabezado numerado: «la sección {number of: wiring}» da «la sección 2».
-- `Number format` (también de `Typography`) escribe el número de un nivel en letras o en romanos: `decimal` (por
+- `Number format` escribe el número de un nivel en letras o en romanos: `decimal` (por
   defecto), `lower-alpha`, `upper-alpha`, `lower-roman` o `upper-roman`. Cada nivel usa el suyo: capítulos en romanos y
   apartados en cifras dan `II.1`.
 - `Number label` cambia lo que va delante del título: `Number label: Anexo {number}.` escribe «Anexo A. Honorarios». El
@@ -89,10 +89,9 @@ una regla, en todo el documento o en un encabezado concreto.
 ```
 Styles:
     For style: annex
-        Typography:
-            Numbered: true
-            Number format: upper-alpha
-            Number label: Anexo {number}.
+        Numbered: true
+        Number format: upper-alpha
+        Number label: Anexo {number}.
 Heading 1:
     Text: Anexos
 Heading 2:
