@@ -5,11 +5,18 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.19.0] - 2026-11-16
 
-Names of the `dev.stxt.pdf` namespace changed in the review before 1.0, and the numbering of headings and figures taken
-out of `Typography`. **From 0.18.1**, a document that uses any of them has to be rewritten: the old names are not
-accepted. The Java API changes where it follows those names.
+The vocabulary of `dev.stxt.pdf` reviewed before 1.0: names that say what they are when they stand alone in a rule,
+the numbering of headings and figures taken out of `Typography`, and the descriptions of the schema read against the
+reference. **From 0.18.1**: `Side` is `Side box`, `Position` is `Text position`, `First number` of a `Section` is
+`First page number`, `Number` of a `List item` is `Item number`, `Fit` is `Image fit` and `Levels` is
+`Heading levels`, with their error codes; `Numbered`, `Number format` and `Number label` are declared in the heading or
+in the `Figure`, not in its `Typography`; none of the old names has an alias. In the Java API, `Style.sideBox()`,
+`Section.firstPageNumber()`, the `numbered()`, `numberFormat()` and `numberLabel()` of `Style` instead of those of
+`TypographyStyle`, and the constants `SIDE_BOX`, `ITEM_NUMBER` and `HEADING_LEVELS` of `PropertyKey`. A document
+written for 0.18.1 has to be changed, and once changed it is laid out the same. The names of the `dev.stxt.pdf`
+namespace and the Java API may still change before 1.0.
 
 ### Changed
 
