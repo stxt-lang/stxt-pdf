@@ -18,7 +18,7 @@ class SidesTest {
 
     @Test
     void verticalPercentagesUseTheWidth() {
-        // Module 1: the percentages of margin and padding, vertical ones too, use the width.
+        // The percentages of margin and padding, vertical ones too, use the width.
         Insets i = Insets.resolve(Sides.shorthand(ValueParser.list("10% auto")), 200);
         assertEquals(new Insets(20, 0, 20, 0), i);
     }

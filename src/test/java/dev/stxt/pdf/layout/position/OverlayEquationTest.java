@@ -18,7 +18,7 @@ class OverlayEquationTest {
     }
 
     @Test
-    void module4ExerciseAnchoredRight() {
+    void anchoredRightSolvesTheStart() {
         OverlayEquation.Solution s = OverlayEquation.horizontal(AUTO, v(180), v(0), AUTO, AUTO, 400, 20, CONTENT);
         assertEquals(220, s.start(), 1e-9);
     }

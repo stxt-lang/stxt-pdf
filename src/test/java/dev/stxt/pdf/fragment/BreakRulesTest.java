@@ -15,7 +15,7 @@ import dev.stxt.pdf.tree.StyleEditor;
 class BreakRulesTest {
 
     @Test
-    void module8Exercise() {
+    void paragraphOverThreePages() {
         // Page area 762, line height 15, paragraph of 53 lines that starts at y = 720.
         int capacity1 = BreakRules.capacity(762 - 720, 15);
         assertEquals(2, capacity1);

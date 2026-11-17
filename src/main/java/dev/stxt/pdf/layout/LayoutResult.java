@@ -9,7 +9,7 @@ import dev.stxt.pdf.tree.Box;
 import java.util.List;
 
 /**
- * Immutable output of the layout of a box (modules 7 and 8).
+ * Immutable output of the layout of a box.
  *
  * @param fragment    the fragment produced in this fragmentainer
  * @param breakToken  where it was broken; {@code null} if the box has finished and

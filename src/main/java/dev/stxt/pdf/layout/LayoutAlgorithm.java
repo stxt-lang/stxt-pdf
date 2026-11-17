@@ -4,7 +4,7 @@ import dev.stxt.pdf.fragment.BreakToken;
 import dev.stxt.pdf.tree.Box;
 
 /**
- * Common interface of the layout algorithms: block, line, stack and grid (modules 7 and 8).
+ * Common interface of the layout algorithms: block, line, stack and grid.
  */
 public interface LayoutAlgorithm {
 

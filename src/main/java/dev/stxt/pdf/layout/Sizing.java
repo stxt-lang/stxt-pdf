@@ -7,7 +7,7 @@ import dev.stxt.pdf.model.Value;
 import java.util.OptionalDouble;
 
 /**
- * Common sizing rules (modules 1 and 7, reference/common/box.md).
+ * Common sizing rules (reference/common/box.md).
  */
 public final class Sizing {
 

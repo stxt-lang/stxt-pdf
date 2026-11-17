@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 /**
- * Immutable input of the layout of a box (modules 7 and 8). Being a {@code record}, it serves as
+ * Immutable input of the layout of a box. Being a {@code record}, it serves as
  * part of the key of {@link LayoutCache}.
  *
  * @param availableWidth          available width; always known

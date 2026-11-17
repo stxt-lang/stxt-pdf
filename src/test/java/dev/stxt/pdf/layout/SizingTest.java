@@ -15,13 +15,13 @@ class SizingTest {
 
     @Test
     void minWinsOverMax() {
-        // Module 7: Width 50 % of 515 = 257.5; Max 250; Min 300 → 300.
+        // Width 50 % of 515 = 257.5; Max 250; Min 300 → 300.
         assertEquals(300, Sizing.constrain(257.5, 300, OptionalDouble.of(250)), 1e-9);
         assertEquals(250, Sizing.constrain(257.5, 0, OptionalDouble.of(250)), 1e-9);
     }
 
     @Test
-    void module1Box() {
+    void autoWidthInFlowSubtractsTheMargins() {
         // 515 of reference container, margin 20 → border box 475; content 451.
         double border = Sizing.autoWidthInFlow(515, Insets.all(20));
         assertEquals(475, border, 1e-9);
@@ -29,7 +29,7 @@ class SizingTest {
     }
 
     @Test
-    void module1Exercise() {
+    void percentageWidthIsTheBorderBox() {
         // Width 50 % (border-box), padding 10 20, border 1 → content 215.5.
         double border = new Value.Percentage(50).resolve(515).getAsDouble();
         assertEquals(215.5, border - 2 - 40, 1e-9);
@@ -37,7 +37,7 @@ class SizingTest {
 
     @Test
     void autoMarginsCenter() {
-        // Module 2: C of 200 pt in 515 → 157.5 on each side.
+        // C of 200 pt in 515 → 157.5 on each side.
         assertArrayEquals(new double[]{157.5, 157.5},
                 Sizing.horizontalMargins(515, 200, Value.AUTO, Value.AUTO), 1e-9);
     }

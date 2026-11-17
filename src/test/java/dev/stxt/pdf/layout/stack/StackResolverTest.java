@@ -11,7 +11,7 @@ class StackResolverTest {
     private static final double AVAILABLE = 515 - 2 * 20; // container 515, two gaps of 20
 
     @Test
-    void module5Growth() {
+    void growthProportionalToGrow() {
         double[] r = StackResolver.resolve(List.of(
                 StackItem.of(100, 1, 1, 60),
                 StackItem.of(150, 2, 1, 80),
@@ -29,7 +29,7 @@ class StackResolverTest {
     }
 
     @Test
-    void zeroBasisExercise() {
+    void zeroBasisSplitsByGrow() {
         double[] r = StackResolver.resolve(List.of(
                 StackItem.of(0, 1, 1, 0),
                 StackItem.of(0, 1, 1, 0),

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class MarginStrutTest {
 
     @Test
-    void module2Cases() {
+    void positiveAndNegativeMargins() {
         assertEquals(30, MarginStrut.collapse(20, 30), 1e-9);
         assertEquals(15, MarginStrut.collapse(20, -5), 1e-9);
         assertEquals(-10, MarginStrut.collapse(-10, -4), 1e-9);

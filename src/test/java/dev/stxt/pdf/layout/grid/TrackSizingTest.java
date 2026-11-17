@@ -126,7 +126,7 @@ class TrackSizingTest {
     }
 
     @Test
-    void module6Exercise() {
+    void autoTrackAndTwoFractions() {
         List<Track> t = ValueParser.list("auto * *").stream().map(Track::of).toList();
         List<ItemContribution> items = List.of(
                 new ItemContribution(0, 1, 60, 100),
