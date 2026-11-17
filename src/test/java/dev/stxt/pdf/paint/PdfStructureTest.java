@@ -390,6 +390,59 @@ class PdfStructureTest {
         }
     }
 
+    // The markers the engine draws (reference/components/list.md): the drawing is the content of the Lbl of its item,
+    // which is read as the character that stands for it.
+
+    private static final String DRAWN_MARKERS = Docs.header(300, 300, 20) + Docs.TYPOGRAPHY
+            + "\t\tFor element: List\n\t\t\tBox:\n\t\t\t\tPadding: 0 0 0 20\n"
+            + "\tList:\n\t\tMarker: checkbox\n"
+            + "\t\tList item:\n\t\t\tChecked: true\n\t\t\tText: Robo\n"
+            + "\t\tList item:\n\t\t\tText: Lunas\n"
+            + "\tList:\n\t\tMarker: circle\n\t\tList item:\n\t\t\tText: Uno\n"
+            + "\tList:\n\t\tMarker: square\n\t\tList item:\n\t\t\tText: Dos\n";
+
+    private static String listNumbering(PDDocument pdf, int list) {
+        PDStructureElement e = (PDStructureElement) section(pdf).getKids().get(list);
+        return ((PDListAttributeObject) e.getAttributes().getObject(0)).getListNumbering();
+    }
+
+    private static PDStructureElement label(PDDocument pdf, int list, int item) {
+        PDStructureElement e = (PDStructureElement) section(pdf).getKids().get(list);
+        PDStructureElement li = (PDStructureElement) e.getKids().get(item);
+        assertEquals(List.of("Lbl", "LBody"), kids(li));
+        return (PDStructureElement) li.getKids().get(0);
+    }
+
+    @Test
+    void aDrawnMarkerIsTheContentOfItsLabelAndIsReadAsItsCharacter() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DRAWN_MARKERS, 1))) {
+            assertEquals("☑", label(pdf, 0, 0).getActualText());
+            assertEquals("☐", label(pdf, 0, 1).getActualText());
+            assertEquals("◦", label(pdf, 1, 0).getActualText());
+            assertEquals("▪", label(pdf, 2, 0).getActualText());
+            // The drawing is marked content of its label, not an artifact.
+            for (PDStructureElement label : List.of(label(pdf, 0, 0), label(pdf, 0, 1), label(pdf, 1, 0),
+                    label(pdf, 2, 0))) {
+                assertEquals(1, label.getKids().size());
+            }
+            assertEquals(PDListAttributeObject.LIST_NUMBERING_NONE, listNumbering(pdf, 0));
+            assertEquals(PDListAttributeObject.LIST_NUMBERING_CIRCLE, listNumbering(pdf, 1));
+            assertEquals(PDListAttributeObject.LIST_NUMBERING_SQUARE, listNumbering(pdf, 2));
+        }
+    }
+
+    /** The drawn markers pass PDF/UA-1 and PDF/UA-2; a list of checkboxes is {@code Unordered} with the second. */
+    @Test
+    void drawnMarkersPassPdfUa1AndPdfUa2() throws Exception {
+        assertEquals(Map.of(), PdfUa.failedRules(Pdfs.of(DRAWN_MARKERS, 1), 1));
+        byte[] ua2 = Pdfs.of(DRAWN_MARKERS, 2);
+        assertEquals(Map.of(), PdfUa.failedRules(ua2, 2));
+        try (PDDocument pdf = Loader.loadPDF(ua2)) {
+            assertEquals("Unordered", listNumbering(pdf, 0));
+            assertEquals(PDListAttributeObject.LIST_NUMBERING_CIRCLE, listNumbering(pdf, 1));
+        }
+    }
+
     // The footnotes (reference/components/footnote.md): the note after the paragraph that calls it, as a Note
     // (PDF/UA-1) or FENote (PDF/UA-2) with its label, and the call as a Reference.
 

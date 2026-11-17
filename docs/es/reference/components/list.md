@@ -26,13 +26,14 @@ List:
 
 | Propiedad | Valores | Por defecto | Elementos | Notas |
 |---|---|---|---|---|
-| `Marker` | `bullet`, `dash`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | obligatorio | `List` | Marcador de los ítems: `•`, `–`, ninguno, una imagen, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker` | `bullet`, `dash`, `circle`, `square`, `checkbox`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | obligatorio | `List` | Marcador de los ítems: `•`, `–`, un círculo hueco, un cuadrado relleno, una casilla, ninguno, una imagen, o una numeración (`1.`, `a.`, `A.`, `i.`, `I.`). |
 | `Marker suffix` | `period`, `parenthesis` | `period` | `List` | Lo que sigue al número en una numeración: un punto (`1.`, `a.`) o un paréntesis de cierre (`1)`, `a)`). Solo en las numeraciones. |
 | `Marker image` | ruta relativa a `images/` | sin valor | `List`, `List item` | La imagen del marcador con `Marker: image` ([Marcadores con imagen](#marcadores-con-imagen)): la de la lista vale para todos sus ítems, y la de un ítem la sustituye. Admite `Alt` y `Height`. |
 | `First number` | entero | `1` | `List` | Número del primer ítem. Solo en las numeraciones. |
 | `Item number` | entero | sin valor | `List item` | Número de este ítem. Los siguientes continúan desde él. Solo en las numeraciones. |
+| `Checked` | `true`, `false` | `false` | `List item` | Si la casilla de este ítem está marcada ([Marcadores dibujados](#marcadores-dibujados)). Solo con `Marker: checkbox`. |
 
-`Marker`, `Marker suffix` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number` y `Item number`, no. Sin `Marker`, propio
+`Marker`, `Marker suffix` y `Marker image` también pueden venir de una regla de `Styles` ([Propiedades de elemento](../common/styles.md#propiedades-de-elemento)); `First number`, `Item number` y `Checked`, no. Sin `Marker`, propio
 o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems es el `Padding` izquierdo de la `List`.
 
 > **Decisión:** un único elemento `List` con `Marker` obligatorio, que no se hereda: cada lista anidada declara el suyo o
@@ -44,7 +45,8 @@ o de una regla, es un error (`LIST_MARKER_MISSING`). La sangría de los ítems e
 `Marker` es obligatorio: si la lista es numerada lo decide el autor. El marcador es texto en la tipografía del
 `List item` (propia, heredada o de `For element: List item`): `•` (`bullet`), `–` (`dash`), ninguno (`none`), o el número del
 ítem con su sufijo: `3.`, `c.`, `C.`, `iii.`, `III.`. Siempre va seguido de un espacio, que lo separa del contenido. Con
-`image`, el marcador es una imagen ([abajo](#marcadores-con-imagen)).
+`circle`, `square` y `checkbox`, el marcador es una forma que dibuja el motor ([abajo](#marcadores-dibujados)), y con
+`image`, una imagen ([abajo](#marcadores-con-imagen)).
 
 El sufijo es el de `Marker suffix`: un punto (`period`, por defecto) o un paréntesis de cierre (`parenthesis`), que
 escribe `3)`, `c)`, `C)`, `iii)`, `III)`.
@@ -60,7 +62,7 @@ List:
 ```
 
 - Es de su lista y no de las que tiene dentro: una lista anidada declara el suyo, lo toma de una regla o lleva el punto.
-- En una lista que no numera (`bullet`, `dash`, `none`, `image`) no tiene efecto y es un error
+- En una lista que no numera (`bullet`, `dash`, `circle`, `square`, `checkbox`, `none`, `image`) no tiene efecto y es un error
   (`LIST_SUFFIX_NOT_ALLOWED`), en la línea del `Marker suffix`, venga de la lista o de una regla.
 - No está en `{number of: id}`, que escribe el número sin sufijo ([Referencias](../common/references.md#number-of-id)).
 - Cuenta en el ancho del marcador, como el resto de su texto (`LIST_MARKER_OVERFLOW`, [Posición](#posición)), y un lector
@@ -75,8 +77,51 @@ List:
 > *Alternativa descartada:* que no tuviera efecto sin avisar, que deja pasar un `Marker suffix` escrito en la lista
 > equivocada.
 
-> **Decisión:** el marcador es texto en la fuente del ítem, sin círculo hueco ni cuadrado, que IBM Plex Sans no tiene.
-> *Alternativa descartada:* dibujarlos como formas.
+## Marcadores dibujados
+
+`circle`, `square` y `checkbox` son formas que dibuja el motor, así que no dependen de la fuente: un círculo hueco, un
+cuadrado relleno y una casilla, que está marcada en los ítems con `Checked: true`.
+
+```
+List:
+    Marker: checkbox
+    List item:
+        Checked: true
+        Paragraph: Documento de identidad del tomador
+    List item:
+        Paragraph: Justificante de pago
+        List:
+            Marker: circle
+            List item:
+                Paragraph: Recibo del banco
+```
+
+- La forma es un cuadrado centrado en las mayúsculas de la tipografía del ítem sobre la línea base de la primera línea,
+  como un marcador con imagen: del alto de las mayúsculas en un `checkbox`, y de la mitad en un `circle` y un `square`.
+  Le sigue el mismo espacio que a un marcador de texto, en la fuente del ítem, y su borde derecho toca el borde izquierdo
+  de la caja de borde del ítem, como los demás marcadores.
+- Se dibuja en el `Color` de la tipografía del ítem. El ancho de sus líneas es una parte de su lado: el 18 % en el
+  círculo, el 10 % en la caja de la casilla y el 12 % en su marca. Ninguna propiedad cambia su tamaño, sus líneas ni su
+  color.
+- El ítem necesita `Font` y `Size`, como con un marcador de texto (`TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE`): el tamaño
+  de la forma y el espacio salen de ellos. Y necesita una primera línea con la que alinearse (`LIST_ITEM_WITHOUT_LINE`).
+- `Checked` en un ítem de una lista cuyo `Marker` no es `checkbox` es un error (`LIST_CHECKED_NOT_ALLOWED`), en la línea
+  del `Checked`, también con `Checked: false`.
+- `First number`, `Item number` y `Marker suffix` no tienen efecto (`LIST_NUMBER_NOT_ALLOWED`,
+  `LIST_SUFFIX_NOT_ALLOWED`), y `{number of: id}` no vale para sus ítems: estas listas no numeran.
+
+> **Decisión:** el círculo hueco, el cuadrado y la casilla se dibujan como formas. *Alternativa descartada:* los
+> caracteres `◦`, `▪`, `☐` y `☑` en la fuente del ítem, que IBM Plex Sans y muchas otras fuentes no tienen
+> (`GLYPH_MISSING`). `bullet` y `dash` siguen siendo texto: los tiene cualquier fuente.
+
+> **Decisión:** el tamaño y las líneas de una forma salen del `Size` del ítem, y su color es el de su texto, como en un
+> marcador que es texto. *Alternativa descartada:* propiedades para ellos (`Marker size`, `Marker color`): un marcador
+> con otro aspecto es una imagen (`Marker: image`).
+
+> **Decisión:** `Marker: checkbox` dice que los marcadores son casillas y `Checked`, en cada ítem, si la suya está
+> marcada, como hacen `Marker: image` y `Marker image`. *Alternativa descartada:* dos valores, `checked` y `unchecked`,
+> de un `Marker` en el ítem, que es de la lista; o `Checked` en una regla de `Styles`, que marcaría los ítems por su
+> estilo y no por lo que dice cada uno.
 
 ## Marcadores con imagen
 
@@ -166,11 +211,18 @@ se parte, el marcador solo está en su primer fragmento. No cambia las reglas de
 
 Un lector de pantalla anuncia la lista con su número de ítems, y cada ítem con su marcador. Un marcador con imagen y `Alt`
 se lee con su texto alternativo (es una figura dentro del marcador, `Lbl` → `Figure`); sin `Alt` es decorativo y el ítem no
-tiene marcador para el lector ([El PDF por dentro](../implementation/pdf.md#listas)).
+tiene marcador para el lector ([El PDF por dentro](../implementation/pdf.md#listas)). Un marcador dibujado se lee como
+el carácter que lo representa: `◦` (`circle`), `▪` (`square`), `☐` (`checkbox`) o `☑` (`checkbox` con
+`Checked: true`).
+
+> **Decisión:** una casilla se lee como `☐` o `☑`, que un lector de pantalla anuncia en el idioma del usuario.
+> *Alternativa descartada:* un texto alternativo («marcada», «sin marcar»), que el motor tendría que escribir en el
+> idioma del documento, o una propiedad para que el autor lo escriba en cada lista.
 
 ## Lo que no hay
 
 - Marcadores dentro del ítem, con un estilo propio distinto del ítem o con otro texto.
-- Círculo hueco y cuadrado.
+- Un tamaño, un ancho de línea o un color propios para los marcadores dibujados, y otras formas (un triángulo, una flecha).
+- Una casilla que se pueda marcar en el PDF: es un dibujo, no un campo de formulario.
 - Listas en orden inverso, y otros sufijos que el punto y el paréntesis de cierre: `(a)` entre paréntesis, `1:`, `1.-`.
 - Marcadores con imagen en las listas de un `Markdown`.

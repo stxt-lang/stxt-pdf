@@ -217,4 +217,36 @@ class ListLayoutTest {
         f.assertAbsent(1, "A");
         assertRect(f.marker(2, "A"), 45, 40.5, 15, 10);
     }
+
+    @Test
+    void aCheckboxIsAsTallAsTheCapitalsAndCenteredOnThem() {
+        // The capitals measure 7 at Size 10: the checkbox is 7 × 7, plus the space of 5: 12, so it starts at 48. The
+        // middle of the capitals is at 40 + 5.5, and its top at 42. Checked or not, it takes up the same.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: checkbox",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno",
+                "\t\tList item:", "\t\t\tId: B", "\t\t\tChecked: true", "\t\t\tText: Dos"));
+        assertRect(f.rect("A"), 60, 40, 495, 12);
+        assertRect(f.marker("A"), 48, 42, 12, 7);
+        assertRect(f.marker("B"), 48, 54, 12, 7);
+    }
+
+    @Test
+    void aCircleAndASquareAreHalfAsTallAsTheCapitals() {
+        // 3.5 × 3.5, plus the space of 5: 8.5, so they start at 51.5; their top is at 40 + 5.5 − 1.75.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: circle",
+                "\t\tList item:", "\t\t\tId: A", "\t\t\tText: Uno",
+                "\t\t\tList:", "\t\t\t\tMarker: square", "\t\t\t\tList item:", "\t\t\t\t\tId: B", "\t\t\t\t\tText: Dos"));
+        assertRect(f.marker("A"), 51.5, 43.75, 8.5, 3.5);
+        assertRect(f.marker("B"), 71.5, 55.75, 8.5, 3.5);
+    }
+
+    @Test
+    void aDrawnMarkerUsesTheSizeOfTheItem() {
+        // Size 20: capitals of 14 and a space of 10. The checkbox is 14 × 14 and starts at 60 − 24; the baseline of
+        // the line of 24 is 18 below its top, and the middle of the capitals, 7 above it.
+        LayoutFixture f = LayoutFixture.layOut(doc("\tList:", "\t\tMarker: checkbox", "\t\tBox:",
+                "\t\t\tPadding: 0 0 0 30", "\t\tList item:", "\t\t\tId: A", "\t\t\tTypography:", "\t\t\t\tSize: 20",
+                "\t\t\tText: Uno"));
+        assertRect(f.marker("A"), 46, 44, 24, 14);
+    }
 }

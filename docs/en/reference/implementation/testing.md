@@ -220,7 +220,7 @@ documents laid out with the fixed metrics.
 
 - Only the boxes with `Id` are dumped, and the descendants with `Id` are nested inside.
 - The marker of a `List item` with `Id` is dumped inside the item as `Marker: 3.` (or `Marker image: path`, with an
-  image), with its `Rect`.
+  image, or `Marker: ☑`, with the character that stands for a drawn marker), with its `Rect`.
 - The lines of the merged borders of a `Table` with `Id` are dumped after its `Rect`, one per line and in the order
   they are painted: `Rule: x y width height color`, in page coordinates.
 - An `Overlay` is nested inside its reference container, after its in-flow children, and not inside its parent.

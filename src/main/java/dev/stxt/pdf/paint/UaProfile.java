@@ -110,13 +110,15 @@ final class UaProfile {
     }
 
     /**
-     * {@code ListNumbering} of a list; {@code dash} and {@code image} have no equivalent in PDF/UA-1 and are
-     * {@code None}, and in PDF/UA-2 they are {@code Unordered}, from PDF 2.0.
+     * {@code ListNumbering} of a list; {@code dash}, {@code checkbox} and {@code image} have no equivalent in
+     * PDF/UA-1 and are {@code None}, and in PDF/UA-2 they are {@code Unordered}, from PDF 2.0.
      */
     String listNumbering(Marker marker) {
         return switch (marker) {
             case BULLET -> PDListAttributeObject.LIST_NUMBERING_DISC;
-            case DASH, IMAGE -> pdf2 != null ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
+            case CIRCLE -> PDListAttributeObject.LIST_NUMBERING_CIRCLE;
+            case SQUARE -> PDListAttributeObject.LIST_NUMBERING_SQUARE;
+            case DASH, CHECKBOX, IMAGE -> pdf2 != null ? "Unordered" : PDListAttributeObject.LIST_NUMBERING_NONE;
             case NONE -> PDListAttributeObject.LIST_NUMBERING_NONE;
             case DECIMAL -> PDListAttributeObject.LIST_NUMBERING_DECIMAL;
             case LOWER_ALPHA -> PDListAttributeObject.LIST_NUMBERING_LOWER_ALPHA;

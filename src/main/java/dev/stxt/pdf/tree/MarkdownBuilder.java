@@ -8,6 +8,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -41,6 +42,7 @@ import org.commonmark.node.OrderedList;
 import org.commonmark.node.Paragraph;
 import org.commonmark.node.SoftLineBreak;
 import org.commonmark.node.StrongEmphasis;
+import org.commonmark.node.SourceSpan;
 import org.commonmark.node.Text;
 import org.commonmark.node.ThematicBreak;
 import org.commonmark.parser.IncludeSourceSpans;
@@ -103,6 +105,9 @@ final class MarkdownBuilder {
 
     /** A footnote call, {@code [^id]} (reference/components/footnote.md): the {@code Id} of a {@code Footnote}. */
     private static final Pattern FOOTNOTE_CALL = Pattern.compile("\\[\\^([^\\[\\]\\s]+)]");
+
+    /** The mark of a task at the start of the text of a list item: {@code [ ]}, {@code [x]} or {@code [X]} and a space. */
+    private static final Pattern TASK = Pattern.compile("\\[([ xX])]\\s+");
 
     /** The {@code >} of the block quotes a line is in, at its start. */
     private static final Pattern QUOTE_PREFIX = Pattern.compile("^(?:>\\s?)+");
@@ -408,10 +413,51 @@ final class MarkdownBuilder {
             return new InlineImage(i.getDestination(), alt(i, line));
         }
 
+        /**
+         * Whether a list item is a task, and whether it is done: its text starts with {@code [ ]} or with {@code [x]}
+         * and a space, written as such ({@code \[ ]} is text). The mark is removed from its text. {@code null} if it
+         * is not a task.
+         */
+        private Boolean task(ListItem item) {
+            if (!(item.getFirstChild() instanceof Paragraph p) || !(p.getFirstChild() instanceof Text t)) {
+                return null;
+            }
+            Matcher mark = TASK.matcher(t.getLiteral());
+            SourceSpan span = p.getSourceSpans().isEmpty() ? null : p.getSourceSpans().get(0);
+            if (!mark.lookingAt() || span == null) {
+                return null;
+            }
+            // The parser gives the same text for [ ] and for \[ ]: what was written is in the line of the source.
+            String written = source[span.getLineIndex()];
+            if (!TASK.matcher(written.substring(Math.min(span.getColumnIndex(), written.length()))).lookingAt()) {
+                return null;
+            }
+            String rest = t.getLiteral().substring(mark.end());
+            if (rest.isEmpty()) {
+                t.unlink();
+            } else {
+                t.setLiteral(rest);
+            }
+            return !" ".equals(mark.group(1));
+        }
+
         private InlineNode list(ListBlock l, int line) {
             boolean numbered = l instanceof OrderedList;
+            // A list of tasks (- [ ], - [x]) has Marker: checkbox, which is not chosen: it does not use Bullet markers.
+            List<Boolean> tasks = new ArrayList<>();
+            for (org.commonmark.node.Node i = l.getFirstChild(); i != null; i = i.getNext()) {
+                tasks.add(task((ListItem) i));
+            }
+            boolean taskList = tasks.stream().anyMatch(Objects::nonNull);
+            if (taskList && (numbered || tasks.contains(null))) {
+                throw error(line, ErrorCode.MARKDOWN_UNSUPPORTED, "Markdown does not allow " + (numbered
+                        ? "tasks ([ ], [x]) in a numbered list: a list of tasks is written with -, * or +"
+                        : "a list with tasks ([ ], [x]) and items that are not: all its items are tasks or none is, "
+                                + "and an item whose text starts with those characters is written with \\ before "
+                                + "them (\\[ ])"));
+            }
             Optional<PropertyNode> property = numbered ? numbering : bullet;
-            if (property.isEmpty()) {
+            if (!taskList && property.isEmpty()) {
                 throw error(line, ErrorCode.MARKDOWN_PROPERTY_MISSING, (numbered ? "The numbered list" : "The list")
                         + " needs " + (numbered ? "Number markers" : "Bullet markers") + " in its Markdown (line "
                         + markdown.getLine() + ") or in a rule of Styles: the marker of each level, as in "
@@ -420,8 +466,9 @@ final class MarkdownBuilder {
             List<String> markers = numbered ? numberings : bullets;
             int depth = numbered ? numberingDepth++ : bulletDepth++;
             InlineNode list = node("List", "", line);
-            list.addChild(generated(node("Marker", markers.get(Math.min(depth, markers.size() - 1)),
-                    property.get().node().getLine()), property.get()));
+            list.addChild(taskList ? node("Marker", "checkbox", line)
+                    : generated(node("Marker", markers.get(Math.min(depth, markers.size() - 1)),
+                            property.get().node().getLine()), property.get()));
             if (l instanceof OrderedList o) {
                 // 1) asks for the parenthesis; 1. asks for nothing, and the list keeps the suffix of its rules.
                 if (")".equals(o.getMarkerDelimiter())) {
@@ -431,9 +478,13 @@ final class MarkdownBuilder {
                     list.addChild(node("First number", Integer.toString(o.getMarkerStartNumber()), line));
                 }
             }
+            int index = 0;
             for (org.commonmark.node.Node i = l.getFirstChild(); i != null; i = i.getNext()) {
                 ListItem source = (ListItem) i;
                 InlineNode item = node("List item", "", line(source));
+                if (Boolean.TRUE.equals(tasks.get(index++))) {
+                    item.addChild(node("Checked", "true", line(source)));
+                }
                 blocks(source, "a list item").forEach(item::addChild);
                 list.addChild(item);
             }
@@ -780,11 +831,13 @@ final class MarkdownBuilder {
                 } catch (IllegalArgumentException e) {
                     // Reported below, with the allowed values.
                 }
-                // The image marker needs a Marker image, which a Markdown does not have.
-                if (marker == null || marker.numbered() != numbered || marker == Marker.IMAGE) {
+                // The image marker needs a Marker image, which a Markdown does not have, and the checkbox is that of
+                // the lists of tasks, which the content writes.
+                if (marker == null || marker.numbered() != numbered || marker == Marker.IMAGE
+                        || marker == Marker.CHECKBOX) {
                     throw error(n, ErrorCode.VALUE_NOT_ALLOWED, "Value not allowed in " + n.getName() + ": " + token
                             + (numbered ? " (decimal, lower-alpha, upper-alpha, lower-roman or upper-roman)"
-                                    : " (bullet, dash or none)"));
+                                    : " (bullet, dash, circle, square or none)"));
                 }
                 markers.add(token.toLowerCase(Locale.ROOT));
             }

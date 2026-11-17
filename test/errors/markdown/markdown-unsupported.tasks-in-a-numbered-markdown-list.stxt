@@ -1,0 +1,20 @@
+# Case: Tasks in a numbered Markdown list
+# Code: MARKDOWN_UNSUPPORTED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		Markdown:
+			Number markers: decimal
+			Content >>
+				1. [x] Uno
+				2. [ ] Dos

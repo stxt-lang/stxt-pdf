@@ -68,7 +68,7 @@ Document (dev.stxt.pdf):
 | Property | What it does |
 |---|---|
 | `Content` | The Markdown, in a `>>` block. Required |
-| `Bullet markers` | The marker of bulleted lists, one per level: `bullet dash` uses `•` on the first level and `–` on the following ones. Required if there are bulleted lists |
+| `Bullet markers` | The marker of bulleted lists, one per level: `bullet dash` uses `•` on the first level and `–` on the following ones. Also `circle`, `square` and `none`. Required if there are bulleted lists, except lists of tasks |
 | `Number markers` | The same for numbered lists: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Required if there are numbered lists. A list written with `1)` has a parenthesis instead of a period: `1)`, `a)` |
 | `Table column sizes` | The columns of the tables: `equal` (all the same) or `auto` (according to their content). Required if there are tables |
 
@@ -86,6 +86,7 @@ of the `Markdown` or, once for the whole document, in `For element: Document`, a
 | `#` to `######` | `Heading 1` to `Heading 6`. With `{#id}` at the end (`## Ventas {#ventas}`), it has that `Id`, to link to it or cite it |
 | A paragraph | `Paragraph` |
 | `-`, `*`, `+` and `1.` | `List`, bulleted or numbered |
+| `- [ ]` and `- [x]` | A list of tasks: a `List` of checkboxes, checked in the items with `[x]`. All the items of the list are tasks, and it needs no `Bullet markers` |
 | A table | `Table`, with the first row as the header. The alignment of each column comes from the separator row (`:--`, `--:`). A row with fewer cells than the header gets empty ones added, and one with more is an error |
 | `**bold**`, `*italic*`, `++underline++`, `~~strikethrough~~` | Inline formatting |
 | `[text](target)` | A link, underlined ([References and links](../common/references-and-links.md)) |

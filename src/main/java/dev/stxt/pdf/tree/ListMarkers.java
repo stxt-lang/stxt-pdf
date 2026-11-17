@@ -18,13 +18,13 @@ final class ListMarkers {
     }
 
     /**
-     * Text of the marker, with the trailing space; {@code null} with {@code none} and with {@code image}, whose
-     * marker is not text. The number and the suffix only count in numberings, and the number must be within their range
-     * ({@link #inRange}).
+     * Text of the marker, with the trailing space; {@code null} with {@code none}, with {@code image} and with the
+     * shapes ({@link Marker#drawn()}), whose marker is not text. The number and the suffix only count in numberings,
+     * and the number must be within their range ({@link #inRange}).
      */
     static String text(Marker marker, MarkerSuffix suffix, int number) {
         String label = switch (marker) {
-            case NONE, IMAGE -> null;
+            case NONE, IMAGE, CIRCLE, SQUARE, CHECKBOX -> null;
             case BULLET -> "•";
             case DASH -> "–";
             default -> number(marker, number) + suffix.text();

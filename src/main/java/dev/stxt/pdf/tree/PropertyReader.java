@@ -147,6 +147,7 @@ final class PropertyReader {
             entry("marker-image", PropertyReader::markerImage),
             entry("first-number", (p, s) -> s.list().setFirstNumber(integer(p))),
             entry("item-number", (p, s) -> s.list().setNumber(integer(p))),
+            entry("checked", (p, s) -> s.list().setChecked(bool(p))),
             entry("isolate-margins", (p, s) -> s.setIsolateMargins(bool(p))),
             entry("trim-margins", (p, s) -> s.setTrimMargins(enumValue(TrimMargins.class, p))),
             entry("link", (p, s) -> s.setLink(link(p))),

@@ -340,6 +340,27 @@ public final class PdfCanvas implements Canvas {
     /**
      * {@inheritDoc}
      *
+     * <p>One path filled with the even-odd rule, inside the marked content of its {@code Lbl}; where it repeats on
+     * every page, an <em>artifact</em> ({@link PdfStructure}).</p>
+     */
+    @Override
+    public void marker(Box box, Rect area) {
+        if (area.width() <= 0 || area.height() <= 0) {
+            return;
+        }
+        io(() -> {
+            tagging.beginText(box);
+            page.painting(box.style().typography().color(), () -> {
+                Shapes.marker(page.path(), box.style().list().marker(), box.style().list().checked(), area);
+                out().fillEvenOdd();
+            });
+            tagging.endText();
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * <p>Drawn exactly in {@code area}, which already has the proportion of the file; a PDF page cannot be one
      * ({@link dev.stxt.pdf.layout.image.Images}).</p>
      */

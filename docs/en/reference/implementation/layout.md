@@ -251,7 +251,8 @@ delegates. `Images.validate` checks the images of the runs beforehand like those
 with the line of the text.
 `TextLine.runs` keeps each placed run, with the `justify` spacing included. `MarkerLayout` places the marker of a
 `List item` in its first fragment, with the baseline of its first line (`Baselines.first`, which goes down the first in-flow
-fragment to one with lines and uses `TextMeasurer.vertical` with the size of the line); an image marker is as
+fragment to one with lines and uses `TextMeasurer.vertical` with the size of the line); a drawn marker is a square as
+tall as the capitals of the item (half as tall, in a `circle` and a `square`), and an image marker is as
 tall as `Height` or the `Size` of the item and as wide as its proportion gives (`LayoutContext.natural`), carries the
 space that separates it from the item as the right padding of the fragment, and is centered on the capitals
 (`VerticalMetrics.capHeight`) of the typography of the item on that baseline. `StackLayout` uses the same `Baselines.first` for

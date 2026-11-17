@@ -26,13 +26,14 @@ List:
 
 | Property | Values | Default | Elements | Notes |
 |---|---|---|---|---|
-| `Marker` | `bullet`, `dash`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | required | `List` | Marker of the items: `•`, `–`, none, an image, or a numbering (`1.`, `a.`, `A.`, `i.`, `I.`). |
+| `Marker` | `bullet`, `dash`, `circle`, `square`, `checkbox`, `none`, `image`, `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | required | `List` | Marker of the items: `•`, `–`, a hollow circle, a filled square, a checkbox, none, an image, or a numbering (`1.`, `a.`, `A.`, `i.`, `I.`). |
 | `Marker suffix` | `period`, `parenthesis` | `period` | `List` | What follows the number in a numbering: a period (`1.`, `a.`) or a closing parenthesis (`1)`, `a)`). Only in the numberings. |
 | `Marker image` | path relative to `images/` | none | `List`, `List item` | The image of the marker with `Marker: image` ([Image markers](#image-markers)): that of the list serves all its items, and that of an item replaces it. It accepts `Alt` and `Height`. |
 | `First number` | integer | `1` | `List` | Number of the first item. Only in the numberings. |
 | `Item number` | integer | none | `List item` | Number of this item. The following ones continue from it. Only in the numberings. |
+| `Checked` | `true`, `false` | `false` | `List item` | Whether the checkbox of this item is checked ([Drawn markers](#drawn-markers)). Only with `Marker: checkbox`. |
 
-`Marker`, `Marker suffix` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number` and `Item number` cannot. Without
+`Marker`, `Marker suffix` and `Marker image` can also come from a rule of `Styles` ([Element properties](../common/styles.md#element-properties)); `First number`, `Item number` and `Checked` cannot. Without
 `Marker`, its own or from a rule, it is an error (`LIST_MARKER_MISSING`). The indent of the items is the left `Padding` of
 the `List`.
 
@@ -45,7 +46,8 @@ the `List`.
 `Marker` is required: whether the list is numbered is decided by the author. The marker is text in the typography of the
 `List item` (its own, inherited or from `For element: List item`): `•` (`bullet`), `–` (`dash`), none (`none`), or the number of the
 item with its suffix: `3.`, `c.`, `C.`, `iii.`, `III.`. It is always followed by a space, which separates it from the content. With
-`image`, the marker is an image ([below](#image-markers)).
+`circle`, `square` and `checkbox`, the marker is a shape the engine draws ([below](#drawn-markers)), and with `image`,
+an image ([below](#image-markers)).
 
 The suffix is that of `Marker suffix`: a period (`period`, the default) or a closing parenthesis (`parenthesis`), which
 writes `3)`, `c)`, `C)`, `iii)`, `III)`.
@@ -61,7 +63,7 @@ List:
 ```
 
 - It belongs to its list and not to the lists inside it: a nested list declares its own, takes it from a rule or has the period.
-- In a list that does not number (`bullet`, `dash`, `none`, `image`) it has no effect and is an error
+- In a list that does not number (`bullet`, `dash`, `circle`, `square`, `checkbox`, `none`, `image`) it has no effect and is an error
   (`LIST_SUFFIX_NOT_ALLOWED`), on the line of the `Marker suffix`, whether it comes from the list or from a rule.
 - It is not in `{number of: id}`, which writes the number without a suffix ([References](../common/references.md#number-of-id)).
 - It counts in the width of the marker, like the rest of its text (`LIST_MARKER_OVERFLOW`, [Position](#position)), and a
@@ -76,8 +78,51 @@ List:
 > *Rejected alternative:* that it had no effect without a warning, which lets through a `Marker suffix` written in the
 > wrong list.
 
-> **Decision:** the marker is text in the font of the item, without a hollow circle or a square, which IBM Plex Sans does not have.
-> *Rejected alternative:* drawing them as shapes.
+## Drawn markers
+
+`circle`, `square` and `checkbox` are shapes the engine draws, so they do not depend on the font: a hollow circle, a
+filled square and a checkbox, which is checked in the items with `Checked: true`.
+
+```
+List:
+    Marker: checkbox
+    List item:
+        Checked: true
+        Paragraph: Identity document of the policyholder
+    List item:
+        Paragraph: Proof of payment
+        List:
+            Marker: circle
+            List item:
+                Paragraph: Bank receipt
+```
+
+- The shape is a square centered on the capitals of the typography of the item on the baseline of the first line, like an
+  image marker: as tall as the capitals in a `checkbox`, and half as tall in a `circle` and a `square`. It is followed
+  by the same space as a text marker, in the font of the item, and its right edge touches the left edge of the border
+  box of the item, like the other markers.
+- It is drawn in the `Color` of the typography of the item. The width of its lines is a part of its side: 18% in the
+  circle, 10% in the box of the checkbox and 12% in its check mark. No property changes its size, its lines or its
+  color.
+- The item needs `Font` and `Size`, as with a text marker (`TEXT_WITHOUT_FONT`, `TEXT_WITHOUT_FONT_SIZE`): the size of the
+  shape and the space come from them. And it needs a first line to align with (`LIST_ITEM_WITHOUT_LINE`).
+- `Checked` in an item of a list whose `Marker` is not `checkbox` is an error (`LIST_CHECKED_NOT_ALLOWED`), on the line
+  of the `Checked`, also with `Checked: false`.
+- `First number`, `Item number` and `Marker suffix` have no effect (`LIST_NUMBER_NOT_ALLOWED`,
+  `LIST_SUFFIX_NOT_ALLOWED`), and `{number of: id}` does not work for its items: these lists do not number.
+
+> **Decision:** the hollow circle, the square and the checkbox are drawn as shapes. *Rejected alternative:* the
+> characters `◦`, `▪`, `☐` and `☑` in the font of the item, which IBM Plex Sans and many other fonts do not have
+> (`GLYPH_MISSING`). `bullet` and `dash` are still text: every font has them.
+
+> **Decision:** the size and the lines of a shape follow from the `Size` of the item, and its color is that of its text,
+> as in a marker that is text. *Rejected alternative:* properties for them (`Marker size`, `Marker color`): a marker
+> with another look is an image (`Marker: image`).
+
+> **Decision:** `Marker: checkbox` says that the markers are checkboxes and `Checked`, in each item, whether its own is
+> checked, as `Marker: image` and `Marker image` do. *Rejected alternative:* two values, `checked` and `unchecked`, of a
+> `Marker` in the item, which belongs to the list; or `Checked` in a rule of `Styles`, which would check the items by
+> their style and not by what each one says.
 
 ## Image markers
 
@@ -166,11 +211,18 @@ breaks, the marker is only in its first fragment. It does not change the break r
 
 A screen reader announces the list with its number of items, and each item with its marker. An image marker with `Alt`
 is read with its alternative text (it is a figure inside the marker, `Lbl` → `Figure`); without `Alt` it is decorative and
-the item has no marker for the reader ([The PDF inside](../implementation/pdf.md#lists)).
+the item has no marker for the reader ([The PDF inside](../implementation/pdf.md#lists)). A drawn marker is read as the
+character that stands for it: `◦` (`circle`), `▪` (`square`), `☐` (`checkbox`) or `☑` (`checkbox` with
+`Checked: true`).
+
+> **Decision:** a checkbox is read as `☐` or `☑`, which a screen reader announces in the language of the user.
+> *Rejected alternative:* an alternative text ("checked", "not checked"), which the engine would have to write in the
+> language of the document, or a property for the author to write it in every list.
 
 ## What is not supported
 
 - Markers inside the item, with a style of their own different from the item or with other text.
-- Hollow circle and square.
+- A size, a line width or a color of their own for the drawn markers, and other shapes (a triangle, an arrow).
+- A checkbox that can be checked in the PDF: it is a drawing, not a form field.
 - Lists in reverse order, and suffixes other than the period and the closing parenthesis: `(a)` in parentheses, `1:`, `1.-`.
 - Image markers in the lists of a `Markdown`.

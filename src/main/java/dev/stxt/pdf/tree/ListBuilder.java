@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static dev.stxt.pdf.tree.Nodes.error;
+import static dev.stxt.pdf.tree.PropertyKey.CHECKED;
 import static dev.stxt.pdf.tree.PropertyKey.FONT_SIZE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_IMAGE;
 import static dev.stxt.pdf.tree.PropertyKey.MARKER_SUFFIX;
@@ -16,8 +17,8 @@ import static dev.stxt.pdf.tree.PropertyKey.FIRST_NUMBER;
 
 /**
  * Lists (reference/components/list.md): numbering of the {@code List item}, the generated box of their
- * marker (text, or the image of {@code Marker image}) and the rules of {@code First number}, {@code Item number} and
- * {@code Marker image}.
+ * marker (text, the image of {@code Marker image} or a shape) and the rules of {@code First number},
+ * {@code Item number}, {@code Checked} and {@code Marker image}.
  */
 final class ListBuilder {
 
@@ -52,17 +53,17 @@ final class ListBuilder {
 
     /**
      * The generated box of the marker of a {@code List item} (reference/components/list.md), or {@code null} with
-     * {@code Marker: none}: text with the typography of the item or, with {@code Marker: image}, the image of the
-     * {@code Marker image} of the item (which replaces that of the list whole) or of the list. Both need
-     * {@code Font} and {@code Size}: the text, like any text; the image, for the space that follows it and for its
-     * height when it does not declare {@code Height}.
+     * {@code Marker: none}: text with the typography of the item; with {@code Marker: image}, the image of the
+     * {@code Marker image} of the item (which replaces that of the list whole) or of the list; or, with a marker the
+     * engine draws ({@link Marker#drawn()}), its shape. All need {@code Font} and {@code Size}: the text, like any
+     * text; the image and the shape, for the space that follows them and for their size.
      */
     static Box marker(InlineNode n, Box item, Box list, int number) {
         Marker marker = list.style().list().marker();
-        String text = ListMarkers.text(marker, list.style().list().markerSuffix(), number);
-        if (text == null && marker != Marker.IMAGE) {
+        if (marker == Marker.NONE) {
             return null;
         }
+        String text = ListMarkers.text(marker, list.style().list().markerSuffix(), number);
         if (item.style().typography().font() == null) {
             throw error(n, ErrorCode.TEXT_WITHOUT_FONT, "The marker of the List item needs Font: it is declared in "
                     + "the Typography of the List item, of an ancestor or of Styles (For element: Document)");
@@ -89,13 +90,27 @@ final class ListBuilder {
             return image;
         }
         Box box = new Box(null, Element.MARKER, s, false, n.getLine());
-        box.setText(text, n.getLine(), false);
+        if (marker.drawn()) {
+            // A shape, not text: which one, and whether its checkbox is checked, go in the style of the marker.
+            s.list().setMarker(marker);
+            s.list().setChecked(item.style().list().checked());
+        } else {
+            box.setText(text, n.getLine(), false);
+        }
         return box;
     }
 
-    /** {@code Marker image} in a {@code List item} only with {@code Marker: image} in its list. */
+    /**
+     * {@code Marker image} in a {@code List item} only with {@code Marker: image} in its list, and {@code Checked},
+     * only with {@code Marker: checkbox}.
+     */
     static void validateItem(Style s, Box list) {
         Marker marker = list.style().list().marker();
+        if (s.isDeclared(CHECKED) && marker != Marker.CHECKBOX) {
+            throw error(s.line(CHECKED), ErrorCode.LIST_CHECKED_NOT_ALLOWED, "Checked has no effect: the list (line "
+                    + list.line() + ") has Marker: " + markerName(marker) + ", and only Marker: checkbox draws a "
+                    + "checkbox");
+        }
         if (s.isDeclared(MARKER_IMAGE) && marker != Marker.IMAGE) {
             throw error(s.line(MARKER_IMAGE), ErrorCode.LIST_IMAGE_NOT_ALLOWED, "Marker image has no effect: the list "
                     + "(line " + list.line() + ") has Marker: " + markerName(marker) + ", and only Marker: image "

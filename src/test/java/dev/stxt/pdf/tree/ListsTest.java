@@ -1,6 +1,7 @@
 package dev.stxt.pdf.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -218,5 +219,57 @@ class ListsTest {
     void anImageListDoesNotNumber() {
         assertEquals(ErrorCode.LIST_NUMBER_NOT_ALLOWED, error("\tList:", "\t\tMarker: image", "\t\tFirst number: 2",
                 "\t\tMarker image: test/check.svg", "\t\tList item:", "\t\t\tText: a").errorCode());
+    }
+
+    @Test
+    void aDrawnMarkerIsAShapeBoxWithoutText() {
+        Box list = root("\tList:", "\t\tMarker: circle", "\t\tList item:", "\t\t\tText: a",
+                "\t\t\tList:", "\t\t\t\tMarker: square", "\t\t\t\tList item:", "\t\t\t\t\tText: b",
+                "\t\t\tList:", "\t\t\t\tMarker: bullet", "\t\t\t\tList item:", "\t\t\t\t\tText: c").children().get(0);
+        Box item = list.children().get(0);
+        Box circle = item.marker();
+        assertTrue(circle.isMarkerShape());
+        assertFalse(circle.hasText());
+        assertFalse(circle.isImage());
+        assertEquals(Marker.CIRCLE, circle.style().list().marker());
+        // The shape belongs to the list of the item, not to the lists inside it.
+        Box square = item.children().get(1).children().get(0).marker();
+        assertEquals(Marker.SQUARE, square.style().list().marker());
+        assertFalse(square.style().list().checked());
+        // A marker of the font is text, not a shape.
+        Box bullet = item.children().get(2).children().get(0).marker();
+        assertFalse(bullet.isMarkerShape());
+        assertEquals("• ", bullet.text());
+    }
+
+    @Test
+    void aCheckboxIsCheckedInTheItemsThatDeclareIt() {
+        Box list = root("\tList:", "\t\tMarker: checkbox",
+                "\t\tList item:", "\t\t\tChecked: true", "\t\t\tText: a",
+                "\t\tList item:", "\t\t\tText: b",
+                "\t\tList item:", "\t\t\tChecked: false", "\t\t\tText: c").children().get(0);
+        assertEquals(List.of(true, false, false),
+                list.children().stream().map(i -> i.marker().style().list().checked()).toList());
+        assertEquals(List.of(Marker.CHECKBOX, Marker.CHECKBOX, Marker.CHECKBOX),
+                list.children().stream().map(i -> i.marker().style().list().marker()).toList());
+    }
+
+    @Test
+    void checkedIsOnlyOfAnItemOfACheckboxList() {
+        InvalidModelException e = error("\tList:", "\t\tMarker: square",
+                "\t\tList item:", "\t\t\tChecked: false", "\t\t\tText: a");
+        assertEquals(ErrorCode.LIST_CHECKED_NOT_ALLOWED, e.errorCode());
+        assertEquals(16, e.line());
+        assertTrue(e.getMessage().contains("Marker: square"), e.getMessage());
+    }
+
+    @Test
+    void aDrawnMarkerNeedsALineAndDoesNotNumber() {
+        assertEquals(ErrorCode.LIST_ITEM_WITHOUT_LINE, error("\tList:", "\t\tMarker: checkbox",
+                "\t\tList item:", "\t\t\tImage: test/square.png").errorCode());
+        assertEquals(ErrorCode.LIST_NUMBER_NOT_ALLOWED, error("\tList:", "\t\tMarker: circle", "\t\tFirst number: 2",
+                "\t\tList item:", "\t\t\tText: a").errorCode());
+        assertEquals(ErrorCode.LIST_SUFFIX_NOT_ALLOWED, error("\tList:", "\t\tMarker: checkbox",
+                "\t\tMarker suffix: parenthesis", "\t\tList item:", "\t\t\tText: a").errorCode());
     }
 }

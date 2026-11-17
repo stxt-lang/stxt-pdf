@@ -85,6 +85,11 @@ class StackingContextTest {
         }
 
         @Override
+        public void marker(Box box, Rect area) {
+            events.add("marker " + box.style().list().marker() + " " + round(area));
+        }
+
+        @Override
         public void inlineImage(Box box, InlineImage image, String link, Rect area) {
             events.add("inline image " + image.path() + " " + round(area));
         }

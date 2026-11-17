@@ -68,7 +68,7 @@ Document (dev.stxt.pdf):
 | Propiedad | Qué hace |
 |---|---|
 | `Content` | El Markdown, en un bloque `>>`. Obligatorio |
-| `Bullet markers` | El marcador de las listas con viñetas, uno por nivel: `bullet dash` usa `•` en el primer nivel y `–` en los siguientes. Obligatorio si hay listas con viñetas |
+| `Bullet markers` | El marcador de las listas con viñetas, uno por nivel: `bullet dash` usa `•` en el primer nivel y `–` en los siguientes. También `circle`, `square` y `none`. Obligatorio si hay listas con viñetas, salvo las listas de tareas |
 | `Number markers` | Igual para las listas numeradas: `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman`. Obligatorio si hay listas numeradas. Una lista escrita con `1)` lleva paréntesis en lugar de punto: `1)`, `a)` |
 | `Table column sizes` | Las columnas de las tablas: `equal` (todas iguales) o `auto` (según su contenido). Obligatorio si hay tablas |
 
@@ -86,6 +86,7 @@ del `Markdown` o, una vez para todo el documento, en `For element: Document`, y 
 | `#` a `######` | `Heading 1` a `Heading 6`. Con `{#id}` al final (`## Ventas {#ventas}`), lleva ese `Id`, para enlazarlo o citarlo |
 | Un párrafo | `Paragraph` |
 | `-`, `*`, `+` y `1.` | `List`, con viñetas o numerada |
+| `- [ ]` y `- [x]` | Una lista de tareas: una `List` de casillas, marcadas en los ítems con `[x]`. Todos los ítems de la lista son tareas, y no necesita `Bullet markers` |
 | Una tabla | `Table`, con la primera fila de cabecera. La alineación de cada columna sale de la fila de separación (`:--`, `--:`). A una fila con menos celdas que la cabecera se le añaden vacías, y una con más es un error |
 | `**negrita**`, `*cursiva*`, `++subrayado++`, `~~tachado~~` | Formato dentro de la línea |
 | `[texto](destino)` | Un enlace, subrayado ([Referencias y enlaces](../common/references-and-links.md)) |

@@ -124,6 +124,11 @@ public final class ContrastCheck implements Canvas {
         add(area, null);
     }
 
+    /** A drawn marker is not a backdrop, and it has the color of the text of its item, which is checked. */
+    @Override
+    public void marker(Box box, Rect area) {
+    }
+
     /**
      * Records {@code r} with the current rotations. Unrotated, it stays a rectangle: rotated, it is a path, whose
      * {@code contains} counts crossings, and {@link #backdrops} asks every layer for every run.

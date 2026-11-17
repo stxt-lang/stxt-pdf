@@ -102,6 +102,13 @@ public interface Canvas {
     void inlineImage(Box box, InlineImage image, String link, Rect area);
 
     /**
+     * The marker of a {@code List item} that the engine draws ({@link Box#isMarkerShape()},
+     * reference/components/list.md): a hollow circle, a filled square or a checkbox, in the square {@code area} and
+     * in the color of its typography. It is the content of the {@code Lbl} of its item, like the text of a marker.
+     */
+    void marker(Box box, Rect area);
+
+    /**
      * Starts painting rotated (reference/common/layers-and-rotation.md): everything painted until
      * {@link #endRotation()}, link areas included, rotates {@code degrees} degrees clockwise around the
      * point ({@code x}, {@code y}) of the page. Rotations nest: one inside another adds to the outer

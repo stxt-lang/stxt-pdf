@@ -294,6 +294,11 @@ caja de contenido hasta esa línea y alarga hasta su mitad las barras largas (`M
 `BarcodeText.isLong`), y el lienzo pinta cada tramo de la línea con `text`, en la fuente y el color de la caja, dentro
 del mismo contenido marcado: en el PDF etiquetado el texto es parte de la `Figure`, no un texto aparte.
 
+Un marcador de lista que dibuja el motor (`Box.isMarkerShape()`: `circle`, `square`, `checkbox`) lo pinta
+`Canvas.marker`: `Shapes.marker` da su trazado (un anillo, un rectángulo, o el anillo de la caja con el contorno de su
+marca), que los dos lienzos rellenan una vez con la regla par-impar en el color de la tipografía del ítem; `PdfCanvas` lo
+hace dentro del contenido marcado del `Lbl` del ítem.
+
 > **Decisión:** un solo trazado y un solo relleno, y no un relleno por módulo: dos rectángulos rellenados por separado
 > dejan ver una línea fina entre ellos en algunos visores por el suavizado, que en un QR se lee como un módulo claro.
 

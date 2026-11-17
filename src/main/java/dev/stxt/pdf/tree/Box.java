@@ -186,8 +186,9 @@ public final class Box {
      * a text box ({@link Element#MARKER}) with the typography of the item and the text of the
      * marker plus the space that separates it from the content ({@code "3. "}, {@code "• "}) or, with
      * {@code Marker: image}, an image box ({@link #isImage()}, with its file in {@link #image()} and its {@code Alt}
-     * and {@code Height} in {@code style().list()}). It is not among the children: the layout of the item hangs it
-     * on its left. {@code null} if the box has no marker.
+     * and {@code Height} in {@code style().list()}) or, with a marker the engine draws, a box without text
+     * ({@link #isMarkerShape()}, with its {@code Marker} and its {@code Checked} in {@code style().list()}). It is not
+     * among the children: the layout of the item hangs it on its left. {@code null} if the box has no marker.
      */
     public Box marker() {
         return marker;
@@ -475,6 +476,15 @@ public final class Box {
     /** Whether it is the generated box of the marker of a {@code List item}. */
     public boolean isMarker() {
         return element == Element.MARKER;
+    }
+
+    /**
+     * Whether it is the marker of a {@code List item} that the engine draws as a shape
+     * ({@link dev.stxt.pdf.model.Marker#drawn()}): which one is in {@code style().list().marker()} and, in a
+     * checkbox, whether it is checked in {@code style().list().checked()}. It has neither text nor image.
+     */
+    public boolean isMarkerShape() {
+        return element == Element.MARKER && style.list().marker() != null;
     }
 
     /**

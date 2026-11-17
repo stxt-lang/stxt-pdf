@@ -2,6 +2,8 @@ package dev.stxt.pdf.paint;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import dev.stxt.pdf.model.Corners;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
@@ -55,6 +58,54 @@ class ShapesTest {
     }
 
     private static final Rect BOX = new Rect(10, 20, 100, 60);
+
+    // The markers of a list that the engine draws (reference/components/list.md#drawn-markers), in a square of 10.
+
+    private static List<String> marker(Marker marker, boolean checked) {
+        Recorder path = new Recorder();
+        Shapes.marker(path, marker, checked, new Rect(0, 0, 10, 10));
+        return path.ops;
+    }
+
+    @Test
+    void aSquareMarkerIsItsRect() {
+        assertEquals(List.of("R 0.00 0.00 10.00 10.00"), marker(Marker.SQUARE, false));
+    }
+
+    @Test
+    void aCheckboxIsARingWithALineOfATenthOfItsSide() {
+        assertEquals(List.of("R 0.00 0.00 10.00 10.00", "R 1.00 1.00 8.00 8.00"), marker(Marker.CHECKBOX, false));
+    }
+
+    @Test
+    void aCircleMarkerIsARingOfTwoCircles() {
+        List<String> ops = marker(Marker.CIRCLE, false);
+        assertEquals(List.of("M", "C", "C", "C", "C", "Z", "M", "C", "C", "C", "C", "Z"),
+                ops.stream().map(o -> o.substring(0, 1)).toList());
+        // The outer one starts at the top, in the middle; the inner one, 1.8 further in.
+        assertEquals("M 5.00 0.00", ops.get(0));
+        assertEquals("M 5.00 1.80", ops.get(6));
+    }
+
+    @Test
+    void aCheckedCheckboxAddsTheOutlineOfItsMarkInsideTheBox() {
+        List<String> ops = marker(Marker.CHECKBOX, true);
+        assertEquals(List.of("R", "R", "M", "L", "L", "L", "L", "L", "Z"),
+                ops.stream().map(o -> o.substring(0, 1)).toList());
+        // The start of the short stroke, the corner at the bottom and the end of the long stroke, on one side.
+        assertEquals(List.of("M 1.98 5.62", "L 4.24 7.88", "L 8.06 3.39"), ops.subList(2, 5));
+        for (String op : ops.subList(2, 8)) {
+            for (String number : op.substring(2).split(" ")) {
+                double v = Double.parseDouble(number);
+                assertTrue(v > 1 && v < 9, op);
+            }
+        }
+    }
+
+    @Test
+    void aMarkerOfTheFontIsNotDrawn() {
+        assertThrows(IllegalArgumentException.class, () -> marker(Marker.BULLET, false));
+    }
 
     @Test
     void aSquareBoxIsARect() {

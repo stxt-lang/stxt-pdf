@@ -106,11 +106,12 @@ final class PdfStructureLinks {
     }
 
     /**
-     * Whether the box or what it contains has something to read: text, a marker (with text, or an image with
+     * Whether the box or what it contains has something to read: text, a marker (with text, drawn, or an image with
      * {@code Alt}) or an image with {@code Alt}.
      */
     private static boolean hasContent(Box box) {
-        if (box.hasText() || box.marker() != null && (box.marker().hasText() || box.marker().style().image().alt() != null)
+        if (box.hasText() || box.marker() != null && (box.marker().hasText() || box.marker().isMarkerShape()
+                || box.marker().style().image().alt() != null)
                 || box.isImage() && box.style().image().alt() != null) {
             return true;
         }

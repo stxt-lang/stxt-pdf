@@ -5,12 +5,15 @@ import dev.stxt.pdf.model.MarkerSuffix;
 
 /**
  * The properties of lists (reference/components/list.md): the {@code Marker}, the {@code Marker suffix}, the
- * {@code Marker image} and the {@code First number} of a {@code List} and the {@code Item number} and the {@code Marker image} of a {@code List item}. They are
- * not inherited.
+ * {@code Marker image} and the {@code First number} of a {@code List} and the {@code Item number}, the {@code Checked}
+ * and the {@code Marker image} of a {@code List item}. They are not inherited.
  */
 public final class ListStyle extends StyleGroup {
 
-    /** Marker of the items of a {@code List}; {@code null} in the other boxes. */
+    /**
+     * Marker of the items of a {@code List} and, in the generated box of a marker the engine draws, its shape;
+     * {@code null} in the other boxes.
+     */
     private Marker marker;
     /** What follows the number in the markers of a numbered {@code List}. */
     private MarkerSuffix markerSuffix = MarkerSuffix.PERIOD;
@@ -18,6 +21,8 @@ public final class ListStyle extends StyleGroup {
     private int firstNumber = 1;
     /** Number that a {@code List item} sets; {@code null} = the one after that of the previous item. */
     private Integer number;
+    /** {@code Checked} of a {@code List item}: whether the checkbox of its marker is checked. */
+    private boolean checked;
     /** Path of the {@code Marker image}, relative to {@code images/}; {@code null} if it does not declare one. */
     private String markerImage;
     /** {@code Alt} of the {@code Marker image}; {@code null} = decorative. */
@@ -63,6 +68,19 @@ public final class ListStyle extends StyleGroup {
     void setNumber(Integer v) {
         writable();
         number = v;
+    }
+
+    /**
+     * {@code Checked} of a {@code List item} of a list with {@code Marker: checkbox}, and in the generated box of its
+     * marker, whether the checkbox is drawn checked; {@code false} by default.
+     */
+    public boolean checked() {
+        return checked;
+    }
+
+    void setChecked(boolean v) {
+        writable();
+        checked = v;
     }
 
     /**

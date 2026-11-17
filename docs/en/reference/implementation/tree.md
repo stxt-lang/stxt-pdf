@@ -205,7 +205,10 @@ box that is passed to them. `Text position` only exists in that `Style` (`Style.
   `Marker image` in its `ListStyle`), with the line of the `Marker image` of the item or, if it has none, of the list.
   `PropertyReader.markerImage` reads the `Marker image` with its children, `ListBuilder.validateList` and
   `validateItem` check that it only goes with `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`) and `ListBuilder.marker`, that with
-  `Marker: image` there is an image (`LIST_IMAGE_MISSING`).
+  `Marker: image` there is an image (`LIST_IMAGE_MISSING`). With a marker the engine draws (`Marker.drawn()`: `circle`,
+  `square`, `checkbox`), a box without text or image (`Box.isMarkerShape()`), with the `Marker` and the `Checked` of its
+  item in its `ListStyle`; `validateItem` checks that `Checked` only goes with `Marker: checkbox`
+  (`LIST_CHECKED_NOT_ALLOWED`).
 - **Column flow:** the content of a `Columns` goes in a generated block box (`Element.COLUMN_FLOW`), its only child.
 - **Table of contents entries:** `TableOfContentsBuilder` generates at the end one `Stack` box per heading (`Element.TOC_1` to `Element.TOC_6`)
   or, with `Entries: figures` or `tables`, per `Figure` of that counter (`Element.TOC_1`), with the title or the caption, the

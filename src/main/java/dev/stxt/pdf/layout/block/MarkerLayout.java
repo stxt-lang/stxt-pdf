@@ -6,6 +6,7 @@ import dev.stxt.pdf.layout.Baselines;
 import dev.stxt.pdf.layout.LayoutContext;
 import dev.stxt.pdf.layout.inline.TextMeasurer;
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.tree.Box;
 import dev.stxt.pdf.tree.Style;
 import dev.stxt.pdf.tree.TypographyStyle;
@@ -17,7 +18,8 @@ import java.util.OptionalDouble;
 /**
  * Marker of a {@code List item} (reference/components/list.md): a fragment that hangs to the left of the border box
  * of the item, aligned with its first line: a one-line text fragment with its baseline on that of the line or,
- * with {@code Marker: image}, an image centered on the capitals of the item's typography on that baseline.
+ * with {@code Marker: image} or a marker the engine draws ({@code circle}, {@code square}, {@code checkbox}), an image
+ * or a shape centered on the capitals of the item's typography on that baseline.
  *
  * <p>The first line is the one found by going down through the first in-flow child of each
  * fragment until one with lines; the tree already guarantees that it exists ({@code LIST_ITEM_WITHOUT_LINE}).
@@ -25,6 +27,9 @@ import java.util.OptionalDouble;
  * with the first line, which is the first one of the item.</p>
  */
 final class MarkerLayout {
+
+    /** The side of a circle or a square marker, as a part of the height of the capitals of the item. */
+    private static final double SMALL_SHAPE = 0.5;
 
     private MarkerLayout() {
     }
@@ -48,15 +53,17 @@ final class MarkerLayout {
         Box marker = item.marker();
         Style s = marker.style();
         TypographyStyle t = s.typography();
-        if (marker.isImage()) {
-            // As tall as its Height or the Size of the item, as wide as its proportion gives, and followed by the
-            // space of the item's font, which is its right padding: the content box is the image.
-            double height = s.list().markerHeight() != null ? s.list().markerHeight() : t.fontSize();
-            double width = height * context.natural(marker).ratio();
+        if (marker.isImage() || marker.isMarkerShape()) {
+            double capitals = measurer.vertical(t.fontFace()).capHeight() * t.fontSize();
+            // An image is as tall as its Height or the Size of the item and as wide as its proportion gives; a shape
+            // is a square, as tall as the capitals of the item if it is a checkbox and half of them if not. Both are
+            // followed by the space of the item's font, which is their right padding: the content box is the drawing.
+            double height = marker.isMarkerShape() ? capitals * (s.list().marker() == Marker.CHECKBOX ? 1 : SMALL_SHAPE)
+                    : s.list().markerHeight() != null ? s.list().markerHeight() : t.fontSize();
+            double width = marker.isMarkerShape() ? height : height * context.natural(marker).ratio();
             double space = measurer.width(" ", t.fontFace(), t.fontSize());
             double x = -border.left() - padding.left() - width - space;
             // Its center is the middle of the capitals of the item's typography on the baseline of the first line.
-            double capitals = measurer.vertical(t.fontFace()).capHeight() * t.fontSize();
             double y = baseline.getAsDouble() - capitals / 2 - height / 2;
             return Optional.of(new Fragment(marker, x, y, width + space, height, Insets.ZERO, Insets.ZERO,
                     new Insets(0, space, 0, 0), List.of(), List.of(), true, true));

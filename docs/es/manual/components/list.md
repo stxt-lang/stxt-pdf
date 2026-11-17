@@ -41,11 +41,12 @@ Document (dev.stxt.pdf):
 
 | Propiedad | Dónde | Qué hace |
 |---|---|---|
-| `Marker` | `List` | **Obligatorio**, en la lista o en una regla de `Styles` ([Estilos](../common/styles.md#propiedades-de-un-elemento)). `bullet` (•), `dash` (–), `none`, `image` (una imagen), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Obligatorio**, en la lista o en una regla de `Styles` ([Estilos](../common/styles.md#propiedades-de-un-elemento)). `bullet` (•), `dash` (–), `circle` (un círculo hueco), `square` (un cuadrado relleno), `checkbox` (una casilla), `none`, `image` (una imagen), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Marker suffix` | `List` | Lo que sigue al número: `period` (`1.`, `a.`), por defecto, o `parenthesis` (`1)`, `a)`). Solo en las numeradas |
 | `Marker image` | `List`, `List item` | La imagen del marcador con `Marker: image`, de `images/`. La de la lista vale para todos sus ítems; la de un ítem la sustituye. Admite `Alt` y `Height` |
 | `First number` | `List` | El número del primer ítem (1 por defecto). Solo en las numeradas |
 | `Item number` | `List item` | El número de este ítem. Los siguientes siguen desde él |
+| `Checked` | `List item` | `true` si la casilla de este ítem está marcada (`false` por defecto). Solo en una lista con `Marker: checkbox` |
 
 `List` y `List item` admiten además `Id`, `Style`, `Link`, `Box`, `Typography` y `Break`. Un ítem tiene uno o varios
 elementos (un `Paragraph`, un `Text`, otra `List`), pero no encabezados.
@@ -84,6 +85,44 @@ Document (dev.stxt.pdf):
             List item:
                 Paragraph: Conservar los restos hasta la peritación.
 ```
+
+## Casillas, círculos y cuadrados
+
+`circle`, `square` y `checkbox` los dibuja el motor, así que no dependen de la fuente. `circle` y `square` son los
+marcadores habituales del segundo y el tercer nivel de una lista. `checkbox` dibuja una casilla, marcada en los ítems con
+`Checked: true`: una lista de comprobación.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Documentación
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+    Section:
+        List:
+            Marker: checkbox
+            List item:
+                Checked: true
+                Paragraph: Documento de identidad del tomador.
+            List item:
+                Paragraph: Justificante de pago.
+                List:
+                    Marker: circle
+                    List item:
+                        Paragraph: Recibo del banco o extracto de la tarjeta.
+```
+
+Los tres toman el color del texto del ítem y su tamaño: una casilla mide de alto lo que sus mayúsculas, y un círculo y un
+cuadrado, la mitad. Un lector de pantalla lee una casilla como marcada o sin marcar.
 
 ## Marcadores con imagen
 
@@ -138,6 +177,7 @@ marcadores quedan alineados a la derecha, pegados al texto con un espacio.
   numera es un error.
 - `Marker image` solo tiene sentido con `Marker: image`; en otra lista es un error, y un ítem de una lista con
   `Marker: image` sin imagen, ni suya ni de la lista, también.
+- `Checked` solo tiene sentido con `Marker: checkbox`; en otra lista es un error.
 - Si el ítem se parte entre páginas, el marcador va en la primera.
 - `{number of: id}` escribe el número de un ítem con `Id` (`3`, `c`, `IV`): «véase la cláusula {number of: pago}».
 

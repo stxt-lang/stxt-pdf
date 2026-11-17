@@ -299,6 +299,11 @@ box down to that line and lengthens the long bars to its middle (`Modules.rects(
 and the canvas paints each run of the line with `text`, in the font and the color of the box, inside the same marked
 content: in the tagged PDF the text is part of the `Figure`, not a separate text.
 
+A marker of a list that the engine draws (`Box.isMarkerShape()`: `circle`, `square`, `checkbox`) is painted by
+`Canvas.marker`: `Shapes.marker` gives its path (a ring, a rectangle, or the ring of the box with the outline of its
+check mark), which both canvases fill once with the even-odd rule in the color of the typography of the item;
+`PdfCanvas` does it inside the marked content of the `Lbl` of the item.
+
 > **Decision:** a single path and a single fill, and not one fill per module: two rectangles filled separately show a thin
 > line between them in some viewers because of anti-aliasing, which in a QR code reads as a light module.
 

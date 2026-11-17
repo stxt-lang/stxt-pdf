@@ -247,7 +247,8 @@ y tan ancho como su proporción, que `TextValues.WithImages` lee del fichero a t
 antes las imágenes de los tramos como las de las `Image` (formato, límites), con la línea del texto.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`Baselines.first`, que baja por el primer
-fragmento en flujo hasta uno con líneas y usa `TextMeasurer.vertical` con el tamaño de la línea); un marcador con imagen
+fragmento en flujo hasta uno con líneas y usa `TextMeasurer.vertical` con el tamaño de la línea); un marcador dibujado
+es un cuadrado del alto de las mayúsculas del ítem (de la mitad, en un `circle` y un `square`), y un marcador con imagen
 mide `Height` o el `Size` del ítem de alto y lo que da su proporción (`LayoutContext.natural`) de ancho, lleva el espacio
 que lo separa del ítem como relleno derecho del fragmento, y se centra en las mayúsculas (`VerticalMetrics.capHeight`) de
 la tipografía del ítem sobre esa línea base. `StackLayout` usa el mismo `Baselines.first` para `Vertical: baseline`:

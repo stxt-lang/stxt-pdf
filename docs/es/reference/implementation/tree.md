@@ -204,7 +204,9 @@ leen.
   `Marker image` en su `ListStyle`), con la línea del `Marker image` del ítem o, si no tiene, de la lista.
   `PropertyReader.markerImage` lee el `Marker image` con sus hijos, `ListBuilder.validateList` y `validateItem`
   comprueban que solo va con `Marker: image` (`LIST_IMAGE_NOT_ALLOWED`) y `ListBuilder.marker`, que con `Marker: image` hay
-  una imagen (`LIST_IMAGE_MISSING`).
+  una imagen (`LIST_IMAGE_MISSING`). Con un marcador que dibuja el motor (`Marker.drawn()`: `circle`, `square`,
+  `checkbox`), una caja sin texto ni imagen (`Box.isMarkerShape()`), con el `Marker` y el `Checked` de su ítem en su
+  `ListStyle`; `validateItem` comprueba que `Checked` solo va con `Marker: checkbox` (`LIST_CHECKED_NOT_ALLOWED`).
 - **Flujo de columnas:** el contenido de un `Columns` va en una caja de bloque generada (`Element.COLUMN_FLOW`), su único hijo.
 - **Entradas de índice:** `TableOfContentsBuilder` genera al final una caja `Stack` por encabezado (`Element.TOC_1` a `Element.TOC_6`)
   o, con `Entries: figures` o `tables`, por `Figure` de ese contador (`Element.TOC_1`), con el título o el pie, la guía y el

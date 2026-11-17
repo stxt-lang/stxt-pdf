@@ -205,7 +205,7 @@ once, and the elements, as many times as needed.
 | `Text`, `Paragraph` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Content`, `Rotate`, `Below side boxes`; `Paragraph`, besides, `Drop cap` |
 | `Heading 1` to `Heading 6` | `Id`, `Style`, `Link`, `In table of contents`, `Numbered`, `Number format`, `Number label`, `Box`, `Typography`, `Below side boxes`; `Text` (at least one) |
 | `List` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Marker` (required, its own or from a rule), `Marker suffix`, `Marker image` (with `Alt` and `Height`), `First number`; `List item` (at least one) |
-| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Item number`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
+| `List item` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Item number`, `Checked`, `Marker image` (with `Alt` and `Height`), `Trim margins`; elements except headings (at least one) |
 | `Table` | `Id`, `Style`, `Link`, `Box`, `Typography`, `Break`, `Column sizes` (required, its own or from a rule), `Column align`, `Gap`, `Split rows`; `Header rows`, `Body rows` (required), `Footer rows` |
 | `Header rows`, `Body rows`, `Footer rows` | `Row` (at least one) |
 | `Row` | `Id`, `Style`, `Box` (appearance only), `Typography`, `Break`; `Cell` (at least one) |

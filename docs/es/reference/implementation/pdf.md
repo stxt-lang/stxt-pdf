@@ -123,7 +123,7 @@ espacios tras él. No está en la estructura: la de un elemento con `Case` sigue
 ### Listas
 
 `L` lleva el atributo `ListNumbering` según el `Marker`: `Disc`, `Decimal`, `LowerAlpha`, `UpperAlpha`, `LowerRoman`,
-`UpperRoman`, y `None` para `dash`, `none` e `image`.
+`UpperRoman`, `Circle`, `Square`, y `None` para `dash`, `checkbox`, `none` e `image`.
 
 > **Decisión:** `dash` es `ListNumbering: None`, porque PDF/UA-1 no tiene un valor para el guion. *Alternativa
 > descartada:* `Unordered`, de PDF 2.0, que sí se usa con PDF/UA-2 ([abajo](#pdfua-2)).
@@ -131,6 +131,10 @@ espacios tras él. No está en la estructura: la de un elemento con `Case` sigue
 Un marcador con imagen ([List](../components/list.md#marcadores-con-imagen)) con `Alt` es un `Figure` dentro del `Lbl` del
 ítem, con el texto alternativo y el `BBox` de la imagen (`PdfStructure.figureBox`); sin `Alt` es decorativo, se pinta como
 *artifact* y el `LI` no lleva `Lbl`. veraPDF lo acepta así en PDF/UA-1 y PDF/UA-2.
+
+Un marcador dibujado ([List](../components/list.md#marcadores-dibujados)) es el contenido del `Lbl` de su ítem: un trazado
+relleno con la regla par-impar (`PdfCanvas.marker`). El dibujo no tiene texto, así que el `Lbl` lleva como `ActualText` el
+carácter que lo representa (`Marker.symbol`): `◦`, `▪`, `☐` o `☑`.
 
 > **Decisión:** la imagen decorativa deja al ítem sin `Lbl`, en vez de un `Lbl` vacío. *Alternativa descartada:* un
 > `Lbl` sin contenido, que no dice nada al lector; o `ActualText` en el `Lbl`, que PDF/UA no prevé para una imagen.
@@ -272,7 +276,7 @@ escriben:
 - **Destinos de estructura:** un enlace a una caja del documento y un marcador son una acción `GoTo` con el elemento de la
   caja en `SD` (o el de su antecesor más cercano que tenga elemento) y la misma posición. `D`, con la página, queda para los
   visores que no entienden `SD`.
-- **Listas:** `dash` e `image` son `ListNumbering: Unordered`.
+- **Listas:** `dash`, `checkbox` e `image` son `ListNumbering: Unordered`.
 - **Notas al pie:** `FENote` en lugar de `Note`, con `NoteType: Footnote`.
 - **Enlaces sin nada que leer** (los que llevan `Alt`): su anotación no lleva `Contents`, porque lo que se lee es el `Alt`.
 

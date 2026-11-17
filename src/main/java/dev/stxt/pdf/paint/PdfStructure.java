@@ -201,6 +201,10 @@ final class PdfStructure {
                     elements.put(marker, figure);
                 } else {
                     elements.put(marker, label);
+                    if (marker.isMarkerShape()) {
+                        // A drawing has no text of its own: the character that stands for it is what is read.
+                        label.setActualText(marker.style().list().marker().symbol(marker.style().list().checked()));
+                    }
                 }
             }
             PDStructureElement body = profile.element("LBody", e);

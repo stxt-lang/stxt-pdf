@@ -1,0 +1,30 @@
+# The capitals measure 7 (Size 10) and the space, 5; the baseline of a line is 9 below its top, so the capitals are
+# centered 5.5 below it. A circle and a square are 3.5 on a side: with the space, 8.5 wide, from x = 61.5 (the items
+# start at 70), and their top is 3.75 below that of the line. A checkbox is 7 on a side: with the space, 12 wide, from
+# x = 58, and its top is 2 below that of the line. The items of sub start at x = 100, and its square, at 91.5.
+Result:
+	Page: 1
+		Fragment: levels
+			Rect: 40 40 515 24
+			Fragment: l1
+				Rect: 70 40 485 24
+				Marker: ◦
+					Rect: 61.5 43.75 8.5 3.5
+				Fragment: sub
+					Rect: 70 52 485 12
+					Fragment: s1
+						Rect: 100 52 455 12
+						Marker: ▪
+							Rect: 91.5 55.75 8.5 3.5
+		Fragment: tasks
+			Rect: 40 64 515 24
+			Fragment: t1
+				Rect: 70 64 485 12
+				Marker: ☑
+					Rect: 58 66 12 7
+			Fragment: t2
+				Rect: 70 76 485 12
+				Marker: ☐
+					Rect: 58 78 12 7
+		Fragment: md
+			Rect: 40 88 515 60

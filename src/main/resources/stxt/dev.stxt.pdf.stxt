@@ -462,6 +462,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 			Child: Item number
 				Max: 1
+			Child: Checked
+				Max: 1
 			Child: Marker image
 				Max: 1
 			Child: Trim margins
@@ -1935,10 +1937,13 @@ Schema (@stxt.schema): dev.stxt.pdf
 
 	Node: Marker
 		Type: ENUM
-		Description: Marker of the items: bullet (•), dash (–) or none, an image (the Marker image of the list or of each item), or a numbering (1., a., A., i., I.; with Marker suffix: parenthesis, 1), a)...).
+		Description: Marker of the items: bullet (•) or dash (–), in the font of the item; circle (hollow), square (filled) or checkbox (checked in the items with Checked: true), which the engine draws in the color of the item; none; an image (the Marker image of the list or of each item); or a numbering (1., a., A., i., I.; with Marker suffix: parenthesis, 1), a)...).
 		Values:
 			Value: bullet
 			Value: dash
+			Value: circle
+			Value: square
+			Value: checkbox
 			Value: none
 			Value: image
 			Value: decimal
@@ -1966,6 +1971,9 @@ Schema (@stxt.schema): dev.stxt.pdf
 	Node: Item number
 		Type: INTEGER
 		Description: Number of this item of a numbered List, in the same range as First number; the following ones continue from it. In a List that does not number, it is an error.
+	Node: Checked
+		Type: BOOLEAN
+		Description: Whether the checkbox of this item of a List with Marker: checkbox is checked. By default, false. In a List with another Marker, it is an error.
 
 	# Table
 
@@ -2045,7 +2053,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 	# Markdown
 
 	Node: Bullet markers
-		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash or none. Required, its own or from a rule of Styles, if the content has bulleted lists.
+		Description: Markers of the bulleted lists (-, *, +) of a Markdown, one per nesting level (the last one serves the deeper levels): bullet, dash, circle, square or none. Required, its own or from a rule of Styles, if the content has bulleted lists. A list of tasks (- [ ], - [x]) has Marker: checkbox and does not use it.
 	Node: Number markers
 		Description: Markers of the numbered lists (1., 1)) of a Markdown, one per nesting level (the last one serves the deeper levels): decimal, lower-alpha, upper-alpha, lower-roman or upper-roman. A list written with 1) has Marker suffix: parenthesis. Required, its own or from a rule of Styles, if the content has numbered lists.
 	Node: Table column sizes

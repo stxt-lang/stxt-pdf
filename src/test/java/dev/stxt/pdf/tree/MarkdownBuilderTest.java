@@ -158,6 +158,68 @@ class MarkdownBuilderTest {
     }
 
     @Test
+    void aListOfTasksHasCheckboxesAndNeedsNoBulletMarkers() {
+        MarkdownBuilder.Translation t = translate("- [x] hecho", "- [ ] **por** hacer", "- [X] también");
+        assertEquals(List.of("List @15",
+                "  Marker: checkbox @15",
+                "  List item @15",
+                "    Checked: true @15",
+                "    Paragraph: hecho @15",
+                "  List item @16",
+                "    Paragraph: por hacer @16",
+                "  List item @17",
+                "    Checked: true @17",
+                "    Paragraph: también @17"), outline(t.elements().get(0)));
+        // The mark is not part of the text: the bold run starts the paragraph.
+        InlineNode second = (InlineNode) ((InlineNode) t.elements().get(0).getChildren().get(2)).getChildren().get(0);
+        assertEquals("por", t.runs().get(second).get(0).text());
+    }
+
+    @Test
+    void aListOfTasksCountsAsALevelOfBulletedLists() {
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: circle square"),
+                "- [ ] a", "  - b", "", "texto", "", "- c", "  - [x] d");
+        assertEquals(List.of("List @16", "  Marker: checkbox @16", "  List item @16", "    Paragraph: a @16",
+                "    List @17", "      Marker: square @14", "      List item @17", "        Paragraph: b @17"),
+                outline(t.elements().get(0)));
+        assertEquals(List.of("List @21", "  Marker: circle @14", "  List item @21", "    Paragraph: c @21",
+                "    List @22", "      Marker: checkbox @22", "      List item @22", "        Checked: true @22",
+                "        Paragraph: d @22"), outline(t.elements().get(2)));
+    }
+
+    @Test
+    void whatIsNotWrittenAsATaskIsText() {
+        // Escaped, without the space after it, or not at the start of the item.
+        MarkdownBuilder.Translation t = translate(List.of("Bullet markers: bullet"),
+                "- \\[x] uno", "- [x]dos", "- tres [ ] cuatro", "- [y] cinco");
+        assertEquals(List.of("List @16", "  Marker: bullet @14", "  List item @16", "    Paragraph: [x] uno @16",
+                "  List item @17", "    Paragraph: [x]dos @17", "  List item @18", "    Paragraph: tres [ ] cuatro @18",
+                "  List item @19", "    Paragraph: [y] cinco @19"), outline(t.elements().get(0)));
+    }
+
+    @Test
+    void tasksDoNotMixWithOtherItemsNorGoInANumberedList() {
+        InvalidModelException mixed = assertThrows(InvalidModelException.class,
+                () -> translate(List.of("Bullet markers: bullet"), "- [ ] uno", "- dos"));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, mixed.errorCode());
+        assertEquals(16, mixed.line());
+        InvalidModelException numbered = assertThrows(InvalidModelException.class,
+                () -> translate(List.of("Number markers: decimal"), "1. [ ] uno", "2. [x] dos"));
+        assertEquals(ErrorCode.MARKDOWN_UNSUPPORTED, numbered.errorCode());
+        assertTrue(numbered.getMessage().contains("numbered list"), numbered.getMessage());
+    }
+
+    @Test
+    void bulletMarkersTakeTheShapesButNotTheCheckbox() {
+        assertEquals("square", translate(List.of("Bullet markers: square"), "- a").elements().get(0)
+                .getChild("marker").getText());
+        InvalidModelException e = assertThrows(InvalidModelException.class,
+                () -> translate(List.of("Bullet markers: checkbox"), "- a"));
+        assertEquals(ErrorCode.VALUE_NOT_ALLOWED, e.errorCode());
+        assertEquals(14, e.line());
+    }
+
+    @Test
     void aNumberedListWrittenWithAParenthesisTakesItAsItsSuffix() {
         MarkdownBuilder.Translation t = translate(List.of("Number markers: lower-alpha"), "2) x", "3) y", "", "1. z");
         assertEquals(List.of("List @16", "  Marker: lower-alpha @14", "  Marker suffix: parenthesis @16",

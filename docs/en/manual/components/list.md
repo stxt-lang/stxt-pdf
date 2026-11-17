@@ -41,11 +41,12 @@ Document (dev.stxt.pdf):
 
 | Property | Where | What it does |
 |---|---|---|
-| `Marker` | `List` | **Required**, in the list or in a rule of `Styles` ([Styles](../common/styles.md#element-properties)). `bullet` (•), `dash` (–), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
+| `Marker` | `List` | **Required**, in the list or in a rule of `Styles` ([Styles](../common/styles.md#element-properties)). `bullet` (•), `dash` (–), `circle` (a hollow circle), `square` (a filled square), `checkbox` (a checkbox), `none`, `image` (an image), `decimal` (1.), `lower-alpha` (a.), `upper-alpha` (A.), `lower-roman` (i.), `upper-roman` (I.) |
 | `Marker suffix` | `List` | What follows the number: `period` (`1.`, `a.`), the default, or `parenthesis` (`1)`, `a)`). Only in numbered lists |
 | `Marker image` | `List`, `List item` | The image of the marker with `Marker: image`, from `images/`. That of the list serves all its items; that of an item replaces it. It accepts `Alt` and `Height` |
 | `First number` | `List` | The number of the first item (1 by default). Only in numbered lists |
 | `Item number` | `List item` | The number of this item. The following ones continue from it |
+| `Checked` | `List item` | `true` if the checkbox of this item is checked (`false` by default). Only in a list with `Marker: checkbox` |
 
 `List` and `List item` also accept `Id`, `Style`, `Link`, `Box`, `Typography` and `Break`. An item has one or more elements
 (a `Paragraph`, a `Text`, another `List`), but not headings.
@@ -84,6 +85,44 @@ Document (dev.stxt.pdf):
             List item:
                 Paragraph: Keep the remains until the appraisal.
 ```
+
+## Checkboxes, circles and squares
+
+`circle`, `square` and `checkbox` are drawn by the engine, so they do not depend on the font. `circle` and `square` are
+the usual markers of the second and third level of a list. `checkbox` draws a box, checked in the items with
+`Checked: true`: a checklist.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Documents
+    Page:
+        Paper: A4
+        Margin: 50
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 10
+        For element: List
+            Box:
+                Padding: 0 0 0 18
+    Section:
+        List:
+            Marker: checkbox
+            List item:
+                Checked: true
+                Paragraph: Identity document of the policyholder.
+            List item:
+                Paragraph: Proof of payment.
+                List:
+                    Marker: circle
+                    List item:
+                        Paragraph: Bank receipt or card statement.
+```
+
+The three take the color of the text of the item and its size: a checkbox is as tall as its capitals, and a circle and a
+square, half as tall. A screen reader reads a checkbox as checked or not checked.
 
 ## Image markers
 
@@ -138,6 +177,7 @@ in the example. The markers are aligned to the right, next to the text with a sp
   does not number it is an error.
 - `Marker image` only makes sense with `Marker: image`; in another list it is an error, and so is an item of a list with
   `Marker: image` without an image, neither its own nor the list's.
+- `Checked` only makes sense with `Marker: checkbox`; in another list it is an error.
 - If the item is split across pages, the marker goes on the first one.
 - `{number of: id}` writes the number of an item with an `Id` (`3`, `c`, `IV`): "see clause {number of: pago}".
 

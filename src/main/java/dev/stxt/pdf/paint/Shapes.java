@@ -1,6 +1,7 @@
 package dev.stxt.pdf.paint;
 
 import dev.stxt.pdf.model.Insets;
+import dev.stxt.pdf.model.Marker;
 import dev.stxt.pdf.model.Radii;
 import dev.stxt.pdf.model.Rect;
 import dev.stxt.pdf.model.Sides;
@@ -11,8 +12,8 @@ import java.util.function.Consumer;
 
 /**
  * The shapes the canvases paint (reference/common/box.md): a rectangle with rounded
- * corners, the ring of a border, the four trapezoids it is split into and the line along the middle of a border that
- * is not solid. They are described as a path that
+ * corners, the ring of a border, the four trapezoids it is split into, the line along the middle of a border that
+ * is not solid and the markers of a list that are drawn (reference/components/list.md). They are described as a path that
  * each canvas draws its own way ({@link Path}), so that the PDF and the SVG paint the same.
  */
 final class Shapes {
@@ -97,6 +98,91 @@ final class Shapes {
         if (inner.width() > 0 && inner.height() > 0) {
             roundedRect(path, inner, radii.inset(widths));
         }
+    }
+
+    /** Width of the line of a circle marker, as a part of its side. */
+    private static final double CIRCLE_LINE = 0.18;
+    /** Width of the line of the box of a checkbox, as a part of its side. */
+    private static final double CHECKBOX_LINE = 0.1;
+    /** Half the width of the line of a check mark, as a part of the side of its checkbox. */
+    private static final double CHECK_HALF_LINE = 0.06;
+    /** The three points of a check mark, as parts of the side of its checkbox: x and y of each one. */
+    private static final double[] CHECK = {0.24, 0.52, 0.42, 0.70, 0.76, 0.30};
+
+    /**
+     * A marker of a list that the engine draws (reference/components/list.md) in the square {@code r}, to be filled
+     * with the even-odd rule: a hollow circle, a filled square, or the box of a checkbox, with its check mark if it
+     * is {@code checked}. The widths of its lines are parts of its side, so that it scales with the text.
+     */
+    static void marker(Path path, Marker marker, boolean checked, Rect r) {
+        double side = r.width();
+        switch (marker) {
+            case SQUARE -> path.rect(r.x(), r.y(), side, r.height());
+            case CIRCLE -> {
+                circle(path, r);
+                circle(path, r.shrink(all(side * CIRCLE_LINE)));
+            }
+            case CHECKBOX -> {
+                ring(path, r, all(side * CHECKBOX_LINE), Radii.NONE);
+                if (checked) {
+                    checkMark(path, r);
+                }
+            }
+            default -> throw new IllegalArgumentException("Not a drawn marker: " + marker);
+        }
+    }
+
+    private static Insets all(double width) {
+        return new Insets(width, width, width, width);
+    }
+
+    /**
+     * The ellipse inscribed in {@code r}, clockwise from the top: four quarters from its center, without the sides
+     * of no length that {@link #roundedRect} would leave between them.
+     */
+    private static void circle(Path path, Rect r) {
+        Radii.Corner round = Radii.Corner.of(r.width() / 2, r.height() / 2);
+        double cx = r.x() + round.rx();
+        double cy = r.y() + round.ry();
+        path.moveTo(cx, r.y());
+        corner(path, cx, r.y(), r.right(), cy, true, round);
+        corner(path, r.right(), cy, cx, r.bottom(), false, round);
+        corner(path, cx, r.bottom(), r.x(), cy, true, round);
+        corner(path, r.x(), cy, cx, r.y(), false, round);
+        path.close();
+    }
+
+    /**
+     * The outline of a check mark: the line through the three points of {@link #CHECK}, with square ends and a
+     * pointed corner at the middle one.
+     */
+    private static void checkMark(Path path, Rect r) {
+        double[] p = new double[6];
+        for (int i = 0; i < 6; i += 2) {
+            p[i] = r.x() + CHECK[i] * r.width();
+            p[i + 1] = r.y() + CHECK[i + 1] * r.height();
+        }
+        double half = CHECK_HALF_LINE * r.width();
+        // The normal of each stroke, of length 1.
+        double[] n1 = normal(p[0], p[1], p[2], p[3]);
+        double[] n2 = normal(p[2], p[3], p[4], p[5]);
+        // Where the two edges of the same side meet: the middle point moved along the sum of the normals.
+        double miter = half / (1 + n1[0] * n2[0] + n1[1] * n2[1]);
+        double mx = (n1[0] + n2[0]) * miter;
+        double my = (n1[1] + n2[1]) * miter;
+        polygon(path,
+                p[0] + n1[0] * half, p[1] + n1[1] * half,
+                p[2] + mx, p[3] + my,
+                p[4] + n2[0] * half, p[5] + n2[1] * half,
+                p[4] - n2[0] * half, p[5] - n2[1] * half,
+                p[2] - mx, p[3] - my,
+                p[0] - n1[0] * half, p[1] - n1[1] * half);
+    }
+
+    /** The normal, of length 1, of the segment from ({@code x1}, {@code y1}) to ({@code x2}, {@code y2}). */
+    private static double[] normal(double x1, double y1, double x2, double y2) {
+        double length = Math.hypot(x2 - x1, y2 - y1);
+        return new double[]{-(y2 - y1) / length, (x2 - x1) / length};
     }
 
     /** The rectangle {@code r} with the corners {@code radii}, clockwise. */

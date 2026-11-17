@@ -218,7 +218,7 @@ pequeños maquetados con las métricas fijas.
 
 - Solo se vuelcan las cajas con `Id`, y las descendientes con `Id` se anidan dentro.
 - El marcador de un `List item` con `Id` se vuelca dentro del ítem como `Marker: 3.` (o `Marker image: ruta`, con una
-  imagen), con su `Rect`.
+  imagen, o `Marker: ☑`, con el carácter que representa a un marcador dibujado), con su `Rect`.
 - Las líneas de los bordes fusionados de una `Table` con `Id` se vuelcan detrás de su `Rect`, una por línea y en el
   orden en que se pintan: `Rule: x y ancho alto color`, en coordenadas de la página.
 - Un `Overlay` se anida dentro de su contenedor de referencia, detrás de sus hijos en flujo, y no dentro de su padre.

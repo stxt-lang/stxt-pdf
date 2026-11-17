@@ -54,7 +54,7 @@ Document (dev.stxt.pdf):
 | Propiedad | Valores | Por defecto | Notas |
 |---|---|---|---|
 | `Content` | bloque `>>` | sin valor | El Markdown. Obligatorio. |
-| `Bullet markers` | lista de `bullet`, `dash`, `none` | sin valor | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento. El último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas. |
+| `Bullet markers` | lista de `bullet`, `dash`, `circle`, `square`, `none` | sin valor | El `Marker` de las listas con viñetas (`-`, `*`, `+`), uno por nivel de anidamiento. El último sirve para los niveles más profundos. Obligatorio si hay listas con viñetas que no son listas de tareas. |
 | `Number markers` | lista de `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | sin valor | Igual, para las listas numeradas (`1.`, `1)`). Obligatorio si las hay. |
 | `Table column sizes` | `equal`, `auto` | sin valor | Las `Column sizes` de las tablas: `equal` es `repeat(n, *)`, y `auto`, `repeat(n, auto)`. Obligatorio si hay tablas. |
 
@@ -67,7 +67,7 @@ del documento ([Propiedades de elemento](../common/styles.md#propiedades-de-elem
 
 ## El subconjunto
 
-El Markdown es [CommonMark](https://commonmark.org) con las tablas y el tachado de GFM y el subrayado `++...++`. Se traduce
+El Markdown es [CommonMark](https://commonmark.org) con las tablas, el tachado y las listas de tareas de GFM y el subrayado `++...++`. Se traduce
 así:
 
 | Markdown | Elemento |
@@ -75,6 +75,7 @@ así:
 | `#` a `######` (y los subrayados con `===` y `---`) | `Heading 1` a `Heading 6`, con un `Text`, y con `{#id}` al final del texto (`## Ventas {#ventas}`), su `Id` |
 | Párrafo | `Paragraph` |
 | `-`, `*`, `+` | `List` con el `Marker` de `Bullet markers` para su nivel, con un `List item` por ítem |
+| `- [ ]`, `- [x]` | `List` con `Marker: checkbox`, con un `List item` por ítem, con `Checked: true` en los escritos con `[x]` ([Listas](#listas-de-tareas)) |
 | `1.`, `1)` | `List` con el `Marker` de `Number markers` para su nivel, `First number`, el primer número si no es 1, y, escrita con `1)`, `Marker suffix: parenthesis` ([Listas](#listas)) |
 | Tabla | `Table` con las `Column sizes` de `Table column sizes`, con la fila de cabecera en `Header rows` y el resto en `Body rows` |
 | `**x**`, `__x__` | tramo en negrita ([Formato del texto](../common/text-formatting.md#tramos)) |
@@ -98,7 +99,7 @@ Todo lo demás es un error (`MARKDOWN_UNSUPPORTED`): enlaces con título (`[x](d
 línea ([abajo](#saltos-de-línea-forzados)) y definiciones de enlaces (`[x][ref]` con `[ref]: destino`: el destino se
 escribe en el propio enlace).
 Un encabezado tampoco puede ir dentro de un ítem de lista, como en un `List item`, ni una tabla quedarse sin filas debajo de
-la cabecera.
+la cabecera, ni una lista tener tareas e ítems que no lo son ([abajo](#listas-de-tareas)).
 
 **Los bloques vacíos se ignoran**: un encabezado sin texto (`#` solo), un bloque de código vacío, una cita sin
 contenido (`>` solo) y un párrafo sin texto no generan ningún elemento, tampoco dentro de una cita o de un ítem. Dos
@@ -111,7 +112,8 @@ vacíos siguen siendo un error: un `Markdown` que se queda sin ningún elemento,
 > error, como el de un `Text` vacío que escribe el autor: ese elemento está declarado, y este es un resto del texto.
 > No es lo que «no tendría efecto» (abajo): ahí el autor escribió algo que esperaba ver.
 
-Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`. Una imagen clicable es una `Image` con
+Un `Bullet markers` o un `Number markers` con un marcador del otro tipo es `VALUE_NOT_ALLOWED`, y un `Bullet markers`
+con `image` o con `checkbox`, también. Una imagen clicable es una `Image` con
 `Link` o, dentro de un texto, una imagen en línea dentro de un enlace (`[![Alt](ruta)](destino)`).
 
 > **Decisión:** lo que no tendría efecto (la etiqueta de lenguaje de un bloque de código, el título de un enlace) es un
@@ -269,6 +271,33 @@ donde cambia el delimitador, así que cada lista tiene uno solo.
 > forma habitual; o una propiedad `Number suffixes` por nivel, como `Number markers`, que repite lo que el autor ya
 > escribe.
 
+### Listas de tareas
+
+```
+Markdown:
+    Content >>
+        - [x] Documento de identidad
+        - [ ] Justificante de pago
+```
+
+Una lista con viñetas cuyos ítems empiezan por `[ ]` o por `[x]` (o `[X]`) y un espacio es una lista de tareas: una
+`List` con `Marker: checkbox`, cuyos ítems escritos con `[x]` llevan `Checked: true` ([List](list.md#marcadores-dibujados)).
+La marca no es parte del texto del ítem.
+
+- No usa `Bullet markers`, y un `Markdown` cuyas únicas listas con viñetas son listas de tareas no lo necesita. Cuenta
+  como un nivel para las listas con viñetas que tiene dentro.
+- Todos los ítems de la lista son tareas o no lo es ninguno: una lista con los dos es `MARKDOWN_UNSUPPORTED`, con la
+  línea de la lista. Una tarea en una lista numerada (`1. [ ]`), también.
+- Solo es una marca lo que se escribe como tal. `\[ ]`, `[x]` sin un espacio detrás, `[ ]` solo en su ítem y unos
+  corchetes con otro carácter (`[y]`) son texto.
+
+> **Decisión:** la casilla de una lista de tareas no se elige en `Bullet markers`: que la lista lo es lo dice el
+> contenido. *Alternativa descartada:* exigir `checkbox` en `Bullet markers`, que es por nivel y haría de casillas todas
+> las listas de ese nivel.
+
+> **Decisión:** una lista con tareas e ítems que no lo son es un error. *Alternativa descartada:* GFM pinta esos ítems
+> con una viñeta, que pediría dos marcadores en la misma lista, y una `List` tiene uno.
+
 ## Tablas
 
 Cada columna tiene la alineación de la fila de separación (`:--`, `:-:`, `--:`) como `Align` de sus celdas. Sin alineación,
@@ -325,7 +354,7 @@ Una cita se lee como cita, y una línea horizontal no se lee.
 
 ## Lo que no hay
 
-- HTML, listas de tareas y resaltado de código. Las notas al pie se
+- HTML y resaltado de código. Las notas al pie se
   llaman con `[^id]`, pero su contenido es una `Footnote`, no una definición `[^id]: ...` ([Footnote](footnote.md)).
 - Enlaces con título o con definición aparte, e imágenes con título.
 - Dos espacios al final de la línea como salto de línea forzado: STXT los quita.

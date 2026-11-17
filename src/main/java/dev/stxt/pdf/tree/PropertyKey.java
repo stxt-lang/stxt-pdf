@@ -51,6 +51,7 @@ public final class PropertyKey {
     public static final String OPACITY = "opacity";
     public static final String FIRST_NUMBER = "first-number";
     public static final String ITEM_NUMBER = "item-number";
+    public static final String CHECKED = "checked";
     public static final String MARKER_IMAGE = "marker-image";
     public static final String MARKER_SUFFIX = "marker-suffix";
     public static final String PDF_PAGE = "pdf-page";

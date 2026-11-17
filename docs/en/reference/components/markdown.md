@@ -54,7 +54,7 @@ Document (dev.stxt.pdf):
 | Property | Values | Default | Notes |
 |---|---|---|---|
 | `Content` | `>>` block | none | The Markdown. Required. |
-| `Bullet markers` | list of `bullet`, `dash`, `none` | none | The `Marker` of the bulleted lists (`-`, `*`, `+`), one per nesting level. The last one serves for the deeper levels. Required if there are bulleted lists. |
+| `Bullet markers` | list of `bullet`, `dash`, `circle`, `square`, `none` | none | The `Marker` of the bulleted lists (`-`, `*`, `+`), one per nesting level. The last one serves for the deeper levels. Required if there are bulleted lists that are not lists of tasks. |
 | `Number markers` | list of `decimal`, `lower-alpha`, `upper-alpha`, `lower-roman`, `upper-roman` | none | The same, for the numbered lists (`1.`, `1)`). Required if there are any. |
 | `Table column sizes` | `equal`, `auto` | none | The `Column sizes` of the tables: `equal` is `repeat(n, *)`, and `auto`, `repeat(n, auto)`. Required if there are tables. |
 
@@ -67,7 +67,7 @@ of the document ([Element properties](../common/styles.md#element-properties)). 
 
 ## The subset
 
-The Markdown is [CommonMark](https://commonmark.org) with the tables and the strikethrough of GFM and the `++...++` underline. It is translated
+The Markdown is [CommonMark](https://commonmark.org) with the tables, the strikethrough and the lists of tasks of GFM and the `++...++` underline. It is translated
 as follows:
 
 | Markdown | Element |
@@ -75,6 +75,7 @@ as follows:
 | `#` to `######` (and the ones underlined with `===` and `---`) | `Heading 1` to `Heading 6`, with a `Text`, and with `{#id}` at the end of the text (`## Sales {#sales}`), its `Id` |
 | Paragraph | `Paragraph` |
 | `-`, `*`, `+` | `List` with the `Marker` of `Bullet markers` for its level, with one `List item` per item |
+| `- [ ]`, `- [x]` | `List` with `Marker: checkbox`, with one `List item` per item, with `Checked: true` in those written with `[x]` ([Lists](#lists-of-tasks)) |
 | `1.`, `1)` | `List` with the `Marker` of `Number markers` for its level, `First number`, the first number if it is not 1, and, written with `1)`, `Marker suffix: parenthesis` ([Lists](#lists)) |
 | Table | `Table` with the `Column sizes` of `Table column sizes`, with the header row in `Header rows` and the rest in `Body rows` |
 | `**x**`, `__x__` | bold run ([Text formatting](../common/text-formatting.md#runs)) |
@@ -98,7 +99,7 @@ Everything else is an error (`MARKDOWN_UNSUPPORTED`): links with a title (`[x](t
 before it on its line ([below](#forced-line-breaks)) and link definitions (`[x][ref]` with `[ref]: target`: the target is
 written in the link itself).
 A heading cannot go inside a list item either, as in a `List item`, nor can a table be left without rows below
-the header.
+the header, nor can a list have tasks and items that are not ([below](#lists-of-tasks)).
 
 **Empty blocks are ignored**: a heading without text (`#` alone), an empty code block, a quote without content (`>`
 alone) and a paragraph without text generate no element, also inside a quote or an item. Two empty things are still
@@ -111,7 +112,8 @@ marker would be painted.
 > error, like that of an empty `Text` the author writes: that element is declared, and this is a leftover of the
 > text. It is not what "would have no effect" (below): there the author wrote something they expected to see.
 
-A `Bullet markers` or a `Number markers` with a marker of the other type is `VALUE_NOT_ALLOWED`. A clickable image is an `Image` with
+A `Bullet markers` or a `Number markers` with a marker of the other type is `VALUE_NOT_ALLOWED`, and so is a
+`Bullet markers` with `image` or with `checkbox`. A clickable image is an `Image` with
 `Link` or, inside a text, an inline image inside a link (`[![Alt](path)](target)`).
 
 > **Decision:** what would have no effect (the language tag of a code block, the title of a link) is an
@@ -273,6 +275,33 @@ the delimiter changes, so each list has only one.
 > written with `1.`, the usual form; or a `Number suffixes` property per level, like `Number markers`, which repeats what
 > the author already writes.
 
+### Lists of tasks
+
+```
+Markdown:
+    Content >>
+        - [x] Identity document
+        - [ ] Proof of payment
+```
+
+A bulleted list whose items start with `[ ]` or with `[x]` (or `[X]`) and a space is a list of tasks: a `List` with
+`Marker: checkbox`, whose items written with `[x]` have `Checked: true` ([List](list.md#drawn-markers)). The mark is not
+part of the text of the item.
+
+- It does not use `Bullet markers`, and a `Markdown` whose only bulleted lists are lists of tasks does not need it. It
+  counts as a level for the bulleted lists inside it.
+- All the items of the list are tasks or none is: a list with both is `MARKDOWN_UNSUPPORTED`, with the line of the list.
+  So is a task in a numbered list (`1. [ ]`).
+- Only what is written as a mark is one. `\[ ]`, `[x]` without a space after it, `[ ]` alone in its item and brackets
+  with another character (`[y]`) are text.
+
+> **Decision:** the checkbox of a list of tasks is not chosen in `Bullet markers`: the content says that the list is
+> one. *Rejected alternative:* requiring `checkbox` in `Bullet markers`, which is per level and would make every list of
+> that level a list of checkboxes.
+
+> **Decision:** a list with tasks and items that are not is an error. *Rejected alternative:* GFM paints those items
+> with a bullet, which would need two markers in the same list, and a `List` has one.
+
 ## Tables
 
 Each column has the alignment of the delimiter row (`:--`, `:-:`, `--:`) as the `Align` of its cells. Without alignment,
@@ -329,7 +358,7 @@ A block quote is read as a quote, and a horizontal rule is not read.
 
 ## What is not supported
 
-- HTML, task lists and code highlighting. Footnotes are called with
+- HTML and code highlighting. Footnotes are called with
   `[^id]`, but their content is a `Footnote`, not a definition `[^id]: ...` ([Footnote](footnote.md)).
 - Links with a title or with a separate definition, and images with a title.
 - Two spaces at the end of the line as a forced line break: STXT removes them.

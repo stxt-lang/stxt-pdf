@@ -153,6 +153,7 @@ class SchemaCoverageTest {
             Map.entry("First number", "First number: 3"),
             Map.entry("First page number", "First page number: 3"),
             Map.entry("Item number", "Item number: 5"),
+            Map.entry("Checked", "Checked: true"),
             // Columns
             Map.entry("Column count", "Column count: 3"),
             Map.entry("Min column width", "Min column width: 100"),
@@ -231,6 +232,9 @@ class SchemaCoverageTest {
         t.put("List", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\t{}\n\t\tList item:\n\t\t\tParagraph: Uno",
                 Set.of("Marker")));
         t.put("List item", new Template(HEADER + "\tList:\n\t\tMarker: decimal\n\t\tList item:\n\t\t\t{}\n"
+                + "\t\t\tParagraph: Uno"));
+        // Checked is only of an item of a list with Marker: checkbox.
+        t.put("List item > Checked", new Template(HEADER + "\tList:\n\t\tMarker: checkbox\n\t\tList item:\n\t\t\t{}\n"
                 + "\t\t\tParagraph: Uno"));
         // The children of a Marker image (Alt, Height), in a list with Marker: image.
         t.put("Marker image", new Template(HEADER + "\tList:\n\t\tMarker: image\n\t\tMarker image: test/square.png\n"

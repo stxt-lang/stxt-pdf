@@ -126,7 +126,7 @@ spaces after it. It is not in the structure: that of an element with `Case` is s
 ### Lists
 
 `L` carries the attribute `ListNumbering` according to the `Marker`: `Disc`, `Decimal`, `LowerAlpha`, `UpperAlpha`, `LowerRoman`,
-`UpperRoman`, and `None` for `dash`, `none` and `image`.
+`UpperRoman`, `Circle`, `Square`, and `None` for `dash`, `checkbox`, `none` and `image`.
 
 > **Decision:** `dash` is `ListNumbering: None`, because PDF/UA-1 has no value for the dash. *Rejected
 > alternative:* `Unordered`, from PDF 2.0, which is used with PDF/UA-2 ([below](#pdfua-2)).
@@ -134,6 +134,10 @@ spaces after it. It is not in the structure: that of an element with `Case` is s
 An image marker ([List](../components/list.md#image-markers)) with `Alt` is a `Figure` inside the `Lbl` of the item, with
 the alternative text and the `BBox` of the image (`PdfStructure.figureBox`); without `Alt` it is decorative, painted as
 an *artifact*, and the `LI` has no `Lbl`. veraPDF accepts it this way in PDF/UA-1 and PDF/UA-2.
+
+A drawn marker ([List](../components/list.md#drawn-markers)) is the content of the `Lbl` of its item: one path filled
+with the even-odd rule (`PdfCanvas.marker`). The drawing has no text, so the `Lbl` carries as `ActualText` the character
+that stands for it (`Marker.symbol`): `◦`, `▪`, `☐` or `☑`.
 
 > **Decision:** a decorative image leaves the item without `Lbl`, instead of an empty `Lbl`. *Rejected alternative:* a
 > `Lbl` without content, which tells the reader nothing; or `ActualText` on the `Lbl`, which PDF/UA does not provide
@@ -277,7 +281,7 @@ write:
 - **Structure destinations:** a link to a box of the document and a bookmark are a `GoTo` action with the element of the
   box in `SD` (or that of its nearest ancestor that has an element) and the same position. `D`, with the page, remains for the
   viewers that do not understand `SD`.
-- **Lists:** `dash` and `image` are `ListNumbering: Unordered`.
+- **Lists:** `dash`, `checkbox` and `image` are `ListNumbering: Unordered`.
 - **Footnotes:** `FENote` instead of `Note`, with `NoteType: Footnote`.
 - **Links with nothing to read** (those that carry `Alt`): their annotation does not carry `Contents`, because what is read is the `Alt`.
 

@@ -459,6 +459,14 @@ public final class SvgCanvas implements Canvas {
     }
 
     @Override
+    public void marker(Box box, Rect area) {
+        StringBuilder d = new StringBuilder();
+        Shapes.marker(pathWriter(d), box.style().list().marker(), box.style().list().checked(), area);
+        svg.append("<path d=\"").append(d.toString().strip()).append("\" fill-rule=\"evenodd\"")
+                .append(fillAttr(box.style().typography().color())).append("/>\n");
+    }
+
+    @Override
     public void inlineImage(Box box, InlineImage image, String link, Rect area) {
         if (resources == null) {
             return;

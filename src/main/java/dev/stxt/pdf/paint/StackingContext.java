@@ -386,14 +386,16 @@ public final class StackingContext {
     }
 
     /**
-     * What the content step of the piece clips: an image, by the corners and the windows of its ancestors; text or a
-     * leader, only by the windows; a box with nothing to paint there, nothing (no empty clip is written).
+     * What the content step of the piece clips: an image, by the corners and the windows of its ancestors; text, a
+     * leader or a drawn marker, only by the windows; a box with nothing to paint there, nothing (no empty clip is
+     * written).
      */
     private static Clips contentClips(Piece p) {
         if (p.f().box().isImage()) {
             return Clips.ALL;
         }
-        return p.f().lines().isEmpty() && p.f().box().role() != Role.LEADER ? Clips.NONE : Clips.WINDOWS;
+        return p.f().lines().isEmpty() && p.f().box().role() != Role.LEADER && !p.f().box().isMarkerShape()
+                ? Clips.NONE : Clips.WINDOWS;
     }
 
     /** The background and the border of the piece, with its clips. */
@@ -539,8 +541,8 @@ public final class StackingContext {
     }
 
     /**
-     * The content of a box: its text lines or, in an {@code Image}, the image
-     * (reference/components/image.md), and then its link.
+     * The content of a box: its text lines, in an {@code Image}, the image (reference/components/image.md), or, in a
+     * drawn marker, its shape (reference/components/list.md), and then its link.
      */
     private static void paintContent(Canvas canvas, Piece p) {
         if (p.f().box().isImage()) {
@@ -551,6 +553,8 @@ public final class StackingContext {
             canvas.image(p.f().box(), p.borderBox().shrink(inside), radii(p).inset(inside), p.f().lines());
         } else if (p.f().box().role() == Role.LEADER) {
             paintLeader(canvas, p);
+        } else if (p.f().box().isMarkerShape()) {
+            canvas.marker(p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()));
         } else {
             TextPainter.paint(canvas, p.f().box(), p.borderBox().shrink(p.f().border()).shrink(p.f().padding()),
                     p.f().lines());

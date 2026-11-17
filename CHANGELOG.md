@@ -5,6 +5,29 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Added
+
+- `Marker: circle` and `Marker: square`: a hollow circle and a filled square, the markers of the second and third
+  level of a list. The engine draws them, so they do not depend on the font, in the color of the text of the item and
+  half as tall as its capitals. `Bullet markers` of a `Markdown` accepts them too.
+- `Marker: checkbox` and `Checked`: a list of checkboxes, as tall as the capitals of the item, checked in the items
+  with `Checked: true`. `Checked` in an item of a list with another `Marker` is `LIST_CHECKED_NOT_ALLOWED`.
+- Lists of tasks in a `Markdown`: a bulleted list whose items start with `[ ]` or `[x]` is a `List` with
+  `Marker: checkbox`, and needs no `Bullet markers`.
+- In the tagged PDF, a drawn marker is the content of the `Lbl` of its item and is read as the character that stands
+  for it (`◦`, `▪`, `☐` or `☑`); `ListNumbering` is `Circle` and `Square` for the first two.
+- In the Java API, `Marker.CIRCLE`, `Marker.SQUARE` and `Marker.CHECKBOX`, `Marker.drawn()` and `Marker.symbol()`,
+  `Box.isMarkerShape()`, `ListStyle.checked()` and `PropertyKey.CHECKED`.
+
+### Changed
+
+- In a `Markdown`, the items of a bulleted list that start with `[ ]` or `[x]` and a space were painted with those
+  characters as text, and now they are tasks. A list with tasks and items that are not, and a task in a numbered list,
+  are `MARKDOWN_UNSUPPORTED`. An item whose text starts with those characters is written `\[ ]`.
+- `Canvas` has a new method, `marker(Box, Rect)`, which paints a drawn marker: a class that implements it has to add it.
+
 ## [0.19.0] - 2026-11-16
 
 The vocabulary of `dev.stxt.pdf` reviewed before 1.0: names that say what they are when they stand alone in a rule,

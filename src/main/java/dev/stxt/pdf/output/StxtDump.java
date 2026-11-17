@@ -77,6 +77,10 @@ public final class StxtDump {
                 String tab = "\t".repeat(level);
                 if (f.box().isImage()) {
                     sb.append(tab).append("Marker image: ").append(f.box().image()).append('\n');
+                } else if (f.box().isMarkerShape()) {
+                    // A drawn marker has no text: the character that stands for it.
+                    sb.append(tab).append("Marker: ").append(f.box().style().list().marker()
+                            .symbol(f.box().style().list().checked())).append('\n');
                 } else {
                     sb.append(tab).append("Marker: ").append(f.box().text().strip()).append('\n');
                 }

@@ -74,6 +74,8 @@ public enum ErrorCode {
     LIST_IMAGE_NOT_ALLOWED,
     /** An item of a list with {@code Marker: image} that has no {@code Marker image}, its own or the list's. */
     LIST_IMAGE_MISSING,
+    /** {@code Checked} in an item of a list whose {@code Marker} is not {@code checkbox}. */
+    LIST_CHECKED_NOT_ALLOWED,
     /** A {@code List} without {@code Marker}, its own or from a rule of {@code Styles}. */
     LIST_MARKER_MISSING,
 

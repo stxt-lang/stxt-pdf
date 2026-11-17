@@ -1,0 +1,20 @@
+# Case: Checked in an item of a bulleted list
+# Code: LIST_CHECKED_NOT_ALLOWED
+# Line: 19
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 595
+		Height: 842
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+	Section:
+		List:
+			Marker: bullet
+			List item:
+				Checked: true
+				Text: Uno
