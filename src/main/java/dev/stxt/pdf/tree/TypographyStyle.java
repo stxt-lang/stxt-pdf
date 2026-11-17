@@ -62,6 +62,8 @@ public final class TypographyStyle extends StyleGroup {
     private boolean smallCaps;
     /** {@code Text position}: only the style of a styled run has it, so it is not inherited. */
     private TextPosition position = TextPosition.NORMAL;
+    /** {@code Highlight}: only the style of a styled run has it, so it is not inherited; {@code null} without it. */
+    private String highlight;
     /**
      * {@code Ligatures}: whether the text is measured and painted with the ligatures of the font
      * (reference/common/text-formatting.md). Inherited.
@@ -272,6 +274,16 @@ public final class TypographyStyle extends StyleGroup {
     void setPosition(TextPosition v) {
         writable();
         position = v;
+    }
+
+    /** {@return {@code Highlight}, which only the style of a styled run declares; {@code null} without it} */
+    public String highlight() {
+        return highlight;
+    }
+
+    void setHighlight(String v) {
+        writable();
+        highlight = v;
     }
 
     public boolean ligatures() {

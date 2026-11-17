@@ -1,0 +1,12 @@
+# Four texts one after the other from y = 20, the second with three lines (see input.stxt): the same boxes as without
+# Highlight, which only paints.
+Result:
+	Page: 1
+		Fragment: one
+			Rect: 20 20 200 15
+		Fragment: lines
+			Rect: 20 35 60 45
+		Fragment: marks
+			Rect: 20 80 200 15
+		Fragment: more
+			Rect: 20 95 200 15

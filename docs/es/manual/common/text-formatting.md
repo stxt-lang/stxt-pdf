@@ -68,7 +68,7 @@ Document (dev.stxt.pdf):
 
 - La regla es una regla `For style` como las demás: la misma puede dar estilo a una caja (`Style: precio`) y a una parte
   de un texto. En una parte solo valen `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps`,
-  `Letter spacing` y `Text position`. Si la regla declara algo más, como `Size` o un `Box`, y se usa en una parte, es un error
+  `Letter spacing`, `Text position` y `Highlight`. Si la regla declara algo más, como `Size` o un `Box`, y se usa en una parte, es un error
   (`STYLE_NOT_ALLOWED_IN_RUN`).
 - Las marcas se suman al estilo: `[**12,50 €**]{precio}` y `**[12,50 €]{precio}**` van en negrita aunque la regla diga
   `Weight: 300`. Un enlace puede llevar una parte con estilo (`[[ver precio]{precio}](https://...)`) y una parte con estilo
@@ -109,6 +109,39 @@ Document (dev.stxt.pdf):
 - `Text position` solo vale en una parte de un texto. En una caja (en su `Typography`, o con `Style: sup`) es un error
   (`TEXT_POSITION_OUTSIDE_RUN`).
 - El número de una [nota al pie](../components/footnote.md) ya va en superíndice, sin ninguna regla.
+
+## Texto resaltado (`Highlight`)
+
+Una parte con estilo cuya regla declara `Highlight` lleva ese color detrás, como un rotulador: una fecha, un importe, una
+cláusula que ha cambiado.
+
+```
+Document (dev.stxt.pdf):
+    Language: es
+    Title: Texto resaltado
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Markup: markdown
+        For style: aviso
+            Typography:
+                Highlight: #FFE680
+    Section:
+        Paragraph: El pago vence el [15 de diciembre]{aviso}, y el importe es de [1.250,00 €]{aviso}.
+```
+
+- El color es tan alto como las letras de la línea, sin relleno. La línea no cambia, y una parte que sigue en la línea
+  siguiente va resaltada en las dos.
+- La regla puede llevar también un color o una fuente para las letras. Las letras necesitan contraste suficiente con el
+  resaltado (`CONTRAST_LOW`).
+- `Highlight` solo vale en una parte de un texto. En una caja es un error (`HIGHLIGHT_OUTSIDE_RUN`): el color de detrás
+  de una caja entera es su `Background`.
+- Un lector de pantalla no lo anuncia.
 
 ## Imágenes en la frase
 

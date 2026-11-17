@@ -40,7 +40,7 @@ Styles:
 | `Widows`, `Orphans` | entero ≥ 1 | `2` | Líneas de un párrafo que no se quedan solas al cambiar de página |
 | `Language` | etiqueta BCP 47: `es`, `en-GB`, `ca` | el del documento | El idioma del texto, si no es el del documento |
 
-El resto (`Markup`, `Case`, `Small caps`, `Text position`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
+El resto (`Markup`, `Case`, `Small caps`, `Text position`, `Highlight`, `Letter spacing`, `Ligatures`, `Preformatted` y `Tab size`) está en
 [Formato del texto](text-formatting.md).
 
 ## Fuente y tamaño

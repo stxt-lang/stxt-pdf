@@ -95,6 +95,8 @@ public final class PropertyKey {
 
     /** {@code Text position} of {@code Typography}: the superscript or subscript of a styled run. */
     public static final String TEXT_POSITION = "text-position";
+    /** {@code Highlight} of {@code Typography}: the color behind a styled run. */
+    public static final String HIGHLIGHT = "highlight";
 
     /**
      * Internal name of each property of {@code Typography} and {@code Break} whose name in the document is short.

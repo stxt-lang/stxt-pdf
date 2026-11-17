@@ -128,6 +128,7 @@ final class PropertyReader {
             entry("letter-spacing", (p, s) -> s.typography().setLetterSpacing(signedPoints(p))),
             entry("small-caps", (p, s) -> s.typography().setSmallCaps(bool(p))),
             entry("text-position", PropertyReader::position),
+            entry("highlight", PropertyReader::highlight),
             entry("ligatures", (p, s) -> s.typography().setLigatures(bool(p))),
             entry("kerning", (p, s) -> s.typography().setKerning(bool(p))),
             entry("preformatted", (p, s) -> s.typography().setPreformatted(enumValue(Preformatted.class, p))),
@@ -244,6 +245,21 @@ final class PropertyReader {
                     + "rule, and the rule is given to a part of a text with Markup: markdown, as in m[2]{sup}");
         }
         s.typography().setPosition(position);
+    }
+
+    /**
+     * {@code Highlight} (reference/common/text-formatting.md): the color behind a styled run. Like
+     * {@code Text position}, only the {@code For style} rule of a run gives it: in the style of a box it is an error.
+     */
+    private static void highlight(Node p, Style s) {
+        String color = color(p, s.namedColors());
+        if (!s.isRun()) {
+            throw error(p, ErrorCode.HIGHLIGHT_OUTSIDE_RUN, "Highlight is of a styled run and here it reaches a box, "
+                    + "whose color behind is its Background (in Box): Highlight is declared in the Typography of a "
+                    + "For style rule, and the rule is given to a part of a text with Markup: markdown, as in "
+                    + "[due on Friday]{warning}");
+        }
+        s.typography().setHighlight(color);
     }
 
     /**

@@ -112,6 +112,7 @@ class SchemaCoverageTest {
             Map.entry("Letter spacing", "Letter spacing: 1.5"),
             Map.entry("Small caps", "Small caps: true"),
             Map.entry("Text position", "Text position: superscript"),
+            Map.entry("Highlight", "Highlight: #FFE680"),
             Map.entry("Ligatures", "Ligatures: true"),
             Map.entry("Kerning", "Kerning: true"),
             Map.entry("Code font", "Code font: IBM Plex Mono"),
@@ -283,6 +284,9 @@ class SchemaCoverageTest {
         // Text position is only of a styled run: in the Typography of the rule that a run takes.
         t.put("Typography > Text position", new Template(HEADER + "\t\tFor style: sup\n\t\t\tTypography:\n\t\t\t\t{}\n"
                 + "\tText: m[2]{sup}\n\t\tTypography:\n\t\t\tMarkup: markdown"));
+        // So is Highlight.
+        t.put("Typography > Highlight", new Template(HEADER + "\t\tFor style: mark\n\t\t\tTypography:\n\t\t\t\t{}\n"
+                + "\tText: [hoy]{mark}\n\t\tTypography:\n\t\t\tMarkup: markdown"));
         t.put("Break", new Template(HEADER + "\tBlock:\n\t\tBreak:\n\t\t\t{}"));
         // Readable text is only of a barcode of one row.
         t.put("Barcode > Readable text", new Template(HEADER + "\tBarcode: STXT-1\n\t\tAlt: Referencia\n"

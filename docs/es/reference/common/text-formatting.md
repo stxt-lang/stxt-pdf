@@ -71,7 +71,7 @@ pie, `[^id]`, que es un tramo en superíndice con el número de la nota ([Footno
 
 Con `Markup: markdown`, o en un `Markdown`, un texto entre corchetes seguido, sin nada en medio, del nombre de un estilo
 entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regla `For style: precio` de `Styles`
-([Reglas reutilizables](styles.md)) lo que cambia cómo se ven sus letras y no el alto de la línea.
+([Reglas reutilizables](styles.md)) lo que cambia cómo se ven sus letras, o lo que hay detrás de ellas, y no el alto de la línea.
 
 | Propiedad de la regla | En el tramo |
 |---|---|
@@ -81,6 +81,7 @@ entre llaves, `[12,50 €]{precio}`, es un **tramo con estilo**: toma de la regl
 | `Case`, `Small caps` | cómo se pintan sus letras ([Mayúsculas](#mayúsculas-case), [Versalitas](#versalitas-small-caps)) |
 | `Letter spacing` | el interletraje de sus caracteres, también de sus espacios ([Interletraje](#interletraje-letter-spacing)) |
 | `Text position` | el tramo en superíndice o en subíndice ([abajo](#superíndice-y-subíndice-text-position)) |
+| `Highlight` | el color de detrás del tramo ([abajo](#resaltado-highlight)) |
 
 - Lo que la regla declara **sustituye** a lo de la caja, y lo que no declara es lo de la caja. Si dos reglas
   `For style` con ese nombre (una del documento de estilos aparte y otra del documento) declaran lo mismo, gana la del
@@ -175,6 +176,46 @@ Paragraph: Emite 120 g de CO[2]{sub} por m[2]{sup}.
 > **Decisión:** `Text position` en una caja es un error y no se ignora ni se hereda: una caja entera en superíndice no tiene
 > una línea respecto a la que subir. *Alternativa descartada:* que la herede el texto de la caja, que la mezclaría con
 > `Overflow: shrink` y con la letra capitular sin ningún uso.
+
+## Resaltado (`Highlight`)
+
+`Highlight`, en la regla `For style` de un [tramo con estilo](#tramos-con-estilo), pinta un color detrás del tramo, como
+un rotulador: `[15 de diciembre]{aviso}`.
+
+```stxt
+Styles:
+    For style: aviso
+        Typography:
+            Highlight: #FFE680
+Paragraph: El pago vence el [15 de diciembre]{aviso}.
+    Typography:
+        Markup: markdown
+```
+
+- **Es un rectángulo en cada línea** en la que está el tramo: tan ancho como el tramo, con los espacios de dentro (y lo
+  que les añade `justify`) y sin el espacio que se come el salto de línea, y tan alto como la fuente de la caja, de su
+  ascendente a su descendente, sea cual sea `Line height`.
+- **No cambia la línea**: ni su alto ni dónde se parte. No tiene relleno, borde ni radio.
+- Se pinta detrás del texto de su caja y encima de su `Background`. Lo que hay dentro del tramo (negrita, un subrayado,
+  un enlace, un superíndice, una imagen) queda sobre el mismo rectángulo.
+- El valor es un color, que puede ser el nombre de un `Named color` ([Reglas reutilizables](styles.md#colores-con-nombre)).
+- **Contraste.** El resaltado es lo que hay debajo del texto del tramo: sin contraste suficiente entre los dos es
+  `CONTRAST_LOW` ([PDF](pdf.md)).
+- **Solo vale en un tramo.** `Highlight` en una caja es `HIGHLIGHT_OUTSIDE_RUN`, con la línea de la propiedad, en los
+  mismos sitios que `Text position`. El color de detrás de una caja es su `Background`.
+- En el PDF etiquetado es un *artifact*, como el subrayado: un lector de pantalla no lo anuncia.
+
+> **Decisión:** el resaltado es una propiedad de la regla de un tramo con estilo y no una marca del texto (`==texto==`):
+> una marca necesitaría un color que el documento no ha declarado. *Alternativa descartada:* la marca con un color por
+> defecto.
+
+> **Decisión:** `Highlight`, y no `Background` en la regla de un tramo: `Background` es de `Box`, con su relleno, su
+> borde y su radio, y un tramo no es una caja. *Alternativa descartada:* admitir `Box` en un tramo solo para su
+> `Background`.
+
+> **Decisión:** el rectángulo es tan alto como la fuente y no como la línea: no cambia con `Line height`, y con un
+> interlineado amplio los resaltados de dos líneas no se tocan. *Alternativa descartada:* el alto de la línea, que une
+> las líneas resaltadas en un bloque.
 
 ## Código en línea
 
@@ -329,6 +370,7 @@ subrayado va debajo del texto y el tachado, encima. Un lector de pantalla no las
   interlineado, superíndices y subíndices con otro tamaño u otro desplazamiento o con los glifos propios de la fuente, tramos con estilo dentro de otros y
   marcas que quiten la negrita o la cursiva (un tramo con estilo sí puede, con `Weight` o `Italic: false`).
 - Estilos de raya (ondulada, punteada), color propio de la raya ni subrayado que se interrumpe en los descendentes.
+- Un resaltado con relleno, borde o radio (una etiqueta dentro de una línea), o con otro alto.
 - `Case` a anchura completa, interletraje relativo al cuerpo, versalitas con `smcp` y más modos de `Preformatted`.
 - Imágenes en línea con otro tamaño que el de la letra o alineadas de otra forma, y la página de un PDF o un código de
   barras dentro de un texto.

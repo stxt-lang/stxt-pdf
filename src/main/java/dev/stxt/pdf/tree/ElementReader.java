@@ -557,7 +557,8 @@ enum ElementReader {
                 s.isDeclared(PropertyKey.internal("letter-spacing")) ? t.letterSpacing() : null,
                 s.isDeclared(PropertyKey.internal("case")) ? t.textCase() : null,
                 s.isDeclared(PropertyKey.internal("small-caps")) ? t.smallCaps() : null,
-                s.isDeclared(PropertyKey.TEXT_POSITION) ? t.position() : null);
+                s.isDeclared(PropertyKey.TEXT_POSITION) ? t.position() : null,
+                t.highlight());
     }
 
     /**

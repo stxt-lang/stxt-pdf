@@ -68,7 +68,7 @@ class StyledRunsTest {
     void theRunTakesTheValuesOfItsRule() {
         Box text = text(PRICE, "Total: [12,50 €]{price}.");
         assertEquals("Total: 12,50 €.", text.text());
-        RunStyle price = new RunStyle("price", "#B3261E", null, null, FontWeight.BOLD, null, null, null, null, null);
+        RunStyle price = new RunStyle("price", "#B3261E", null, null, FontWeight.BOLD, null, null, null, null, null, null);
         assertEquals(List.of(run("Total: "), new TextRun("12,50 €", TextFormat.PLAIN.withStyle(price)), run(".")),
                 text.formattedRuns());
         // The box keeps the style with the line of each property.
@@ -90,7 +90,7 @@ class StyledRunsTest {
                 				Letter spacing: 1.5
                 """, "Uno [dos `tres`]{all}");
         RunStyle all = new RunStyle("all", "#333333", "IBM Plex Serif", "IBM Plex Mono", new FontWeight(300),
-                FontStyle.ITALIC, 1.5, TextCase.UPPERCASE, true, null);
+                FontStyle.ITALIC, 1.5, TextCase.UPPERCASE, true, null, null);
         TextFormat f = TextFormat.PLAIN.withStyle(all);
         assertEquals(List.of(run("Uno "), new TextRun("dos ", f.withFamily("IBM Plex Serif")),
                 new TextRun("tres", f.asCode().withFamily("IBM Plex Mono"))), text.formattedRuns());
@@ -105,7 +105,7 @@ class StyledRunsTest {
                 """;
         Box inside = text(light, "[a **b**]{light}");
         Box outside = text(light, "**[b]{light}**");
-        RunStyle style = new RunStyle("light", null, null, null, new FontWeight(300), null, null, null, null, null);
+        RunStyle style = new RunStyle("light", null, null, null, new FontWeight(300), null, null, null, null, null, null);
         TextFormat f = TextFormat.PLAIN.withStyle(style);
         assertEquals(List.of(new TextRun("a ", f), new TextRun("b", f.withMarks(true, false, false, false))),
                 inside.formattedRuns());
@@ -244,9 +244,9 @@ class StyledRunsTest {
     void positionMakesTheRunASuperscriptOrASubscript() {
         Box text = text(SCRIPTS, "10 m[2]{sup} de CO[2]{sub}");
         assertEquals("10 m2 de CO2", text.text());
-        RunStyle sup = new RunStyle("sup", null, null, null, null, null, null, null, null, TextPosition.SUPERSCRIPT);
+        RunStyle sup = new RunStyle("sup", null, null, null, null, null, null, null, null, TextPosition.SUPERSCRIPT, null);
         RunStyle sub = new RunStyle("sub", "#333333", null, null, null, null, null, null, null,
-                TextPosition.SUBSCRIPT);
+                TextPosition.SUBSCRIPT, null);
         assertEquals(List.of(run("10 m"), new TextRun("2", TextFormat.PLAIN.withStyle(sup)), run(" de CO"),
                 new TextRun("2", TextFormat.PLAIN.withStyle(sub))), text.formattedRuns());
         assertEquals(15, text.runStyle("sup").line("text-position").number());
@@ -278,6 +278,58 @@ class StyledRunsTest {
                 () -> new BoxTreeBuilder().build(new DocumentReader().read(
                         HEADER.replace("Markup: markdown", "Text position: subscript") + "\tSection:\n\t\tText: Uno\n")));
         assertEquals(ErrorCode.TEXT_POSITION_OUTSIDE_RUN, document.errorCode());
+    }
+
+    private static final String HIGHLIGHT = """
+            		For style: mark
+            			Typography:
+            				Highlight: #FFE680
+            """;
+
+    /** Highlight is the color behind the run: the rest of the text and the box do not have it. */
+    @Test
+    void highlightIsTheColorBehindTheRun() {
+        Box text = text(HIGHLIGHT, "Vence el [15 de mayo]{mark}.");
+        assertEquals("Vence el 15 de mayo.", text.text());
+        RunStyle mark = new RunStyle("mark", null, null, null, null, null, null, null, null, null, "#FFE680");
+        assertEquals(List.of(run("Vence el "), new TextRun("15 de mayo", TextFormat.PLAIN.withStyle(mark)), run(".")),
+                text.formattedRuns());
+        assertEquals("#FFE680", text.formattedRuns().get(1).format().highlight());
+        assertNull(text.formattedRuns().get(0).format().highlight());
+        assertEquals(15, text.runStyle("mark").line("highlight").number());
+        assertNull(text.style().typography().highlight());
+    }
+
+    /** The color can be the name of a Named color, like any other. */
+    @Test
+    void highlightCanBeANamedColor() {
+        Box text = new BoxTreeBuilder().build(new DocumentReader().read(HEADER.replace("\tStyles:\n",
+                "\tStyles:\n\t\tNamed color: marker #FFE680\n")
+                + HIGHLIGHT.replace("#FFE680", "marker") + "\tSection:\n\t\tText: [Uno]{mark}\n"))
+                .sections().get(0).box().children().get(0);
+        assertEquals("#FFE680", text.formattedRuns().get(0).format().highlight());
+    }
+
+    @Test
+    void highlightInABoxIsAnErrorOnItsLine() {
+        // In the Typography of an element.
+        InvalidModelException own = assertThrows(InvalidModelException.class,
+                () -> build("", "Text: Uno", "\tTypography:", "\t\tHighlight: #FFE680"));
+        assertEquals(ErrorCode.HIGHLIGHT_OUTSIDE_RUN, own.errorCode());
+        assertEquals(16, own.line());
+        // By the rule of a styled run given to a box with Style: the line of the property in the rule.
+        InvalidModelException styled = assertThrows(InvalidModelException.class,
+                () -> build(HIGHLIGHT, "Text: Uno", "\tStyle: mark"));
+        assertEquals(ErrorCode.HIGHLIGHT_OUTSIDE_RUN, styled.errorCode());
+        assertEquals(15, styled.line());
+        // In a rule that only reaches boxes, when the rule is read.
+        InvalidModelException element = assertThrows(InvalidModelException.class, () -> build("""
+                		For element: Paragraph
+                			Typography:
+                				Highlight: #FFE680
+                """, "Text: Uno"));
+        assertEquals(ErrorCode.HIGHLIGHT_OUTSIDE_RUN, element.errorCode());
+        assertEquals(15, element.line());
     }
 
     /** A nested rule takes the superscript away from the runs inside the elements of the outer one. */

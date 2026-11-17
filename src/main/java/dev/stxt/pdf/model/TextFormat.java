@@ -171,6 +171,14 @@ public record TextFormat(boolean bold, boolean italic, boolean underline, boolea
                 runStyle, image);
     }
 
+    /**
+     * {@return the color painted behind the run: the {@code Highlight} of its {@link #style()}, or {@code null} if it
+     * has none}
+     */
+    public String highlight() {
+        return style != null ? style.highlight() : null;
+    }
+
     /** {@return whether it has underline or strikeout, which are painted apart from the text} */
     public boolean decorated() {
         return underline || strike;

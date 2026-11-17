@@ -271,8 +271,8 @@ final class StyleRules {
             }
             default -> throw unread(rule);
         }
-        // Text position is only of a styled run, which takes a For style: there it is read, and applied to a box it is an
-        // error.
+        // Text position and Highlight are only of a styled run, which takes a For style: there they are read, and
+        // applied to a box they are an error.
         read(rule, rule.getCanonicalName().equals("for-style") ? Style.ofRun(namedColors) : new Style(namedColors),
                 null, null);
         checkElementProperties(rule, type, source);
@@ -650,13 +650,13 @@ final class StyleRules {
 
     /**
      * The properties of {@code Typography} that a styled run allows (reference/common/text-formatting.md): the ones that
-     * change how its letters look and not the height of the line.
+     * change how its letters look, or what is behind them, and not the height of the line.
      */
     static final List<String> RUN_PROPERTIES = List.of("font", "code-font", "bold", "weight", "italic", "color",
-            "case", "small-caps", "letter-spacing", "text-position");
+            "case", "small-caps", "letter-spacing", "text-position", "highlight");
 
     private static final String RUN_ALLOWED = "Font, Code font, Bold, Weight, Italic, Color, Case, Small caps, "
-            + "Letter spacing and Text position";
+            + "Letter spacing, Text position and Highlight";
 
     /**
      * The style of a styled run, {@code [text]{name}} (reference/common/text-formatting.md): what the {@code For style}

@@ -1,0 +1,48 @@
+# Highlight, the color behind a styled run (reference/common/text-formatting.md): page of 240 × 160 with margins of
+# 20, page area of 200 × 120 from (20, 20). Size 10 with Line height 15; with the test metrics each character measures
+# 5 pt. The highlight changes no box and no line: the image shows it, from the ascent to the descent of the font.
+#   one:   a run in the middle of a line. y = 20.
+#   lines: "aaaa bbbb cccc dddd eeee" in a box of 60, with "bbbb cccc dddd" highlighted: three lines, the highlight at
+#          the end of the first and on the whole second, without the space the line break swallows. y = 35.
+#   marks: bold, underline and strikethrough inside the run, which is a single rectangle, and a run with its own color
+#          of text. y = 80.
+#   more:  a highlighted superscript, whose rectangle is that of the line, and a link inside a highlighted run. y = 95.
+Document (dev.stxt.pdf):
+	Language: es
+	Title: Prueba
+	Page:
+		Width: 240
+		Height: 160
+		Margin: 20
+	Styles:
+		For element: Document
+			Typography:
+				Font: IBM Plex Sans
+				Size: 10
+				Line height: 15
+				Markup: markdown
+		For style: mark
+			Typography:
+				Highlight: #FFE680
+		For style: alert
+			Typography:
+				Highlight: #B3261E
+				Color: #FFFFFF
+				Bold: true
+		For style: sup
+			Typography:
+				Text position: superscript
+				Highlight: #CDE8FF
+		For style: narrow
+			Box:
+				Width: 60
+	Section:
+		Text: Vence el [15 de mayo]{mark}.
+			Id: one
+		Text: aaaa [bbbb cccc dddd]{mark} eeee
+			Id: lines
+			Style: narrow
+		Text: Son [**12** de ++mayo++ y ~~13~~]{mark} y [NO]{alert}.
+			Id: marks
+		Text: Son m[2]{sup} y [ver [la web](https://stxt.dev)]{mark}.
+			Id: more

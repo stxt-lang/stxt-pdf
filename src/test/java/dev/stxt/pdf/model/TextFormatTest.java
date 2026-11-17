@@ -43,7 +43,7 @@ class TextFormatTest {
     @Test
     void theStyleOfARunReplacesTheBoxAndTheMarksAddToIt() {
         RunStyle light = new RunStyle("light", "#B3261E", null, null, new FontWeight(300), FontStyle.NORMAL, 1.5,
-                TextCase.UPPERCASE, true, null);
+                TextCase.UPPERCASE, true, null, null);
         TextFormat f = TextFormat.PLAIN.withStyle(light);
         FontFace boldItalic = new FontFace("F", FontWeight.BOLD, FontStyle.ITALIC);
         assertEquals(new FontFace("F", new FontWeight(300), FontStyle.NORMAL), f.face(boldItalic));
@@ -66,10 +66,10 @@ class TextFormatTest {
     void aRunWithLetterSpacingHasNoLigatures() {
         FontFace ligatures = new FontFace("F", FontWeight.NORMAL, FontStyle.NORMAL, true, false);
         TextFormat spaced = TextFormat.PLAIN.withStyle(
-                new RunStyle("wide", null, null, null, null, null, 1.0, null, null, null));
+                new RunStyle("wide", null, null, null, null, null, 1.0, null, null, null, null));
         assertFalse(spaced.face(ligatures).ligatures());
         TextFormat unspaced = TextFormat.PLAIN.withStyle(
-                new RunStyle("tight", null, null, null, null, null, 0.0, null, null, null));
+                new RunStyle("tight", null, null, null, null, null, 0.0, null, null, null, null));
         assertTrue(unspaced.face(ligatures).ligatures());
     }
 
@@ -192,6 +192,6 @@ class TextFormatTest {
     }
 
     private static RunStyle position(String name, TextPosition position) {
-        return new RunStyle(name, null, null, null, null, null, null, null, null, position);
+        return new RunStyle(name, null, null, null, null, null, null, null, null, position, null);
     }
 }

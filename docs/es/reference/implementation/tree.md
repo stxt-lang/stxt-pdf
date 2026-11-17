@@ -190,7 +190,8 @@ familia de `Font` va además en `TextFormat.family`, como la del código. La caj
 `Text position` solo existe en ese `Style` (`Style.ofRun`, el único con `isRun()`): `PropertyReader.position` lo rechaza en
 el de una caja (`TEXT_POSITION_OUTSIDE_RUN`), y por eso la lectura de comprobación de una regla `For style` usa también un
 `Style.ofRun`. `RunStyle.position` es el `model.TextPosition` del tramo, y `TextFormat.superscript()` y `subscript()` lo
-leen.
+leen. `Highlight` se lee igual (`PropertyReader.highlight`, `HIGHLIGHT_OUTSIDE_RUN`): `RunStyle.highlight` es su color,
+y `TextFormat.highlight()` se lo da al pintado.
 
 > **Decisión:** el texto de la caja sigue siendo una cadena y los tramos son una partición suya: las líneas del documento,
 > los mensajes, los marcadores del PDF y `{page}` trabajan sobre el texto entero, y un texto sin formato se mide y se pinta

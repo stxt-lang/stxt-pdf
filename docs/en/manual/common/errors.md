@@ -29,6 +29,7 @@ line 18: Margin auto does not center a box that takes up the whole width: Width 
 | `STYLE_WITHOUT_RULE` | A style, of a box or of a part of a text (`[x]{name}`), without its `For style` rule | Adding the rule or correcting the typo |
 | `STYLE_NOT_ALLOWED_IN_RUN` | The rule of a styled part declares something that would change the line, such as `Size` or a `Box` ([Text formatting](text-formatting.md#parts-in-another-color-or-font)) | Using a separate rule for the part, with only the color, the font, the capitalization or the letter spacing |
 | `TEXT_POSITION_OUTSIDE_RUN` | `Text position` (superscript or subscript) in a box and not in a part of a text ([Text formatting](text-formatting.md#superscripts-and-subscripts-text-position)) | Declaring it in a `For style` rule and giving the rule to the part: `m[2]{sup}` |
+| `HIGHLIGHT_OUTSIDE_RUN` | `Highlight` in a box and not in a part of a text ([Text formatting](text-formatting.md#highlighted-text-highlight)) | Declaring it in a `For style` rule and giving the rule to the part, or using `Background` for the whole box |
 | `HEADING_LEVEL` | A skipped level (`Heading 3` after `Heading 1`) | Using the next level |
 | `TABLE_ROW_CELLS` | A row with too many or too few cells | Adding empty `Cell:` entries or using `Span` |
 | `IMAGE_UNKNOWN`, `IMAGE_FORMAT` | The image does not exist or is not a PNG, a JPEG, a PDF or a supported SVG | Checking the path or converting the file |

@@ -285,6 +285,11 @@ public enum ErrorCode {
      * styled run ({@code [text]{name}}) gives it (line of the property).
      */
     TEXT_POSITION_OUTSIDE_RUN,
+    /**
+     * {@code Highlight} reaches a box, in its {@code Typography} or by a rule: only the {@code For style} rule of a
+     * styled run ({@code [text]{name}}) gives it (line of the property).
+     */
+    HIGHLIGHT_OUTSIDE_RUN,
     /** Two {@code Named color} with the same name in the same source. */
     COLOR_DUPLICATE,
     /** A color written with a name that no {@code Named color} declares (line of the property). */

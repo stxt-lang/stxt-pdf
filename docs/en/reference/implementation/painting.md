@@ -170,6 +170,11 @@ the line, which is what the OpenType specification says. They are painted as *ar
 superscript or a subscript is painted from the baseline of the run and at its size; the underline, from that of the
 line.
 
+The highlight of the styled runs (`Highlight`, `TextFormat.highlight()`) is painted by `TextPainter.paintHighlights`
+before the underline and the text of the box, with `Canvas.background`, as an *artifact*: on each line, one rectangle
+for the consecutive runs with the same color, from the ascent to the descent that `Canvas.vertical` gives for the font
+of the box. `ContrastCheck` records it like any other rectangle, so the text of the run is checked against it.
+
 > **Decision:** the ligatures and kerning options travel in `FontFace` (its fourth and fifth components, and `base()` is
 > the font without them): this way `TextMeasurer`, `Canvas.text` and the font cache of the PDF use them without changes,
 > and a file is identified the same with and without them. *Rejected alternative:* one more parameter in `TextMeasurer.width` and in `Canvas.text`.

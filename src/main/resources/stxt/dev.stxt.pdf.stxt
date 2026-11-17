@@ -1453,7 +1453,7 @@ Schema (@stxt.schema): dev.stxt.pdf
 				Max: 1
 	Node: Typography
 		Type: GROUP
-		Description: The text and how it is broken into lines: the font (family, code font, weight, italic, size), the color, the line height, the alignment and the first line indent, the line breaking (hyphenation, long words, widows and orphans), the inline formatting (Markup), letter case, small caps, letter spacing, ligatures and kerning, preformatted text and the language. Inherited: what an element declares applies to it and to its descendants that do not change it; only Text position is not.
+		Description: The text and how it is broken into lines: the font (family, code font, weight, italic, size), the color, the line height, the alignment and the first line indent, the line breaking (hyphenation, long words, widows and orphans), the inline formatting (Markup), letter case, small caps, letter spacing, ligatures and kerning, preformatted text and the language. Inherited: what an element declares applies to it and to its descendants that do not change it; only Text position and Highlight, which are of a styled run, are not.
 		Children:
 			Child: Font
 				Max: 1
@@ -1492,6 +1492,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Child: Small caps
 				Max: 1
 			Child: Text position
+				Max: 1
+			Child: Highlight
 				Max: 1
 			Child: Ligatures
 				Max: 1
@@ -1800,6 +1802,8 @@ Schema (@stxt.schema): dev.stxt.pdf
 			Value: normal
 			Value: superscript
 			Value: subscript
+	Node: Highlight
+		Description: Color painted behind a styled run, like a highlighter: on each line the run is on, a rectangle as wide as the run, from the ascent to the descent of the font of its box. It does not change the line or its height, and has no padding or corner radius. Only in the For style rule of a styled run ([text]{name}): in a box it is an error (the color behind a box is its Background). Not inherited.
 	Node: Ligatures
 		Type: BOOLEAN
 		Description: Whether the text is measured and painted with the ligatures of the font (fi, fl). By default, true; with false, one glyph per character. With Letter spacing other than 0 there are no ligatures. It only matters in the fonts that have them (IBM Plex Sans and Serif; Plex Mono does not).

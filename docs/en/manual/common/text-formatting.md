@@ -67,8 +67,8 @@ Document (dev.stxt.pdf):
 ```
 
 - The rule is a `For style` rule like the others: the same one can style a box (`Style: price`) and a part of a text. In
-  a part only `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps`, `Letter spacing` and
-  `Text position` are valid. If the rule declares something else, such as `Size` or a `Box`, and it is used in a part, it is an error
+  a part only `Font`, `Code font`, `Bold`, `Weight`, `Italic`, `Color`, `Case`, `Small caps`, `Letter spacing`,
+  `Text position` and `Highlight` are valid. If the rule declares something else, such as `Size` or a `Box`, and it is used in a part, it is an error
   (`STYLE_NOT_ALLOWED_IN_RUN`).
 - The marks add to the style: `[**€12.50**]{price}` and `**[€12.50]{price}**` are bold even if the rule says
   `Weight: 300`. A link can have a styled part (`[[see price]{price}](https://...)`) and a styled part can have a link,
@@ -109,6 +109,39 @@ Document (dev.stxt.pdf):
 - `Text position` is only valid in a part of a text. In a box (in its `Typography`, or with `Style: sup`) it is an error
   (`TEXT_POSITION_OUTSIDE_RUN`).
 - The number of a [footnote](../components/footnote.md) is already a superscript, with no rule.
+
+## Highlighted text (`Highlight`)
+
+A styled part whose rule declares `Highlight` has that color behind it, like a highlighter: a date, an amount, a changed
+clause.
+
+```
+Document (dev.stxt.pdf):
+    Language: en
+    Title: Highlighted text
+    Page:
+        Paper: A5
+        Margin: 15mm
+    Styles:
+        For element: Document
+            Typography:
+                Font: IBM Plex Sans
+                Size: 11
+                Markup: markdown
+        For style: due
+            Typography:
+                Highlight: #FFE680
+    Section:
+        Paragraph: The payment is due on [15 December]{due}, and the amount is [€1,250.00]{due}.
+```
+
+- The color is as tall as the letters of the line, with no padding. The line does not change, and a part that goes on in
+  the next line is highlighted in both.
+- The rule can also carry a color or a font for the letters. The letters need enough contrast with the highlight
+  (`CONTRAST_LOW`).
+- `Highlight` is only valid in a part of a text. In a box it is an error (`HIGHLIGHT_OUTSIDE_RUN`): the color behind a
+  whole box is its `Background`.
+- A screen reader does not announce it.
 
 ## Images in the sentence
 

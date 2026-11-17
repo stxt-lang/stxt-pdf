@@ -7,7 +7,7 @@ import java.util.Objects;
  * rule of that name declares of the properties a run allows. Each value is that of the rule, or {@code null} if the
  * rule does not declare it and the run keeps that of its box. The size, the line height and the alignment are always
  * those of the box, so the lines do not change their height; a superscript or a subscript ({@code Text position}) is
- * painted smaller within its line.
+ * painted smaller within its line, and a {@code Highlight} is a color behind the run, within its line too.
  *
  * <p>The Markdown of the text only knows the name ({@link #named}); the box, which knows the rules, gives it its
  * values when it is built. The family of the run ({@code Font}) and that of its code ({@code Code font}) go in
@@ -23,10 +23,11 @@ import java.util.Objects;
  * @param textCase      {@code Case}
  * @param smallCaps     {@code Small caps}
  * @param position      {@code Text position}: superscript, subscript or normal
+ * @param highlight     {@code Highlight}, a hexadecimal color: the one painted behind the run
  */
 public record RunStyle(String name, String color, String family, String codeFamily, FontWeight weight,
                        FontStyle style, Double letterSpacing, TextCase textCase, Boolean smallCaps,
-                       TextPosition position) {
+                       TextPosition position, String highlight) {
 
     /**
      * A style of a run: each value is that of the rule, or {@code null} for that of the box.
@@ -41,6 +42,7 @@ public record RunStyle(String name, String color, String family, String codeFami
      * @param textCase      {@code Case}
      * @param smallCaps     {@code Small caps}
      * @param position      {@code Text position}
+     * @param highlight     {@code Highlight}
      * @throws NullPointerException if the name is {@code null}
      */
     public RunStyle {
@@ -54,6 +56,6 @@ public record RunStyle(String name, String color, String family, String codeFami
      * @return a style with every value {@code null}
      */
     public static RunStyle named(String name) {
-        return new RunStyle(name, null, null, null, null, null, null, null, null, null);
+        return new RunStyle(name, null, null, null, null, null, null, null, null, null, null);
     }
 }

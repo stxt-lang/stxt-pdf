@@ -20,8 +20,9 @@ import java.util.Objects;
 
 /**
  * The text lines of a fragment, each run with its font (reference/common/text-formatting.md), as {@link StackingContext}
- * paints them in the content step of a box. The underline is painted before the text and the strikethrough after it;
- * both outside the marked content, because they are not text (in the tagged PDF, <em>artifacts</em>).
+ * paints them in the content step of a box. The highlight of the styled runs and the underline are painted before the
+ * text and the strikethrough after it; all outside the marked content, because they are not text (in the tagged PDF,
+ * <em>artifacts</em>).
  *
  * <p>The runs of each line are split first into {@linkplain Sequence sequences}: consecutive runs that are one marked
  * content of the tagged PDF (same link, the call or the label of a footnote, which are marked apart, or an image, which
@@ -113,6 +114,7 @@ final class TextPainter {
     }
 
     private void paint() {
+        paintHighlights();
         paintDecorations(true);
         for (int n = 0; n < lines.size(); n++) {
             paintLine(n);
@@ -290,6 +292,36 @@ final class TextPainter {
         Rect area = new Rect(content.x() + l.x() + first.x(), content.y() + l.y(),
                 last.x() + last.width() - first.x(), l.height());
         tags.link(box, area, first.format().link(), text.toString());
+    }
+
+    /**
+     * The highlight of the styled runs ({@code Highlight}, reference/common/text-formatting.md): behind each one, a
+     * rectangle of its color from the ascent to the descent of the font of the box, whatever the height of the line.
+     * The consecutive runs of a line with the same color are one rectangle, so that no seam shows between them. All
+     * of them are painted before any text of the box: the one of a line does not cover the letters of the line above.
+     */
+    private void paintHighlights() {
+        for (TextLine l : lines) {
+            double baseline = metrics.baseline(content.y() + l.y(), l.height(), l.fontSize());
+            double top = baseline - metrics.ascent() * l.fontSize();
+            double height = (metrics.ascent() + metrics.descent()) * l.fontSize();
+            List<TextLine.Run> runs = l.runs();
+            int from = 0;
+            while (from < runs.size()) {
+                String color = runs.get(from).format().highlight();
+                int to = from + 1;
+                while (to < runs.size() && Objects.equals(color, runs.get(to).format().highlight())) {
+                    to++;
+                }
+                if (color != null) {
+                    TextLine.Run first = runs.get(from);
+                    TextLine.Run last = runs.get(to - 1);
+                    canvas.background(new Rect(content.x() + l.x() + first.x(), top,
+                            last.x() + last.width() - first.x(), height), color);
+                }
+                from = to;
+            }
+        }
     }
 
     /** Underline ({@code underline}) or strikethrough lines of the runs, with the color of the text of each run. */

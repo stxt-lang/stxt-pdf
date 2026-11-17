@@ -57,6 +57,8 @@ inherited (without `Color`, the usual black, the line of the box).
 - **Inside a box with `Opacity`** ([Layers and rotation](layers-and-rotation.md#opacity-opacity)), the opacity of the
   text and that of the backgrounds are multiplied by that of the box, and that of the boxes with `Opacity` that contain
   it. The message then names the `Opacity` too.
+- **The `Highlight` of a styled run** ([Text formatting](text-formatting.md#highlight-highlight)) is what lies under
+  the text of the run.
 - **On top of an image** it is not known what is underneath, so that text is not checked, unless an opaque background
   covers the image.
 - All the text that is painted is checked, also that of a `Page overlay` and that of the entries of a table of contents.

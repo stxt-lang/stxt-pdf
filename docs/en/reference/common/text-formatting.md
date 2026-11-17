@@ -70,7 +70,7 @@ is a superscript run with the number of the note ([Footnote](../components/footn
 
 With `Markup: markdown`, or in a `Markdown`, a text in brackets followed, with nothing in between, by the name of a style
 in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For style: price` rule of `Styles`
-([Reusable rules](styles.md)) what changes how its letters look and not the height of the line.
+([Reusable rules](styles.md)) what changes how its letters look, or what is behind them, and not the height of the line.
 
 | Property of the rule | In the run |
 |---|---|
@@ -80,6 +80,7 @@ in braces, `[€12.50]{price}`, is a **styled run**: it takes from the `For styl
 | `Case`, `Small caps` | how its letters are painted ([Capitalization](#capitalization-case), [Small caps](#small-caps-small-caps)) |
 | `Letter spacing` | the letter spacing of its characters, also of its spaces ([Letter spacing](#letter-spacing-letter-spacing)) |
 | `Text position` | the run as a superscript or a subscript ([below](#superscript-and-subscript-text-position)) |
+| `Highlight` | the color behind the run ([below](#highlight-highlight)) |
 
 - What the rule declares **replaces** what the box has, and what it does not declare is that of the box. If two
   `For style` rules with that name (one of the separate styles document and one of the document) declare the same thing,
@@ -173,6 +174,45 @@ Paragraph: It emits 120 g of CO[2]{sub} per m[2]{sup}.
 > **Decision:** `Text position` in a box is an error and is neither ignored nor inherited: a whole box as a superscript has no
 > line to be raised on. *Alternative discarded:* that the text of the box inherits it, which would mix it with
 > `Overflow: shrink` and with the drop cap for no use.
+
+## Highlight (`Highlight`)
+
+`Highlight`, in the `For style` rule of a [styled run](#styled-runs), paints a color behind the run, like a highlighter:
+`[15 December]{due}`.
+
+```stxt
+Styles:
+    For style: due
+        Typography:
+            Highlight: #FFE680
+Paragraph: The payment is due on [15 December]{due}.
+    Typography:
+        Markup: markdown
+```
+
+- **It is one rectangle on each line** the run is on: as wide as the run, with the spaces inside it (and what `justify`
+  adds to them) and without the space the line break swallows, and as tall as the font of the box, from its ascent to
+  its descent, whatever the `Line height`.
+- **It does not change the line**: neither its height nor where it breaks. It has no padding, border or corner radius.
+- It is painted behind the text of its box and over its `Background`. What is inside the run (bold, an underline, a
+  link, a superscript, an image) is on the same rectangle.
+- The value is a color, which can be the name of a `Named color` ([Styles](styles.md#named-colors)).
+- **Contrast.** The highlight is what lies under the text of the run: without enough contrast between the two it is
+  `CONTRAST_LOW` ([PDF](pdf.md)).
+- **It is only valid in a run.** `Highlight` in a box is `HIGHLIGHT_OUTSIDE_RUN`, with the line of the property, in the
+  same places as `Text position`. The color behind a box is its `Background`.
+- In the tagged PDF it is an *artifact*, like the underline: a screen reader does not announce it.
+
+> **Decision:** the highlight is a property of the rule of a styled run and not a mark of the text (`==text==`): a mark
+> would need a color that the document has not declared. *Alternative discarded:* the mark with a default color.
+
+> **Decision:** `Highlight`, and not `Background` in the rule of a run: `Background` is of `Box`, with its padding, its
+> border and its corner radius, and a run is not a box. *Alternative discarded:* allowing `Box` in a run only for its
+> `Background`.
+
+> **Decision:** the rectangle is as tall as the font and not as the line: it does not change with `Line height`, and
+> with loose lines the highlights of two lines do not touch. *Alternative discarded:* the height of the line, which
+> joins the highlighted lines into a block.
 
 ## Inline code
 
@@ -326,6 +366,7 @@ underline goes below the text and the strikethrough, over it. A screen reader do
   height, superscripts and subscripts with another size or another shift or with the glyphs of the font for them, styled runs inside others, and marks that
   remove bold or italic (a styled run can, with `Weight` or `Italic: false`).
 - Line styles (wavy, dotted), a color of its own for the line, or an underline that skips descenders.
+- A highlight with padding, a border or a corner radius (a label inside a line), or with another height.
 - Full-width `Case`, letter spacing relative to the font size, small caps with `smcp` and more `Preformatted` modes.
 - Inline images with another size than that of the letters or aligned otherwise, and the page of a PDF or a barcode
   inside a text.

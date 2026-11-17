@@ -57,6 +57,8 @@ de siempre, la línea de la caja).
 - **Dentro de una caja con `Opacity`** ([Capas y giro](layers-and-rotation.md#opacidad-opacity)), la opacidad del texto y
   la de los fondos se multiplican por la de la caja, y la de las cajas con `Opacity` que la contienen. El mensaje nombra
   entonces también la `Opacity`.
+- **El `Highlight` de un tramo con estilo** ([Formato del texto](text-formatting.md#resaltado-highlight)) es lo que
+  hay debajo del texto del tramo.
 - **Encima de una imagen** no se sabe qué hay debajo, así que ese texto no se comprueba, salvo que un fondo opaco tape la
   imagen.
 - Se comprueba todo el texto que se pinta, también el de un `Page overlay` y el de las entradas de un índice.

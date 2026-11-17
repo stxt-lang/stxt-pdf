@@ -167,6 +167,11 @@ tabla `post`, y `yStrikeoutPosition` y `yStrikeoutSize` de `OS/2`, medidos desde
 la raya, que es lo que dice la especificación OpenType. Se pintan como *artifacts*. El tachado de un superíndice o de
 un subíndice se pinta desde la línea base del tramo y con su tamaño; el subrayado, desde la de la línea.
 
+El resaltado de los tramos con estilo (`Highlight`, `TextFormat.highlight()`) lo pinta `TextPainter.paintHighlights`
+antes del subrayado y del texto de la caja, con `Canvas.background`, como *artifact*: en cada línea, un rectángulo para
+los tramos seguidos con el mismo color, del ascendente al descendente que da `Canvas.vertical` para la fuente de la
+caja. `ContrastCheck` lo apunta como cualquier otro rectángulo, así que el texto del tramo se comprueba contra él.
+
 > **Decisión:** las opciones de las ligaduras y del kerning viajan en `FontFace` (sus componentes cuarto y quinto, y
 > `base()` es la fuente sin ellas): así las usan sin cambios `TextMeasurer`, `Canvas.text` y la caché de fuentes del
 > PDF, y un fichero se identifica igual con y sin ellas. *Alternativa descartada:* un parámetro más en `TextMeasurer.width` y en `Canvas.text`.

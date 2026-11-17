@@ -20,6 +20,12 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   for it (`◦`, `▪`, `☐` or `☑`); `ListNumbering` is `Circle` and `Square` for the first two.
 - In the Java API, `Marker.CIRCLE`, `Marker.SQUARE` and `Marker.CHECKBOX`, `Marker.drawn()` and `Marker.symbol()`,
   `Box.isMarkerShape()`, `ListStyle.checked()` and `PropertyKey.CHECKED`.
+- `Highlight`, in the `Typography` of the `For style` rule of a styled run (`[text]{name}`): a color behind the run,
+  like a highlighter. On each line the run is on, it is a rectangle as wide as the run and as tall as the font of its
+  box, with no padding; it does not change the line. The text of the run is checked for contrast against it. In a box
+  it is `HIGHLIGHT_OUTSIDE_RUN`.
+- In the Java API, `RunStyle.highlight()`, `TextFormat.highlight()`, `TypographyStyle.highlight()` and
+  `PropertyKey.HIGHLIGHT`.
 
 ### Changed
 
@@ -27,6 +33,8 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   characters as text, and now they are tasks. A list with tasks and items that are not, and a task in a numbered list,
   are `MARKDOWN_UNSUPPORTED`. An item whose text starts with those characters is written `\[ ]`.
 - `Canvas` has a new method, `marker(Box, Rect)`, which paints a drawn marker: a class that implements it has to add it.
+- The record `RunStyle` has a new last component, `highlight`: code that creates one has to give it (`null` for none).
+- The message of `STYLE_NOT_ALLOWED_IN_RUN` lists `Highlight` among what a styled run takes.
 
 ## [0.19.0] - 2026-11-16
 

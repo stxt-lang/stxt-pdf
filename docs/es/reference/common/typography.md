@@ -30,6 +30,7 @@ celdas). En un `Barcode` solo admite `Color`, el de sus módulos ([Barcode](../c
 | `Letter spacing` | número | `0` | Interletraje; puede ser negativo ([Formato del texto](text-formatting.md#interletraje-letter-spacing)). |
 | `Small caps` | `true`, `false` | `false` | Versalitas ([Formato del texto](text-formatting.md#versalitas-small-caps)). |
 | `Text position` | `normal`, `superscript`, `subscript` | `normal` | Superíndice o subíndice; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#superíndice-y-subíndice-text-position)). |
+| `Highlight` | un color | ninguno | Color de detrás del tramo; solo en la regla de un tramo con estilo y no se hereda ([Formato del texto](text-formatting.md#resaltado-highlight)). |
 | `Ligatures` | `true`, `false` | `true` | Ligaduras de la fuente ([Formato del texto](text-formatting.md#ligaduras-ligatures)). |
 | `Kerning` | `true`, `false` | `true` | Pares de kerning de la fuente ([Kerning](#kerning-kerning)). |
 | `Preformatted` | `none`, `keep`, `wrap` | `none` | Texto preformateado ([Formato del texto](text-formatting.md#texto-preformateado)). |

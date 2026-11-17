@@ -78,6 +78,19 @@ class ContrastCheckTest {
         assertTrue(e.getMessage().contains("(#000000 on #1A2B3C)"), e.getMessage());
     }
 
+    /** The Highlight of a styled run is what is below its text, and not below the rest of the text of its box. */
+    @Test
+    void theHighlightOfARunIsWhatIsBelowIt() {
+        String[] rule = {"\tText: Vence [hoy]{mark} mismo", "\t\tTypography:", "\t\t\tMarkup: markdown"};
+        String styles = "\tStyles:\n\t\tFor style: mark\n\t\t\tTypography:\n\t\t\t\tHighlight: %s\n\t\t\t\tColor: %s\n";
+        assertDoesNotThrow(() -> Converter.create().layOut(
+                Docs.read(HEADER.replace("\tStyles:\n", String.format(styles, "#1A2B3C", "#FFFFFF")), rule)));
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> Converter.create().layOut(
+                Docs.read(HEADER.replace("\tStyles:\n", String.format(styles, "#1A2B3C", "#000000")), rule)));
+        assertEquals(ErrorCode.CONTRAST_LOW, e.errorCode());
+        assertTrue(e.getMessage().contains("(#000000 on #1A2B3C)"), e.getMessage());
+    }
+
     @Test
     void aTranslucentBackgroundMixesWithWhatIsBelow() {
         // Half black over the white page is middle gray: the white on top does not reach the ratio.
