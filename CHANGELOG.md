@@ -5,7 +5,13 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
-## [Unreleased]
+## [0.20.0] - 2026-11-17
+
+Markers drawn by the engine (`circle`, `square` and `checkbox`), task lists in a `Markdown`, and `Highlight`, a color
+behind a styled run. **From 0.19.0**: in a `Markdown`, the items of a bulleted list that start with `[ ]` or `[x]` are
+tasks and no longer text; no other document that was valid changes. In the Java API, a class that implements `Canvas`
+has to add `marker(Box, Rect)`, and code that creates a `RunStyle` has to give its `highlight`. The names of the
+`dev.stxt.pdf` namespace and the Java API may still change before 1.0.
 
 ### Added
 
@@ -18,14 +24,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
   `Marker: checkbox`, and needs no `Bullet markers`.
 - In the tagged PDF, a drawn marker is the content of the `Lbl` of its item and is read as the character that stands
   for it (`◦`, `▪`, `☐` or `☑`); `ListNumbering` is `Circle` and `Square` for the first two.
-- In the Java API, `Marker.CIRCLE`, `Marker.SQUARE` and `Marker.CHECKBOX`, `Marker.drawn()` and `Marker.symbol()`,
-  `Box.isMarkerShape()`, `ListStyle.checked()` and `PropertyKey.CHECKED`.
 - `Highlight`, in the `Typography` of the `For style` rule of a styled run (`[text]{name}`): a color behind the run,
   like a highlighter. On each line the run is on, it is a rectangle as wide as the run and as tall as the font of its
   box, with no padding; it does not change the line. The text of the run is checked for contrast against it. In a box
   it is `HIGHLIGHT_OUTSIDE_RUN`.
-- In the Java API, `RunStyle.highlight()`, `TextFormat.highlight()`, `TypographyStyle.highlight()` and
-  `PropertyKey.HIGHLIGHT`.
+- In the Java API, `Marker.CIRCLE`, `Marker.SQUARE` and `Marker.CHECKBOX`, `Marker.drawn()` and `Marker.symbol()`,
+  `Box.isMarkerShape()`, `ListStyle.checked()` and `PropertyKey.CHECKED`; and `RunStyle.highlight()`,
+  `TextFormat.highlight()`, `TypographyStyle.highlight()` and `PropertyKey.HIGHLIGHT`.
 
 ### Changed
 
