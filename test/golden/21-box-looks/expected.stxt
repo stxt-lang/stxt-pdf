@@ -1,4 +1,4 @@
-# Milestone 28: box appearance (reference/common/box.md). Corner radius, Border color per side, Background with a
+# Box appearance (reference/common/box.md). Corner radius, Border color per side, Background with a
 # gradient and colors with opacity only change the painting: the dump checks that they do not move any box, and the
 # PNGs (with the debug outlines) are checked by eye. Page of 300 × 300 with margins of 20: page area of
 # 260 × 260 from (20, 20). Each row is a Stack of 260 × 50 with gaps of 10 and a margin of 10 below: y = 20, 80, 140
