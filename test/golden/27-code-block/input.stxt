@@ -1,4 +1,4 @@
-# Milestone 34: the code block of a Markdown is the generated element Code block (reference/common/styles.md,
+# The code block of a Markdown is the generated element Code block (reference/common/styles.md,
 # reference/components/markdown.md). Page of 200 × 300 with margins of 20: page area of 160 × 260 from (20, 20).
 # The line measures 120 % of the Size of its box.
 #   md:   a Markdown with three blocks. "Antes." and "Después." are one-line Paragraph elements (Size 10: 12). The code

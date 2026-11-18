@@ -1,4 +1,4 @@
-# Milestone 29: preformatted text and code (reference/common/text-formatting.md and reference/components/markdown.md).
+# Preformatted text and code (reference/common/text-formatting.md and reference/components/markdown.md).
 # Page of 200 × 300 with margins of 20: page area of 160 × 260 from (20, 20). Lines of 12 (Size 10); with the test
 # metrics each character measures 5 pt.
 #   term:    Preformatted pre, five lines of the block, the fourth empty (a blank line is a line,

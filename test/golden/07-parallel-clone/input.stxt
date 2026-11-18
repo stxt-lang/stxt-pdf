@@ -1,4 +1,5 @@
-# Milestone 7 (reference/common/breaks.md). Page area of 260 × 160 from (20, 20).
+# Breaks: a box with Edges: closed and a grid row split in parallel (reference/common/breaks.md). Page area of
+# 260 × 160 from (20, 20).
 #
 # Page 1: card (Edges: closed, border 2 and padding 3) leaves 160 − 10 = 150 to the content:
 #   150 of the 200 of c1 fit.
