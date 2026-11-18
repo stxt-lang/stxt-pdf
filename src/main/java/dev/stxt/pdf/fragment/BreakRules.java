@@ -157,14 +157,14 @@ public final class BreakRules {
      * @return {@code PAGE}, {@code COLUMN} or {@code AUTO}
      */
     public static Break forcedBefore(Box box) {
-        Break own = forced(box.style().breaks().before());
+        Break own = box.style().breaks().before();
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own : stronger(own, fromInside(box, forcedBefore(children.get(0))));
     }
 
     /** The forced break after the box or, if it is a block, after its last in-flow child ({@link #forcedBefore}). */
     public static Break forcedAfter(Box box) {
-        Break own = forced(box.style().breaks().after());
+        Break own = box.style().breaks().after();
         List<Box> children = propagates(box) ? box.inFlowChildren() : List.of();
         return children.isEmpty() ? own
                 : stronger(own, fromInside(box, forcedAfter(children.get(children.size() - 1))));
@@ -191,10 +191,6 @@ public final class BreakRules {
     /** The forced break of a first or last child that leaves the box: from a {@code Columns}, only page breaks. */
     private static Break fromInside(Box box, Break forced) {
         return box.style().layout() == Layout.COLUMNS && forced == Break.COLUMN ? Break.AUTO : forced;
-    }
-
-    private static Break forced(Break b) {
-        return isForced(b) ? b : Break.AUTO;
     }
 
     private static Break stronger(Break a, Break b) {
