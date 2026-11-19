@@ -199,6 +199,17 @@ class ListLayoutTest {
     }
 
     @Test
+    void aDrawnMarkerWiderThanTheIndentIsAnError() {
+        // A checkbox is 7 wide at Size 10 and its space 5: 12 in an indent of 10. It has no text: the message names it
+        // by the character that stands for it.
+        InvalidModelException e = assertThrows(InvalidModelException.class, () -> LayoutFixture.layOut(
+                "\tList:", "\t\tMarker: checkbox", "\t\tBox:", "\t\t\tPadding: 0 0 0 10",
+                "\t\tList item:", "\t\t\tText: Uno"));
+        assertEquals(ErrorCode.LIST_MARKER_OVERFLOW, e.errorCode());
+        assertTrue(e.getMessage().contains("The marker '☐'"), e.getMessage());
+    }
+
+    @Test
     void imageMarkerUsesTheTypographyOfTheItemNotOfItsFirstLine() {
         // Paragraph of 20 pt: line of 24 and baseline at 40 + 2 + 16 = 58. The marker takes the Size of the item,
         // 10: 10 × 10 centered 3.5 above the baseline, with its top at 58 − 3.5 − 5 = 49.5.

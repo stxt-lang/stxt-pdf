@@ -236,14 +236,27 @@ public final class Overflow {
             }
             double room = item.x() + list.padding().left();
             if (m.width() > room + TOLERANCE) {
-                String marker = m.box().isImage() ? "image " + m.box().image() : "'" + m.box().text().strip() + "'";
                 throw new InvalidModelException(item.box().line(), ErrorCode.LIST_MARKER_OVERFLOW, "The marker "
-                        + marker + " of List item " + item.box().describe() + " measures "
+                        + markerName(m.box()) + " of List item " + item.box().describe() + " measures "
                         + pt(m.width()) + " with its space, and the indent leaves " + pt(room)
                         + ": the left Padding of the list or "
                         + "the left margin of the item has to be increased");
             }
         }
+    }
+
+    /**
+     * A marker in a message: the image of an image marker, the character that stands for a marker the engine draws,
+     * which has no text, or the text of the marker.
+     */
+    private static String markerName(Box marker) {
+        if (marker.isImage()) {
+            return "image " + marker.image();
+        }
+        if (marker.isMarkerShape()) {
+            return "'" + marker.style().list().marker().symbol(marker.style().list().checked()) + "'";
+        }
+        return "'" + marker.text().strip() + "'";
     }
 
     // ------------------------------------------------------------------------------------------

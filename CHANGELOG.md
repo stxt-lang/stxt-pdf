@@ -5,6 +5,14 @@ All notable changes to `dev.stxt:stxt-pdf` are documented in this file, newest f
 The format follows [Keep a Changelog](http://keepachangelog.com/). While the version starts with `0.`, the names of the
 `dev.stxt.pdf` namespace and the Java API may change between minor versions.
 
+## [Unreleased]
+
+### Fixed
+
+- A marker the engine draws (`circle`, `square` or `checkbox`) that does not fit in the indent of its list stopped the
+  conversion with an internal error (`InternalException`, from a `NullPointerException`) instead of
+  `LIST_MARKER_OVERFLOW`. The message names it by the character that stands for it (`'☐'`).
+
 ## [0.20.0] - 2026-11-17
 
 Markers drawn by the engine (`circle`, `square` and `checkbox`), task lists in a `Markdown`, and `Highlight`, a color
