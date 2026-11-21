@@ -12,6 +12,9 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - A marker the engine draws (`circle`, `square` or `checkbox`) that does not fit in the indent of its list stopped the
   conversion with an internal error (`InternalException`, from a `NullPointerException`) instead of
   `LIST_MARKER_OVERFLOW`. The message names it by the character that stands for it (`'☐'`).
+- The message of `FIGURE_PROPERTY_WITHOUT_EFFECT` for `Alt` in a `Figure` with a `Barcode` said "an Barcode"; it
+  says "a Barcode".
+- `Converter.Builder` had no description in the javadoc since 0.13.0: it sat on a private method above the class.
 
 ## [0.20.0] - 2026-11-17
 

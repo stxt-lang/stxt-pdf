@@ -181,6 +181,10 @@ class FiguresTest {
                 "\t" + TABLE.replace("\n", "\n\t"));
         assertEquals(ErrorCode.FIGURE_PROPERTY_WITHOUT_EFFECT, table.errorCode());
         assertEquals(14, table.line());
+        InvalidModelException barcode = error("\tSection:", "\t\tFigure:", "\t\t\tAlt: Código", "\t\t\tCaption: Pie",
+                "\t\t\tBarcode: https://stxt.dev", "\t\t\t\tAlt: Enlace");
+        assertEquals(ErrorCode.FIGURE_PROPERTY_WITHOUT_EFFECT, barcode.errorCode());
+        assertTrue(barcode.getMessage().contains("a Barcode, which carries the Alt itself"), barcode.getMessage());
         // With a Block, the figure carries its own Alt.
         Box f = figures(build("\tSection:", "\t\tFigure:", "\t\t\tAlt: Dos fotos", "\t\t\tCaption: Pie", "\t\t\tBlock:",
                 "\t\t\t\tText: Hola")).get(0);

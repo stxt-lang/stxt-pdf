@@ -682,7 +682,7 @@ public final class Converter {
         return new InternalException("Unexpected failure while converting: " + e, e);
     }
 
-    /** Configures a {@link Converter}; every option is optional. */
+    /** The version in the resource {@link #VERSION_RESOURCE}; without it, the jar is built wrong. */
     private static String readVersion() {
         try (InputStream in = Converter.class.getResourceAsStream(VERSION_RESOURCE)) {
             if (in == null) {
@@ -696,6 +696,7 @@ public final class Converter {
         }
     }
 
+    /** Configures a {@link Converter}; every option is optional. */
     public static final class Builder {
 
         /** The converter this builder comes from ({@link Converter#toBuilder()}); {@code null} if from scratch. */

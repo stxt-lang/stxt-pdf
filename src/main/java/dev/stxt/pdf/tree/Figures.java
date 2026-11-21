@@ -99,7 +99,8 @@ final class Figures {
         if (content.element() != Element.BLOCK && s.isDeclared(ALT)) {
             throw error(s.line(ALT), ErrorCode.FIGURE_PROPERTY_WITHOUT_EFFECT, "Alt has no effect on a Figure with "
                     + (content.element() == Element.TABLE ? "a Table, which is read by itself"
-                    : "an " + content.element().label() + ", which carries the Alt itself") + ": it is not needed");
+                    : content.element() == Element.IMAGE ? "an Image, which carries the Alt itself"
+                    : "a Barcode, which carries the Alt itself") + ": it is not needed");
         }
     }
 }
