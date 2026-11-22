@@ -8,9 +8,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import dev.stxt.pdf.fragment.Fragment;
 import dev.stxt.pdf.fragment.TextLine;
+import dev.stxt.pdf.layout.Engine;
 import dev.stxt.pdf.layout.LayoutFixture;
+import dev.stxt.pdf.model.FontFace;
+import dev.stxt.pdf.model.FontStyle;
+import dev.stxt.pdf.model.FontWeight;
 import dev.stxt.pdf.model.Rect;
+import dev.stxt.pdf.model.VerticalMetrics;
+import dev.stxt.pdf.resources.Resources;
+import dev.stxt.pdf.stxt.DocumentReader;
 
 /**
  * Drop caps (reference/components/text.md). Page area of 515 from (40, 40); lines of 12 (Size 10), 5 pt per
@@ -54,6 +62,45 @@ class DropCapLayoutTest {
         assertEquals(19, lines.get(1).text().split(" ").length);
         assertEquals(19, lines.get(3).text().split(" ").length);
         assertEquals(20, lines.get(4).text().split(" ").length);
+    }
+
+    /**
+     * With the font ({@link PdfMetrics}), the drop cap is sized with the cap height of the font (698 of 1000 in IBM
+     * Plex Serif, not the approximate 0.7) and its baseline, with the ascent and descent the font is painted with, is
+     * that of its last line.
+     */
+    @Test
+    void theDropCapIsSizedAndPlacedWithTheMetricsOfTheFont() {
+        Resources resources = new Resources();
+        PdfMetrics metrics = new PdfMetrics(resources);
+        String document = "Document (dev.stxt.pdf):\n\tPage:\n\t\tPaper: A4\n\t\tMargin: 40\n\tTitle: T\n\tLanguage: es\n"
+                + "\tStyles:\n\t\tFor element: Document\n\t\t\tTypography:\n\t\t\t\tFont: IBM Plex Serif\n"
+                + "\t\t\t\tSize: 10\n\t\t\t\tLine height: 14\n"
+                + "\tSection:\n\t\tParagraph: L" + "orem ipsum dolor sit amet ".repeat(40).strip() + "\n\t\t\tDrop cap: 3\n";
+        List<TextLine> lines = lines(new Engine(metrics, resources).layOutDocument(new DocumentReader().read(document))
+                .pages().get(0).content());
+        TextLine drop = lines.get(0);
+        TextLine third = lines.get(3);
+        VerticalMetrics vertical = metrics.vertical(new FontFace("IBM Plex Serif", FontWeight.NORMAL, FontStyle.NORMAL));
+        assertEquals(0.698, vertical.capHeight(), 1e-9);
+        assertEquals("L", drop.text());
+        assertEquals((2 * 14 + 0.698 * 10) / 0.698, drop.fontSize(), 1e-9);
+        assertEquals(vertical.baseline(third.y(), third.height(), third.fontSize()),
+                vertical.baseline(drop.y(), drop.height(), drop.fontSize()), 1e-9);
+    }
+
+    /** The lines of the first fragment with lines, in document order. */
+    private static List<TextLine> lines(Fragment f) {
+        if (!f.lines().isEmpty()) {
+            return f.lines();
+        }
+        for (Fragment child : f.children()) {
+            List<TextLine> lines = lines(child);
+            if (!lines.isEmpty()) {
+                return lines;
+            }
+        }
+        return List.of();
     }
 
     @Test

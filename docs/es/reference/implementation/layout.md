@@ -243,7 +243,8 @@ y con su interletraje (`TextFormat.letterSpacing`, en `advance`) y quita a una l
 carácter (`trailing`, `Paragraph.width`), que es el de su tramo. Un tramo que es una imagen (`TextFormat.image`, con el
 texto `TextRun.IMAGE`, U+FFFC) mide en `advance` lo que da `TextMeasurer.imageWidth`: tan alto como el tamaño de la línea
 y tan ancho como su proporción, que `TextValues.WithImages` lee del fichero a través de `LayoutContext.imageRatio`
-(así también con `FixedMetrics` la imagen mide lo que es), y `PageNumbers.probing` delega. `Images.validate` comprueba
+(así también con `FixedMetrics` la imagen mide lo que es), y `PageNumbers.probing` delega, como delega
+`TextMeasurer.vertical`. `Images.validate` comprueba
 antes las imágenes de los tramos como las de las `Image` (formato, límites), con la línea del texto.
 `TextLine.runs` guarda cada tramo colocado, con el espaciado de `justify` incluido. `MarkerLayout` coloca el marcador de un
 `List item` en su primer fragmento, con la línea base de su primera línea (`Baselines.first`, que baja por el primer

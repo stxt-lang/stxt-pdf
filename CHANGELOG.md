@@ -9,6 +9,10 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 
 ### Fixed
 
+- The drop cap of a `Paragraph` (`Drop cap`) was sized and placed with the approximate metrics (capitals of 70% of
+  the size, 80% above the baseline and 20% below) and not with those of the font: its size ignored the cap height of
+  the `OS/2` table, and its baseline fell below that of its last line, by more the larger the drop cap (3 pt with IBM
+  Plex Serif at 10 pt and lines of 14 pt). It is now set as the reference says. **Documents with `Drop cap` change.**
 - A marker the engine draws (`circle`, `square` or `checkbox`) that does not fit in the indent of its list stopped the
   conversion with an internal error (`InternalException`, from a `NullPointerException`) instead of
   `LIST_MARKER_OVERFLOW`. The message names it by the character that stands for it (`'☐'`).

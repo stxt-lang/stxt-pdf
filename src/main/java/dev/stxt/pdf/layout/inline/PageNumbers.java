@@ -5,6 +5,7 @@ import dev.stxt.pdf.fragment.TextLine;
 import dev.stxt.pdf.model.FontFace;
 import dev.stxt.pdf.model.InlineImage;
 import dev.stxt.pdf.model.TextRun;
+import dev.stxt.pdf.model.VerticalMetrics;
 import dev.stxt.pdf.tree.Style;
 
 import java.util.ArrayList;
@@ -75,7 +76,8 @@ public final class PageNumbers {
 
     /**
      * Measures the markers as the probe number {@code probe} (first phase); an image inside the text
-     * ({@link TextMeasurer#imageWidth}) measures what {@code measurer} says.
+     * ({@link TextMeasurer#imageWidth}) measures what {@code measurer} says, and the vertical metrics of a font are
+     * those of {@code measurer} too.
      */
     public static TextMeasurer probing(TextMeasurer measurer, String probe) {
         return new TextMeasurer() {
@@ -88,6 +90,11 @@ public final class PageNumbers {
             @Override
             public double imageWidth(InlineImage image, double height) {
                 return measurer.imageWidth(image, height);
+            }
+
+            @Override
+            public VerticalMetrics vertical(FontFace font) {
+                return measurer.vertical(font);
             }
         };
     }
