@@ -214,7 +214,8 @@ una tabla desde su segunda página y todo lo que hay dentro de un `Page overlay`
 
 Cada zona es una anotación `Link` sin borde, con la acción `URI` o el destino de la página, y como texto (`Contents`) lo que
 dice la caja o el tramo: el texto de la caja y de lo que contiene unido por espacios, o el `Alt` de una imagen. Sin
-texto, lleva el propio destino. Las referencias y los marcadores de página del texto salen sin sustituir. Los destinos internos
+texto, lleva el propio destino, como se escribió. La dirección de la acción `URI` va en ASCII, con lo que no lo es como los
+bytes de su forma UTF-8 con `%` (`Links.ascii`). Las referencias y los marcadores de página del texto salen sin sustituir. Los destinos internos
 se resuelven después de pintar todas las páginas, así que un enlace puede ir hacia delante. Las páginas con anotaciones
 llevan `Tabs: S`, para que el visor recorra los enlaces en el orden de la estructura.
 

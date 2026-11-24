@@ -31,7 +31,8 @@ final class PdfLinks {
     /**
      * A link annotation in the rectangle {@code area} (PDF coordinates) towards
      * {@code destination}. {@code description} is what a screen reader reads; without it, the
-     * destination itself.
+     * destination itself, as the author wrote it. The {@code URI} of the action carries it in ASCII
+     * ({@link Links#ascii}).
      */
     PDAnnotationLink create(PDRectangle area, String destination, String description) {
         PDAnnotationLink annotation = new PDAnnotationLink();
@@ -45,7 +46,8 @@ final class PdfLinks {
             internal.add(new Internal(annotation, Links.target(destination)));
         } else {
             PDActionURI action = new PDActionURI();
-            action.setURI(destination);
+            // In ASCII: PDFBox writes the string as it gets it, and an í would go as a byte of PDFDocEncoding.
+            action.setURI(Links.ascii(destination));
             annotation.setAction(action);
         }
         return annotation;

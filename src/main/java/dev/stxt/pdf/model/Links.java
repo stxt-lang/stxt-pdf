@@ -2,6 +2,7 @@ package dev.stxt.pdf.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 public final class Links {
 
     private static final Set<String> SCHEMES = Set.of("http", "https", "mailto");
+    private static final String HEX = "0123456789ABCDEF";
 
     private Links() {
     }
@@ -68,8 +70,36 @@ public final class Links {
                 return Optional.of("'" + destination + "' has no recipient: mailto:name@domain");
             }
         } else if (uri.getHost() == null || uri.getHost().isEmpty()) {
+            String authority = uri.getAuthority();
+            if (authority != null && authority.chars().anyMatch(c -> c >= 0x80)) {
+                return Optional.of("'" + destination + "' has a host with characters outside ASCII: it is written in "
+                        + "its ASCII form (xn--...)");
+            }
             return Optional.of("'" + destination + "' has no host: " + scheme + "://host/path");
         }
         return Optional.empty();
+    }
+
+    /**
+     * An external target as the PDF carries it: in ASCII, with each character outside it as the bytes of its UTF-8
+     * form, {@code %XX} each ({@code envíos} → {@code env%C3%ADos}). The {@code URI} of an action is 7-bit ASCII (ISO
+     * 32000-1, 12.6.4.7), and this is how an IRI becomes a URI (RFC 3987, 3.1). What is already ASCII stays as it is,
+     * the {@code %XX} the author wrote included, and nothing is normalized: the bytes are those of the document.
+     */
+    public static String ascii(String destination) {
+        if (destination.chars().allMatch(c -> c < 0x80)) {
+            return destination;
+        }
+        StringBuilder out = new StringBuilder(destination.length() + 16);
+        destination.codePoints().forEach(c -> {
+            if (c < 0x80) {
+                out.append((char) c);
+            } else {
+                for (byte b : Character.toString(c).getBytes(StandardCharsets.UTF_8)) {
+                    out.append('%').append(HEX.charAt((b >> 4) & 0xF)).append(HEX.charAt(b & 0xF));
+                }
+            }
+        });
+        return out.toString();
     }
 }

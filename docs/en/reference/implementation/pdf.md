@@ -219,7 +219,8 @@ table from its second page on, and everything inside a `Page overlay`.
 
 Each area is a `Link` annotation without a border, with the `URI` action or the destination on the page, and as text (`Contents`) what
 the box or the run says: the text of the box and of what it contains joined by spaces, or the `Alt` of an image. Without
-text, it carries the destination itself. The references and the page markers of the text come out without being replaced. Internal destinations
+text, it carries the destination itself, as it was written. The address of the `URI` action goes in ASCII, with what is not as the
+bytes of its UTF-8 form with `%` (`Links.ascii`). The references and the page markers of the text come out without being replaced. Internal destinations
 are resolved after all the pages have been painted, so a link can point forward. The pages with annotations
 carry `Tabs: S`, so that the viewer goes through the links in the order of the structure.
 

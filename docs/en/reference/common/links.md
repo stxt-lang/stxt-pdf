@@ -25,6 +25,23 @@ malformed target, one without a host, one with another scheme (`javascript:`, `f
 > **Decision:** only `https`, `http`, `mailto` and `#id`: a PDF should not carry a link that runs or reads something on
 > the machine of whoever opens it. *Rejected alternative:* any URI, with a list of forbidden schemes.
 
+A URL admits characters outside ASCII in the path, the query, the fragment and the recipient. The PDF carries them as
+the bytes of their UTF-8 form, with a `%` each:
+
+| The `Link` | What the PDF carries |
+|---|---|
+| `https://example.com/envíos?de=almacén` | `https://example.com/env%C3%ADos?de=almac%C3%A9n` |
+| `mailto:josé@example.com` | `mailto:jos%C3%A9@example.com` |
+| `https://example.com/a%20b` | `https://example.com/a%20b` |
+
+What is already ASCII does not change. A space is `LINK_SCHEME`: it is written `%20`. A host with characters outside
+ASCII (`https://españa.example`) is `LINK_SCHEME` too: it is written in its ASCII form,
+`https://xn--espaa-rta.example`.
+
+> **Decision:** the URL is written in ASCII, which is what PDF asks of the address of a link, without changing the bytes
+> of the document or normalizing them. *Rejected alternative:* `LINK_SCHEME` for every URL that is not ASCII. The host is
+> not converted: its ASCII form is another encoding, and a host with accents is rare.
+
 ## Targets in the document
 
 `#id` leads to the page and to the top left corner of the box with that `Id` (of its first piece, if it is split), which

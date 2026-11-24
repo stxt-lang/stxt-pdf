@@ -19,6 +19,13 @@ The format follows [Keep a Changelog](http://keepachangelog.com/). While the ver
 - The message of `FIGURE_PROPERTY_WITHOUT_EFFECT` for `Alt` in a `Figure` with a `Barcode` said "an Barcode"; it
   says "a Barcode".
 - `Converter.Builder` had no description in the javadoc since 0.13.0: it sat on a private method above the class.
+- The URL of a link with characters outside ASCII (`https://example.com/envíos`, `mailto:josé@example.com`) is
+  written in the PDF in ASCII, with each of them as the bytes of its UTF-8 form (`env%C3%ADos`), which is what PDF
+  asks of the address of a link. Until now they were written as single bytes of PDFDocEncoding. What a screen reader
+  says of the link does not change, and neither does a URL that was already ASCII. "Target" in the reference of
+  links.
+- A link to a host with characters outside ASCII (`https://españa.example`) was already `LINK_SCHEME`, with a message
+  that said it had no host. The message now says that the host is written in its ASCII form (`xn--...`).
 
 ## [0.20.0] - 2026-11-17
 

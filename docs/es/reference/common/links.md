@@ -25,6 +25,22 @@ sin servidor, con otro esquema (`javascript:`, `file:` o `tel:`) o una ruta rela
 > **Decisión:** solo `https`, `http`, `mailto` y `#id`: un PDF no debería llevar un enlace que ejecute o lea algo en quien
 > lo abre. *Alternativa descartada:* cualquier URI, con una lista de esquemas prohibidos.
 
+Una URL admite caracteres que no son ASCII en la ruta, la consulta, el fragmento y el destinatario. El PDF los lleva como
+los bytes de su forma UTF-8, con un `%` cada uno:
+
+| El `Link` | Lo que lleva el PDF |
+|---|---|
+| `https://example.com/envíos?de=almacén` | `https://example.com/env%C3%ADos?de=almac%C3%A9n` |
+| `mailto:josé@example.com` | `mailto:jos%C3%A9@example.com` |
+| `https://example.com/a%20b` | `https://example.com/a%20b` |
+
+Lo que ya es ASCII no cambia. Un espacio es `LINK_SCHEME`: se escribe `%20`. Un servidor con caracteres que no son ASCII
+(`https://españa.example`) también es `LINK_SCHEME`: se escribe en su forma ASCII, `https://xn--espaa-rta.example`.
+
+> **Decisión:** la URL se escribe en ASCII, que es lo que PDF pide a la dirección de un enlace, sin cambiar los bytes del
+> documento ni normalizarlos. *Alternativa descartada:* `LINK_SCHEME` en toda URL que no sea ASCII. El servidor no se
+> convierte: su forma ASCII es otra codificación, y un servidor con acentos es raro.
+
 ## Destinos del documento
 
 `#id` lleva a la página y a la esquina superior izquierda de la caja con ese `Id` (de su primer trozo, si está partida),

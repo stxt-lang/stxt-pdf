@@ -12,10 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.COSObjectable;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -124,6 +127,40 @@ class PdfLinksTest {
             String extracted = new PDFTextStripper().getText(pdf);
             assertTrue(extracted.contains("Visita la web hoy."), extracted);
         }
+    }
+
+    /**
+     * The {@code URI} of an action is 7-bit ASCII (ISO 32000-1, 12.6.4.7): what is not goes as the bytes of its UTF-8
+     * form, {@code %XX} each, in a box and in a Markdown run alike. What a screen reader says of the link, its
+     * {@code Contents}, is still what the author wrote (reference/common/links.md).
+     */
+    @Test
+    void aUrlWithNonAsciiCharactersIsWrittenPercentEncoded() throws Exception {
+        try (PDDocument pdf = Loader.loadPDF(Pdfs.of(DOCUMENT
+                + "\tText: Envíos\n\t\tLink: https://example.com/envíos?de=almacén#sección\n"
+                + "\tText: José\n\t\tLink: mailto:josé@example.com?subject=Año\n"
+                + "\tText: Ya escrita\n\t\tLink: https://example.com/a%20b?x=%C3%AD&y=1\n"
+                + "\tBlock:\n\t\tLink: https://example.com/año\n\t\tBox:\n\t\t\tHeight: 10\n"
+                + "\tMarkdown:\n\t\tContent >>\n\t\t\tVéase [el almacén](https://example.com/almacén).\n"))) {
+            List<PDAnnotationLink> links = links(pdf, 0);
+            assertEquals(List.of("https://example.com/env%C3%ADos?de=almac%C3%A9n#secci%C3%B3n",
+                    "mailto:jos%C3%A9@example.com?subject=A%C3%B1o", "https://example.com/a%20b?x=%C3%AD&y=1",
+                    "https://example.com/a%C3%B1o", "https://example.com/almac%C3%A9n"),
+                    links.stream().map(PdfLinksTest::rawUri).toList());
+            assertEquals("Envíos", links.get(0).getContents());
+            // Without a text of its own, the link is announced by its target, as it was written.
+            assertEquals("https://example.com/año", links.get(3).getContents());
+            assertEquals("el almacén", links.get(4).getContents());
+        }
+    }
+
+    /** The bytes of the {@code URI} of the action of a link, one character each: they have to be ASCII. */
+    private static String rawUri(PDAnnotationLink link) {
+        byte[] bytes = ((COSString) link.getAction().getCOSObject().getDictionaryObject(COSName.URI)).getBytes();
+        for (byte b : bytes) {
+            assertTrue(b > 0x20 && b < 0x7F, () -> "Not ASCII: " + new String(bytes, StandardCharsets.ISO_8859_1));
+        }
+        return new String(bytes, StandardCharsets.US_ASCII);
     }
 
     /**
